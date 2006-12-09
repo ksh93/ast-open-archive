@@ -40,8 +40,10 @@
 #define _std_strtol	1
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide ftruncate mount readlink sbrk strmode truncate utimes __utimes
+__STDPP__directive pragma pp:hide fchown ftruncate mount readlink sbrk strmode truncate utimes __utimes
 #else
+#undef	fchown
+#define fchown		______fchown
 #undef	ftruncate
 #define ftruncate	______ftruncate
 #undef	mount
@@ -97,8 +99,9 @@ extern char*		strerror();
 #include "msg.h"
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide ftruncate mount readlink sbrk strmode truncate utimes __utimes
+__STDPP__directive pragma pp:nohide fchown ftruncate mount readlink sbrk strmode truncate utimes __utimes
 #else
+#undef	fchown
 #undef	ftruncate
 #undef	mount
 #undef	readlink

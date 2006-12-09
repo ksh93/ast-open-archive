@@ -225,25 +225,21 @@ prev ${INSTALLROOT}/lib/dss
 make data/netflow-cflow.dss
 done data/netflow-cflow.dss
 exec - test '' = 'data/netflow-cflow.dss' || ${STDCMP} 2>/dev/null -s data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss.old 2>/dev/null || true; ${STDCP} data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/dss/netflow-cflow.dss) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/dss/netflow-cflow.dss generated
 make ${INSTALLROOT}/lib/dss/netflow-map.dss
 make data/netflow-map.dss
 done data/netflow-map.dss
 exec - test '' = 'data/netflow-map.dss' || ${STDCMP} 2>/dev/null -s data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss.old 2>/dev/null || true; ${STDCP} data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/dss/netflow-map.dss) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/dss/netflow-map.dss generated
 make ${INSTALLROOT}/lib/dss/netflow-sample.dss
 make data/netflow-sample.dss
 done data/netflow-sample.dss
 exec - test '' = 'data/netflow-sample.dss' || ${STDCMP} 2>/dev/null -s data/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss.old 2>/dev/null || true; ${STDCP} data/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/dss/netflow-sample.dss) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/dss/netflow-sample.dss generated
 make ${INSTALLROOT}/lib/dss/ip.map
 make data/ip.map
 done data/ip.map
 exec - test '' = 'data/ip.map' || ${STDCMP} 2>/dev/null -s data/ip.map ${INSTALLROOT}/lib/dss/ip.map || { ${STDMV} ${INSTALLROOT}/lib/dss/ip.map ${INSTALLROOT}/lib/dss/ip.map.old 2>/dev/null || true; ${STDCP} data/ip.map ${INSTALLROOT}/lib/dss/ip.map  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/dss/ip.map) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/dss/ip.map generated
 make ${INSTALLROOT}/lib/pz
 exec - if	silent test ! -d ${INSTALLROOT}/lib/pz
@@ -255,7 +251,6 @@ prev ${INSTALLROOT}/lib/pz
 make dss-netflow.prt
 done dss-netflow.prt
 exec - test '' = 'dss-netflow.prt' || ${STDCMP} 2>/dev/null -s dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt || { ${STDMV} ${INSTALLROOT}/lib/pz/dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt.old 2>/dev/null || true; ${STDCP} dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/pz/dss-netflow.prt) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/pz/dss-netflow.prt generated
 done install virtual
 make test

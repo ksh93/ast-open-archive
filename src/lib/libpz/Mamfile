@@ -337,7 +337,6 @@ prev ${INSTALLROOT}/man/man3
 make pzip.3
 done pzip.3
 exec - test '' = 'pzip.3' || ${STDCMP} 2>/dev/null -s pzip.3 ${INSTALLROOT}/man/man3/pzip.3 || { ${STDMV} ${INSTALLROOT}/man/man3/pzip.3 ${INSTALLROOT}/man/man3/pzip.3.old 2>/dev/null || true; ${STDCP} pzip.3 ${INSTALLROOT}/man/man3/pzip.3  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/man/man3/pzip.3) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man3/pzip.3 generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
@@ -348,7 +347,6 @@ make ${INSTALLROOT}/lib/lib/pz
 prev ${INSTALLROOT}/lib/lib
 prev pz.req
 exec - test '' = 'pz.req' || ${STDCMP} 2>/dev/null -s pz.req ${INSTALLROOT}/lib/lib/pz || { ${STDMV} ${INSTALLROOT}/lib/lib/pz ${INSTALLROOT}/lib/lib/pz.old 2>/dev/null || true; ${STDCP} pz.req ${INSTALLROOT}/lib/lib/pz  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/pz) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/pz generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

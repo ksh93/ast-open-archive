@@ -224,7 +224,6 @@ make ${INSTALLROOT}/lib/lib/dsstime_t
 prev ${INSTALLROOT}/lib/lib
 prev dsstime_t.req
 exec - test '' = 'dsstime_t.req' || ${STDCMP} 2>/dev/null -s dsstime_t.req ${INSTALLROOT}/lib/lib/dsstime_t || { ${STDMV} ${INSTALLROOT}/lib/lib/dsstime_t ${INSTALLROOT}/lib/lib/dsstime_t.old 2>/dev/null || true; ${STDCP} dsstime_t.req ${INSTALLROOT}/lib/lib/dsstime_t  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/dsstime_t) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/dsstime_t generated
 done install virtual
 make test

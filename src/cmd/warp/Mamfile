@@ -74,4 +74,164 @@ meta FEATURE/lib features/%>FEATURE/% features/lib lib
 make features/lib
 done features/lib
 prev warp.req
-make +ldll
+bind -ldll
+bind -last
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast}  : run features/lib
+done FEATURE/lib generated
+make ${PACKAGE_ast_INCLUDE}/times.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+make ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
+done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
+done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/times.h
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h
+make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
+done ${PACKAGE_ast_INCLUDE}/dlldefs.h
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done warp.c
+meta warp.o %.c>%.o warp.c warp
+prev warp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c warp.c
+done warp.o generated
+exec - ${AR} cr libwarp.a warp.o
+exec - (ranlib libwarp.a) >/dev/null 2>&1 || true
+done libwarp.a generated
+make warp.sh
+done warp.sh
+meta warp %.sh>% warp.sh warp
+prev warp.sh
+exec - case static,port:$OPTIND:$RANDOM in
+exec - ?*:*:*|*::*|*:*:$RANDOM)
+exec - 	;;
+exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= $SHELL -n warp.sh
+exec - 	fi
+exec - 	;;
+exec - esac
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 208 in
+exec - 	0)	cp warp.sh warp
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < warp.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
+exec - 		esac
+exec - 		cat - warp.sh <<'!'
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?warp]" _PACKAGE_ast=1
+exec - !
+exec - 		} > warp
+exec - 		;;
+exec - 	esac
+exec - 	;;
+exec - *)	cat - warp.sh > warp <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?warp]" _PACKAGE_ast=1
+exec - !
+exec - 	;;
+exec - esac
+exec - silent test -w warp -a -x warp || chmod u+w,+x warp
+done warp generated
+prev libwarp.a archive
+make ${INSTALLROOT}/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib
+exec - fi
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libwarp.a archive
+prev ${INSTALLROOT}/lib
+prev libwarp.a archive
+exec - test '' = 'libwarp.a' || ${STDCMP} 2>/dev/null -s libwarp.a ${INSTALLROOT}/lib/libwarp.a || { ${STDMV} ${INSTALLROOT}/lib/libwarp.a ${INSTALLROOT}/lib/libwarp.a.old 2>/dev/null || true; ${STDCP} libwarp.a ${INSTALLROOT}/lib/libwarp.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libwarp.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libwarp.a generated
+make ${INSTALLROOT}/lib/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib/lib
+exec - fi
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/warp
+prev ${INSTALLROOT}/lib/lib
+prev warp.req
+exec - test '' = 'warp.req' || ${STDCMP} 2>/dev/null -s warp.req ${INSTALLROOT}/lib/lib/warp || { ${STDMV} ${INSTALLROOT}/lib/lib/warp ${INSTALLROOT}/lib/lib/warp.old 2>/dev/null || true; ${STDCP} warp.req ${INSTALLROOT}/lib/lib/warp  		    		    ;}
+done ${INSTALLROOT}/lib/lib/warp generated
+make ${INSTALLROOT}/bin
+exec - if	silent test ! -d ${INSTALLROOT}/bin
+exec - then	mkdir -p ${INSTALLROOT}/bin
+exec - fi
+done ${INSTALLROOT}/bin generated
+make ${INSTALLROOT}/bin/warp
+prev ${INSTALLROOT}/bin
+prev warp
+exec - test '' = 'warp' || ${STDCMP} 2>/dev/null -s warp ${INSTALLROOT}/bin/warp || { ${STDMV} ${INSTALLROOT}/bin/warp ${INSTALLROOT}/bin/warp.old 2>/dev/null || true; ${STDCP} warp ${INSTALLROOT}/bin/warp  		    		    ;}
+done ${INSTALLROOT}/bin/warp generated
+done install virtual
+make test
+make test.warp
+make warp.tst
+done warp.tst
+prev warp
+exec - regress  warp.tst warp
+done test.warp virtual
+done test dontcare virtual

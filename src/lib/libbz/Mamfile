@@ -239,7 +239,6 @@ make ${INSTALLROOT}/lib/lib/bz
 prev ${INSTALLROOT}/lib/lib
 prev bz.req
 exec - test '' = 'bz.req' || ${STDCMP} 2>/dev/null -s bz.req ${INSTALLROOT}/lib/lib/bz || { ${STDMV} ${INSTALLROOT}/lib/lib/bz ${INSTALLROOT}/lib/lib/bz.old 2>/dev/null || true; ${STDCP} bz.req ${INSTALLROOT}/lib/lib/bz  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/bz) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/bz generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

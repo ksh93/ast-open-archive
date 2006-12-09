@@ -311,7 +311,6 @@ make ${INSTALLROOT}/lib/lib/codex
 prev ${INSTALLROOT}/lib/lib
 prev codex.req
 exec - test '' = 'codex.req' || ${STDCMP} 2>/dev/null -s codex.req ${INSTALLROOT}/lib/lib/codex || { ${STDMV} ${INSTALLROOT}/lib/lib/codex ${INSTALLROOT}/lib/lib/codex.old 2>/dev/null || true; ${STDCP} codex.req ${INSTALLROOT}/lib/lib/codex  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/codex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/codex generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

@@ -4516,6 +4516,9 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 					case 'U':
 						aux |= VAL_UNBOUND;
 						continue;
+					case 'X':
+						exp = 1;
+						continue;
 					default:
 						if (*ed == del)
 						{

@@ -132,10 +132,9 @@ prev banner.c
 setv LICENSE -DLICENSE="since=1989,author=dgk"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c banner.c
 done banner.o generated
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
+bind -last
 setv LICENSE -DLICENSE="since=1989,author=dgk"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o banner banner.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o banner banner.o ${mam_libast}
 done banner generated
 make dd
 make dd.o
@@ -170,8 +169,7 @@ meta dd.o %.c>%.o dd.c dd
 prev dd.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c dd.c
 done dd.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o dd dd.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o dd dd.o ${mam_libast}
 done dd generated
 make df
 make df.o
@@ -196,8 +194,7 @@ meta df.o %.c>%.o df.c df
 prev df.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c df.c
 done df.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o df df.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o df df.o ${mam_libast}
 done df generated
 make du
 make du.o
@@ -223,8 +220,7 @@ meta du.o %.c>%.o du.c du
 prev du.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c du.c
 done du.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o du du.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o du du.o ${mam_libast}
 done du generated
 make file
 make file.o
@@ -241,8 +237,7 @@ meta file.o %.c>%.o file.c file
 prev file.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c file.c
 done file.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o file file.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o file file.o ${mam_libast}
 done file generated
 make iconv
 make iconv.o
@@ -255,8 +250,7 @@ meta iconv.o %.c>%.o iconv.c iconv
 prev iconv.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c iconv.c
 done iconv.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o iconv iconv.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o iconv iconv.o ${mam_libast}
 done iconv generated
 make locale
 make locale.o
@@ -270,8 +264,7 @@ make FEATURE/locales implicit
 meta FEATURE/locales features/%>FEATURE/% features/locales locales
 make features/locales
 done features/locales
-prev ${mam_libast} archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/locales
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/locales
 done FEATURE/locales generated
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/tm.h implicit
@@ -296,8 +289,7 @@ meta locale.o %.c>%.o locale.c locale
 prev locale.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c locale.c
 done locale.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o locale locale.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o locale locale.o ${mam_libast}
 done locale generated
 make ls
 make ls.o
@@ -319,8 +311,7 @@ meta ls.o %.c>%.o ls.c ls
 prev ls.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c ls.c
 done ls.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o ls ls.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o ls ls.o ${mam_libast}
 done ls generated
 make mesg
 make mesg.o
@@ -333,9 +324,8 @@ prev mesg.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c mesg.c
 done mesg.o generated
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o mesg mesg.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mesg mesg.o ${mam_libast}
 done mesg generated
 make ast_mount
 make mount.o
@@ -350,8 +340,7 @@ make FEATURE/unmount implicit
 meta FEATURE/unmount features/%>FEATURE/% features/unmount unmount
 make features/unmount
 done features/unmount
-prev ${mam_libast} archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/unmount
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/unmount
 done FEATURE/unmount generated
 done mount.c
 meta mount.o %.c>%.o mount.c mount
@@ -359,9 +348,8 @@ prev mount.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c mount.c
 done mount.o generated
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o ast_mount mount.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o ast_mount mount.o ${mam_libast}
 done ast_mount generated
 make ps
 make ps.o
@@ -401,8 +389,7 @@ make FEATURE/procfs implicit
 meta FEATURE/procfs features/%>FEATURE/% features/procfs procfs
 make features/procfs
 done features/procfs
-prev ${mam_libast} archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/procfs
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/procfs
 done FEATURE/procfs dontcare generated
 prev pss.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_windows.h implicit
@@ -513,9 +500,8 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_
 done pss-info.o generated
 make ${mam_libkvm} archive
 done ${mam_libkvm} dontcare virtual
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o ps ps.o pss.o pss-null.o pss-procfs.o pss-getprocs.o pss-cygwin.o pss-kvm.o pss-pstat.o pss-ps.o pss-info.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o ps ps.o pss.o pss-null.o pss-procfs.o pss-getprocs.o pss-cygwin.o pss-kvm.o pss-pstat.o pss-ps.o pss-info.o ${mam_libast}
 done ps generated
 make shar
 make shar.sh
@@ -566,9 +552,8 @@ prev split.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c split.c
 done split.o generated
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o split split.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o split split.o ${mam_libast}
 done split generated
 make csplit
 prev split
@@ -599,10 +584,8 @@ meta sum.o %.c>%.o sum.c sum
 prev sum.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c sum.c
 done sum.o generated
-prev sum
 bind -lsum
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.}  -o sum sum.o ${mam_libsum}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o sum sum.o ${mam_libsum} ${mam_libast}
 done sum generated
 make cksum
 prev sum
@@ -630,8 +613,7 @@ meta touch.o %.c>%.o touch.c touch
 prev touch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c touch.c
 done touch.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o touch touch.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o touch touch.o ${mam_libast}
 done touch generated
 make tsort
 make tsort.o
@@ -645,9 +627,8 @@ prev tsort.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c tsort.c
 done tsort.o generated
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o tsort tsort.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o tsort tsort.o ${mam_libast}
 done tsort generated
 make unexpand
 make unexpand.o
@@ -659,9 +640,8 @@ prev unexpand.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"\" -c unexpand.c
 done unexpand.o generated
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o unexpand unexpand.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o unexpand unexpand.o ${mam_libast}
 done unexpand generated
 make expand
 prev unexpand
@@ -679,67 +659,54 @@ make ${INSTALLROOT}/bin/banner
 prev ${INSTALLROOT}/bin
 prev banner
 exec - test '' = 'banner' || ${STDCMP} 2>/dev/null -s banner ${INSTALLROOT}/bin/banner || { ${STDMV} ${INSTALLROOT}/bin/banner ${INSTALLROOT}/bin/banner.old 2>/dev/null || true; ${STDCP} banner ${INSTALLROOT}/bin/banner  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/banner) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/banner generated
 make ${INSTALLROOT}/bin/dd
 prev dd
 exec - test '' = 'dd' || ${STDCMP} 2>/dev/null -s dd ${INSTALLROOT}/bin/dd || { ${STDMV} ${INSTALLROOT}/bin/dd ${INSTALLROOT}/bin/dd.old 2>/dev/null || true; ${STDCP} dd ${INSTALLROOT}/bin/dd  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/dd) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/dd generated
 make ${INSTALLROOT}/bin/df
 prev df
 exec - test '' = 'df' || ${STDCMP} 2>/dev/null -s df ${INSTALLROOT}/bin/df || { ${STDMV} ${INSTALLROOT}/bin/df ${INSTALLROOT}/bin/df.old 2>/dev/null || true; ${STDCP} df ${INSTALLROOT}/bin/df  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/df) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/df generated
 make ${INSTALLROOT}/bin/du
 prev du
 exec - test '' = 'du' || ${STDCMP} 2>/dev/null -s du ${INSTALLROOT}/bin/du || { ${STDMV} ${INSTALLROOT}/bin/du ${INSTALLROOT}/bin/du.old 2>/dev/null || true; ${STDCP} du ${INSTALLROOT}/bin/du  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/du) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/du generated
 make ${INSTALLROOT}/bin/file
 prev file
 exec - test '' = 'file' || ${STDCMP} 2>/dev/null -s file ${INSTALLROOT}/bin/file || { ${STDMV} ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; ${STDCP} file ${INSTALLROOT}/bin/file  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/file) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/file generated
 make ${INSTALLROOT}/bin/iconv
 prev iconv
 exec - test '' = 'iconv' || ${STDCMP} 2>/dev/null -s iconv ${INSTALLROOT}/bin/iconv || { ${STDMV} ${INSTALLROOT}/bin/iconv ${INSTALLROOT}/bin/iconv.old 2>/dev/null || true; ${STDCP} iconv ${INSTALLROOT}/bin/iconv  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/iconv) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/iconv generated
 make ${INSTALLROOT}/bin/locale
 prev locale
 exec - test '' = 'locale' || ${STDCMP} 2>/dev/null -s locale ${INSTALLROOT}/bin/locale || { ${STDMV} ${INSTALLROOT}/bin/locale ${INSTALLROOT}/bin/locale.old 2>/dev/null || true; ${STDCP} locale ${INSTALLROOT}/bin/locale  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/locale) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/locale generated
 make ${INSTALLROOT}/bin/ls
 prev ls
 exec - test '' = 'ls' || ${STDCMP} 2>/dev/null -s ls ${INSTALLROOT}/bin/ls || { ${STDMV} ${INSTALLROOT}/bin/ls ${INSTALLROOT}/bin/ls.old 2>/dev/null || true; ${STDCP} ls ${INSTALLROOT}/bin/ls  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/ls) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/ls generated
 make ${INSTALLROOT}/bin/mesg
 prev mesg
 exec - test '' = 'mesg' || ${STDCMP} 2>/dev/null -s mesg ${INSTALLROOT}/bin/mesg || { ${STDMV} ${INSTALLROOT}/bin/mesg ${INSTALLROOT}/bin/mesg.old 2>/dev/null || true; ${STDCP} mesg ${INSTALLROOT}/bin/mesg  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mesg) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mesg generated
 make ${INSTALLROOT}/bin/ast_mount
 prev ast_mount
 exec - test '' = 'ast_mount' || ${STDCMP} 2>/dev/null -s ast_mount ${INSTALLROOT}/bin/ast_mount || { ${STDMV} ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; ${STDCP} ast_mount ${INSTALLROOT}/bin/ast_mount  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/ast_mount) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/ast_mount generated
 make ${INSTALLROOT}/bin/ps
 prev ps
 exec - test '' = 'ps' || ${STDCMP} 2>/dev/null -s ps ${INSTALLROOT}/bin/ps || { ${STDMV} ${INSTALLROOT}/bin/ps ${INSTALLROOT}/bin/ps.old 2>/dev/null || true; ${STDCP} ps ${INSTALLROOT}/bin/ps  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/ps) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/ps generated
 make ${INSTALLROOT}/bin/shar
 prev shar
 exec - test '' = 'shar' || ${STDCMP} 2>/dev/null -s shar ${INSTALLROOT}/bin/shar || { ${STDMV} ${INSTALLROOT}/bin/shar ${INSTALLROOT}/bin/shar.old 2>/dev/null || true; ${STDCP} shar ${INSTALLROOT}/bin/shar  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/shar) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/shar generated
 make ${INSTALLROOT}/bin/split
 prev split
 exec - test '' = 'split' || ${STDCMP} 2>/dev/null -s split ${INSTALLROOT}/bin/split || { ${STDMV} ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/split.old 2>/dev/null || true; ${STDCP} split ${INSTALLROOT}/bin/split  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/split) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/split generated
 make ${INSTALLROOT}/bin/csplit
 prev ${INSTALLROOT}/bin/split
@@ -751,7 +718,6 @@ done ${INSTALLROOT}/bin/csplit generated
 make ${INSTALLROOT}/bin/sum
 prev sum
 exec - test '' = 'sum' || ${STDCMP} 2>/dev/null -s sum ${INSTALLROOT}/bin/sum || { ${STDMV} ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/sum.old 2>/dev/null || true; ${STDCP} sum ${INSTALLROOT}/bin/sum  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/sum) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/sum generated
 make ${INSTALLROOT}/bin/cksum
 prev ${INSTALLROOT}/bin/sum
@@ -770,17 +736,14 @@ done ${INSTALLROOT}/bin/md5sum generated
 make ${INSTALLROOT}/bin/touch
 prev touch
 exec - test '' = 'touch' || ${STDCMP} 2>/dev/null -s touch ${INSTALLROOT}/bin/touch || { ${STDMV} ${INSTALLROOT}/bin/touch ${INSTALLROOT}/bin/touch.old 2>/dev/null || true; ${STDCP} touch ${INSTALLROOT}/bin/touch  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/touch) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/touch generated
 make ${INSTALLROOT}/bin/tsort
 prev tsort
 exec - test '' = 'tsort' || ${STDCMP} 2>/dev/null -s tsort ${INSTALLROOT}/bin/tsort || { ${STDMV} ${INSTALLROOT}/bin/tsort ${INSTALLROOT}/bin/tsort.old 2>/dev/null || true; ${STDCP} tsort ${INSTALLROOT}/bin/tsort  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/tsort) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/tsort generated
 make ${INSTALLROOT}/bin/unexpand
 prev unexpand
 exec - test '' = 'unexpand' || ${STDCMP} 2>/dev/null -s unexpand ${INSTALLROOT}/bin/unexpand || { ${STDMV} ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/unexpand.old 2>/dev/null || true; ${STDCP} unexpand ${INSTALLROOT}/bin/unexpand  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/unexpand) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/unexpand generated
 make ${INSTALLROOT}/bin/expand
 prev ${INSTALLROOT}/bin/unexpand

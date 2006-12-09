@@ -232,11 +232,9 @@ meta mamnew.o %.c>%.o mamnew.c mamnew
 prev mamnew.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?mam]"\" -c mamnew.c
 done mamnew.o generated
-make ${mam_libmam} archive
-done ${mam_libmam} dontcare virtual
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o mamnew mamnew.o
+bind -lmam
+bind -last
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mamnew mamnew.o ${mam_libmam} ${mam_libast}
 done mamnew generated
 make mamold
 make mamold.o
@@ -255,9 +253,7 @@ meta mamold.o %.c>%.o mamold.c mamold
 prev mamold.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?mam]"\" -c mamold.c
 done mamold.o generated
-prev ${mam_libmam} archive
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o mamold mamold.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mamold mamold.o ${mam_libmam} ${mam_libast}
 done mamold generated
 make mamsh
 make mamsh.sh
@@ -305,8 +301,7 @@ meta mamstate.o %.c>%.o mamstate.c mamstate
 prev mamstate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE}  -c mamstate.c
 done mamstate.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o mamstate mamstate.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mamstate mamstate.o ${mam_libast}
 done mamstate generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -317,37 +312,30 @@ make ${INSTALLROOT}/bin/mamdag
 prev ${INSTALLROOT}/bin
 prev mamdag
 exec - test '' = 'mamdag' || ${STDCMP} 2>/dev/null -s mamdag ${INSTALLROOT}/bin/mamdag || { ${STDMV} ${INSTALLROOT}/bin/mamdag ${INSTALLROOT}/bin/mamdag.old 2>/dev/null || true; ${STDCP} mamdag ${INSTALLROOT}/bin/mamdag  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamdag) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamdag generated
 make ${INSTALLROOT}/bin/mamdot
 prev mamdot
 exec - test '' = 'mamdot' || ${STDCMP} 2>/dev/null -s mamdot ${INSTALLROOT}/bin/mamdot || { ${STDMV} ${INSTALLROOT}/bin/mamdot ${INSTALLROOT}/bin/mamdot.old 2>/dev/null || true; ${STDCP} mamdot ${INSTALLROOT}/bin/mamdot  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamdot) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamdot generated
 make ${INSTALLROOT}/bin/mamexec
 prev mamexec
 exec - test '' = 'mamexec' || ${STDCMP} 2>/dev/null -s mamexec ${INSTALLROOT}/bin/mamexec || { ${STDMV} ${INSTALLROOT}/bin/mamexec ${INSTALLROOT}/bin/mamexec.old 2>/dev/null || true; ${STDCP} mamexec ${INSTALLROOT}/bin/mamexec  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamexec) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamexec generated
 make ${INSTALLROOT}/bin/mamnew
 prev mamnew
 exec - test '' = 'mamnew' || ${STDCMP} 2>/dev/null -s mamnew ${INSTALLROOT}/bin/mamnew || { ${STDMV} ${INSTALLROOT}/bin/mamnew ${INSTALLROOT}/bin/mamnew.old 2>/dev/null || true; ${STDCP} mamnew ${INSTALLROOT}/bin/mamnew  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamnew) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamnew generated
 make ${INSTALLROOT}/bin/mamold
 prev mamold
 exec - test '' = 'mamold' || ${STDCMP} 2>/dev/null -s mamold ${INSTALLROOT}/bin/mamold || { ${STDMV} ${INSTALLROOT}/bin/mamold ${INSTALLROOT}/bin/mamold.old 2>/dev/null || true; ${STDCP} mamold ${INSTALLROOT}/bin/mamold  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamold) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamold generated
 make ${INSTALLROOT}/bin/mamsh
 prev mamsh
 exec - test '' = 'mamsh' || ${STDCMP} 2>/dev/null -s mamsh ${INSTALLROOT}/bin/mamsh || { ${STDMV} ${INSTALLROOT}/bin/mamsh ${INSTALLROOT}/bin/mamsh.old 2>/dev/null || true; ${STDCP} mamsh ${INSTALLROOT}/bin/mamsh  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamsh) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamsh generated
 make ${INSTALLROOT}/bin/mamstate
 prev mamstate
 exec - test '' = 'mamstate' || ${STDCMP} 2>/dev/null -s mamstate ${INSTALLROOT}/bin/mamstate || { ${STDMV} ${INSTALLROOT}/bin/mamstate ${INSTALLROOT}/bin/mamstate.old 2>/dev/null || true; ${STDCP} mamstate ${INSTALLROOT}/bin/mamstate  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamstate) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamstate generated
 done install virtual
 make test

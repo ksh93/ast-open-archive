@@ -179,7 +179,6 @@ make ${INSTALLROOT}/lib/lib/mam
 prev ${INSTALLROOT}/lib/lib
 prev mam.req
 exec - test '' = 'mam.req' || ${STDCMP} 2>/dev/null -s mam.req ${INSTALLROOT}/lib/lib/mam || { ${STDMV} ${INSTALLROOT}/lib/lib/mam ${INSTALLROOT}/lib/lib/mam.old 2>/dev/null || true; ${STDCP} mam.req ${INSTALLROOT}/lib/lib/mam  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/mam) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/mam generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

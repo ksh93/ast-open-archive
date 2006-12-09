@@ -166,11 +166,9 @@ meta msgcpp.o %.c>%.o msgcpp.c msgcpp
 prev msgcpp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msgcpp.c
 done msgcpp.o generated
-make ${mam_libpp} archive
-done ${mam_libpp} dontcare virtual
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o msgcpp msgcpp.o
+bind -lpp
+bind -last
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o msgcpp msgcpp.o ${mam_libpp} ${mam_libast}
 done msgcpp generated
 make msgcc
 make msgcc.sh
@@ -220,8 +218,7 @@ meta msgcvt.o %.c>%.o msgcvt.c msgcvt
 prev msgcvt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msgcvt.c
 done msgcvt.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o msgcvt msgcvt.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o msgcvt msgcvt.o ${mam_libast}
 done msgcvt generated
 make msggen
 make msggen.o
@@ -238,8 +235,7 @@ meta msggen.o %.c>%.o msggen.c msggen
 prev msggen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msggen.c
 done msggen.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o msggen msggen.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o msggen msggen.o ${mam_libast}
 done msggen generated
 make msgget
 make msgget.o
@@ -252,8 +248,7 @@ meta msgget.o %.c>%.o msgget.c msgget
 prev msgget.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msgget.c
 done msgget.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o msgget msgget.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o msgget msgget.o ${mam_libast}
 done msgget generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -264,32 +259,26 @@ make ${INSTALLROOT}/bin/msgadmin
 prev ${INSTALLROOT}/bin
 prev msgadmin
 exec - test '' = 'msgadmin' || ${STDCMP} 2>/dev/null -s msgadmin ${INSTALLROOT}/bin/msgadmin || { ${STDMV} ${INSTALLROOT}/bin/msgadmin ${INSTALLROOT}/bin/msgadmin.old 2>/dev/null || true; ${STDCP} msgadmin ${INSTALLROOT}/bin/msgadmin  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/msgadmin) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/msgadmin generated
 make ${INSTALLROOT}/bin/msgcpp
 prev msgcpp
 exec - test '' = 'msgcpp' || ${STDCMP} 2>/dev/null -s msgcpp ${INSTALLROOT}/bin/msgcpp || { ${STDMV} ${INSTALLROOT}/bin/msgcpp ${INSTALLROOT}/bin/msgcpp.old 2>/dev/null || true; ${STDCP} msgcpp ${INSTALLROOT}/bin/msgcpp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/msgcpp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/msgcpp generated
 make ${INSTALLROOT}/bin/msgcc
 prev msgcc
 exec - test '' = 'msgcc' || ${STDCMP} 2>/dev/null -s msgcc ${INSTALLROOT}/bin/msgcc || { ${STDMV} ${INSTALLROOT}/bin/msgcc ${INSTALLROOT}/bin/msgcc.old 2>/dev/null || true; ${STDCP} msgcc ${INSTALLROOT}/bin/msgcc  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/msgcc) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/msgcc generated
 make ${INSTALLROOT}/bin/msgcvt
 prev msgcvt
 exec - test '' = 'msgcvt' || ${STDCMP} 2>/dev/null -s msgcvt ${INSTALLROOT}/bin/msgcvt || { ${STDMV} ${INSTALLROOT}/bin/msgcvt ${INSTALLROOT}/bin/msgcvt.old 2>/dev/null || true; ${STDCP} msgcvt ${INSTALLROOT}/bin/msgcvt  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/msgcvt) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/msgcvt generated
 make ${INSTALLROOT}/bin/msggen
 prev msggen
 exec - test '' = 'msggen' || ${STDCMP} 2>/dev/null -s msggen ${INSTALLROOT}/bin/msggen || { ${STDMV} ${INSTALLROOT}/bin/msggen ${INSTALLROOT}/bin/msggen.old 2>/dev/null || true; ${STDCP} msggen ${INSTALLROOT}/bin/msggen  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/msggen) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/msggen generated
 make ${INSTALLROOT}/bin/msgget
 prev msgget
 exec - test '' = 'msgget' || ${STDCMP} 2>/dev/null -s msgget ${INSTALLROOT}/bin/msgget || { ${STDMV} ${INSTALLROOT}/bin/msgget ${INSTALLROOT}/bin/msgget.old 2>/dev/null || true; ${STDCP} msgget ${INSTALLROOT}/bin/msgget  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/msgget) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/msgget generated
 done install virtual
 make test

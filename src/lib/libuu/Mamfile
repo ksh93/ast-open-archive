@@ -187,7 +187,6 @@ make ${INSTALLROOT}/lib/lib/uu
 prev ${INSTALLROOT}/lib/lib
 prev uu.req
 exec - test '' = 'uu.req' || ${STDCMP} 2>/dev/null -s uu.req ${INSTALLROOT}/lib/lib/uu || { ${STDMV} ${INSTALLROOT}/lib/lib/uu ${INSTALLROOT}/lib/lib/uu.old 2>/dev/null || true; ${STDCP} uu.req ${INSTALLROOT}/lib/lib/uu  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/uu) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/uu generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

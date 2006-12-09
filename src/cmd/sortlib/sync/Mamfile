@@ -184,7 +184,6 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ssexit.h
 exec - test '' = 'ssexit.h' || ${STDCMP} 2>/dev/null -s ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h.old 2>/dev/null || true; ${STDCP} ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_INCLUDE}/ssexit.h) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_INCLUDE}/ssexit.h generated
 done install virtual
 make test

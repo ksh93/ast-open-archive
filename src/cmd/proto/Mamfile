@@ -160,9 +160,8 @@ meta proto.o %.c>%.o proto.c proto
 prev proto.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libpp -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?proto]"\" -c proto.c
 done proto.o generated
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o proto proto.o
+bind -last
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o proto proto.o ${mam_libast}
 done proto generated
 make mamake
 make mamake.o
@@ -177,9 +176,8 @@ prev ../INIT/mamake.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/mamake.c
 done mamake.o generated
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o mamake mamake.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mamake mamake.o ${mam_libast}
 done mamake generated
 make ratz
 make ratz.o
@@ -205,8 +203,7 @@ meta ratz.o %.c>%.o ../INIT/ratz.c ratz
 prev ../INIT/ratz.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ../INIT/ratz.c
 done ratz.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o ratz ratz.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o ratz ratz.o ${mam_libast}
 done ratz generated
 make release
 make release.o
@@ -220,9 +217,8 @@ prev ../INIT/release.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/release.c
 done release.o generated
-prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o release release.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o release release.o ${mam_libast}
 done release generated
 make sear
 make sear.sh
@@ -309,32 +305,26 @@ make ${INSTALLROOT}/bin/proto
 prev ${INSTALLROOT}/bin
 prev proto
 exec - test '' = 'proto' || ${STDCMP} 2>/dev/null -s proto ${INSTALLROOT}/bin/proto || { ${STDMV} ${INSTALLROOT}/bin/proto ${INSTALLROOT}/bin/proto.old 2>/dev/null || true; ${STDCP} proto ${INSTALLROOT}/bin/proto  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/proto) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/proto generated
 make ${INSTALLROOT}/bin/mamake
 prev mamake
 exec - test '' = 'mamake' || ${STDCMP} 2>/dev/null -s mamake ${INSTALLROOT}/bin/mamake || { ${STDMV} ${INSTALLROOT}/bin/mamake ${INSTALLROOT}/bin/mamake.old 2>/dev/null || true; ${STDCP} mamake ${INSTALLROOT}/bin/mamake  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mamake) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mamake generated
 make ${INSTALLROOT}/bin/ratz
 prev ratz
 exec - test '' = 'ratz' || ${STDCMP} 2>/dev/null -s ratz ${INSTALLROOT}/bin/ratz || { ${STDMV} ${INSTALLROOT}/bin/ratz ${INSTALLROOT}/bin/ratz.old 2>/dev/null || true; ${STDCP} ratz ${INSTALLROOT}/bin/ratz  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/ratz) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/ratz generated
 make ${INSTALLROOT}/bin/release
 prev release
 exec - test '' = 'release' || ${STDCMP} 2>/dev/null -s release ${INSTALLROOT}/bin/release || { ${STDMV} ${INSTALLROOT}/bin/release ${INSTALLROOT}/bin/release.old 2>/dev/null || true; ${STDCP} release ${INSTALLROOT}/bin/release  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/release) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/release generated
 make ${INSTALLROOT}/bin/sear
 prev sear
 exec - test '' = 'sear' || ${STDCMP} 2>/dev/null -s sear ${INSTALLROOT}/bin/sear || { ${STDMV} ${INSTALLROOT}/bin/sear ${INSTALLROOT}/bin/sear.old 2>/dev/null || true; ${STDCP} sear ${INSTALLROOT}/bin/sear  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/sear) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/sear generated
 make ${INSTALLROOT}/bin/changes
 prev changes
 exec - test '' = 'changes' || ${STDCMP} 2>/dev/null -s changes ${INSTALLROOT}/bin/changes || { ${STDMV} ${INSTALLROOT}/bin/changes ${INSTALLROOT}/bin/changes.old 2>/dev/null || true; ${STDCP} changes ${INSTALLROOT}/bin/changes  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/changes) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/changes generated
 make ${INSTALLROOT}/lib/sear
 exec - if	silent test ! -d ${INSTALLROOT}/lib/sear
@@ -345,13 +335,11 @@ make ${INSTALLROOT}/lib/sear/ratz.c
 prev ${INSTALLROOT}/lib/sear
 prev ../INIT/ratz.c
 exec - test '' = '../INIT/ratz.c' || ${STDCMP} 2>/dev/null -s ../INIT/ratz.c ${INSTALLROOT}/lib/sear/ratz.c || { ${STDMV} ${INSTALLROOT}/lib/sear/ratz.c ${INSTALLROOT}/lib/sear/ratz.c.old 2>/dev/null || true; ${STDCP} ../INIT/ratz.c ${INSTALLROOT}/lib/sear/ratz.c  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/sear/ratz.c) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/sear/ratz.c generated
 make ${INSTALLROOT}/lib/sear/sear.ico
 make sear.ico
 done sear.ico
 exec - test '' = 'sear.ico' || ${STDCMP} 2>/dev/null -s sear.ico ${INSTALLROOT}/lib/sear/sear.ico || { ${STDMV} ${INSTALLROOT}/lib/sear/sear.ico ${INSTALLROOT}/lib/sear/sear.ico.old 2>/dev/null || true; ${STDCP} sear.ico ${INSTALLROOT}/lib/sear/sear.ico  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/sear/sear.ico) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/sear/sear.ico generated
 done install virtual
 make test

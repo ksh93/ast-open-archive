@@ -524,7 +524,6 @@ prev ${INSTALLROOT}/man/man3
 make vcodex.3
 done vcodex.3
 exec - test '' = 'vcodex.3' || ${STDCMP} 2>/dev/null -s vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3 || { ${STDMV} ${INSTALLROOT}/man/man3/vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3.old 2>/dev/null || true; ${STDCP} vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/man/man3/vcodex.3) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man3/vcodex.3 generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
@@ -535,7 +534,6 @@ make ${INSTALLROOT}/lib/lib/vcodex
 prev ${INSTALLROOT}/lib/lib
 prev vcodex.req
 exec - test '' = 'vcodex.req' || ${STDCMP} 2>/dev/null -s vcodex.req ${INSTALLROOT}/lib/lib/vcodex || { ${STDMV} ${INSTALLROOT}/lib/lib/vcodex ${INSTALLROOT}/lib/lib/vcodex.old 2>/dev/null || true; ${STDCP} vcodex.req ${INSTALLROOT}/lib/lib/vcodex  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/vcodex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/vcodex generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

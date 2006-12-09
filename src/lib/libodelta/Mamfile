@@ -185,7 +185,6 @@ make ${INSTALLROOT}/lib/lib/odelta
 prev ${INSTALLROOT}/lib/lib
 prev odelta.req
 exec - test '' = 'odelta.req' || ${STDCMP} 2>/dev/null -s odelta.req ${INSTALLROOT}/lib/lib/odelta || { ${STDMV} ${INSTALLROOT}/lib/lib/odelta ${INSTALLROOT}/lib/lib/odelta.old 2>/dev/null || true; ${STDCP} odelta.req ${INSTALLROOT}/lib/lib/odelta  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/odelta) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/odelta generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

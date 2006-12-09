@@ -360,7 +360,6 @@ make ${INSTALLROOT}/lib/lib/dss
 prev ${INSTALLROOT}/lib/lib
 prev dss.req
 exec - test '' = 'dss.req' || ${STDCMP} 2>/dev/null -s dss.req ${INSTALLROOT}/lib/lib/dss || { ${STDMV} ${INSTALLROOT}/lib/lib/dss ${INSTALLROOT}/lib/lib/dss.old 2>/dev/null || true; ${STDCP} dss.req ${INSTALLROOT}/lib/lib/dss  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/dss) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/dss generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

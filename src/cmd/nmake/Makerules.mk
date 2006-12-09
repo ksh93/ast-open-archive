@@ -1189,7 +1189,7 @@ $(IFFEGENDIR)/% : "" .SCAN.c (IFFE) (IFFEFLAGS)
 		: $(*)
 	.MAKE : .R.
 	T := $(*.SOURCE.%.STD.INCLUDE:N=*/($(.PACKAGE.build:A!=.TARGET:/ /|/G)):T=FD:U!)
-	T := $(T:/^/-I/) $(T:D:U:/^/-I/) $(*.R.:N!=$(<:T=M:@/ /|/G))
+	T := $(T:/^/-I/) $(T:D:U:/^/-I/) $(*.R.:N!=$(<:T=M:@/ /|/G):U)
 	if T
 		if "$(-mam:N=static*,port*)"
 			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=${mam_lib+([a-zA-Z0-9_])}:P=D):$(.CC.NOSTDLIB.):/.*/${mam_cc_L+-L&}/) $(T) $(IFFEREFS) :
@@ -4630,11 +4630,13 @@ end
 		CC.OPTIMIZE = ${mam_cc_OPTIMIZE}
 		CC.PIC = ${mam_cc_PIC}
 		CC.PICBIG = ${mam_cc_PICBIG}
+		CC.PREFIX.ARCHIVE = lib
 		CC.PREFIX.DYNAMIC = ${mam_cc_PREFIX_DYNAMIC}
 		CC.PREFIX.SHARED = ${mam_cc_PREFIX_SHARED}
 		CC.SHARED =
 		CC.SHELLMAGIC = ${mam_cc_SHELLMAGIC}
 		CC.STATIC =
+		CC.SUFFIX.ARCHIVE = .a
 		CC.SUFFIX.DYNAMIC = ${mam_cc_SUFFIX_DYNAMIC}
 		CC.SUFFIX.SHARED = ${mam_cc_SUFFIX_SHARED}
 		_hosttype_ = ${mam_cc_HOSTTYPE}

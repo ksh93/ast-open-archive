@@ -119,9 +119,8 @@ meta html2rtf.o %.c>%.o html2rtf.c html2rtf
 prev html2rtf.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c html2rtf.c
 done html2rtf.o generated
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o html2rtf html2rtf.o
+bind -last
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o html2rtf html2rtf.o ${mam_libast}
 done html2rtf generated
 make html2db
 make html2db.o
@@ -133,8 +132,7 @@ meta html2db.o %.c>%.o html2db.c html2db
 prev html2db.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c html2db.c
 done html2db.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o html2db html2db.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o html2db html2db.o ${mam_libast}
 done html2db generated
 make htmlrefs
 make htmlrefs.o
@@ -179,8 +177,7 @@ meta htmlrefs.o %.c>%.o htmlrefs.c htmlrefs
 prev htmlrefs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c htmlrefs.c
 done htmlrefs.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o htmlrefs htmlrefs.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o htmlrefs htmlrefs.o ${mam_libast}
 done htmlrefs generated
 make mm2html
 make mm2html.sh
@@ -248,8 +245,7 @@ meta troff2html.o %.c>%.o troff2html.c troff2html
 prev troff2html.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c troff2html.c
 done troff2html.o generated
-prev ${mam_libast} archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o troff2html troff2html.o
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o troff2html troff2html.o ${mam_libast}
 done troff2html generated
 make download
 make download.sh
@@ -297,7 +293,6 @@ make ${INSTALLROOT}/bin/html2rtf
 prev ${INSTALLROOT}/bin
 prev html2rtf
 exec - test '' = 'html2rtf' || ${STDCMP} 2>/dev/null -s html2rtf ${INSTALLROOT}/bin/html2rtf || { ${STDMV} ${INSTALLROOT}/bin/html2rtf ${INSTALLROOT}/bin/html2rtf.old 2>/dev/null || true; ${STDCP} html2rtf ${INSTALLROOT}/bin/html2rtf  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/html2rtf) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/html2rtf generated
 make ${INSTALLROOT}/man/man1
 exec - if	silent test ! -d ${INSTALLROOT}/man/man1
@@ -309,39 +304,32 @@ prev ${INSTALLROOT}/man/man1
 make html2rtf.1
 done html2rtf.1
 exec - test '' = 'html2rtf.1' || ${STDCMP} 2>/dev/null -s html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1 || { ${STDMV} ${INSTALLROOT}/man/man1/html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1.old 2>/dev/null || true; ${STDCP} html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/man/man1/html2rtf.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/html2rtf.1 generated
 make ${INSTALLROOT}/bin/html2db
 prev html2db
 exec - test '' = 'html2db' || ${STDCMP} 2>/dev/null -s html2db ${INSTALLROOT}/bin/html2db || { ${STDMV} ${INSTALLROOT}/bin/html2db ${INSTALLROOT}/bin/html2db.old 2>/dev/null || true; ${STDCP} html2db ${INSTALLROOT}/bin/html2db  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/html2db) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/html2db generated
 make ${INSTALLROOT}/bin/htmlrefs
 prev htmlrefs
 exec - test '' = 'htmlrefs' || ${STDCMP} 2>/dev/null -s htmlrefs ${INSTALLROOT}/bin/htmlrefs || { ${STDMV} ${INSTALLROOT}/bin/htmlrefs ${INSTALLROOT}/bin/htmlrefs.old 2>/dev/null || true; ${STDCP} htmlrefs ${INSTALLROOT}/bin/htmlrefs  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/htmlrefs) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/htmlrefs generated
 make ${INSTALLROOT}/bin/mm2html
 prev mm2html
 exec - test '' = 'mm2html' || ${STDCMP} 2>/dev/null -s mm2html ${INSTALLROOT}/bin/mm2html || { ${STDMV} ${INSTALLROOT}/bin/mm2html ${INSTALLROOT}/bin/mm2html.old 2>/dev/null || true; ${STDCP} mm2html ${INSTALLROOT}/bin/mm2html  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/mm2html) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/mm2html generated
 make ${INSTALLROOT}/man/man1/mm2html.1
 make mm2html.1
 done mm2html.1
 exec - test '' = 'mm2html.1' || ${STDCMP} 2>/dev/null -s mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1.old 2>/dev/null || true; ${STDCP} mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/man/man1/mm2html.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/mm2html.1 generated
 make ${INSTALLROOT}/bin/troff2html
 prev troff2html
 exec - test '' = 'troff2html' || ${STDCMP} 2>/dev/null -s troff2html ${INSTALLROOT}/bin/troff2html || { ${STDMV} ${INSTALLROOT}/bin/troff2html ${INSTALLROOT}/bin/troff2html.old 2>/dev/null || true; ${STDCP} troff2html ${INSTALLROOT}/bin/troff2html  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/troff2html) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/troff2html generated
 make ${INSTALLROOT}/man/man1/troff2html.1
 make troff2html.1
 done troff2html.1
 exec - test '' = 'troff2html.1' || ${STDCMP} 2>/dev/null -s troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1.old 2>/dev/null || true; ${STDCP} troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/man/man1/troff2html.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/troff2html.1 generated
 make ${INSTALLROOT}/lib/html
 exec - if	silent test ! -d ${INSTALLROOT}/lib/html
@@ -353,66 +341,55 @@ prev ${INSTALLROOT}/lib/html
 make ast.mm
 done ast.mm
 exec - test '' = 'ast.mm' || ${STDCMP} 2>/dev/null -s ast.mm ${INSTALLROOT}/lib/html/ast.mm || { ${STDMV} ${INSTALLROOT}/lib/html/ast.mm ${INSTALLROOT}/lib/html/ast.mm.old 2>/dev/null || true; ${STDCP} ast.mm ${INSTALLROOT}/lib/html/ast.mm  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/ast.mm) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/ast.mm generated
 make ${INSTALLROOT}/lib/html/strings.mm
 make strings.mm
 done strings.mm
 exec - test '' = 'strings.mm' || ${STDCMP} 2>/dev/null -s strings.mm ${INSTALLROOT}/lib/html/strings.mm || { ${STDMV} ${INSTALLROOT}/lib/html/strings.mm ${INSTALLROOT}/lib/html/strings.mm.old 2>/dev/null || true; ${STDCP} strings.mm ${INSTALLROOT}/lib/html/strings.mm  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/strings.mm) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/strings.mm generated
 make ${INSTALLROOT}/lib/html/man.tr
 make man.tr
 done man.tr
 exec - test '' = 'man.tr' || ${STDCMP} 2>/dev/null -s man.tr ${INSTALLROOT}/lib/html/man.tr || { ${STDMV} ${INSTALLROOT}/lib/html/man.tr ${INSTALLROOT}/lib/html/man.tr.old 2>/dev/null || true; ${STDCP} man.tr ${INSTALLROOT}/lib/html/man.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/man.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/man.tr generated
 make ${INSTALLROOT}/lib/html/mm.tr
 make mm.tr
 done mm.tr
 exec - test '' = 'mm.tr' || ${STDCMP} 2>/dev/null -s mm.tr ${INSTALLROOT}/lib/html/mm.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mm.tr ${INSTALLROOT}/lib/html/mm.tr.old 2>/dev/null || true; ${STDCP} mm.tr ${INSTALLROOT}/lib/html/mm.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/mm.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/mm.tr generated
 make ${INSTALLROOT}/lib/html/mandoc.tr
 make mandoc.tr
 done mandoc.tr
 exec - test '' = 'mandoc.tr' || ${STDCMP} 2>/dev/null -s mandoc.tr ${INSTALLROOT}/lib/html/mandoc.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mandoc.tr ${INSTALLROOT}/lib/html/mandoc.tr.old 2>/dev/null || true; ${STDCP} mandoc.tr ${INSTALLROOT}/lib/html/mandoc.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/mandoc.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/mandoc.tr generated
 make ${INSTALLROOT}/lib/html/mdoc.tr
 make mdoc.tr
 done mdoc.tr
 exec - test '' = 'mdoc.tr' || ${STDCMP} 2>/dev/null -s mdoc.tr ${INSTALLROOT}/lib/html/mdoc.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc.tr ${INSTALLROOT}/lib/html/mdoc.tr.old 2>/dev/null || true; ${STDCP} mdoc.tr ${INSTALLROOT}/lib/html/mdoc.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/mdoc.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/mdoc.tr generated
 make ${INSTALLROOT}/lib/html/mdoc-common.tr
 make mdoc-common.tr
 done mdoc-common.tr
 exec - test '' = 'mdoc-common.tr' || ${STDCMP} 2>/dev/null -s mdoc-common.tr ${INSTALLROOT}/lib/html/mdoc-common.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-common.tr ${INSTALLROOT}/lib/html/mdoc-common.tr.old 2>/dev/null || true; ${STDCP} mdoc-common.tr ${INSTALLROOT}/lib/html/mdoc-common.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/mdoc-common.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/mdoc-common.tr generated
 make ${INSTALLROOT}/lib/html/mdoc-nroff.tr
 make mdoc-nroff.tr
 done mdoc-nroff.tr
 exec - test '' = 'mdoc-nroff.tr' || ${STDCMP} 2>/dev/null -s mdoc-nroff.tr ${INSTALLROOT}/lib/html/mdoc-nroff.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-nroff.tr ${INSTALLROOT}/lib/html/mdoc-nroff.tr.old 2>/dev/null || true; ${STDCP} mdoc-nroff.tr ${INSTALLROOT}/lib/html/mdoc-nroff.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/mdoc-nroff.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/mdoc-nroff.tr generated
 make ${INSTALLROOT}/lib/html/mdoc-syms.tr
 make mdoc-syms.tr
 done mdoc-syms.tr
 exec - test '' = 'mdoc-syms.tr' || ${STDCMP} 2>/dev/null -s mdoc-syms.tr ${INSTALLROOT}/lib/html/mdoc-syms.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-syms.tr ${INSTALLROOT}/lib/html/mdoc-syms.tr.old 2>/dev/null || true; ${STDCP} mdoc-syms.tr ${INSTALLROOT}/lib/html/mdoc-syms.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/mdoc-syms.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/mdoc-syms.tr generated
 make ${INSTALLROOT}/lib/html/mdoc-troff.tr
 make mdoc-troff.tr
 done mdoc-troff.tr
 exec - test '' = 'mdoc-troff.tr' || ${STDCMP} 2>/dev/null -s mdoc-troff.tr ${INSTALLROOT}/lib/html/mdoc-troff.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-troff.tr ${INSTALLROOT}/lib/html/mdoc-troff.tr.old 2>/dev/null || true; ${STDCP} mdoc-troff.tr ${INSTALLROOT}/lib/html/mdoc-troff.tr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/mdoc-troff.tr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/mdoc-troff.tr generated
 make ${INSTALLROOT}/lib/html/download
 prev download
 exec - test '' = 'download' || ${STDCMP} 2>/dev/null -s download ${INSTALLROOT}/lib/html/download || { ${STDMV} ${INSTALLROOT}/lib/html/download ${INSTALLROOT}/lib/html/download.old 2>/dev/null || true; ${STDCP} download ${INSTALLROOT}/lib/html/download  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/html/download) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/html/download generated
 done install virtual
 make test

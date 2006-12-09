@@ -123,12 +123,9 @@ meta FEATURE/recsort features/%>FEATURE/% features/recsort recsort
 make features/recsort
 done features/recsort
 prev recsort.req
-make ${mam_libdll}
-done ${mam_libdll} dontcare virtual
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
-prev ${mam_libast} archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/recsort
+bind -ldll
+bind -last
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast}  : run features/recsort
 done FEATURE/recsort dontcare generated
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -372,7 +369,6 @@ prev ${INSTALLROOT}/man/man3
 make recsort.3
 done recsort.3
 exec - test '' = 'recsort.3' || ${STDCMP} 2>/dev/null -s recsort.3 ${INSTALLROOT}/man/man3/recsort.3 || { ${STDMV} ${INSTALLROOT}/man/man3/recsort.3 ${INSTALLROOT}/man/man3/recsort.3.old 2>/dev/null || true; ${STDCP} recsort.3 ${INSTALLROOT}/man/man3/recsort.3  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/man/man3/recsort.3) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man3/recsort.3 generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
@@ -383,7 +379,6 @@ make ${INSTALLROOT}/lib/lib/recsort
 prev ${INSTALLROOT}/lib/lib
 prev recsort.req
 exec - test '' = 'recsort.req' || ${STDCMP} 2>/dev/null -s recsort.req ${INSTALLROOT}/lib/lib/recsort || { ${STDMV} ${INSTALLROOT}/lib/lib/recsort ${INSTALLROOT}/lib/lib/recsort.old 2>/dev/null || true; ${STDCP} recsort.req ${INSTALLROOT}/lib/lib/recsort  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/recsort) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/recsort generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

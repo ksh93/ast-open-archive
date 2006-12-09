@@ -873,7 +873,6 @@ make ${INSTALLROOT}/lib/lib/tk
 prev ${INSTALLROOT}/lib/lib
 prev tk.req
 exec - test '' = 'tk.req' || ${STDCMP} 2>/dev/null -s tk.req ${INSTALLROOT}/lib/lib/tk || { ${STDMV} ${INSTALLROOT}/lib/lib/tk ${INSTALLROOT}/lib/lib/tk.old 2>/dev/null || true; ${STDCP} tk.req ${INSTALLROOT}/lib/lib/tk  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/tk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/tk generated
 make ${INSTALLROOT}/include/tcl
 exec - if	silent test ! -d ${INSTALLROOT}/include/tcl
@@ -899,163 +898,136 @@ prev ${INSTALLROOT}/lib/tk4.2
 make library/bgerror.tcl
 done library/bgerror.tcl
 exec - test '' = 'library/bgerror.tcl' || ${STDCMP} 2>/dev/null -s library/bgerror.tcl ${INSTALLROOT}/lib/tk4.2/bgerror.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/bgerror.tcl ${INSTALLROOT}/lib/tk4.2/bgerror.tcl.old 2>/dev/null || true; ${STDCP} library/bgerror.tcl ${INSTALLROOT}/lib/tk4.2/bgerror.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/bgerror.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/bgerror.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/button.tcl
 make library/button.tcl
 done library/button.tcl
 exec - test '' = 'library/button.tcl' || ${STDCMP} 2>/dev/null -s library/button.tcl ${INSTALLROOT}/lib/tk4.2/button.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/button.tcl ${INSTALLROOT}/lib/tk4.2/button.tcl.old 2>/dev/null || true; ${STDCP} library/button.tcl ${INSTALLROOT}/lib/tk4.2/button.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/button.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/button.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/clrpick.tcl
 make library/clrpick.tcl
 done library/clrpick.tcl
 exec - test '' = 'library/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/clrpick.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/clrpick.tcl.old 2>/dev/null || true; ${STDCP} library/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/clrpick.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/clrpick.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/clrpick.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/comdlg.tcl
 make library/comdlg.tcl
 done library/comdlg.tcl
 exec - test '' = 'library/comdlg.tcl' || ${STDCMP} 2>/dev/null -s library/comdlg.tcl ${INSTALLROOT}/lib/tk4.2/comdlg.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/comdlg.tcl ${INSTALLROOT}/lib/tk4.2/comdlg.tcl.old 2>/dev/null || true; ${STDCP} library/comdlg.tcl ${INSTALLROOT}/lib/tk4.2/comdlg.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/comdlg.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/comdlg.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/console.tcl
 make library/console.tcl
 done library/console.tcl
 exec - test '' = 'library/console.tcl' || ${STDCMP} 2>/dev/null -s library/console.tcl ${INSTALLROOT}/lib/tk4.2/console.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/console.tcl ${INSTALLROOT}/lib/tk4.2/console.tcl.old 2>/dev/null || true; ${STDCP} library/console.tcl ${INSTALLROOT}/lib/tk4.2/console.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/console.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/console.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/dialog.tcl
 make library/dialog.tcl
 done library/dialog.tcl
 exec - test '' = 'library/dialog.tcl' || ${STDCMP} 2>/dev/null -s library/dialog.tcl ${INSTALLROOT}/lib/tk4.2/dialog.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/dialog.tcl ${INSTALLROOT}/lib/tk4.2/dialog.tcl.old 2>/dev/null || true; ${STDCP} library/dialog.tcl ${INSTALLROOT}/lib/tk4.2/dialog.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/dialog.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/dialog.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/entry.tcl
 make library/entry.tcl
 done library/entry.tcl
 exec - test '' = 'library/entry.tcl' || ${STDCMP} 2>/dev/null -s library/entry.tcl ${INSTALLROOT}/lib/tk4.2/entry.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/entry.tcl ${INSTALLROOT}/lib/tk4.2/entry.tcl.old 2>/dev/null || true; ${STDCP} library/entry.tcl ${INSTALLROOT}/lib/tk4.2/entry.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/entry.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/entry.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/focus.tcl
 make library/focus.tcl
 done library/focus.tcl
 exec - test '' = 'library/focus.tcl' || ${STDCMP} 2>/dev/null -s library/focus.tcl ${INSTALLROOT}/lib/tk4.2/focus.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/focus.tcl ${INSTALLROOT}/lib/tk4.2/focus.tcl.old 2>/dev/null || true; ${STDCP} library/focus.tcl ${INSTALLROOT}/lib/tk4.2/focus.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/focus.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/focus.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/folder.gif
 make library/folder.gif
 done library/folder.gif
 exec - test '' = 'library/folder.gif' || ${STDCMP} 2>/dev/null -s library/folder.gif ${INSTALLROOT}/lib/tk4.2/folder.gif || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/folder.gif ${INSTALLROOT}/lib/tk4.2/folder.gif.old 2>/dev/null || true; ${STDCP} library/folder.gif ${INSTALLROOT}/lib/tk4.2/folder.gif  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/folder.gif) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/folder.gif generated
 make ${INSTALLROOT}/lib/tk4.2/license.terms
 make library/license.terms
 done library/license.terms
 exec - test '' = 'library/license.terms' || ${STDCMP} 2>/dev/null -s library/license.terms ${INSTALLROOT}/lib/tk4.2/license.terms || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/license.terms ${INSTALLROOT}/lib/tk4.2/license.terms.old 2>/dev/null || true; ${STDCP} library/license.terms ${INSTALLROOT}/lib/tk4.2/license.terms  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/license.terms) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/license.terms generated
 make ${INSTALLROOT}/lib/tk4.2/listbox.tcl
 make library/listbox.tcl
 done library/listbox.tcl
 exec - test '' = 'library/listbox.tcl' || ${STDCMP} 2>/dev/null -s library/listbox.tcl ${INSTALLROOT}/lib/tk4.2/listbox.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/listbox.tcl ${INSTALLROOT}/lib/tk4.2/listbox.tcl.old 2>/dev/null || true; ${STDCP} library/listbox.tcl ${INSTALLROOT}/lib/tk4.2/listbox.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/listbox.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/listbox.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/menu.tcl
 make library/menu.tcl
 done library/menu.tcl
 exec - test '' = 'library/menu.tcl' || ${STDCMP} 2>/dev/null -s library/menu.tcl ${INSTALLROOT}/lib/tk4.2/menu.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/menu.tcl ${INSTALLROOT}/lib/tk4.2/menu.tcl.old 2>/dev/null || true; ${STDCP} library/menu.tcl ${INSTALLROOT}/lib/tk4.2/menu.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/menu.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/menu.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/msgbox.tcl
 make library/msgbox.tcl
 done library/msgbox.tcl
 exec - test '' = 'library/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/msgbox.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/msgbox.tcl.old 2>/dev/null || true; ${STDCP} library/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/msgbox.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/msgbox.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/msgbox.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/obsolete.tcl
 make library/obsolete.tcl
 done library/obsolete.tcl
 exec - test '' = 'library/obsolete.tcl' || ${STDCMP} 2>/dev/null -s library/obsolete.tcl ${INSTALLROOT}/lib/tk4.2/obsolete.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/obsolete.tcl ${INSTALLROOT}/lib/tk4.2/obsolete.tcl.old 2>/dev/null || true; ${STDCP} library/obsolete.tcl ${INSTALLROOT}/lib/tk4.2/obsolete.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/obsolete.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/obsolete.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/optMenu.tcl
 make library/optMenu.tcl
 done library/optMenu.tcl
 exec - test '' = 'library/optMenu.tcl' || ${STDCMP} 2>/dev/null -s library/optMenu.tcl ${INSTALLROOT}/lib/tk4.2/optMenu.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/optMenu.tcl ${INSTALLROOT}/lib/tk4.2/optMenu.tcl.old 2>/dev/null || true; ${STDCP} library/optMenu.tcl ${INSTALLROOT}/lib/tk4.2/optMenu.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/optMenu.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/optMenu.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/palette.tcl
 make library/palette.tcl
 done library/palette.tcl
 exec - test '' = 'library/palette.tcl' || ${STDCMP} 2>/dev/null -s library/palette.tcl ${INSTALLROOT}/lib/tk4.2/palette.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/palette.tcl ${INSTALLROOT}/lib/tk4.2/palette.tcl.old 2>/dev/null || true; ${STDCP} library/palette.tcl ${INSTALLROOT}/lib/tk4.2/palette.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/palette.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/palette.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/prolog.ps
 make library/prolog.ps
 done library/prolog.ps
 exec - test '' = 'library/prolog.ps' || ${STDCMP} 2>/dev/null -s library/prolog.ps ${INSTALLROOT}/lib/tk4.2/prolog.ps || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/prolog.ps ${INSTALLROOT}/lib/tk4.2/prolog.ps.old 2>/dev/null || true; ${STDCP} library/prolog.ps ${INSTALLROOT}/lib/tk4.2/prolog.ps  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/prolog.ps) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/prolog.ps generated
 make ${INSTALLROOT}/lib/tk4.2/scale.tcl
 make library/scale.tcl
 done library/scale.tcl
 exec - test '' = 'library/scale.tcl' || ${STDCMP} 2>/dev/null -s library/scale.tcl ${INSTALLROOT}/lib/tk4.2/scale.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/scale.tcl ${INSTALLROOT}/lib/tk4.2/scale.tcl.old 2>/dev/null || true; ${STDCP} library/scale.tcl ${INSTALLROOT}/lib/tk4.2/scale.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/scale.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/scale.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl
 make library/scrlbar.tcl
 done library/scrlbar.tcl
 exec - test '' = 'library/scrlbar.tcl' || ${STDCMP} 2>/dev/null -s library/scrlbar.tcl ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl.old 2>/dev/null || true; ${STDCP} library/scrlbar.tcl ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/tclIndex
 make library/tclIndex
 done library/tclIndex
 exec - test '' = 'library/tclIndex' || ${STDCMP} 2>/dev/null -s library/tclIndex ${INSTALLROOT}/lib/tk4.2/tclIndex || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/tclIndex ${INSTALLROOT}/lib/tk4.2/tclIndex.old 2>/dev/null || true; ${STDCP} library/tclIndex ${INSTALLROOT}/lib/tk4.2/tclIndex  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/tclIndex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/tclIndex generated
 make ${INSTALLROOT}/lib/tk4.2/tearoff.tcl
 make library/tearoff.tcl
 done library/tearoff.tcl
 exec - test '' = 'library/tearoff.tcl' || ${STDCMP} 2>/dev/null -s library/tearoff.tcl ${INSTALLROOT}/lib/tk4.2/tearoff.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/tearoff.tcl ${INSTALLROOT}/lib/tk4.2/tearoff.tcl.old 2>/dev/null || true; ${STDCP} library/tearoff.tcl ${INSTALLROOT}/lib/tk4.2/tearoff.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/tearoff.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/tearoff.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/text.tcl
 make library/text.tcl
 done library/text.tcl
 exec - test '' = 'library/text.tcl' || ${STDCMP} 2>/dev/null -s library/text.tcl ${INSTALLROOT}/lib/tk4.2/text.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/text.tcl ${INSTALLROOT}/lib/tk4.2/text.tcl.old 2>/dev/null || true; ${STDCP} library/text.tcl ${INSTALLROOT}/lib/tk4.2/text.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/text.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/text.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/textfile.gif
 make library/textfile.gif
 done library/textfile.gif
 exec - test '' = 'library/textfile.gif' || ${STDCMP} 2>/dev/null -s library/textfile.gif ${INSTALLROOT}/lib/tk4.2/textfile.gif || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/textfile.gif ${INSTALLROOT}/lib/tk4.2/textfile.gif.old 2>/dev/null || true; ${STDCP} library/textfile.gif ${INSTALLROOT}/lib/tk4.2/textfile.gif  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/textfile.gif) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/textfile.gif generated
 make ${INSTALLROOT}/lib/tk4.2/tk.tcl
 make library/tk.tcl
 done library/tk.tcl
 exec - test '' = 'library/tk.tcl' || ${STDCMP} 2>/dev/null -s library/tk.tcl ${INSTALLROOT}/lib/tk4.2/tk.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/tk.tcl ${INSTALLROOT}/lib/tk4.2/tk.tcl.old 2>/dev/null || true; ${STDCP} library/tk.tcl ${INSTALLROOT}/lib/tk4.2/tk.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/tk.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/tk.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl
 make library/tkfbox.tcl
 done library/tkfbox.tcl
 exec - test '' = 'library/tkfbox.tcl' || ${STDCMP} 2>/dev/null -s library/tkfbox.tcl ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl.old 2>/dev/null || true; ${STDCP} library/tkfbox.tcl ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/updir.xbm
 make library/updir.xbm
 done library/updir.xbm
 exec - test '' = 'library/updir.xbm' || ${STDCMP} 2>/dev/null -s library/updir.xbm ${INSTALLROOT}/lib/tk4.2/updir.xbm || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/updir.xbm ${INSTALLROOT}/lib/tk4.2/updir.xbm.old 2>/dev/null || true; ${STDCP} library/updir.xbm ${INSTALLROOT}/lib/tk4.2/updir.xbm  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/updir.xbm) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/updir.xbm generated
 make ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl
 make library/xmfbox.tcl
 done library/xmfbox.tcl
 exec - test '' = 'library/xmfbox.tcl' || ${STDCMP} 2>/dev/null -s library/xmfbox.tcl ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl.old 2>/dev/null || true; ${STDCP} library/xmfbox.tcl ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos
 exec - if	silent test ! -d ${INSTALLROOT}/lib/tk4.2/demos
@@ -1067,283 +1039,236 @@ prev ${INSTALLROOT}/lib/tk4.2/demos
 make library/demos/README
 done library/demos/README
 exec - test '' = 'library/demos/README' || ${STDCMP} 2>/dev/null -s library/demos/README ${INSTALLROOT}/lib/tk4.2/demos/README || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/README ${INSTALLROOT}/lib/tk4.2/demos/README.old 2>/dev/null || true; ${STDCP} library/demos/README ${INSTALLROOT}/lib/tk4.2/demos/README  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/README) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/README generated
 make ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl
 make library/demos/arrow.tcl
 done library/demos/arrow.tcl
 exec - test '' = 'library/demos/arrow.tcl' || ${STDCMP} 2>/dev/null -s library/demos/arrow.tcl ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl.old 2>/dev/null || true; ${STDCP} library/demos/arrow.tcl ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl
 make library/demos/bind.tcl
 done library/demos/bind.tcl
 exec - test '' = 'library/demos/bind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bind.tcl ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl.old 2>/dev/null || true; ${STDCP} library/demos/bind.tcl ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl
 make library/demos/bitmap.tcl
 done library/demos/bitmap.tcl
 exec - test '' = 'library/demos/bitmap.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bitmap.tcl ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl.old 2>/dev/null || true; ${STDCP} library/demos/bitmap.tcl ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/browse
 make library/demos/browse
 done library/demos/browse
 exec - test '' = 'library/demos/browse' || ${STDCMP} 2>/dev/null -s library/demos/browse ${INSTALLROOT}/lib/tk4.2/demos/browse || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/browse ${INSTALLROOT}/lib/tk4.2/demos/browse.old 2>/dev/null || true; ${STDCP} library/demos/browse ${INSTALLROOT}/lib/tk4.2/demos/browse  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/browse) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/browse generated
 make ${INSTALLROOT}/lib/tk4.2/demos/button.tcl
 make library/demos/button.tcl
 done library/demos/button.tcl
 exec - test '' = 'library/demos/button.tcl' || ${STDCMP} 2>/dev/null -s library/demos/button.tcl ${INSTALLROOT}/lib/tk4.2/demos/button.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/button.tcl ${INSTALLROOT}/lib/tk4.2/demos/button.tcl.old 2>/dev/null || true; ${STDCP} library/demos/button.tcl ${INSTALLROOT}/lib/tk4.2/demos/button.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/button.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/button.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/check.tcl
 make library/demos/check.tcl
 done library/demos/check.tcl
 exec - test '' = 'library/demos/check.tcl' || ${STDCMP} 2>/dev/null -s library/demos/check.tcl ${INSTALLROOT}/lib/tk4.2/demos/check.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/check.tcl ${INSTALLROOT}/lib/tk4.2/demos/check.tcl.old 2>/dev/null || true; ${STDCP} library/demos/check.tcl ${INSTALLROOT}/lib/tk4.2/demos/check.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/check.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/check.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl
 make library/demos/clrpick.tcl
 done library/demos/clrpick.tcl
 exec - test '' = 'library/demos/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/demos/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl.old 2>/dev/null || true; ${STDCP} library/demos/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl
 make library/demos/colors.tcl
 done library/demos/colors.tcl
 exec - test '' = 'library/demos/colors.tcl' || ${STDCMP} 2>/dev/null -s library/demos/colors.tcl ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl.old 2>/dev/null || true; ${STDCP} library/demos/colors.tcl ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl
 make library/demos/cscroll.tcl
 done library/demos/cscroll.tcl
 exec - test '' = 'library/demos/cscroll.tcl' || ${STDCMP} 2>/dev/null -s library/demos/cscroll.tcl ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl.old 2>/dev/null || true; ${STDCP} library/demos/cscroll.tcl ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl
 make library/demos/ctext.tcl
 done library/demos/ctext.tcl
 exec - test '' = 'library/demos/ctext.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ctext.tcl ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl.old 2>/dev/null || true; ${STDCP} library/demos/ctext.tcl ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl
 make library/demos/dialog1.tcl
 done library/demos/dialog1.tcl
 exec - test '' = 'library/demos/dialog1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog1.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl.old 2>/dev/null || true; ${STDCP} library/demos/dialog1.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl
 make library/demos/dialog2.tcl
 done library/demos/dialog2.tcl
 exec - test '' = 'library/demos/dialog2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog2.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl.old 2>/dev/null || true; ${STDCP} library/demos/dialog2.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl
 make library/demos/entry1.tcl
 done library/demos/entry1.tcl
 exec - test '' = 'library/demos/entry1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry1.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl.old 2>/dev/null || true; ${STDCP} library/demos/entry1.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl
 make library/demos/entry2.tcl
 done library/demos/entry2.tcl
 exec - test '' = 'library/demos/entry2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry2.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl.old 2>/dev/null || true; ${STDCP} library/demos/entry2.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl
 make library/demos/filebox.tcl
 done library/demos/filebox.tcl
 exec - test '' = 'library/demos/filebox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/filebox.tcl ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl.old 2>/dev/null || true; ${STDCP} library/demos/filebox.tcl ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl
 make library/demos/floor.tcl
 done library/demos/floor.tcl
 exec - test '' = 'library/demos/floor.tcl' || ${STDCMP} 2>/dev/null -s library/demos/floor.tcl ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl.old 2>/dev/null || true; ${STDCP} library/demos/floor.tcl ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/form.tcl
 make library/demos/form.tcl
 done library/demos/form.tcl
 exec - test '' = 'library/demos/form.tcl' || ${STDCMP} 2>/dev/null -s library/demos/form.tcl ${INSTALLROOT}/lib/tk4.2/demos/form.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/form.tcl ${INSTALLROOT}/lib/tk4.2/demos/form.tcl.old 2>/dev/null || true; ${STDCP} library/demos/form.tcl ${INSTALLROOT}/lib/tk4.2/demos/form.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/form.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/form.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/hello
 make library/demos/hello
 done library/demos/hello
 exec - test '' = 'library/demos/hello' || ${STDCMP} 2>/dev/null -s library/demos/hello ${INSTALLROOT}/lib/tk4.2/demos/hello || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/hello ${INSTALLROOT}/lib/tk4.2/demos/hello.old 2>/dev/null || true; ${STDCP} library/demos/hello ${INSTALLROOT}/lib/tk4.2/demos/hello  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/hello) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/hello generated
 make ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl
 make library/demos/hscale.tcl
 done library/demos/hscale.tcl
 exec - test '' = 'library/demos/hscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/hscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl.old 2>/dev/null || true; ${STDCP} library/demos/hscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl
 make library/demos/icon.tcl
 done library/demos/icon.tcl
 exec - test '' = 'library/demos/icon.tcl' || ${STDCMP} 2>/dev/null -s library/demos/icon.tcl ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl.old 2>/dev/null || true; ${STDCP} library/demos/icon.tcl ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl
 make library/demos/image1.tcl
 done library/demos/image1.tcl
 exec - test '' = 'library/demos/image1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image1.tcl ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl.old 2>/dev/null || true; ${STDCP} library/demos/image1.tcl ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl
 make library/demos/image2.tcl
 done library/demos/image2.tcl
 exec - test '' = 'library/demos/image2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image2.tcl ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl.old 2>/dev/null || true; ${STDCP} library/demos/image2.tcl ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/items.tcl
 make library/demos/items.tcl
 done library/demos/items.tcl
 exec - test '' = 'library/demos/items.tcl' || ${STDCMP} 2>/dev/null -s library/demos/items.tcl ${INSTALLROOT}/lib/tk4.2/demos/items.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/items.tcl ${INSTALLROOT}/lib/tk4.2/demos/items.tcl.old 2>/dev/null || true; ${STDCP} library/demos/items.tcl ${INSTALLROOT}/lib/tk4.2/demos/items.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/items.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/items.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/ixset
 make library/demos/ixset
 done library/demos/ixset
 exec - test '' = 'library/demos/ixset' || ${STDCMP} 2>/dev/null -s library/demos/ixset ${INSTALLROOT}/lib/tk4.2/demos/ixset || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/ixset ${INSTALLROOT}/lib/tk4.2/demos/ixset.old 2>/dev/null || true; ${STDCP} library/demos/ixset ${INSTALLROOT}/lib/tk4.2/demos/ixset  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/ixset) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/ixset generated
 make ${INSTALLROOT}/lib/tk4.2/demos/label.tcl
 make library/demos/label.tcl
 done library/demos/label.tcl
 exec - test '' = 'library/demos/label.tcl' || ${STDCMP} 2>/dev/null -s library/demos/label.tcl ${INSTALLROOT}/lib/tk4.2/demos/label.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/label.tcl ${INSTALLROOT}/lib/tk4.2/demos/label.tcl.old 2>/dev/null || true; ${STDCP} library/demos/label.tcl ${INSTALLROOT}/lib/tk4.2/demos/label.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/label.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/label.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/license.terms
 make library/demos/license.terms
 done library/demos/license.terms
 exec - test '' = 'library/demos/license.terms' || ${STDCMP} 2>/dev/null -s library/demos/license.terms ${INSTALLROOT}/lib/tk4.2/demos/license.terms || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/license.terms ${INSTALLROOT}/lib/tk4.2/demos/license.terms.old 2>/dev/null || true; ${STDCP} library/demos/license.terms ${INSTALLROOT}/lib/tk4.2/demos/license.terms  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/license.terms) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/license.terms generated
 make ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl
 make library/demos/menu.tcl
 done library/demos/menu.tcl
 exec - test '' = 'library/demos/menu.tcl' || ${STDCMP} 2>/dev/null -s library/demos/menu.tcl ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl.old 2>/dev/null || true; ${STDCP} library/demos/menu.tcl ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl
 make library/demos/msgbox.tcl
 done library/demos/msgbox.tcl
 exec - test '' = 'library/demos/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl.old 2>/dev/null || true; ${STDCP} library/demos/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl
 make library/demos/plot.tcl
 done library/demos/plot.tcl
 exec - test '' = 'library/demos/plot.tcl' || ${STDCMP} 2>/dev/null -s library/demos/plot.tcl ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl.old 2>/dev/null || true; ${STDCP} library/demos/plot.tcl ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl
 make library/demos/puzzle.tcl
 done library/demos/puzzle.tcl
 exec - test '' = 'library/demos/puzzle.tcl' || ${STDCMP} 2>/dev/null -s library/demos/puzzle.tcl ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl.old 2>/dev/null || true; ${STDCP} library/demos/puzzle.tcl ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl
 make library/demos/radio.tcl
 done library/demos/radio.tcl
 exec - test '' = 'library/demos/radio.tcl' || ${STDCMP} 2>/dev/null -s library/demos/radio.tcl ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl.old 2>/dev/null || true; ${STDCP} library/demos/radio.tcl ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/rmt
 make library/demos/rmt
 done library/demos/rmt
 exec - test '' = 'library/demos/rmt' || ${STDCMP} 2>/dev/null -s library/demos/rmt ${INSTALLROOT}/lib/tk4.2/demos/rmt || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/rmt ${INSTALLROOT}/lib/tk4.2/demos/rmt.old 2>/dev/null || true; ${STDCP} library/demos/rmt ${INSTALLROOT}/lib/tk4.2/demos/rmt  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/rmt) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/rmt generated
 make ${INSTALLROOT}/lib/tk4.2/demos/rolodex
 make library/demos/rolodex
 done library/demos/rolodex
 exec - test '' = 'library/demos/rolodex' || ${STDCMP} 2>/dev/null -s library/demos/rolodex ${INSTALLROOT}/lib/tk4.2/demos/rolodex || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/rolodex ${INSTALLROOT}/lib/tk4.2/demos/rolodex.old 2>/dev/null || true; ${STDCP} library/demos/rolodex ${INSTALLROOT}/lib/tk4.2/demos/rolodex  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/rolodex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/rolodex generated
 make ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl
 make library/demos/ruler.tcl
 done library/demos/ruler.tcl
 exec - test '' = 'library/demos/ruler.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ruler.tcl ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl.old 2>/dev/null || true; ${STDCP} library/demos/ruler.tcl ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl
 make library/demos/sayings.tcl
 done library/demos/sayings.tcl
 exec - test '' = 'library/demos/sayings.tcl' || ${STDCMP} 2>/dev/null -s library/demos/sayings.tcl ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl.old 2>/dev/null || true; ${STDCP} library/demos/sayings.tcl ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/search.tcl
 make library/demos/search.tcl
 done library/demos/search.tcl
 exec - test '' = 'library/demos/search.tcl' || ${STDCMP} 2>/dev/null -s library/demos/search.tcl ${INSTALLROOT}/lib/tk4.2/demos/search.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/search.tcl ${INSTALLROOT}/lib/tk4.2/demos/search.tcl.old 2>/dev/null || true; ${STDCP} library/demos/search.tcl ${INSTALLROOT}/lib/tk4.2/demos/search.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/search.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/search.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/square
 make library/demos/square
 done library/demos/square
 exec - test '' = 'library/demos/square' || ${STDCMP} 2>/dev/null -s library/demos/square ${INSTALLROOT}/lib/tk4.2/demos/square || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/square ${INSTALLROOT}/lib/tk4.2/demos/square.old 2>/dev/null || true; ${STDCP} library/demos/square ${INSTALLROOT}/lib/tk4.2/demos/square  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/square) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/square generated
 make ${INSTALLROOT}/lib/tk4.2/demos/states.tcl
 make library/demos/states.tcl
 done library/demos/states.tcl
 exec - test '' = 'library/demos/states.tcl' || ${STDCMP} 2>/dev/null -s library/demos/states.tcl ${INSTALLROOT}/lib/tk4.2/demos/states.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/states.tcl ${INSTALLROOT}/lib/tk4.2/demos/states.tcl.old 2>/dev/null || true; ${STDCP} library/demos/states.tcl ${INSTALLROOT}/lib/tk4.2/demos/states.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/states.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/states.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/style.tcl
 make library/demos/style.tcl
 done library/demos/style.tcl
 exec - test '' = 'library/demos/style.tcl' || ${STDCMP} 2>/dev/null -s library/demos/style.tcl ${INSTALLROOT}/lib/tk4.2/demos/style.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/style.tcl ${INSTALLROOT}/lib/tk4.2/demos/style.tcl.old 2>/dev/null || true; ${STDCP} library/demos/style.tcl ${INSTALLROOT}/lib/tk4.2/demos/style.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/style.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/style.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/tclIndex
 make library/demos/tclIndex
 done library/demos/tclIndex
 exec - test '' = 'library/demos/tclIndex' || ${STDCMP} 2>/dev/null -s library/demos/tclIndex ${INSTALLROOT}/lib/tk4.2/demos/tclIndex || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/tclIndex ${INSTALLROOT}/lib/tk4.2/demos/tclIndex.old 2>/dev/null || true; ${STDCP} library/demos/tclIndex ${INSTALLROOT}/lib/tk4.2/demos/tclIndex  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/tclIndex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/tclIndex generated
 make ${INSTALLROOT}/lib/tk4.2/demos/tcolor
 make library/demos/tcolor
 done library/demos/tcolor
 exec - test '' = 'library/demos/tcolor' || ${STDCMP} 2>/dev/null -s library/demos/tcolor ${INSTALLROOT}/lib/tk4.2/demos/tcolor || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/tcolor ${INSTALLROOT}/lib/tk4.2/demos/tcolor.old 2>/dev/null || true; ${STDCP} library/demos/tcolor ${INSTALLROOT}/lib/tk4.2/demos/tcolor  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/tcolor) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/tcolor generated
 make ${INSTALLROOT}/lib/tk4.2/demos/text.tcl
 make library/demos/text.tcl
 done library/demos/text.tcl
 exec - test '' = 'library/demos/text.tcl' || ${STDCMP} 2>/dev/null -s library/demos/text.tcl ${INSTALLROOT}/lib/tk4.2/demos/text.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/text.tcl ${INSTALLROOT}/lib/tk4.2/demos/text.tcl.old 2>/dev/null || true; ${STDCP} library/demos/text.tcl ${INSTALLROOT}/lib/tk4.2/demos/text.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/text.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/text.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/timer
 make library/demos/timer
 done library/demos/timer
 exec - test '' = 'library/demos/timer' || ${STDCMP} 2>/dev/null -s library/demos/timer ${INSTALLROOT}/lib/tk4.2/demos/timer || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/timer ${INSTALLROOT}/lib/tk4.2/demos/timer.old 2>/dev/null || true; ${STDCP} library/demos/timer ${INSTALLROOT}/lib/tk4.2/demos/timer  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/timer) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/timer generated
 make ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl
 make library/demos/twind.tcl
 done library/demos/twind.tcl
 exec - test '' = 'library/demos/twind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/twind.tcl ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl.old 2>/dev/null || true; ${STDCP} library/demos/twind.tcl ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl
 make library/demos/vscale.tcl
 done library/demos/vscale.tcl
 exec - test '' = 'library/demos/vscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/vscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl.old 2>/dev/null || true; ${STDCP} library/demos/vscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl generated
 make ${INSTALLROOT}/lib/tk4.2/demos/widget
 make library/demos/widget
 done library/demos/widget
 exec - test '' = 'library/demos/widget' || ${STDCMP} 2>/dev/null -s library/demos/widget ${INSTALLROOT}/lib/tk4.2/demos/widget || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/widget ${INSTALLROOT}/lib/tk4.2/demos/widget.old 2>/dev/null || true; ${STDCP} library/demos/widget ${INSTALLROOT}/lib/tk4.2/demos/widget  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/widget) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/widget generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images
 exec - if	silent test ! -d ${INSTALLROOT}/lib/tk4.2/demos/images
@@ -1355,67 +1280,56 @@ prev ${INSTALLROOT}/lib/tk4.2/demos/images
 make library/demos/images/earth.gif
 done library/demos/images/earth.gif
 exec - test '' = 'library/demos/images/earth.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earth.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif.old 2>/dev/null || true; ${STDCP} library/demos/images/earth.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif
 make library/demos/images/earthris.gif
 done library/demos/images/earthris.gif
 exec - test '' = 'library/demos/images/earthris.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earthris.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif.old 2>/dev/null || true; ${STDCP} library/demos/images/earthris.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp
 make library/demos/images/face.bmp
 done library/demos/images/face.bmp
 exec - test '' = 'library/demos/images/face.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/face.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/face.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp
 make library/demos/images/flagdown.bmp
 done library/demos/images/flagdown.bmp
 exec - test '' = 'library/demos/images/flagdown.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagdown.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/flagdown.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp
 make library/demos/images/flagup.bmp
 done library/demos/images/flagup.bmp
 exec - test '' = 'library/demos/images/flagup.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagup.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/flagup.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp
 make library/demos/images/gray25.bmp
 done library/demos/images/gray25.bmp
 exec - test '' = 'library/demos/images/gray25.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/gray25.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/gray25.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp
 make library/demos/images/letters.bmp
 done library/demos/images/letters.bmp
 exec - test '' = 'library/demos/images/letters.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/letters.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/letters.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp
 make library/demos/images/noletter.bmp
 done library/demos/images/noletter.bmp
 exec - test '' = 'library/demos/images/noletter.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/noletter.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/noletter.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp
 make library/demos/images/pattern.bmp
 done library/demos/images/pattern.bmp
 exec - test '' = 'library/demos/images/pattern.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/pattern.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/pattern.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif
 make library/demos/images/tcllogo.gif
 done library/demos/images/tcllogo.gif
 exec - test '' = 'library/demos/images/tcllogo.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/tcllogo.gif ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif.old 2>/dev/null || true; ${STDCP} library/demos/images/tcllogo.gif ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif generated
 make ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm
 make library/demos/images/teapot.ppm
 done library/demos/images/teapot.ppm
 exec - test '' = 'library/demos/images/teapot.ppm' || ${STDCMP} 2>/dev/null -s library/demos/images/teapot.ppm ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm || { ${STDMV} ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm.old 2>/dev/null || true; ${STDCP} library/demos/images/teapot.ppm ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm generated
 done install virtual
 make test

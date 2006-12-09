@@ -225,7 +225,6 @@ make ${INSTALLROOT}/lib/lib/dssflat
 prev ${INSTALLROOT}/lib/lib
 prev dssflat.req
 exec - test '' = 'dssflat.req' || ${STDCMP} 2>/dev/null -s dssflat.req ${INSTALLROOT}/lib/lib/dssflat || { ${STDMV} ${INSTALLROOT}/lib/lib/dssflat ${INSTALLROOT}/lib/lib/dssflat.old 2>/dev/null || true; ${STDCP} dssflat.req ${INSTALLROOT}/lib/lib/dssflat  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/dssflat) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/dssflat generated
 done install virtual
 make test

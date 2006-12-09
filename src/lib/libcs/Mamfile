@@ -87,12 +87,9 @@ meta FEATURE/lib features/%>FEATURE/% features/lib lib
 make features/lib
 done features/lib
 prev cs.req
-make ${mam_libdl}
-done ${mam_libdl} dontcare virtual
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
-prev ${mam_libast} archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/lib
+bind -ldl dontcare
+bind -last
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run features/lib
 done FEATURE/lib generated
 exec - cmp 2>/dev/null -s FEATURE/lib cs_lib.h || { rm -f cs_lib.h; silent test -d . || mkdir .; cp FEATURE/lib cs_lib.h; }
 done cs_lib.h dontcare generated
@@ -190,10 +187,7 @@ prev FEATURE/lib implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done features/cs.c
 prev cs.req
-prev ${mam_libdl}
-prev ${mam_libast} archive
-prev ${mam_libast} archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/cs.c
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run features/cs.c
 done FEATURE/cs generated
 exec - cmp 2>/dev/null -s FEATURE/cs ast_cs.h || { rm -f ast_cs.h; silent test -d . || mkdir .; cp FEATURE/cs ast_cs.h; }
 done ast_cs.h dontcare generated
@@ -258,10 +252,7 @@ meta FEATURE/termios features/%>FEATURE/% features/termios termios
 make features/termios
 done features/termios
 prev cs.req
-prev ${mam_libdl}
-prev ${mam_libast} archive
-prev ${mam_libast} archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/termios
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run features/termios
 done FEATURE/termios generated
 prev cslib.h implicit
 done csclient.c
@@ -733,7 +724,6 @@ prev ${INSTALLROOT}/man/man3
 make cs.3
 done cs.3
 exec - test '' = 'cs.3' || ${STDCMP} 2>/dev/null -s cs.3 ${INSTALLROOT}/man/man3/cs.3 || { ${STDMV} ${INSTALLROOT}/man/man3/cs.3 ${INSTALLROOT}/man/man3/cs.3.old 2>/dev/null || true; ${STDCP} cs.3 ${INSTALLROOT}/man/man3/cs.3  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/man/man3/cs.3) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man3/cs.3 generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
@@ -744,7 +734,6 @@ make ${INSTALLROOT}/lib/lib/cs
 prev ${INSTALLROOT}/lib/lib
 prev cs.req
 exec - test '' = 'cs.req' || ${STDCMP} 2>/dev/null -s cs.req ${INSTALLROOT}/lib/lib/cs || { ${STDMV} ${INSTALLROOT}/lib/lib/cs ${INSTALLROOT}/lib/lib/cs.old 2>/dev/null || true; ${STDCP} cs.req ${INSTALLROOT}/lib/lib/cs  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/cs) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/cs generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
@@ -801,12 +790,10 @@ make ${INSTALLROOT}/lib/cs/genlocal
 prev ${INSTALLROOT}/lib/cs
 prev genlocal
 exec - test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${INSTALLROOT}/lib/cs/genlocal || { ${STDMV} ${INSTALLROOT}/lib/cs/genlocal ${INSTALLROOT}/lib/cs/genlocal.old 2>/dev/null || true; ${STDCP} genlocal ${INSTALLROOT}/lib/cs/genlocal  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/cs/genlocal) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/cs/genlocal generated
 make ${INSTALLROOT}/lib/cs/genshare
 prev genshare
 exec - test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${INSTALLROOT}/lib/cs/genshare || { ${STDMV} ${INSTALLROOT}/lib/cs/genshare ${INSTALLROOT}/lib/cs/genshare.old 2>/dev/null || true; ${STDCP} genshare ${INSTALLROOT}/lib/cs/genshare  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/cs/genshare) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/cs/genshare generated
 make ${INSTALLROOT}/share/lib/cs
 exec - if	silent test ! -d ${INSTALLROOT}/share/lib/cs
@@ -818,17 +805,14 @@ prev ${INSTALLROOT}/share/lib/cs
 make local.ast
 done local.ast
 exec - test '' = 'local.ast' || ${STDCMP} 2>/dev/null -s local.ast ${INSTALLROOT}/share/lib/cs/local.ast || { ${STDMV} ${INSTALLROOT}/share/lib/cs/local.ast ${INSTALLROOT}/share/lib/cs/local.ast.old 2>/dev/null || true; ${STDCP} local.ast ${INSTALLROOT}/share/lib/cs/local.ast  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/share/lib/cs/local.ast) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/share/lib/cs/local.ast generated
 make ${INSTALLROOT}/share/lib/cs/genlocal
 prev genlocal
 exec - test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${INSTALLROOT}/share/lib/cs/genlocal || { ${STDMV} ${INSTALLROOT}/share/lib/cs/genlocal ${INSTALLROOT}/share/lib/cs/genlocal.old 2>/dev/null || true; ${STDCP} genlocal ${INSTALLROOT}/share/lib/cs/genlocal  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/share/lib/cs/genlocal) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/share/lib/cs/genlocal generated
 make ${INSTALLROOT}/share/lib/cs/genshare
 prev genshare
 exec - test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${INSTALLROOT}/share/lib/cs/genshare || { ${STDMV} ${INSTALLROOT}/share/lib/cs/genshare ${INSTALLROOT}/share/lib/cs/genshare.old 2>/dev/null || true; ${STDCP} genshare ${INSTALLROOT}/share/lib/cs/genshare  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/share/lib/cs/genshare) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/share/lib/cs/genshare generated
 make ${INSTALLROOT}/share/lib/cs/tcp
 setv mode -Dmode="+rwxt"
@@ -852,7 +836,6 @@ prev ${INSTALLROOT}/lib/make
 make SERVICE.mk
 done SERVICE.mk
 exec - test '' = 'SERVICE.mk' || ${STDCMP} 2>/dev/null -s SERVICE.mk ${INSTALLROOT}/lib/make/SERVICE.mk || { ${STDMV} ${INSTALLROOT}/lib/make/SERVICE.mk ${INSTALLROOT}/lib/make/SERVICE.mk.old 2>/dev/null || true; ${STDCP} SERVICE.mk ${INSTALLROOT}/lib/make/SERVICE.mk  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/make/SERVICE.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/SERVICE.mk generated
 make ${INSTALLROOT}/lib/cs/share
 make share

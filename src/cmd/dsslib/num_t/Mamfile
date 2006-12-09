@@ -218,7 +218,6 @@ make ${INSTALLROOT}/lib/lib/dssnum_t
 prev ${INSTALLROOT}/lib/lib
 prev dssnum_t.req
 exec - test '' = 'dssnum_t.req' || ${STDCMP} 2>/dev/null -s dssnum_t.req ${INSTALLROOT}/lib/lib/dssnum_t || { ${STDMV} ${INSTALLROOT}/lib/lib/dssnum_t ${INSTALLROOT}/lib/lib/dssnum_t.old 2>/dev/null || true; ${STDCP} dssnum_t.req ${INSTALLROOT}/lib/lib/dssnum_t  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/dssnum_t) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/dssnum_t generated
 done install virtual
 make test

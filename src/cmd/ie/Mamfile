@@ -104,12 +104,9 @@ meta FEATURE/ielib features/%>FEATURE/% features/ielib ielib
 make features/ielib
 done features/ielib
 prev edit.req
-make +ldll
-done +ldll virtual
-make +last archive
-done +last dontcare virtual
-prev +last archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/ielib
+bind -ldll
+bind -last
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast}  : run features/ielib
 done FEATURE/ielib dontcare generated
 make FEATURE/options implicit
 meta FEATURE/options features/%.sh>FEATURE/% features/options.sh options
@@ -118,10 +115,7 @@ make OPTIONS implicit
 done OPTIONS
 done features/options.sh dontcare
 prev edit.req
-prev +ldll
-prev +last archive
-prev +last archive
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/options.sh OPTIONS
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast}  : run features/options.sh OPTIONS
 done FEATURE/options dontcare generated
 done sh_config.h
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -295,7 +289,6 @@ make ${INSTALLROOT}/lib/lib/edit
 prev ${INSTALLROOT}/lib/lib
 prev edit.req
 exec - test '' = 'edit.req' || ${STDCMP} 2>/dev/null -s edit.req ${INSTALLROOT}/lib/lib/edit || { ${STDMV} ${INSTALLROOT}/lib/lib/edit ${INSTALLROOT}/lib/lib/edit.old 2>/dev/null || true; ${STDCP} edit.req ${INSTALLROOT}/lib/lib/edit  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/edit) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/edit generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -306,7 +299,6 @@ make ${INSTALLROOT}/bin/ie
 prev ${INSTALLROOT}/bin
 prev ie
 exec - test '' = 'ie' || ${STDCMP} 2>/dev/null -s ie ${INSTALLROOT}/bin/ie || { ${STDMV} ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; ${STDCP} ie ${INSTALLROOT}/bin/ie  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/bin/ie) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/ie generated
 done install virtual
 make test

@@ -171,15 +171,10 @@ meta config.h %.iffe>%.h src/config.iffe config
 make src/config.iffe
 done src/config.iffe
 prev tcl.req
-make +lshell
-done +lshell virtual
-make ${mam_libX11} archive
-done ${mam_libX11} dontcare virtual
-make ${mam_libast} archive
-done ${mam_libast} dontcare virtual
-prev ${mam_libX11} archive
-prev ${mam_libast} archive
-exec - iffe -o config.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include  : run src/config.iffe
+bind -lshell
+bind -lX11 dontcare
+bind -last
+exec - iffe -o config.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libshell} ${mam_libast}  : run src/config.iffe
 done config.h dontcare generated
 make include/tksh.h implicit
 prev include/tcl.h implicit
@@ -654,7 +649,6 @@ make ${INSTALLROOT}/lib/lib/tcl
 prev ${INSTALLROOT}/lib/lib
 prev tcl.req
 exec - test '' = 'tcl.req' || ${STDCMP} 2>/dev/null -s tcl.req ${INSTALLROOT}/lib/lib/tcl || { ${STDMV} ${INSTALLROOT}/lib/lib/tcl ${INSTALLROOT}/lib/lib/tcl.old 2>/dev/null || true; ${STDCP} tcl.req ${INSTALLROOT}/lib/lib/tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/tcl generated
 make ${INSTALLROOT}/include/tcl
 exec - if	silent test ! -d ${INSTALLROOT}/include/tcl
@@ -688,37 +682,31 @@ prev ${INSTALLROOT}/lib/tksh7.6
 make lib/tksh7.6/init.ksh
 done lib/tksh7.6/init.ksh
 exec - test '' = 'lib/tksh7.6/init.ksh' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.ksh ${INSTALLROOT}/lib/tksh7.6/init.ksh || { ${STDMV} ${INSTALLROOT}/lib/tksh7.6/init.ksh ${INSTALLROOT}/lib/tksh7.6/init.ksh.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/init.ksh ${INSTALLROOT}/lib/tksh7.6/init.ksh  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tksh7.6/init.ksh) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tksh7.6/init.ksh generated
 make ${INSTALLROOT}/lib/tksh7.6/init.tcl
 make lib/tksh7.6/init.tcl
 done lib/tksh7.6/init.tcl
 exec - test '' = 'lib/tksh7.6/init.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.tcl ${INSTALLROOT}/lib/tksh7.6/init.tcl || { ${STDMV} ${INSTALLROOT}/lib/tksh7.6/init.tcl ${INSTALLROOT}/lib/tksh7.6/init.tcl.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/init.tcl ${INSTALLROOT}/lib/tksh7.6/init.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tksh7.6/init.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tksh7.6/init.tcl generated
 make ${INSTALLROOT}/lib/tksh7.6/ldAout.tcl
 make lib/tksh7.6/ldAout.tcl
 done lib/tksh7.6/ldAout.tcl
 exec - test '' = 'lib/tksh7.6/ldAout.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/ldAout.tcl ${INSTALLROOT}/lib/tksh7.6/ldAout.tcl || { ${STDMV} ${INSTALLROOT}/lib/tksh7.6/ldAout.tcl ${INSTALLROOT}/lib/tksh7.6/ldAout.tcl.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/ldAout.tcl ${INSTALLROOT}/lib/tksh7.6/ldAout.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tksh7.6/ldAout.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tksh7.6/ldAout.tcl generated
 make ${INSTALLROOT}/lib/tksh7.6/license.terms
 make lib/tksh7.6/license.terms
 done lib/tksh7.6/license.terms
 exec - test '' = 'lib/tksh7.6/license.terms' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/license.terms ${INSTALLROOT}/lib/tksh7.6/license.terms || { ${STDMV} ${INSTALLROOT}/lib/tksh7.6/license.terms ${INSTALLROOT}/lib/tksh7.6/license.terms.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/license.terms ${INSTALLROOT}/lib/tksh7.6/license.terms  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tksh7.6/license.terms) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tksh7.6/license.terms generated
 make ${INSTALLROOT}/lib/tksh7.6/parray.tcl
 make lib/tksh7.6/parray.tcl
 done lib/tksh7.6/parray.tcl
 exec - test '' = 'lib/tksh7.6/parray.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/parray.tcl ${INSTALLROOT}/lib/tksh7.6/parray.tcl || { ${STDMV} ${INSTALLROOT}/lib/tksh7.6/parray.tcl ${INSTALLROOT}/lib/tksh7.6/parray.tcl.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/parray.tcl ${INSTALLROOT}/lib/tksh7.6/parray.tcl  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tksh7.6/parray.tcl) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tksh7.6/parray.tcl generated
 make ${INSTALLROOT}/lib/tksh7.6/tclIndex
 make lib/tksh7.6/tclIndex
 done lib/tksh7.6/tclIndex
 exec - test '' = 'lib/tksh7.6/tclIndex' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/tclIndex ${INSTALLROOT}/lib/tksh7.6/tclIndex || { ${STDMV} ${INSTALLROOT}/lib/tksh7.6/tclIndex ${INSTALLROOT}/lib/tksh7.6/tclIndex.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/tclIndex ${INSTALLROOT}/lib/tksh7.6/tclIndex  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/tksh7.6/tclIndex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/tksh7.6/tclIndex generated
 done install virtual
 make test

@@ -2336,6 +2336,7 @@ All recorded changes follow.
 :::::::: nmake ::::::::
 
 06-12-07 expand.c: add $("<table>":L...) for { FILES RULES VARIABLES }
+06-12-07 expand.c: add :VX: to still expand value
 06-12-07 Makerules.mk: use $("<VARIABLES>":L=CC.+([[:upper:].])) in .MAM.INIT
 06-11-23 Makerules.mk: fix .BIND.-l% for -g only bootstrap
 06-11-15 Makerules.mk: fix :: vs :LIBRARY: ordering bug for .o prereqs
@@ -4801,7 +4802,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
-06-12-05 Makefile: finx conftab.c generation CCFLAGS to match build - doh
+06-12-07 Makefile: fix conftab.c generation CCFLAGS to match build - doh
 06-12-04 sfio/sfcvt.c: fix (int) vs. (long) cast mismatches
 06-12-01 comp/conf.tab: add changes to cover solaris { bin xpg4 xpg6 }
 06-12-01 regex/reginit.c: adjust { SRE KRE } escaped (){}*? inside [...]

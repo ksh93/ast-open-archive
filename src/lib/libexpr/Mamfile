@@ -378,7 +378,6 @@ make ${INSTALLROOT}/lib/lib/expr
 prev ${INSTALLROOT}/lib/lib
 prev expr.req
 exec - test '' = 'expr.req' || ${STDCMP} 2>/dev/null -s expr.req ${INSTALLROOT}/lib/lib/expr || { ${STDMV} ${INSTALLROOT}/lib/lib/expr ${INSTALLROOT}/lib/lib/expr.old 2>/dev/null || true; ${STDCP} expr.req ${INSTALLROOT}/lib/lib/expr  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/lib/expr) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/expr generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
@@ -397,7 +396,6 @@ done ${PACKAGE_ast_INCLUDE}/expr.h generated
 make ${PACKAGE_ast_INCLUDE}/exparse.h
 prev exparse.h
 exec - test '' = 'exparse.h' || ${STDCMP} 2>/dev/null -s exparse.h ${PACKAGE_ast_INCLUDE}/exparse.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/exparse.h ${PACKAGE_ast_INCLUDE}/exparse.h.old 2>/dev/null || true; ${STDCP} exparse.h ${PACKAGE_ast_INCLUDE}/exparse.h  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_INCLUDE}/exparse.h) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_INCLUDE}/exparse.h generated
 done install virtual
 make test
