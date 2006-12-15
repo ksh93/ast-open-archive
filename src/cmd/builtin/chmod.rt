@@ -12,6 +12,7 @@ TEST '"=" vs. umask'
 	UMASK $mask
 
 	EXEC 777 f
+	EXEC -c 777 f
 	EXEC -c = f
 	EXEC -c =rw f
 	EXEC -c =,u=rw f

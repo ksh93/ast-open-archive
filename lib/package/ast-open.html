@@ -3325,6 +3325,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-15 Makerules.mk: set up PACKAGE rules to search CC.STDLIB -- doh
+06-12-14 rules-win32.mk: add (RC) (RCFLAGS) to %.rc =&gt; %.res
+06-12-12 bind.c: handle win32 dir vs. dir.exe =&gt; not aliased
 06-12-07 expand.c: add $("&lt;table&gt;":L...) for { FILES RULES VARIABLES }
 06-12-07 expand.c: add :VX: to still expand value
 06-12-07 Makerules.mk: use $("&lt;VARIABLES&gt;":L=CC.+(&#0091;&#0091;:upper:&#0093;.&#0093;)) in .MAM.INIT
@@ -4589,6 +4592,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-12 chmod.rt,mkdir.rt: add absolute mode tests
 06-11-15 cp.tst,ln.tst,mv.tst: add initial regression tests
 06-10-31 global edit to eliminate most non-const static data
 06-10-11 add sfstruse() error checks
@@ -5492,6 +5496,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-11 ls.c: disable LS_PRINTABLE for utf-8
 06-12-04 du.c: handle &gt; 2Ti in local.pointer
 06-11-23 ps.c: --escape now the default: -E =&gt; --noescape
 06-10-11 add sfstruse() error checks
@@ -5897,6 +5902,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-12 string/strperm.c: octal modes are absolute!
+06-12-11 comp/conf.tab: always defer ARG_MAX
 06-12-07 Makefile: fix conftab.c generation CCFLAGS to match build - doh
 06-12-04 sfio/sfcvt.c: fix (int) vs. (long) cast mismatches
 06-12-01 comp/conf.tab: add changes to cover solaris { bin xpg4 xpg6 }
@@ -8787,7 +8794,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>December 11, 2006</TD>
+<TD align=right>December 14, 2006</TD>
 </TR>
 </TABLE>
 <P>

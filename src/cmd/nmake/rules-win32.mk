@@ -19,7 +19,9 @@ SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 
 .ATTRIBUTE.%.rc : .SCAN.rc
 
-%.res : %.rc
+(RC) (RCFLAGS) : .PARAMETER
+
+%.res : %.rc (RC) (RCFLAGS)
 	$(RC) $(RCFLAGS) -r -fo$(<:P=N) $(.INCLUDE. rc:P=N:/^/-I/) $(>:P=N)
 
 %.def : %.sym

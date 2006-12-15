@@ -71,6 +71,54 @@ TEST 01 '"-m =" vs. umask'
 	PROG	rmdir d
 		OUTPUT -
 
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
 	EXEC	-m =rx d
 		UMASK 007
 
@@ -129,6 +177,54 @@ TEST 01 '"-m =" vs. umask'
 		OUTPUT -
 
 	EXEC	-m a=rx d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
 
 	PROG	chmod -v + d
 		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
@@ -201,6 +297,54 @@ TEST 01 '"-m =" vs. umask'
 	PROG	rmdir d
 		OUTPUT -
 
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
 	EXEC	-m =rx d
 		UMASK 077
 
@@ -259,6 +403,54 @@ TEST 01 '"-m =" vs. umask'
 		OUTPUT -
 
 	EXEC	-m a=rx d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
 
 	PROG	chmod -v + d
 		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
@@ -331,6 +523,54 @@ TEST 01 '"-m =" vs. umask'
 	PROG	rmdir d
 		OUTPUT -
 
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
 	EXEC	-m =rx d
 		UMASK 707
 
@@ -389,6 +629,54 @@ TEST 01 '"-m =" vs. umask'
 		OUTPUT -
 
 	EXEC	-m a=rx d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
 
 	PROG	chmod -v + d
 		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
@@ -461,6 +749,54 @@ TEST 01 '"-m =" vs. umask'
 	PROG	rmdir d
 		OUTPUT -
 
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
 	EXEC	-m =rx d
 		UMASK 777
 
@@ -519,6 +855,54 @@ TEST 01 '"-m =" vs. umask'
 		OUTPUT -
 
 	EXEC	-m a=rx d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -777 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0000 (---------)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m 222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0222 (-w--w--w-)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m +222 d
+
+	PROG	chmod -v + d
+		OUTPUT - 'd: mode changed to 0777 (rwxrwxrwx)'
+
+	PROG	rmdir d
+		OUTPUT -
+
+	EXEC	-m -222 d
 
 	PROG	chmod -v + d
 		OUTPUT - 'd: mode changed to 0555 (r-xr-xr-x)'

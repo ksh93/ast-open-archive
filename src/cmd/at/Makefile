@@ -6,6 +6,7 @@ DEBUG == 1
 
 if CC.HOSTTYPE == "win32*"
 AT_STRICT == 1
+PACKAGE_LOCAL ==
 end
 
 $(PACKAGE_LOCAL)at :: PROMO.mm RELEASE at.h at.c -lcoshell -lcs

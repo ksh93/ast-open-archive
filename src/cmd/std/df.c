@@ -505,10 +505,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				s = "";
 			break;
 		case KEY_native:
-			if (df->vfs.f_bsize >= 1024)
-				sfsprintf(state.buf, sizeof(state.buf), "%3dk", df->vfs.f_bsize / 1024);
+			if ((n = F_FRSIZE(&df->vfs)) >= 1024)
+				sfsprintf(state.buf, sizeof(state.buf), "%I*3dk", sizeof(n), n / 1024);
 			else
-				sfsprintf(state.buf, sizeof(state.buf), "%4d", df->vfs.f_bsize);
+				sfsprintf(state.buf, sizeof(state.buf), "%I*4d", sizeof(n), n);
 			s = state.buf;
 			break;
 		case KEY_options:

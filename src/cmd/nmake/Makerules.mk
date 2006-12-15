@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-12-07 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-12-15 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2579,7 +2579,7 @@ end
 	local T1 T2 T3 T4 T5 T6 T7
 	local B D G H I K L N P Q T V W X Y Z IP LP LPL LPV PFX SFX FOUND
 	if ! .PACKAGE.GLOBAL.
-		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(INSTALLROOT:T=F:P=L=*) $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
+		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(INSTALLROOT:T=F:P=L=*) $(CC.STDLIB:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
 		.PACKAGE.GLOBAL. := $(.PACKAGE.GLOBAL.:N!=$(PACKAGE_IGNORE):T=F:U)
 		.PACKAGE.CONFIG. := $(.PACKAGE.GLOBAL.:X=$(.PACKAGE.CONFIG.):T=F:U)
 		: $(.PACKAGE.PROBE.:V:R)
@@ -2739,7 +2739,7 @@ end
 							end
 						end
 						for LPV $(LPL)
-							X := $(T5:C%$%/$(D)/$(LPV)/$(P)$(P)$(SFX)%:C%^//%/%)
+							X := $(T5:C%$%/$(D)/$(LPV)/$(PFX)$(P)$(SFX)%:C%^//%/%)
 							if ( T1 = "$(X:N!=//*:P=X:O=1:D)" )
 								break 3
 							end

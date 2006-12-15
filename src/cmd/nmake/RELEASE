@@ -1,3 +1,6 @@
+06-12-15 Makerules.mk: set up PACKAGE rules to search CC.STDLIB -- doh
+06-12-14 rules-win32.mk: add (RC) (RCFLAGS) to %.rc => %.res
+06-12-12 bind.c: handle win32 dir vs. dir.exe => not aliased
 06-12-07 expand.c: add $("<table>":L...) for { FILES RULES VARIABLES }
 06-12-07 expand.c: add :VX: to still expand value
 06-12-07 Makerules.mk: use $("<VARIABLES>":L=CC.+([[:upper:].])) in .MAM.INIT

@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2006-10-11 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2006-12-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -1290,7 +1290,11 @@ main(int argc, register char** argv)
 	else if (streq(s, "lsx"))
 		state.lsflags |= LS_ACROSS|LS_COLUMNS;
 	else if (isatty(1))
-		state.lsflags |= LS_COLUMNS|LS_PRINTABLE;
+	{
+		state.lsflags |= LS_COLUMNS;
+		if (!strmatch(setlocale(LC_ALL, NiL), "*[Uu][Tt][Ff]?(-)8"))
+			state.lsflags |= LS_PRINTABLE;
+	}
 	state.endflags = state.flags;
 	state.blocksize = 512;
 	state.testdate = ~0;

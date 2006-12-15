@@ -1,3 +1,4 @@
+06-12-12 chmod.rt,mkdir.rt: add absolute mode tests
 06-11-15 cp.tst,ln.tst,mv.tst: add initial regression tests
 06-10-31 global edit to eliminate most non-const static data
 06-10-11 add sfstruse() error checks

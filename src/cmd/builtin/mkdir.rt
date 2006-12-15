@@ -18,6 +18,15 @@ TEST '"-m =" vs. umask'
 
 	done
 
+	for perm in 777 +777 -777 222 +222 -222
+	do
+
+	EXEC -m ${perm} d
+	PROG chmod -v + d
+	PROG rmdir d
+
+	done
+
 	done
 
 TEST '-p vs umask vs intermediate and final modes'

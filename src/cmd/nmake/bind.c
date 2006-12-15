@@ -186,7 +186,7 @@ unique(register Rule_t* r)
 	}
 	id.dev = st.st_dev;
 	id.ino = st.st_ino;
-	if ((d = getdir(&id)) && state.alias && (!state.mam.statix || S_ISDIR(st.st_mode)))
+	if ((d = getdir(&id)) && state.alias && d->directory == (S_ISDIR(st.st_mode) != 0) && (!state.mam.statix || S_ISDIR(st.st_mode)))
 	{
 		/*
 		 * internal.unbind causes directory rescan

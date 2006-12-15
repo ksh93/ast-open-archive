@@ -11,6 +11,8 @@ TEST 01 '"=" vs. umask'
 	EXEC	777 f
 		UMASK 000
 
+	EXEC	-c 777 f
+
 	EXEC	-c = f
 		OUTPUT - 'f: mode changed to 0000 (---------)'
 
@@ -41,6 +43,8 @@ TEST 01 '"=" vs. umask'
 	EXEC	777 f
 		OUTPUT -
 		UMASK 007
+
+	EXEC	-c 777 f
 
 	EXEC	-c = f
 		OUTPUT - 'f: mode changed to 0000 (---------)'
@@ -73,6 +77,8 @@ TEST 01 '"=" vs. umask'
 		OUTPUT -
 		UMASK 070
 
+	EXEC	-c 777 f
+
 	EXEC	-c = f
 		OUTPUT - 'f: mode changed to 0000 (---------)'
 
@@ -103,6 +109,8 @@ TEST 01 '"=" vs. umask'
 	EXEC	777 f
 		OUTPUT -
 		UMASK 077
+
+	EXEC	-c 777 f
 
 	EXEC	-c = f
 		OUTPUT - 'f: mode changed to 0000 (---------)'
@@ -135,6 +143,8 @@ TEST 01 '"=" vs. umask'
 		OUTPUT -
 		UMASK 700
 
+	EXEC	-c 777 f
+
 	EXEC	-c = f
 		OUTPUT - 'f: mode changed to 0000 (---------)'
 
@@ -165,6 +175,8 @@ TEST 01 '"=" vs. umask'
 	EXEC	777 f
 		OUTPUT -
 		UMASK 707
+
+	EXEC	-c 777 f
 
 	EXEC	-c = f
 		OUTPUT - 'f: mode changed to 0000 (---------)'
@@ -197,6 +209,8 @@ TEST 01 '"=" vs. umask'
 		OUTPUT -
 		UMASK 770
 
+	EXEC	-c 777 f
+
 	EXEC	-c = f
 		OUTPUT - 'f: mode changed to 0000 (---------)'
 
@@ -228,9 +242,13 @@ TEST 01 '"=" vs. umask'
 		OUTPUT -
 		UMASK 777
 
+	EXEC	-c 777 f
+
 	EXEC	-c = f
+		OUTPUT - 'f: mode changed to 0000 (---------)'
 
 	EXEC	-c =rw f
+		OUTPUT -
 
 	EXEC	-c =,u=rw f
 		OUTPUT - 'f: mode changed to 0600 (rw-------)'
