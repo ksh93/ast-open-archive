@@ -301,21 +301,6 @@ exec - (ranlib libpz.a) >/dev/null 2>&1 || true
 done libpz.a generated
 done pz virtual
 prev libpz.a archive
-make line
-make libpzline.a archive
-make pzline.o
-make pzline.c
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev pzip.h implicit
-done pzline.c
-meta pzline.o %.c>%.o pzline.c pzline
-prev pzline.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpz]"\" -c pzline.c
-done pzline.o generated
-exec - ${AR} cr libpzline.a pzline.o
-exec - (ranlib libpzline.a) >/dev/null 2>&1 || true
-done libpzline.a generated
-done line virtual
 make ${INSTALLROOT}/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib
 exec - then	mkdir -p ${INSTALLROOT}/lib

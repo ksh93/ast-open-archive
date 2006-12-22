@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-12-15 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-12-22 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2615,10 +2615,7 @@ end
 			LP =
 		end
 		if ! LP
-			if CC.HOSTTYPE == "*64" && "$(CC.STDLIB:B:N=*64)"
-				LP = lib64
-			end
-			LP += lib
+			LP := $(CC.STDLIB.BASE)
 		end
 		if ( I && L || "$(.PACKAGE.$(P).rules)" != "-" && ( "$(I:T=F)" || "$(L:T=F)" ) )
 			FOUND = 1
@@ -2706,11 +2703,6 @@ end
 				N += $(P)
 				if P == "*[!0-9]+([0-9])"
 					N += $(P:C,[0-9]*$,,)
-				end
-				if CC.HOSTTYPE == "*64" && ! "$(CC.STDLIB:B:N=*64)"
-					T1 = lib64
-				else
-					T1 =
 				end
 				LPL := $(CC.STDLIB:B) $(T1) $(LP)
 				LPL := $(LPL:U)
@@ -3418,7 +3410,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	return $(*.INSTALL:N=$(INSTALLROOT)/*) $(*.INSTALL:N=$(INSTALLROOT)/*$(CC.SUFFIX.SHARED).+([0-9.]):/\.[0-9.]*$//)
 
 .PROBE.LOAD : .MAKE .VIRTUAL .FORCE
-	.PROBE.SPECIAL. = CC.HOSTTYPE CC.LD.DYNAMIC CC.LD.STATIC
+	.PROBE.SPECIAL. = CC.HOSTTYPE CC.LD.DYNAMIC CC.LD.STATIC CC.STDLIB.BASE
 	$(.PROBE.SPECIAL.) : .FUNCTION
 		$(.PROBE.SPECIAL.) : -FUNCTIONAL
 		make .PROBE.INIT
@@ -3489,6 +3481,10 @@ PACKAGES : .SPECIAL .FUNCTION
 	end
 	if ! CC.SUFFIX.OBJECT
 		CC.SUFFIX.OBJECT = .o
+	end
+	if ! CC.STDLIB.BASE
+		CC.STDLIB.BASE := $(CC.STDLIB:N=?(/usr)/lib?(64):B) lib
+		CC.STDLIB.BASE := $(CC.STDLIB.BASE:U)
 	end
 	if CCSPECIALIZE
 		CC.OPTIMIZE := $(CCSPECIALIZE)

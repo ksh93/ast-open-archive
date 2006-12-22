@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -40,6 +40,9 @@
 #ifndef SHRT_MAX
 #define SHRT_MAX	((short)(~((unsigned short)0)) >> 1)
 #endif
+#ifndef INT_MAX
+#define INT_MAX		((int)(~((unsigned int)0)) >> 1)
+#endif
 #ifndef LONG_MAX
 #define LONG_MAX	((long)(~((unsigned long)0)) >> 1)
 #endif
@@ -48,7 +51,7 @@
 #define OUTSIZE		(64*1024)	/* default outsize		*/
 #define PROCSIZE	(4*1024*1024)	/* default procsize		*/
 
-#define MAXFIELD	SHRT_MAX
+#define MAXFIELD	INT_MAX
 
 #define blank(c)	((c)==' '||(c)=='\t')
 
@@ -59,8 +62,8 @@ typedef int (*Coder_t)(struct _rskey_s*, struct Field_s*, unsigned char*, unsign
 
 typedef struct				/* field position		*/
 {
-	short		field;		/* field offset			*/
-	short		index;		/* char offset			*/
+	int		field;		/* field offset			*/
+	int		index;		/* char offset			*/
 } Position_t;
 
 typedef struct Field_s			/* key field			*/

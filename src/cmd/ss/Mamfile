@@ -144,6 +144,8 @@ done ss generated
 make ssd
 make ssd.o
 make ssd.c
+make nlist.h implicit
+done nlist.h dontcare virtual
 make FEATURE/cmd implicit
 meta FEATURE/cmd features/%>FEATURE/% features/cmd cmd
 make features/cmd

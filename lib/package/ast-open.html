@@ -1046,7 +1046,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-06-11-20  --- Release ksh93s  ---
+06-12-22  --- Release ksh93s  ---
+06-12-22  /dev/(tcp|udp|sctp)/HOST/SEVRICE now handles IPv6 addresses on
+	  systems that provide getaddrinfo(3).
+06-12-19  A -v option was added to read.  With this option the value of
+	  the first variable name argument will become the default value
+	  when read from a terminal device. 
 06-11-20  A bug in which "${foo&#0091;@&#0093;:1}}" expands a null argument (instead of
 	  no argument), when foo&#0091;0&#0093; is not empty has been fixed. 
 06-11-16  The discipline functions have been modified to allow each subscript
@@ -3325,6 +3330,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-22 Makerules.mk: add CC.STDLIB.BASE to differentiate 32 vs 64 arch
+06-12-22 pkg-X11.mk: use CC.STDLIB.BASE
 06-12-15 Makerules.mk: set up PACKAGE rules to search CC.STDLIB -- doh
 06-12-14 rules-win32.mk: add (RC) (RCFLAGS) to %.rc =&gt; %.res
 06-12-12 bind.c: handle win32 dir vs. dir.exe =&gt; not aliased
@@ -5902,6 +5909,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-20 features/libpath.sh: generalize sol.* LIBPATH patterns
+06-12-18 comp/setlocale.c: include ast_standards.h and ast_wchar.h !
 06-12-12 string/strperm.c: octal modes are absolute!
 06-12-11 comp/conf.tab: always defer ARG_MAX
 06-12-07 Makefile: fix conftab.c generation CCFLAGS to match build - doh
@@ -7618,6 +7627,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="librecsort changes">librecsort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-15 rskeyhdr.h: increase MAXFIELD to INT_MAX
 06-07-17 rsprocess.c: re-key after RS_READ calout
 06-06-29 rsprocess.c: set obj key,keylen before RS_READ
 06-05-10 rsmerge.c: (car) caught 2 more missing RS_WRITE callouts!
@@ -8581,6 +8591,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpz changes">libpz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-18 pzline.c: move to separate plugin source dir
 06-10-11 add sfstruse() error checks
 06-03-22 pzopen.c: change "input stream close error" to "data corrupted"
 05-07-17 pzinflate.c: use sferror() instead of sfsync() -- doh
@@ -8794,7 +8805,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>December 14, 2006</TD>
+<TD align=right>December 23, 2006</TD>
 </TR>
 </TABLE>
 <P>
