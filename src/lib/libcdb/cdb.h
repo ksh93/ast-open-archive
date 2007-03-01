@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1997-2005 AT&T Corp.                  *
+*           Copyright (c) 1997-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -119,8 +119,8 @@
 #define CDB_CLOSE	6		/* close event			*/
 #define CDB_RECLOSE	7		/* method reopen close event	*/
 
-#define Cdbint_t	_ast_int4_t
-#define Cdbuint_t	unsigned _ast_int4_t
+#define Cdbint_t	int32_t
+#define Cdbuint_t	uint32_t
 
 struct Cdb_s; typedef struct Cdb_s Cdb_t;
 struct Cdbdata_s; typedef struct Cdbdata_s Cdbdata_t;

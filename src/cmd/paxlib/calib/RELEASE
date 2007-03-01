@@ -1,3 +1,4 @@
+07-02-03 fix sfsprintf() size to match 2006-12 posix alignment
 04-04-04 add camap.c for { \0 \r } in cobol
 04-04-01 fix COPY REPLACING edit comment parse
 04-03-30 fix COPY-REPLACING delimiter to be `=='

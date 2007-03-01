@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -68,11 +68,9 @@ MAIN()
 	if(pipe(fd) < 0)
 		terror("Opening pipes\n");
 
-	if(!(w = sfnew(NIL(Sfio_t*),NIL(Void_t*),(size_t)SF_UNBOUND,
-			fd[1],SF_WRITE)) )
+	if(!(w = sfnew(NIL(Sfio_t*),NIL(Void_t*),(size_t)SF_UNBOUND, fd[1],SF_WRITE)) )
 		terror("Opening write stream\n");
-	if(!(r = sfnew(NIL(Sfio_t*),NIL(Void_t*),(size_t)SF_UNBOUND,
-			fd[0],SF_READ)) )
+	if(!(r = sfnew(NIL(Sfio_t*),NIL(Void_t*),(size_t)SF_UNBOUND, fd[0],SF_READ)) )
 		terror("Opening read stream\n");
 
 	sfdisc(w,&Wdisc);

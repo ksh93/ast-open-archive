@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -109,9 +109,9 @@ fill(State_t* state)
 static int
 flush(register State_t* state)
 {
-	unsigned _ast_int4_t	b;
-	int			c3;
-	int			x;
+	uint32_t	b;
+	int		c3;
+	int		x;
 
 	x = 1;
 	if (state->c1 >= 0)
@@ -228,12 +228,12 @@ uu_init(Codex_t* p)
 static ssize_t
 uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 {
-	register State_t*		state = (State_t*)CODEX(disc)->data;
-	register char*			s = (char*)buf;
-	register char*			e = s + n - UUIN + 1;
-	register unsigned _ast_int4_t	b;
-	register int			c;
-	register int			x;
+	register State_t*	state = (State_t*)CODEX(disc)->data;
+	register char*		s = (char*)buf;
+	register char*		e = s + n - UUIN + 1;
+	register uint32_t	b;
+	register int		c;
+	register int		x;
 
 	if (state->data->length)
 		while (s < e)
@@ -355,13 +355,13 @@ uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 static ssize_t
 uu_write(Sfio_t* sp, const void* buf, size_t n, Sfdisc_t* disc)
 {
-	register State_t*		state = (State_t*)CODEX(disc)->data;
-	register unsigned char*		s;
-	register unsigned char*		e;
-	register unsigned _ast_int4_t	b;
-	register int			c1;
-	register int			c2;
-	register int			c3;
+	register State_t*	state = (State_t*)CODEX(disc)->data;
+	register unsigned char*	s;
+	register unsigned char*	e;
+	register uint32_t	b;
+	register int		c1;
+	register int		c2;
+	register int		c3;
 
 	s = (unsigned char*)buf;
 	e = s + n;

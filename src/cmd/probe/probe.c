@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: probe (AT&T Research) 2006-09-05 $\n]"
+"[-?\n@(#)$Id: probe (AT&T Research) 2007-02-22 $\n]"
 USAGE_LICENSE
 "[+NAME?probe - generate/install/display language processor probe information]"
 "[+DESCRIPTION?\bprobe\b generates, installs and displays on the standard"
@@ -545,7 +545,6 @@ main(int argc, char** argv)
 				 * verify and rename to the real probe key path
 				 */
 
-				sfclose(fp);
 				strcpy(base, key);
 				if (verify(tmp, path, processor, 1))
 				{

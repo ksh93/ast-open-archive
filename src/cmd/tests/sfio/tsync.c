@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -162,8 +162,6 @@ MAIN()
 		terror("Bad SF_SYNC count=%d, expecting 3\n", Count);
 
 	sfdisc(f1,NIL(Sfdisc_t*));
-	if(Count != 3)
-		terror("Bad SF_SYNC count=%d, expecting 3\n", Count);
 
 	sfseek(f2,(Sfoff_t)0,0);
 	sfgetc(f2);

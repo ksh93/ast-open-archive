@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -430,8 +430,8 @@ struct Frame_s; typedef struct Frame_s Frame_t;
 struct List_s; typedef struct List_s List_t;
 struct Rule_s; typedef struct Rule_s Rule_t;
 
-typedef unsigned _ast_int4_t Flags_t;	/* flag bit vector		*/
-typedef unsigned _ast_int4_t Seconds_t;	/* seconds resolution time	*/
+typedef uint32_t Flags_t;		/* flag bit vector		*/
+typedef uint32_t Seconds_t;		/* seconds resolution time	*/
 
 typedef struct Fileid_s			/* unique file id		*/
 {

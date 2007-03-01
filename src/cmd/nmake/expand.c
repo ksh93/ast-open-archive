@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -787,9 +787,7 @@ linebreak(Sfio_t* xp, register char* s, char* pfx)
 static void
 listtab(Sfio_t* xp, Hash_table_t* tab, char* pat, int flags)
 {
-	register Rule_t*	r;
 	register char**		v;
-	char**			w;
 	Hash_position_t*	pos;
 	int			n;
 	Sfio_t*			hit;
@@ -1786,7 +1784,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 		sep = 0;
 		if (!r || !r->time || (r->property & P_state) || r->status == IGNORE)
 			break;
-		if ((t = getbound(r->name)) || (s = r->uname) && (t = getbound(s)))
+		if (((state.questionable & 0x10000000) || !(s = r->uname) || !(t = strrchr(r->name, '/')) || !streq(t+1, s)) && ((t = getbound(r->name)) || (s = r->uname) && (t = getbound(s))))
 		{
 			if ((x = getrule(t)) && (x->dynamic & (D_entries|D_scanned)) == (D_entries|D_scanned) || *t == '/' && !*(t + 1))
 				s = 0;
@@ -1798,10 +1796,23 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			if (s)
 				*s = '/';
 			s = (!(state.questionable & 0x00008000) && *r->name == '/') ? r->uname : (char*)0;
+			t = state.localview ? localview(x) : x->name;
+			if ((r->dynamic & D_alias) && !(state.questionable & 0x10000000))
+			{
+				sfprintf(internal.nam, "%s/%s", t, r->uname);
+				if (!getrule(sfstruse(internal.nam)) && (e = strrchr(r->name, '/')))
+				{
+					*e = 0;
+					x = getrule(r->name);
+					*e = '/';
+					if (x && (x->dynamic & (D_entries|D_scanned)) == (D_entries|D_scanned))
+						t = state.localview ? localview(x) : x->name;
+				}
+			}
 			sfputr(xp, state.localview ? localview(x) : x->name, -1);
-			sep = 1;
 			if (!s)
 				return;
+			sep = 1;
 		}
 		if (s)
 		{
@@ -2469,6 +2480,12 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	{
 		switch (op)
 		{
+		case 'Z':
+			if (*ops != 'W')
+				break;
+			if (*++ops == '=')
+				ops++;
+			/*FALLTHROUGH*/
 		case 'R':
 			sfputr(xp, timefmt(ops, CURTIME), -1);
 			break;

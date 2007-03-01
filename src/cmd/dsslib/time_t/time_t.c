@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -40,8 +40,8 @@ typedef struct Precise_s
 	size_t			size;
 } Precise_t;
 
-#ifdef _ast_int8_t
-typedef unsigned _ast_int8_t Nstime_t;
+#if _typ_int64_t
+typedef uint64_t Nstime_t;
 #else
 typedef double Nstime_t;
 #endif

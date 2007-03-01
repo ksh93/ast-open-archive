@@ -38,12 +38,6 @@ split :: split.c LICENSE=since=1995,author=dgk+gsf
 
 csplit :LINK: split
 
-sum :: sum.c -lsum
-
-cksum :LINK: sum
-
-md5sum :LINK: sum
-
 touch :: touch.c
 
 tsort :: tsort.c LICENSE=since=1995,author=dgk+gsf
@@ -52,6 +46,6 @@ unexpand :: unexpand.c LICENSE=since=1995,author=dgk
 
 expand :LINK: unexpand
 
-:TEST: csplit dd locale ls sum touch tsort
+:TEST: csplit dd locale ls touch tsort
 
 :: y2k.dat

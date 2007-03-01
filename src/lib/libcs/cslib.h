@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -58,7 +58,6 @@ typedef struct Server_s Server_t;
 #include <cs.h>
 #include <debug.h>
 #include <errno.h>
-#include <int.h>
 #include <sig.h>
 #include <tok.h>
 

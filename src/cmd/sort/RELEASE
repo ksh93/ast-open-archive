@@ -1,3 +1,4 @@
+07-01-25 main.c: v format size is max of all input files
 06-07-17 main.c: RS_POP before checking output
 06-07-17 main.c: handle empty file for record format data sample
 06-05-09 main.c: add path to record format determination message

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -173,9 +173,9 @@
 #endif
 
 typedef _ast_fltmax_t Cxnumber_t;
-typedef unsigned _ast_int4_t Cxflags_t;
-typedef _ast_intmax_t Cxinteger_t;
-typedef unsigned _ast_intmax_t Cxunsigned_t;
+typedef      uint32_t Cxflags_t;
+typedef      intmax_t Cxinteger_t;
+typedef     uintmax_t Cxunsigned_t;
 
 struct Cx_s; typedef struct Cx_s Cx_t;
 struct Cxarray_s; typedef struct Cxarray_s Cxarray_t;

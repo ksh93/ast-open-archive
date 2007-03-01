@@ -5,15 +5,15 @@
  *
  * test registry
  *
- *	0001000	disable auto-sequence
- *	0002000 disable latest version selection
- *	0004000 trace directory type { 0 1 }
- *	0010000 disable ibm => standard cobol conversions
- *	0020000 trace all directory types
- *	0040000 trace partial output record buffers
- *	0100000 trace record headers in decimal
- *	0200000 trace record headers in base 4
- *	0400000 trace record headers in base 4 (alternate format)
+ *	0x00200	disable auto-sequence
+ *	0x00400 disable latest version selection
+ *	0x00800 trace directory type { 0 1 }
+ *	0x01000 disable ibm => standard cobol conversions
+ *	0x02000 trace all directory types
+ *	0x04000 trace partial output record buffers
+ *	0x08000 trace record headers in decimal
+ *	0x10000 trace record headers in base 4
+ *	0x20000 trace record headers in base 4 (alternate format)
  */
 
 #include <paxlib.h>
@@ -296,13 +296,13 @@ calib_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfil
 			(*pax->errorf)(NiL, pax, 3, "%s: %s format block header read error", ap->name, ap->format->name);
 		j = casize2(&blk[10]);
 		k = casize2(&blk[12]);
-		if (pax->test & 0400000)
+		if (pax->test & 0x20000)
 			(*pax->errorf)(NiL, pax, 1, "blk %c%c%c%c%c%c%c%c %02x %02x %02x %02x %02x %02x %02x %02x", ccmapchr(ar->map, blk[0]), ccmapchr(ar->map, blk[1]), ccmapchr(ar->map, blk[2]), ccmapchr(ar->map, blk[3]), ccmapchr(ar->map, blk[4]), ccmapchr(ar->map, blk[5]), ccmapchr(ar->map, blk[6]), ccmapchr(ar->map, blk[7]), blk[8], blk[9], blk[10], blk[11], blk[12], blk[13], blk[14], blk[15]);
 		while (k-- > 0)
 		{
 			if (paxread(pax, ap, dir, (off_t)sizeof(dir), (off_t)sizeof(dir), 0) <= 0)
 				(*pax->errorf)(NiL, pax, 3, "%s: %s format header read error", ap->name, ap->format->name);
-			if (pax->test & 0400000)
+			if (pax->test & 0x20000)
 				(*pax->errorf)(NiL, pax, 1, "dir %c%c%c%c%c%c%c%c %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", ccmapchr(ar->map, dir[0]), ccmapchr(ar->map, dir[1]), ccmapchr(ar->map, dir[2]), ccmapchr(ar->map, dir[3]), ccmapchr(ar->map, dir[4]), ccmapchr(ar->map, dir[5]), ccmapchr(ar->map, dir[6]), ccmapchr(ar->map, dir[7]), dir[8], dir[9], dir[10], dir[11], dir[12], dir[13], dir[14], dir[15], dir[16], dir[17], dir[18], dir[19], dir[20], dir[21]);
 			if (dp >= de)
 			{
@@ -385,7 +385,7 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 	comment[0] = from[0] = to[0] = 0;
 	sequence = ar->digits && ar->increment && (ar->position + ar->digits) <= ar->linesize ? ar->sequence : -1;
 	noted = !wfp || !pax->warn;
-	if (pax->test & 0001000)
+	if (pax->test & 0x00200)
 		sequence = -1;
 	generate = ar->flags != 0xf1;
 	block = 0;
@@ -393,7 +393,7 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 	error_info.line = 0;
 	ofile = error_info.file;
 	error_info.file = f->name;
-	version = (pax->test & 0002000) ? -1 : ar->version;
+	version = (pax->test & 0x00400) ? -1 : ar->version;
 	for (;;)
 	{
 		block++;
@@ -417,11 +417,11 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 			while ((ar->count = ar->next[-1]) == 1 && ar->next[0] == 0)
 				ar->next += 2;
 			error_info.line++;
-			if (pax->test & 0100000)
+			if (pax->test & 0x08000)
 				(*pax->errorf)(NiL, pax, 0, "%03d %3u %3u %5u %3u %03o %4u %4u %4u %4u %4u %4o %4o %4o %4u %4u", error_info.line, ar->count, ar->next - hdr, ar->next - ar->buffer, hdr[0], hdr[1], hdr[2], hdr[3], hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9], hdr[10], hdr[11]);
-			if (pax->test & 0200000)
+			if (pax->test & 0x10000)
 				(*pax->errorf)(NiL, pax, 0, "%03d %3u %3u %3u %03o %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u", error_info.line, ar->count, ar->next - hdr, hdr[0], hdr[1], hdr[2], hdr[3], hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9], hdr[10], hdr[11]);
-			if (pax->test & 0400000)
+			if (pax->test & 0x20000)
 				(*pax->errorf)(NiL, pax, 0, "%03d %3d %03d:%02x:%04..4u:%03u | %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u",
 					error_info.line,
 					ar->count,
@@ -467,13 +467,13 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 				}
 				else if (ar->count & 0x80)
 				{
-					if (pax->test & 0040000)
+					if (pax->test & 0x04000)
 						(*pax->errorf)(NiL, pax, 1, "part c=%d n=%d k=%d \"%-.*s\"", c, out - outbuf, ar->count & 0x7f, out - outbuf, outbuf);
 					goto key;
 				}
 				else if ((c = ar->count - 64) & 0x80)
 					c = (c + 64) & 0x7f;
-				if (pax->test & 0040000)
+				if (pax->test & 0x04000)
 					(*pax->errorf)(NiL, pax, 1, "part c=%d:%d:%d r=%d:%d bits=%d n=%d x=%u \"%-.*s\"", c, &outbuf[ar->linesize] - out, c ^ 64, ar->next - ar->buffer, ar->line, bits, out - outbuf, *ar->next, out - outbuf, outbuf);
 				if (c > (&outbuf[ar->linesize] - out))
 				{
@@ -609,7 +609,7 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 							memset(out, ' ', c);
 							out += c;
 						}
-						b += sfsprintf((char*)b, ar->digits, "%0.*lu", ar->digits, generate ? sequence : casize3(&hdr[2]));
+						b += sfsprintf((char*)b, ar->digits+1, "%0.*lu", ar->digits, generate ? sequence : casize3(&hdr[2]));
 						if (out < b)
 							out = b;
 					}
@@ -645,7 +645,7 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 							}
 					}
 				}
-				else if (!pax->strict && !(pax->test & 0010000) && outbuf[0] == '-' && outbuf[1] == 'I' && outbuf[2] == 'N' && outbuf[3] == 'C' && outbuf[4] == ' ')
+				else if (!pax->strict && !(pax->test & 0x01000) && outbuf[0] == '-' && outbuf[1] == 'I' && outbuf[2] == 'N' && outbuf[3] == 'C' && outbuf[4] == ' ')
 				{
 					for (b = outbuf + 5; *b == ' '; b++);
 					for (m = b; m < (out - 1) && *m != ' '; m++);
@@ -761,7 +761,7 @@ calib_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 		if (!(k & (1<<j)))
 		{
 			k |= (1<<j);
-			if (pax->test & 0020000)
+			if (pax->test & 0x02000)
 			{
 				int	y;
 
@@ -794,7 +794,7 @@ calib_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 				for (s = f->name + 8; *(s - 1) == ' '; s--);
 				*(ar->suffix = s) = 0;
 				f->st->st_mtime = f->st->st_ctime = f->st->st_atime = tmscan(sfprints("%-.6s%02u%02u%02u", memcmp(h + 18, "000000", 6) ? (h + 18) : (h + 12), h[24], h[25], h[26]), NiL, "%y%m%d%H%M%S", NiL, NiL, 0);
-				if (pax->test & 0004000)
+				if (pax->test & 0x00800)
 					(*pax->errorf)(NiL, pax, 0, "head %-8s %d %03o %03o %03o %03o %03o %03o %03o", f->name, j, h[32], h[33], h[34], h[35], h[36], h[37], h[38]);
 				break;
 			case 1:
@@ -823,7 +823,7 @@ calib_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 				for (s = f->name + 8; *(s - 1) == ' '; s--);
 				*(ar->suffix = s) = 0;
 				f->st->st_mtime = f->st->st_ctime = f->st->st_atime = tmscan(sfprints("%-.6s%-.4s00", memcmp(h + 18, "000000", 6) ? (h + 18) : (h + 12), h + 24), NiL, "%m%d%y%H%M%S", NiL, NiL, 0);
-				if (pax->test & 0004000)
+				if (pax->test & 0x00800)
 					(*pax->errorf)(NiL, pax, 0, "head %-8s %d %03o %03o %03o %03o %03o %03o %03o", f->name, j, h[32], h[33], h[34], h[35], h[36], h[37], h[38]);
 				break;
 			case 5:
@@ -909,7 +909,7 @@ calib_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 	for (i = 0, s = f->name; *s; s++)
 		if (*s == '.')
 		{
-			if (!(pax->test & 0010000) && (!strcasecmp(s + 1, "COB") || !strcasecmp(s + 1, "CPY")))
+			if (!(pax->test & 0x01000) && (!strcasecmp(s + 1, "COB") || !strcasecmp(s + 1, "CPY")))
 				ar->camap = 1;
 			break;
 		}

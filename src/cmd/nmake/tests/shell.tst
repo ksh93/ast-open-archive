@@ -11,7 +11,9 @@ TEST 01 'here documents'
 	XXX'
 		OUTPUT tst $'main(){}'
 		ERROR - $'+ cat
-+ 1> tst 0<<'
++ 1> tst 0<< \\XXX
+main(){}
+XXX'
 
 TEST 02 'shell exit'
 

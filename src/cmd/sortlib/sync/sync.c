@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dfsort (AT&T Research) 2006-08-01 $\n]"
+"[-1lp0?\n@(#)$Id: dfsort (AT&T Research) 2007-01-25 $\n]"
 USAGE_LICENSE
 "[+NAME?sync - IBM dfsort discipline]"
 "[+DESCRIPTION?The \bsync\b \bsort\b(1) discipline applies an IBM \bDFSORT\b"
@@ -536,7 +536,8 @@ rs_disc(Rskey_t* key, const char* options)
 					goto drop;
 				}
 				p = s;
-				ss->format = f;
+				if (RECTYPE(f) != REC_variable || RECTYPE(ss->format) != REC_variable || REC_V_SIZE(ss->format) < REC_V_SIZE(f))
+					ss->format = f;
 				if (!ss->suffix && *u == '.')
 					ss->suffix = u;
 			}

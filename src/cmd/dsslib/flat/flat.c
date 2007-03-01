@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2005-09-19 $\n]"
+"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2007-01-17 $\n]"
 USAGE_LICENSE
 "[+NAME?flat - dss flat method schema description]"
 "[+DESCRIPTION?The \bdss\b flat method schema is an XML file.]"
@@ -114,7 +114,7 @@ struct Field_s				/* field info			*/
 	Cxvariable_t	variable;	/* logical field variable	*/
 	Physical_t	physical;	/* physical field info		*/
 	Field_t* 	next;		/* next in list			*/
-	Field_t*	width;		/* variable size		*/
+	Cxexpr_t*	width;		/* variable size		*/
 	Cxvariable_t*	convert;	/* convert source variable	*/
 	Convertget_f	convertgetf;	/* convert flatget()		*/
 	Flatget_f	flatgetf;	/* flat flatget()		*/
@@ -349,8 +349,9 @@ flatget(register Record_t* r, int index)
 				{
 					if (f->width)
 					{
-						if (v = flatget(r, f->width->variable.index))
-							n = v->number;
+						if (cxeval(flat->qualification, f->width, r->record, &a) < 0)
+							goto empty;
+						n = a.value.number;
 					}
 					else if (f->physical.format.escape < 0 && f->physical.format.quotebegin < 0)
 					{
@@ -447,7 +448,14 @@ flatget(register Record_t* r, int index)
 				}
 				else
 				{
-					n = (f->width && (v = flatget(r, f->width->variable.index))) ? v->number : f->physical.format.width;
+					if (f->width)
+					{
+						if (cxeval(flat->qualification, f->width, r->record, &a) < 0)
+							goto empty;
+						n = a.value.number;
+					}
+					else
+						n = f->physical.format.width;
 					t = s + n;
 				}
 				p->off = (char*)s - r->buf;
@@ -534,17 +542,20 @@ flatget(register Record_t* r, int index)
 		}
 		s = (unsigned char*)r->buf + w->off;
 	found:
-		if (w->field->width && (v = flatget(r, w->field->width->variable.index)))
+		if (w->field->width)
 		{
-			if (w->field->physical.format.width && v->number > w->field->physical.format.width)
+			if (cxeval(flat->qualification, w->field->width, r->record, &a) < 0)
+				goto empty;
+			n = a.value.number;
+			if (w->field->physical.format.width && n > w->field->physical.format.width)
 			{
 				if (r->dss->disc->errorf)
-					(*r->dss->disc->errorf)(r->dss, r->dss->disc, 1, "%s%s: variable field width %s=%d exceeds fixed maximum %d -- maximum assumed", cxlocation(r->cx, r->record), w->field->variable.name, w->field->width->variable.name, (int)v->number, w->field->physical.format.width);
+					(*r->dss->disc->errorf)(r->dss, r->dss->disc, 1, "%s%s: variable field width %d exceeds fixed maximum %d -- maximum assumed", cxlocation(r->cx, r->record), w->field->variable.name, n, w->field->physical.format.width);
 				w->siz = w->field->physical.format.width;
 			}
 			else
 			{
-				w->siz = v->number;
+				w->siz = n;
 				if (!flat->fixed)
 					r->cur = (char*)s + w->siz;
 				else if (flat->sufficient && w->field->physical.format.width)
@@ -595,31 +606,31 @@ flatgetbinary(register Record_t* r, int index)
 		switch (FW(w->field->physical.format.flags,w->field->physical.format.width))
 		{
 		case FW(CX_UNSIGNED|CX_INTEGER,1):
-			w->value.number = *(unsigned _ast_int1_t*)(r->buf + w->off);
+			w->value.number = *(uint8_t*)(r->buf + w->off);
 			break;
 		case FW(CX_UNSIGNED|CX_INTEGER,2):
-			w->value.number = *(unsigned _ast_int2_t*)(r->buf + w->off);
+			w->value.number = *(uint16_t*)(r->buf + w->off);
 			break;
 		case FW(CX_UNSIGNED|CX_INTEGER,4):
-			w->value.number = *(unsigned _ast_int4_t*)(r->buf + w->off);
+			w->value.number = *(uint32_t*)(r->buf + w->off);
 			break;
-#ifdef _ast_int8_t
+#if _typ_int64_t
 		case FW(CX_UNSIGNED|CX_INTEGER,8):
-			w->value.number = (_ast_int8_t)(*(unsigned _ast_int8_t*)(r->buf + w->off));
+			w->value.number = (int64_t)(*(uint64_t*)(r->buf + w->off));
 			break;
 #endif
 		case FW(CX_INTEGER,1):
 			w->value.number = *(unsigned _ast_int1_t*)(r->buf + w->off);
 			break;
 		case FW(CX_INTEGER,2):
-			w->value.number = *(_ast_int2_t*)(r->buf + w->off);
+			w->value.number = *(int16_t*)(r->buf + w->off);
 			break;
 		case FW(CX_INTEGER,4):
-			w->value.number = *(_ast_int4_t*)(r->buf + w->off);
+			w->value.number = *(int32_t*)(r->buf + w->off);
 			break;
-#ifdef _ast_int8_t
+#if _typ_int64_t
 		case FW(CX_INTEGER,8):
-			w->value.number = *(_ast_int8_t*)(r->buf + w->off);
+			w->value.number = *(int64_t*)(r->buf + w->off);
 			break;
 #endif
 		case FW(CX_FLOAT,4):
@@ -1174,6 +1185,20 @@ tabinit(Flat_t* flat, Dssdisc_t* disc)
 	return t;
 }
 
+static Cxexpr_t*
+keycomp(Flat_t* flat, const char* s, Dssdisc_t* disc)
+{
+	Cxexpr_t*	expr;
+
+	if (!flat->qualification && !(flat->qualification = cxscope(NiL, flat->meth.cx, 0, 0, disc)))
+		return 0;
+	if (cxpush(flat->qualification, NiL, NiL, s, -1))
+		return 0;
+	expr = cxcomp(flat->qualification);
+	while (!flat->qualification->eof && !cxpop(flat->qualification));
+	return expr;
+}
+
 /*
  * final dictionary table initialization
  */
@@ -1200,18 +1225,11 @@ tabcomp(Flat_t* flat, register Table_t* tab, Dssdisc_t* disc)
 	for (k = (Key_t*)dtfirst(tab->dict); k; k = (Key_t*)dtnext(tab->dict, k))
 		for (q = k; q; q = q->next)
 		{
-			if (q->qualification)
+			if (q->qualification && !(q->expr = keycomp(flat, q->qualification, disc)))
 			{
-				if (!flat->qualification && !(flat->qualification = cxscope(NiL, flat->meth.cx, 0, 0, disc)))
-				{
-					if (disc->errorf)
-						(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: %s: %s: cannot compile key qualification expression", q->field->variable.name, q->name, q->qualification);
-					return -1;
-				}
-				if (cxpush(flat->qualification, NiL, NiL, q->qualification, -1))
-					return -1;
-				q->expr = cxcomp(flat->qualification);
-				while (!flat->qualification->eof && !cxpop(flat->qualification));
+				if (disc->errorf)
+					(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: %s: %s: cannot compile key qualification expression", q->field->variable.name, q->name, q->qualification);
+				return -1;
 			}
 			s = q->name;
 			tab->id[*s] |= 3;
@@ -1320,13 +1338,15 @@ flatfopen(Dssfile_t* file, Dssdisc_t* disc)
 	{
 		if (file->ident)
 			goto noswap;
+#if 0
 		if (flat->variable)
 		{
 			i = roundof(flat->fixed, 8 * 1024);
 			if (s = vmnewof(file->dss->vm, 0, char, i, 0))
 				sfsetbuf(file->io, s, i);
 		}
-		if (file->skip && !sfreserve(file->io, file->skip, 0))
+#endif
+		if (file->skip && !sfreserve(file->io, file->skip, -1))
 		{
 			if (disc->errorf)
 				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: unexpected EOF in magic header", file->path);
@@ -1367,22 +1387,22 @@ flatfopen(Dssfile_t* file, Dssdisc_t* disc)
 				sfwrite(file->io, flat->magic->string, flat->magic->length);
 			else
 			{
-				char	tmp[sizeof(_ast_intmax_t)];
+				char	tmp[sizeof(intmax_t)];
 
 				switch (flat->magic->length)
 				{
 				case 1:
-					*((_ast_int1_t*)tmp) = flat->magic->number;
+					*((int8_t*)tmp) = flat->magic->number;
 					break;
 				case 2:
-					*((_ast_int2_t*)tmp) = flat->magic->number;
+					*((int16_t*)tmp) = flat->magic->number;
 					break;
 				case 4:
-					*((_ast_int4_t*)tmp) = flat->magic->number;
+					*((int32_t*)tmp) = flat->magic->number;
 					break;
-#ifdef _ast_int8_t
+#if _typ_int64_t
 				case 8:
-					*((_ast_int8_t*)tmp) = flat->magic->number;
+					*((int64_t*)tmp) = flat->magic->number;
 					break;
 #endif
 				}
@@ -1651,7 +1671,7 @@ flat_field_width_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* di
 			return -1;
 		}
 	}
-	else if (!(flat->lastfield->width = (Field_t*)strdup(data)))
+	else if (!(flat->lastfield->width = (Cxexpr_t*)strdup(data)))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
@@ -3177,10 +3197,10 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 	{
 		if (cxaddvariable(flat->meth.cx, &f->variable, disc))
 			return 0;
-		if ((us = (char*)f->width) && !(f->width = (Field_t*)dtmatch(flat->meth.cx->variables, us)))
+		if ((us = (char*)f->width) && !(f->width = keycomp(flat, us, disc)))
 		{
 			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, 2, "%s: %s: unknown field width index", f->variable.name, us);
+				(*disc->errorf)(NiL, disc, 2, "%s: %s: invalid field width index", f->variable.name, us);
 			return 0;
 		}
 		if (f->variable.array && (us = (char*)f->variable.array->variable) && !(f->variable.array->variable = (Cxvariable_t*)dtmatch(flat->meth.cx->variables, us)))

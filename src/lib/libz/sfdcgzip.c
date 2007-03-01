@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1995-2007 AT&T Knowledge Ventures            *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *
@@ -57,6 +57,7 @@ typedef struct
 {
 	Sfdisc_t	disc;		/* sfio discipline		*/
 	gzFile*		gz;		/* gz handle			*/
+	Sfio_t*		op;		/* original stream		*/
 } Sfgzip_t;
 
 /*
@@ -104,6 +105,11 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 		}
 		else
 			r = 0;
+		if (gz->op)
+		{
+			sfclose(gz->op);
+			gz->op = 0;
+		}
 		if (op != SF_CLOSING)
 			free(dp);
 		return r;
@@ -160,12 +166,16 @@ sfgzwrite(Sfio_t* fp, const Void_t* buf, size_t size, Sfdisc_t* dp)
  *	<0	error
  */
 
+#define PRIVATE	0
+
 int
 sfdcgzip(Sfio_t* sp, int flags)
 {
 	char*		m;
 	Sfgzip_t*	gz;
+	int		fd;
 	int		rd;
+	size_t		z;
 	char		mode[10];
 
 	rd = sfset(sp, 0, 0) & SF_READ;
@@ -183,11 +193,15 @@ sfdcgzip(Sfio_t* sp, int flags)
 		 *	0xd6c3c4d8	sfpopen		vzunzip
 		 */
 		
+#if PRIVATE
 		if (!(n = sfset(sp, 0, 0) & SF_SHARE))
 			sfset(sp, SF_SHARE, 1);
-		s = (unsigned char*)sfreserve(sp, 4, 1);
+#endif
+		s = (unsigned char*)sfreserve(sp, 4, SF_LOCKR);
+#if PRIVATE
 		if (!n)
 			sfset(sp, SF_SHARE, 0);
+#endif
 		if (!s)
 			return -1;
 		n = 0;
@@ -240,12 +254,29 @@ sfdcgzip(Sfio_t* sp, int flags)
 	if ((flags &= 0xf) > 0 && flags <= 9)
 		*m++ = '0' + flags;
 	*m = 0;
+#if PRIVATE
 	sfset(sp, SF_SHARE|SF_PUBLIC, 0);
-	if (sfdisc(sp, &gz->disc) != &gz->disc || !(gz->gz = gzdopen(sffileno(sp), mode)))
+#endif
+	if (!rd)
+	{
+		m = 0;
+		z = 0;
+	}
+	else if (!(z = sfreserve(sp, 0, -1) ? (size_t)sfvalue(sp) : 0))
+		m = 0;
+	else if (m = sfreserve(sp, z, 0))
+		z = (size_t)sfvalue(sp);
+	else
+		z = 0;
+	fd = sffileno(sp);
+	if (rd && (gz->op = sfopen(NiL, "/dev/null", "r")))
+		sfswap(sp, gz->op);
+	if (!(gz->gz = gzbopen(fd, mode, m, z)) || sfdisc(sp, &gz->disc) != &gz->disc)
 	{
 		free(gz);
 		return -1;
 	}
+#if PRIVATE
 #if 0
 {
 	char*	v;
@@ -261,6 +292,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 }
 #else
 	sfsetbuf(sp, NiL, SF_BUFSIZE);
+#endif
 #endif
 	if (!rd)
 		sfset(sp, SF_IOCHECK, 1);

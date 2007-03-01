@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -35,7 +35,7 @@ static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2003-05
 
 #define PREFIX(a,b)	((Cxnumber_t)(a)*64+(b))
 
-#ifdef _ast_int8_t
+#if _typ_int64_t
 
 #define PREFIX_ADDR(p)	((Ptaddr_t)(((Cxinteger_t)(p))>>6))
 #define PREFIX_BITS(p)	((int)(((Cxinteger_t)(p)) & 0x3f))

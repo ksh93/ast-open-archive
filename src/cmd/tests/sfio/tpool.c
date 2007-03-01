@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -124,8 +124,10 @@ MAIN()
 	   !(f2 = sfopen(NIL(Sfio_t*), tstfile(1), "w+")) ||
 	   !(f3 = sfopen(NIL(Sfio_t*), tstfile(2), "w+")) )
 		terror("sfopen3\n");
-	if(sfpool(f1,f2,SF_SHARE) != f2 || sfpool(f3,f2,SF_SHARE) != f2 )
-		terror("sfpool3\n");
+	if(sfpool(f1,f2,SF_SHARE) != f2)
+		terror("sfpool3 f1\n");
+	if(sfpool(f3,f2,SF_SHARE) != f2 )
+		terror("sfpool3 f3\n");
 	if(sfputc(f3,'x') < 0)
 		terror("sfputc to f3\n");
 	if(sfputc(f2,'y') < 0)

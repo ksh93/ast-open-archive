@@ -70,8 +70,8 @@
 #define	HSIZE		69001		/* 95% occupancy */
 
 /* A code_int must be able to hold 2**BITS values of type int, and also -1. */
-typedef long code_int;
-typedef long count_int;
+typedef int32_t code_int;
+typedef int32_t count_int;
 
 typedef u_char char_type;
 

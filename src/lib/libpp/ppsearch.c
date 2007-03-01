@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1986-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -86,7 +86,7 @@ ppmultiple(register struct ppfile* fp, register struct ppsymbol* test)
 			{
 				if ((pp.mode & (ALLMULTIPLE|LOADING)) == LOADING)
 					fp->guard = INC_IGNORE;
-				if (pp.state & WARN)
+				if ((pp.state & WARN) && (pp.mode & (HOSTED|MARKHOSTED|RELAX|PEDANTIC)) == PEDANTIC)
 					error(1, "%s: ignored -- already included", fp->name);
 				else
 					message((-3, "%s: ignored -- already included", fp->name));
@@ -530,7 +530,7 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 						xp->guard = INC_TEST;
 					else
 					{
-						if (pp.state & WARN)
+						if ((pp.state & WARN) && (pp.mode & (HOSTED|MARKHOSTED|RELAX|PEDANTIC)) == PEDANTIC)
 							error(1, "%s: ignored -- already included", xp->name);
 						else
 							message((-3, "%s: ignored -- already included", xp->name));

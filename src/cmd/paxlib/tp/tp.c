@@ -13,9 +13,9 @@
 #define DIRDEC		192
 #define DIRMAG		496
 
-typedef unsigned _ast_int1_t ui1;
-typedef unsigned _ast_int2_t ui2;
-typedef unsigned _ast_int4_t ui4;
+typedef  uint8_t ui1;
+typedef uint16_t ui2;
+typedef uint32_t ui4;
 
 typedef struct Dir_s
 {
@@ -60,7 +60,7 @@ tp_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_t
 	register Ar_t*		ar;
 	register ui1*		s;
 	register ui1*		e;
-	_ast_int2_t		w;
+	int16_t			w;
 	size_t			n;
 
 	if (size < 2 * TP_BLOCK)
@@ -97,7 +97,7 @@ tp_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 	register Dir_t*		dp;
 	register ui1*		s;
 	register ui1*		e;
-	_ast_int2_t		w;
+	int16_t			w;
 
 	do
 	{

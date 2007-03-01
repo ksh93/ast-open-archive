@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#           Copyright (c) 1996-2006 AT&T Knowledge Ventures            #
+#           Copyright (c) 1996-2007 AT&T Knowledge Ventures            #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                      by AT&T Knowledge Ventures                      #
@@ -41,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2006-10-31' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2007-02-09' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Labs Research) 2005-10-15 $
+@(#)$Id: mm2html (AT&T Labs Research) 2007-02-09 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -394,7 +394,7 @@ function getfiles
 	-e 's%\\c%<JOIN>%g' \
 	-e 's%\\e%\&#0092;%g' \
 	-e '/^'\''[abcdefghijklmnopqrstuvwxyz][abcdefghijklmnopqrstuvwxyz]\>/s%.%.%' \
-	-e '/^\..*".*\\/s%\\%\\\\%g' \
+	-e '/^\..*".*\\/s%\\[^\*][^(]%\\&%g' \
 	"$@"
 }
 

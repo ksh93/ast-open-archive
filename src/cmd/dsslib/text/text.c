@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -43,7 +43,7 @@ USAGE_LICENSE
 #include <dsslib.h>
 #include <tm.h>
 
-typedef unsigned _ast_int4_t Ipaddr_t;
+typedef uint32_t Ipaddr_t;
 
 struct Text_s; typedef struct Text_s Text_t;
 

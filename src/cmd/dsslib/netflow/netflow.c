@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -248,15 +248,15 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.number = rp->sampling_mode;
 		break;
 	case NETFLOW_start:
-#ifdef _ast_int8_t
-		r->value.number = (_ast_int8_t)rp->start; /* ms cc requires signed */
+#if _typ_int64_t
+		r->value.number = (int64_t)rp->start; /* ms cc requires signed */
 #else
 		r->value.number = rp->start;
 #endif
 		break;
 	case NETFLOW_end:
-#ifdef _ast_int8_t
-		r->value.number = (_ast_int8_t)rp->end; /* ms cc requires signed */
+#if _typ_int64_t
+		r->value.number = (int64_t)rp->end; /* ms cc requires signed */
 #else
 		r->value.number = rp->start;
 #endif

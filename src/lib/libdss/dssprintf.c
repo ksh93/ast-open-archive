@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -114,10 +114,10 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		fp->fmt.size = sizeof(int);
 		if (((ret.value.number >= 0) ? ret.value.number : -ret.value.number) < 1)
 			value->i = 0;
-		else if (ret.value.number > DBL_ULONG_MAX)
-			value->i = DBL_LONG_MAX;
-		else if (ret.value.number < DBL_LONG_MIN)
-			value->i = DBL_LONG_MAX;
+		else if (ret.value.number > UINT_MAX)
+			value->i = INT_MAX;
+		else if (ret.value.number < INT_MIN)
+			value->i = INT_MAX;
 		else
 			value->i = (unsigned int)ret.value.number;
 		break;

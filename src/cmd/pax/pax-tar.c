@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -410,7 +410,7 @@ extend(Archive_t* ap, File_t* f, int type)
 					{
 						if (type != EXTTYPE)
 							f->st->st_gid = state.gid;
-						if ((unsigned _ast_int4_t)f->st->st_gid <= (unsigned long)07777777)
+						if ((uint32_t)f->st->st_gid <= (unsigned long)07777777)
 							continue;
 					}
 					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_gid), f->st->st_gid);
@@ -423,7 +423,7 @@ extend(Archive_t* ap, File_t* f, int type)
 					s = f->gidname;
 					break;
 				case OPT_size:
-#ifdef _ast_int8_t
+#if _typ_int64_t
 					if (type == GLBTYPE)
 						continue;
 					if (!(f->st->st_size >> 33))

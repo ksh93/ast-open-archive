@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -78,7 +78,6 @@ __STDPP__directive pragma pp:nohide strmode
 
 #include <ast.h>
 #include <ls.h>
-#include <int.h>
 #include <sig.h>
 #include <times.h>
 #include <error.h>
@@ -119,8 +118,8 @@ __STDPP__directive pragma pp:nohide fchown ftruncate mount readlink sbrk strmode
 #if defined(__STDPP__directive) && defined(__STDPP__note)
 #if !_typ_off64_t && !noticed(off64_t)
 #undef	off64_t
-#ifdef _ast_int8_t
-#define off64_t		_ast_int8_t
+#if _typ_int64_t
+#define off64_t		int64_t
 #else
 #define off64_t		long
 #endif

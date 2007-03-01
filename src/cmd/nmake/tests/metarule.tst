@@ -414,6 +414,7 @@ iffe: test: is sys/types.h a header ... yes
 iffe: test: cat{ ... }end ... yes
 + iffe -v -c \'cc -O   \' -S \'\' def b
 iffe: test: is sys/types.h a header ... yes
+iffe: test: is b a command ... no
 iffe: test: is b a library data symbol ... no
 iffe: test: is b.h a header ... no
 iffe: test: is b a reserved keyword ... no

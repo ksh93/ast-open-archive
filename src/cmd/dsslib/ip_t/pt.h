@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -42,8 +42,8 @@ struct Pt_s; typedef struct Pt_s Pt_t;
 struct Ptdisc_s; typedef struct Ptdisc_s Ptdisc_t;
 struct Ptprefix_s; typedef struct Ptprefix_s Ptprefix_t;
 
-typedef unsigned _ast_int4_t Ptaddr_t;
-typedef unsigned _ast_intmax_t Ptcount_t;
+typedef  uint32_t Ptaddr_t;
+typedef uintmax_t Ptcount_t;
 
 struct Ptprefix_s
 {

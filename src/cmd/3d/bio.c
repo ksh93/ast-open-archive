@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -45,9 +45,9 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 	long		n;
 	unsigned long	u;
 	ssize_t		z;
-#ifdef _ast_int8_t
-	_ast_int8_t		q;
-	unsigned _ast_int8_t	v;
+#if _typ_int64_t
+	int64_t		q;
+	uint64_t	v;
 #endif
 	char*		s;
 	char*		b;
@@ -143,8 +143,8 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 					n = va_arg(ap, int);
 					break;
 				default:
-#ifdef _ast_int8_t
-					q = va_arg(ap, _ast_int8_t);
+#if _typ_int64_t
+					q = va_arg(ap, int64_t);
 					if (q < 0)
 					{
 						g = '-';
@@ -171,8 +171,8 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 					u = va_arg(ap, unsigned int);
 					break;
 				default:
-#ifdef _ast_int8_t
-					v = va_arg(ap, unsigned _ast_int8_t);
+#if _typ_int64_t
+					v = va_arg(ap, uint64_t);
 					goto oct_8;
 				case 1:
 #endif
@@ -222,8 +222,8 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 					u = va_arg(ap, unsigned int);
 					break;
 				default:
-#ifdef _ast_int8_t
-					v = va_arg(ap, unsigned _ast_int8_t);
+#if _typ_int64_t
+					v = va_arg(ap, uint64_t);
 					goto dec_8;
 				case 1:
 #endif
@@ -242,10 +242,10 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 					f = '0';
 					l = 0;
 				}
-#ifdef _ast_int8_t
-				if (sizeof(char*) == sizeof(_ast_int8_t))
+#if _typ_int64_t
+				if (sizeof(char*) == sizeof(int64_t))
 				{
-					v = (unsigned _ast_int8_t)x;
+					v = (uint64_t)x;
 					goto hex_8;
 				}
 #endif
@@ -258,8 +258,8 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 					u = va_arg(ap, unsigned int);
 					break;
 				default:
-#ifdef _ast_int8_t
-					v = va_arg(ap, unsigned _ast_int8_t);
+#if _typ_int64_t
+					v = va_arg(ap, uint64_t);
 					goto hex_8;
 				case 1:
 #endif
@@ -273,7 +273,7 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 				if (p >= e) goto done;
 				*p++ = c;
 				continue;
-#ifdef _ast_int8_t
+#if _typ_int64_t
 			dec_8:
 				if (r <= 0 || r >= sizeof(digits)) r = 10;
 				do *b++ = digits[v % r]; while (v /= r);

@@ -92,7 +92,35 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-06-12-22  --- Release ksh93s  ---
+07-03-08  --- Release ksh93s+  ---
+07-03-08  A bug in which an error in read (for example, an invalid variable
+	  name), could leave the terminal in raw mode has been fixed.
+07-03-06  A bug in which read could core dump when specified with an array
+	  variable with a subscript that is an arithmetic expression has
+	  been fixed.
+07-03-06  Several serious bugs with the restricted shell were reported and
+	  fixed.
+07-03-02  If a job is stopped, and subsequently restarted with a CONT
+	  signal and exits normally, ksh93 was incorrectly exiting with
+	  the exit status of the stop signal number.
+07-02-26  M-^L added to emacs mode to clear the screen.
+07-02-26  A bug in which setting a variable readonly in a subshell would
+	  cause an unset error when the subshell completed has been fixed. 
+07-02-19  The format with printf uses the new = flag to center the output.
+07-02-19  A bug in which ksh93 did not allow multibyte characters in
+	  identifier names has been fixed.
+07-02-19  A bug introduced in ksh93 that causes global compound variable
+	  definitions inside functions to exit with "no parent" has been fixed.
+07-02-19  A bug in which using compound commands in process redirection
+	  arguments would give syntax errors <(...) and >(...) has been fixed.
+07-01-29  A bug which caused the shell to core dump which can occur when a
+	  built-in exits without closing files that it opens has been fixed.
+07-01-26  A bug in which ~(E) in patterns containing \ that are not inside ()
+	  has been fixed.
+
+06-12-29  --- Release ksh93s  ---
+06-12-29  A bug in which the value of IFS could be changed after a command
+	  substitution has been fixed. 
 06-12-22  /dev/(tcp|udp|sctp)/HOST/SEVRICE now handles IPv6 addresses on
 	  systems that provide getaddrinfo(3).
 06-12-19  A -v option was added to read.  With this option the value of
@@ -121,6 +149,8 @@ All recorded changes follow.
 06-10-23  A bug in ${var:offset:len} in multibyte locales has been fixed.
 06-10-15  The remaining math functions from C99 were added for any system
 	  that supports them.
+06-10-13  The klockwork.com software detected a few coding errors that
+	  have been fixed.
 06-10-12  A bug when skipping over `...` with ${x:=`...`} when x is set
 	  has been fixed.
 06-10-11  A bug in process floating constants produced by the %a format
@@ -1819,6 +1849,7 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+07-02-09 mm2html.sh: expand \*(.. rather than escape to \\(*..
 06-10-31 mm2html: fix tager=_top omission bug
 06-10-11 add sfstruse() error checks
 06-05-03 htmlrefs.c: add COPY to avoid e.g. cgi symlinks
@@ -2340,6 +2371,15 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-03-11 Makerules.mk: add --shared as an alternative to CCFLAGS+=$(CC.DLL)
+07-02-23 Makerules.mk: add :PACKAGE: foo:private for +lfoo but not in *.req
+07-02-14 expand.c: tweak :P=D: alias check (-Q0x10000000)
+07-01-11 --- release 5.2 ---
+07-01-09 expand.c: add :P=D: alias check (-Q0x10000000)
+07-01-01 Makerules.mk: add --local-static with dynamic targets now default
+07-01-01 Makerules.mk: cmd+dll installs dll before command compile/link
+06-12-24 expand.c: handle $("":T=ZW) (equivalent to $("":T=R))
+06-12-24 misc.c: fix :F=T: to handle sec[.nsec]
 06-12-22 Makerules.mk: add CC.STDLIB.BASE to differentiate 32 vs 64 arch
 06-12-22 pkg-X11.mk: use CC.STDLIB.BASE
 06-12-15 Makerules.mk: set up PACKAGE rules to search CC.STDLIB -- doh
@@ -3536,6 +3576,7 @@ All recorded changes follow.
 
 :::::::: probe ::::::::
 
+07-02-22 probe.c: fix double sfclose(fp)
 06-09-05 probe.c: add -f, --force
 02-10-30 probe.c: reset proc->rfd after sfnew() to avoid close() error
 02-09-21 probe.c: handle strlen(base) != BASE_MAX
@@ -3597,6 +3638,8 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+07-02-23 cksum.tst: add -x tw tests
+07-02-07 cksum: handle std => libcmd move
 06-12-12 chmod.rt,mkdir.rt: add absolute mode tests
 06-11-15 cp.tst,ln.tst,mv.tst: add initial regression tests
 06-10-31 global edit to eliminate most non-const static data
@@ -3834,6 +3877,10 @@ All recorded changes follow.
 02-11-20 split support libs from libdss main source
 	 flat: add lazy field recognition
 
+:::::::: att ::::::::
+
+07-02-14 mrd-mail.dss: add
+
 :::::::: bgp ::::::::
 
 06-01-25 bgp.h: move to dsslib/ip_t/
@@ -3871,6 +3918,7 @@ All recorded changes follow.
 
 :::::::: flat ::::::::
 
+07-01-17 flat.c: don't sfsetbuf() on an active stream!
 06-10-11 flat.c: add sfstruse() error checks
 05-09-16 flat.c: fix <QUOTEALL> q=-1 vs. \xff data bug
 05-05-09 flat.c: literal quote is "" inside "..." for quote+noescape
@@ -4011,6 +4059,7 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+07-02-06 cmd2.c: "S name" => .../From/name
 06-10-11 data.c: ARG_MAX => private ARGMAX
 06-10-11 add sfstropen()/sfstruse() error checks
 06-06-24 fio.c: fix nul count scan bug
@@ -4360,6 +4409,7 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+07-01-25 main.c: v format size is max of all input files
 06-07-17 main.c: RS_POP before checking output
 06-07-17 main.c: handle empty file for record format data sample
 06-05-09 main.c: add path to record format determination message
@@ -4423,6 +4473,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+07-02-07 sum.c: move to libcmd & builtin
 06-12-11 ls.c: disable LS_PRINTABLE for utf-8
 06-12-04 du.c: handle > 2Ti in local.pointer
 06-11-23 ps.c: --escape now the default: -E => --noescape
@@ -4697,6 +4748,7 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+07-01-06 find.c: fix dumb -empty coding bug
 06-12-07 find.c,find.tst: fix -exec/-xargs vs {} +
 06-12-07 cmdarg.c,xargs.tst: adjust ARG_MAX logic
 06-10-11 add sfstropen()/sfstruse() error checks
@@ -4814,6 +4866,30 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+07-03-11 tm/tmxscan.c,regex/regnexec.c: fix strict-alias transgressions
+07-02-27 comp/conf.sh: handle native getconf invalid numeric values
+07-02-21 comp/conf.sh,comp/conf.tab: handle SSIZE_MAX vs _POSIX_SSIZE_MAX
+07-02-20 sfio/sfvprintf.c: handle SF_WCWIDTH justification
+07-02-14 features/common: cover <stdint.h>, move to int_(bits)_t
+07-02-14 include/int.h: drop
+07-02-14 include/sfio.h: add SF_WCWIDTH
+07-02-12 comp/conf.sh: fix CONF_LIMIT bug that missed ULONG_MAX etc.
+07-02-12 comp/conf.tab: *LONGLONG* => *LLONG* to match posix
+07-02-12 features/float: *LONGLONG* => *LLONG* to match posix
+07-02-12 port/astconf.c: handle CONF_LIMITS_DEF with no deferral
+07-02-12 stdio/vasprintf.c: add trailing '\0' -- doh
+07-02-04 string/fmtelapsed.c: fix naive multi month/year logic
+07-02-02 misc/optget.c: add --??posix for getopts(1)/getopt(3)
+07-01-26 string/chresc.c: use mbchar()
+07-01-26 misc/optget.c: handle "o:-:" usage for old-style long options
+07-01-22 sfio/sfdisc.c,sfpool.c: handle push on streams with pending peek
+07-01-22 include/sfio.h: mv Sfieee_t to sfio/sfhdr.h
+07-01-17 tm/tmxfmt.c: fix terminating nil logic which clobbered size-1
+07-01-11 misc/stk.c: a 2 day marathon bug fix (can we release now dr ek?)
+07-01-05 comp/spawnveg.c: posix_spawnattr_setflags(POSIX_SPAWN_SETPGROUP)
+07-01-05 misc/error.c: fix multibyte vs. printable logic
+07-01-01 comp/conf.sh: LC_ALL=C
+06-12-26 tm/tmxdate.c: handle nn*.nnnn* == sec.ns
 06-12-20 features/libpath.sh: generalize sol.* LIBPATH patterns
 06-12-18 comp/setlocale.c: include ast_standards.h and ast_wchar.h !
 06-12-12 string/strperm.c: octal modes are absolute!
@@ -6217,6 +6293,17 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+07-03-11 tty.c: add sysV --line-number, -l
+07-02-26 Makefile: sumlib.o: direct extract from +lsum (vcodex someday)
+07-02-24 Makefile: tweak cmdext.h action for --mam bootstrap
+07-02-09 Makefile: { cmdext.h cmdlist.h } depend on *.c list!
+07-02-09 Makefile: +lsum to bring in static -lsum (no dynamic right now)
+07-02-07 cksum.c: move from src/cmd/std with ftwalk => fts
+07-02-07 getconf.c: handle /bin == /usr/bin in defer logic
+07-01-26 chmod.c: don't FTS_FOLLOW if !FTS_PHYSICAL
+07-01-23 cut.c: Cut_t variable dimension list[] must be last member
+07-01-22 uname.c: fix -h typo that clobbered astconf() state -- ouch
+07-01-02 fmt.c: fix buffer splice off by one bug -- what else
 06-11-23 cmd.h: because of proto cmdinit cannot be a function like macro
 06-11-21 cp.c: fix 06-10-31 const dot[] readonly assignment
 06-11-15 cp.c: fix 06-10-31 ln -s enoent bug
@@ -6624,6 +6711,8 @@ All recorded changes follow.
 
 :::::::: libz ::::::::
 
+07-01-25 zlib.h,gzio.c: add gzbopen() to handle buffered unseekable data
+07-01-25 sfdcgzip.c: use gzbopen() to handle buffered unseekable data
 05-07-25 __MVS__ tweaks
 05-03-21 snarf and merge zlib 1.2.3, drop gzseek64() gztell64()
 05-05-11 sfdcgzip.c: change return value to [cgv], add vcunzip read check
@@ -6778,6 +6867,8 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+07-03-11 add -D-Y pp:pedantic, PP_WARN macro formal parenthesis checks
+07-01-26 pp.def,probe.win32: add _WCHAR_T_DEFINED
 06-09-23 ppop.c: check -I <dev,ino> for c and TYPE_HOSTED|TYPE_VENDOR attrs
 06-09-23 pplex.c: add HOSTED check for "/* appears in // comment" -- doh
 06-09-05 pp.probe: add version stamp comment
@@ -7267,6 +7358,7 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+07-01-17 dssfile.c: sfdcpzip() => sfdczip()
 06-12-04 dssopt.c: add full type description to dssopt()
 06-10-11 add sfstruse() error checks
 06-02-14 dss.h: always __EXPORT__ dss_lib()

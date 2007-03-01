@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -70,7 +70,7 @@ struct Dssoptdisc_s; typedef struct Dssoptdisc_s Dssoptdisc_t;
 struct Dssrecord_s; typedef struct Dssrecord_s Dssrecord_t;
 struct Dssstate_s; typedef struct Dssstate_s Dssstate_t;
 
-typedef unsigned _ast_int4_t Dssflags_t;
+typedef uint32_t Dssflags_t;
 typedef double Dssnumber_t;
 typedef Cxexpr_t Dssexpr_t;
 
@@ -235,7 +235,7 @@ extern int		dsseval(Dss_t*, Dssexpr_t*, Dssrecord_t*);
 extern int		dssend(Dss_t*, Dssexpr_t*);
 extern int		dsslist(Dss_t*, Dssexpr_t*, Sfio_t*);
 extern int		dssfree(Dss_t*, Dssexpr_t*);
-extern ssize_t		dssmagic(Dss_t*, Sfio_t*, const char*, const char*, unsigned _ast_int4_t, size_t);
+extern ssize_t		dssmagic(Dss_t*, Sfio_t*, const char*, const char*, uint32_t, size_t);
 extern int		dssprintf(Dss_t*, Sfio_t*, const char*, Dssrecord_t*);
 
 extern int		dssget(Dssrecord_t*, Dssvariable_t*, Dsstype_t*, const char*, Dssvalue_t*);

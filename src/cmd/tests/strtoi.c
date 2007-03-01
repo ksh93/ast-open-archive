@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -35,12 +35,13 @@
 #define ERANGE	EINVAL
 #endif
 
+int
 main(int argc, char** argv)
 {
 	char*			s;
 	char*			p;
 	unsigned long		l;
-	unsigned _ast_intmax_t	ll;
+	uintmax_t		ll;
 	char			b;
 	int			m;
 	int			decimal;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -30,7 +30,7 @@
 #include <magicid.h>
 
 ssize_t
-dssmagic(Dss_t* dss, Sfio_t* sp, const char* name, const char* type, unsigned _ast_int4_t version, size_t size)
+dssmagic(Dss_t* dss, Sfio_t* sp, const char* name, const char* type, uint32_t version, size_t size)
 {
 	Magicid_t	magic;
 	ssize_t		n;

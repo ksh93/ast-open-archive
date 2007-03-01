@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -448,7 +448,7 @@ cpio_putheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		(long)CPIO_TRUNCATE(idevice(f->st)),
 		(long)f->st->st_mtime,
 		(long)f->namesize,
-		sizeof(_ast_intmax_t), (_ast_intmax_t)(f->st->st_size + (f->type == X_IFLNK ? f->linkpathsize : 0)));
+		sizeof(intmax_t), (intmax_t)(f->st->st_size + (f->type == X_IFLNK ? f->linkpathsize : 0)));
 	paxwrite(pax, ap, state.tmp.buffer, CPIO_HEADER);
 #if CPIO_EXTENDED
 	putxops(pax, ap, f);

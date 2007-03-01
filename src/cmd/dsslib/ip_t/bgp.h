@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -106,8 +106,8 @@
 struct Bgproute_s; typedef struct Bgproute_s Bgproute_t;
 struct Bgpvec_s; typedef struct Bgpvec_s Bgpvec_t;
 
-typedef unsigned _ast_int2_t Bgpasn_t;
-typedef unsigned _ast_int4_t Bgpnum_t;
+typedef uint16_t Bgpasn_t;
+typedef uint32_t Bgpnum_t;
 
 struct Bgpvec_s				/* vector data			*/
 {

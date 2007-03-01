@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -150,7 +150,7 @@ struct Key_s; typedef struct Key_s Key_t;
 #define DATA_clear	0x00000001	/* explicit clear			*/
 #define DATA_hold	0x00000002	/* explicit hold			*/
 
-typedef unsigned _ast_int4_t Number_t;
+typedef uint32_t Number_t;
 
 typedef struct Data_s			/* event data				*/
 {
@@ -209,7 +209,7 @@ typedef struct State_s			/* program state			*/
 	int		log;		/* log activity				*/
 	int		major;		/* db major version			*/
 	int		minor;		/* db major version			*/
-	int		swap;		/* datum <=> native _ast_int4_t swap	*/
+	int		swap;		/* datum <=> native int32_ swap		*/
 	unsigned long	expire;		/* expiration in seconds		*/
 	DBM*		dbm;		/* dbm handle				*/
 	Dt_t*		connections;	/* active connection list		*/
@@ -1007,10 +1007,10 @@ waitfree(Dt_t* dt, void* obj, Dtdisc_t* disc)
 static void
 db(register State_t* state)
 {
-	datum			key;
-	datum			val;
-	Data_t			data;
-	unsigned _ast_int4_t	u4;
+	datum		key;
+	datum		val;
+	Data_t		data;
+	uint32_t	u4;
 
 	if (!(state->dbm = dbm_open(state->path, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)))
 		error(ERROR_SYSTEM|3, "%s: cannot open database for read/write", state->path);

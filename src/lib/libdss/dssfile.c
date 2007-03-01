@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -78,8 +78,6 @@ dssfopen(Dss_t* dss, const char* path, Sfio_t* io, Dssflags_t flags, Dssformat_t
 	struct stat	st;
 	Sfdisc_t	top;
 	char		buf[PATH_MAX];
-
-	static Pzdisc_t	pzdisc;
 
 	if (flags & DSS_FILE_WRITE)
 	{
@@ -163,17 +161,20 @@ dssfopen(Dss_t* dss, const char* path, Sfio_t* io, Dssflags_t flags, Dssformat_t
 	}
 	else
 	{
-		if (sfsize(file->io) || !fstat(sffileno(file->io), &st) && S_ISFIFO(st.st_mode))
+		if (sfsize(file->io) || !fstat(sffileno(file->io), &st) && (S_ISFIFO(st.st_mode)
+#ifdef S_ISSOCK
+			|| S_ISSOCK(st.st_mode)
+#endif
+			))
 		{
-			pzdisc.errorf = dss->disc->errorf;
-			if (sfdcpzip(file->io, file->path, 0, &pzdisc) < 0)
+			if (sfdczip(file->io, file->path, NiL, dss->disc->errorf) < 0)
 			{
 				if (dss->disc->errorf)
 					(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "%s: inflate error", file->path);
 				dssfclose(file);
 				return 0;
 			}
-			if (!(s = sfreserve(file->io, SF_UNBOUND, 1)))
+			if (!(s = sfreserve(file->io, SF_UNBOUND, SF_LOCKR)))
 			{
 				if (dss->disc->errorf)
 					(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "%s: cannot peek", file->path);

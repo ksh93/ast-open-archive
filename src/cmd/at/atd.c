@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -35,7 +35,7 @@
  * <time> is the earliest absolute time the job can be run
  */
 
-static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2006-09-19 $\0\n";
+static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2007-02-09 $\0\n";
 
 #include "at.h"
 
@@ -1330,7 +1330,7 @@ init(const char* path)
 	struct stat		js;
 	struct stat		xs;
 
-	umask(~(S_IWGRP|S_IWOTH));
+	umask(S_IWGRP|S_IWOTH);
 	if ((i = (int)strtol(astconf("OPEN_MAX", NiL, NiL), NiL, 0)) < 20)
 		i = 20;
 	if (!(state = newof(0, State_t, 1, (i - 1) * sizeof(Connection_t))))

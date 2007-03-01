@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Research) 2006-07-17 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Research) 2007-01-25 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -161,6 +161,7 @@ USAGE_LICENSE
 "[X:test?Enables implementation defined test code. Some or all of these"
 "	may be disabled.]:[test]{"
 "		[+dump?List detailed information on the option settings.]"
+"		[+io?List io file paths.]"
 "		[+keys?List the canonical key for each record.]"
 "		[+read?Force input file read by disabling memory mapping.]"
 "		[+show?Show setup information and exit before sorting.]"
@@ -231,10 +232,11 @@ USAGE_LICENSE
 #define INREC		(16*INMIN)	/* record begin chunk size	*/
 
 #define TEST_dump	0x80000000	/* dump the state before sort	*/
-#define TEST_keys	0x40000000	/* dump keys			*/
-#define TEST_read	0x20000000	/* force sfread()		*/
-#define TEST_show	0x10000000	/* show but don't do		*/
-#define TEST_reserve	0x08000000	/* force sfreserve()		*/
+#define TEST_io		0x40000000	/* dump io files		*/
+#define TEST_keys	0x20000000	/* dump keys			*/
+#define TEST_read	0x10000000	/* force sfread()		*/
+#define TEST_show	0x08000000	/* show but don't do		*/
+#define TEST_reserve	0x04000000	/* force sfreserve()		*/
 
 #define pathstdin(s)	(!(s)||streq(s,"-")||streq(s,"/dev/stdin")||streq(s,"/dev/fd/0"))
 #define pathstdout(s)	(!(s)||streq(s,"-")||streq(s,"/dev/stdout")||streq(s,"/dev/fd/1"))
@@ -543,6 +545,8 @@ parse(register Sort_t* sp, char** argv)
 			{
 				if (streq(s, "dump"))
 					opt_info.num = TEST_dump;
+				else if (streq(s, "io"))
+					opt_info.num = TEST_io;
 				else if (streq(s, "keys"))
 					opt_info.num = TEST_keys;
 				else if (streq(s, "read"))
@@ -635,7 +639,8 @@ parse(register Sort_t* sp, char** argv)
 						error(2, "%s: format %s incompatible with %s format %s", p, fmtrec(r, 0), key->input[i], fmtrec(key->disc->data, 0));
 						return 1;
 					}
-					key->disc->data = r;
+					if (RECTYPE(r) != REC_variable || RECTYPE(key->disc->data) != REC_variable || REC_V_SIZE(key->disc->data) < REC_V_SIZE(r))
+						key->disc->data = r;
 					i = n;
 				}
 			}
@@ -1039,6 +1044,13 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	}
 	if (sp->rec->meth->type == RS_MTCOPY)
 		sp->chunk = 1;
+	if (sp->test & TEST_io)
+	{
+		for (n = 0; s = key->input[n]; n++)
+			error(0, "%s input[%d]\t\"%s\"", error_info.id, n, s);
+		if (s = key->output)
+			error(0, "%s output\t\"%s\"", error_info.id, s);
+	}
 	return 0;
 }
 

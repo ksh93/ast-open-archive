@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -157,6 +157,7 @@
  *	0x02000000 2002-12-04 don't inhibit .UNBIND of M_bind rules
  *	0x04000000 2004-01-20 don't include triggered time==0 targets in :T=F: 
  *	0x08000000 2004-10-01 metaget does not assume % target for ... : % .NULL
+ *	0x10000000 2007-01-08 :P=D: alias check
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *

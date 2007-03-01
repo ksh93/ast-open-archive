@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-12-22 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-03-11 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -48,16 +48,18 @@ set option=';instrument;s;-;Enable compile-time, link-time and/or run-time code 
 set option=';ld-script;s;-;A space-separated list of suffixes of script files to be passed to the linker.;suffix'
 set option=';lib-type;b;-;Bind library references to \b--debug-symbols\b or \b--profile\b specific variants.'
 set option=';link;s;-;Hard link \binstall\b action targets matching \apattern\a instead of copying.;pattern'
+set option=';local-static;b;-;Compile and link against static library targets. The default links against shared library targets, but care must be taken to point runtime shared library binding to the current directory when executing command targets in the current directory.'
 set option=';native-pp;n;-;Force the use of the native C preprocessor and print a \alevel\a diagnostic message noting the override.;level'
 set option=';official-output;s;-;The \bdiff\b(1) log file name for the \bofficial\b action. If \afile\a is a relative path name then it is written in the next view level.;file:=OFFICIAL'
-set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b$(CC.INCLUDE.LOCAL)\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
+set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b$$(CC.INCLUDE.LOCAL)\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
 set option=';preserve;sv;-;Move existing \binstall\b action targets matching \apattern\a to the \bETXTBSY\b subdirectory of the install target.;pattern:!*'
 set option=';profile;b;-;Compile and link with \bprof\b(1) instrumentation options enabled.'
 set option=';recurse;s;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+combine?Combine all recursive makefiles into one rooted at the current directory. \b::\b, \b:PACKAGE:\b, \b.SOURCE\b*, and \bLDLIBRARIES\b are intercepted to adjust relative directory and library references. Complex makefile hierarchies may not be amenable to combination.][+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
 set option=';recurse-enter;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon entering a recursive \b:MAKE:\b directory.;text'
 set option=';recurse-leave;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon leaving a recursive \b:MAKE:\b directory. If \b--recurse-leave\b is not specified then no message is printed upon leaving \b:MAKE:\b directories.;text'
 set option=';select;s;-;A catenation of edit operators that selects terminal source files.;edit-ops'
-set option=';separate-include;b;-;Allow \b$(CC.INCLUDE.LOCAL)\b to be used with compilers that support it. On by default. If \b--noseparate-include\b is set then \b$(CC.INCLUDE.LOCAL)\b will not be used, even if the current compiler supports it.'
+set option=';separate-include;b;-;Allow \b$$(CC.INCLUDE.LOCAL)\b to be used with compilers that support it. On by default. If \b--noseparate-include\b is set then \b$$(CC.INCLUDE.LOCAL)\b will not be used, even if the current compiler supports it.'
+set option=';shared;b;-;Set \b:LIBRARY:\b to generate shared libraries (dlls).'
 set option=';static-link;b;-;Compile and link with a preference for static libraries.'
 set option=';strip-symbols;b;-;Strip link-time static symbols from executables.'
 set option=';threads;b;-;Compile and link with thread options enabled. Not implemented yet.'
@@ -85,7 +87,7 @@ set virtual:=1
 
 .OPTION.COMPATIBILITY : .MAKE .VIRTUAL .FORCE
 	local N O
-	if .MAKEVERSION. < 20070101
+	if .MAKEVERSION. < 20080101
 		O =
 		N =
 		if ! "$(-?clobber)" && "$("clobber":T=QV)"
@@ -641,7 +643,7 @@ end
 	return $(L)
 
 .BIND.-l% : .FUNCTION
-	local A B D T V
+	local A B D T V X
 	B := $(%:/[-+]l//)
 	if "$(-mam:N=static*,port*)" && ! .BIND.REAL.
 		if "$(%)" != "-l+([a-zA-Z0-9_])"
@@ -678,23 +680,35 @@ end
 		end
 	end
 	if "$(CC.DIALECT:N=DYNAMIC)" && ( "$(CCLDFLAGS:N=$(CC.DYNAMIC))" || ! "$(CCLDFLAGS:N=$(CC.STATIC))" )
-		if CC.SUFFIX.DYNAMIC && CC.SUFFIX.SHARED && ! "$(.PLUGIN.$(B))"
-			T := $(*$(B):N=*$(CC.SUFFIX.DYNAMIC))
-			if "$(CC.PREFIX.DYNAMIC)" != "$(CC.PREFIX.SHARED)"
-				if CC.PREFIX.DYNAMIC
-					T := $(T:D:B=$(T:B:/$(CC.PREFIX.DYNAMIC)/$(CC.PREFIX.SHARED)/):S=$(CC.SUFFIX.SHARED))
+		if ( CC.SUFFIX.DYNAMIC || ! "$(-local-static)" ) && CC.SUFFIX.SHARED && ! "$(.PLUGIN.$(B))"
+			if CC.SUFFIX.DYNAMIC
+				T := $(*$(B):N=*$(CC.SUFFIX.DYNAMIC))
+				if "$(CC.PREFIX.DYNAMIC)" != "$(CC.PREFIX.SHARED)"
+					if CC.PREFIX.DYNAMIC
+						T := $(T:D:B=$(T:B:/$(CC.PREFIX.DYNAMIC)/$(CC.PREFIX.SHARED)/):S=$(CC.SUFFIX.SHARED))
+					else
+						T := $(T:D:B=$(T:B:/^/$(CC.PREFIX.SHARED)/):S=$(CC.SUFFIX.SHARED))
+					end
 				else
-					T := $(T:D:B=$(T:B:/^/$(CC.PREFIX.SHARED)/):S=$(CC.SUFFIX.SHARED))
+					T := $(T:D:B:S=$(CC.SUFFIX.SHARED))
 				end
 			else
-				T := $(T:D:B:S=$(CC.SUFFIX.SHARED))
+				T := $(*$(B):N=*$(CC.SUFFIX.SHARED)*(.+([0-9])))
 			end
 			if "$(T:A=.TARGET)"
+				if ( X = "$(*.INSTALL:N=*/$(T))" )
+					make $(X)
+					return - $(X)
+				end
 				return $(T)
 			end
 			if ( T = "$(*$(B):N=-l$(B):/-l//)" )
 				T := $(T)$($(B).VERSION:/[^0-9]//G)
 				if ( T = "$(T:B:S=$(CC.SUFFIX.SHARED):A=.TARGET)" )
+					if ( X = "$(*.INSTALL:N=*/$(T))" )
+						make $(X)
+						return - $(X)
+					end
 					return $(T)
 				end
 			end
@@ -1652,9 +1666,9 @@ end
 						T1 := $(*$(T1):V)
 					end
 				end
-				if T1 && T1 != "." && T1 != "$(T0:V:D)"
-					$(T1:V) :INSTALLDIR: $(T0)
-				end
+			end
+			if T1 && T1 != "." && T1 != "$(T0:V:D)"
+				$(T1:V) :INSTALLDIR: $(T0)
 			end
 			let T1 = 1
 			while T1 <= 9
@@ -2048,7 +2062,7 @@ end
 				case "$(D)" in
 				*?)	echo " $(D)" ;;
 				esac
-				for i in $$(.REQUIRE.$(A):/^[-+]l//)
+				for i in $$(.MAM.REQ. $$(.REQUIRE.$(A)))
 				do	case $i in
 					"$(A)"$(...:A=.ARCHIVE:A=.TARGET:N=$(CC.PREFIX.ARCHIVE)*$(CC.SUFFIX.ARCHIVE):/^$(CC.PREFIX.ARCHIVE)\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
 						;;
@@ -2089,17 +2103,33 @@ end
 			B := $(I)
 			I := -l$(I)
 		end
-		if "$(.REQUIRE.$(B))"
-			R += $(I)
-		else
-			if Q = "$(.REQUIRE.-l% $(I))"
-				if ! "$(Q:N=[-+]l$(B))" && ! "$(MAKE_QUESTIONABLE_require)"
-					continue
+		if ! "$(.PACKAGE.$(B).private)"
+			if "$(.REQUIRE.$(B))"
+				R += $(I)
+			else
+				if Q = "$(.REQUIRE.-l% $(I))"
+					if ! "$(Q:N=[-+]l$(B))" && ! "$(MAKE_QUESTIONABLE_require)"
+						continue
+					end
+				end
+				if "$(I:T=F)"
+					R += $(I)
 				end
 			end
-			if "$(I:T=F)"
-				R += $(I)
-			end
+		end
+	end
+	return $(R)
+
+.MAM.REQ. : .FUNCTION
+	local B I R
+	for I $(%)
+		if I == "[-+]l*"
+			B := $(I:/^[-+]l//)
+		else
+			B := $(I)
+		end
+		if ! "$(.PACKAGE.$(B).private)"
+			R += $(B)
 		end
 	end
 	return $(R)
@@ -2119,7 +2149,7 @@ end
 .SHARED.FLAGS. = : $(CCFLAGS) :
 
 .SHARED.ON. : .FUNCTION
-	if ! "$(-static-link)" && ! "$(CC.LIB.DLL:N=broken)" && "$(CC.DLL)" && ! "$(-mam:N=static*,port*)" && ( "$(.SHARED.FLAGS.:@N=* ($(CC.DLL)|$(CC.DLLBIG)) *)" || "$(.SHARED.FLAGS.:V:@N=* ($\(CC.DLL\)|$\(CC.DLLBIG\)) *)" )
+	if ! "$(-static-link)" && ! "$(CC.LIB.DLL:N=broken)" && "$(CC.DLL)" && ! "$(-mam:N=static*,port*)" && ( "$(-shared)" || "$(.SHARED.FLAGS.:@N=* ($(CC.DLL)|$(CC.DLLBIG)) *)" || "$(.SHARED.FLAGS.:V:@N=* ($\(CC.DLL\)|$\(CC.DLLBIG\)) *)" )
 		return 1
 	end
 
@@ -2843,7 +2873,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	return $(X:/\([A-Za-z_.][A-Za-z0-9_.]*\)/"$$(.PACKAGE.\1.found)"=="1"/G:@/"  *"/" \&\& "/G:E)
 
 ":PACKAGE:" : .MAKE .OPERATOR
-	local A H I T N O P Q V version insert=0 install=1 library=-l options=1
+	local A H I T N O P Q V version insert=0 install=1 library=-l options=1 private
 	if "$(<)"
 		/* a separate include handles package definitions */
 		eval
@@ -2898,6 +2928,9 @@ PACKAGES : .SPECIAL .FUNCTION
 					else
 						N =
 					end
+				elif N == "private"
+					private = 1
+					N = static
 				elif N == "space"
 					if ! "$(PACKAGE_OPTIMIZE:N=time)"
 						N = dynamic
@@ -3006,6 +3039,7 @@ PACKAGES : .SPECIAL .FUNCTION
 				.PACKAGE.$(P).rules := -
 			end
 			.PACKAGE.$(P).library := $(library)
+			.PACKAGE.$(P).private := $(private)
 			if "$(V)"
 				PACKAGE_$(P)_VERSION := $(V)
 			end
@@ -3060,6 +3094,13 @@ PACKAGES : .SPECIAL .FUNCTION
 						.PACKAGE.$(P).library := -l
 					else
 						.PACKAGE.$(P).library :=
+					end
+				elif N == "private"
+					if V
+						.PACKAGE.$(P).library := +l
+						.PACKAGE.$(P).private := 1
+					else
+						.PACKAGE.$(P).private :=
 					end
 				elif N == "include|lib"
 					if V != 1
@@ -3379,15 +3420,15 @@ PACKAGES : .SPECIAL .FUNCTION
 		.ARGS : .CLEAR
 		.MAIN.TARGET. := $(T:O=1:B:S)
 		for X $(T)
-			T := $(.FILES.$(X:B:S):T=F:T!=G)
+			T := $(.FILES.$(X:B:S):N!=[-+]l*:T=F:T!=G)
 			$(T:N!=[-+]l*) : .SPECIAL -ARCHIVE -COMMAND -OBJECT
-			.UNION. : .SPECIAL $(T) $(?$(X:B:S):T=F:P=S:T!=G)
+			.UNION. : .SPECIAL $(T) $(?$(X:B:S):N!=[-+]l*:T=F:P=S:T!=G)
 		end
 	else
 		.UNION. : .SPECIAL $(.FILES.:T=F:T!=G)
 		$(*.UNION.:N!=[-+]l*) : .SPECIAL -ARCHIVE -COMMAND -OBJECT
-		.UNION. : .SPECIAL $(...:T!=XS:T=F:A=.REGULAR:P=S:T!=G)
-		.UNION. : .SPECIAL $(...:T=XSFA:T=F:A=.REGULAR:P=S:T!=G)
+		.UNION. : .SPECIAL $(...:T!=XS:N!=[-+]l*:T=F:A=.REGULAR:P=S:T!=G)
+		.UNION. : .SPECIAL $(...:T=XSFA:N!=[-+]l*:T=F:A=.REGULAR:P=S:T!=G)
 	end
 	return $(*.UNION.:$(-select):$(.SELECT.EDIT.))
 
@@ -3913,8 +3954,16 @@ PACKAGES : .SPECIAL .FUNCTION
 	if "$(-static-link)"
 		_BLD_STATIC_LINK == 1
 	end
+	if "$(-shared)" && ! "$(CCFLAGS:VP:N=$\(CC.DLL\))"
+		T4 = $(CC.DLL)
+	else
+		T4 =
+	end
 	if T3
-		CCFLAGS &= $$(-target-context:?$$$(!$$$(*):A=.PFX.INCLUDE:@Y%$$$(<:P=U:D:T=*:P=L=*:/^/-I/) %%)??)$$(-target-prefix:?$$$(<:O=1:N=$$$(*:O=1:B:S=$$$(CC.SUFFIX.OBJECT)):Y%%-o $$$$(<) %)??)$(T3:V)
+		T4 += $$(-target-context:?$$$(!$$$(*):A=.PFX.INCLUDE:@Y%$$$(<:P=U:D:T=*:P=L=*:/^/-I/) %%)??)$$(-target-prefix:?$$$(<:O=1:N=$$$(*:O=1:B:S=$$$(CC.SUFFIX.OBJECT)):Y%%-o $$$$(<) %)??)$(T3:V)
+	end
+	if T3 || T4
+		CCFLAGS &= $(T4:V)
 	end
 	T3 =
 	T4 =

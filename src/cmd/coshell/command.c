@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -27,7 +27,7 @@
 
 #include "service.h"
 
-#define NOARG	(((long)1)<<(CHAR_BIT*sizeof(long)-2))
+#define NOARG	(((int)1)<<(CHAR_BIT*sizeof(int)-2))
 
 static struct
 {

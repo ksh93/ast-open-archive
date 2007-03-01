@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2005 AT&T Corp.                  *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -57,7 +57,7 @@
 
 #define CODEX(d)	((Codex_t*)(d))
 
-typedef unsigned _ast_int4_t Codexnum_t;
+typedef uint32_t Codexnum_t;
 
 struct Codex_s; typedef struct Codex_s Codex_t;
 struct Codexdata_s; typedef struct Codexdata_s Codexdata_t;

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -32,42 +32,42 @@
 
 typedef struct
 {
-	unsigned int_4	magic;
-	unsigned char	major;
-	unsigned char	minor;
-	int_2		type;
+	uint32_t	magic;
+	uint8_t		major;
+	uint8_t		minor;
+	int16_t		type;
 } Rpm_magic_t;
 
 typedef struct
 {
-	int_2		archnum;
+	int16_t		archnum;
 	char		name[66];
-	int_2		osnum;
-	int_2		sigtype;
+	int16_t		osnum;
+	int16_t		sigtype;
 	char		pad[16];
 } Rpm_lead_t;
 
 typedef struct
 {
-	int_2		archnum;
+	int16_t		archnum;
 	char		name[66];
-	unsigned int_4	specoff;
-	unsigned int_4	speclen;
-	unsigned int_4	archoff;
+	uint32_t	specoff;
+	uint32_t	speclen;
+	uint32_t	archoff;
 } Rpm_lead_old_t;
 
 typedef struct
 {
-	unsigned int_4	entries;
-	unsigned int_4	datalen;
+	uint32_t	entries;
+	uint32_t	datalen;
 } Rpm_head_t;
 
 typedef struct
 {
-	unsigned int_4	tag;
-	unsigned int_4	type;
-	unsigned int_4	offset;
-	unsigned int_4	size;
+	uint32_t	tag;
+	uint32_t	type;
+	uint32_t	offset;
+	uint32_t	size;
 } Rpm_entry_t;
 
 static int

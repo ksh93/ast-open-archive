@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -593,12 +593,12 @@ MAIN()
 	y = 1;
 	sfsprintf(buf1, sizeof(buf1), "%g %g %g", x/x, y/x, (-y)/x);
 	if (strcmp(buf1, "NaN Inf -Inf") != 0)
-		terror("Sfdouble_t NaN Inf error: %s", buf1);
+		terror("double NaN Inf error: %s", buf1);
 	lx = 0;
 	ly = 1;
 	sfsprintf(buf1, sizeof(buf1), "%Lg %Lg %Lg", lx/lx, ly/lx, (-ly)/lx);
 	if (strcmp(buf1, "NaN Inf -Inf") != 0)
-		terror("double NaN Inf error: %s", buf1);
+		terror("Sfdbouble_t NaN Inf error: %s", buf1);
 
 	/* test the sfaprints() function */
 	if(sfaprints(&s, "%d", 123) != 4 || strcmp(s, "123") != 0)

@@ -381,7 +381,7 @@ state
 field[0]
 	begin field = 0
 	 begin char = 0
-	  end field = 32767
+	  end field = 2147483647
 	   end char = 0
 	      ccode = 0
 	      coder = t

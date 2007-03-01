@@ -1,3 +1,5 @@
+07-01-25 zlib.h,gzio.c: add gzbopen() to handle buffered unseekable data
+07-01-25 sfdcgzip.c: use gzbopen() to handle buffered unseekable data
 05-07-25 __MVS__ tweaks
 05-03-21 snarf and merge zlib 1.2.3, drop gzseek64() gztell64()
 05-05-11 sfdcgzip.c: change return value to [cgv], add vcunzip read check

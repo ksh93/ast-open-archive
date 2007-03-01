@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -28,7 +28,6 @@
 #include "tw.h"
 
 #include <ctype.h>
-#include <int.h>
 #include <tm.h>
 
 #define STAT(f,b)	((state.ftwflags&FTW_PHYSICAL)?lstat(f,b):pathstat(f,b))
@@ -134,10 +133,10 @@ checksum(const char* path)
 	register unsigned char*	e;
 	register Sfio_t*	sp;
 
-	unsigned int_4		k0 = 0;
-	unsigned int_4		k1 = 0;
-	unsigned int_4		k2 = 0;
-	unsigned int_4		k3 = 0;
+	uint32_t		k0 = 0;
+	uint32_t		k1 = 0;
+	uint32_t		k2 = 0;
+	uint32_t		k3 = 0;
 
 	static char		buf[25];
 

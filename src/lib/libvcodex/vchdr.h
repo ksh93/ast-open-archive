@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -128,7 +128,7 @@ static double		_Vcdbtime;
 
 #define VC_LARGE	((ssize_t)((~((size_t)0)) >> 1) )
 
-typedef unsigned _ast_int4_t	Vchash_t;		/* 4-byte hash values	*/
+typedef uint32_t	Vchash_t;			/* 4-byte hash values	*/
 #define VCHASH(ky)	(((ky)>>13)^0x1add2b3^(ky) )	/* 1add2b3 is a prime!	*/
 #define	VCINDEX(ky,msk)	(VCHASH(ky) & (msk) ) 		/* get index % (msk+1)	*/
 

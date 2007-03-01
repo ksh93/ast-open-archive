@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -43,7 +43,6 @@
 #include <align.h>
 #include <debug.h>
 #include <stdarg.h>
-#include <int.h>
 #include <sum.h>
 #include <tv.h>
 #include <fnv.h>
@@ -312,7 +311,7 @@ struct Member_s				/* cached member info		*/
 	unsigned int	mark:1;		/* visit mark			*/
 };
 
-typedef unsigned _ast_int4_t Magic_t;
+typedef uint32_t Magic_t;
 
 typedef struct Compress_format_s	/* compress format data		*/
 {
@@ -350,9 +349,9 @@ typedef struct Post_s			/* post processing restoration	*/
 
 typedef union Integral_u		/* byte|half swap probe		*/
 {
-	unsigned int_4	l;
-	unsigned int_2	s[2];
-	unsigned int_1	c[4];
+	uint32_t	l;
+	uint16_t	s[2];
+	uint8_t		c[4];
 } Integral_t;
 
 typedef struct Convert_s		/* char code conversion		*/

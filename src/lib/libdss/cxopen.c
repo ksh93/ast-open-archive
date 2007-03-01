@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -143,8 +143,8 @@ number_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 	char	fmt[16];
 
 	if (CXDETAILS(details, format, type, 0))
-		n = sfsprintf(buf, size, details, (_ast_intmax_t)value->number);
-	else if (value->number == (_ast_intmax_t)value->number || (format->flags & CX_INTEGER))
+		n = sfsprintf(buf, size, details, (intmax_t)value->number);
+	else if (value->number == (intmax_t)value->number || (format->flags & CX_INTEGER))
 	{
 		f = fmt;
 		*f++ = '%';
@@ -167,7 +167,7 @@ number_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 			*f++ = 'd';
 		}
 		*f = 0;
-		n = sfsprintf(buf, size, fmt, (_ast_intmax_t)value->number);
+		n = sfsprintf(buf, size, fmt, (intmax_t)value->number);
 	}
 	else
 		n = sfsprintf(buf, size, "%1.*Lg", format->width ? format->width : 15, value->number);

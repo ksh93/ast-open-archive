@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1991-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1991-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -79,7 +79,8 @@ static const char ID[] = "\n@(#)$Id: hix (AT&T Research) 2001-12-21 $\0\n";
 
 #define VIR_directory	(1<<4)		/* data is dir			*/
 
-#define Number_t	int_4
+#define Number_t	int32_t
+#define UNumber_t	uint32_t
 
 typedef struct
 {
@@ -649,10 +650,10 @@ iozero(register Index_t* x, register int z)
 static int
 compare(const void* a, const void* b)
 {
-	register Number_t*		left = (Number_t*)a;
-	register Number_t*		right = (Number_t*)b;
-	register unsigned Number_t	l;
-	register unsigned Number_t	r;
+	register Number_t*	left = (Number_t*)a;
+	register Number_t*	right = (Number_t*)b;
+	register UNumber_t	l;
+	register UNumber_t	r;
 
 	if ((l = bucket(state.mask, *left)) > (r = bucket(state.mask, *right)))
 		return 1;
@@ -671,13 +672,13 @@ compare(const void* a, const void* b)
 static int
 build(Hix_t* hix, register Index_t* x, Sfio_t* sp)
 {
-	register unsigned Number_t	hash;
-	register unsigned Number_t	c;
-	register Number_t		offset;
-	register Number_t*		p;
-	register Number_t*		m;
-	Sfio_t*				op;
-	char*				b = 0;
+	register UNumber_t	hash;
+	register UNumber_t	c;
+	register Number_t	offset;
+	register Number_t*	p;
+	register Number_t*	m;
+	Sfio_t*			op;
+	char*			b = 0;
 
 	/*
 	 * finish up from hixput()

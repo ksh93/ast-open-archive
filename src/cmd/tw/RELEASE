@@ -1,3 +1,4 @@
+07-01-06 find.c: fix dumb -empty coding bug
 06-12-07 find.c,find.tst: fix -exec/-xargs vs {} +
 06-12-07 cmdarg.c,xargs.tst: adjust ARG_MAX logic
 06-10-11 add sfstropen()/sfstruse() error checks

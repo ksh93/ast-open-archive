@@ -85,7 +85,7 @@ typedef struct gz_stream {
 } gz_stream;
 
 
-local gzFile gz_open      OF((const char *path, const char *mode, FILE* fp));
+local gzFile gz_open      OF((const char *path, const char *mode, FILE* fp, void* buf, unsigned len));
 local int do_flush        OF((gzFile file, int flush));
 local int    get_byte     OF((gz_stream *s));
 local void   check_header OF((gz_stream *s));
@@ -102,10 +102,12 @@ local uLong  getLong      OF((gz_stream *s));
    can be checked to distinguish the two cases (if errno is zero, the
    zlib error is Z_MEM_ERROR).
 */
-local gzFile gz_open (path, mode, fp)
+local gzFile gz_open (path, mode, fp, buf, len)
     const char *path;
     const char *mode;
     FILE       *fp;
+    void       *buf;
+    unsigned    len;
 {
     int err;
     int level = Z_DEFAULT_COMPRESSION; /* compression level */
@@ -190,7 +192,16 @@ local gzFile gz_open (path, mode, fp)
             return destroy(s), (gzFile)Z_NULL;
         }
     } else {
-        s->stream.next_in  = s->inbuf = (Byte*)ALLOC(Z_BUFSIZE);
+	if (buf == Z_NULL)
+	    len = 0;
+        s->stream.next_in = s->inbuf = (Byte*)ALLOC((len > Z_BUFSIZE) ? len : Z_BUFSIZE);
+        if (len) {
+            s->stream.avail_in = len;
+            zmemcpy(s->inbuf, buf, len);
+#if 0
+fprintf(stderr, "AHA gz_open inbuf=< %02x %02x > len=%d offset=%d:%d\n", s->inbuf[0], s->inbuf[1], len, (int)ftell(fp), (int)lseek(fileno(fp), 0, SEEK_CUR));
+#endif
+        }
 
         err = inflateInit2(&(s->stream), -MAX_WBITS);
         /* windowBits is passed < 0 to tell that there is no zlib header.
@@ -239,16 +250,14 @@ gzFile ZEXPORT gzopen (path, mode)
     const char *path;
     const char *mode;
 {
-    return gz_open (path, mode, (FILE*)Z_NULL);
+    return gz_open (path, mode, (FILE*)Z_NULL, (void*)Z_NULL, 0);
 }
 
-/* ===========================================================================
-     Associate a gzFile with the file descriptor fd. fd is not dup'ed here
-   to mimic the behavio(u)r of fdopen.
-*/
-gzFile ZEXPORT gzdopen (fd, mode)
+gzFile ZEXPORT gzbopen (fd, mode, buf, len)
     int fd;
     const char *mode;
+    void *buf;
+    unsigned len;
 {
     FILE *fp;
     char name[46];      /* allow for up to 128-bit integers */
@@ -257,7 +266,17 @@ gzFile ZEXPORT gzdopen (fd, mode)
        return (gzFile)Z_NULL;
     sprintf(name, "<fd:%d>", fd); /* for debugging */
 
-    return gz_open (name, mode, fp);
+    return gz_open (name, mode, fp, buf, len);
+}
+/* ===========================================================================
+     Associate a gzFile with the file descriptor fd. fd is not dup'ed here
+   to mimic the behavio(u)r of fdopen.
+*/
+gzFile ZEXPORT gzdopen (fd, mode)
+    int fd;
+    const char *mode;
+{
+    return gzbopen (fd, mode, (void*)Z_NULL, 0);
 }
 
 /* ===========================================================================
@@ -274,7 +293,7 @@ gzFile ZEXPORT gzfopen (fp, mode)
        return (gzFile)Z_NULL;
     sprintf(name, "<fd:%d>", fileno(sp)); /* for debugging */
 
-    return gz_open (name, mode, sp);
+    return gz_open (name, mode, sp, (void*)Z_NULL, 0);
 }
 
 /* ===========================================================================

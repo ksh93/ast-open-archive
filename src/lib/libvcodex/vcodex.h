@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -92,9 +92,9 @@ typedef int			(*Vcevent_f)_ARG_((Vcodex_t*, int, Void_t*, Vcdisc_t*));
 typedef ssize_t			(*Vcapply_f)_ARG_((Vcodex_t*, const Void_t*, size_t, Void_t**));
 
 /* types to encode/decode bits and integers */
-typedef unsigned _ast_int4_t	Vcbit_t; 	/* 32-bit accumulator	*/
+typedef uint32_t		Vcbit_t; 	/* 32-bit accumulator	*/
 #define VC_BITSIZE		(sizeof(Vcbit_t)*8 )
-typedef _ast_int4_t		Vcint_t;	/* 32-bit integers	*/
+typedef int32_t			Vcint_t;	/* 32-bit integers	*/
 #define VC_INTSIZE		(sizeof(Vcint_t)*8 )
 
 /* Vcio_t: handle to perform IO functions on strings */

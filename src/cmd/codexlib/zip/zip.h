@@ -9,9 +9,9 @@
 
 #include <codex.h>
 
-typedef unsigned _ast_int1_t uch;
-typedef unsigned _ast_int2_t ush;
-typedef unsigned _ast_int4_t ulg;
+typedef  uint8_t uch;
+typedef uint16_t ush;
+typedef uint32_t ulg;
 
 extern Codexmeth_t	codex_zip_shrink;
 extern Codexmeth_t	codex_zip_reduce;

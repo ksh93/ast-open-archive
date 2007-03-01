@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2007 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -262,13 +262,9 @@ save1(char* str, Dt_t** ignore, unsigned long flags)
 	}
 	else if (getmsglist(str, 0) < 0)
 		return 1;
-	if (!file) {
-		if (flags & FOLLOWUP)
-			file = record(grab(state.msg.list + state.msg.list->m_index - 1, GREPLY, NiL), flags);
-		else file = expand("&", 1);
-	}
-	else
-		file = expand(file, 1);
+	if (flags & FOLLOWUP)
+		file = record(file ? file : grab(state.msg.list + state.msg.list->m_index - 1, GREPLY, NiL), flags);
+	else file = expand(file ? file : "&", 1);
 	if (!file)
 		return 1;
 	if (state.var.debug) {

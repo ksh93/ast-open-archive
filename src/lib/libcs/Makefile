@@ -28,8 +28,7 @@ $(ID) 3.0 :LIBRARY: RELEASE cs.3 \
 	msginfo.c msglist.c msgname.c msgread.c msgrecv.c msgsend.c \
 	msgsetmask.c msguser.c \
 	-lin -lipc -lnetcompat \
-	$(CC.HOSTTYPE:N=$(-mam:N=static*:?UNKNOWN?sgi.mips*?):??-lsocket -linet -lnsl -ldl?) \
-	-lintl
+	$(CC.HOSTTYPE:N=$(-mam:N=static*:?UNKNOWN?sgi.mips*?):??-lsocket -linet -lnsl -ldl?)
 
 $(HEADERS:N=*_*.h) :COPY: FEATURE/$$(<:B:/.*_//)
 

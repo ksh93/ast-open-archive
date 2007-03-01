@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -29,8 +29,8 @@ MAIN()
 	long double	ldval, ldmax;
 	char		*s, *str;
 
-	ldmax = LDBL_MAX;
-
+	if(sfsscanf("Inf","%Le",&ldmax) != 1)
+		terror("sfsscanf Inf failed\n");
 	if(!(s = sfprints("%Le",ldmax)) )
 		terror("sfprints failed1\n");
 	if(!(str = malloc(strlen(s)+1)) )

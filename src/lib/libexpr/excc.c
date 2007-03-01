@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -445,7 +445,7 @@ gen(Excc_t* cc, register Exnode_t* expr)
 		sfprintf(cc->ccdisc->text, ")");
 		return;
 	case S2I:
-		sfprintf(cc->ccdisc->text, "strto%s(", sizeof(_ast_intmax_t) > sizeof(long) ? "ll" : "l");
+		sfprintf(cc->ccdisc->text, "strto%s(", sizeof(intmax_t) > sizeof(long) ? "ll" : "l");
 		gen(cc, x);
 		sfprintf(cc->ccdisc->text, ",(char**)0,0)");
 		return;

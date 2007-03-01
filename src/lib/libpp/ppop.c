@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1986-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -736,7 +736,7 @@ ppop(int op, ...)
 				ppop(PP_TRANSITION, 1);
 				break;
 			}
-			if (!(pp.arg_style & STYLE_gnu))
+			if (!(pp.state & WARN) && !(pp.arg_style & STYLE_gnu))
 				ppop(PP_PEDANTIC, 1);
 			if (pp.state & PASSTHROUGH)
 			{

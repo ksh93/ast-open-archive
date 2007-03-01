@@ -1082,6 +1082,7 @@ ZEXTERN gzFile ZEXPORT gzopen  OF((const char *path, const char *mode));
    can be checked to distinguish the two cases (if errno is zero, the
    zlib error is Z_MEM_ERROR).  */
 
+ZEXTERN gzFile ZEXPORT gzbopen  OF((int fd, const char *mode, void* buf, unsigned len));
 ZEXTERN gzFile ZEXPORT gzdopen  OF((int fd, const char *mode));
 /*
      gzdopen() associates a gzFile with the file descriptor fd.  File

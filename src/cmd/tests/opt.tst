@@ -142,6 +142,7 @@ OPTIONS
   --man           List detailed info in displayed man page form.
   --nroff         List detailed info in nroff.
   --options       List short and long option details.
+  --posix         List posix getopt usage.
   --short         List short option usage.
   --usage         List the usage string with C style escapes.
   --?-label       List implementation info matching label*.
@@ -3212,6 +3213,24 @@ return=o option=-o name=-o arg=out num=1'
 return=g option=-g name=--global arg=(null) num=1
 return=o option=-o name=--output arg=out num=1'
 
+TEST 56 'old format does long options, well, with a lot of secondary work'
+	usage=$'o:-:'
+	EXEC oldisnew "$usage" -o old --boolean --name=value
+		OUTPUT - $'return=o option=-o name=-o arg=old num=1
+return=- option=-- name=-- arg=boolean num=1
+return=- option=-- name=-- arg=name=value num=1'
+	EXEC oldisnew "$usage" '--?'
+		OUTPUT - $'return=? option=-? name=--? num=0'
+		ERROR - $'Usage: oldisnew [-o arg] [--long-option[=value]]'
+		EXIT 2
+
+TEST 57 'and the new format does old options'
+	usage=$'[-][f:FFF][n:NNN]#[nnn][s:SSS]:[sss]\n\nfile ...'
+	EXEC newisold "$usage" --'??posix'
+		OUTPUT - $'return=? option=-? name=--??posix num=0'
+		ERROR - $'fn:s:'
+		EXIT 2
+
 # skip non-astsa (standalone ast) tests
 
 [[ $(COMMAND -+ query '[-]' '--???about' 2>/dev/null) == *catalog=libast* ]] || exit
@@ -3604,6 +3623,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=xlate catalog=libast text="NAME"
@@ -3629,6 +3649,8 @@ id=xlate catalog=libast text="nroff"
 id=xlate catalog=libast text="List detailed info in nroff."
 id=xlate catalog=libast text="options"
 id=xlate catalog=libast text="List short and long option details."
+id=xlate catalog=libast text="posix"
+id=xlate catalog=libast text="List posix getopt usage."
 id=xlate catalog=libast text="short"
 id=xlate catalog=libast text="List short option usage."
 id=xlate catalog=libast text="usage"
@@ -3676,6 +3698,7 @@ BCGVBAF
   --aebss|nroff   Yvfg qrgnvyrq vasb va aebss.
   --bcgvbaf|options
                   Yvfg fubeg naq ybat bcgvba qrgnvyf.
+  --cbfvk|posix   Yvfg cbfvk trgbcg hfntr.
   --fubeg|short   Yvfg fubeg bcgvba hfntr.
   --hfntr|usage   Yvfg gur hfntr fgevat jvgu P fglyr rfpncrf.
   --?-ynory|?-label
@@ -3804,6 +3827,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="unknown option"
@@ -3825,6 +3849,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="unknown option"
@@ -3929,6 +3954,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="unknown option"
@@ -3948,6 +3974,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="unknown option"
@@ -3966,6 +3993,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="unknown option"
@@ -3984,6 +4012,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="unknown option"
@@ -4005,6 +4034,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="section not found"
@@ -4026,6 +4056,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="section not found"
@@ -4047,6 +4078,7 @@ id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="posix"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=(null) catalog=libast text="section not found"

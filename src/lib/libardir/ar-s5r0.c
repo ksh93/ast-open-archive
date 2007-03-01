@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -86,7 +86,7 @@ s5r0close(Ardir_t* ar)
 				r = -1;
 			else
 			{
-				swapput(0, (char*)&header.ar_date, sizeof(header.ar_date), (int_max)((unsigned long)time((time_t*)0) + 5));
+				swapput(0, (char*)&header.ar_date, sizeof(header.ar_date), (intmax_t)((unsigned long)time((time_t*)0) + 5));
 				if (write(ar->fd, &header.ar_date, sizeof(header.ar_date)) != sizeof(header.ar_date))
 					r = -1;
 			}
@@ -172,7 +172,7 @@ s5r0change(Ardir_t* ar, Ardirent_t* ent)
 		ar->error = errno;
 		return -1;
 	}
-	swapput(0, (char*)&state->member.arf_date, sizeof(state->member.arf_date), (int_max)ent->mtime);
+	swapput(0, (char*)&state->member.arf_date, sizeof(state->member.arf_date), (intmax_t)ent->mtime);
 	if (write(ar->fd, &state->member.arf_date, sizeof(state->member.arf_date)) != sizeof(state->member.arf_date))
 	{
 		ar->error = errno;

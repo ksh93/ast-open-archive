@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2000-2006 AT&T Corp.                  *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -63,8 +63,8 @@ ptstats(Pt_t* a, Sfio_t* sp)
 		{
 			n++;
 			total_prefixes += prefixes[i];
-			tc = (int)((double)(sizeof(tot) - (sizeof(S) - 10)) * ((double)((_ast_intmax_t)addresses[i]) / (double)((Ptaddr_t)~0)));
-			pc = total_addresses ? ((int)((double)(sizeof(prt) - (sizeof(S) - 10)) * ((double)((_ast_intmax_t)addresses[i]) / (double)((_ast_intmax_t)total_addresses))) - tc) : 0;
+			tc = (int)((double)(sizeof(tot) - (sizeof(S) - 10)) * ((double)((intmax_t)addresses[i]) / (double)((Ptaddr_t)~0)));
+			pc = total_addresses ? ((int)((double)(sizeof(prt) - (sizeof(S) - 10)) * ((double)((intmax_t)addresses[i]) / (double)((intmax_t)total_addresses))) - tc) : 0;
 			sfprintf(sp, "/%-2d %6I*u %*I*u  %s%s\n", i, sizeof(prefixes[i]), prefixes[i], sizeof(S) - 1, sizeof(addresses[i]), addresses[i], prt + sizeof(prt) - pc - 1, tot + sizeof(tot) - tc - 1);
 		}
 	sfprintf(sp, "--- ------ %s\n", S);

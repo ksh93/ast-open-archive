@@ -1,3 +1,4 @@
+07-01-25 sync.c: v format size is max of all input files
 06-10-11 ss.c: add sfstruse() error checks
 06-08-01 sync.c: handle %size.suffix mapping with multiple .'s
 06-07-17 ss.c: fix RS_POP event to unlock output sfreserve's

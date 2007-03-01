@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -26,8 +26,6 @@
  */
 
 #include "make.h"
-
-#include <int.h>
 
 /*
  * stat() that checks for read access
@@ -222,6 +220,7 @@ timenum(const char* s, char** p)
 {
 	Time_t		t;
 	unsigned long	n;
+	unsigned long	m;
 	char*		e;
 
 	if ((t = strtoull(s, &e, 10)) == (Time_t)(-1))
@@ -230,7 +229,13 @@ timenum(const char* s, char** p)
 			*p = (char*)s;
 		return TMX_NOTIME;
 	}
-	n = *e == '.' ? strtoul(e + 1, &e, 10) : 0;
+	n = 0;
+	if (*e == '.')
+	{
+		m = 1000000000;
+		while (isdigit(*++e))
+			n += (*e - '0') * (m /= 10);
+	}
 	if (p)
 		*p = e;
 	return tmxsns(t, n);
@@ -261,8 +266,7 @@ timestr(Time_t t)
  * printext() value types
  */
 
-#ifndef int_8
-#define int_8		int_4
+#if _ast_intmax_long
 #undef	strtoll
 #define strtoll		strtol
 #undef	strtoull
@@ -273,7 +277,7 @@ typedef union Value_u
 {
 	char**		p;
 	char*		s;
-	int_8		q;
+	intmax_t	q;
 	unsigned long	u;
 	long		l;
 	int		i;
@@ -303,6 +307,7 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	char*		txt;
 	char*		e;
 	Time_t		tm;
+	long		n;
 
 	if (fp->all)
 	{
@@ -404,7 +409,7 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		break;
 	case 't':
 	case 'T':
-		if (!isdigit(*s) || ((tm = strtol(s, &e, 0)), *e))
+		if (!isdigit(*s) || ((tm = timenum(s, &e)), *e))
 			tm = tmxdate(s, &e, TMX_NOW);
 		if (*e || tm == TMX_NOTIME)
 			tm = CURTIME;

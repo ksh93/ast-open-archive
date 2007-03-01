@@ -33,6 +33,9 @@ MSGCATDIR = msgs
 		$$(MSGCATDIR)/msgcat.mso : $(>)
 			{ $(@:V) ;} | $(SED) 's,^,str ,' > $$(<)
 		end
+	else
+		$(MSGCATDIR)/msgcat.mso : $(>)
+			$(*) --'??keys' > $(<) 2>&1 || true
 	end
 
 _PACKAGE_ID = $(LICENSEINFO:B:/^$(LICENSEFILE)$/LIC/)

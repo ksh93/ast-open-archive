@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -29,13 +29,13 @@
 
 #include <error.h>
 
-#define ITLINT		unsigned _ast_int2_t
+#define ITLINT		uint16_t
 #define ITLINTERNAL	itl2internal
 #define ITLEXTERNAL	itl2external
 
 #include "itlie.h"
 
-#define ITLINT		unsigned _ast_int4_t
+#define ITLINT		uint32_t
 #define ITLINTERNAL	itl4internal
 #define ITLEXTERNAL	itl4external
 

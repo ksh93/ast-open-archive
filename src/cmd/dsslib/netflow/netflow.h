@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -32,10 +32,10 @@
 
 #define NETFLOW_PACKET		1464
 
-typedef unsigned _ast_int1_t Nfbyte_t;
-typedef unsigned _ast_int2_t Nfshort_t;
-typedef unsigned _ast_int4_t Nflong_t;
-typedef unsigned _ast_intmax_t Nftime_t;
+typedef   uint8_t Nfbyte_t;
+typedef  uint16_t Nfshort_t;
+typedef  uint32_t Nflong_t;
+typedef uintmax_t Nftime_t;
 
 /*
  * canonical netflow data

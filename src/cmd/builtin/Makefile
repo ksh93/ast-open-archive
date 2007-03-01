@@ -14,7 +14,7 @@ CMD_BUILTIN ==
 CMD_DYNAMIC ==
 CMD_STANDALONE ==
 
-LINKS = cp: ln mv
+LINKS = cp: ln mv cksum: md5sum sum
 NOBIN = getconf
 
 CAT = $(STDCAT|"cat")
@@ -84,5 +84,5 @@ BUILTINS :COMMAND: cmdlist.h
 
 :: PROMO.mm RELEASE
 
-:TEST: asa chmod chown cp cut date expr fmt head join ln look \
-	mkdir mv nl od paste tail tr uniq uuencode wc
+:TEST: asa chmod chown cksum cp cut date expr fmt head join ln \
+	look mkdir mv nl od paste tail tr uniq uuencode wc

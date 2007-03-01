@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -33,11 +33,11 @@
 typedef struct Header_s
 {
 	char		ar_name[14];
-	unsigned int_4	ar_date;		/* native representation*/
+	uint32_t	ar_date;		/* native representation*/
 	char		ar_uid;			/* 	"		*/
 	char		ar_gid;			/* 	"		*/
-	int_2		ar_mode;		/* 	"		*/
-	unsigned int_4	ar_size;		/* 	"		*/
+	uint16_t	ar_mode;		/* 	"		*/
+	uint32_t	ar_size;		/* 	"		*/
 } Header_t;
 
 typedef struct State_s			/* method state			*/
@@ -142,7 +142,7 @@ pdpchange(Ardir_t* ar, Ardirent_t* ent)
 		ar->error = errno;
 		return -1;
 	}
-	swapput(state->swap, (char*)&state->header.ar_date, sizeof(state->header.ar_date), (int_max)ent->mtime);
+	swapput(state->swap, (char*)&state->header.ar_date, sizeof(state->header.ar_date), (intmax_t)ent->mtime);
 	if (write(ar->fd, &state->header.ar_date, sizeof(state->header.ar_date)) != sizeof(state->header.ar_date))
 	{
 		ar->error = errno;

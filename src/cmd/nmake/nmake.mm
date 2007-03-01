@@ -101,7 +101,7 @@ features used by the component makefiles of the
 .xx link="/sw/download/	ast-open"
 source package.
 Although slightly out of sync with the AT&T release, the
-.xx link="http://www.bell-labs.com/project/nmake/	Lucent nmake"
+.xx link="http://www.alcatel-lucent.com/	Alcatel-Lucent (search for nmake -- who mourns for Bell Labs?)"
 site provides a more complete treatment of the details
 (the tech writer remained with Lucent after the '95 split.)
 The following assumes familiarity with the UNIX or GNU
@@ -297,7 +297,7 @@ Attribute names all begin with a
 .L .
 and are all upper case.
 The full list of attributes and their meaning can be found in the
-.xx link="http://www.bell-labs.com/project/nmake/manual/	Lucent documentation."
+Alcatel-Lucent documentation.
 An example of an attribute is
 .L .MAKE
 which marks an action block to be executed by
@@ -382,7 +382,7 @@ would print
 .L /usr/include/stdio.h
 on most UNIX systems.
 The complete list of expansion operators can be found in the
-.xx link="http://www.bell-labs.com/project/nmake/manual/	Lucent documentation."
+Alcatel-Lucent documentation.
 .P
 .B nmake
 uses certain conventions for naming related variables.
@@ -1528,8 +1528,7 @@ named
 This is the version maintained by the original author.
 .LI
 .B "Lucent nmake 3.5"
-.xx link="http://www.bell-labs.com/project/nmake/	Lucent nmake"
-is the variant that split in 1995 when AT&T spun off Lucent.
+The the variant that split in 1995 when AT&T spun off Lucent.
 .LI
 .B "MicroSoft NMAKE"
 This variant has some features inspired by the 1985 Portland USENIX paper,

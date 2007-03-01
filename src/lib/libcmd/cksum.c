@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1992-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -15,6 +15,7 @@
 *                           Florham Park NJ                            *
 *                                                                      *
 *                 Glenn Fowler <gsf@research.att.com>                  *
+*                  David Korn <dgk@research.att.com>                   *
 *                                                                      *
 ***********************************************************************/
 #pragma prototyped
@@ -26,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sum (AT&T Research) 2003-12-17 $\n]"
+"[-?\n@(#)$Id: sum (AT&T Research) 2007-02-07 $\n]"
 USAGE_LICENSE
 "[+NAME?cksum,md5sum,sum - print file checksum and block count]"
 "[+DESCRIPTION?\bsum\b lists the checksum, and for most methods the block"
@@ -102,13 +103,13 @@ USAGE_LICENSE
 "[+SEE ALSO?\bgetconf\b(1), \btw\b(1), \buuencode\b(1)]"
 ;
 
+#include <cmd.h>
 #include <sum.h>
 #include <ls.h>
-#include <ftwalk.h>
+#include <fts.h>
 #include <error.h>
-#include <modex.h>
 
-static struct				/* program state		*/
+typedef struct State_s			/* program state		*/
 {
 	int		all;		/* list all items		*/
 	Sfio_t*		check;		/* check previous output	*/
@@ -121,15 +122,15 @@ static struct				/* program state		*/
 	int		recursive;	/* recursively descend dirs	*/
 	unsigned long	size;		/* combined size of all files	*/
 	int		silent;		/* silent check, 0 exit if ok	*/
-	int		(*sort)(Ftw_t*, Ftw_t*);
+	int		(*sort)(FTSENT* const*, FTSENT* const*);
 	Sum_t*		sum;		/* sum method			*/
 	int		text;		/* \r\n == \n			*/
 	int		total;		/* list totals only		*/
 	uid_t		uid;		/* caller uid			*/
 	int		warn;		/* invalid check line warnings	*/
-} state;
+} State_t;
 
-static void	verify(char*, char*, Sfio_t*);
+static void	verify(State_t*, char*, char*, Sfio_t*);
 
 /*
  * open path for read mode
@@ -165,7 +166,7 @@ closefile(Sfio_t* sp)
  */
 
 static void
-pr(Sfio_t* op, Sfio_t* ip, char* file, int perm, struct stat* st, Sfio_t* check)
+pr(State_t* state, Sfio_t* op, Sfio_t* ip, char* file, int perm, struct stat* st, Sfio_t* check)
 {
 	register char*	p;
 	register char*	r;
@@ -175,16 +176,16 @@ pr(Sfio_t* op, Sfio_t* ip, char* file, int perm, struct stat* st, Sfio_t* check)
 
 	if (check)
 	{
-		state.oldsum = state.sum;
+		state->oldsum = state->sum;
 		while (p = sfgetr(ip, '\n', 1))
-			verify(p, file, check);
-		state.sum = state.oldsum;
-		if (state.warn && !sfeof(ip))
+			verify(state, p, file, check);
+		state->sum = state->oldsum;
+		if (state->warn && !sfeof(ip))
 			error(2, "%s: last line incomplete", file);
 		return;
 	}
-	suminit(state.sum);
-	if (state.text)
+	suminit(state->sum);
+	if (state->text)
 	{
 		peek = 0;
 		while (p = sfreserve(ip, SF_UNBOUND, 0))
@@ -194,7 +195,7 @@ pr(Sfio_t* op, Sfio_t* ip, char* file, int perm, struct stat* st, Sfio_t* check)
 			{
 				peek = 0;
 				if (*p != '\n')
-					sumblock(state.sum, "\r", 1);
+					sumblock(state->sum, "\r", 1);
 			}
 			while (r = memchr(p, '\r', e - p))
 			{
@@ -204,23 +205,23 @@ pr(Sfio_t* op, Sfio_t* ip, char* file, int perm, struct stat* st, Sfio_t* check)
 					peek = 1;
 					break;
 				}
-				sumblock(state.sum, p, r - p - (*r == '\n'));
+				sumblock(state->sum, p, r - p - (*r == '\n'));
 				p = r;
 			}
-			sumblock(state.sum, p, e - p);
+			sumblock(state->sum, p, e - p);
 		}
 		if (peek)
-			sumblock(state.sum, "\r", 1);
+			sumblock(state->sum, "\r", 1);
 	}
 	else
 		while (p = sfreserve(ip, SF_UNBOUND, 0))
-			sumblock(state.sum, p, sfvalue(ip));
+			sumblock(state->sum, p, sfvalue(ip));
 	if (sfvalue(ip))
 		error(ERROR_SYSTEM|2, "%s: read error", file);
-	sumdone(state.sum);
-	if (!state.total || state.all)
+	sumdone(state->sum);
+	if (!state->total || state->all)
 	{
-		sumprint(state.sum, op, SUM_SIZE|SUM_SCALE);
+		sumprint(state->sum, op, SUM_SIZE|SUM_SCALE);
 		if (perm >= 0)
 		{
 			if (perm)
@@ -230,8 +231,8 @@ pr(Sfio_t* op, Sfio_t* ip, char* file, int perm, struct stat* st, Sfio_t* check)
 				else
 					sfprintf(sfstdout, " %04o %s %s",
 						modex(st->st_mode & S_IPERM),
-						(st->st_uid != state.uid && ((st->st_mode & S_ISUID) || (st->st_mode & S_IRUSR) && !(st->st_mode & (S_IRGRP|S_IROTH)) || (st->st_mode & S_IXUSR) && !(st->st_mode & (S_IXGRP|S_IXOTH)))) ? fmtuid(st->st_uid) : "-",
-						(st->st_gid != state.gid && ((st->st_mode & S_ISGID) || (st->st_mode & S_IRGRP) && !(st->st_mode & S_IROTH) || (st->st_mode & S_IXGRP) && !(st->st_mode & S_IXOTH))) ? fmtgid(st->st_gid) : "-");
+						(st->st_uid != state->uid && ((st->st_mode & S_ISUID) || (st->st_mode & S_IRUSR) && !(st->st_mode & (S_IRGRP|S_IROTH)) || (st->st_mode & S_IXUSR) && !(st->st_mode & (S_IXGRP|S_IXOTH)))) ? fmtuid(st->st_uid) : "-",
+						(st->st_gid != state->gid && ((st->st_mode & S_ISGID) || (st->st_mode & S_IRGRP) && !(st->st_mode & S_IROTH) || (st->st_mode & S_IXGRP) && !(st->st_mode & S_IXOTH))) ? fmtgid(st->st_gid) : "-");
 			}
 			if (ip != sfstdin)
 				sfprintf(op, " %s", file);
@@ -245,7 +246,7 @@ pr(Sfio_t* op, Sfio_t* ip, char* file, int perm, struct stat* st, Sfio_t* check)
  */
 
 static void
-verify(register char* s, char* check, Sfio_t* rp)
+verify(State_t* state, register char* s, char* check, Sfio_t* rp)
 {
 	register char*	t;
 	char*		e;
@@ -295,12 +296,12 @@ verify(register char* s, char* check, Sfio_t* rp)
 		}
 		if (sp = openfile(file, "rb"))
 		{
-			pr(rp, sp, file, -1, NiL, NiL);
+			pr(state, rp, sp, file, -1, NiL, NiL);
 			if (!(t = sfstruse(rp)))
 				error(ERROR_SYSTEM|3, "out of space");
 			if (!streq(s, t))
 			{
-				if (state.silent)
+				if (state->silent)
 					error_info.errors++;
 				else
 					error(2, "%s: checksum changed", file);
@@ -309,7 +310,7 @@ verify(register char* s, char* check, Sfio_t* rp)
 			{
 				if (fstat(sffileno(sp), &st))
 				{
-					if (state.silent)
+					if (state->silent)
 						error_info.errors++;
 					else
 						error(ERROR_SYSTEM|2, "%s: cannot stat", file);
@@ -318,23 +319,23 @@ verify(register char* s, char* check, Sfio_t* rp)
 				{
 					if (uid < 0 || uid == st.st_uid)
 						uid = -1;
-					else if (!state.permissions)
+					else if (!state->permissions)
 					{
-						if (state.silent)
+						if (state->silent)
 							error_info.errors++;
 						else
 							error(2, "%s: uid should be %s", file, fmtuid(uid));
 					}
 					if (gid < 0 || gid == st.st_gid)
 						gid = -1;
-					else if (!state.permissions)
+					else if (!state->permissions)
 					{
-						if (state.silent)
+						if (state->silent)
 							error_info.errors++;
 						else
 							error(2, "%s: gid should be %s", file, fmtgid(gid));
 					}
-					if (state.permissions && (uid >= 0 || gid >= 0))
+					if (state->permissions && (uid >= 0 || gid >= 0))
 					{
 						if (chown(file, uid, gid) < 0)
 						{
@@ -357,14 +358,14 @@ verify(register char* s, char* check, Sfio_t* rp)
 					}
 					if ((st.st_mode & S_IPERM) ^ mode)
 					{
-						if (state.permissions)
+						if (state->permissions)
 						{
 							if (chmod(file, mode) < 0)
 								error(ERROR_SYSTEM|2, "%s: cannot change mode to %s", file, fmtmode(mode, 0));
 							else
 								error(ERROR_SYSTEM|1, "%s: changed mode to %s", file, fmtmode(mode, 0));
 						}
-						else if (state.silent)
+						else if (state->silent)
 							error_info.errors++;
 						else
 							error(2, "%s: mode should be %s", file, fmtmode(mode, 0));
@@ -377,60 +378,15 @@ verify(register char* s, char* check, Sfio_t* rp)
 	else if (strneq(s, "method=", 7))
 	{
 		s += 7;
-		if (state.sum != state.oldsum)
-			sumclose(state.sum);
-		if (!(state.sum = sumopen(s)))
+		if (state->sum != state->oldsum)
+			sumclose(state->sum);
+		if (!(state->sum = sumopen(s)))
 			error(3, "%s: %s: unknown checksum method", check, s);
 	}
 	else if (streq(s, "permissions"))
-		state.haveperm = 1;
+		state->haveperm = 1;
 	else
 		error(1, "%s: %s: unknown option", check, s);
-}
-
-/*
- * sum a single file
- */
-
-static int
-sum(register Ftw_t* ftw)
-{
-	register Sfio_t*	sp;
-	int			info;
-	int			status;
-
-	status = ftw->status;
-	if (((info = ftw->info) & FTW_D) && !state.recursive)
-	{
-		info = FTW_F;
-		ftw->status = FTW_SKIP;
-	}
-	switch (info)
-	{
-	case FTW_NS:
-		error(ERROR_SYSTEM|2, "%s: not found", ftw->path);
-		break;
-	case FTW_D:
-		break;
-	case FTW_DC:
-		error(2, "%s: directory causes cycle", ftw->path);
-		break;
-	case FTW_DNR:
-		error(2, "%s: cannot read directory", ftw->path);
-		break;
-	case FTW_DNX:
-		error(2, "%s: cannot search directory", ftw->path);
-		ftw->status = FTW_SKIP;
-		break;
-	case FTW_F:
-		if (sp = openfile(status == FTW_NAME ? ftw->name : ftw->path, "rb"))
-		{
-			pr(sfstdout, sp, ftw->path, state.permissions, &ftw->statb, state.check);
-			closefile(sp);
-		}
-		break;
-	}
-	return 0;
 }
 
 /*
@@ -438,15 +394,15 @@ sum(register Ftw_t* ftw)
  */
 
 static void
-list(register Sfio_t* lp)
+list(State_t* state, register Sfio_t* lp)
 {
 	register char*		file;
 	register Sfio_t*	sp;
 
 	while (file = sfgetr(lp, '\n', 1))
-		if (sp = openfile(file, state.check ? "rt" : "rb"))
+		if (sp = openfile(file, state->check ? "rt" : "rb"))
 		{
-			pr(sfstdout, sp, file, state.permissions, NiL, state.check);
+			pr(state, sfstdout, sp, file, state->permissions, NiL, state->check);
 			closefile(sp);
 		}
 }
@@ -456,9 +412,9 @@ list(register Sfio_t* lp)
  */
 
 static int
-order(register Ftw_t* f1, register Ftw_t* f2)
+order(FTSENT* const* f1, FTSENT* const* f2)
 {
-	return strcoll(f1->name, f2->name);
+	return strcoll((*f1)->fts_name, (*f2)->fts_name);
 }
 
 /*
@@ -474,22 +430,21 @@ optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 }
 
 int
-main(int argc, register char** argv)
+b_cksum(int argc, register char** argv, void* context)
 {
 	register int	flags;
 	register char*	s;
 	char*		file;
 	Sfio_t*		sp;
+	FTS*		fts;
+	FTSENT*		ent;
 	Optdisc_t	optdisc;
+	State_t		state;
 
-	NoP(argc);
+	cmdinit(argc, argv, context, ERROR_CATALOG, ERROR_NOTIFY);
+	memset(&state, 0, sizeof(state));
 	setlocale(LC_ALL, "");
-	if (s = strrchr(*argv, '/'))
-		s++;
-	else
-		s = *argv;
-	error_info.id = s;
-	flags = ftwflags();
+	flags = fts_flags() | FTS_TOP | FTS_NOPOSTORDER | FTS_NOSEEDOTDIR;
 	state.warn = 1;
 	optinit(&optdisc, optinfo);
 	for (;;)
@@ -516,6 +471,7 @@ main(int argc, register char** argv)
 			state.permissions = 1;
 			continue;
 		case 'r':
+			flags &= ~FTS_TOP;
 			state.recursive = 1;
 			state.sort = order;
 			continue;
@@ -533,14 +489,14 @@ main(int argc, register char** argv)
 				error(3, "%s: unknown checksum method", opt_info.arg);
 			continue;
 		case 'H':
-			flags |= FTW_META|FTW_PHYSICAL;
+			flags |= FTS_META|FTS_PHYSICAL;
 			continue;
 		case 'L':
-			flags &= ~(FTW_META|FTW_PHYSICAL);
+			flags &= ~(FTS_META|FTS_PHYSICAL);
 			continue;
 		case 'P':
-			flags &= ~FTW_META;
-			flags |= FTW_PHYSICAL;
+			flags &= ~FTS_META;
+			flags |= FTS_PHYSICAL;
 			continue;
 		case 'T':
 			state.text = 1;
@@ -588,20 +544,51 @@ main(int argc, register char** argv)
 			while (file = *argv++)
 				if (sp = openfile(file, "rt"))
 				{
-					list(sp);
+					list(&state, sp);
 					closefile(sp);
 				}
 		}
 		else if (sp = openfile(NiL, "rt"))
 		{
-			list(sp);
+			list(&state, sp);
 			closefile(sp);
 		}
 	}
-	else if (!*argv)
-		pr(sfstdout, sfstdin, "/dev/stdin", state.permissions, NiL, state.check);
+	else if (!*argv && !state.recursive)
+		pr(&state, sfstdout, sfstdin, "/dev/stdin", state.permissions, NiL, state.check);
+	else if (!(fts = fts_open(argv, flags, state.sort)))
+		error(ERROR_system(1), "%s: not found", *argv);
 	else
-		ftwalk((char*)argv, sum, flags|FTW_MULTIPLE, state.sort);
+	{
+		while (!cmdquit() && (ent = fts_read(fts)))
+			switch (ent->fts_info)
+			{
+			case FTS_SL:
+				if (!(flags & FTS_PHYSICAL) || (flags & FTS_META) && ent->fts_level == 1)
+					fts_set(NiL, ent, FTS_FOLLOW);
+				break;
+			case FTS_F:
+				if (sp = openfile(ent->fts_accpath, "rb"))
+				{
+					pr(&state, sfstdout, sp, ent->fts_path, state.permissions, ent->fts_statp, state.check);
+					closefile(sp);
+				}
+				break;
+			case FTS_DC:
+				error(ERROR_warn(0), "%s: directory causes cycle", ent->fts_accpath);
+				break;
+			case FTS_DNR:
+				error(ERROR_system(0), "%s: cannot read directory", ent->fts_accpath);
+				break;
+			case FTS_DNX:
+				error(ERROR_system(0), "%s: cannot search directory", ent->fts_accpath);
+				break;
+			case FTS_NS:
+				error(ERROR_system(0), "%s: not found", ent->fts_accpath);
+				break;
+			}
+		fts_close(fts);
+	}
 	if (state.total)
 	{
 		sumprint(state.sum, sfstdout, SUM_TOTAL|SUM_SIZE|SUM_SCALE);

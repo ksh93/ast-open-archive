@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2006-12-07 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2006-01-06 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -1526,8 +1526,8 @@ execute(Ftw_t* ftw)
 			}
 			else
 			{
-				val = 1;
 				while ((ent = readdir(dir)) && (ent->d_name[0] == '.' && (!ent->d_name[1] || ent->d_name[1] == '.' && !ent->d_name[2])));
+				val = !ent;
 				closedir(dir);
 			}
 			break;

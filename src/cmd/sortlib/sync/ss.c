@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -2146,7 +2146,7 @@ sssum(Ss_t* ss, register Ssfield_t* dp, const char* buf, size_t size, char* out)
 	register unsigned char*	se;
 	register unsigned char*	t;
 	register unsigned char*	te;
-	register _ast_intmax_t	n;
+	register intmax_t	n;
 	register int		i;
 	register int		j;
 

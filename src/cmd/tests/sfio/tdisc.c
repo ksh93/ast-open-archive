@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -140,11 +140,9 @@ MAIN()
 {
 	Sfio_t	*f, *fs;
 	char	*l, *u, *s;
-	int	n, r;
+	int	n, r, fd[2];
 	int	flags;
 	char	buf[1024], low[64], up[64];
-
-	static char data[] = "data";
 
 	sfsetbuf(sfstdin,buf,sizeof(buf));
 	flags = sfset(sfstdin,0,0);
@@ -233,31 +231,26 @@ MAIN()
 		terror("Bad call of sfwr\n");
 	sfclose(f);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
-		terror("Opening file to write\n");
-	if(sfwrite(f, data, sizeof(data)) != sizeof(data))
-		terror("data write\n");
-	if(sfclose(f))
-		terror("Write close\n");
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
-		terror("Opening file to read\n");
-	sfset(f, SF_SHARE, 0);
-	if(!(s = (char*)sfreserve(f, SF_UNBOUND, SF_LOCKR)))
-		terror("sfreserve SF_UNBOUND SF_LOCKR\n");
-	n = sfvalue(f);
-	if(n != sizeof(data))
-		terror("sfreserve SF_LOCKR %d -- %d expected\n", n, sizeof(data));
-	if(sfread(f, s, 0))
-		terror("sfread unlock\n");
-	sfdisc(f,&Edisc);
-	if(!(s = (char*)sfreserve(f, SF_UNBOUND, 0)))
-		terror("sfreserve SF_UNBOUND\n");
-	n = sfvalue(f);
-	if(n != sizeof(data))
-		terror("sfreserve %d -- %d expected\n", n, sizeof(data));
-	if(strcmp(s, data))
-		terror("sfreserve data \"%s\" corrupt -- \"%s\" expected\n", s, data);
-	sfclose(f);
+	/* test for setting discipline on an unseekable device */
+	if(pipe(fd) < 0)
+		terror("Bad pipe call");
+	if(!(f = sfnew(0, 0, -1, fd[0], SF_READ)) )
+		terror("Can't create stream to read");
+	if(write(fd[1], "1234ABCD", 8) != 8)
+		terror("Can't write to pipe");
+	close(fd[1]);
+	if(!(s = sfreserve(f, -1, SF_LOCKR)) )
+		terror("Can't reserve for data");
+	if(s[0] != '1' || s[1] != '2' || s[2] != '3' || s[3] != '4')
+		terror("Bad reserved data");
+	if(sfread(f, s, 4) != 4)
+		terror("Bad reopening of stream");
+	if(!sfdisc(f, &Ldisc) )
+		terror("Can't insert new discipline");
+	if(sfread(f, buf, sizeof(buf)) != 4)
+		terror("Read wrong data size");
+	if(buf[0] != 'a' || buf[1] != 'b' || buf[2] != 'c' || buf[3] != 'd')
+		terror("Bad read data");
 
 	TSTEXIT(0);
 }

@@ -176,7 +176,7 @@ This is a test.
 \'
 )'
 		INPUT t.c $'static char usage[] = "YADA" USAGE "YADA";'
-		OUTPUT - $'+ cc -O  -DUSAGE=\\""[-author?Bob Ushka <bu@regress.com>][-copyright?Copyright (c) 1999-2004 PRI Corp.][-license?http://www.regress.com/sw/license/regress-open.html]"\\" -c t.c
+		OUTPUT - $'+ cc -O  -DUSAGE=\\""[-author?Bob Ushka <bu@regress.com>][-copyright?Copyright (c) 1999-2004 PRI][-license?http://www.regress.com/sw/license/regress-open.html]"\\" -c t.c
 + cc  -O   -o t t.o'
 
 TEST 08 '.PARAMETER'

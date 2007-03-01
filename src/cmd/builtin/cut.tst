@@ -49,6 +49,39 @@ TEST 04 '-d -f'
 		OUTPUT - $':'
 	EXEC	-d: -f2-4 f1
 		OUTPUT - $'::'
+	EXEC	-d' ' -f1-5 f5
+		INPUT f5 $'1 2 3 4 5'
+		OUTPUT - $'1 2 3 4 5'
+	EXEC	-d' ' -f1 f5
+		OUTPUT - $'1'
+	EXEC	-d' ' -f2 f5
+		OUTPUT - $'2'
+	EXEC	-d' ' -f3 f5
+		OUTPUT - $'3'
+	EXEC	-d' ' -f4 f5
+		OUTPUT - $'4'
+	EXEC	-d' ' -f5 f5
+		OUTPUT - $'5'
+	EXEC	-d' ' -f1,2 f5
+		OUTPUT - $'1 2'
+	EXEC	-d' ' -f1,3 f5
+		OUTPUT - $'1 3'
+	EXEC	-d' ' -f1,4 f5
+		OUTPUT - $'1 4'
+	EXEC	-d' ' -f1,5 f5
+		OUTPUT - $'1 5'
+	EXEC	-d' ' -f2,3 f5
+		OUTPUT - $'2 3'
+	EXEC	-d' ' -f2,4 f5
+		OUTPUT - $'2 4'
+	EXEC	-d' ' -f2,5 f5
+		OUTPUT - $'2 5'
+	EXEC	-d' ' -f2,4 f5
+		OUTPUT - $'2 4'
+	EXEC	-d' ' -f3,5 f5
+		OUTPUT - $'3 5'
+	EXEC	-d' ' -f4,5 f5
+		OUTPUT - $'4 5'
 
 TEST 05 '-d -f -s'
 	EXEC	-s -d: -f1-3 f1

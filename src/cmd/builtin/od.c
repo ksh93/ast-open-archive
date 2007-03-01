@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1992-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -108,7 +108,6 @@ USAGE_LICENSE
 ;
 
 #include <cmd.h>
-#include <int.h>
 #include <sig.h>
 #include <swap.h>
 #include <ccode.h>
@@ -122,9 +121,9 @@ USAGE_LICENSE
 #define BASE_WIDTH	7
 #define LINE_LENGTH	78
 
-#define WIDTHINDEX(n)	((n>1)+(n>2)+(n>4)+(n>8))
+#define WIDTHINDEX(n)	(((n)>1)+((n)>2)+((n)>4)+((n)>8))
 
-#ifdef int_8
+#ifdef _ast_int8_t
 #define QUAL		"ll"
 #else
 #define QUAL		"l"
@@ -202,7 +201,7 @@ struct State_s
 	Format_t*	form;
 	Format_t*	last;
 	unsigned char*	map;
-	int_max		offset;
+	intmax_t	offset;
 	struct
 	{
 	char*		data;
@@ -233,8 +232,8 @@ static const Size_t	isize[] =
 "int",		'I',	0,	1,	0,	0,	sizeof(int),
 "long",		'L',	0,	0,	0,	"l",	sizeof(long),
 "long long",	'D',	0,	0,	0,
-#ifdef int_8
-						"ll",	sizeof(int_8),
+#ifdef _ast_int8_t
+						"ll",	sizeof(int64_t),
 #else
 						0,	sizeof(long),
 #endif
@@ -486,8 +485,8 @@ format(State_t* state, register char* t)
 static Sfio_t*
 init(State_t* state, char*** p)
 {
-	Sfio_t*	ip;
-	int_max	offset;
+	Sfio_t*		ip;
+	intmax_t	offset;
 
 	for (;;)
 	{
@@ -559,16 +558,16 @@ init(State_t* state, char*** p)
 }
 
 static int
-block(State_t* state, Sfio_t* op, char* bp, char* ep, int_max base, char* buf, size_t siz)
+block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base, char* buf, size_t siz)
 {
 	register Format_t*	fp;
 	register unsigned char*	u;
 	register char*		f;
 	unsigned long		n;
-	int_max			x;
+	intmax_t		x;
 	union
 	{
-	char			m_char[sizeof(int_max) + sizeof(double_max)];
+	char			m_char[sizeof(intmax_t) + sizeof(double_max)];
 	float			m_float;
 	double			m_double;
 #if _typ_long_double
@@ -626,32 +625,32 @@ block(State_t* state, Sfio_t* op, char* bp, char* ep, int_max base, char* buf, s
 						switch (fp->size.internal)
 						{
 						case 1:
-							sfsprintf(f, siz, fp->form, (unsigned int_1)x);
+							sfsprintf(f, siz, fp->form, (uint8_t)x);
 							break;
 						case 2:
-							sfsprintf(f, siz, fp->form, (unsigned int_2)x);
+							sfsprintf(f, siz, fp->form, (uint16_t)x);
 							break;
 						case 4:
-							sfsprintf(f, siz, fp->form, (unsigned int_4)x);
+							sfsprintf(f, siz, fp->form, (uint32_t)x);
 							break;
 						default:
-							sfsprintf(f, siz, fp->form, (unsigned int_max)x);
+							sfsprintf(f, siz, fp->form, (uintmax_t)x);
 							break;
 						}
 					else
 						switch (fp->size.internal)
 						{
 						case 1:
-							sfsprintf(f, siz, fp->form, (int_1)x);
+							sfsprintf(f, siz, fp->form, (int8_t)x);
 							break;
 						case 2:
-							sfsprintf(f, siz, fp->form, (int_2)x);
+							sfsprintf(f, siz, fp->form, (int16_t)x);
 							break;
 						case 4:
-							sfsprintf(f, siz, fp->form, (int_4)x);
+							sfsprintf(f, siz, fp->form, (int32_t)x);
 							break;
 						default:
-							sfsprintf(f, siz, fp->form, (int_max)x);
+							sfsprintf(f, siz, fp->form, (intmax_t)x);
 							break;
 						}
 				}
@@ -833,8 +832,8 @@ od(State_t* state, char** files)
 			{
 				if (state->bufsize < 2 * n)
 				{
-					if ((state->bufsize = 2 * n) < LINE_LENGTH * sizeof(int_max))
-						state->bufsize = LINE_LENGTH * sizeof(int_max);
+					if ((state->bufsize = 2 * n) < LINE_LENGTH * sizeof(intmax_t))
+						state->bufsize = LINE_LENGTH * sizeof(intmax_t);
 					state->bufsize = roundof(state->bufsize, 1024);
 					if (!(state->buf = vmnewof(state->vm, state->buf, char, state->bufsize, 0)))
 					{
@@ -1185,7 +1184,7 @@ b_od(int argc, char** argv, void* context)
 	if (*state.base && !state.strings)
 	{
 		*(state.base + strlen(state.base) - 1) = '\n';
-		sfprintf(sfstdout, state.base, (int_max)state.offset);
+		sfprintf(sfstdout, state.base, (intmax_t)state.offset);
 	}
 	if (sfsync(sfstdout) && errno != EPIPE)
 		error(ERROR_SYSTEM|2, "write error");

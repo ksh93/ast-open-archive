@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1998-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -56,8 +56,6 @@ USAGE_LICENSE
 
 #include "pzlib.h"
 
-#include <int.h>
-
 #define CHECKSUM_OP	SFDCEVENT('P','Z',1)
 
 #define CHECKSUM	(1<<0)		/* checksum enabled		*/
@@ -78,7 +76,7 @@ struct Chain_s
 typedef struct
 {
 	unsigned long	flags;
-	unsigned int_4	checksum;
+	uint32_t	checksum;
 	Chain_t*	chain;
 	Chain_t*	last;
 } Cvt_t;
@@ -100,8 +98,8 @@ typedef struct
  * compute the incremental linear congruential hash checksum
  */
 
-static unsigned int_4
-memsum_4(register unsigned int_4 sum, const void* buf, size_t size)
+static uint32_t
+memsum_4(register uint32_t sum, const void* buf, size_t size)
 {
 	register unsigned char*	s = (unsigned char*)buf;
 	register unsigned char*	e = s + size;

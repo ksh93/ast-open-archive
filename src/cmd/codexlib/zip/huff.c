@@ -39,9 +39,9 @@
 #define N_MAX 288	/* maximum number of codes in any set */
 
 int huff(
-    unsigned *b,	/* code lengths in bits (all assumed <= BMAX) */
-    unsigned n,		/* number of codes (assumed <= N_MAX) */
-    unsigned s,		/* number of simple-valued codes (0..s-1) */
+    ulg *b,		/* code lengths in bits (all assumed <= BMAX) */
+    ulg n,		/* number of codes (assumed <= N_MAX) */
+    ulg s,		/* number of simple-valued codes (0..s-1) */
     ush *d,		/* list of base values for non-simple codes */
     ush *e,		/* list of extra bits for non-simple codes */
     Huff_t **t,	/* result: starting table */
@@ -56,27 +56,27 @@ int huff(
    so that no bits beyond that code are fetched when that code is
    decoded. */
 {
-    unsigned a;			/* counter for codes of length k */
-    unsigned c[BMAX+1];		/* bit length count table */
-    unsigned el;		/* length of EOB code (value 256) */
-    unsigned f;			/* i repeats in table every f entries */
+    ulg a;			/* counter for codes of length k */
+    ulg c[BMAX+1];		/* bit length count table */
+    ulg el;			/* length of EOB code (value 256) */
+    ulg f;			/* i repeats in table every f entries */
     int g;			/* maximum code length */
     int h;			/* table level */
-    register unsigned i;	/* counter, current code */
-    register unsigned j;	/* counter */
+    register ulg i;		/* counter, current code */
+    register ulg j;		/* counter */
     register int k;		/* number of bits in current code */
     int lx[BMAX+1];		/* memory for l[-1..BMAX-1] */
     int *l = lx+1;		/* stack of bits per table */
-    register unsigned *p;	/* pointer into c[], b[], or v[] */
-    register Huff_t *q;	/* points to current table */
-    Huff_t r;		/* table entry for structure assignment */
-    Huff_t *u[BMAX];	/* table stack */
-    unsigned v[N_MAX];		/* values in order of bit length */
+    register ulg *p;		/* pointer into c[], b[], or v[] */
+    register Huff_t *q;		/* points to current table */
+    Huff_t r;			/* table entry for structure assignment */
+    Huff_t *u[BMAX];		/* table stack */
+    ulg v[N_MAX];		/* values in order of bit length */
     register int w;		/* bits before this table == (l * h) */
-    unsigned x[BMAX+1];		/* bit offsets, then code stack */
-    unsigned *xp;		/* pointer into x */
+    ulg x[BMAX+1];		/* bit offsets, then code stack */
+    ulg *xp;			/* pointer into x */
     int y;			/* number of dummy codes added */
-    unsigned z;			/* number of entries in current table */
+    ulg z;			/* number of entries in current table */
 
     /* Generate counts for each bit length */
     el = n > 256 ? b[256] : BMAX; /* set length of EOB code, if any */
@@ -100,13 +100,13 @@ int huff(
 	if(c[j])
 	    break;
     k = j;			/* minimum code length */
-    if((unsigned)*m < j)
+    if((ulg)*m < j)
 	*m = j;
     for(i = BMAX; i; i--)
 	if(c[i])
 	    break;
     g = i;			/* maximum code length */
-    if((unsigned)*m > i)
+    if((ulg)*m > i)
 	*m = i;
 
     /* Adjust last length count to fill out codes, if needed */
@@ -156,7 +156,7 @@ int huff(
 		w += l[h++];	/* add bits already decoded */
 
 		/* compute minimum size table less than or equal to *m bits */
-		z = (z = g - w) > (unsigned)*m ? *m : z; /* upper limit */
+		z = (z = g - w) > (ulg)*m ? *m : z; /* upper limit */
 		if((f = 1 << (j = k - w)) > a + 1) /* try a k-w bit table */
 		{		/* too few codes for k-w bit table */
 		    f -= a + 1;	/* deduct codes from patterns left */
@@ -168,7 +168,7 @@ int huff(
 			f -= *xp;	/* else deduct codes from patterns */
 		    }
 		}
-		if((unsigned)w + j > el && (unsigned)w < el)
+		if((ulg)w + j > el && (ulg)w < el)
 		    j = el - w;	/* make EOB code end at table */
 		z = 1 << j;	/* table entries for j-bit table */
 		l[h] = j;	/* set table size in stack */

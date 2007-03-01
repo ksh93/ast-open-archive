@@ -1,3 +1,12 @@
+07-03-11 Makerules.mk: add --shared as an alternative to CCFLAGS+=$(CC.DLL)
+07-02-23 Makerules.mk: add :PACKAGE: foo:private for +lfoo but not in *.req
+07-02-14 expand.c: tweak :P=D: alias check (-Q0x10000000)
+07-01-11 --- release 5.2 ---
+07-01-09 expand.c: add :P=D: alias check (-Q0x10000000)
+07-01-01 Makerules.mk: add --local-static with dynamic targets now default
+07-01-01 Makerules.mk: cmd+dll installs dll before command compile/link
+06-12-24 expand.c: handle $("":T=ZW) (equivalent to $("":T=R))
+06-12-24 misc.c: fix :F=T: to handle sec[.nsec]
 06-12-22 Makerules.mk: add CC.STDLIB.BASE to differentiate 32 vs 64 arch
 06-12-22 pkg-X11.mk: use CC.STDLIB.BASE
 06-12-15 Makerules.mk: set up PACKAGE rules to search CC.STDLIB -- doh

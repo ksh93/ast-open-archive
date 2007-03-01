@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -87,8 +87,8 @@ typedef Paxformat_t* (*Paxlib_f)(Pax_t*);
 struct Paxvalue_s			/* string and/or number value	*/
 {
 	char*		string;		/* string value			*/
-	_ast_int4_t	number;		/* numeric value		*/
-	_ast_int4_t	fraction;	/* fractional part		*/
+	int32_t		number;		/* numeric value		*/
+	int32_t		fraction;	/* fractional part		*/
 	size_t		size;		/* max string size		*/
 };
 
@@ -125,7 +125,7 @@ struct Paxformat_s			/* format info			*/
 	char*		match;		/* name strgrpmatch pattern	*/
 	char*		desc;		/* description			*/
 	int		variant;	/* variant index		*/
-	_ast_int4_t	flags;		/* flags			*/
+	int32_t		flags;		/* flags			*/
 	unsigned long	regular;	/* default regular blocking	*/
 	unsigned long	special;	/* default special blocking	*/
 	int		align;		/* trailer alignment		*/
@@ -155,7 +155,7 @@ struct Paxarchive_s			/* archive info			*/
 	char*		name;		/* archive name			*/
 	void*		data;		/* format specific data		*/
 	Paxformat_t*	format;		/* format			*/
-	_ast_int4_t	flags;		/* format flags			*/
+	int32_t		flags;		/* format flags			*/
 	int		incomplete;	/* file requires new volume	*/
 	int		volume;		/* volume number		*/
 	size_t		entries;	/* total number of entries	*/
@@ -179,7 +179,7 @@ struct Pax_s				/* global state			*/
 {
 	const char*	id;		/* interface id			*/
 	const char*	passphrase;	/* encryption passphrase	*/
-	_ast_int4_t	flags;		/* flags			*/
+	int32_t		flags;		/* flags			*/
 	int		gid;		/* current group id		*/
 	int		keepgoing;	/* keep going on error		*/
 	int		list;		/* full file trace		*/

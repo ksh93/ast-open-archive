@@ -43,9 +43,9 @@ struct State_s; typedef struct State_s State_t;
 
 typedef int (*Decode_f)(State_t*);
 
-typedef unsigned _ast_int1_t ui1;
-typedef unsigned _ast_int2_t ui2;
-typedef unsigned _ast_int4_t ui4;
+typedef uint8_t ui1;
+typedef uint16_t ui2;
+typedef uint32_t ui4;
 
 struct State_s
 {

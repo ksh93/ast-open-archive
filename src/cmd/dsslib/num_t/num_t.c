@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -50,7 +50,7 @@ static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 20
 
 #define FIXED_INTERNAL(f,w,value,format)	{ \
 		int	i; \
-		f = (_ast_intmax_t)w; /* signed cast is msvc workaround */ \
+		f = (intmax_t)w; /* signed cast is msvc workaround */ \
 		if (i = format->fixedpoint) \
 			for (;;) \
 			{ \

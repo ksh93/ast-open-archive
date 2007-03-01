@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -36,7 +36,7 @@
 
 #define ireinit(p)	(memset(p,0,sizeof(*(p))),(p)->version=IRE_VERSION)
 
-typedef unsigned _ast_int4_t Ireint_t;
+typedef uint32_t Ireint_t;
 
 struct Ire_s; typedef struct Ire_s Ire_t;
 struct Iredisc_s; typedef struct Iredisc_s Iredisc_t;

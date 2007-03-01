@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -47,9 +47,9 @@ typedef int (*Ireexec_f)(struct Ire_s*, void*, size_t);
 
 #include <error.h>
 
-typedef unsigned _ast_int1_t Ireint1_t;
-typedef unsigned _ast_int2_t Ireint2_t;
-typedef unsigned _ast_int4_t Ireint4_t;
+typedef  uint8_t Ireint1_t;
+typedef uint16_t Ireint2_t;
+typedef uint32_t Ireint4_t;
 
 typedef struct Re_s
 {

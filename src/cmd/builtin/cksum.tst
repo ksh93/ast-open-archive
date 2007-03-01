@@ -1168,3 +1168,20 @@ TEST 11 'SHA-512 secure hash algorithm'
 		OUTPUT - $'211bec83fbca249c53668802b857a9889428dc5120f34b3eac1603f13d1b47965c387b39ef6af15b3a44c5e7b6bbb6c1096a677dc98fc8f472737540a332f378 z12271.dat'
 	EXEC	-x SHA-512 z1079.dat
 		OUTPUT - $'ebad464e6d9f1df7e8aadff69f52db40a001b253fbf65a018f29974dcc7fbf8e58b69e247975fbadb4153d7289357c9b6212752d0ab67dd3d9bbc0bb908aa98c z1079.dat'
+
+TEST 12 'tw 32x4 memsum algorithm'
+	DO	DATA big.dat chars.dat xyz.dat zyx.dat zero.dat
+	EXEC	-x tw
+		OUTPUT - $'000000000000000000000000'
+	EXEC	-x tw /dev/null
+		OUTPUT - $'000000000000000000000000 /dev/null'
+	EXEC	-x tw xyz.dat zyx.dat
+		OUTPUT - $'0jURpn1vP@As2kmq0L2YHh5b xyz.dat\n0Olp8n1@3o7s08fz3L1QPghH zyx.dat'
+	EXEC	-x tw -t xyz.dat zyx.dat
+		OUTPUT - $'0jURpn1vP@As2kmq0L2YHh5b'
+	EXEC	-x tw big.dat
+		OUTPUT - $'2LwgwX1jngxw3f8M@X3jys8b big.dat'
+	EXEC	-x tw chars.dat
+		OUTPUT - $'2t0Ly00mL@E01UvwO01fOoO0 chars.dat'
+	EXEC	-x tw zero.dat
+		OUTPUT - $'2N6s402zI@800vNTk01gUZQ0 zero.dat'

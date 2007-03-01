@@ -121,6 +121,8 @@ for T $(RULES:B)
 	$(T:F=%(lower)s:D=$$(RULESDIR):B:S=.mo) :INSTALL: $(T:B:S=.mo)
 end
 
+:MSGKEY: nmake
+
 /*
  * this works around a master source race condition
  */

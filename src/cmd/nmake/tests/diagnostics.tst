@@ -716,7 +716,7 @@ TEST 13 'self-documentation'
             [--archive-clean=edit-ops] [--archive-output=file] [--cctype=type]
             [--clean-ignore=pattern] [--clobber[=pattern]] [--compare]
             [--debug-symbols] [--force-shared] [--instrument=command]
-            [--ld-script=suffix] [--lib-type] [--link=pattern]
+            [--ld-script=suffix] [--lib-type] [--link=pattern] [--local-static]
             [--native-pp=level] [--official-output=file] [--prefix-include]
             [--preserve[=pattern]] [--profile] [--recurse=action]
             [--recurse-enter=text] [--recurse-leave=text] [--select=edit-ops]

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -122,7 +122,6 @@ USAGE_LICENSE
 #include <ctype.h>
 #include <dirent.h>
 #include <error.h>
-#include <int.h>
 #include <ls.h>
 #include <pss.h>
 #include <sfdisc.h>

@@ -10,9 +10,9 @@
 
 #if _PACKAGE_ast
 #include <ast_std.h>	/* for { _WINIX __IMPORT__ __EXPORT__ } */
-#define z_off_t		_ast_int4_t
-#ifdef _ast_int8_t
-#define z_off64_t	_ast_int8_t
+#define z_off_t		int32_t
+#if _typ_int64_t
+#define z_off64_t	int64_t
 #endif
 #else
 #if !defined(_WINIX) && (_UWIN || __CYGWIN__ || __EMX__)

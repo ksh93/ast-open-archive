@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -351,7 +351,7 @@ filter(Archive_t* ap, File_t* f)
 void
 setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 {
-	_ast_intmax_t	n;
+	intmax_t	n;
 	int		c;
 	int		y;
 	int		cvt;

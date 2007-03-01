@@ -44,12 +44,12 @@ arj_done(Pax_t* pax, register Paxarchive_t* ap)
 static int
 arj_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_t* f, unsigned char* buf, size_t size)
 {
-	register Ar_t*		ar;
-	register char*		s;
-	int			n;
-	int			r;
-	unsigned _ast_int4_t	checksum;
-	Codexdata_t		sum;
+	register Ar_t*	ar;
+	register char*	s;
+	int		n;
+	int		r;
+	uint32_t	checksum;
+	Codexdata_t	sum;
 
 	if (size < 4 || swapget(3, buf, 2) != MAGIC || size < ((n = swapget(3, buf+2, 2)) + 8) || n > 2600)
 		return 0;
@@ -94,7 +94,7 @@ arj_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 	unsigned long		dostime;
 	long			n;
 	int			mode;
-	unsigned _ast_int4_t	checksum;
+	uint32_t		checksum;
 	Codexdata_t		sum;
 
 	for (;;)
