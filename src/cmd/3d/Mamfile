@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-03-26
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -80,7 +80,8 @@ make features/syslib
 done features/syslib
 prev 3d.req
 bind -ldl dontcare
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run features/syslib
+bind -last
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run features/syslib
 done FEATURE/syslib dontcare generated
 make FEATURE/syscall implicit
 meta FEATURE/syscall features/%.sh>FEATURE/% features/syscall.sh syscall
@@ -89,7 +90,7 @@ make sys.tab implicit
 done sys.tab
 done features/syscall.sh
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run features/syscall.sh sys.tab
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run features/syscall.sh sys.tab
 done FEATURE/syscall dontcare generated
 make FEATURE/peek implicit
 meta FEATURE/peek features/%.c>FEATURE/% features/peek.c peek
@@ -106,7 +107,7 @@ make ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_tty.h dontcare
 done features/peek.c
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_ast ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run features/peek.c
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_ast ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run features/peek.c
 done FEATURE/peek dontcare generated
 make ../../lib/libcs/msg.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -329,7 +330,7 @@ meta FEATURE/hack features/%>FEATURE/% ../../lib/libast/features/hack hack
 make ../../lib/libast/features/hack
 done ../../lib/libast/features/hack
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run ../../lib/libast/features/hack
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run ../../lib/libast/features/hack
 done FEATURE/hack generated
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -417,7 +418,7 @@ meta FEATURE/eaccess features/%>FEATURE/% ../../lib/libast/features/eaccess eacc
 make ../../lib/libast/features/eaccess
 done ../../lib/libast/features/eaccess
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run ../../lib/libast/features/eaccess
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run ../../lib/libast/features/eaccess
 done FEATURE/eaccess dontcare generated
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit

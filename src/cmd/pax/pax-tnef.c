@@ -49,6 +49,7 @@ tnef_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, un
 	if (!(tnef = newof(0, Tnef_t, 1, 0)))
 		nospace();
 	ap->data = (void*)tnef;
+	ap->swap = 3;
 	return 1;
 }
 

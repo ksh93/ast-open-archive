@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-03-26
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -390,6 +390,8 @@ prev locale.dat
 prev testmatch.dat
 make testsub.dat
 done testsub.dat
+make testdecomp.dat
+done testdecomp.dat
 make rxposix.dat
 done rxposix.dat
 make zero.dat
@@ -441,6 +443,6 @@ done forcedassoc.dat
 make noop.dat
 done noop.dat
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
-exec - testregex -c testregex.dat locale.dat testmatch.dat testsub.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat nested.dat austin.dat xopen.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat cut.dat libtre.dat reg.dat repetition.dat rightassoc.dat forcedassoc.dat noop.dat
+exec - testregex -c testregex.dat locale.dat testmatch.dat testsub.dat testdecomp.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat nested.dat austin.dat xopen.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat cut.dat libtre.dat reg.dat repetition.dat rightassoc.dat forcedassoc.dat noop.dat
 done test.regex virtual
 done test dontcare virtual

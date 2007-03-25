@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -177,7 +177,7 @@ static Namval_t *typenode(const char *name, int flag)
 		rp = nv_open(name, shp->var_tree, NV_IDENT);
 		nv_unset(rp);
 		nv_putval(rp,stkptr(stkstd,offset+1),0);
-		nv_setref(rp);
+		nv_setref(rp,shp->var_tree,NV_VARNAME|NV_NOREF);
 		stkseek(stkstd,offset);
 	}
 	return(mp);
@@ -1367,5 +1367,5 @@ void init_dss(int flag)
 	rp = nv_open("dss", shp->var_tree, NV_IDENT);
 	nv_unset(rp);
 	nv_putval(rp,nv_name(np),NV_NOFREE);
-	nv_setref(rp);
+	nv_setref(rp,shp->var_tree,NV_VARNAME|NV_NOREF);
 }

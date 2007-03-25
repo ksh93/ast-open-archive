@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -339,6 +339,8 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 	trap();
 	errors = 0;
 	*ttarget = 0;
+	if (state.expandall)
+		return errors;
 	if (r == internal.query)
 	{
 		interpreter(NiL);

@@ -772,6 +772,7 @@ typedef struct State_s			/* program state		*/
 	unsigned char	compatibility;	/* disable compatibility msgs	*/
 	unsigned char	cross;		/* don't run gen'd executables	*/
 	unsigned char	exec;		/* execute shell actions	*/
+	unsigned char	expandall;	/* expanding $(...)		*/
 	unsigned char	expandview;	/* expand paths if fsview!=0	*/
 	unsigned char	explain;	/* explain reason for actions	*/
 	unsigned char	explicitrules;	/* explicit rules statement	*/

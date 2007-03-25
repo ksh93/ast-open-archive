@@ -1547,6 +1547,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+07-03-14 pax-tnef.c: swap op == 3 for all arch!
 06-10-31 delta.c,format.c: fix ar=>ar delta bug that skipped data twice
 06-10-11 add sfstropen()/sfstruse() error checks
 06-09-27 pax.tst: fix uid etc. tests to use --listformat -- duh
@@ -2053,6 +2054,8 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+07-03-26 Makefile: drop -L* from IFFEREFS -- handled by .IFFE.REF.
+07-03-21 lib_3d.h,error.c: handle error_info => *_error_data_
 06-12-04 3d.h: strmode() bsd conflict tweak
 06-11-23 finally get linux to pass regression tests
 06-11-21 fchdir3d: let chdir do the work if fd matches cached path
@@ -2371,6 +2374,9 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-03-26 make.h: add state.expall to detect and disable $(...) recursion
+07-03-26 Makerules.mk: fix .IFFE.REF. to handle -l* reqs
+07-03-23 ppcc.sh: handle -G <number>
 07-03-11 Makerules.mk: add --shared as an alternative to CCFLAGS+=$(CC.DLL)
 07-02-23 Makerules.mk: add :PACKAGE: foo:private for +lfoo but not in *.req
 07-02-14 expand.c: tweak :P=D: alias check (-Q0x10000000)
@@ -4011,6 +4017,7 @@ All recorded changes follow.
 
 :::::::: sh ::::::::
 
+07-03-19 update nv_setref() calls
 04-02-29 fix bugs exposed by $(CC.EXPORT.DYNAMIC)
 04-02-14 add ksh93:command prereq for -lshell
 04-01-30 install as ksh plugin
@@ -4262,6 +4269,8 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+07-03-19 testregex.c: add regdecomp() harness
+07-03-19 testdecomp.dat: add regdecomp() tests
 06-10-11 add sfstruse() error checks
 06-08-16 testglob.dat,noop.dat: add KRE ~(N) tests
 06-07-28 testglob.(c|dat): add gl_extra tests
@@ -4473,6 +4482,8 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+07-03-19 du.c: fix 0 pointer deref
+07-03-19 pss.c: initialize not found process placeholders
 07-02-07 sum.c: move to libcmd & builtin
 06-12-11 ls.c: disable LS_PRINTABLE for utf-8
 06-12-04 du.c: handle > 2Ti in local.pointer
@@ -4866,6 +4877,10 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+07-03-25 features/common: fix { ast_std.h ast_map.h stdint.h } logic
+07-03-21 error.h: move from error_info to (*_error_data_)
+07-03-21 option.h: move from opt_info to (*_opt_data_)
+07-03-19 regex/regdecomp.c: fix REX_ONECHAR escapes and add REX_KMP
 07-03-11 tm/tmxscan.c,regex/regnexec.c: fix strict-alias transgressions
 07-02-27 comp/conf.sh: handle native getconf invalid numeric values
 07-02-21 comp/conf.sh,comp/conf.tab: handle SSIZE_MAX vs _POSIX_SSIZE_MAX
@@ -6293,6 +6308,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+07-03-25 wclib.h: iswspace() requires <wctype.h>!
 07-03-11 tty.c: add sysV --line-number, -l
 07-02-26 Makefile: sumlib.o: direct extract from +lsum (vcodex someday)
 07-02-24 Makefile: tweak cmdext.h action for --mam bootstrap
@@ -7612,6 +7628,7 @@ All recorded changes follow.
 
 :::::::: libtksh ::::::::
 
+07-03-19 src/var.c: use nv_setref() to initialize references
 06-09-19  src/shcompat.c: sysconf() => astconf()
 04-07-19  tcl/tclIOUtil.c: treat { O_RDONLY O_WRONLY O_RDWR } as values
 03-06-13  include/tclInt.h: disable #undef sprintf that masked its prototype

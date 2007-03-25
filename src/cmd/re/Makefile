@@ -36,9 +36,9 @@ match :TEST: testmatch.c testregex.dat locale.dat testmatch.dat
 	$(*:O=1) $(TESTREFLAGS) $(*:O>1)
 
 regex :TEST: testregex.c testregex.dat locale.dat testmatch.dat testsub.dat \
-		rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat \
-		minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat \
-		nested.dat austin.dat xopen.dat \
+		testdecomp.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat \
+		perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat \
+		subexpr.dat nested.dat austin.dat xopen.dat \
 		pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat \
 		cut.dat libtre.dat reg.dat \
 		repetition.dat rightassoc.dat forcedassoc.dat noop.dat

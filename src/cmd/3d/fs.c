@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -172,6 +172,8 @@ fscall(register Mount_t* mp, long call, int ret, ...)
 	oerrno = errno;
 	initialize();
 	state.ret = -1;
+	if (state.in_2d)
+		return -1;
 	up = 0;
 	/* proto workaround */
 	va_start(ap, ret); va_end(ap);

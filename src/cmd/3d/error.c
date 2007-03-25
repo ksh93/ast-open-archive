@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -45,7 +45,12 @@ fs3d_write(int fd, const void* buf, size_t n)
 	return(WRITE(fd, buf, n));
 }
 
-Error_info_t	error_info = { 2, exit, fs3d_write };
+#undef error_info
+#define error_info	_error_info_
+
+Error_info_t	_error_info_ = { 2, exit, fs3d_write };
+Error_info_t*	_error_infop_ = &_error_info_;
+Error_info_t*	_error_data_ = &_error_info_;
 
 /*
  * print a name, converting unprintable chars

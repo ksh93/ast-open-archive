@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2005-05-20 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2007-03-19 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -94,6 +94,8 @@ static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2005-05-20 $\0\n"
 
 #define TEST_CATCH		0x10000000
 #define TEST_VERBOSE		0x20000000
+
+#define TEST_DECOMP		0x40000000
 
 #define TEST_GLOBAL		(TEST_ACTUAL|TEST_AND|TEST_BASELINE|TEST_CATCH|TEST_FAIL|TEST_IGNORE_ERROR|TEST_IGNORE_OVER|TEST_IGNORE_POSITION|TEST_OR|TEST_PASS|TEST_SUMMARY|TEST_VERBOSE)
 
@@ -233,6 +235,7 @@ T("    y	REG_LEFT		regexec() implicit ^...\n");
 T("    z	REG_NULL		NULL subexpressions ok\n");
 T("    $	                        expand C \\c escapes in fields 2 and 3\n");
 T("    /	                        field 2 is a regsubcomp() expression\n");
+T("    =	                        field 3 is a regdecomp() expression\n");
 T("\n");
 T("  Field 1 control lines:\n");
 T("\n");
@@ -398,6 +401,9 @@ static const char* unsupported[] =
 #endif
 #if !_REG_subcomp
 	"regsubcomp",
+#endif
+#if !_REG_decomp
+	"redecomp",
 #endif
 	0
 };
@@ -1127,6 +1133,7 @@ main(int argc, char** argv)
 	int		nsub;
 	int		i;
 	int		j;
+	int		k;
 	int		expected;
 	int		got;
 	int		locale;
@@ -1575,6 +1582,10 @@ main(int argc, char** argv)
 					test |= TEST_SUB;
 					continue;
 
+				case '=':
+					test |= TEST_DECOMP;
+					continue;
+
 				case '?':
 					test |= TEST_VERIFY;
 					test &= ~(TEST_AND|TEST_OR);
@@ -1676,7 +1687,7 @@ main(int argc, char** argv)
 					continue;
 				state.passed = state.verify;
 			}
-			if (i < 4)
+			if (i < ((test & TEST_DECOMP) ? 3 : 4))
 				bad("too few fields\n", NiL, NiL, 0, test);
 			while (i < elementsof(field))
 				field[i++] = 0;
@@ -1705,7 +1716,7 @@ main(int argc, char** argv)
 					nexec = nstr;
 #endif
 			}
-			if (!(ans = field[3]))
+			if (!(ans = field[(test & TEST_DECOMP) ? 2 : 3]))
 				bad("NIL answer\n", NiL, NiL, 0, test);
 			msg = field[4];
 			fflush(stdout);
@@ -1713,6 +1724,10 @@ main(int argc, char** argv)
 #if _REG_subcomp
 				cflags |= REG_DELIMITED;
 #else
+				continue;
+#endif
+#if !_REG_decomp
+			if (test & TEST_DECOMP)
 				continue;
 #endif
 
@@ -1841,6 +1856,46 @@ main(int argc, char** argv)
 				}
 			}
 #endif
+#if _REG_decomp
+			if (!cret && (test & TEST_DECOMP))
+			{
+				char	buf[128];
+
+				if ((j = nmatch) > sizeof(buf))
+					j = sizeof(buf);
+				fun = "regdecomp";
+				p = re + preg.re_npat;
+				if (!(test & TEST_CATCH))
+					i = regdecomp(&preg, -1, buf, j);
+				else if (!(cret = setjmp(state.gotcha)))
+				{
+					alarm(HUNG);
+					i = regdecomp(&preg, -1, buf, j);
+					alarm(0);
+				}
+				if (!cret)
+				{
+					catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
+					if (i > j)
+					{
+						if (i != (strlen(ans) + 1))
+						{
+							report("failed", fun, re, s, nstr, msg, flags, test);
+							printf(" %d byte buffer supplied, %d byte buffer required\n", j, i);
+						}
+					}
+					else if (strcmp(buf, ans))
+					{
+						report("failed", fun, re, s, nstr, msg, flags, test);
+						quote(ans, -1, test|TEST_DELIMIT);
+						printf(" expected, ");
+						quote(buf, -1, test|TEST_DELIMIT);
+						printf(" returned\n");
+					}
+					continue;
+				}
+			}
+#endif
 			if (!cret)
 			{
 				if (!(flags & REG_NOSUB) && nsub < 0 && *ans == '(')
@@ -1875,7 +1930,7 @@ main(int argc, char** argv)
 						}
 					}
 				}
-				if (!(test & TEST_SUB) && *ans && *ans != '(' && !streq(ans, "OK") && !streq(ans, "NOMATCH"))
+				if (!(test & (TEST_DECOMP|TEST_SUB)) && *ans && *ans != '(' && !streq(ans, "OK") && !streq(ans, "NOMATCH"))
 				{
 					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
 						skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
@@ -2081,7 +2136,7 @@ main(int argc, char** argv)
 					goto execute;
 				}
 #endif
-				if (!(test & (TEST_SUB|TEST_VERIFY)) && !nonosub)
+				if (!(test & (TEST_DECOMP|TEST_SUB|TEST_VERIFY)) && !nonosub)
 				{
 					if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
 						continue;

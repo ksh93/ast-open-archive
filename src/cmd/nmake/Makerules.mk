@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-03-11 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-03-26 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1198,7 +1198,7 @@ $(IFFEGENDIR)/% : "" .SCAN.c (IFFE) (IFFEFLAGS)
 	T := $(...:N=*.req:A=.TARGET)
 	.MAKE : $(T)
 	T := $(T:T=F:T=I:/[[:space:]][[:space:]]*/ /G:N!=-l($(T:B:C, ,|,G)))
-	T += $(LDLIBRARIES)
+	T += $(LDLIBRARIES) $(IFFEREFS:N=-l*)
 	.R. : .CLEAR .MAKE $(T)
 		: $(*)
 	.MAKE : .R.
@@ -1206,9 +1206,9 @@ $(IFFEGENDIR)/% : "" .SCAN.c (IFFE) (IFFEFLAGS)
 	T := $(T:/^/-I/) $(T:D:U:/^/-I/) $(*.R.:N!=$(<:T=M:@/ /|/G):U)
 	if T
 		if "$(-mam:N=static*,port*)"
-			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=${mam_lib+([a-zA-Z0-9_])}:P=D):$(.CC.NOSTDLIB.):/.*/${mam_cc_L+-L&}/) $(T) $(IFFEREFS) :
+			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=${mam_lib+([a-zA-Z0-9_])}:P=D):$(.CC.NOSTDLIB.):/.*/${mam_cc_L+-L&}/) $(T) $(IFFEREFS:N!=-l*) :
 		else
-			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=-l*:P=D):$(.CC.NOSTDLIB.):P=A:/^/-L/) $(T) $(IFFEREFS) :
+			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=-l*:P=D):$(.CC.NOSTDLIB.):P=A:/^/-L/) $(IFFEREFS:N!=-l*) $(T) :
 		end
 	end
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: du (AT&T Research) 2006-12-04 $\n]"
+"[-?\n@(#)$Id: du (AT&T Research) 2007-03-19 $\n]"
 USAGE_LICENSE
 "[+NAME?du - summarize disk usage]"
 "[+DESCRIPTION?\bdu\b reports the number of blocks contained in all files"
@@ -130,8 +130,11 @@ du(register Ftw_t* ftw)
 		ftw->status = FTW_SKIP;
 		break;
 	case FTW_DP:
-		n = *(Count_t*)ftw->local.pointer;
-		free(ftw->local.pointer);
+		if (ftw->local.pointer)
+		{
+			n = *(Count_t*)ftw->local.pointer;
+			free(ftw->local.pointer);
+		}
 		break;
 	default:
 		if (ftw->statb.st_nlink > 1)

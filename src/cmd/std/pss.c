@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -25,7 +25,7 @@
  * process status stream implementation
  */
 
-static const char id[] = "\n@(#)$Id: pss library (AT&T Research) 2003-03-11 $\0\n";
+static const char id[] = "\n@(#)$Id: pss library (AT&T Research) 2007-03-19 $\0\n";
 
 static const char lib[] = "std:pss";
 
@@ -123,7 +123,11 @@ pssread(register Pss_t* pss, Pss_id_t pid)
 		if ((i = (*pss->meth->partf)(pss, pe)) < 0)
 			return 0;
 		if (!i)
+		{
+			memset(pe, 0, sizeof(*pe));
+			pe->pid = pss->pid;
 			goto next;
+		}
 		if (pid)
 			pe->pss = PSS_EXPLICIT;
 		else if (flags & PSS_ALL)

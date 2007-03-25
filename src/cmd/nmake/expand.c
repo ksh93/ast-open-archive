@@ -3407,7 +3407,15 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 	top[1] = 0;
 	dir = bas = suf = DELETE;
 	if (exp < 0)
+	{
+		if (state.expandall)
+		{
+			error(1, "$(...) recursion disabled");
+			return;
+		}
+		state.expandall = 1;
 		all = lla == D_select0 ? D_select1 : D_select0;
+	}
 	else
 	{
 		all = 0;
@@ -3895,6 +3903,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		{
 			expandall(xp, exp < 0 ? 0 : all);
 			all = 0;
+			state.expandall = 0;
 		}
 		if (!all)
 		{
@@ -4423,7 +4432,10 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		}
 	}
 	if (all)
+	{
 		expandall(buf[0], exp < 0 ? 0 : all);
+		state.expandall = 0;
+	}
 	else
 	{
 		if (out)

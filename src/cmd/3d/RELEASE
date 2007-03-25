@@ -1,3 +1,5 @@
+07-03-26 Makefile: drop -L* from IFFEREFS -- handled by .IFFE.REF.
+07-03-21 lib_3d.h,error.c: handle error_info => *_error_data_
 06-12-04 3d.h: strmode() bsd conflict tweak
 06-11-23 finally get linux to pass regression tests
 06-11-21 fchdir3d: let chdir do the work if fd matches cached path

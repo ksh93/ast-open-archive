@@ -283,7 +283,6 @@ int TkshUpVar(Tcl_Interp *interp, char *newname, char *part1,
 		char *part2, Hashtab_t *scope)
 {
 	Namval_t *namval;
-	Hashtab_t *oldscope = sh.var_tree;
 
 	if (hashscope(sh.var_tree) && nv_open(newname,sh.var_tree,NV_NOSCOPE|NV_NOADD))
 	{
@@ -296,24 +295,11 @@ int TkshUpVar(Tcl_Interp *interp, char *newname, char *part1,
 		part1 = sfprints("%s[%s]", part1, part2);
 		part2 = NULL;
 	}
-#if 0
 	if (!(namval = TkshOpenVar(interp,&newname,&part2,0,0,"access")))
 		return TCL_ERROR;
-	nv_putval(namval,part1,NV_REF|NV_NOFREE);
-	sh.var_tree = scope; /* nv_getscope(level << 1); */
-	nv_setref(namval);
-	sh.var_tree = oldscope;
+	nv_putval(namval,part1,NV_NOFREE);
+	nv_setref(namval,scope,NV_NOREF);
 	nv_close(namval);
-#else
-	sh.var_tree = scope; /* nv_getscope(level << 1); */
-	namval = TkshOpenVar(interp,&newname,&part2,0,0,"access");
-	sh.var_tree = oldscope;
-	if (!namval)
-		return TCL_ERROR;
-	nv_putval(namval,part1,NV_REF|NV_NOFREE);
-	nv_setref(namval);
-	nv_close(namval);
-#endif
 	return TCL_OK;
 }
 

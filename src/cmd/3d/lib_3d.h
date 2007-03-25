@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -39,7 +39,9 @@
 #define checklink	_3d_checklink
 #define control		_3d_control
 #define error		_3d_error
-#define error_info	_3d_error_info
+#define _error_data_	_3d_error_data /*AHA*/
+#define _error_info_	_3d_error_info
+#define _error_infop_	_3d_error_infop
 #define errorf		_3d_errorf
 #define errormsg	_3d_errormsg
 #define errorv		_3d_errorv

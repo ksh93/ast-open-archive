@@ -1,3 +1,6 @@
+07-03-26 make.h: add state.expall to detect and disable $(...) recursion
+07-03-26 Makerules.mk: fix .IFFE.REF. to handle -l* reqs
+07-03-23 ppcc.sh: handle -G <number>
 07-03-11 Makerules.mk: add --shared as an alternative to CCFLAGS+=$(CC.DLL)
 07-02-23 Makerules.mk: add :PACKAGE: foo:private for +lfoo but not in *.req
 07-02-14 expand.c: tweak :P=D: alias check (-Q0x10000000)

@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1984-2005 AT&T Corp.                  #
+#           Copyright (c) 1984-2007 AT&T Knowledge Ventures            #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                      by AT&T Knowledge Ventures                      #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -278,6 +278,10 @@ case $old:$RANDOM in
 			;;
 		-[DIU]*|-[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*)
 			;;
+		-G)	case $1 in
+			[0-9]*)	shift ;;
+			esac
+			;;
 		[-+]*)	continue
 			;;
 		$src1|$src2|$src3|$src4)
@@ -430,6 +434,15 @@ case $old:$RANDOM in
 			doti=1
 			trap 0 1 2 3 15
 			continue
+			;;
+		-G)	case ${av[nav]} in
+			[0-9]*)	cc[ncc]=$arg
+				(( ncc = ncc + 1 ))
+				arg=${av[nav]}
+				(( nav = nav + 1 ))
+				print -u2 AHA ${cc[ncc]} $arg
+				;;
+			esac
 			;;
 		-P)	ppfile=1
 			doti=1
