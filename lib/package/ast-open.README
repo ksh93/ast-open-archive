@@ -93,6 +93,7 @@ All recorded changes follow.
 :::::::: ksh93 ::::::::
 
 07-03-08  --- Release ksh93s+  ---
+07-03-08  A bug in which set +o output command line options has been fixed.
 07-03-08  A bug in which an error in read (for example, an invalid variable
 	  name), could leave the terminal in raw mode has been fixed.
 07-03-06  A bug in which read could core dump when specified with an array
@@ -4877,6 +4878,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+07-03-28 misc/optget.c: fix l10n --?-
 07-03-25 features/common: fix { ast_std.h ast_map.h stdint.h } logic
 07-03-21 error.h: move from error_info to (*_error_data_)
 07-03-21 option.h: move from opt_info to (*_opt_data_)
@@ -6308,6 +6310,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+07-03-28 date.c: add --unelepsed=scale, -U: fmtelapsed() => strelapsed()
 07-03-25 wclib.h: iswspace() requires <wctype.h>!
 07-03-11 tty.c: add sysV --line-number, -l
 07-02-26 Makefile: sumlib.o: direct extract from +lsum (vcodex someday)

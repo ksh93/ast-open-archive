@@ -720,9 +720,9 @@ TEST 13 'self-documentation'
             [--native-pp=level] [--official-output=file] [--prefix-include]
             [--preserve[=pattern]] [--profile] [--recurse=action]
             [--recurse-enter=text] [--recurse-leave=text] [--select=edit-ops]
-            [--separate-include] [--static-link] [--strip-symbols] [--threads]
-            [--variants[=pattern]] [--view-verify=level] [--virtual]
-            [ script ... ] [ target ... ]'
+            [--separate-include] [--shared] [--static-link] [--strip-symbols]
+            [--threads] [--variants[=pattern]] [--view-verify=level]
+            [--virtual] [ script ... ] [ target ... ]'
 
 	EXEC	-f - --long
 
