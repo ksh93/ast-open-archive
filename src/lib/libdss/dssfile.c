@@ -174,14 +174,15 @@ dssfopen(Dss_t* dss, const char* path, Sfio_t* io, Dssflags_t flags, Dssformat_t
 				dssfclose(file);
 				return 0;
 			}
-			if (!(s = sfreserve(file->io, SF_UNBOUND, SF_LOCKR)))
+			s = sfreserve(file->io, SF_UNBOUND, SF_LOCKR);
+			n = sfvalue(file->io);
+			if (!s)
 			{
-				if (dss->disc->errorf)
+				if (n && dss->disc->errorf)
 					(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "%s: cannot peek", file->path);
 				dssfclose(file);
 				return 0;
 			}
-			n = sfvalue(file->io);
 			for (file->format = (Dssformat_t*)dtfirst(dss->meth->formats); file->format && !(i = (*file->format->identf)(file, s, n, dss->disc)); file->format = (Dssformat_t*)dtnext(dss->meth->formats, file->format));
 			sfread(file->io, s, 0);
 			if (!file->format)

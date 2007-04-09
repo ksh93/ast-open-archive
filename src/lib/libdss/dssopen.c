@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss library (AT&T Research) 2006-02-02 $\n]"
+"[-?\n@(#)$Id: dss library (AT&T Research) 2007-04-02 $\n]"
 USAGE_LICENSE
 "[+NAME?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method schema is a pure XML (tags only)"

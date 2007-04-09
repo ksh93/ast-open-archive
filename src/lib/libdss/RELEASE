@@ -1,3 +1,4 @@
+07-04-02 dssfile.c: handle empty compressed file peek
 07-01-17 dssfile.c: sfdcpzip() => sfdczip()
 06-12-04 dssopt.c: add full type description to dssopt()
 06-10-11 add sfstruse() error checks
