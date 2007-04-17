@@ -298,7 +298,7 @@ prev cxlib.h implicit
 done cxopen.c
 meta cxopen.o %.c>%.o cxopen.c cxopen
 prev cxopen.c
-exec - ${CC} -g -D_BLD_DLL -fpic -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxopen.c
+exec - ${CC} -g -D_BLD_DLL -fPIC -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxopen.c
 done cxopen.o generated
 make cxcomp.o
 make cxcomp.c
@@ -314,7 +314,7 @@ prev cxlib.h implicit
 done cxeval.c
 meta cxeval.o %.c>%.o cxeval.c cxeval
 prev cxeval.c
-exec - ${CC} -g -D_BLD_DLL -fpic -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxeval.c
+exec - ${CC} -g -D_BLD_DLL -fPIC -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxeval.c
 done cxeval.o generated
 make cxmap.o
 make cxmap.c

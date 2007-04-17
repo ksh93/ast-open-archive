@@ -2952,6 +2952,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-04-11 sfio/tprintf.c: update for { inf INF nan NAN }
 06-09-14 datey2k.dat: yield to the gentlemen from congress
 06-08-25 opt.tst: update for leading 0 numeric option arg strip
 05-04-30 sfio: tgetr: add sfmaxr() tests
@@ -5977,6 +5978,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-04-13 tm/tmxdate.c,tm/tmzone.c: handle &#0091;-+&#0093;0000 UTC zone offset
+07-04-11 sfio/sfvprintf.c: add %F, propagate SFFMT_UPPER
+07-04-11 sfio/sfcvt.c: handle SFFMT_UPPER =&gt; nan/inf vs. NAN/INF
 07-04-02 comp/conf.tab,comp/conf.sh: add C/POSIX &lt;stdint.h&gt; symbols
 07-03-28 misc/optget.c: fix l10n --?-
 07-03-25 features/common: fix { ast_std.h ast_map.h stdint.h } logic
@@ -8924,7 +8928,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>April 11, 2007</TD>
+<TD align=right>April 16, 2007</TD>
 </TR>
 </TABLE>
 <P>

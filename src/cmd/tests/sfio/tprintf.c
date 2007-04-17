@@ -592,12 +592,18 @@ MAIN()
 	x = 0;
 	y = 1;
 	sfsprintf(buf1, sizeof(buf1), "%g %g %g", x/x, y/x, (-y)/x);
-	if (strcmp(buf1, "NaN Inf -Inf") != 0)
+	if (strcmp(buf1, "nan inf -inf") != 0)
+		terror("double NaN Inf error: %s", buf1);
+	sfsprintf(buf1, sizeof(buf1), "%G %G %G", x/x, y/x, (-y)/x);
+	if (strcmp(buf1, "NAN INF -INF") != 0)
+		terror("double NaN Inf error: %s", buf1);
+	sfsprintf(buf1, sizeof(buf1), "%05g %05g %05g", x/x, y/x, (-y)/x);
+	if (strcmp(buf1, "  nan   inf  -inf") != 0)
 		terror("double NaN Inf error: %s", buf1);
 	lx = 0;
 	ly = 1;
 	sfsprintf(buf1, sizeof(buf1), "%Lg %Lg %Lg", lx/lx, ly/lx, (-ly)/lx);
-	if (strcmp(buf1, "NaN Inf -Inf") != 0)
+	if (strcmp(buf1, "nan inf -inf") != 0)
 		terror("Sfdbouble_t NaN Inf error: %s", buf1);
 
 	/* test the sfaprints() function */
