@@ -1047,7 +1047,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-07-03-08  --- Release ksh93s+  ---
+07-04-18  --- Release ksh93s+  ---
+07-04-18  A small memory leak with each redirection of a non-builtin has
+	  been fixed.
 07-03-08  A bug in which set +o output command line options has been fixed.
 07-03-08  A bug in which an error in read (for example, an invalid variable
 	  name), could leave the terminal in raw mode has been fixed.
@@ -3367,6 +3369,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-04-18 Makerules.mk: add :REQUIRE:
 07-03-26 make.h: add state.expall to detect and disable $(...) recursion
 07-03-26 Makerules.mk: fix .IFFE.REF. to handle -l* reqs
 07-03-23 ppcc.sh: handle -G &lt;number&gt;
@@ -8928,7 +8931,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>April 16, 2007</TD>
+<TD align=right>April 18, 2007</TD>
 </TR>
 </TABLE>
 <P>

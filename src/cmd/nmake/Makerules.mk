@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-03-26 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-04-18 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2093,6 +2093,21 @@ end
 	end
 	.LIBRARY.ONLY. += _BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G)=
 	$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
+
+/*
+ * <pseudo-library> :REQUIRE: -[lL]*
+ */
+
+":REQUIRE:" : .MAKE .OPERATOR
+	if ! "$(.NO.INSTALL.)"
+		$$(LIBDIR)/lib/$(<) :INSTALL: $(<).req
+	end
+	.REQUIRE.$(<) := $(>)
+	(.REQUIRE.$(<)) : .PARAMETER
+	eval
+	$$(<:B:S=.req) : (.REQUIRE.$$(<))
+		echo "" $$(.REQ. $$(.REQUIRE.$(<))) > $$(<)
+	end
 
 .REQ. : .FUNCTION
 	local B I Q R

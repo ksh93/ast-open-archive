@@ -92,7 +92,9 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-07-03-08  --- Release ksh93s+  ---
+07-04-18  --- Release ksh93s+  ---
+07-04-18  A small memory leak with each redirection of a non-builtin has
+	  been fixed.
 07-03-08  A bug in which set +o output command line options has been fixed.
 07-03-08  A bug in which an error in read (for example, an invalid variable
 	  name), could leave the terminal in raw mode has been fixed.
@@ -2376,6 +2378,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-04-18 Makerules.mk: add :REQUIRE:
 07-03-26 make.h: add state.expall to detect and disable $(...) recursion
 07-03-26 Makerules.mk: fix .IFFE.REF. to handle -l* reqs
 07-03-23 ppcc.sh: handle -G <number>
