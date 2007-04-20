@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -169,6 +169,7 @@ struct _rs_s
 #define RS_MTCOPY	020000
 
 #define RSKEY_ERROR	000001		/* unrecoverable error		*/
+#define RSKEY_KEYS	000002		/* keys specified		*/
 
 #define RSKEYDISC(p)	(((Rskey_t*)((char*)(p)-offsetof(Rskey_t,disc)))->keydisc)
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*              Copyright (c) 2006 AT&T Knowledge Ventures              *
+*           Copyright (c) 2006-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortglean (AT&T Research) 2006-11-23 $\n]"
+"[-1lp0?\n@(#)$Id: sortglean (AT&T Research) 2007-04-20 $\n]"
 USAGE_LICENSE
 "[+NAME?sortglean - glean minima and/or maxima from record stream]"
 "[+DESCRIPTION?The \bsortglean\b \bsort\b(1) discipline gleans minima "
@@ -39,7 +39,10 @@ USAGE_LICENSE
     "key \ak1\a and the second using sort key \ak2\a.]"
 "[+?Note that \b,\b is the plugin option separator. Literal \b,\b must "
     "either be quoted or escaped \aafter\a normal shell expansion.]"
-"[c:count?Precede each output record with its category ordinal.]"
+"[a:absolute?List only the absolute minimum/maximum records for each "
+    "category.]"
+"[c:count?Precede each output record with its category index, "
+    "category count, and total record count.]"
 "[f:flush?Flush each line written to the standard output.]"
 "[m:min?Mimima \bsort\b(1) key specification.]:[sort-key]"
 "[M:max?Maxima \bsort\b(1) key specification.]:[sort-key]"
@@ -71,6 +74,7 @@ typedef struct Category_s
 {
 	Dtlink_t	link;
 	Sfulong_t	count;
+	unsigned int	index;
 	Data_t		key;
 	Data_t		lim[1];
 } Category_t;
@@ -83,6 +87,10 @@ struct Field_s
 	Rskey_t*	lim;
 	int		mm;
 	int		index;
+	Category_t*	category;
+	Sfulong_t	count;
+	Sfulong_t	total;
+	Data_t		absolute;
 };
 
 typedef struct State_s
@@ -91,11 +99,14 @@ typedef struct State_s
 	Dtdisc_t	dtdisc;
 	Rskeydisc_t	kydisc;
 	Dt_t*		categories;
+	unsigned int	index;
 	Field_t*	field;
-	int		fields;
+	unsigned int	fields;
 	Data_t		key;
 	Vmalloc_t*	vm;
+	int		absolute;
 	int		count;
+	Category_t*	all;
 	Sfulong_t	total;
 } State_t;
 
@@ -147,23 +158,34 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 	switch (op)
 	{
 	case RS_POP:
+		if (state->absolute)
+			for (f = state->field; f; f = f->next)
+			{
+				if (state->count)
+					sfprintf(sfstdout, "%u/%I*u/%I*u ", f->category->index, sizeof(f->count), f->count, sizeof(f->total), f->total);
+				sfwrite(sfstdout, f->absolute.data, f->absolute.len);
+			}
 		vmclose(state->vm);
 		return 0;
 	case RS_READ:
 		r = (Rsobj_t*)data;
 		x.key.data = r->key;
 		x.key.len = r->keylen;
-		if (!(p = (Category_t*)dtsearch(state->categories, &x)))
+		if (state->categories && !(p = (Category_t*)dtsearch(state->categories, &x)) || !state->categories && !(p = state->all))
 		{
 			if (!(p = vmnewof(state->vm, 0, Category_t, 1, (state->fields - 1) * sizeof(Data_t) + r->keylen)))
 			{
 				error(ERROR_SYSTEM|2, "out of space [category]");
 				return -1;
 			}
+			p->index = ++state->index;
 			p->key.len = r->keylen;
 			p->key.data = (char*)(p + 1) + (state->fields - 1) * sizeof(Data_t);
 			memcpy(p->key.data, r->key, r->keylen);
-			dtinsert(state->categories, p);
+			if (state->categories)
+				dtinsert(state->categories, p);
+			else
+				state->all = p;
 		}
 		state->total++;
 		p->count++;
@@ -203,7 +225,6 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 			}
 			if (f->mm == 'm' ? (n < 0) : (n > 0))
 			{
-				m = 1;
 				if (f->lim->disc->defkeyf)
 				{
 					t = state->key;
@@ -212,12 +233,22 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 				}
 				else if (save(state->vm, &p->lim[f->index], t.data, t.len))
 					return -1;
+				if (!state->absolute)
+					m = 1;
+				else if (save(state->vm, &f->absolute, r->data, r->datalen))
+					return -1;
+				else
+				{
+					f->category = p;
+					f->count = p->count;
+					f->total = state->total;
+				}
 			}
 		}
 		if (m)
 		{
 			if (state->count)
-				sfprintf(sfstdout, "%I*u/%I*u ", sizeof(p->count), p->count, sizeof(state->total), state->total);
+				sfprintf(sfstdout, "%u/%I*u/%I*u ", p->index, sizeof(p->count), p->count, sizeof(state->total), state->total);
 			sfwrite(sfstdout, r->data, r->datalen);
 		}
 		return RS_DELETE;
@@ -243,7 +274,7 @@ rs_disc(Rskey_t* key, const char* options)
 	state->kydisc.errorf = errorf;
 	state->rsdisc.eventf = glean;
 	state->rsdisc.events = RS_READ|RS_POP;
-	if (!(state->categories = dtnew(vm, &state->dtdisc, Dttree)))
+	if ((key->keydisc->flags & RSKEY_KEYS) && !(state->categories = dtnew(vm, &state->dtdisc, Dttree)))
 		error(ERROR_SYSTEM|3, "out of space [dictionary]");
 	if (options)
 	{
@@ -253,6 +284,9 @@ rs_disc(Rskey_t* key, const char* options)
 			{
 			case 0:
 				break;
+			case 'a':
+				state->absolute = opt_info.num;
+				continue;
 			case 'c':
 				state->count = opt_info.num;
 				continue;

@@ -1,3 +1,4 @@
+07-04-16 recsort.h,rskey.c: add RSKEY_KEYS
 06-12-15 rskeyhdr.h: increase MAXFIELD to INT_MAX
 06-07-17 rsprocess.c: re-key after RS_READ calout
 06-06-29 rsprocess.c: set obj key,keylen before RS_READ

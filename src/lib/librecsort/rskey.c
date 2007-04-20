@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -873,6 +873,7 @@ int		obsolete;
 	char*			t;
 	char			buf[32];
 
+	kp->keydisc->flags |= RSKEY_KEYS;
 	s = (char*)key;
 	if (*s == '.')
 	{
