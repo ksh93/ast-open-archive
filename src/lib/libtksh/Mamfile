@@ -179,17 +179,6 @@ done config.h dontcare generated
 make include/tksh.h implicit
 prev include/tcl.h implicit
 make ${INSTALLROOT}/include/ast/shell.h implicit
-make ${INSTALLROOT}/include/ast/nval.h implicit
-make ${INSTALLROOT}/include/ast/cdt.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/cdt.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/nval.h dontcare
-make name.h implicit
-done name.h dontcare virtual
-prev ${INSTALLROOT}/include/ast/cdt.h implicit
 make ${INSTALLROOT}/include/ast/cmd.h implicit
 make ${INSTALLROOT}/include/ast/dlldefs.h implicit
 make include/dlfcn.h implicit
@@ -198,6 +187,9 @@ done ${INSTALLROOT}/include/ast/dlldefs.h dontcare
 make ${INSTALLROOT}/include/ast/cmdext.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/cmdext.h dontcare
+make ${INSTALLROOT}/include/ast/shcmd.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/shcmd.h dontcare
 make ${INSTALLROOT}/include/ast/stak.h implicit
 make ${INSTALLROOT}/include/ast/stk.h implicit
 prev ${INSTALLROOT}/include/ast/sfio.h implicit
@@ -216,6 +208,18 @@ done ${INSTALLROOT}/include/ast/error.h dontcare
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/cmd.h dontcare
+make ${INSTALLROOT}/include/ast/nval.h implicit
+make ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/cdt.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/nval.h dontcare
+make name.h implicit
+done name.h dontcare virtual
+prev ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/shell.h dontcare
 done include/tksh.h dontcare

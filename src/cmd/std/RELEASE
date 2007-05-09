@@ -1,3 +1,5 @@
+07-05-05 seq.sh,seq.rt: new
+07-04-25 locale.c: defer unknown keywords to /usr/bin/locale
 07-03-19 du.c: fix 0 pointer deref
 07-03-19 pss.c: initialize not found process placeholders
 07-02-07 sum.c: move to libcmd & builtin

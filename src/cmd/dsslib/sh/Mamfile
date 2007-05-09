@@ -125,20 +125,15 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dss.h
 make ${PACKAGE_ast_INCLUDE}/shell.h implicit
-make ${PACKAGE_ast_INCLUDE}/nval.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/nval.h dontcare
-make name.h implicit
-done name.h dontcare virtual
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cmdext.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmdext.h dontcare
+make ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/shcmd.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stak.h implicit
 make ${PACKAGE_ast_INCLUDE}/stk.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
@@ -150,6 +145,15 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
+make ${PACKAGE_ast_INCLUDE}/nval.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/nval.h dontcare
+make name.h implicit
+done name.h dontcare virtual
+prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/shell.h
 done dsstype.c

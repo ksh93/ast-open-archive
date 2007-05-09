@@ -60,6 +60,9 @@ prev ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 make ${PACKAGE_ast_INCLUDE}/cmdext.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmdext.h dontcare
+make ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/shcmd.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stak.h implicit
 make ${PACKAGE_ast_INCLUDE}/stk.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio.h implicit

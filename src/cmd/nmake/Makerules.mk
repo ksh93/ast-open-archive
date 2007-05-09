@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-04-18 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-05-09 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2122,13 +2122,11 @@ end
 			if "$(.REQUIRE.$(B))"
 				R += $(I)
 			else
-				if Q = "$(.REQUIRE.-l% $(I))"
-					if ! "$(Q:N=[-+]l$(B))" && ! "$(MAKE_QUESTIONABLE_require)"
-						continue
+				Q := $(.REQUIRE.-l% $(I))
+				if Q != "{ - }"
+					if "$(Q:T=F)"
+						R += $(I)
 					end
-				end
-				if "$(I:T=F)"
-					R += $(I)
 				end
 			end
 		end

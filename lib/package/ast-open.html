@@ -1047,7 +1047,14 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-07-04-18  --- Release ksh93s+  ---
+07-05-10  --- Release ksh93s+  ---
+07-05-10  A bug in which ksh -R file core dumped if no script was sepcifed
+	  has been fixed.  It now displays an error message.
+07-05-07  Added additional Solaris signals to signal table.
+07-04-30  A bug in which a pipeline with command substitution inside a
+	  function could cause a pipline that invokes this function to
+	  hang when the pipefail option is on has been fixed.
+07-04-30  Added -q to whence.
 07-04-18  A small memory leak with each redirection of a non-builtin has
 	  been fixed.
 07-03-08  A bug in which set +o output command line options has been fixed.
@@ -2508,6 +2515,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-01 pax-tar.c,options.c: fix pax extended header for &gt;=2**32 size
 07-03-14 pax-tnef.c: swap op == 3 for all arch!
 06-10-31 delta.c,format.c: fix ar=&gt;ar delta bug that skipped data twice
 06-10-11 add sfstropen()/sfstruse() error checks
@@ -2814,6 +2822,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-04-20 mm2bb.sh: add for mm =&gt; bb code
 07-02-09 mm2html.sh: expand  rather than escape to \\(*..
 06-10-31 mm2html: fix tager=_top omission bug
 06-10-11 add sfstruse() error checks
@@ -3369,6 +3378,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-09 Makerules.mk: fix %.req logic
+07-04-20 rules-win32.mk: fix PROTOINSTALL sed &lt;ast_*.h&gt; =&gt; &lt;ast/ast_*.h&gt;
 07-04-18 Makerules.mk: add :REQUIRE:
 07-03-26 make.h: add state.expall to detect and disable $(...) recursion
 07-03-26 Makerules.mk: fix .IFFE.REF. to handle -l* reqs
@@ -5070,6 +5081,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sh changes">sh changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-09 update for lib_init(flags,context) context arg
 07-03-19 update nv_setref() calls
 04-02-29 fix bugs exposed by $(CC.EXPORT.DYNAMIC)
 04-02-14 add ksh93:command prereq for -lshell
@@ -5571,6 +5583,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-05 seq.sh,seq.rt: new
+07-04-25 locale.c: defer unknown keywords to /usr/bin/locale
 07-03-19 du.c: fix 0 pointer deref
 07-03-19 pss.c: initialize not found process placeholders
 07-02-07 sum.c: move to libcmd &amp; builtin
@@ -5854,6 +5868,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-08 find.c: fix -printf =&gt; sfvprintf() translation
+07-05-08 tw.c: provide empty *ftw for -n actions
+07-04-24 cmdarg.c,cmdarg.h: move to src/lib/libast
 07-01-06 find.c: fix dumb -empty coding bug
 06-12-07 find.c,find.tst: fix -exec/-xargs vs {} +
 06-12-07 cmdarg.c,xargs.tst: adjust ARG_MAX logic
@@ -5981,9 +5998,17 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-09 features/signal.c,features/siglist: use kill -l &amp; strsignal()
+07-04-25 misc/optctx.c: add for opt_info switching
+07-04-24 misc/cmdarg.c,include/cmdarg.h: add CMD_CHECKED, CMD_SILENT
+07-04-24 misc/procopen.c,include/proc.h: add PROC_CHECK
+07-04-24 misc/procrun.c: add flags arg (current use PROC_ARGMOD)
+07-04-24 misc/cmdarg.c,include/cmdarg.h: move from src/cmd/tw
 07-04-20 port/(lclang.h|lc.c|mc.c|lclib.h|lcgen.c): separate lctab.c
 07-04-20 comp/conf.sh: defer to systems without 'grep -q' -- sigh
 07-04-20 comp/conf.sh: probe for LL integer constant initializer suffix
+07-04-20 include/syslog.h: &lt;namval.h&gt; =&gt; &lt;ast_namval.h&gt; for win32
+07-04-20 ast_namval.h: add as copy of include/namval.h for win32
 07-04-19 comp/conf.tab: fix SVID SI entries to probe SI_* (not _SI_*)
 07-04-13 tm/tmxdate.c,tm/tmzone.c: handle &#0091;-+&#0093;0000 UTC zone offset
 07-04-11 sfio/sfvprintf.c: add %F, propagate SFFMT_UPPER
@@ -5992,6 +6017,7 @@ All recorded changes follow.
 07-03-28 misc/optget.c: fix l10n --?-
 07-03-25 features/common: fix { ast_std.h ast_map.h stdint.h } logic
 07-03-21 error.h: move from error_info to (*_error_data_)
+07-03-21 misc/error.c: add errorctx() for error_info switching
 07-03-21 option.h: move from opt_info to (*_opt_data_)
 07-03-19 regex/regdecomp.c: fix REX_ONECHAR escapes and add REX_KMP
 07-03-11 tm/tmxscan.c,regex/regnexec.c: fix strict-alias transgressions
@@ -7427,6 +7453,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-11 cmd.h: add _CMD_CONTEXT_OK() to verify &gt;= 20070511 context
+07-05-09 fds.c: handle ipv6 sockets
+07-05-09 cmd.h: &lt;shbltin.h&gt; : cmdquit() =&gt; sh_checksig(context)
+07-04-25 mkdir.c: force (S_ISVTX|S_ISUID|S_ISGID) after mkdir(2)
+07-04-24 procrun.c: add -last intercept =&gt; sh_run() and whence -q
 07-04-19 uname.c: name operands first checked for CS_NAME, then NAME
 07-03-28 date.c: add --unelapsed=scale, -U: fmtelapsed() =&gt; strelapsed()
 07-03-25 wclib.h: iswspace() requires &lt;wctype.h&gt;!
@@ -7873,6 +7904,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libz changes">libz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-09 Makefile: :INSTALLPROTO: zconf.h for win32 &lt;ast_*&gt; post edit
 07-01-25 zlib.h,gzio.c: add gzbopen() to handle buffered unseekable data
 07-01-25 sfdcgzip.c: use gzbopen() to handle buffered unseekable data
 05-07-25 __MVS__ tweaks
@@ -8937,7 +8969,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>April 20, 2007</TD>
+<TD align=right>May 13, 2007</TD>
 </TR>
 </TABLE>
 <P>

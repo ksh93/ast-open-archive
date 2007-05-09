@@ -992,7 +992,7 @@ static const Namdisc_t dss_disc =
 static const char *discnames[] = { "list", "load", 0 };
 
 static const char optlist[] =
-"[-1c?\n@(#)$Id: dss.list (AT&T Research) 2003-01-10 $\n]"
+"[-1c?\n@(#)$Id: dss.list (AT&T Research) 2007-05-09 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - list the known dss entities]"
 "[+DESCRIPTION?\b\f?\f\b causes each of the specified dss entities "
@@ -1346,9 +1346,9 @@ static int format(int argc, char *argv[], void *ptr)
 	__EXPORT__
 #   endif
 #endif
-void init_dss(int flag)
+void init_dss(int flag, void* context)
 {
-	Shell_t *shp = sh_getinterp();
+	Shell_t *shp = ((Shbltin_t*)context)->shp;
 	Namval_t *np,*rp;
 	Namfun_t *nfp = newof(NiL,Namfun_t,1,0);
 	char tmp[sizeof(NV_CLASS)+17];

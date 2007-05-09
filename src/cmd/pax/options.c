@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -880,6 +880,7 @@ Option_t		options[] =
 	"size",
 	0,
 	OPT_HEADER|OPT_OPTIONAL,
+	7
 },
 {
 	"strict",

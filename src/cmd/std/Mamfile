@@ -108,6 +108,9 @@ done ${PACKAGE_ast_INCLUDE}/dlldefs.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cmdext.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmdext.h dontcare
+make ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/shcmd.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stak.h implicit
 make ${PACKAGE_ast_INCLUDE}/stk.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
@@ -500,6 +503,44 @@ done ${mam_libkvm} dontcare virtual
 setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o ps ps.o pss.o pss-null.o pss-procfs.o pss-getprocs.o pss-cygwin.o pss-kvm.o pss-pstat.o pss-ps.o pss-info.o ${mam_libast}
 done ps generated
+make seq
+make seq.sh
+done seq.sh
+meta seq %.sh>% seq.sh seq
+prev seq.sh
+setv LICENSE -DLICENSE="since=2007,author=dgk"
+exec - case static,port:$OPTIND:$RANDOM in
+exec - ?*:*:*|*::*|*:*:$RANDOM)
+exec - 	;;
+exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= $SHELL -n seq.sh
+exec - 	fi
+exec - 	;;
+exec - esac
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 185 in
+exec - 	0)	cp seq.sh seq
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < seq.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
+exec - 		esac
+exec - 		cat - seq.sh <<'!'
+exec - USAGE_LICENSE="[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"
+exec - !
+exec - 		} > seq
+exec - 		;;
+exec - 	esac
+exec - 	;;
+exec - *)	cat - seq.sh > seq <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - USAGE_LICENSE="[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?std]"
+exec - !
+exec - 	;;
+exec - esac
+exec - silent test -w seq -a -x seq || chmod u+w,+x seq
+done seq generated
 make shar
 make shar.sh
 done shar.sh
@@ -658,6 +699,10 @@ make ${INSTALLROOT}/bin/ps
 prev ps
 exec - test '' = 'ps' || ${STDCMP} 2>/dev/null -s ps ${INSTALLROOT}/bin/ps || { ${STDMV} ${INSTALLROOT}/bin/ps ${INSTALLROOT}/bin/ps.old 2>/dev/null || true; ${STDCP} ps ${INSTALLROOT}/bin/ps  		    		    ;}
 done ${INSTALLROOT}/bin/ps generated
+make ${INSTALLROOT}/bin/seq
+prev seq
+exec - test '' = 'seq' || ${STDCMP} 2>/dev/null -s seq ${INSTALLROOT}/bin/seq || { ${STDMV} ${INSTALLROOT}/bin/seq ${INSTALLROOT}/bin/seq.old 2>/dev/null || true; ${STDCP} seq ${INSTALLROOT}/bin/seq  		    		    ;}
+done ${INSTALLROOT}/bin/seq generated
 make ${INSTALLROOT}/bin/shar
 prev shar
 exec - test '' = 'shar' || ${STDCMP} 2>/dev/null -s shar ${INSTALLROOT}/bin/shar || { ${STDMV} ${INSTALLROOT}/bin/shar ${INSTALLROOT}/bin/shar.old 2>/dev/null || true; ${STDCP} shar ${INSTALLROOT}/bin/shar  		    		    ;}
@@ -718,6 +763,18 @@ done ls.tst
 prev ls
 exec - regress  ls.tst ls
 done test.ls virtual
+make test.seq
+make seq.tst
+meta seq.tst %.rt>%.tst seq.rt seq
+make seq.rt
+done seq.rt
+exec - if	[[ "1" || "seq.rt" -nt "seq.tst" ]]
+exec - then	mktest --style=regress seq.rt > seq.tst
+exec - fi
+done seq.tst generated
+prev seq
+exec - regress  seq.tst seq
+done test.seq virtual
 make test.touch
 make touch.tst
 done touch.tst

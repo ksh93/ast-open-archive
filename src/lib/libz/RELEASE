@@ -1,3 +1,4 @@
+07-05-09 Makefile: :INSTALLPROTO: zconf.h for win32 <ast_*> post edit
 07-01-25 zlib.h,gzio.c: add gzbopen() to handle buffered unseekable data
 07-01-25 sfdcgzip.c: use gzbopen() to handle buffered unseekable data
 05-07-25 __MVS__ tweaks

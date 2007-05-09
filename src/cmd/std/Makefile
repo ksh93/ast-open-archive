@@ -32,6 +32,8 @@ ps :: ps.c pss.c pss-null.c LICENSE=since=1998,author=gsf \
 
 dontcare -lkvm
 
+seq :: seq.sh LICENSE=since=2007,author=dgk
+
 shar :: shar.sh LICENSE=since=1999,author=dgk
 
 split :: split.c LICENSE=since=1995,author=dgk+gsf
@@ -46,6 +48,6 @@ unexpand :: unexpand.c LICENSE=since=1995,author=dgk
 
 expand :LINK: unexpand
 
-:TEST: csplit dd locale ls touch tsort
+:TEST: csplit dd locale ls seq touch tsort
 
 :: y2k.dat

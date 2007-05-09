@@ -2,7 +2,7 @@
 
 export LC_ALL=C TZ=EST5EDT
 
-listformat='%(mtime:time=%Y-%m-%d/%H:%M:%S)s %(path)s'
+listformat='%(mtime:time=%K)s %(path)s'
 
 VIEW data y2k.dat
 

@@ -5,7 +5,7 @@
 .INSTALL.libast.a = .
 .INSTALL.libast-g.a = .
 
-PROTOINSTALL = | $(SED) '/^#[ 	]*include <ast_/s,<,<ast/,'
+PROTOINSTALL = | $(SED) '/^#[[:space:]]*include[[:space:]]*<ast_/s,<,<ast/,'
 
 RC = rc
 RCFLAGS = -x

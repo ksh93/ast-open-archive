@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: locale (AT&T Research) 2003-01-10 $\n]"
+"[-?\n@(#)$Id: locale (AT&T Research) 2007-04-25 $\n]"
 USAGE_LICENSE
 "[+NAME?locale - get locale-specific information]"
 "[+DESCRIPTION?\blocale\b writes information about the current locale to"
@@ -466,6 +466,8 @@ typedef struct Keyword_s
 #ifndef MB_CUR_MIN
 #define MB_CUR_MIN		1
 #endif
+
+static const char	defer[] = "/usr/bin/locale";
 
 static Keyword_t	keywords[] =
 {
@@ -987,12 +989,14 @@ main(int argc, char** argv)
 	int			transform;
 	int			j;
 	char*			value;
+	char**			oargv;
 	Keyword_t*		key;
 	char			buf[64];
 	char			col[1024];
 	char			dip[64];
 
 	error_info.id = "locale";
+	oargv = argv;
 	flags = 0;
 	collate = 0;
 	composite = 0;
@@ -1023,7 +1027,7 @@ main(int argc, char** argv)
 			flags |= LC_local;
 			continue;
 		case 'm':
-			return execv("/usr/bin/locale", argv);
+			return execv(defer, argv);
 		case 'q':
 			flags |= LC_qualified;
 			continue;
@@ -1161,6 +1165,16 @@ main(int argc, char** argv)
 		{
 			if (name[0] == 'L' && name[1] == 'C' && name[2] == '_')
 				error(2, "%s: unknown category", name);
+			else if (oargv[0][0] != '/')
+			{
+				char*	cmd[3];
+
+				cmd[0] = (char*)defer;
+				cmd[1] = name;
+				cmd[2] = 0;
+				procrun(defer, cmd, 0);
+				state.output = 1;
+			}
 			else
 				error(2, "%s: unknown keyword", name);
 		}

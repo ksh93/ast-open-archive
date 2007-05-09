@@ -17,9 +17,7 @@ $(ID) $(VERSION) :LIBRARY: zlib.3 zlib.h zconf.h zutil.h \
 	inflate.c inftrees.c trees.c uncompr.c zutil.c \
 	sfdcgzip.c sfdclzw.c
 
-$(INCLUDEDIR) :INSTALLDIR: zlib.h zconf.h
-
-$(INCLUDEDIR) :INSTALLPROTO: sfdcgzip.h
+$(INCLUDEDIR) :INSTALLPROTO: zlib.h zconf.h sfdcgzip.h
 
 :: RELEASE README INDEX ChangeLog algorithm.doc
 

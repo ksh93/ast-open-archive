@@ -340,11 +340,19 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/zlib.h
 prev ${PACKAGE_ast_INCLUDE}
 prev zlib.h
-exec - test '' = 'zlib.h' || ${STDCMP} 2>/dev/null -s zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h.old 2>/dev/null || true; ${STDCP} zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h  		    		    ;}
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"'  zlib.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/zlib.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/zlib.h
+exec - fi
 done ${PACKAGE_ast_INCLUDE}/zlib.h generated
 make ${PACKAGE_ast_INCLUDE}/zconf.h
 prev zconf.h
-exec - test '' = 'zconf.h' || ${STDCMP} 2>/dev/null -s zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/dev/null || true; ${STDCP} zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h  		    		    ;}
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"'  zconf.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/zconf.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/zconf.h
+exec - fi
 done ${PACKAGE_ast_INCLUDE}/zconf.h generated
 make ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
 prev sfdcgzip.h

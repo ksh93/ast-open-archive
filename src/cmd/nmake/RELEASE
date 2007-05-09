@@ -1,3 +1,5 @@
+07-05-09 Makerules.mk: fix %.req logic
+07-04-20 rules-win32.mk: fix PROTOINSTALL sed <ast_*.h> => <ast/ast_*.h>
 07-04-18 Makerules.mk: add :REQUIRE:
 07-03-26 make.h: add state.expall to detect and disable $(...) recursion
 07-03-26 Makerules.mk: fix .IFFE.REF. to handle -l* reqs

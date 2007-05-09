@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1985-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -15,6 +15,8 @@
 *                           Florham Park NJ                            *
 *                                                                      *
 *                 Glenn Fowler <gsf@research.att.com>                  *
+*                  David Korn <dgk@research.att.com>                   *
+*                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
 #pragma prototyped
@@ -28,6 +30,7 @@
 #ifndef _CMDARG_H
 #define _CMDARG_H
 
+#define CMD_CHECKED	(1<<9)		/* cmdopen() argv[0] ok		*/
 #define CMD_EMPTY	(1<<0)		/* run once, even if no args	*/
 #define CMD_EXACT	(1<<1)		/* last command must have argmax*/
 #define CMD_IGNORE	(1<<2)		/* ignore EXIT_QUIT exit	*/
@@ -36,6 +39,7 @@
 #define CMD_NEWLINE	(1<<5)		/* echo separator is newline	*/
 #define CMD_POST	(1<<6)		/* argpat is post arg position	*/
 #define CMD_QUERY	(1<<7)		/* trace and query each command	*/
+#define CMD_SILENT	(1<<10)		/* no error messages		*/
 #define CMD_TRACE	(1<<8)		/* trace each command		*/
 
 #define CMD_USER	(1<<12)
@@ -66,9 +70,15 @@ typedef struct				/* cmd + args info		*/
 	char		buf[1];		/* argv and arg buffer		*/
 } Cmdarg_t;
 
+#if _BLD_ast && defined(__EXPORT__)
+#define extern		__EXPORT__
+#endif
+
 extern Cmdarg_t*	cmdopen(char**, int, int, const char*, int);
 extern int		cmdflush(Cmdarg_t*);
 extern int		cmdarg(Cmdarg_t*, const char*, int);
 extern int		cmdclose(Cmdarg_t*);
+
+#undef	extern
 
 #endif

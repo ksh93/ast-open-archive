@@ -426,7 +426,7 @@ extend(Archive_t* ap, File_t* f, int type)
 #if _typ_int64_t
 					if (type == GLBTYPE)
 						continue;
-					if (!(f->st->st_size >> 33))
+					if (!(f->st->st_size >> 32))
 						continue;
 					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_size), f->st->st_size);
 					break;

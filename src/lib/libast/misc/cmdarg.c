@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1985-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -15,6 +15,8 @@
 *                           Florham Park NJ                            *
 *                                                                      *
 *                 Glenn Fowler <gsf@research.att.com>                  *
+*                  David Korn <dgk@research.att.com>                   *
+*                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
 #pragma prototyped
@@ -41,7 +43,7 @@ static const char*	echo[] = { "echo", 0 };
 /*
  * open a cmdarg stream
  * initialize the command for execution
- * argv[-1] is reserved for procopen(PROC_ARGMOD)
+ * argv[-1] is reserved for procrun(PROC_ARGMOD)
  */
 
 Cmdarg_t*
@@ -87,7 +89,10 @@ cmdopen(char** argv, int argmax, int size, const char* argpat, int flags)
 	m = n + (argc + 4) * sizeof(char**) + strlen(sh) + 1;
 	m = roundof(m, sizeof(char**));
 	if (size < m)
-		error(3, "size must be at least %d", m);
+	{
+		error(2, "size must be at least %d", m);
+		return 0;
+	}
 	if ((m = x / 10) > 2048)
 		m = 2048;
 	if (size > (x - m))
@@ -95,7 +100,10 @@ cmdopen(char** argv, int argmax, int size, const char* argpat, int flags)
 	n = size - n;
 	m = ((flags & CMD_INSERT) && argpat) ? (strlen(argpat) + 1) : 0;
 	if (!(cmd = newof(0, Cmdarg_t, 1, n + m)))
-		error(ERROR_SYSTEM|3, "out of space [arg handle]");
+	{
+		error(ERROR_SYSTEM|2, "out of space");
+		return 0;
+	}
 	c = n / sizeof(char**);
 	if (argmax <= 0 || argmax > c)
 		argmax = c;
@@ -110,12 +118,17 @@ cmdopen(char** argv, int argmax, int size, const char* argpat, int flags)
 		cmd->echo = 1;
 		flags &= ~CMD_NEWLINE;
 	}
-	else
+	else if (!(flags & CMD_CHECKED))
 	{
 		if (!pathpath(s, argv[0], NiL, PATH_REGULAR|PATH_EXECUTE))
 		{
-			error(ERROR_SYSTEM|2, "%s: command not found", argv[0]);
-			exit(EXIT_NOTFOUND);
+			if (!(flags & CMD_SILENT))
+			{
+				error(ERROR_SYSTEM|2, "%s: command not found", argv[0]);
+				exit(EXIT_NOTFOUND);
+			}
+			free(cmd);
+			return 0;
 		}
 		argv[0] = s;
 	}
@@ -172,7 +185,11 @@ cmdflush(register Cmdarg_t* cmd)
 	else if (cmd->nextarg <= cmd->firstarg)
 		return 0;
 	if ((cmd->flags & CMD_MINIMUM) && cmd->argcount < cmd->argmax)
-		error(3, "%d arg command would be too long", cmd->argcount);
+	{
+		if (!(cmd->flags & CMD_SILENT))
+			error(2, "%d arg command would be too long", cmd->argcount);
+		return -1;
+	}
 	cmd->total.args += cmd->argcount;
 	cmd->total.commands++;
 	cmd->argcount = 0;
@@ -223,7 +240,11 @@ cmdflush(register Cmdarg_t* cmd)
 					*b++ = 0;
 			}
 		if (b >= e)
-			error(3, "%s: command too large after insert", a);
+		{
+			if (!(cmd->flags & CMD_SILENT))
+				error(2, "%s: command too large after insert", a);
+			return -1;
+		}
 	}
 	cmd->nextarg = cmd->firstarg;
 	cmd->nextstr = cmd->laststr;
@@ -245,16 +266,23 @@ cmdflush(register Cmdarg_t* cmd)
 			sfputr(sfstdout, s, *p ? n : '\n');
 		n = 0;
 	}
-	else if ((n = procclose(procopen(*cmd->argv, cmd->argv, NiL, NiL, PROC_ARGMOD))) == -1)
+	else if ((n = procrun(*cmd->argv, cmd->argv, PROC_ARGMOD|PROC_IGNOREPATH)) == -1)
 	{
-		error(ERROR_SYSTEM|2, "%s: command exec error", *cmd->argv);
-		exit(EXIT_NOTFOUND - 1);
+		if (!(cmd->flags & CMD_SILENT))
+		{
+			error(ERROR_SYSTEM|2, "%s: command exec error", *cmd->argv);
+			exit(EXIT_NOTFOUND - 1);
+		}
+		return -1;
 	}
 	else if (n >= EXIT_NOTFOUND - 1)
-		exit(n);
+	{
+		if (!(cmd->flags & CMD_SILENT))
+			exit(n);
+	}
 	else if (!(cmd->flags & CMD_IGNORE))
 	{
-		if (n == EXIT_QUIT)
+		if (n == EXIT_QUIT && !(cmd->flags & CMD_SILENT))
 			exit(2);
 		if (n)
 			error_info.errors++;
@@ -278,7 +306,10 @@ cmdarg(register Cmdarg_t* cmd, const char* file, register int len)
 		while ((cmd->nextstr -= len + 1) < (char*)(cmd->nextarg + cmd->offset))
 		{
 			if (cmd->nextarg == cmd->firstarg)
-				error(3, "%s: path too long for exec args", file);
+			{
+				error(2, "%s: path too long for exec args", file);
+				return -1;
+			}
 			if (i = cmdflush(cmd))
 			{
 				if (r < i)
@@ -307,7 +338,11 @@ cmdclose(Cmdarg_t* cmd)
 	int	n;
 
 	if ((cmd->flags & CMD_EXACT) && cmd->argcount < cmd->argmax)
-		error(3, "only %d arguments for last command", cmd->argcount);
+	{
+		if (!(cmd->flags & CMD_SILENT))
+			error(2, "only %d arguments for last command", cmd->argcount);
+		return -1;
+	}
 	cmd->flags &= ~CMD_MINIMUM;
 	n = cmdflush(cmd);
 	free(cmd);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -29,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Research) 2005-06-13 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Research) 2007-05-08 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -541,6 +541,7 @@ main(int argc, register char** argv)
 	Dir_t*		lastdir;
 	Exnode_t*	x;
 	Exnode_t*	y;
+	Ftw_t		ftw;
 	Finddisc_t	disc;
 
 	setlocale(LC_ALL, "");
@@ -681,6 +682,8 @@ main(int argc, register char** argv)
 		state.select = x;
 	if (!(state.ftwflags & FTW_PHYSICAL))
 		state.ftwflags &= ~FTW_DELAY;
+	memset(&ftw, 0, sizeof(ftw));
+	ftw.path = ftw.name = "";
 	if (traverse)
 	{
 		if (x = exexpr(state.program, "action", NiL, 0))
@@ -856,9 +859,9 @@ main(int argc, register char** argv)
 			exit(2);
 	}
 	else if (state.select)
-		error_info.errors = eval(state.select, NiL) == 0;
+		error_info.errors = eval(state.select, &ftw) == 0;
 	if (x = exexpr(state.program, "end", NiL, 0))
-		eval(x, NiL);
+		eval(x, &ftw);
 	if (sfsync(sfstdout))
 		error(ERROR_SYSTEM|2, "write error");
 	exit(error_info.errors != 0);

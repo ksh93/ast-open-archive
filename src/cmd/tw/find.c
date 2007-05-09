@@ -23,7 +23,7 @@
  * Glenn Fowler
  * AT&T Research
  *
- * rewrite of find program to use ftwalk() and optget()
+ * rewrite of find program to use fts*() and optget()
  * this implementation should have all your favorite
  * find options plus these extensions:
  * 
@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2006-01-06 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2007-05-08 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -91,7 +91,7 @@ static const char usage2[] =
 #include <ls.h>
 #include <modex.h>
 #include <find.h>
-#include <ftwalk.h>
+#include <fts.h>
 #include <dirent.h>
 #include <error.h>
 #include <proc.h>
@@ -100,13 +100,13 @@ static const char usage2[] =
 #include <magic.h>
 #include <mime.h>
 #include <regex.h>
+#include <vmalloc.h>
 
 #include "cmdarg.h"
-#include "ftwlocal.h"
 
 #define ignorecase	fts_number
 
-#define PATH(f)		((f)->status==FTW_NAME?(f)->name:(f)->path)
+#define PATH(f)		((f)->fts_path)
 
 #define DAY		(unsigned long)(24*60*60)
 
@@ -146,7 +146,15 @@ enum Command
 #define Stat		(1<<7)
 #define Unit		(1<<8)
 
-struct Args
+typedef int (*Sort_f)(FTSENT* const*, FTSENT* const*);
+
+struct Node_s;
+typedef struct Node_s Node_t;
+
+struct State_s;
+typedef struct State_s State_t;
+
+typedef struct Args_s
 {
 	const char*	name;
 	enum Command	action;
@@ -155,9 +163,9 @@ struct Args
 	const char*	arg;
 	const char*	values;
 	const char*	help;
-};
+} Args_t;
 
-union Value
+typedef union Value_u
 {
 	char**		p;
 	char*		s;
@@ -166,20 +174,79 @@ union Value
 	int		i;
 	short		h;
 	char		c;
-};
+} Value_t;
 
-struct Fmt
+typedef struct Fmt_s
 {
 	Sffmt_t		fmt;
-	Ftw_t*		ftw;
+	State_t*	state;
+	FTSENT*		ent;
 	char		tmp[PATH_MAX];
+} Fmt_t;
+
+typedef union Item_u
+{
+	Node_t*		np;
+	char*		cp;
+	Cmdarg_t*	xp;
+	regex_t*	re;
+	Sfio_t*		fp;
+	unsigned long	u;
+	long		l;
+	int		i;
+} Item_t;
+
+struct Node_s
+{
+	Node_t*		next;
+	const char*	name;
+	enum Command	action;
+	Item_t		first;
+	Item_t		second;
+	Item_t		third;
 };
+
+struct State_s
+{
+	unsigned int	minlevel;
+	unsigned int	maxlevel;
+	int		walkflags;
+	char		buf[LS_W_LONG+LS_W_INUMBER+LS_W_BLOCKS+2*PATH_MAX+1];
+	char		txt[PATH_MAX+1];
+	char*		usage;
+	Node_t*		cmd;
+	Proc_t*		proc;
+	Node_t*		topnode;
+	Node_t*		lastnode;
+	Node_t*		nextnode;
+	unsigned long	now;
+	unsigned long	day;
+	Sfio_t*		output;
+	char*		codes;
+	char*		fast;
+	int		icase;
+	int		lastval;
+	int		primary;
+	int		reverse;
+	int		silent;
+	enum Command	sortkey;
+	Magic_t*	magic;
+	Magicdisc_t	magicdisc;
+	regdisc_t	redisc;
+	Fmt_t		fmt;
+	Sfio_t*		str;
+	Sfio_t*		tmp;
+	Vmalloc_t*	vm;
+};
+
+static const char* const	cpio[] = { "cpio", "-o", 0 };
+static const char* const	ncpio[] = { "cpio", "-ocB", 0 };
 
 /*
  * Except for pathnames, these are the only legal arguments
  */
 
-const struct Args commands[] =
+static const Args_t	commands[] =
 {
 "begin",	LPAREN,		Unary,		0,	0,	0,
 	"Equivalent to \\(. Begin nested expression.",
@@ -432,74 +499,14 @@ const struct Args commands[] =
 	0,
 };
 
-union Item
-{
-	struct Node*	np;
-	char*		cp;
-	Cmdarg_t*	xp;
-	regex_t*	re;
-	Sfio_t*		fp;
-	unsigned long	u;
-	long		l;
-	int		i;
-};
-
-struct Node
-{
-	struct Node*	next;
-	const char*	name;
-	enum Command	action;
-	union Item	first;
-	union Item	second;
-	union Item	third;
-};
-
-struct Format
-{
-	Sffmt_t		fmt;
-	Ftw_t*		ftw;
-};
-
-static unsigned int	minlevel = 0;
-static unsigned int	maxlevel = ~0;
-static int		walkflags = FTW_PHYSICAL|FTW_DELAY|FTW_SEEDOTDIR;
-static char		buf[LS_W_LONG+LS_W_INUMBER+LS_W_BLOCKS+2*PATH_MAX+1];
-static char		txt[PATH_MAX+1];
-
-static char*		usage;
-static struct Node*	cmd;
-static Proc_t*		proc;
-static struct Node*	topnode;
-static struct Node*	lastnode;
-static struct Node*	nextnode;
-static char*		cpio[] = { "cpio", "-o", 0 };
-static char*		ncpio[] = { "cpio", "-ocB", 0 };
-static unsigned long	now;
-static unsigned long	day;
-static Sfio_t*		output;
-static char*		dummyarg = (char*)-1;
-static char*		codes;
-static char*		fast;
-static int		icase;
-static int		lastval;
-static int		primary;
-static int		reverse;
-static int		silent;
-static int		(*sort)(Ftw_t*, Ftw_t*);
-static enum Command	sortkey = IGNORE;
-static Magic_t*		magic;
-static Magicdisc_t	magicdisc;
-static struct Format	fmt;
-static Sfio_t*		tmp;
-
 /*
  *  Table lookup routine
  */
 
-static struct Args*
+static Args_t*
 lookup(register char* word)
 {
-	register struct Args*	argp;
+	register Args_t*	argp;
 	register int		second;
 
 	while (*word == '-')
@@ -507,7 +514,7 @@ lookup(register char* word)
 	if (*word)
 	{
 		second = word[1];
-		for (argp = (struct Args*)commands; argp->name; argp++)
+		for (argp = (Args_t*)commands; argp->name; argp++)
 			if (second == argp->name[1] && streq(word, argp->name))
 				return argp;
 	}
@@ -540,9 +547,10 @@ quotex(register Sfio_t* sp, register const char* s, int term)
 static int
 print(Sfio_t* sp, void* vp, Sffmt_t* dp)
 {
-	register struct Fmt*	fp = (struct Fmt*)dp;
-	register Ftw_t*		ftw = fp->ftw;
-	union Value*		value = (union Value*)vp;
+	register Fmt_t*		fp = (Fmt_t*)dp;
+	register FTSENT*	ent = fp->ent;
+	register State_t*	state = fp->state;
+	Value_t*		value = (Value_t*)vp;
 
 	char*			s;
 
@@ -555,113 +563,119 @@ print(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	case 'A':
 		dp->fmt = 's';
 		dp->size = -1;
-		value->s = fmttime(s, ftw->statb.st_atime);
+		value->s = fmttime(s, ent->fts_statp->st_atime);
 		break;
 	case 'b':
 		dp->fmt = 'u';
-		value->u = iblocks(&ftw->statb);
+		value->u = iblocks(ent->fts_statp);
 		break;
 	case 'C':
 		dp->fmt = 's';
 		dp->size = -1;
-		value->s = fmttime(s, ftw->statb.st_ctime);
+		value->s = fmttime(s, ent->fts_statp->st_ctime);
 		break;
 	case 'd':
 		dp->fmt = 'u';
-		value->u = ftw->level;
+		value->u = ent->fts_level;
 		break;
 	case 'H':
-		while (ftw->level > 0)
-			ftw = ftw->parent;
+		while (ent->fts_level > 0)
+			ent = ent->fts_parent;
 		/*FALLTHROUGH*/
 	case 'f':
 		dp->fmt = 's';
-		dp->size = ftw->namelen;
-		value->s = ftw->name;
+		dp->size = ent->fts_namelen;
+		value->s = ent->fts_name;
 		break;
 	case 'F':
 		dp->fmt = 's';
 		dp->size = -1;
-		value->s = fmtfs(&ftw->statb);
+		value->s = fmtfs(ent->fts_statp);
 		break;
 	case 'g':
 		dp->fmt = 's';
 		dp->size = -1;
-		value->s = fmtgid(ftw->statb.st_gid);
+		value->s = fmtgid(ent->fts_statp->st_gid);
 		break;
 	case 'G':
 		dp->fmt = 'd';
-		value->i = ftw->statb.st_gid;
+		value->i = ent->fts_statp->st_gid;
 		break;
 	case 'i':
 		dp->fmt = 'u';
-		value->u = ftw->statb.st_ino;
+		value->u = ent->fts_statp->st_ino;
 		break;
 	case 'k':
 		dp->fmt = 'u';
-		value->u = iblocks(&ftw->statb);
+		value->u = iblocks(ent->fts_statp);
 		break;
 	case 'm':
 		dp->fmt = 'o';
-		value->i = ftw->statb.st_mode;
+		value->i = ent->fts_statp->st_mode;
 		break;
 	case 'n':
 		dp->fmt = 'u';
-		value->u = ftw->statb.st_nlink;
+		value->u = ent->fts_statp->st_nlink;
 		break;
 	case 'p':
 		dp->fmt = 's';
-		dp->size = ftw->pathlen;
-		value->s = ftw->path;
+		dp->size = ent->fts_pathlen;
+		value->s = ent->fts_path;
 		break;
 	case 'P':
 		dp->fmt = 's';
 		dp->size = -1;
-		s = ftw->path;
-		while (ftw->level > 0)
-			ftw = ftw->parent;
-		s += ftw->pathlen;
+		s = ent->fts_path;
+		while (ent->fts_level > 0)
+			ent = ent->fts_parent;
+		s += ent->fts_pathlen;
 		if (*s == '/')
 			s++;
 		value->s = s;
 		break;
 	case 's':
 		dp->fmt = 'u';
-		value->u = ftw->statb.st_size;
+		value->u = ent->fts_statp->st_size;
 		break;
 	case 'T':
 		dp->fmt = 's';
 		dp->size = -1;
-		value->s = fmttime(s, ftw->statb.st_mtime);
+		value->s = fmttime(s, ent->fts_statp->st_mtime);
 		break;
 	case 'u':
 		dp->fmt = 's';
 		dp->size = -1;
-		value->s = fmtgid(ftw->statb.st_uid);
+		value->s = fmtuid(ent->fts_statp->st_uid);
 		break;
 	case 'U':
 		dp->fmt = 'd';
-		value->i = ftw->statb.st_uid;
+		value->i = ent->fts_statp->st_uid;
 		break;
 	case 'x':
 		dp->fmt = 's';
-		quotex(tmp, ftw->path, -1);
-		dp->size = sfstrtell(tmp);
-		if (!(value->s = sfstruse(tmp)))
-			error(ERROR_SYSTEM|3, "out of space");
+		quotex(state->tmp, ent->fts_path, -1);
+		dp->size = sfstrtell(state->tmp);
+		if (!(value->s = sfstruse(state->tmp)))
+		{
+			error(ERROR_SYSTEM|2, "out of space");
+			return -1;
+		}
 		break;
 	case 'X':
 		dp->fmt = 's';
-		s = ftw->path;
-		while (ftw->level > 0)
-			ftw = ftw->parent;
-		s += ftw->pathlen;
+		s = ent->fts_path;
+		while (ent->fts_level > 0)
+			ent = ent->fts_parent;
+		s += ent->fts_pathlen;
 		if (*s == '/')
 			s++;
-		quotex(tmp, s, -1);
-		dp->size = sfstrtell(tmp);
-		if (!(value->s = sfstruse(tmp)))
-			error(ERROR_SYSTEM|3, "out of space");
+		quotex(state->tmp, s, -1);
+		dp->size = sfstrtell(state->tmp);
+		if (!(value->s = sfstruse(state->tmp)))
+		{
+			error(ERROR_SYSTEM|2, "out of space");
+			return -1;
+		}
 		break;
 	case 'Y':
 		if (s)
@@ -675,10 +689,10 @@ print(Sfio_t* sp, void* vp, Sffmt_t* dp)
 				break;
 			case 'h':
 				dp->fmt = 's';
-				if (s = strrchr(ftw->path, '/'))
+				if (s = strrchr(ent->fts_path, '/'))
 				{
-					value->s = ftw->path;
-					dp->size = s - ftw->path;
+					value->s = ent->fts_path;
+					dp->size = s - ent->fts_path;
 				}
 				else
 				{
@@ -689,7 +703,7 @@ print(Sfio_t* sp, void* vp, Sffmt_t* dp)
 			case 'l':
 				dp->fmt = 's';
 				dp->size = -1;
-				value->s = S_ISLNK(ftw->statb.st_mode) && pathgetlink(PATH(ftw), fp->tmp, sizeof(fp->tmp)) > 0 ? fp->tmp : "";
+				value->s = S_ISLNK(ent->fts_statp->st_mode) && pathgetlink(PATH(ent), fp->tmp, sizeof(fp->tmp)) > 0 ? fp->tmp : "";
 				break;
 			default:
 				error(2, "%%(%s)Y: invalid %%Y argument", s);
@@ -715,7 +729,7 @@ print(Sfio_t* sp, void* vp, Sffmt_t* dp)
  */
 
 static char*
-format(register char* s)
+format(State_t* state, register char* s)
 {
 	register char*	t;
 	register int	c;
@@ -723,8 +737,11 @@ format(register char* s)
 
 	stresc(s);
 	c = strlen(s);
-	if (!(t = newof(0, char, c * 2, 0)))
-		error(ERROR_SYSTEM|3, "out of space [format]");
+	if (!(t = vmnewof(state->vm, 0, char, c * 2, 0)))
+	{
+		error(ERROR_SYSTEM|2, "out of space");
+		return 0;
+	}
 	b = t;
 	while (c = *s++)
 	{
@@ -750,8 +767,18 @@ format(register char* s)
 				case 'T':
 					*t++ = '(';
 					*t++ = '%';
-					if ((*t++ = *s) && *s++ == '@')
-						*(t - 1) = '@';
+					switch (*t++ = *s++)
+					{
+					case '@':
+						*(t - 1) = '#';
+						break;
+					default:
+						if (isalpha(*(t - 1)))
+							break;
+						*(t - 1) = 'K';
+						s--;
+						break;
+					}
 					*t++ = ')';
 					break;
 				case 'a':
@@ -787,8 +814,8 @@ format(register char* s)
 				case 'Z':
 					break;
 				default:
-					error(3, "%%%c: unknown format", c);
-					break;
+					error(2, "%%%c: unknown format", c);
+					return 0;
 				}
 			}
 		}
@@ -803,22 +830,23 @@ format(register char* s)
  */
 
 static int
-compile(char** argv, register struct Node* np)
+compile(State_t* state, char** argv, register Node_t* np)
 {
-	register char*			b;
-	register struct Node*		oldnp = 0;
-	register const struct Args*	argp;
-	struct Node*			tp;
-	char*				e;
-	char**				com;
-	int				index = opt_info.index;
-	int				i;
-	int				k;
-	enum Command			oldop = PRINT;
+	register char*		b;
+	register Node_t*	oldnp = 0;
+	register const Args_t*	argp;
+	Node_t*			tp;
+	char*			e;
+	char**			com;
+	regdisc_t*		redisc;
+	int			index = opt_info.index;
+	int			i;
+	int			k;
+	enum Command		oldop = PRINT;
 
 	for (;;)
 	{
-		if ((i = optget(argv, usage)) > 0)
+		if ((i = optget(argv, state->usage)) > 0)
 		{
 			k = argv[opt_info.index-1][0];
 			if (i == '?')
@@ -856,18 +884,21 @@ compile(char** argv, register struct Node* np)
 			break;
 		}
 		argp = commands - (i + 10);
-		primary |= argp->primary;
+		state->primary |= argp->primary;
 		np->next = 0;
 		np->name = argp->name;
 		np->action = argp->action;
 		np->second.i = 0; 
 		np->third.u = 0; 
 		if (argp->type & Stat)
-			walkflags &= ~FTW_DELAY;
+			state->walkflags &= ~FTS_NOSTAT;
 		if (argp->type & Op)
 		{
 			if (oldop == NOT || np->action != NOT && (oldop != PRINT || !oldnp))
-				error(3, "%s: operator syntax error", np->name);
+			{
+				error(2, "%s: operator syntax error", np->name);
+				return -1;
+			}
 			oldop = argp->action;
 		}
 		else
@@ -880,9 +911,12 @@ compile(char** argv, register struct Node* np)
 				{
 				case File:
 					if (streq(b, "/dev/stdout") || streq(b, "/dev/fd/1"))
-						np->first.fp = output;
+						np->first.fp = state->output;
 					else if (!(np->first.fp = sfopen(NiL, b, "w")))
-						error(ERROR_SYSTEM|3, "%s: cannot write", b);
+					{
+						error(ERROR_SYSTEM|2, "%s: cannot write", b);
+						return -1;
+					}
 					break;
 				case Num:
 					if (*b == '+' || *b == '-')
@@ -930,62 +964,66 @@ compile(char** argv, register struct Node* np)
 			continue;
 		case OR:
 		case COMMA:
-			np->first.np = topnode;
-			topnode = np;
+			np->first.np = state->topnode;
+			state->topnode = np;
 			oldnp->next = 0;
 			break;
 		case LPAREN:
-			tp = topnode;
-			topnode = np + 1;
-			i = compile(argv, topnode);
-			np->first.np = topnode;
-			topnode = tp;
+			tp = state->topnode;
+			state->topnode = np + 1;
+			if ((i = compile(state, argv, state->topnode)) < 0)
+				return i;
+			np->first.np = state->topnode;
+			state->topnode = tp;
 			oldnp = np;
 			np->next = np + i;
 			np += i;
 			continue;
 		case RPAREN:
 			if (!oldnp)
-				error(3, "(...) imbalance", np->name);
+			{
+				error(2, "(...) imbalance", np->name);
+				return -1;
+			}
 			oldnp->next = 0;
 			return opt_info.index - index;
 		case LOGIC:
-			walkflags &= ~(FTW_META|FTW_PHYSICAL);
+			state->walkflags &= ~(FTS_META|FTS_PHYSICAL);
 		ignore:
 			np->action = IGNORE;
 			continue;
 		case META:
-			walkflags |= FTW_META|FTW_PHYSICAL;
+			state->walkflags |= FTS_META|FTS_PHYSICAL;
 			goto ignore;
 		case PHYS:
-			walkflags &= ~FTW_META;
-			walkflags |= FTW_PHYSICAL;
+			state->walkflags &= ~FTS_META;
+			state->walkflags |= FTS_PHYSICAL;
 			goto ignore;
 		case XDEV:
-			walkflags |= FTW_MOUNT;
+			state->walkflags |= FTS_XDEV;
 			goto ignore;
 		case POST:
-			walkflags |= FTW_TWICE;
+			state->walkflags &= ~FTS_NOPOSTORDER;
 			goto ignore;
 		case CHECK:
-			silent = 0;
+			state->silent = 0;
 			goto ignore;
 		case NOLEAF:
 			goto ignore;
 		case REVERSE:
-			reverse = 1;
+			state->reverse = 1;
 			goto ignore;
 		case SILENT:
-			silent = 1;
+			state->silent = 1;
 			goto ignore;
 		case CODES:
-			codes = b;
+			state->codes = b;
 			goto ignore;
 		case FAST:
-			fast = b;
+			state->fast = b;
 			goto ignore;
 		case ICASE:
-			icase = 1;
+			state->icase = 1;
 			goto ignore;
 		case LOCAL:
 			np->first.l = 0;
@@ -997,15 +1035,15 @@ compile(char** argv, register struct Node* np)
 			switch (np->second.i)
 			{
 			case '+':
-				np->second.u = day - np->first.u * DAY;
+				np->second.u = state->day - np->first.u * DAY;
 				np->first.u = 0;
 				break;
 			case '-':
-				np->first.u = day - np->first.u * DAY;
+				np->first.u = state->day - np->first.u * DAY;
 				np->second.u = ~0;
 				break;
 			default:
-				np->second.u = day - np->first.u * DAY;
+				np->second.u = state->day - np->first.u * DAY;
 				np->first.u = np->second.u - DAY;
 				break;
 			}
@@ -1017,38 +1055,47 @@ compile(char** argv, register struct Node* np)
 			switch (np->second.i)
 			{
 			case '+':
-				np->second.u = now - np->first.u * 60;
+				np->second.u = state->now - np->first.u * 60;
 				np->first.u = 0;
 				break;
 			case '-':
-				np->first.u = now - np->first.u * 60;
+				np->first.u = state->now - np->first.u * 60;
 				np->second.u = ~0;
 				break;
 			default:
-				np->second.u = now - np->first.u * 60;
+				np->second.u = state->now - np->first.u * 60;
 				np->first.u = np->second.u - 60;
 				break;
 			}
 			break;
 		case USER:
 			if ((np->first.l = struid(b)) < 0)
-				error(3, "%s: invalid user name", np->name);
+			{
+				error(2, "%s: invalid user name", np->name);
+				return -1;
+			}
 			break;
 		case GROUP:
 			if ((np->first.l = strgid(b)) < 0)
-				error(3, "%s: invalid group name", np->name);
+			{
+				error(2, "%s: invalid group name", np->name);
+				return -1;
+			}
 			break;
 		case EXEC:
 		case OK:
 		case XARGS:
-			walkflags |= FTW_DOT;
+			state->walkflags |= FTS_NOCHDIR;
 			com = argv + opt_info.index - 1;
 			i = np->action == XARGS ? 0 : 1;
 			k = np->action == OK ? CMD_QUERY : 0;
 			for (;;)
 			{
 				if (!(b = argv[opt_info.index++]))
-					error(3, "incomplete statement");
+				{
+					error(2, "incomplete statement");
+					return -1;
+				}
 				if (streq(b, ";"))
 					break;
 				if (strmatch(b, "*{}*"))
@@ -1066,91 +1113,125 @@ compile(char** argv, register struct Node* np)
 			if (k & CMD_INSERT)
 				i = 1;
 			if (!(np->first.xp = cmdopen(com, i, 0, "{}", k|CMD_IGNORE)))
-				error(ERROR_SYSTEM|3, "out of space [args]");
-			np->second.np = cmd;
-			cmd = np;
+			{
+				error(ERROR_SYSTEM|2, "out of space");
+				return -1;
+			}
+			np->second.np = state->cmd;
+			state->cmd = np;
 			break;
 		case MAGIC:
 		case MIME:
-			if (!magic)
+			if (!state->magic)
 			{
-				magicdisc.version = MAGIC_VERSION;
-				magicdisc.flags = 0;
-				magicdisc.errorf = errorf;
-				if (!(magic = magicopen(&magicdisc)) || magicload(magic, NiL, 0))
-					error(3, "%s: cannot load magic file", MAGIC_FILE);
+				state->magicdisc.version = MAGIC_VERSION;
+				state->magicdisc.flags = 0;
+				state->magicdisc.errorf = errorf;
+				if (!(state->magic = magicopen(&state->magicdisc)) || magicload(state->magic, NiL, 0))
+				{
+					error(2, "%s: cannot load magic file", MAGIC_FILE);
+					return -1;
+				}
 			}
 			break;
 		case IREGEX:
 		case REGEX:
-			if (!(np->second.re = newof(0, regex_t, 1, 0)))
-				error(ERROR_SYSTEM|3, "out of space [re]");
-			i = REG_EXTENDED|REG_LENIENT|REG_NOSUB|REG_NULL|REG_LEFT|REG_RIGHT;
+			if (!(np->second.re = vmnewof(state->vm, 0, regex_t, 1, sizeof(regdisc_t))))
+			{
+				error(ERROR_SYSTEM|2, "out of space");
+				return -1;
+			}
+			redisc = (regdisc_t*)(np->second.re + 1);
+			redisc->re_version = REG_VERSION;
+			redisc->re_flags = REG_NOFREE;
+			redisc->re_errorf = (regerror_t)errorf;
+			redisc->re_resizef = (regresize_t)vmgetmem;
+			redisc->re_resizehandle = (void*)state->vm;
+			np->second.re->re_disc = redisc;
+			i = REG_EXTENDED|REG_LENIENT|REG_NOSUB|REG_NULL|REG_LEFT|REG_RIGHT|REG_DISCIPLINE;
 			if (argp->action == IREGEX)
 			{
 				i |= REG_ICASE;
 				np->action = REGEX;
 			}
 			if (i = regcomp(np->second.re, b, i))
-				regfatal(np->second.re, 3, i);
+			{
+				regfatal(np->second.re, 2, i);
+				return -1;
+			}
 			break;
 		case PERM:
 			if (*b == '-' || *b == '+')
 				np->second.l = *b++;
 			np->first.l = strperm(b, &e, -1);
 			if (*e)
-				error(3, "%s: invalid permission expression", e);
+			{
+				error(2, "%s: invalid permission expression", e);
+				return -1;
+			}
 			break;
 		case SORT:
 			if (!(argp = lookup(b)))
-				error(3, "%s: invalid sort key", b);
-			sortkey = argp->action;
+			{
+				error(2, "%s: invalid sort key", b);
+				return -1;
+			}
+			state->sortkey = argp->action;
 			goto ignore;
 		case TYPE:
 		case XTYPE:
 			np->first.l = *b;
 			break;
 		case CPIO:
-			com = cpio;
+			com = (char**)cpio;
 			goto common;
 		case NCPIO:
 			{
 				long	ops[2];
 				int	fd;
 
-				com = ncpio;
+				com = (char**)ncpio;
 			common:
 				/*
 				 * set up cpio
 				 */
 
 				if ((fd = open(b, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)) < 0)
-					error(3, "%s: cannot create", b);
+				{
+					error(ERROR_SYSTEM|2, "%s: cannot create", b);
+					return -1;
+				}
 				ops[0] = PROC_FD_DUP(fd, 1, PROC_FD_PARENT|PROC_FD_CHILD);
 				ops[1] = 0;
-				if (!(proc = procopen("cpio", com, NiL, ops, PROC_WRITE)))
-					error(3, "cpio: cannot exec");
-				if (!(output = sfnew(NiL, NiL, -1, proc->wfd, SF_WRITE)))
-					error(3, "cpio: cannot write");
-				walkflags |= FTW_TWICE;
+				if (!(state->proc = procopen("cpio", com, NiL, ops, PROC_WRITE)))
+				{
+					error(ERROR_SYSTEM|2, "cpio: cannot exec");
+					return -1;
+				}
+				if (!(state->output = sfnew(NiL, NiL, -1, state->proc->wfd, SF_WRITE)))
+				{
+					error(ERROR_SYSTEM|2, "cpio: cannot write");
+					return -1;
+				}
+				state->walkflags &= ~FTS_NOPOSTORDER;
 				np->action = PRINT;
 			}
 			/*FALLTHROUGH*/
 		case PRINT:
-			np->first.fp = output;
+			np->first.fp = state->output;
 			np->second.i = '\n';
 			break;
 		case PRINT0:
-			np->first.fp = output;
+			np->first.fp = state->output;
 			np->second.i = 0;
 			np->action = PRINT;
 			break;
 		case PRINTF:
-			np->second.cp = format(np->first.cp);
-			np->first.fp = output;
+			np->second.cp = format(state, np->first.cp);
+			np->first.fp = state->output;
 			break;
 		case PRINTX:
-			np->first.fp = output;
+			np->first.fp = state->output;
 			np->second.i = '\n';
 			break;
 		case FPRINT:
@@ -1163,21 +1244,24 @@ compile(char** argv, register struct Node* np)
 			break;
 		case FPRINTF:
 			if (!(b = argv[opt_info.index++]))
-				error(3, "incomplete statement");
-			np->second.cp = format(b);
+			{
+				error(2, "incomplete statement");
+				return -1;
+			}
+			np->second.cp = format(state, b);
 			break;
 		case FPRINTX:
 			np->second.i = '\n';
 			np->action = PRINTX;
 			break;
 		case LS:
-			np->first.fp = output;
-			if (sortkey == IGNORE)
-				sortkey = NAME;
+			np->first.fp = state->output;
+			if (state->sortkey == IGNORE)
+				state->sortkey = NAME;
 			break;
 		case FLS:
-			if (sortkey == IGNORE)
-				sortkey = NAME;
+			if (state->sortkey == IGNORE)
+				state->sortkey = NAME;
 			np->action = LS;
 			break;
 		case NEWER:
@@ -1187,46 +1271,52 @@ compile(char** argv, register struct Node* np)
 				struct stat	st;
 
 				if (stat(b, &st))
-					error(3, "%s: not found", b);
+				{
+					error(2, "%s: not found", b);
+					return -1;
+				}
 				np->first.l = st.st_mtime;
 				np->second.i = '+';
 			}
 			break;
 		case CHOP:
-			walkflags |= FTW_NOSEEDOTDIR;
+			state->walkflags |= FTS_NOSEEDOTDIR;
 			goto ignore;
 		case DAYSTART:
 			{
 				Tm_t*	tm;
 				time_t	t;
 
-				t = now;
+				t = state->now;
 				tm = tmmake(&t);
 				tm->tm_hour = 0;
 				tm->tm_min = 0;
 				tm->tm_sec = 0;
-				day = tmtime(tm, TM_LOCALZONE);
+				state->day = tmtime(tm, TM_LOCALZONE);
 			}
 			goto ignore;
 		case MINDEPTH:
-			minlevel = np->first.l;
+			state->minlevel = np->first.l;
 			goto ignore;
 		case MAXDEPTH:
-			maxlevel = np->first.l;
+			state->maxlevel = np->first.l;
 			goto ignore;
 		case TEST:
-			day = np->first.u;
+			state->day = np->first.u;
 			goto ignore;
 		}
 		oldnp = np;
 		oldnp->next = ++np;
 	}
 	if (oldop != PRINT)
+	{
 		error(2, "%s: invalid argument", argv[opt_info.index - 1]);
+		return -1;
+	}
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	nextnode = np;
-	if (lastnode = oldnp)
+	state->nextnode = np;
+	if (state->lastnode = oldnp)
 		oldnp->next = 0;
 	return opt_info.index - index;
 }
@@ -1236,57 +1326,57 @@ compile(char** argv, register struct Node* np)
  */
 
 static int
-execute(Ftw_t* ftw)
+execute(State_t* state, FTSENT* ent)
 {
-	register struct Node*	np = topnode;
+	register Node_t*	np = state->topnode;
 	register int		val;
 	register unsigned long	u;
 	unsigned long		m;
 	int			not = 1;
 	Sfio_t*			fp;
-	struct Node*		tp;
+	Node_t*			tp;
 	struct stat		st;
 	DIR*			dir;
-	struct dirent*		ent;
+	struct dirent*		dnt;
 
-	if (ftw->level > maxlevel)
+	if (ent->fts_level > state->maxlevel)
 	{
-		ftw->status = FTW_SKIP;
+		fts_set(NiL, ent, FTS_SKIP);
 		return 0;
 	}
-	switch (ftw->info)
+	switch (ent->fts_info)
 	{
-	case FTW_DP:
-		if ((walkflags & FTW_DOT) && stat(PATH(ftw), &ftw->statb))
+	case FTS_DP:
+		if ((state->walkflags & FTS_NOCHDIR) && stat(PATH(ent), ent->fts_statp))
 			return 0;
 		break;
-	case FTW_NS:
-		if (!silent)
-			error(2, "%s: not found", ftw->path);
+	case FTS_NS:
+		if (!state->silent)
+			error(2, "%s: not found", ent->fts_path);
 		return 0;
-	case FTW_DC:
-		if (!silent)
-			error(2, "%s: directory causes cycle", ftw->path);
+	case FTS_DC:
+		if (!state->silent)
+			error(2, "%s: directory causes cycle", ent->fts_path);
 		return 0;
-	case FTW_DNR:
-		if (!silent)
-			error(2, "%s: cannot read directory", ftw->path);
+	case FTS_DNR:
+		if (!state->silent)
+			error(2, "%s: cannot read directory", ent->fts_path);
 		break;
-	case FTW_DNX:
-		if (!silent)
-			error(2, "%s: cannot search directory", ftw->path);
-		ftw->status = FTW_SKIP;
+	case FTS_DNX:
+		if (!state->silent)
+			error(2, "%s: cannot search directory", ent->fts_path);
+		fts_set(NiL, ent, FTS_SKIP);
 		break;
-	case FTW_D:
-		if (walkflags & FTW_TWICE)
+	case FTS_D:
+		if (!(state->walkflags & FTS_NOPOSTORDER))
 			return 0;
-		ftw->ignorecase = (icase || (!ftw->level || !ftw->parent->ignorecase) && strchr(astconf("PATH_ATTRIBUTES", ftw->name, NiL), 'c')) ? STR_ICASE : 0;
+		ent->ignorecase = (state->icase || (!ent->fts_level || !ent->fts_parent->ignorecase) && strchr(astconf("PATH_ATTRIBUTES", ent->fts_name, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	default:
-		ftw->ignorecase = ftw->level ? ftw->parent->ignorecase : (icase || strchr(astconf("PATH_ATTRIBUTES", ftw->name, NiL), 'c')) ? STR_ICASE : 0;
+		ent->ignorecase = ent->fts_level ? ent->fts_parent->ignorecase : (state->icase || strchr(astconf("PATH_ATTRIBUTES", ent->fts_name, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	}
-	if (ftw->level < minlevel)
+	if (ent->fts_level < state->minlevel)
 		return 0;
 	while (np)
 	{
@@ -1299,11 +1389,11 @@ execute(Ftw_t* ftw)
 		case COMMA:
 		case LPAREN:
 		case OR:
-			tp = topnode;
-			topnode = np->first.np;
-			execute(ftw);
-			val = lastval;
-			topnode = tp;
+			tp = state->topnode;
+			state->topnode = np->first.np;
+			execute(state, ent);
+			val = state->lastval;
+			state->topnode = tp;
 			switch (np->action)
 			{
 			case COMMA:
@@ -1317,13 +1407,13 @@ execute(Ftw_t* ftw)
 			}
 			break;
 		case LOCAL:
-			u = ftwlocal(ftw);
+			u = fts_local(ent);
 			goto num;
 		case XTYPE:
-			val = ((walkflags & FTW_PHYSICAL) ? stat(PATH(ftw), &st) : lstat(PATH(ftw), &st)) ? 0 : st.st_mode;
+			val = ((state->walkflags & FTS_PHYSICAL) ? stat(PATH(ent), &st) : lstat(PATH(ent), &st)) ? 0 : st.st_mode;
 			goto type;
 		case TYPE:
-			val = ftw->statb.st_mode;
+			val = ent->fts_statp->st_mode;
 		type:
 			switch (np->first.l)
 			{
@@ -1366,7 +1456,7 @@ execute(Ftw_t* ftw)
 			}
 			break;
 		case PERM:
-			u = modex(ftw->statb.st_mode) & 07777;
+			u = modex(ent->fts_statp->st_mode) & 07777;
 			switch (np->second.i)
 			{
 			case '-':
@@ -1381,47 +1471,47 @@ execute(Ftw_t* ftw)
 			}
 			break;
 		case INUM:
-			u = ftw->statb.st_ino;
+			u = ent->fts_statp->st_ino;
 			goto num;
 		case ATIME:
-			u = ftw->statb.st_atime;
+			u = ent->fts_statp->st_atime;
 			goto tim;
 		case CTIME:
-			u = ftw->statb.st_ctime;
+			u = ent->fts_statp->st_ctime;
 			goto tim;
 		case MTIME:
-			u = ftw->statb.st_mtime;
+			u = ent->fts_statp->st_mtime;
 		tim:
 			val = u >= np->first.u && u <= np->second.u;
 			break;
 		case NEWER:
-			val = (unsigned long)ftw->statb.st_mtime > (unsigned long)np->first.u;
+			val = (unsigned long)ent->fts_statp->st_mtime > (unsigned long)np->first.u;
 			break;
 		case ANEWER:
-			val = (unsigned long)ftw->statb.st_atime > (unsigned long)np->first.u;
+			val = (unsigned long)ent->fts_statp->st_atime > (unsigned long)np->first.u;
 			break;
 		case CNEWER:
-			val = (unsigned long)ftw->statb.st_ctime > (unsigned long)np->first.u;
+			val = (unsigned long)ent->fts_statp->st_ctime > (unsigned long)np->first.u;
 			break;
 		case SIZE:
-			u = ftw->statb.st_size;
+			u = ent->fts_statp->st_size;
 			goto num;
 		case USER:
-			u = ftw->statb.st_uid;
+			u = ent->fts_statp->st_uid;
 			goto num;
 		case NOUSER:
-			val = *fmtuid(ftw->statb.st_uid);
+			val = *fmtuid(ent->fts_statp->st_uid);
 			val = isdigit(val);
 			break;
 		case GROUP:
-			u = ftw->statb.st_gid;
+			u = ent->fts_statp->st_gid;
 			goto num;
 		case NOGROUP:
-			val = *fmtgid(ftw->statb.st_gid);
+			val = *fmtgid(ent->fts_statp->st_gid);
 			val = isdigit(val);
 			break;
 		case LINKS:
-			u = ftw->statb.st_nlink;
+			u = ent->fts_statp->st_nlink;
 		num:
 			if (m = np->third.u)
 				u = (u + m - 1) / m;
@@ -1441,42 +1531,42 @@ execute(Ftw_t* ftw)
 		case EXEC:
 		case OK:
 		case XARGS:
-			val = !cmdarg(np->first.xp, ftw->path, ftw->pathlen);
+			val = !cmdarg(np->first.xp, ent->fts_path, ent->fts_pathlen);
 			break;
 		case NAME:
-			val = strgrpmatch(ftw->name, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ftw->ignorecase) != 0;
+			val = strgrpmatch(ent->fts_name, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ent->ignorecase) != 0;
 			break;
 		case INAME:
-			val = strgrpmatch(ftw->name, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|STR_ICASE) != 0;
+			val = strgrpmatch(ent->fts_name, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|STR_ICASE) != 0;
 			break;
 		case LNAME:
-			val = S_ISLNK(ftw->statb.st_mode) && pathgetlink(PATH(ftw), txt, sizeof(txt)) > 0 && strgrpmatch(txt, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ftw->ignorecase);
+			val = S_ISLNK(ent->fts_statp->st_mode) && pathgetlink(PATH(ent), state->txt, sizeof(state->txt)) > 0 && strgrpmatch(state->txt, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ent->ignorecase);
 			break;
 		case ILNAME:
-			val = S_ISLNK(ftw->statb.st_mode) && pathgetlink(PATH(ftw), txt, sizeof(txt)) > 0 && strgrpmatch(txt, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|STR_ICASE);
+			val = S_ISLNK(ent->fts_statp->st_mode) && pathgetlink(PATH(ent), state->txt, sizeof(state->txt)) > 0 && strgrpmatch(state->txt, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|STR_ICASE);
 			break;
 		case PATH:
-			val = strgrpmatch(ftw->path, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ftw->ignorecase) != 0;
+			val = strgrpmatch(ent->fts_path, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ent->ignorecase) != 0;
 			break;
 		case IPATH:
-			val = strgrpmatch(ftw->path, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|STR_ICASE) != 0;
+			val = strgrpmatch(ent->fts_path, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|STR_ICASE) != 0;
 			break;
 		case MAGIC:
-			fp = sfopen(NiL, PATH(ftw), "r");
-			val = strmatch(magictype(magic, fp, PATH(ftw), &ftw->statb), np->first.cp) != 0;
+			fp = sfopen(NiL, PATH(ent), "r");
+			val = strmatch(magictype(state->magic, fp, PATH(ent), ent->fts_statp), np->first.cp) != 0;
 			if (fp)
 				sfclose(fp);
 			break;
 		case MIME:
-			fp = sfopen(NiL, PATH(ftw), "r");
-			magicdisc.flags |= MAGIC_MIME;
-			val = strmatch(magictype(magic, fp, PATH(ftw), &ftw->statb), np->first.cp) != 0;
-			magicdisc.flags &= ~MAGIC_MIME;
+			fp = sfopen(NiL, PATH(ent), "r");
+			state->magicdisc.flags |= MAGIC_MIME;
+			val = strmatch(magictype(state->magic, fp, PATH(ent), ent->fts_statp), np->first.cp) != 0;
+			state->magicdisc.flags &= ~MAGIC_MIME;
 			if (fp)
 				sfclose(fp);
 			break;
 		case REGEX:
-			if (!(val = regnexec(np->second.re, ftw->path, ftw->pathlen, NiL, 0, 0)))
+			if (!(val = regnexec(np->second.re, ent->fts_path, ent->fts_pathlen, NiL, 0, 0)))
 				val = 1;
 			else if (val == REG_NOMATCH)
 				val = 0;
@@ -1484,50 +1574,50 @@ execute(Ftw_t* ftw)
 				regfatal(np->second.re, 3, val);
 			break;
 		case PRINT:
-			sfputr(np->first.fp, ftw->path, np->second.i);
+			sfputr(np->first.fp, ent->fts_path, np->second.i);
 			val = 1;
 			break;
 		case PRINTF:
-			fmt.fmt.version = SFIO_VERSION;
-			fmt.fmt.extf = print;
-			fmt.fmt.form = np->second.cp;
-			fmt.ftw = ftw;
-			sfprintf(np->first.fp, "%!", &fmt);
+			state->fmt.fmt.version = SFIO_VERSION;
+			state->fmt.fmt.extf = print;
+			state->fmt.fmt.form = np->second.cp;
+			state->fmt.ent = ent;
+			sfprintf(np->first.fp, "%!", &state->fmt);
 			val = 1;
 			break;
 		case PRINTX:
-			quotex(np->first.fp, ftw->path, np->second.i);
+			quotex(np->first.fp, ent->fts_path, np->second.i);
 			val = 1;
 			break;
 		case PRUNE:
-			ftw->status = FTW_SKIP;
+			fts_set(NiL, ent, FTS_SKIP);
 			val = 1;
 			break;
 		case FSTYPE:
-			val = strcmp(fmtfs(&ftw->statb), np->first.cp);
+			val = strcmp(fmtfs(ent->fts_statp), np->first.cp);
 			break;
 		case LS:
-			fmtls(buf, ftw->path, &ftw->statb, NiL, S_ISLNK(ftw->statb.st_mode) && pathgetlink(PATH(ftw), txt, sizeof(txt)) > 0 ? txt : NiL, LS_LONG|LS_INUMBER|LS_BLOCKS);
-			sfputr(np->first.fp, buf, '\n');
+			fmtls(state->buf, ent->fts_path, ent->fts_statp, NiL, S_ISLNK(ent->fts_statp->st_mode) && pathgetlink(PATH(ent), state->txt, sizeof(state->txt)) > 0 ? state->txt : NiL, LS_LONG|LS_INUMBER|LS_BLOCKS);
+			sfputr(np->first.fp, state->buf, '\n');
 			val = 1;
 			break;
 		case EMPTY:
-			if (S_ISREG(ftw->statb.st_mode))
-				val = !ftw->statb.st_size;
-			else if (!S_ISDIR(ftw->statb.st_mode))
+			if (S_ISREG(ent->fts_statp->st_mode))
+				val = !ent->fts_statp->st_size;
+			else if (!S_ISDIR(ent->fts_statp->st_mode))
 				val = 0;
-			else if (!ftw->statb.st_size)
+			else if (!ent->fts_statp->st_size)
 				val = 1;
-			else if (!(dir = opendir(ftw->path)))
+			else if (!(dir = opendir(ent->fts_path)))
 			{
-				if (!silent)
-					error(2, "%s: cannot read directory", ftw->path);
+				if (!state->silent)
+					error(2, "%s: cannot read directory", ent->fts_path);
 				val = 0;
 			}
 			else
 			{
-				while ((ent = readdir(dir)) && (ent->d_name[0] == '.' && (!ent->d_name[1] || ent->d_name[1] == '.' && !ent->d_name[2])));
-				val = !ent;
+				while ((dnt = readdir(dir)) && (dnt->d_name[0] == '.' && (!dnt->d_name[1] || dnt->d_name[1] == '.' && !dnt->d_name[2])));
+				val = !dnt;
 				closedir(dir);
 			}
 			break;
@@ -1538,13 +1628,13 @@ execute(Ftw_t* ftw)
 			val = 1;
 			break;
 		case LEVEL:
-			u = ftw->level;
+			u = ent->fts_level;
 			goto num;
 		default:
-			error(3, "internal error: %s: action not implemented", np->name);
-			break;
+			error(2, "internal error: %s: action not implemented", np->name);
+			return -1;
 		}
-		lastval = val;
+		state->lastval = val;
 		if (val ^ not)
 			return 0;
 		not = 1;
@@ -1558,36 +1648,40 @@ execute(Ftw_t* ftw)
  */
 
 static int
-order(register Ftw_t* f1, register Ftw_t* f2)
+order(FTSENT* const* p1, FTSENT* const* p2)
 {
-	register long	n1;
-	register long	n2;
-	int		n;
+	register const FTSENT*	f1 = *p1;
+	register const FTSENT*	f2 = *p2;
+	register State_t*	state = f1->fts->fts_handle;
+	register long		n1;
+	register long		n2;
+	int			n;
 
-	switch (sortkey)
+	switch (state->sortkey)
 	{
 	case ATIME:
-		n2 = f1->statb.st_atime;
-		n1 = f2->statb.st_atime;
+		n2 = f1->fts_statp->st_atime;
+		n1 = f2->fts_statp->st_atime;
 		break;
 	case CTIME:
-		n2 = f1->statb.st_ctime;
-		n1 = f2->statb.st_ctime;
+		n2 = f1->fts_statp->st_ctime;
+		n1 = f2->fts_statp->st_ctime;
 		break;
 	case MTIME:
-		n2 = f1->statb.st_mtime;
-		n1 = f2->statb.st_mtime;
+		n2 = f1->fts_statp->st_mtime;
+		n1 = f2->fts_statp->st_mtime;
 		break;
 	case SIZE:
-		n2 = f1->statb.st_size;
-		n1 = f2->statb.st_size;
+		n2 = f1->fts_statp->st_size;
+		n1 = f2->fts_statp->st_size;
 		break;
 	default:
 		error(1, "invalid sort key -- name assumed");
-		sortkey = NAME;
+		state->sortkey = NAME;
 		/*FALLTHROUGH*/
 	case NAME:
-		return icase ? strcasecmp(f1->name, f2->name) : strcoll(f1->name, f2->name);
+		n = state->icase ? strcasecmp(f1->fts_name, f2->fts_name) : strcoll(f1->fts_name, f2->fts_name);
+		goto done;
 	}
 	if (n1 < n2)
 		n = -1;
@@ -1595,9 +1689,32 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 		n = 1;
 	else
 		n = 0;
-	if (reverse)
+ done:
+	if (state->reverse)
 		n = -n;
 	return n;
+}
+
+static int
+find(State_t* state, char** paths, int flags, Sort_f sort)
+{
+	FTS*	fts;
+	FTSENT*	ent;
+	int	r;
+
+	r = 0;
+	if (fts = fts_open(paths, flags, sort))
+	{
+		fts->fts_handle = state;
+		while (ent = fts_read(fts))
+			if (execute(state, ent) < 0)
+			{
+				r = 1;
+				break;
+			}
+		fts_close(fts);
+	}
+	return r;
 }
 
 int
@@ -1606,111 +1723,140 @@ main(int argc, char** argv)
 	register char*			cp;
 	register char**			op;
 	register Find_t*		fp;
-	register const struct Args*	ap;
-	Sfio_t*				sp;
+	register const Args_t*		ap;
 	int				r;
+	Sort_f				sort;
 	Finddisc_t			disc;
+	State_t				state;
 
-	static char*	defpath[] = { ".", 0 };
-	static char*	defopts[] = { 0, "-print", 0 };
+	static const char* const	defpath[] = { ".", 0 };
+	static const char* const	defopts[] = { 0, "-print", 0 };
 
 	setlocale(LC_ALL, "");
 	error_info.id = "find";
-	if (!(sp = sfstropen()) || !(tmp = sfstropen()))
-		error(ERROR_SYSTEM|3, "out of space [usage]");
-	sfputr(sp, usage1, -1);
+	memset(&state, 0, sizeof(state));
+	if (!(state.vm = vmopen(Vmdcheap, Vmbest, 0)) || !(state.str = sfstropen()) || !(state.tmp = sfstropen()))
+	{
+		error(ERROR_SYSTEM|2, "out of space");
+		goto done;
+	}
+	state.maxlevel = ~0;
+	state.walkflags = FTS_PHYSICAL|FTS_NOSTAT|FTS_NOPOSTORDER|FTS_SEEDOTDIR;
+	state.sortkey = IGNORE;
+	sort = 0;
+	fp = 0;
+	sfputr(state.str, usage1, -1);
 	for (ap = commands; ap->name; ap++)
 	{
-		sfprintf(sp, "[%d:%s?%s]", ap - commands + 10, ap->name, ap->help);
+		sfprintf(state.str, "[%d:%s?%s]", ap - commands + 10, ap->name, ap->help);
 		if (ap->arg)
-			sfprintf(sp, "%c[%s]", (ap->type & Num) ? '#' : ':', ap->arg);
+			sfprintf(state.str, "%c[%s]", (ap->type & Num) ? '#' : ':', ap->arg);
 		if (ap->values)
-			sfprintf(sp, "{%s}", ap->values);
-		sfputc(sp, '\n');
+			sfprintf(state.str, "{%s}", ap->values);
+		sfputc(state.str, '\n');
 	}
-	sfputr(sp, usage2, -1);
-	if (!(usage = sfstruse(sp)))
-		error(ERROR_SYSTEM|3, "out of space");
-	day = now = (unsigned long)time(NiL);
-	output = sfstdout;
-	if (!(topnode = newof(0, struct Node, argc + 1, 0)))
-		error(3, "not enough space for expressions");
-	compile(argv, topnode);
+	sfputr(state.str, usage2, -1);
+	if (!(state.usage = sfstruse(state.str)))
+	{
+		error(ERROR_SYSTEM|2, "out of space");
+		goto done;
+	}
+	state.day = state.now = (unsigned long)time(NiL);
+	state.output = sfstdout;
+	if (!(state.topnode = vmnewof(state.vm, 0, Node_t, argc + 1, 0)))
+	{
+		error(2, "not enough space for expressions");
+		goto done;
+	}
+	if (compile(&state, argv, state.topnode) < 0)
+		goto done;
 	op = argv + opt_info.index;
 	for (;;)
 	{
 		if (!(cp = argv[opt_info.index]))
 		{
-			argv = defopts;
+			argv = (char**)defopts;
 			opt_info.index = 0;
 			break;
 		}
 		if (*cp == '-' || (*cp == '!' || *cp == '(' || *cp == ')' || *cp == ',') && *(cp + 1) == 0)
 		{
 			r = opt_info.index;
-			compile(argv, topnode);
+			if (compile(&state, argv, state.topnode) < 0)
+				goto done;
 			argv[r] = 0;
 			break;
 		}
 		opt_info.index++;
 	}
 	if (cp = argv[opt_info.index])
-		error(3, "%s: invalid argument", cp);
-	if (!*op)
-		op = defpath;
-	while (topnode && topnode->action == IGNORE)
-		topnode = topnode->next;
-	if (!(walkflags & FTW_PHYSICAL))
-		walkflags &= ~FTW_DELAY;
-	if (fast)
 	{
-		if (sortkey != IGNORE)
+		error(2, "%s: invalid argument", cp);
+		goto done;
+	}
+	if (!*op)
+		op = (char**)defpath;
+	while (state.topnode && state.topnode->action == IGNORE)
+		state.topnode = state.topnode->next;
+	if (!(state.walkflags & FTS_PHYSICAL))
+		state.walkflags &= ~FTS_NOSTAT;
+	if (state.fast)
+	{
+		if (state.sortkey != IGNORE)
 			error(1, "-sort ignored for -fast");
 		memset(&disc, 0, sizeof(disc));
 		disc.version = FIND_VERSION;
-		disc.flags = icase ? FIND_ICASE : 0;
+		disc.flags = state.icase ? FIND_ICASE : 0;
 		disc.errorf = errorf;
 		disc.dirs = op;
-		walkflags |= FTW_TOP;
-		if (fp = findopen(codes, fast, NiL, &disc))
+		state.walkflags |= FTS_TOP;
+		if (fp = findopen(state.codes, state.fast, NiL, &disc))
 			while (cp = findread(fp))
 			{
-				if (topnode)
-					ftwalk(cp, execute, walkflags, NiL);
-				else
+				if (!state.topnode)
 					sfputr(sfstdout, cp, '\n');
+				else if (find(&state, (char**)cp, FTS_ONEPATH|state.walkflags, NiL))
+					goto done;
 			}
 	}
 	else
 	{
-		if (!primary)
+		if (!state.primary)
 		{
-			if (lastnode)
-				lastnode->next = nextnode;
-			else if (topnode)
-				nextnode = topnode;
+			if (state.lastnode)
+				state.lastnode->next = state.nextnode;
+			else if (state.topnode)
+				state.nextnode = state.topnode;
 			else
-				topnode = nextnode;
-			nextnode->action = PRINT;
-			nextnode->first.fp = output;
-			nextnode->second.i = '\n';
-			nextnode->next = 0;
+				state.topnode = state.nextnode;
+			state.nextnode->action = PRINT;
+			state.nextnode->first.fp = state.output;
+			state.nextnode->second.i = '\n';
+			state.nextnode->next = 0;
 		}
 		fp = 0;
-		if (sortkey != IGNORE)
+		if (state.sortkey != IGNORE)
 			sort = order;
-		ftwalk((char*)op, execute, walkflags|FTW_MULTIPLE, sort);
+		find(&state, op, state.walkflags, sort);
 	}
-	while (cmd)
+ done:
+	if (state.vm)
+		vmclose(state.vm);
+	if (state.str)
+		sfstrclose(state.str);
+	if (state.tmp)
+		sfstrclose(state.tmp);
+	while (state.cmd)
 	{
-		cmdflush(cmd->first.xp);
-		cmd = cmd->second.np;
+		cmdflush(state.cmd->first.xp);
+		cmdclose(state.cmd->first.xp);
+		state.cmd = state.cmd->second.np;
 	}
 	if (fp && findclose(fp))
-		return 1;
-	if (proc && (r = procclose(proc)))
-		return r;
+		error(ERROR_SYSTEM|2, "fast find error");
+	if (state.proc && (r = procclose(state.proc)))
+		error(ERROR_SYSTEM|2, "subprocess exit code %d", r);
 	if (sfsync(sfstdout))
 		error(ERROR_SYSTEM|2, "write error");
-	return error_info.errors;
+	return error_info.errors != 0;
 }

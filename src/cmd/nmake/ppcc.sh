@@ -440,7 +440,6 @@ case $old:$RANDOM in
 				(( ncc = ncc + 1 ))
 				arg=${av[nav]}
 				(( nav = nav + 1 ))
-				print -u2 AHA ${cc[ncc]} $arg
 				;;
 			esac
 			;;
