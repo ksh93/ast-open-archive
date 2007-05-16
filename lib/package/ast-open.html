@@ -1047,9 +1047,14 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-07-05-10  --- Release ksh93s+  ---
+07-05-15  --- Release ksh93s+  ---
+07-05-15  A bug in which the %B format of printf was affected  by the
+	  locale has been fixed.
+07-05-14  A bug in which &nbsp;was not removed in the replacement pattern with
+	  ${var/pattern/rep} when it was not followed by &nbsp;or a digit has
+	  been fixed.
 07-05-10  A bug in which ksh -R file core dumped if no script was sepcifed
-	  has been fixed.  It now displays an error message.
+	  has been fixed.  it not displays an error message.
 07-05-07  Added additional Solaris signals to signal table.
 07-04-30  A bug in which a pipeline with command substitution inside a
 	  function could cause a pipline that invokes this function to
@@ -5998,6 +6003,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-05-15 sfio/sfvprintf.c: %h? and SFFMT_SHORT =&gt; raw bytes
 07-05-09 features/signal.c,features/siglist: use kill -l &amp; strsignal()
 07-04-25 misc/optctx.c: add for opt_info switching
 07-04-24 misc/cmdarg.c,include/cmdarg.h: add CMD_CHECKED, CMD_SILENT
@@ -8969,7 +8975,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>May 13, 2007</TD>
+<TD align=right>May 15, 2007</TD>
 </TR>
 </TABLE>
 <P>
