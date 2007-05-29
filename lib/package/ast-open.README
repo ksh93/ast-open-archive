@@ -92,7 +92,12 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-07-05-15  --- Release ksh93s+  ---
+07-05-28  --- Release ksh93s+  ---
+07-05-28  A bug in brace expansion in which single and double quotes did
+          not treat the comma as a literal character has been fixed.
+07-05-24  The -p option of whence now disables -v.
+07-05-23  Several bug fixes in compound variables and arrays of arrays
+	  have been made.
 07-05-15  A bug in which the %B format of printf was affected  by the
 	  locale has been fixed.
 07-05-14  A bug in which \ was not removed in the replacement pattern with
@@ -1998,6 +2003,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+07-05-21 date*.*: update for ISO 8601:2000 %F == %Y-%m-%d
 07-04-11 sfio/tprintf.c: update for { inf INF nan NAN }
 06-09-14 datey2k.dat: yield to the gentlemen from congress
 06-08-25 opt.tst: update for leading 0 numeric option arg strip
@@ -2392,6 +2398,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-05-25 Makerules.mk: retry package sans version if version fails
+07-05-21 misc.c: invalidate openfile if _WINIX && st_nlink>1
 07-05-09 Makerules.mk: fix %.req logic
 07-04-20 rules-win32.mk: fix PROTOINSTALL sed <ast_*.h> => <ast/ast_*.h>
 07-04-18 Makerules.mk: add :REQUIRE:
@@ -4904,6 +4912,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+07-05-21 tm/tmxfmt.c,tmxscan.c: %F => %L (TM_DEFAULT); %F => %Y-%m-%d
 07-05-15 sfio/sfvprintf.c: %h? and SFFMT_SHORT => raw bytes
 07-05-09 features/signal.c,features/siglist: use kill -l & strsignal()
 07-04-25 misc/optctx.c: add for opt_info switching
@@ -6354,6 +6363,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+07-05-20 cmd.h: handle msvc's balk at if(0)0=0;
+07-05-20 cksum.c: #include <modex.h>
 07-05-11 cmd.h: add _CMD_CONTEXT_OK() to verify >= 20070511 context
 07-05-09 fds.c: handle ipv6 sockets
 07-05-09 cmd.h: <shbltin.h> : cmdquit() => sh_checksig(context)

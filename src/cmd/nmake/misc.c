@@ -80,6 +80,14 @@ rstat(char* name, Stat_t* st, int res)
 		return -1;
 	if (fstat(internal.openfd, st))
 		return -1;
+#if _WINIX
+	if (st->st_nlink > 1)
+	{
+		internal.openfile = 0;
+		close(internal.openfd);
+		internal.openfd = -1;
+	}
+#endif
  found:
 	if (!tmxgetmtime(st))
 	{

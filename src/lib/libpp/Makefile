@@ -20,9 +20,9 @@ $(ID) 2.0 :LIBRARY: BUGS NOTES RELEASE HISTORY pp.3 \
 		pplex.c ppline.c ppmacref.c ppmisc.c ppop.c pppragma.c \
 		ppprintf.c ppproto.c ppsearch.c pptrace.c
 
-"hp.pa"		:NOOPTIMIZE: ppfsm.c
-"osf.alpha"	:NOOPTIMIZE: ppcall.c
-"sol*.i386"	:NOOPTIMIZE: ppcpp.c pplex.c
+"hp.pa*"	:NOOPTIMIZE: ppfsm.c
+"osf.alpha*"	:NOOPTIMIZE: ppcall.c
+"sol*.i386*"	:NOOPTIMIZE: ppcpp.c pplex.c
 
 ppdef.h : gentab pp.tab
 	$(*:N=*gentab:P=A) -d $(*:N=*.tab) > $(<)

@@ -15,7 +15,7 @@ expr 2.0 :LIBRARY: RELEASE expr.h exlib.h exgram.h exparse.y \
 		exerror.c exopen.c exrewind.c extoken.c extype.c \
 		exnospace.c exstash.c exzero.c
 
-"*.i386" :NOOPTIMIZE: exeval.c
+"*.i386*" :NOOPTIMIZE: exeval.c
 
 exop.h : exparse.h
 	{

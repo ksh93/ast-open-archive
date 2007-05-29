@@ -1,3 +1,4 @@
+07-05-21 date*.*: update for ISO 8601:2000 %F == %Y-%m-%d
 07-04-11 sfio/tprintf.c: update for { inf INF nan NAN }
 06-09-14 datey2k.dat: yield to the gentlemen from congress
 06-08-25 opt.tst: update for leading 0 numeric option arg strip

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-05-09 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-05-25 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2824,7 +2824,7 @@ end
 						I := $(I)/$(P)
 					end
 					eval
-					PACKAGE_$(P)_INCLUDE = $(I)
+					PACKAGE_$(P)_INCLUDE = $(I:P=C)
 					end
 				end
 				if ! "$(PACKAGE_$(P)_LIB)" || !L && LP != "-"
@@ -2832,7 +2832,7 @@ end
 						L := $(T1)/$(LP:O=N)
 					end
 					eval
-					PACKAGE_$(P)_LIB = $(L)
+					PACKAGE_$(P)_LIB = $(L:P=C)
 					end
 					if ! "$(.PACKAGE.stdlib:N=$(L))"
 						.SOURCE.a : $(L)
@@ -2843,17 +2843,26 @@ end
 					H := $(I)/.
 					if "$(H:P=X)"
 						eval
-						PACKAGE_$(P)_INCLUDE = $(I)
+						PACKAGE_$(P)_INCLUDE = $(I:P=C)
 						end
 					end
 				end
 				eval
 				_PACKAGE_$(P) $(.INITIALIZED.:?=?==?) 1
 				end
-				for D $(I)/*.h*([!.]) $(I)/*/*.h*([!.])
-					if "$(D:P=G:O=1:P=X)"
-						FOUND = 1
-						break
+				if ! FOUND
+					for D $(I)/*.h*([!.]) $(I)/*/*.h*([!.])
+						if "$(D:P=G:O=1:P=X)"
+							FOUND = 1
+							break
+						end
+					end
+					if ! FOUND && "$(PACKAGE_$(P)_VERSION)"
+						PACKAGE_$(P)_VERSION :=
+						PACKAGE_$(P) :=
+						PACKAGE_$(P)_INCLUDE :=
+						PACKAGE_$(P)_LIB :=
+						return $(.PACKAGE.INIT. $(P))
 					end
 				end
 			end
