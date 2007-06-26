@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -147,6 +147,7 @@
 
 #define CS_CLIENT_ARGV	(1<<0)		/* just process argv		*/
 #define CS_CLIENT_RAW	(1<<1)		/* tty raw mode input		*/
+#define CS_CLIENT_SEP	(1<<2)		/* argv ':' line sep		*/
 
 typedef struct
 {

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-05-21
+info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -352,6 +352,13 @@ done mount.o generated
 setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o ast_mount mount.o ${mam_libast}
 done ast_mount generated
+make ast_umount
+prev ast_mount
+exec - if	silent test -f "ast_umount"
+exec - then	rm -f ast_umount
+exec - fi
+exec - ln ast_mount ast_umount
+done ast_umount generated
 make ps
 make ps.o
 make ps.c
@@ -695,6 +702,13 @@ make ${INSTALLROOT}/bin/ast_mount
 prev ast_mount
 exec - test '' = 'ast_mount' || ${STDCMP} 2>/dev/null -s ast_mount ${INSTALLROOT}/bin/ast_mount || { ${STDMV} ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; ${STDCP} ast_mount ${INSTALLROOT}/bin/ast_mount  		    		    ;}
 done ${INSTALLROOT}/bin/ast_mount generated
+make ${INSTALLROOT}/bin/ast_umount
+prev ${INSTALLROOT}/bin/ast_mount
+exec - if	silent test -f "${INSTALLROOT}/bin/ast_umount"
+exec - then	rm -f ${INSTALLROOT}/bin/ast_umount
+exec - fi
+exec - ln ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_umount
+done ${INSTALLROOT}/bin/ast_umount generated
 make ${INSTALLROOT}/bin/ps
 prev ps
 exec - test '' = 'ps' || ${STDCMP} 2>/dev/null -s ps ${INSTALLROOT}/bin/ps || { ${STDMV} ${INSTALLROOT}/bin/ps ${INSTALLROOT}/bin/ps.old 2>/dev/null || true; ${STDCP} ps ${INSTALLROOT}/bin/ps  		    		    ;}

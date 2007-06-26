@@ -16,7 +16,7 @@
 #define ZLIB_INTERNAL
 #include "zlib.h"
 
-#ifdef STDC
+#ifdef ZLIB_STDC
 #  ifndef _WIN32_WCE
 #    include <stddef.h>
 #  endif
@@ -86,7 +86,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 
         /* target dependencies */
 
-#if defined(MSDOS) || (defined(WINDOWS) && !defined(WIN32))
+#if defined(ZLIB_MSDOS) || (defined(ZLIB_WINDOWS) && !defined(ZLIB_WIN32))
 #  define OS_CODE  0x00
 #  if defined(__TURBOC__) || defined(__BORLANDC__)
 #    if(__STDC__ == 1) && (defined(__LARGE__) || defined(__COMPACT__))
@@ -115,7 +115,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  define OS_CODE  0x05
 #endif
 
-#ifdef OS2
+#ifdef ZLIB_OS2
 #  define OS_CODE  0x06
 #  ifdef M_I86
      #include <malloc.h>
@@ -137,7 +137,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  define OS_CODE  0x0a
 #endif
 
-#ifdef WIN32
+#ifdef ZLIB_WIN32
 #  ifndef __CYGWIN__  /* Cygwin is Unix, not Win32 */
 #    define OS_CODE  0x0b
 #  endif
@@ -175,7 +175,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 
          /* functions */
 
-#if defined(STDC99) || (defined(__TURBOC__) && __TURBOC__ >= 0x550)
+#if defined(ZLIB_STDC99) || (defined(__TURBOC__) && __TURBOC__ >= 0x550)
 #  ifndef HAVE_VSNPRINTF
 #    define HAVE_VSNPRINTF
 #  endif
@@ -186,7 +186,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  endif
 #endif
 #ifndef HAVE_VSNPRINTF
-#  ifdef MSDOS
+#  ifdef ZLIB_MSDOS
      /* vsnprintf may exist on some MS-DOS compilers (DJGPP?),
         but for now we just assume it doesn't. */
 #    define NO_vsnprintf
@@ -194,7 +194,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  ifdef __TURBOC__
 #    define NO_vsnprintf
 #  endif
-#  ifdef WIN32
+#  ifdef ZLIB_WIN32
      /* In Win32, vsnprintf is available as the "non-ANSI" _vsnprintf. */
 #    if !defined(vsnprintf) && !defined(NO_vsnprintf)
 #      define vsnprintf _vsnprintf
@@ -218,11 +218,11 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
   */
 #  define NO_MEMCPY
 #endif
-#if defined(STDC) && !defined(HAVE_MEMCPY) && !defined(NO_MEMCPY)
+#if defined(ZLIB_STDC) && !defined(HAVE_MEMCPY) && !defined(NO_MEMCPY)
 #  define HAVE_MEMCPY
 #endif
 #ifdef HAVE_MEMCPY
-#  ifdef SMALL_MEDIUM /* MSDOS small or medium model */
+#  ifdef SMALL_MEDIUM /* ZLIB_MSDOS small or medium model */
 #    define zmemcpy _fmemcpy
 #    define zmemcmp _fmemcmp
 #    define zmemzero(dest, len) _fmemset(dest, 0, len)

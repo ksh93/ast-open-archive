@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -62,6 +62,7 @@ csclient(Cs_t* cs, int fd, const char* service, const char* prompt, char** argv,
 {
 	register int	i;
 	char*		s;
+	Sfio_t*		tmp;
 	int		done;
 	int		promptlen;
 	int		timeout;
@@ -109,6 +110,7 @@ csclient(Cs_t* cs, int fd, const char* service, const char* prompt, char** argv,
 	if (promptlen = (!argv && prompt && isatty(fds[0].fd) && isatty(1)) ? strlen(prompt) : 0)
 		write(1, prompt, promptlen);
 	timeout = CS_NEVER;
+	tmp = 0;
 	while (cspoll(cs, fds, elementsof(fds), timeout) > 0)
 		for (i = 0; i < elementsof(fds); i++)
 			if (fds[i].status & (CS_POLL_READ|CS_POLL_WRITE))
@@ -128,13 +130,24 @@ csclient(Cs_t* cs, int fd, const char* service, const char* prompt, char** argv,
 						fds[0].events = CS_POLL_READ;
 						continue;
 					}
-					n = strlen(s = *argv++);
-					if (n > (sizeof(buf) - 2))
-						n = sizeof(buf) - 2;
-					memcpy(buf, s, n);
-					buf[n++] = '\n';
+					if (!tmp && !(tmp = sfstropen()))
+						error(ERROR_SYSTEM|3, "out of space");
+					for (;;)
+					{
+						s = *argv++;
+						if ((flags & CS_CLIENT_SEP) && *s == ':' && !*(s + 1))
+							break;
+						if (sfstrtell(tmp))
+							sfputc(tmp, ' ');
+						sfprintf(tmp, "%s", s);
+						if (!(flags & CS_CLIENT_SEP) || !*argv)
+							break;
+					}
+					sfputc(tmp, '\n');
+					n = sfstrtell(tmp);
+					s = sfstruse(tmp);
 				}
-				else if ((n = read(fds[i].fd, buf, sizeof(buf) - 1)) < 0)
+				else if ((n = read(fds[i].fd, s = buf, sizeof(buf) - 1)) < 0)
 					error(ERROR_SYSTEM|3, "/dev/fd/%d: read error", fds[i].fd);
 				if (!n)
 				{
@@ -147,33 +160,33 @@ csclient(Cs_t* cs, int fd, const char* service, const char* prompt, char** argv,
 				if (!i)
 				{
 #if _hdr_termios
-					register char*	s;
+					register char*	u;
 					register int	m;
 
-					buf[n] = 0;
-					if ((s = strchr(buf, 035)))
+					s[n] = 0;
+					if ((u = strchr(s, 035)))
 					{
-						if ((m = s - buf) > 0 && write(sdf[i], buf, m) != m)
+						if ((m = u - s) > 0 && write(sdf[i], s, m) != m)
 							error(ERROR_SYSTEM|3, "/dev/fd/%d: write error", sdf[i]);
 						tcsetattr(0, TCSANOW, &state.old_term);
 						if (promptlen)
 							write(1, prompt, promptlen);
-						if ((n = read(fds[i].fd, buf, sizeof(buf) - 1)) <= 0)
+						if ((n = read(fds[i].fd, s = buf, sizeof(buf) - 1)) <= 0)
 						{
 							write(1, "\n", 1);
 							return 0;
 						}
 						buf[n - 1] = 0;
-						if (*s == 'q' || *s == 'Q')
+						if (*u == 'q' || *u == 'Q')
 							return 0;
 						tcsetattr(0, TCSANOW, &state.new_term);
-						if (*s)
-							error(1, "%s: unknown command", s);
+						if (*u)
+							error(1, "%s: unknown command", u);
 						continue;
 					}
 #endif
 				}
-				if (write(sdf[i], buf, n) != n)
+				if (write(sdf[i], s, n) != n)
 					error(ERROR_SYSTEM|3, "/dev/fd/%d: write error", sdf[i]);
 				if (sdf[i] == 1 && promptlen)
 					write(1, prompt, promptlen);

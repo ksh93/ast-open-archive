@@ -1,3 +1,17 @@
+07-06-25 rules-win32.mk: let $(CPP) do the %.rc=>%.res preprocessing
+07-06-21 Makerules.mk: .IGNORE shared only if ! "$(CC.SUFFIX.DYNAMIC)"
+07-06-21 Makerules.mk: flush dir cache after each :MAKE: recursion
+07-06-21 option.c: handle set --option=';foo;sa;...'
+07-06-21 expand.c: handle --recurse=*implicit* and clean up order_*() apis
+07-06-21 expand.c: + ... intermediate makefile dirs in :W: (-Q0x40000000)
+07-06-20 Makerules.mk: add --recurse=leaf to terminate leaf recursion
+07-06-20 Makerules.mk: handle "lhs :ALL:"
+07-06-15 expand.c: add :W: . alias check
+07-06-11 variable.c: foo:bar==1 equiv to bar==; foo : bar=1
+07-06-06 bind.c: fix ancient internal.openfile bug -- wow
+07-06-06 Makerules.mk: add .SHARED.LIST.EXCLUDE. to exclude self
+07-06-06 rule.c: add self to IGNORECHANGE(), only check primary joint
+07-06-01 rules-win32.mk: PACKAGE_LOCAL=
 07-05-25 Makerules.mk: retry package sans version if version fails
 07-05-21 misc.c: invalidate openfile if _WINIX && st_nlink>1
 07-05-09 Makerules.mk: fix %.req logic

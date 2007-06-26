@@ -5,6 +5,8 @@
 .INSTALL.libast.a = .
 .INSTALL.libast-g.a = .
 
+PACKAGE_LOCAL =
+
 PROTOINSTALL = | $(SED) '/^#[[:space:]]*include[[:space:]]*<ast_/s,<,<ast/,'
 
 RC = rc
@@ -22,7 +24,8 @@ SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 (RC) (RCFLAGS) : .PARAMETER
 
 %.res : %.rc (RC) (RCFLAGS)
-	$(RC) $(RCFLAGS) -r -fo$(<:P=N) $(.INCLUDE. rc:P=N:/^/-I/) $(>:P=N)
+	$(CPP) $(.INCLUDE. rc:/^/-I/) $(>) > $(%).ri
+	$(RC) $(RCFLAGS) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(%).ri
 
 %.def : %.sym
 	{

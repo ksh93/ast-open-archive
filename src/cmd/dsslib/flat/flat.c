@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2007-01-17 $\n]"
+"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2007-06-05 $\n]"
 USAGE_LICENSE
 "[+NAME?flat - dss flat method schema description]"
 "[+DESCRIPTION?The \bdss\b flat method schema is an XML file.]"
@@ -2378,7 +2378,7 @@ flat_section_count_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* 
 	char*			e;
 
 	flat->section->count = strtoul(data, &e, 0);
-	if (*e)
+	if (*e && (*e != '*' || *(e + 1)))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, 2, "%s: invalid number", data);

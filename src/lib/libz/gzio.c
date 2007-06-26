@@ -40,7 +40,7 @@ struct internal_state {int dummy;}; /* for buggy compilers */
 #endif
 
 #if !_PACKAGE_ast
-#ifndef STDC
+#ifndef ZLIB_STDC
 extern voidp  malloc OF((uInt size));
 extern void   free   OF((voidpf ptr));
 #endif
@@ -486,7 +486,7 @@ int ZEXPORT gzread (file, buf, len)
 {
     gz_stream *s = (gz_stream*)file;
     Bytef *start = (Bytef*)buf; /* starting point for crc computation */
-    Byte  *next_out; /* == stream.next_out but not forced far (for MSDOS) */
+    Byte  *next_out; /* == stream.next_out but not forced far (for ZLIB_MSDOS) */
 
     if (s == NULL || s->mode != 'r') return Z_STREAM_ERROR;
 
@@ -739,7 +739,7 @@ int ZEXPORTVA gzprintf ()
 
 #else
 
-#ifdef STDC
+#ifdef ZLIB_STDC
 #include <stdarg.h>
 
 int ZEXPORTVA gzprintf (gzFile file, const char *format, /* args */ ...)
@@ -1129,7 +1129,7 @@ int ZEXPORT gzclose (file)
     return destroy((gz_stream*)file);
 }
 
-#ifdef STDC
+#ifdef ZLIB_STDC
 #  define zstrerror(errnum) strerror(errnum)
 #else
 #  define zstrerror(errnum) ""

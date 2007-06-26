@@ -85,7 +85,7 @@ uLong ZEXPORT zlibCompileFlags()
 #ifdef FASTEST
     flags += 1L << 21;
 #endif
-#ifdef STDC
+#ifdef ZLIB_STDC
 #  ifdef NO_vsnprintf
         flags += 1L << 25;
 #    ifdef HAS_vsprintf_void
@@ -182,7 +182,7 @@ void zmemzero(dest, len)
 #endif
 
 
-#ifdef SYS16BIT
+#ifdef ZLIB_SYS16BIT
 
 #ifdef __TURBOC__
 /* Turbo C in 16-bit mode */
@@ -208,7 +208,7 @@ typedef struct ptr_table_s {
 local ptr_table table[MAX_PTR];
 /* This table is used to remember the original form of pointers
  * to large buffers (64K). Such pointers are normalized with a zero offset.
- * Since MSDOS is not a preemptive multitasking OS, this table is not
+ * Since ZLIB_MSDOS is not a preemptive multitasking OS, this table is not
  * protected from concurrent access. This hack doesn't work anyway on
  * a protected system like OS/2. Use Microsoft C instead.
  */
@@ -286,13 +286,13 @@ void  zcfree (voidpf opaque, voidpf ptr)
 
 #endif /* M_I86 */
 
-#endif /* SYS16BIT */
+#endif /* ZLIB_SYS16BIT */
 
 
 #ifndef MY_ZCALLOC /* Any system without a special alloc function */
 
 #if !_PACKAGE_ast
-#ifndef STDC
+#ifndef ZLIB_STDC
 extern voidp  malloc OF((uInt size));
 extern voidp  calloc OF((uInt items, uInt size));
 extern void   free   OF((voidpf ptr));

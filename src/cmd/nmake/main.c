@@ -158,6 +158,8 @@
  *	0x04000000 2004-01-20 don't include triggered time==0 targets in :T=F: 
  *	0x08000000 2004-10-01 metaget does not assume % target for ... : % .NULL
  *	0x10000000 2007-01-08 :P=D: alias check
+ *	0x20000000 2007-06-15 disable :W: . alias check
+ *	0x40000000 2007-06-20 don't include intermediate makefile dirs in :W:
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *

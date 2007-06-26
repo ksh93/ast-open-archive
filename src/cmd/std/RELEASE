@@ -1,3 +1,5 @@
+07-06-27 seq.sh: error messages to the standard error -- oops
+07-06-01 Makefiles: add $(PACKAGE_LOCALE)umount link
 07-05-05 seq.sh,seq.rt: new
 07-04-25 locale.c: defer unknown keywords to /usr/bin/locale
 07-03-19 du.c: fix 0 pointer deref

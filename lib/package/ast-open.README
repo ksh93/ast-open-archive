@@ -92,7 +92,16 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-07-05-28  --- Release ksh93s+  ---
+07-06-25  --- Release ksh93s+  ---
+07-06-25  In vi insert mode, ksh no longer emits a backspace character
+	  before the carraige return when the newline is entered. 
+07-06-25  A bug in which pipefail would cause a command to return 0
+	  when the pipeline was the last command and the failure happened
+	  on a component other than the last has been fixed.
+07-06-25  A bug in the expansion of ${var/pattern/rep} when pattern or rep
+	  contained a left parenthesis in single quotes has been fixed.
+07-06-18  The braces for a subscripted variable with ${var[sub]} are now
+	  optional when inside [[...]], ((...)) or as a subscript.
 07-05-28  A bug in brace expansion in which single and double quotes did
           not treat the comma as a literal character has been fixed.
 07-05-24  The -p option of whence now disables -v.
@@ -103,11 +112,11 @@ All recorded changes follow.
 07-05-14  A bug in which \ was not removed in the replacement pattern with
 	  ${var/pattern/rep} when it was not followed by \ or a digit has
 	  been fixed.
-07-05-10  A bug in which ksh -R file core dumped if no script was sepcifed
+07-05-10  A bug in which ksh -R file core dumped if no script was specified
 	  has been fixed.  it not displays an error message.
 07-05-07  Added additional Solaris signals to signal table.
 07-04-30  A bug in which a pipeline with command substitution inside a
-	  function could cause a pipline that invokes this function to
+	  function could cause a pipeline that invokes this function to
 	  hang when the pipefail option is on has been fixed.
 07-04-30  Added -q to whence.
 07-04-18  A small memory leak with each redirection of a non-builtin has
@@ -2398,6 +2407,20 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-06-25 rules-win32.mk: let $(CPP) do the %.rc=>%.res preprocessing
+07-06-21 Makerules.mk: .IGNORE shared only if ! "$(CC.SUFFIX.DYNAMIC)"
+07-06-21 Makerules.mk: flush dir cache after each :MAKE: recursion
+07-06-21 option.c: handle set --option=';foo;sa;...'
+07-06-21 expand.c: handle --recurse=*implicit* and clean up order_*() apis
+07-06-21 expand.c: + ... intermediate makefile dirs in :W: (-Q0x40000000)
+07-06-20 Makerules.mk: add --recurse=leaf to terminate leaf recursion
+07-06-20 Makerules.mk: handle "lhs :ALL:"
+07-06-15 expand.c: add :W: . alias check
+07-06-11 variable.c: foo:bar==1 equiv to bar==; foo : bar=1
+07-06-06 bind.c: fix ancient internal.openfile bug -- wow
+07-06-06 Makerules.mk: add .SHARED.LIST.EXCLUDE. to exclude self
+07-06-06 rule.c: add self to IGNORECHANGE(), only check primary joint
+07-06-01 rules-win32.mk: PACKAGE_LOCAL=
 07-05-25 Makerules.mk: retry package sans version if version fails
 07-05-21 misc.c: invalidate openfile if _WINIX && st_nlink>1
 07-05-09 Makerules.mk: fix %.req logic
@@ -3953,6 +3976,7 @@ All recorded changes follow.
 
 :::::::: flat ::::::::
 
+07-06-05 flat.c: <COUNT>*</> => <COUNT>0</> => 0 or more
 07-01-17 flat.c: don't sfsetbuf() on an active stream!
 06-10-11 flat.c: add sfstruse() error checks
 05-09-16 flat.c: fix <QUOTEALL> q=-1 vs. \xff data bug
@@ -4512,6 +4536,8 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+07-06-27 seq.sh: error messages to the standard error -- oops
+07-06-01 Makefiles: add $(PACKAGE_LOCALE)umount link
 07-05-05 seq.sh,seq.rt: new
 07-04-25 locale.c: defer unknown keywords to /usr/bin/locale
 07-03-19 du.c: fix 0 pointer deref
@@ -6792,6 +6818,7 @@ All recorded changes follow.
 
 :::::::: libz ::::::::
 
+07-06-11 rename ARCH macros to ZLIB_ARCH to cut down namespace pollution
 07-05-09 Makefile: :INSTALLPROTO: zconf.h for win32 <ast_*> post edit
 07-01-25 zlib.h,gzio.c: add gzbopen() to handle buffered unseekable data
 07-01-25 sfdcgzip.c: use gzbopen() to handle buffered unseekable data
@@ -6862,6 +6889,7 @@ All recorded changes follow.
 
 :::::::: libcs ::::::::
 
+07-06-05 csclient.c: add CS_CLIENT_SEP
 06-09-19 css.c: sysconf() => astconf()
 06-08-15 csclient.c: fix prompt logic
 06-08-14 csopen.c: fix group=name logic
@@ -6950,6 +6978,9 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+07-06-12 pplex.c: finish -D:preserve logic update for imake
+07-06-07 pplex.c: handle -D:preserve S_CHRB splices
+07-06-04 ppsearch.c: only apply pp:chop ?old?new? if original not found
 07-03-11 add -D-Y pp:pedantic, PP_WARN macro formal parenthesis checks
 07-01-26 pp.def,probe.win32: add _WCHAR_T_DEFINED
 06-09-23 ppop.c: check -I <dev,ino> for c and TYPE_HOSTED|TYPE_VENDOR attrs

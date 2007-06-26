@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -435,10 +435,10 @@ associate(register Rule_t* a, register Rule_t* r, register char* s, List_t** pos
 /*
  * check if r's prerequisite list or named attributes have changed
  *
- * NOTE: IGNORECHANGE(r) prerequisites are ignored in the comparison
+ * NOTE: IGNORECHANGE(r,q) prerequisites are ignored in the comparison
  */
 
-#define IGNORECHANGE(r)	((r)->property & (P_joint|P_ignore))
+#define IGNORECHANGE(r,q)	(((q)->property & (P_joint|P_ignore)) || ((q)->dynamic & D_alias) && getrule((q)->name) == r)
 
 int
 prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, register List_t* oldprereqs)
@@ -446,6 +446,8 @@ prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, registe
 	register List_t*	p;
 
 	if ((r->property & P_accept) || state.accept)
+		return 0;
+	if ((r->property & (P_joint|P_target)) == (P_joint|P_target) && r != r->prereqs->rule->prereqs->rule)
 		return 0;
 	if ((r->attribute ^ o->attribute) & ~internal.accept->attribute)
 	{
@@ -457,11 +459,11 @@ prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, registe
 	{
 		if (newprereqs)
 		{
-			if (IGNORECHANGE(newprereqs->rule))
+			if (IGNORECHANGE(r, newprereqs->rule))
 				newprereqs = newprereqs->next;
 			else if (oldprereqs)
 			{
-				if (IGNORECHANGE(oldprereqs->rule))
+				if (IGNORECHANGE(r, oldprereqs->rule))
 					oldprereqs = oldprereqs->next;
 				else if (newprereqs->rule == oldprereqs->rule || ((newprereqs->rule->dynamic ^ oldprereqs->rule->dynamic) & (D_alias|D_bound)) && getrule(newprereqs->rule) == getrule(oldprereqs->rule))
 				{
@@ -474,7 +476,7 @@ prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, registe
 			else
 				break;
 		}
-		else if (oldprereqs && IGNORECHANGE(oldprereqs->rule))
+		else if (oldprereqs && IGNORECHANGE(r, oldprereqs->rule))
 			oldprereqs = oldprereqs->next;
 		else
 			break;

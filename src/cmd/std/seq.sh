@@ -25,7 +25,7 @@
 #
 case $(getopts '[-]' opt "--???man" 2>&1) in
 version=[0-9]*)
-	usage=$'\n[-?\n@(#)$Id: seq (AT&T Labs Research) 2007-05-05 $\n]
+	usage=$'\n[-?\n@(#)$Id: seq (AT&T Labs Research) 2007-06-27 $\n]
 	'$USAGE_LICENSE$'
 	[+NAME? seq - print a sequence of numbers ]
 	[+DESCRIPTION?\bseq\b writes the numbers from \afirst\a to \alast\a
@@ -59,7 +59,7 @@ esac
 
 function err_exit
 {
-	print -r -- "$command: $@"
+	print -ru2 -- "$command: $@"
 	exit 1
 }
 

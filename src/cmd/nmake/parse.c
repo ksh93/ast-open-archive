@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -286,7 +286,7 @@ declare(char* t, int line, long flags)
 	p->oldv = v;
 	p->newv.name = v->name;
 	p->newv.property &= ~(V_readonly|V_scope);
-	p->newv.property |= (v->property & V_auxiliary) | (flags & V_scope);
+	p->newv.property |= (v->property & (V_auxiliary|V_scan)) | (flags & V_scope);
 	if (!p->newv.value || (p->newv.property & V_import))
 	{
 		p->newv.value = newof(0, char, MINVALUE + 1, 0);
@@ -2220,6 +2220,13 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 			{
 				r->dynamic |= D_scope;
 				set.rule.dynamic |= D_hasscope;
+				if (state.user <= 1 && state.reading && state.makefile && (s = strchr(r->name, '=')) && *(s + 1) == '=')
+				{
+					*s = 0;
+					if (nametype(r->name, NiL) & NAME_identifier)
+						setvar(r->name, NiL, V_scan);
+					*s = '=';
+				}
 			}
 			if (!(set.rule.dynamic & D_dynamic) && !(r->dynamic & D_scope) && isdynamic(r->name))
 				set.rule.dynamic |= D_dynamic;

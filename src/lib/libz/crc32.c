@@ -26,13 +26,13 @@
 #  endif /* !DYNAMIC_CRC_TABLE */
 #endif /* MAKECRCH */
 
-#include "zutil.h"      /* for STDC and FAR definitions */
+#include "zutil.h"      /* for ZLIB_STDC and FAR definitions */
 
 #define local static
 
 /* Find a four-byte integer type for crc32_little() and crc32_big(). */
 #ifndef NOBYFOUR
-#  ifdef STDC           /* need ANSI C limits.h to determine sizes */
+#  ifdef ZLIB_STDC           /* need ANSI C limits.h to determine sizes */
 #    include <limits.h>
 #    define BYFOUR
 #    if (UINT_MAX == 0xffffffffUL)
@@ -48,7 +48,7 @@
 #        endif
 #      endif
 #    endif
-#  endif /* STDC */
+#  endif /* ZLIB_STDC */
 #endif /* !NOBYFOUR */
 
 /* Definitions for doing the crc four data bytes at a time. */

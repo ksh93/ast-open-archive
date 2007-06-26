@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-05-25 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-06-21 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -54,7 +54,7 @@ set option=';official-output;s;-;The \bdiff\b(1) log file name for the \bofficia
 set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b$$(CC.INCLUDE.LOCAL)\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
 set option=';preserve;sv;-;Move existing \binstall\b action targets matching \apattern\a to the \bETXTBSY\b subdirectory of the install target.;pattern:!*'
 set option=';profile;b;-;Compile and link with \bprof\b(1) instrumentation options enabled.'
-set option=';recurse;s;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+combine?Combine all recursive makefiles into one rooted at the current directory. \b::\b, \b:PACKAGE:\b, \b.SOURCE\b*, and \bLDLIBRARIES\b are intercepted to adjust relative directory and library references. Complex makefile hierarchies may not be amenable to combination.][+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
+set option=';recurse;sa;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+combine?Combine all recursive makefiles into one rooted at the current directory. \b::\b, \b:PACKAGE:\b, \b.SOURCE\b*, and \bLDLIBRARIES\b are intercepted to adjust relative directory and library references. Complex makefile hierarchies may not be amenable to combination.][+implicit?All makefiles in all subdirectories are treated as if they contained \b:MAKE:\b.][+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently and a \b+\b prerequisite separates leaf directories from intermediate directories.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
 set option=';recurse-enter;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon entering a recursive \b:MAKE:\b directory.;text'
 set option=';recurse-leave;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon leaving a recursive \b:MAKE:\b directory. If \b--recurse-leave\b is not specified then no message is printed upon leaving \b:MAKE:\b directories.;text'
 set option=';select;s;-;A catenation of edit operators that selects terminal source files.;edit-ops'
@@ -753,7 +753,7 @@ end
 							end
 							T := $(T:T=F)
 							Q = .ARCHIVE
-							if ! "$(-force-shared)" && ! "$(-static-link)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
+							if ! "$(-force-shared)" && ! "$(-static-link)" && ! "$(CC.SUFFIX.DYNAMIC)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
 								Q += .IGNORE
 							end
 							$(%) $(T) : $(Q)
@@ -784,7 +784,7 @@ end
 									end
 								end
 								Q = .ARCHIVE
-								if ! "$(-force-shared)" && ! "$(-static-link)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
+								if ! "$(-force-shared)" && ! "$(-static-link)" && ! "$(CC.SUFFIX.DYNAMIC)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
 									Q += .IGNORE
 								end
 								$(%) $(T) : $(Q)
@@ -1455,18 +1455,21 @@ end
 	return $(V)
 
 .RECURSE.INIT. : .FUNCTION
-	local D P
+	local D N P
+	if ! "$(-recurse)"
+		return
+	end
 	if ! ( D = "$(%)" )
 		D = .
 	end
-	if "$(-recurse)" == "prereqs"
+	if "$(-recurse)" == "*prereqs*"
 		print $(D:W=P=$(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE))
 		exit 0
 	end
 	if D == "."
 		D := $(D:W=R=$(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE))
 	end
-	if "$(-recurse)" == "list"
+	if "$(-recurse)" == "*list*"
 		print $(D:/ /$("\n")/G)
 		exit 0
 	end
@@ -1479,12 +1482,20 @@ end
 	.ORIGINAL.ARGS. := $(.ORIGINAL.ARGS.:N!=$(P))
 	.ARGS : .CLEAR $(~.ARGS:N!=$(P))
 	P := $(D:N!=-|.|.CC-*|cc-*)
-	$(P:T!=FR) : .TERMINAL .RECURSE.DIR
+	if P == "* + *"
+		$(P:@/ + .*//:T!=FR) : .TERMINAL .RECURSE.DIR
+		$(P:@/.* + //:T!=FR) : .TERMINAL .NORECURSE.DIR
+	else
+		$(P:T!=FR) : .TERMINAL .RECURSE.DIR
+	end
 	$(P:T=FR) : .TERMINAL .RECURSE.FILE
 	.SELECT.EDIT. := $(.SELECT.EDIT.):N!=($(P:T=F:P=L=*:/ /|/G))?(/*)
-	return $(D)
+	return $(D:N!=+)
 
-.RECURSE.DIR : .USE .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
+.RECURSE.FLUSH : .MAKE .VIRTUAL .FORCE .REPEAT .AFTER
+	unbind $(<<)
+
+.RECURSE.DIR : .USE .ALWAYS .LOCAL .FORCE .RECURSE.FLUSH .RECURSE.SEMAPHORE
 	set -
 	if	$(*.VIEW:O=2:N=...:+2d) test -d $(<) $(-virtual:+|| $(MKDIR) $(<))
 	then	$(-silent:~echo $(-recurse-enter) $(.RWD.:+$(<:N!=/*:+$(.RWD.)/))$(<)$$(":") >&2)
@@ -1494,7 +1505,17 @@ end
 	else	echo $(<): warning: cannot recurse on virtual directory >&2
 	fi
 
-.RECURSE.FILE : .USE .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
+.NORECURSE.DIR : .USE .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
+	set -
+	if	$(*.VIEW:O=2:N=...:+2d) test -d $(<) $(-virtual:+|| $(MKDIR) $(<))
+	then	$(-silent:~echo $(-recurse-enter) $(.RWD.:+$(<:N!=/*:+$(.RWD.)/))$(<)$$(":") >&2)
+		cd $(<)
+		$(MAKE) $(-) --norecurse --errorid=$(<:Q) $(=:V:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:C%$%/%)$(<) $(.RECURSE.ARGS.:N!=.RECURSE)
+		$(-recurse-leave:+$(-silent:~echo $(-recurse-leave) $(.RWD.:+$(<:N!=/*:+$$(.RWD.)/))$(<)$$$(":") >&2))
+	else	echo $(<): warning: cannot recurse on virtual directory >&2
+	fi
+
+.RECURSE.FILE : .USE .ALWAYS .LOCAL .FORCE .RECURSE.FLUSH .RECURSE.SEMAPHORE
 	set -
 	$(-silent:~echo $(.RWD.:+$(<:N!=/*:+$(.RWD.)/))$(<)$$(":") >&2)
 	$(MAKE) $(-) --errorid=$(<:B:Q) --file=$(<) $(=) .RWD.=$(.RWD.) $(.RECURSE.ARGS.)
@@ -1695,6 +1716,9 @@ end
 		end
 	else
 		.MAIN : .CLEAR .ALL
+		if "$(<:V)"
+			$(<) : .ALL
+		end
 	end
 
 /*
@@ -2166,13 +2190,44 @@ end
 		return 1
 	end
 
+.SHARED.LIST.EXCLUDE. : .FUNCTION
+	local L T X
+	T = <<<
+	while "$($(T):A=.MAKE)"
+		T := $(T)<
+	end
+	T := $($(T):O=1)
+	if CC.SUFFIX.DYNAMIC && "$(T:N=*@($(CC.SUFFIX.DYNAMIC)))"
+		L := $(T:B)
+		if CC.PREFIX.DYNAMIC
+			L := $(X:/$(CC.PREFIX.DYNAMIC)//)
+		end
+	elif CC.SUFFIX.SHARED && "$(T:N=*@($(CC.SUFFIX.SHARED)))"
+		L := $(T:B)
+		if CC.PREFIX.SHARED
+			L := $(X:/$(CC.PREFIX.SHARED)//)
+		end
+	end
+	if L
+		L := $(L:/[0-9._]*$//)
+		X := N!=-l$(L)
+		if CC.SUFFIX.DYNAMIC
+			X := $(X)|?(*/)$(CC.PREFIX.DYNAMIC)$(L)*([0-9._])$(CC.SUFFIX.DYNAMIC)
+		end
+		if CC.SUFFIX.SHARED
+			X := $(X)|?(*/)$(CC.PREFIX.SHARED)$(L)*([0-9._])$(CC.SUFFIX.SHARED)
+		end
+	end
+	return $(X)
+
 .SHARED.LIST.LIBS. : .FUNCTION
 	return $(~~:VBFUI)
 
 .SHARED.LIST. : .FUNCTION
-	local A D L M R T N=0
+	local A D L M R T N=0 X
+	X := $(.SHARED.LIST.EXCLUDE.)
 	M := [-+]l*|*$(CC.SUFFIX.ARCHIVE)|*$(CC.SUFFIX.SHARED)
-	for L $(%)
+	for L $(%:$(X))
 		if A
 			L := $(L:/^$(CC.PREFIX.ARCHIVE)\(.*\)\$(CC.SUFFIX.ARCHIVE)/+l\1/)
 		end
@@ -2241,8 +2296,9 @@ end
 
 .SHARED.BIND. : .FUNCTION
 	local ( B X ... ) $(%)
-	local A L P S
-	X += $("$(B).req":T=F:P=X:T=I:N!=$("\n")|[-+]l$(B)|$(X:/ /|/G))
+	local A L P S N
+	N := $(.SHARED.LIST.EXCLUDE.)
+	X += $("$(B).req":T=F:P=X:T=I:N!=$("\n")|[-+]l$(B)|$(X:/ /|/G):$(N))
 	if "$(X)"
 		let .NO.LIB.TYPE = .NO.LIB.TYPE + 1
 		for L $(X)
@@ -2386,7 +2442,7 @@ end
  */
 
 ":MAKE:" : .MAKE .OPERATOR
-	if "$(-recurse)" != "combine"
+	if "$(-recurse)" != "*combine*"
 		local ATT EXP LHS RHS
 		if ! ( LHS = "$(<)" )
 			LHS = .RECURSE
@@ -4081,7 +4137,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	 * check make recursion limits
 	 */
 
-	T1 := $(-recurse)
+	T1 := $(-recurse:/[^0-9]//G)
 	if T1 > 0
 		T2 =
 		while T1 > 0

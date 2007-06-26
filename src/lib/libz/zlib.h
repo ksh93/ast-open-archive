@@ -143,7 +143,7 @@ typedef gz_header FAR *gz_headerp;
 
    On 16-bit systems, the functions zalloc and zfree must be able to allocate
    exactly 65536 bytes, but will not be required to allocate more than this
-   if the symbol MAXSEG_64K is defined (see zconf.h). WARNING: On MSDOS,
+   if the symbol MAXSEG_64K is defined (see zconf.h). WARNING: On ZLIB_MSDOS,
    pointers returned by zalloc for objects of exactly 65536 bytes *must*
    have their offset normalized to zero. The default allocation function
    provided by this library ensures this (see zutil.c). To reduce memory

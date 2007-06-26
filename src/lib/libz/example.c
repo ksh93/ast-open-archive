@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "zlib.h"
 
-#ifdef STDC
+#ifdef ZLIB_STDC
 #  include <string.h>
 #  include <stdlib.h>
 #endif
@@ -516,7 +516,7 @@ int main(argc, argv)
     char *argv[];
 {
     Byte *compr, *uncompr;
-    uLong comprLen = 10000*sizeof(int); /* don't overflow on MSDOS */
+    uLong comprLen = 10000*sizeof(int); /* don't overflow on ZLIB_MSDOS */
     uLong uncomprLen = comprLen;
     static const char* myVersion = ZLIB_VERSION;
 

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -750,7 +750,7 @@ setop(register Option_t* op, register int n, char* s, int type)
 			Oplist_t*	x;
 
 			/*
-			 * save for listops(*,'O')
+			 * save for listops(*,'@')
 			 */
 
 			sfprintf(internal.tmp, "%s", op->name);
@@ -1075,8 +1075,6 @@ setop(register Option_t* op, register int n, char* s, int type)
 					}
 					break;
 				}
-				if (n & Os)
-					n &= ~Oa;
 			}
 			func = field(&s, sep, app, 1);
 			desc = field(&s, sep, app, 0);
@@ -1108,6 +1106,8 @@ setop(register Option_t* op, register int n, char* s, int type)
 			set_insert:
 				nop->name = name;
 				nop->set = func;
+				if ((n & (Os|Oa)) == (Os|Oa) && !op->value)
+					*((Rule_t**)nop->value) = catrule(".OPTION.", nop->name, ".LIST.", 1);
 				if (!desc)
 					desc = "option.";
 				if (*desc != '(')
@@ -1551,7 +1551,7 @@ optcheck(int must)
  *	'-' all
  *      '?' non-Ox OPT_DEFAULT
  *	'#' table attributes with the current value
- *	'O' internal object file dump
+ *	'@' internal object file dump
  */
 
 void
@@ -1589,7 +1589,7 @@ listops(register Sfio_t* sp, int setting)
 		mask = 0;
 		test = 0;
 		break;
-	case 'O':
+	case '@':
 		setting = '-';
 		mask = Ox|OPT_COMPILE;
 		test = OPT_COMPILE;

@@ -48,7 +48,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2007-03-11 $\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2007-06-12 $\0\n";
 
 #include "pplib.h"
 

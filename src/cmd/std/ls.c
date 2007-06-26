@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -36,7 +36,7 @@ USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
 "	file argument the name and requested information are listed."
-"	The current directory is listed if no file arguments appear."
+"	The directory \b.\b is assumed if no file arguments appear."
 "	The listing is sorted by file name by default, except that file"
 "	arguments are listed before directories.]"
 "[+?Multi-column terminal output display width is determined by \bioctl\b(2)"

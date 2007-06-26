@@ -332,14 +332,13 @@ TEST 08 'floating epsilon'
 TEST 09 diagnostics
 
 	EXEC
-		OUTPUT - 'seq: too few arguments'
+		ERROR - 'seq: too few arguments'
 		EXIT 1
 
 	EXEC	1 2 3 4
-		OUTPUT - 'seq: too many arguments'
+		ERROR - 'seq: too many arguments'
 
 	EXEC	-f
-		OUTPUT -
 		ERROR - $'seq: -f: format argument expected
 Usage: seq [-w] [-f format] [-s string] [ first  [ incr ] ] last'
 		EXIT 2
@@ -354,6 +353,5 @@ seq: -0: unknown option
 Usage: seq [-w] [-f format] [-s string] [ first  [ incr ] ] last'
 
 	EXEC	-f%g -w 10
-		OUTPUT - 'seq: format string may not be specified when printing equal width strings'
-		ERROR -
+		ERROR - 'seq: format string may not be specified when printing equal width strings'
 		EXIT 1

@@ -30,16 +30,18 @@
 #define EVENT_MINOR		0
 
 static const char usage[] =
-"[-?\n@(#)$Id: event (AT&T Research) 2006-08-04 $\n]"
+"[-?\n@(#)$Id: event (AT&T Research) 2007-06-05 $\n]"
 USAGE_LICENSE
 "[+NAME?event - shared event client and server]"
 "[+DESCRIPTION?\bevent\b is a shared event client and server. Events are "
-    "stored in a persistent database named by the \apath\a operand. Each "
+    "stored in a persistent database named by the \aname\a operand. Each "
     "event has a name, an expiration, and a binary status \braised\b or "
     "\bnot-raised\b. A non-existent event is \bnot-raised\b. Events may be "
-    "raised, deleted, cleared, tested and waited for. In the following "
-    "events operands are matched by \bksh\b(1) patterns. The client requests "
-    "are:]"
+    "raised, deleted, cleared, tested and waited for. If no \brequest\b "
+    "operands are specified then requests are prompted for, with an "
+    "\bEVENT>\b prompt, and read from the standard input. Multiple comman "
+    "line requests must be separated by \b:\b. In the following events "
+    "operands are matched by \bksh\b(1) patterns. The client requests are:]"
     "{"
         "[+all \aconnection\a?Raise all pending events for the "
             "\aconnection\a. Mainly for debugging.]"
@@ -89,7 +91,7 @@ USAGE_LICENSE
     "specified then only event times > newer and < older match.]:[date]"
 "[q:quiet?Suppress request confirmation messages.]"
 "\n"
-"\nname [ request [ options ] [ arg ... ] ] [ request ... ]\n"
+"\nname [ request [ options ] [ arg ... ] ] [ : request ... ]\n"
 "\n"
 "[+CAVEATS?Expirations, logging and the \bset\b request are not "
     "implemented yet.]"
@@ -1168,7 +1170,7 @@ main(int argc, char** argv)
 		log(&state, 0, 'S', "stop service");
 		return 1;
 	}
-	return csclient(&cs, -1, state.service, "event> ", argv + 1, CS_CLIENT_ARGV);
+	return csclient(&cs, -1, state.service, "event> ", argv + 1, CS_CLIENT_ARGV|CS_CLIENT_SEP);
 }
 
 #endif

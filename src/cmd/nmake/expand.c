@@ -1175,17 +1175,25 @@ native(Sfio_t* xp, const char* s)
 #define ORDER_PACKAGE	"PACKAGE"	/* package assertion operator	*/
 #define ORDER_RECURSE	"MAKE"		/* recursion assertion operator	*/
 
+#define ORDER_all	0x01
+#define ORDER_directory	0x02
+#define ORDER_force	0x04
+#define ORDER_implicit	0x08
+#define ORDER_paths	0x10
+#define ORDER_prereqs	0x20
+
 #define M_INIT		M_metarule
 #define M_MUST		M_mark
 #define M_LHS		M_compile
 #define M_RHS		M_scan
+#define M_SKIP		M_generate
 
 /*
  * order_recurse() partial order traversal support
  */
 
 static unsigned long
-order_descend(Sfio_t* xp, Hash_table_t* tab, Rule_t* r, int all, unsigned long mark, int prereqs)
+order_descend(Sfio_t* xp, Hash_table_t* tab, Rule_t* r, unsigned long mark, unsigned int flags)
 {
 	register List_t*	p;
 	register Rule_t*	a;
@@ -1198,7 +1206,7 @@ order_descend(Sfio_t* xp, Hash_table_t* tab, Rule_t* r, int all, unsigned long m
 	r->complink = mark;
 	if (r->prereqs)
 	{
-		if (prereqs && all)
+		if ((flags & (ORDER_all|ORDER_prereqs)) == (ORDER_all|ORDER_prereqs))
 		{
 			for (p = r->prereqs; p; p = p->next)
 			{
@@ -1226,22 +1234,22 @@ order_descend(Sfio_t* xp, Hash_table_t* tab, Rule_t* r, int all, unsigned long m
 			if (!(a = (Rule_t*)hashget(tab, p->rule->name)))
 				a = p->rule;
 			if (a->mark & M_MUST)
-				mark = order_descend(xp, tab, a, all, mark, prereqs);
+				mark = order_descend(xp, tab, a, mark, flags);
 			else if (need < a->complink)
 				need = a->complink;
 		}
 		freelist(r->prereqs);
 		r->prereqs = 0;
 	}
-	else if (prereqs)
+	else if (flags & ORDER_prereqs)
 	{
-		if (!all || (r->mark & M_RHS))
+		if (!(flags & ORDER_all) || (r->mark & M_RHS))
 			return mark;
 		r->mark |= M_LHS;
 	}
-	if (!prereqs)
+	if (!(flags & ORDER_prereqs))
 	{
-		if (!all || (r->mark & M_RHS))
+		if (!(flags & ORDER_all) || (r->mark & M_RHS))
 			return mark;
 		if (sfstrtell(xp) != here || mark == need)
 		{
@@ -1255,24 +1263,41 @@ order_descend(Sfio_t* xp, Hash_table_t* tab, Rule_t* r, int all, unsigned long m
 	return mark;
 }
 
-static void	order_find(Sfio_t*, Sfio_t*, Sfio_t*, Hash_table_t*, char*, char*, char*, char*, int, int, int);
+static void	order_find(Sfio_t*, Sfio_t*, Sfio_t*, Hash_table_t*, char*, char*, char*, char*, unsigned int);
+
+static void
+order_all(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, Rule_t* d, char* makefiles, char* skip, unsigned int flags)
+{
+	register char*	t;
+	register char**	v;
+	int		n;
+	glob_t		gl;
+
+	d->mark |= M_RHS;
+	n = strlen(d->name) + 1;
+	sfprintf(internal.tmp, "%s/*/", d->name);
+	v = globv(&gl, sfstruse(internal.tmp));
+	flags |= ORDER_directory|ORDER_force;
+	while (t = *v++)
+	{
+		t[strlen(t) - 1] = 0;
+		order_find(xp, tmp, vec, tab, d->name, t + n, makefiles, skip, flags);
+	}
+	globfree(&gl);
+}
 
 /*
  * scan makefile r for ORDER_RECURSE assertion operators and add to vec
  */
 
 static void
-order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, Rule_t* d, Rule_t* r, char* makefiles, char* skip, int prereqs)
+order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, Rule_t* d, Rule_t* r, char* makefiles, char* skip, unsigned int flags)
 {
 	register char*	s;
-	register char*	t;
-	register char**	v;
 	Sfio_t*		sp;
-	int		n;
-	glob_t		gl;
 
 	if (d == internal.dot)
-		d->mark |= M_MUST;
+		d->mark |= M_MUST|M_SKIP;
 	else
 	{
 		if (s = strrchr(d->name, '/'))
@@ -1281,14 +1306,14 @@ order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, Rule_t* d, R
 			s = d->name;
 		if (!strneq(s, ORDER_INIT, sizeof(ORDER_INIT) - 1))
 			d->mark |= M_MUST;
-		else if (prereqs)
-			d->mark |= M_INIT;
+		else if (flags & ORDER_prereqs)
+			d->mark |= M_INIT|M_SKIP;
 		else
 		{
 			if (sfstrtell(xp))
 				sfputr(xp, "-", ' ');
 			sfputr(xp, d->name, ' ');
-			d->mark |= M_MUST|M_RHS;
+			d->mark |= M_MUST|M_RHS|M_SKIP;
 		}
 		hashput(tab, s, d);
 	}
@@ -1296,33 +1321,23 @@ order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, Rule_t* d, R
 	putptr(vec, d);
 	if (makefiles && (d->mark & M_MUST) && (sp = rsfopen(r->name)))
 	{
-		while (s = sfgetr(sp, '\n', 1))
-		{
-			while (*s)
-				if (*s++ == ':')
-				{
-					if (strneq(s, ORDER_RECURSE, sizeof(ORDER_RECURSE) - 1) && *(s += sizeof(ORDER_RECURSE) - 1) == ':')
+		if (flags & ORDER_implicit)
+			order_all(xp, tmp, vec, tab, d, makefiles, skip, flags);
+		else
+			while (s = sfgetr(sp, '\n', 1))
+				while (*s)
+					if (*s++ == ':')
 					{
-						while (*++s && (*s == ' ' || *s == '\t'));
-						if (*s)
-							order_find(xp, tmp, vec, tab, NiL, s, makefiles, skip, 0, 1, prereqs);
-						else
+						if (strneq(s, ORDER_RECURSE, sizeof(ORDER_RECURSE) - 1) && *(s += sizeof(ORDER_RECURSE) - 1) == ':')
 						{
-							d->mark |= M_RHS;
-							n = strlen(d->name) + 1;
-							sfprintf(internal.tmp, "%s/*/", d->name);
-							v = globv(&gl, sfstruse(internal.tmp));
-							while (t = *v++)
-							{
-								t[strlen(t) - 1] = 0;
-								order_find(xp, tmp, vec, tab, d->name, t + n, makefiles, skip, 1, 1, prereqs);
-							}
-							globfree(&gl);
+							while (*++s && (*s == ' ' || *s == '\t'));
+							if (*s)
+								order_find(xp, tmp, vec, tab, NiL, s, makefiles, skip, flags|ORDER_force);
+							else
+								order_all(xp, tmp, vec, tab, d, makefiles, skip, flags);
 						}
+						break;
 					}
-					break;
-				}
-		}
 		sfclose(sp);
 	}
 }
@@ -1332,7 +1347,7 @@ order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, Rule_t* d, R
  */
 
 static void
-order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, char* files, char* makefiles, char* skip, int directory, int force, int prereqs)
+order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, char* files, char* makefiles, char* skip, unsigned int flags)
 {
 	Rule_t*		r;
 	Rule_t*		d;
@@ -1342,6 +1357,8 @@ order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, c
 	char*		tok;
 	Stat_t		st;
 
+	if (dir && streq(dir, internal.dot->name))
+		dir = 0;
 	tok = tokopen(files, 1);
 	while (s = tokread(tok))
 	{
@@ -1359,9 +1376,11 @@ order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, c
 			sfprintf(tmp, "%s/%s", dir, s);
 			t = sfstruse(tmp);
 		}
+		else if (!(state.questionable & 0x20000000) && !strchr(s, '/') && (t = strrchr(internal.pwd, '/')) && streq(s, t + 1))
+			continue;
 		else
 			t = s;
-		if (directory || force >= 0 && (d = bindfile(NiL, t, 0)) && !stat(d->name, &st) && S_ISDIR(st.st_mode))
+		if ((flags & ORDER_directory) || (flags & (ORDER_force|ORDER_paths)) == ORDER_force && (d = bindfile(NiL, t, 0)) && !stat(d->name, &st) && S_ISDIR(st.st_mode))
 		{
 			d = makerule(t);
 			t = makefiles;
@@ -1379,14 +1398,14 @@ order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, c
 					sfprintf(tmp, "%s/%s", s, t);
 					t = 0;
 				}
-				if (r = bindfile(NiL, sfstruse(tmp), 0))
+				if (r = bindfile(NiL, e = sfstruse(tmp), 0))
 				{
-					order_scan(xp, tmp, vec, tab, d, r, makefiles, skip, prereqs);
+					order_scan(xp, tmp, vec, tab, d, r, makefiles, skip, flags);
 					break;
 				}
 			}
 		}
-		else if (force && (r = bindfile(NiL, t, 0)))
+		else if ((flags & ORDER_force) && (r = bindfile(NiL, t, 0)))
 		{
 			if (s = strrchr(t, '/'))
 			{
@@ -1396,7 +1415,7 @@ order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, c
 			}
 			else
 				d = internal.dot;
-			order_scan(xp, tmp, vec, tab, d, r, makefiles, skip, prereqs);
+			order_scan(xp, tmp, vec, tab, d, r, makefiles, skip, flags);
 		}
 	}
 	tokclose(tok);
@@ -1417,11 +1436,11 @@ order_cmp(const void* a, const void* b)
  * (recursive) makefile prereqs; if targets!=0 then only
  * those targets and prerequisites are considered
  * directories and targets are ' ' separated
- * force<0 for old :W=O: where directories are makefile paths
+ * ORDER_paths for old :W=O: where directories are makefile paths
  */
 
 static void
-order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* targets, int force, int prereqs)
+order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* targets, unsigned int flags)
 {
 	char*		s;
 	char*		t;
@@ -1433,6 +1452,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	Rule_t*		d;
 	Rule_t*		order;
 	Rule_t**	v;
+	Rule_t**	e;
 	List_t*		q;
 	Sfio_t*		vec;
 	Sfio_t*		tmp;
@@ -1449,7 +1469,10 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	tab = hashalloc(table.rule, 0);
 	tmp = sfstropen();
 	vec = sfstropen();
-	order_find(xp, tmp, vec, tab, NiL, directories, makefiles, skip, 0, force, prereqs);
+	getop(tmp, "recurse", 0);
+	if (strmatch(sfstruse(tmp), "*implicit*"))
+		flags |= ORDER_implicit;
+	order_find(xp, tmp, vec, tab, NiL, directories, makefiles, skip, flags);
 	mark = sfstrtell(vec);
 	putptr(vec, 0);
 	v = (Rule_t**)sfstrbase(vec);
@@ -1632,9 +1655,8 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 		tok = tokopen(targets, 1);
 		while (s = tokread(tok))
 			if ((r = (Rule_t*)hashget(tab, s)) && (r->mark & M_MUST))
-				mark = order_descend(xp, tab, r, 1, mark, prereqs);
+				mark = order_descend(xp, tab, r, mark, flags|ORDER_all);
 		tokclose(tok);
-		k = 0;
 	}
 	else
 	{
@@ -1642,24 +1664,25 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 		 * favor external.order prereqs if they are in the mix
 		 */
 
+		flags |= ORDER_all;
 		if (order)
 			for (q = order->prereqs; q; q = q->next)
 				if ((r = (Rule_t*)hashget(tab, unbound(q->rule))) && (r->mark & M_MUST))
 				{
-					mark = order_descend(xp, tab, r, 1, mark, prereqs);
-					if (!prereqs)
+					mark = order_descend(xp, tab, r, mark, flags);
+					if (!(flags & ORDER_prereqs))
 						sfputr(xp, "-", ' ');
 				}
-		k = 1;
 	}
 	v = (Rule_t**)sfstrbase(vec);
 	while (*v++)
 	{
 		r = *v++;
 		if (r->mark & M_MUST)
-			mark = order_descend(xp, tab, r, k, mark, prereqs);
+			mark = order_descend(xp, tab, r, mark, flags);
 	}
-	if (prereqs)
+	e = v - 1;
+	if (flags & ORDER_prereqs)
 	{
 		sfprintf(xp, "all :");
 		v = (Rule_t**)sfstrbase(vec);
@@ -1670,13 +1693,23 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 				sfprintf(xp, " %s", r->name);
 		}
 	}
+	k = 1;
 	v = (Rule_t**)sfstrbase(vec);
-	while (*v++)
+	while (--e >= v)
 	{
-		r = *v++;
-		if (prereqs && (r->mark & (M_INIT|M_LHS|M_MUST|M_RHS)) == M_LHS)
+		r = *e;
+		if ((flags & ORDER_prereqs) && (r->mark & (M_INIT|M_LHS|M_MUST|M_RHS|M_SKIP)) == M_LHS)
 			sfprintf(xp, " %s", r->name);
-		r->mark &= ~(M_INIT|M_LHS|M_MUST|M_RHS);
+		else if (!(state.questionable & 0x40000000) && !(flags & ORDER_prereqs) && (r->mark & (M_INIT|M_LHS|M_MUST|M_RHS|M_SKIP)) == M_RHS)
+		{
+			if (k)
+			{
+				k = 0;
+				sfputr(xp, "+", ' ');
+			}
+			sfputr(xp, r->name, ' ');
+		}
+		r->mark &= ~(M_INIT|M_LHS|M_MUST|M_RHS|M_SKIP);
 		r->complink = 0;
 	}
 	sfstrclose(vec);
@@ -4046,13 +4079,13 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				switch (op)
 				{
 				case 'O':
-					order_recurse(xp, x, NiL, NiL, val, -1, 0);
+					order_recurse(xp, x, NiL, NiL, val, ORDER_force|ORDER_paths);
 					break;
 				case 'P':
-					order_recurse(xp, x, getval(external.files, VAL_PRIMARY|VAL_AUXILIARY), getval(external.skip, VAL_PRIMARY|VAL_AUXILIARY), val, 1, 1);
+					order_recurse(xp, x, getval(external.files, VAL_PRIMARY|VAL_AUXILIARY), getval(external.skip, VAL_PRIMARY|VAL_AUXILIARY), val, ORDER_force|ORDER_prereqs);
 					break;
 				case 'R':
-					order_recurse(xp, x, getval(external.files, VAL_PRIMARY|VAL_AUXILIARY), getval(external.skip, VAL_PRIMARY|VAL_AUXILIARY), val, 1, 0);
+					order_recurse(xp, x, getval(external.files, VAL_PRIMARY|VAL_AUXILIARY), getval(external.skip, VAL_PRIMARY|VAL_AUXILIARY), val, ORDER_force);
 					break;
 				default:
 					error(1, "unknown edit operator `W=%c'", op);

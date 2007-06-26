@@ -76,24 +76,22 @@
 #  define voidp                 z_voidp
 #endif
 
-#if defined(__MSDOS__) && !defined(MSDOS)
-#  define MSDOS
+#if defined(__MSDOS__) || defined(ZLIB_MSDOS)
+#  define ZLIB_MSDOS
 #endif
-#if (defined(OS_2) || defined(__OS2__)) && !defined(OS2)
-#  define OS2
+#if defined(OS_2) || defined(__OS2__)
+#  define ZLIB_OS2
 #endif
-#if defined(_WINDOWS) && !defined(WINDOWS)
-#  define WINDOWS
+#if defined(_WINDOWS) || defined(ZLIB_WINDOWS)
+#  define ZLIB_WINDOWS
 #endif
 #if defined(_WIN32) || defined(_WIN32_WCE) || defined(__WIN32__)
-#  ifndef WIN32
-#    define WIN32
-#  endif
+#  define ZLIB_WIN32
 #endif
-#if (defined(MSDOS) || defined(OS2) || defined(WINDOWS)) && !defined(WIN32)
+#if (defined(ZLIB_MSDOS) || defined(ZLIB_OS2) || defined(ZLIB_WINDOWS)) && !defined(ZLIB_WIN32)
 #  if !defined(__GNUC__) && !defined(__FLAT__) && !defined(__386__)
-#    ifndef SYS16BIT
-#      define SYS16BIT
+#    ifndef ZLIB_SYS16BIT
+#      define ZLIB_SYS16BIT
 #    endif
 #  endif
 #endif
@@ -102,42 +100,42 @@
  * Compile with -DMAXSEG_64K if the alloc function cannot allocate more
  * than 64k bytes at a time (needed on systems with 16-bit int).
  */
-#ifdef SYS16BIT
+#ifdef ZLIB_SYS16BIT
 #  define MAXSEG_64K
 #endif
-#ifdef MSDOS
+#ifdef ZLIB_MSDOS
 #  define UNALIGNED_OK
 #endif
 
 #ifdef __STDC_VERSION__
-#  ifndef STDC
-#    define STDC
+#  ifndef ZLIB_STDC
+#    define ZLIB_STDC
 #  endif
 #  if __STDC_VERSION__ >= 199901L
-#    ifndef STDC99
-#      define STDC99
+#    ifndef ZLIB_STDC99
+#      define ZLIB_STDC99
 #    endif
 #  endif
 #endif
-#if !defined(STDC) && (defined(__STDC__) || defined(__cplusplus))
-#  define STDC
+#if !defined(ZLIB_STDC) && (defined(__STDC__) || defined(__cplusplus))
+#  define ZLIB_STDC
 #endif
-#if !defined(STDC) && (defined(__GNUC__) || defined(__BORLANDC__))
-#  define STDC
+#if !defined(ZLIB_STDC) && (defined(__GNUC__) || defined(__BORLANDC__))
+#  define ZLIB_STDC
 #endif
-#if !defined(STDC) && (defined(MSDOS) || defined(WINDOWS) || defined(WIN32))
-#  define STDC
+#if !defined(ZLIB_STDC) && (defined(ZLIB_MSDOS) || defined(ZLIB_WINDOWS) || defined(ZLIB_WIN32))
+#  define ZLIB_STDC
 #endif
-#if !defined(STDC) && (defined(OS2) || defined(__HOS_AIX__))
-#  define STDC
-#endif
-
-#if defined(__OS400__) && !defined(STDC)    /* iSeries (formerly AS/400). */
-#  define STDC
+#if !defined(ZLIB_STDC) && (defined(ZLIB_OS2) || defined(__HOS_AIX__))
+#  define ZLIB_STDC
 #endif
 
-#ifndef STDC
-#  ifndef const /* cannot use !defined(STDC) && !defined(const) on Mac */
+#if defined(__OS400__) && !defined(ZLIB_STDC)    /* iSeries (formerly AS/400). */
+#  define ZLIB_STDC
+#endif
+
+#ifndef ZLIB_STDC
+#  ifndef const /* cannot use !defined(ZLIB_STDC) && !defined(const) on Mac */
 #    define const       /* note: need a more gentle solution here */
 #  endif
 #endif
@@ -181,20 +179,20 @@
                         /* Type declarations */
 
 #ifndef OF /* function prototypes */
-#  ifdef STDC
+#  ifdef ZLIB_STDC
 #    define OF(args)  args
 #  else
 #    define OF(args)  ()
 #  endif
 #endif
 
-/* The following definitions for FAR are needed only for MSDOS mixed
+/* The following definitions for FAR are needed only for ZLIB_MSDOS mixed
  * model programming (small or medium model with some far allocations).
- * This was tested only with MSC; for other MSDOS compilers you may have
+ * This was tested only with MSC; for other ZLIB_MSDOS compilers you may have
  * to define NO_MEMCPY in zutil.h.  If you don't need the mixed model,
  * just define FAR to be empty.
  */
-#ifdef SYS16BIT
+#ifdef ZLIB_SYS16BIT
 #  if defined(M_I86SM) || defined(M_I86MM)
      /* MSC small or medium model */
 #    define SMALL_MEDIUM
@@ -215,12 +213,12 @@
 #  endif
 #endif
 
-#if defined(WINDOWS) || defined(WIN32)
+#if defined(ZLIB_WINDOWS) || defined(ZLIB_WIN32)
    /* If building or using zlib as a DLL, define ZLIB_DLL.
     * This is not mandatory, but it offers a little performance increase.
     */
 #  ifdef ZLIB_DLL
-#    if defined(WIN32) && (!defined(__BORLANDC__) || (__BORLANDC__ >= 0x500))
+#    if defined(ZLIB_WIN32) && (!defined(__BORLANDC__) || (__BORLANDC__ >= 0x500))
 #      ifdef ZLIB_INTERNAL
 #        define ZEXTERN extern __declspec(dllexport)
 #      else
@@ -240,7 +238,7 @@
      /* No need for _export, use ZLIB.DEF instead. */
      /* For complete Windows compatibility, use WINAPI, not __stdcall. */
 #    define ZEXPORT WINAPI
-#    ifdef WIN32
+#    ifdef ZLIB_WIN32
 #      define ZEXPORTVA WINAPIV
 #    else
 #      define ZEXPORTVA FAR CDECL
@@ -291,7 +289,7 @@ typedef int   FAR intf;
 typedef uInt  FAR uIntf;
 typedef uLong FAR uLongf;
 
-#ifdef STDC
+#ifdef ZLIB_STDC
    typedef void const *voidpc;
    typedef void FAR   *voidpf;
    typedef void       *voidp;

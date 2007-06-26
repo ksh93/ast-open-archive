@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -1429,7 +1429,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 				x = makerule(name);
 			if (x && x != r)
 			{
-				if (st.st_mode)
+				if (internal.openfile && st.st_mode)
 					internal.openfile = x->name;
 				if (r->property & x->property & P_target)
 				{
@@ -1449,7 +1449,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 
 				s = r->name;
 				r->name = maprule(b, r);
-				if (st.st_mode)
+				if (internal.openfile && st.st_mode)
 					internal.openfile = r->name;
 				if (r->name != s)
 				{

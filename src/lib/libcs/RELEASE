@@ -1,3 +1,4 @@
+07-06-05 csclient.c: add CS_CLIENT_SEP
 06-09-19 css.c: sysconf() => astconf()
 06-08-15 csclient.c: fix prompt logic
 06-08-14 csopen.c: fix group=name logic
