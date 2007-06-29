@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-06-21 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-06-28 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2191,21 +2191,29 @@ end
 	end
 
 .SHARED.LIST.EXCLUDE. : .FUNCTION
-	local L T X
+	local A L T X
 	T = <<<
 	while "$($(T):A=.MAKE)"
 		T := $(T)<
 	end
-	T := $($(T):O=1)
-	if CC.SUFFIX.DYNAMIC && "$(T:N=*@($(CC.SUFFIX.DYNAMIC)))"
-		L := $(T:B)
-		if CC.PREFIX.DYNAMIC
-			L := $(X:/$(CC.PREFIX.DYNAMIC)//)
+	A := $(*$($(T)<):O=1)
+	if CC.SUFFIX.ARCHIVE && "$(A:N=*@($(CC.SUFFIX.ARCHIVE)))"
+		L := $(A:B)
+		if CC.PREFIX.ARCHIVE
+			L := $(L:/^$(CC.PREFIX.ARCHIVE)//)
 		end
-	elif CC.SUFFIX.SHARED && "$(T:N=*@($(CC.SUFFIX.SHARED)))"
-		L := $(T:B)
-		if CC.PREFIX.SHARED
-			L := $(X:/$(CC.PREFIX.SHARED)//)
+	else
+		T := $($(T):O=1)
+		if CC.SUFFIX.DYNAMIC && "$(T:N=*@($(CC.SUFFIX.DYNAMIC)))"
+			L := $(T:B)
+			if CC.PREFIX.DYNAMIC
+				L := $(L:/$(CC.PREFIX.DYNAMIC)//)
+			end
+		elif CC.SUFFIX.SHARED && "$(T:N=*@($(CC.SUFFIX.SHARED)))"
+			L := $(T:B)
+			if CC.PREFIX.SHARED
+				L := $(L:/$(CC.PREFIX.SHARED)//)
+			end
 		end
 	end
 	if L

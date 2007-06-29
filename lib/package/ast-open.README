@@ -92,7 +92,7 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-07-06-25  --- Release ksh93s+  ---
+07-06-28  --- Release ksh93s+  ---
 07-06-25  In vi insert mode, ksh no longer emits a backspace character
 	  before the carraige return when the newline is entered. 
 07-06-25  A bug in which pipefail would cause a command to return 0
@@ -2407,6 +2407,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-06-28 Makerules.mk: fix .SHARED.LIST.EXCLUDE. plugin bug (sortlib/vcodex)
 07-06-25 rules-win32.mk: let $(CPP) do the %.rc=>%.res preprocessing
 07-06-21 Makerules.mk: .IGNORE shared only if ! "$(CC.SUFFIX.DYNAMIC)"
 07-06-21 Makerules.mk: flush dir cache after each :MAKE: recursion
