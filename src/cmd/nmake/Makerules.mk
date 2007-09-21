@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-06-28 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-09-11 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -43,7 +43,7 @@ set option=';clean-ignore;s;-;Ignore \bclean\b action generated target files mat
 set option=';clobber;sv;-;Replace existing \binstall\b action targets matching \apattern\a instead of renaming to \atarget\a\b.old\b.;pattern:!*'
 set option=';compare;b;-;Ignore \binstall\b action targets whose contents have not changed. On by default.'
 set option=';debug-symbols;b;-;Compile and link with debugging symbol options enabled.'
-set option=';force-shared;b;-;Force \b-l\b\aname\a library references to bind to shared libraries.'
+set option=';force-shared;b;-;Do not ignore \b-l\b\aname\a shared library reference modification times.'
 set option=';instrument;s;-;Enable compile-time, link-time and/or run-time code instrumentation. Instrumentation interfaces that replace the compiler command, and the \bapp\b, \binsight\b, \bpurecov\b, \bpurify\b, \bquantify\b and \bsentinel\b special-need interfaces, are supported.;command'
 set option=';ld-script;s;-;A space-separated list of suffixes of script files to be passed to the linker.;suffix'
 set option=';lib-type;b;-;Bind library references to \b--debug-symbols\b or \b--profile\b specific variants.'
@@ -644,6 +644,9 @@ end
 
 .BIND.-l% : .FUNCTION
 	local A B D T V X
+	if "$(%)" != "[-+]l*"
+		return $(%)
+	end
 	B := $(%:/[-+]l//)
 	if "$(-mam:N=static*,port*)" && ! .BIND.REAL.
 		if "$(%)" != "-l+([a-zA-Z0-9_])"

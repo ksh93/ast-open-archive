@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1986-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -29,7 +29,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2006-06-28 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2007-09-21 $\0\n";
 
 #if PROTOMAIN
 
@@ -55,6 +55,7 @@ static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2006-06-28 $\0\n";
 #define MAGICOFF	"noticed"	/* no notice if found in pragma	*/
 #define MAGICTOP	64		/* must be in these top lines	*/
 #define NOTICED		"Copyright"	/* no notice if found in magic	*/
+#define PUBLICDOMAIN	"Public Domain"	/* no notice if found in magic	*/
 
 struct proto				/* proto buffer state		*/
 {
@@ -2285,6 +2286,11 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 							notice = options = 0;
 							break;
 						}
+					}
+					if (*s == *PUBLICDOMAIN && !strncmp(s, PUBLICDOMAIN, sizeof(PUBLICDOMAIN) - 1))
+					{
+						notice = options = 0;
+						break;
 					}
 					else if (*s++ == '\n')
 					{

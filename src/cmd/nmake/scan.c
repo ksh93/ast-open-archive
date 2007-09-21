@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -147,11 +147,7 @@ scansort(register const char* a, register const char* b)
 	while (*++a == *++b)
 		if (!*a)
 			return 0;
-	if (*a == '*')
-		return 1;
-	else if (*b == '*')
-		return -1;
-	for (s = " *%@"; *s; s++)
+	for (s = "* %@"; *s; s++)
 		if (*a == *s)
 			return 1;
 		else if (*b == *s)
@@ -1316,6 +1312,12 @@ scanexec(int fd, Rule_t* r, Scan_t* ss, List_t* p)
 		pb = 0;
 		hit = 0;
 		b = g;
+		if (state.test & 0x00000080)
+		{
+			for (x = g; *x && *x != '\n'; x++);
+			if (x > g)
+				error(2, "scanexec: NXT \"%-.*s\"", x - g, g);
+		}
 		if (s = ss->state)
 		{
 		next:
@@ -1330,14 +1332,18 @@ scanexec(int fd, Rule_t* r, Scan_t* ss, List_t* p)
 				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
 					goto done;
 				g[c] = 0;
+				if (state.test & 0x00000080)
+				{
+					for (x = g; *x && *x != '\n'; x++);
+					error(2, "scanexec: NXT \"%-.*s\"", x - g, g);
+				}
 			}
 			for (;;)
 			{
 #if DEBUG
 				if (state.test & 0x00000080)
 				{
-					if (!(x = (unsigned char*)strchr((char*)(g - 1), '\n')))
-						x = (g - 1) + strlen((char*)(g - 1));
+					for (x = g - 1; *x && *x != '\n'; x++);
 					error(2, "scanexec: %s \"%-.*s\"", opname(s), x - (g - 1), g - 1);
 				}
 #endif
@@ -1524,18 +1530,31 @@ scanexec(int fd, Rule_t* r, Scan_t* ss, List_t* p)
 			p = scanmatch(p, &ss->action[*s], r, (char*)b, a, iflev, c == 'T' ? -1 : a != null && a > (char*)b && (c = *(a - 1)) != '"' && c != '\'' && (c != '<' || arg[0].replace != '>'));
 			for (c = 0; c < n; c++)
 				*(b + arg[c].end) = arg[c].replace;
+			if (pop > any)
+				pop--;
 		}
 		else
 		{
+#if DEBUG
+			if (state.test & 0x00000080)
+				error(2, "scanexec: XXX");
+#endif
 			if (hit)
 				rep = 0;
 			if (pop > any)
 			{
 				pop--;
-				m = s = pop->state;
-				g = pop->buffer;
-				n = pop->arg;
-				goto next;
+				if (c != '\n')
+				{
+#if DEBUG
+					if (state.test & 0x00000080)
+						error(2, "scanexec: POP");
+#endif
+					m = s = pop->state;
+					g = pop->buffer;
+					n = pop->arg;
+					goto next;
+				}
 			}
 		}
 		if (rep)

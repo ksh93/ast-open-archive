@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-06-21
+info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-09-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -73,6 +73,8 @@ make dss-write.h implicit
 done dss-write.h
 make dss-scan.h implicit
 done dss-scan.h
+make dss-return.h implicit
+done dss-return.h
 make dss-print.h implicit
 done dss-print.h
 make dss-null.h implicit

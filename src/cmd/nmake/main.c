@@ -160,6 +160,7 @@
  *	0x10000000 2007-01-08 :P=D: alias check
  *	0x20000000 2007-06-15 disable :W: . alias check
  *	0x40000000 2007-06-20 don't include intermediate makefile dirs in :W:
+ *	0x80000000 2007-08-28 don't force reassoc bindalias()
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *

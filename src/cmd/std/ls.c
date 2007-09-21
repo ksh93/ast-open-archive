@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2006-12-11 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2007-08-03 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -1720,7 +1720,7 @@ main(int argc, register char** argv)
 	if (dump)
 	{
 		sfprintf(sfstdout, "%s\n", state.format);
-		exit(0);
+		return 0;
 	}
 	stresc(state.format);
 
@@ -1739,5 +1739,5 @@ main(int argc, register char** argv)
 		ftwalk(".", ls, state.ftwflags, order);
 	if (keys[KEY_summary].macro)
 		sfkeyprintf(sfstdout, NiL, keys[KEY_summary].macro, key, NiL);
-	exit(error_info.errors != 0);
+	return error_info.errors != 0;
 }

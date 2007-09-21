@@ -17,7 +17,7 @@
 '''\"	]S defined as logo character
 .ds ]S \s36\(LH\s0
 '''\"	}Z defined as Company Name
-.ds }Z AT&T Labs - Research
+.ds }Z AT&T Research
 '''\"
 '''\"   Strings for proprietary markings at bottom of page.
 '''\"	Free Strings:  ]Q ]R ]H ]L ]V ]W ]X ]k ]l

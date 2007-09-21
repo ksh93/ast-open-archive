@@ -634,7 +634,7 @@ globv(register glob_t* gp, char* s)
  */
 
 static Rule_t*
-bindalias(register Rule_t* r, register Rule_t* x, char* path, Rule_t* d)
+bindalias(register Rule_t* r, register Rule_t* x, char* path, Rule_t* d, int force)
 {
 	char*		s;
 	int		i;
@@ -650,7 +650,7 @@ bindalias(register Rule_t* r, register Rule_t* x, char* path, Rule_t* d)
 		if (x == r || (x->dynamic & D_alias))
 			return r;
 	}
-	if (!((r->dynamic|x->dynamic)&D_bound) && !d && !strchr(x->name, '/'))
+	if (!force && !((r->dynamic|x->dynamic)&D_bound) && !d && !strchr(x->name, '/'))
 	{
 		debug((-5, "%s alias %s delayed until one or the other is bound", x->name, r->name));
 		return x;
@@ -859,6 +859,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 	int			ndirs;
 	int			allocated = 0;
 	int			aliased = 0;
+	int			reassoc = 0;
 	unsigned int		view;
 	Time_t			tm;
 	Stat_t			st;
@@ -1257,7 +1258,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 		for (i = ndirs; i-- > 0;)
 			for (p = dirs[i]; p; p = p->next)
 				p->rule->mark &= ~M_directory;
-		if (!found && r && name == r->name && (a = associate(internal.bind_p, r, NiL, NiL)) && (b = call(a, name)) && (s = getarg(&b, NiL)))
+		if (!found && r && (name == r->name || reassoc) && (a = associate(internal.bind_p, r, NiL, NiL)) && (b = call(a, name)) && (s = getarg(&b, NiL)))
 		{
 			char*	t;
 
@@ -1298,6 +1299,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 								free(name);
 							else
 								allocated = 1;
+							reassoc = !(state.questionable & 0x80000000);
 							name = strdup(s);
 							continue;
 						}
@@ -1419,7 +1421,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 						r->dynamic |= D_global;
 				}
 				else if ((r->dynamic & D_regular) && (x = getrule(b + internal.pwdlen + 1)) && x != r)
-					r = bindalias(r, x, b + internal.pwdlen + 1, od);
+					r = bindalias(r, x, b + internal.pwdlen + 1, od, reassoc);
 			}
 			if (!(r->dynamic & D_global))
 				r->preview = r->view;
@@ -1438,7 +1440,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 						found = 0;
 				}
 				else if (r->dynamic & D_regular)
-					r = bindalias(r, x, b, od);
+					r = bindalias(r, x, b, od, reassoc);
 			}
 			else
 			{

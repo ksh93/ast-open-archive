@@ -48,7 +48,9 @@ test.re : test.glob - test.fnmatch - test.match - test.regex
 
 :: testregex.mm basic.dat categorize.dat nullsubexpr-A.dat \
 	leftassoc.dat rightassoc.dat forcedassoc.dat unknownassoc.dat \
-	repetition.dat
+	repetition.dat re-assoc.mm re-definitions.mm re-nullsubexpr.mm \
+	testregex.mm re-categorize.mm re-interpretation.mm re-repetition.mm
+
 
 testregex.tgz : README.re Makefile.re \
 		testfnmatch.c testglob.c testregex.c \

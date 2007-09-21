@@ -1,3 +1,5 @@
+07-09-21 ppproto.c: add "Public Domain" to the noticed list
+07-08-11 probe.win32: add cl.exe setuid workaround, CC.VERSION[.STRING]
 07-06-12 pplex.c: finish -D:preserve logic update for imake
 07-06-07 pplex.c: handle -D:preserve S_CHRB splices
 07-06-04 ppsearch.c: only apply pp:chop ?old?new? if original not found

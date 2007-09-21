@@ -30,7 +30,7 @@
 
 #include <ast_common.h>
 
-#define BGP_VERSION		20030214L	/* interface version	*/
+#define BGP_VERSION		20070906L	/* interface version	*/
 
 #define BGP_SET			0xffff		/* as path set marker	*/
 
@@ -38,7 +38,7 @@
  * attributes (even, 1 bit set)
  */
 
-#define BGP_GROUP		(1<<1)
+#define BGP_MESSAGE		(1<<1)
 #define BGP_atomic		(1<<2)
 #define BGP_best		(1<<3)
 #define BGP_damped		(1<<4)
@@ -47,6 +47,7 @@
 #define BGP_slot		(1<<7)
 #define BGP_suppressed		(1<<8)
 #define BGP_valid		(1<<9)
+#define BGP_PART		(1<<10)
 
 /*
  * indices (odd, 2 bits set)
@@ -76,8 +77,9 @@
 #define BGP_old_state		((22<<1)|1)
 #define BGP_new_state		((23<<1)|1)
 #define BGP_stamp		((24<<1)|1)
+#define BGP_message		((25<<1)|1)
 
-#define BGP_LAST		24
+#define BGP_LAST		25
 
 /*
  * BGP_type
@@ -165,7 +167,8 @@ struct Bgproute_s
 	unsigned char	blocks;		/* # blocks for this record	*/
 	unsigned char	p1;		/* parameter 1			*/
 	unsigned char	p2;		/* parameter 2			*/
-	char		data[930];	/* vector data			*/
+	Bgpnum_t	message;	/* message group index		*/
+	char		data[926];	/* vector data			*/
 };
 
 #endif

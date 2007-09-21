@@ -1331,7 +1331,6 @@ static int
 flatfopen(Dssfile_t* file, Dssdisc_t* disc)
 {
 	register Flat_t*	flat = (Flat_t*)file->dss->meth->data;
-	char*			s;
 	size_t			i;
 
 	if (file->flags & DSS_FILE_READ)
@@ -1341,6 +1340,8 @@ flatfopen(Dssfile_t* file, Dssdisc_t* disc)
 #if 0
 		if (flat->variable)
 		{
+			char*		s;
+
 			i = roundof(flat->fixed, 8 * 1024);
 			if (s = vmnewof(file->dss->vm, 0, char, i, 0))
 				sfsetbuf(file->io, s, i);

@@ -39,7 +39,7 @@ USAGE_LICENSE
     "\bnot-raised\b. A non-existent event is \bnot-raised\b. Events may be "
     "raised, deleted, cleared, tested and waited for. If no \brequest\b "
     "operands are specified then requests are prompted for, with an "
-    "\bEVENT>\b prompt, and read from the standard input. Multiple comman "
+    "\bEVENT>\b prompt, and read from the standard input. Multiple command "
     "line requests must be separated by \b:\b. In the following events "
     "operands are matched by \bksh\b(1) patterns. The client requests are:]"
     "{"

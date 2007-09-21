@@ -1297,7 +1297,7 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 				t = tmxgetmtime(&st);
 			if (!t)
 			{
-				if (n & COMP_DONTCARE)
+				if ((n & COMP_DONTCARE) && !tm)
 					continue;
 				error(state.exec || state.mam.out ? -1 : 1, "%s: %s not found", r->name, s);
 				break;

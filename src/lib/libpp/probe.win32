@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Research) 2006-02-28
+# @(#)probe.win32 (AT&T Research) 2007-08-11
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -9,6 +9,8 @@
 # begin preamble shared with the make probe.ini
 
 IFS=$'\n'
+
+chmod 777 .
 
 typeset -A header version
 
@@ -207,8 +209,18 @@ then	hosttype=$(package)
 	cmd=$1
 	shift
 	set -- $(whence $cmd) "$@"
+	if	"$@" -v >/dev/null 2>&1
+	then	v=$("$@" -v 2>/dev/null)
+		if	[[ $v ]]
+		then	v=";VERSION;-v;$v;PATH;$*"
+		fi
+	else	v=
+	fi
+	if	[[ ! $v ]]
+	then	v="$*"
+	fi
 	cat >&3 <<!
-/* $*
+/* $v
 */
 
 #pragma pp:predefined

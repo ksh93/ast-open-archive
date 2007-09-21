@@ -29,6 +29,8 @@
 
 #include <ctype.h>
 #include <tm.h>
+#include <sfdisc.h>
+#include <sum.h>
 
 #define STAT(f,b)	((state.ftwflags&FTW_PHYSICAL)?lstat(f,b):pathstat(f,b))
 
@@ -75,6 +77,7 @@ static Exid_t	symbols[] =
 	EXID("level",	ID,		F_level,	INTEGER,	0),
 	EXID("local",	ID,		F_local,	INTEGER,	0),
 	EXID("magic",	ID,		F_magic,	STRING,		0),
+	EXID("md5sum",	ID,		F_md5sum,	STRING,		0),
 	EXID("mime",	ID,		F_mime,		STRING,		0),
 	EXID("mode",	ID,		F_mode,		T_MODE,		0),
 	EXID("mode_t",	DECLARE,   	T_MODE,		T_MODE,		0),
@@ -93,6 +96,7 @@ static Exid_t	symbols[] =
 	EXID("uid",	ID,		F_uid,		T_UID,		0),
 	EXID("uid_t",	DECLARE,   	T_UID,		T_UID,		0),
 	EXID("uidok",	ID,		F_uidok,	INTEGER,	0),
+	EXID("url",	ID,		F_url,		STRING,		0),
 	EXID("view",	ID,		F_view,		INTEGER,	0),
 	EXID("visit",	ID,		F_visit,	INTEGER,	0),
 	EXID(0,		0,		0,		0,		0)
@@ -161,6 +165,72 @@ checksum(const char* path)
 	return buf;
  bad:
 	return "*******READ-ERROR*******";
+}
+
+/*
+ * return md5 checksum for path
+ */
+
+static char*
+md5sum(const char* path)
+{
+	Sfio_t*			sp;
+	char*			s;
+	int			r;
+
+	static Sum_t*		sum;
+	static Sfio_t*		buf;
+
+	if (!sum && !(sum = sumopen("md5")) || !buf && !(buf = sfstropen()))
+		error(3, "md5 checksum initialization error");
+	suminit(sum);
+	if (!(sp = sfopen(NiL, path, "r")))
+		goto bad;
+	while (s = (unsigned char*)sfreserve(sp, SF_UNBOUND, 0))
+		sumblock(sum, s, sfvalue(sp));
+	r = !!sfvalue(sp);
+	if (sfclose(sp) || r)
+		goto bad;
+	sumdone(sum);
+	sumprint(sum, buf, 0, 0);
+	return sfstruse(buf);
+ bad:
+	return "*******READ-ERROR*******";
+}
+
+/*
+ * format urlized path
+ */
+
+static char*
+fmturl(register const char* path)
+{
+	register unsigned char*	p;
+	register char*		s;
+	register int		n;
+	register int		c;
+	char*			r;
+
+	static const char	hex[] = "0123456789ABCDEF";
+
+	n = 0;
+	p = (unsigned char*)path;
+	while (c = *p++)
+		if (!(isalnum(c) || c == '_' || c == '-' || c == '+' || c == '=' || c == '/' || c == '.'))
+			n++;
+	r = s = fmtbuf(n * 2 + (p - (unsigned char*)path));
+	p = (unsigned char*)path;
+	while (c = *p++)
+		if (!(isalnum(c) || c == '_' || c == '-' || c == '+' || c == '=' || c == '/' || c == '.'))
+		{
+			*s++ = '%';
+			*s++ = hex[(c>>4)&0xF];
+			*s++ = hex[c&0xF];
+		}
+		else
+			*s++ = c;
+	*s = 0;
+	return r;
 }
 
 /*
@@ -248,6 +318,9 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 		if (fp)
 			sfclose(fp);
 		goto string;
+	case F_md5sum:
+		v.string = md5sum(PATH(ftw));
+		goto string;
 	case F_mime:
 		fp = sfopen(NiL, PATH(ftw), "r");
 		state.magicdisc.flags |= MAGIC_MIME;
@@ -312,6 +385,9 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 	case F_uidok:
 		v.integer = !isdigit(*fmtuid(st->st_uid));
 		break;
+	case F_url:
+		v.string = fmturl(ftw->path);
+		goto string;
 	case F_view:
 		v.integer = iview(st);
 		break;
@@ -707,11 +783,11 @@ convert(Expr_t* prog, register Exnode_t* x, int type, register Exid_t* xref, int
 }
 
 /*
- * compile the tw expression in s
+ * initialize the expression state
  */
 
-void
-compile(char* s)
+static void
+init(void)
 {
 	if (!state.program)
 	{
@@ -727,6 +803,18 @@ compile(char* s)
 		if (!(state.program = exopen(&state.expr)))
 			error(3, "expression allocation error");
 	}
+}
+
+/*
+ * compile the tw expression in s
+ */
+
+void
+compile(char* s)
+{
+	if (!state.program)
+		init();
+	state.compiled = 0;
 	if (excomp(state.program, NiL, 0, s, NiL))
 		error(3, "expression compile error");
 	state.compiled = 1;
@@ -758,4 +846,41 @@ getnum(Exid_t* sym, Ftw_t* ftw)
 
 	v = getval(NiL, NiL, sym, NiL, ftw, 0, NiL);
 	return v.integer;
+}
+
+/*
+ * sfkeyprintf() lookup
+ */
+
+static int
+key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn)
+{
+	Ftw_t*		ftw = (Ftw_t*)handle;
+	Exid_t*		sym;
+	Extype_t	v;
+
+	if (!fp->t_str)
+		return 0;
+	if (!(sym = (Exid_t*)dtmatch(state.program->symbols, fp->t_str)))
+	{
+		error(3, "%s: unknown format key", fp->t_str);
+		return 0;
+	}
+	v = getval(NiL, NiL, sym, NiL, ftw, 0, NiL);
+	if ((sym->type & (F|I|S)) == S)
+		*ps = v.string;
+	else
+		*pn = v.integer;
+	return 1;
+}
+
+ssize_t
+print(Sfio_t* sp, Ftw_t* ftw, const char* format)
+{
+	if (!state.program)
+	{
+		init();
+		state.compiled = 1;
+	}
+	return sfkeyprintf(sp, ftw, format, key, NiL);
 }

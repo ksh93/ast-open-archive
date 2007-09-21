@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -591,6 +591,22 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 			i2->op = CX_NUM;
 			i2->type = type1->fundamental;
 			i2->data = r.value;
+			goto done;
+		}
+		if (cxisstring(type1) && type2->internalf && (x.callout = cxcallout(cx, op, type2->fundamental, type2, cx->disc)))
+		{
+			if (cxisnumber(type2) && v2 && v2->format.map && !cxstr2num(cx, &v2->format, i1->data.string.data, i1->data.string.size, &m))
+			{
+				i1->op = CX_NUM;
+				i1->type = type2->fundamental;
+				i1->data.number = (Cxinteger_t)m;
+				goto done;
+			}
+			if ((*type2->internalf)(cx, type2, NiL, &format, &r.value, i1->data.string.data, i1->data.string.size, cx->pm, cx->disc) < 0)
+				return 0;
+			i1->op = CX_NUM;
+			i1->type = type2->fundamental;
+			i1->data = r.value;
 			goto done;
 		}
 	}
@@ -1215,6 +1231,8 @@ parse(Cx_t* cx, Cxexpr_t* expr, int precedence, Cxvariable_t** ref)
 						goto bad;
 					}
 				}
+				else if (!code(cx, expr, CX_NOP, 0, cx->state->type_void, cx->state->type_void, NiL, 0, NiL))
+					goto bad;
 				if (parse(cx, expr, cx->table->precedence[CX_TST], NiL) != cx->state->type_void || cx->error)
 					goto bad;
 				if (!code(cx, expr, CX_TST, 0, cx->state->type_void, cx->state->type_void, NiL, 0, NiL))
@@ -1388,12 +1406,14 @@ compose(Cx_t* cx, int prec)
 	int		n;
 	int		p;
 	int		q;
+	unsigned long	o;
 
 	fp = 0;
 	rp = 0;
 	p = 0;
 	q = 0;
 	r = 0;
+	o = sfstrtell(cx->buf);
 	for (;;)
 	{
 		switch (c = next(cx))
@@ -1415,7 +1435,7 @@ compose(Cx_t* cx, int prec)
 		case '{':
 			if (q)
 				sfputc(cx->buf, c);
-			else if (sfstrtell(cx->buf))
+			else if (sfstrtell(cx->buf) != o)
 				goto syntax;
 			else
 			{
@@ -1429,7 +1449,7 @@ compose(Cx_t* cx, int prec)
 				}
 				while (isspace(c = next(cx)));
 				back(cx);
-				if (c != 0 && c != '|' && c != '?' && c != ':' && c != ';' && c != '}' && c != '>')
+				if (c != 0 && c != '|' && c != '?' && c != ':' && c != ';' && c != ',' && c != '}' && c != '>')
 				{
 					if (cx->disc->errorf)
 						(*cx->disc->errorf)(NiL, cx->disc, 2, "operator expected: %s", cxcontext(cx));
@@ -1447,7 +1467,7 @@ compose(Cx_t* cx, int prec)
 		case '(':
 			if (q)
 				sfputc(cx->buf, c);
-			else if (sfstrtell(cx->buf))
+			else if (sfstrtell(cx->buf) != o)
 				goto syntax;
 			else
 			{
@@ -1470,6 +1490,10 @@ compose(Cx_t* cx, int prec)
 				continue;
 			}
 			back(cx);
+			/*FALLTHROUGH*/
+		case ',':
+			if (c == ',')
+				o = sfstrtell(cx->buf);
 			/*FALLTHROUGH*/
 		case 0:
 		case ' ':
@@ -1530,7 +1554,11 @@ compose(Cx_t* cx, int prec)
 				}
 				else if (!isspace(c))
 				{
-					n = sfstrtell(cx->buf);
+					if (!(n = sfstrtell(cx->buf)) && prec == '}')
+					{
+						back(cx);
+						return node(cx, 0);
+					}
 					if (!fp)
 					{
 						if (!n)
@@ -1590,7 +1618,7 @@ compose(Cx_t* cx, int prec)
 						back(cx);
 						break;
 					}
-					else if (c == ';')
+					else if (c == ';' || c == ',')
 					{
 						if (!(fp = fp->next = compose(cx, c)))
 							return 0;

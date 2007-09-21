@@ -1,3 +1,4 @@
+07-09-21 format.c: add sumprint() default scale arg
 07-05-01 pax-tar.c,options.c: fix pax extended header for >=2**32 size
 07-03-14 pax-tnef.c: swap op == 3 for all arch!
 06-10-31 delta.c,format.c: fix ar=>ar delta bug that skipped data twice

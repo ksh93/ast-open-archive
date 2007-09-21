@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2006 AT&T Corp.                  *
+*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -471,5 +471,7 @@ readfile(register char* file, int type, char* filter)
 	}
 	if (!(type & COMP_DONTCARE))
 		error((type & COMP_INCLUDE) ? 2 : 3, "%s: cannot read%s", file, (type & COMP_INCLUDE) ? " include file" : (type & COMP_GLOBAL) ? " global rules" : (type & COMP_BASE) ? " base rules" : null);
+	else if ((type & COMP_INCLUDE) && error_info.line)
+		compref(r ? r : makerule(file), type);
 	return(0);
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Labs Research) 2007-02-09">
+<META name="generator" content="mm2html (AT&T Research) 2007-02-09">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
@@ -993,9 +993,8 @@ For the latest information vist the
 <TD align=left><A href="#merge changes">merge</A></TD>
 <TD align=left><A href="#netflow changes">netflow</A></TD>
 <TD align=left><A href="#opaque changes">opaque</A></TD>
-<TD align=left><A href="#sh changes">sh</A></TD>
-</TR><TR>
 <TD align=left><A href="#stats changes">stats</A></TD>
+</TR><TR>
 <TD align=left><A href="#tests changes">tests</A></TD>
 <TD align=left><A href="#text changes">text</A></TD>
 <TD align=left><A href="#validate changes">validate</A></TD>
@@ -1003,8 +1002,8 @@ For the latest information vist the
 <TD align=left><A href="#mailx changes">mailx</A></TD>
 <TD align=left><A href="#ncsl changes">ncsl</A></TD>
 <TD align=left><A href="#pack changes">pack</A></TD>
-</TR><TR>
 <TD align=left><A href="#pzip changes">pzip</A></TD>
+</TR><TR>
 <TD align=left><A href="#re changes">re</A></TD>
 <TD align=left><A href="#sort changes">sort</A></TD>
 <TD align=left><A href="#std changes">std</A></TD>
@@ -1012,8 +1011,8 @@ For the latest information vist the
 <TD align=left><A href="#tw changes">tw</A></TD>
 <TD align=left><A href="#warp changes">warp</A></TD>
 <TD align=left><A href="#vczip changes">vczip</A></TD>
-</TR><TR>
 <TD align=left><A href="#libast changes">libast</A></TD>
+</TR><TR>
 <TD align=left><A href="#libardir changes">libardir</A></TD>
 <TD align=left><A href="#libcmd changes">libcmd</A></TD>
 <TD align=left><A href="#libdll changes">libdll</A></TD>
@@ -1021,8 +1020,8 @@ For the latest information vist the
 <TD align=left><A href="#librecsort changes">librecsort</A></TD>
 <TD align=left><A href="#libsum changes">libsum</A></TD>
 <TD align=left><A href="#libuu changes">libuu</A></TD>
-</TR><TR>
 <TD align=left><A href="#libvdelta changes">libvdelta</A></TD>
+</TR><TR>
 <TD align=left><A href="#libbz changes">libbz</A></TD>
 <TD align=left><A href="#libz changes">libz</A></TD>
 <TD align=left><A href="#libcoshell changes">libcoshell</A></TD>
@@ -1030,8 +1029,8 @@ For the latest information vist the
 <TD align=left><A href="#libpp changes">libpp</A></TD>
 <TD align=left><A href="#libcodex changes">libcodex</A></TD>
 <TD align=left><A href="#libcdb changes">libcdb</A></TD>
-</TR><TR>
 <TD align=left><A href="#libdss changes">libdss</A></TD>
+</TR><TR>
 <TD align=left><A href="#libpz changes">libpz</A></TD>
 <TD align=left><A href="#libtksh changes">libtksh</A></TD>
 <TD align=left><A href="#libvcodex changes">libvcodex</A></TD>
@@ -1047,7 +1046,40 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-07-06-28  --- Release ksh93s+  ---
+07-09-20  --- Release ksh93s+  ---
+07-09-20  A bug in which a nameref to a compound variable that was local
+	  to the calling function would not expand correctly when displaying
+	  its value has been fixed.
+07-09-19  A bug which cause cause a core dump if .sh.edchar returned
+	  80 characters or more from a keyboard trap has been fixed.
+07-09-14  A bug in which could cause a core dump when more than 8 file
+	  descriptors were in use has been fixed.
+07-09-10  A bug in which creating a name reference to an instance of
+	  an array when the array name is itself a reference has been fixed.
+07-09-10  The file completion code has been modified so that after an = in
+	  any word, each : will be considered a path delimiter.
+07-09-06  A bug in which subprocess cleanup could corrupt the malloc() heap
+          has been fixed.
+07-08-26  A bug in which a name reference to an associatve array instance
+	  could cause the subscript to be evaluated as an arithmetic expression
+	  has been fixed.
+07-08-22  A bug in which the value of an array instance was of a compound
+	  variable was not expanded correctly has been fixed.
+07-08-14  A bug which could cause a core dump when a compound assignment was
+	  made to a compound variable element with a typeset -a attribute
+	  has been fixed.
+07-08-08  A bug in which a trap ignored in a subshell caused it to be
+	  ignored by the parent has been fixed.
+07-08-07  A bug in which the set command would generated erroneous output
+	  for a variable with the -RZ attribute if the variable name had been
+	  passed to a function has been fixed.
+07-08-02  A bug in which read x&#0091;1&#0093; could core dump has been fixed.
+07-08-02  A second bug in which after read x&#0091;sub&#0093; into an associative array
+	  of an element that hasn't been assigned could lead to a core dump
+	  has been fixed.
+07-07-31  A bug in which a pipeline that completed correctly could have
+	  an exit status of 127 when pipefail was enabled has been fixed.
+07-07-09  The SHOPT_AUDIT compile option has been added for keyboard logging.
 07-06-25  In vi insert mode, ksh no longer emits a backspace character
 	  before the carraige return when the newline is entered. 
 07-06-25  A bug in which pipefail would cause a command to return 0
@@ -2534,6 +2566,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-21 format.c: add sumprint() default scale arg
 07-05-01 pax-tar.c,options.c: fix pax extended header for &gt;=2**32 size
 07-03-14 pax-tnef.c: swap op == 3 for all arch!
 06-10-31 delta.c,format.c: fix ar=&gt;ar delta bug that skipped data twice
@@ -2841,6 +2874,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-08-11 mm2bb.sh: --texish for tex style bb code
 07-04-20 mm2bb.sh: add for mm =&gt; bb code
 07-02-09 mm2html.sh: expand  rather than escape to \\(*..
 06-10-31 mm2html: fix tager=_top omission bug
@@ -3398,6 +3432,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-11 Makerules.mk: fix --force-shared docs to match semantics
+07-09-07 scan.c: tweak ANY logic (leading ANY still does not play nice)
+07-09-07 pkg-cobol.mk: handle ``ID. COPY ...''
+07-08-28 bind.c: handle assoc foo=&gt;bar alias
+07-07-31 rule.c,object.c: handle include - f, f missing in .mo, then exists
 07-06-28 Makerules.mk: fix .SHARED.LIST.EXCLUDE. plugin bug (sortlib/vcodex)
 07-06-25 rules-win32.mk: let $(CPP) do the %.rc=&gt;%.res preprocessing
 07-06-21 Makerules.mk: .IGNORE shared only if ! "$(CC.SUFFIX.DYNAMIC)"
@@ -4700,6 +4739,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-21 cksum.tst: drop sha1, add -r compatibility
 07-02-23 cksum.tst: add -x tw tests
 07-02-07 cksum: handle std =&gt; libcmd move
 06-12-12 chmod.rt,mkdir.rt: add absolute mode tests
@@ -4963,6 +5003,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-12 bgp-ipma.c,bgp-mrt.c: &lt;(~0),1&gt; is the value (~0), not a group marker
+07-09-06 dss.tst: add message group and dss {return} tests
+07-09-05 bgp.c: add MESSAGE group bit and message index
+07-08-08 data/bgp.map,bgp-map.dss: add atomic map { NAG AG }
 06-01-25 bgp.h: move to dsslib/ip_t/
 05-03-08 lib.c: add for dssstatic()
 03-04-15 bgp-mrt.c: fix mrt as path segment bug that ignored all but the first!
@@ -5054,6 +5098,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-12 itlie.h: &lt;(~0),1&gt; is the value (~0), not a group marker
+07-09-05 ip_t.c: handle ("1.2.3.4/5" =~ prefix)
 06-10-11 itlie.h: add sfstruse() error checks
 06-01-24 bgp.h: bring over from dsslib/bgp.h
 05-03-08 lib.c: add for dssstatic()
@@ -5113,17 +5159,6 @@ All recorded changes follow.
 
 03-01-23 update for void* =&gt; Dssrecord_t*
 03-01-21 add cxlocation() to errorf messages
-
-</PRE>
-<P>
-<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sh changes">sh changes</A></H3></FONT></FONT></CENTER>
-<PRE>
-
-07-05-09 update for lib_init(flags,context) context arg
-07-03-19 update nv_setref() calls
-04-02-29 fix bugs exposed by $(CC.EXPORT.DYNAMIC)
-04-02-14 add ksh93:command prereq for -lshell
-04-01-30 install as ksh plugin
 
 </PRE>
 <P>
@@ -5621,6 +5656,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-08-03 ls.c: use return from main() instead of exit()
 07-06-27 seq.sh: error messages to the standard error -- oops
 07-06-01 Makefiles: add $(PACKAGE_LOCALE)umount link
 07-05-05 seq.sh,seq.rt: new
@@ -5908,6 +5944,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-21 expr.c: add sumprint() default scale arg
+07-08-17 tw.c: add --snapshot
 07-05-08 find.c: fix -printf =&gt; sfvprintf() translation
 07-05-08 tw.c: provide empty *ftw for -n actions
 07-04-24 cmdarg.c,cmdarg.h: move to src/lib/libast
@@ -6038,6 +6076,14 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-18 misc/procopen.c: tighten up SIGCHLD logic between parent/child
+07-09-18 misc/signal.c: unblock SIG_DFL after setting handler, sig&lt;0 =&gt; don't unblock
+07-09-13 misc/fs3d.c: no $LD_PRELOAD =&gt; no 3d and avoids invalid mount(2) call
+07-09-11 vmalloc: vmstat(0,0)==1 =&gt; region in use, drop VM_primary|VM_secondary
+07-09-05 misc/recstr.c: handle &#0091;lL&#0093; gobbled by strtol() -- ouch
+07-08-17 path/pathprobe.c: handle '\r' in VERSION string
+07-07-17 regex/regcache.c: regcache(0,n,0) extends cache to size n (no shrinking)
+07-07-16 tm/tmdata.c: add 2005-12-31, drop 1999-12-31 (where did that come from?)
 07-05-21 tm/tmxfmt.c,tmxscan.c: %F =&gt; %L (TM_DEFAULT); %F =&gt; %Y-%m-%d
 07-05-15 sfio/sfvprintf.c: %h? and SFFMT_SHORT =&gt; raw bytes
 07-05-09 features/signal.c,features/siglist: use kill -l &amp; strsignal()
@@ -7495,6 +7541,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-21 cksum.c: add sumprint() default scale arg, --scale, --bsd for solaris
+07-09-10 chmod.c: add --show,-n
+07-07-27 wclib.c: bias &lt;wchar.h&gt; checks for modern unix
+07-07-17 cat.c: fix --squeeze-blank to reduce multiple blank lines to *one*
 07-05-20 cmd.h: handle msvc's balk at if(0)0=0;
 07-05-20 cksum.c: #include &lt;modex.h&gt;
 07-05-11 cmd.h: add _CMD_CONTEXT_OK() to verify &gt;= 20070511 context
@@ -7900,8 +7950,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libsum changes">libsum changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-21 sum-sha1.c: reinstate Steve Reid's public domain implementation
+07-07-26 sumlib.c: drop GPL sum-sha1.c
 05-02-14 sumlib.c: split into sum-*.c
-	 sum-sha2.c: add SHA { 256 384 512 }
+05-02-14 sum-sha2.c: add SHA { 256 384 512 }
 04-02-29 Makefile: compile with $(CC.PIC) for codexlib/sum $(CC.DLL)
 03-12-16 add { crc prng } generic methods and maps&#0091;&#0093; to these methods
 03-12-16 sum.h,sumlib.c: add sumdata()
@@ -7988,6 +8040,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcoshell changes">libcoshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-08-15 add CO_SEPARATE,CO_MODE_SEPARATE for separate shell+wait per action
 07-04-09 Makefile: $(CC.PIC) to allow archive to be pulled into other dlls
 06-08-22 coshell.h: procrun =&gt; coprocrun, system =&gt; cosystem
 06-08-09 coshell.h: export CO_ENV_MSGFD for COSHELL=coshell
@@ -8117,6 +8170,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-21 ppproto.c: add "Public Domain" to the noticed list
+07-08-11 probe.win32: add cl.exe setuid workaround, CC.VERSION&#0091;.STRING&#0093;
 07-06-12 pplex.c: finish -D:preserve logic update for imake
 07-06-07 pplex.c: handle -D:preserve S_CHRB splices
 07-06-04 ppsearch.c: only apply pp:chop ?old?new? if original not found
@@ -8620,6 +8675,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdss changes">libdss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+07-09-21 dss-return.h: document it via return_beg() -- doh
+07-09-20 dssopen.c: fix dss var initialization base type loop
+07-09-06 dssopen.c: add dss-return.h
+07-09-06 cxcomp.c: handle ()?{}:{...}
+07-09-05 cxopen.c,cxcomp.c: handle (&lt;string&gt; op &lt;fundamental-integer&gt;)
 07-04-02 dssfile.c: handle empty compressed file peek
 07-01-17 dssfile.c: sfdcpzip() =&gt; sfdczip()
 06-12-04 dssopt.c: add full type description to dssopt()
@@ -9018,7 +9078,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>June 29, 2007</TD>
+<TD align=right>September 21, 2007</TD>
 </TR>
 </TABLE>
 <P>

@@ -25,7 +25,7 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2003-05-21 $\0\n";
+static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2007-09-05 $\0\n";
 
 #include <dsslib.h>
 #include <bgp.h>
@@ -151,7 +151,7 @@ ipaddr_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 
 	s = fmtip4((Ptaddr_t)value->number, -1);
 	n = strlen(s);
-	if ((n + 1) >= size)
+	if ((n + 1) > size)
 		return n + 1;
 	memcpy(buf, s, n + 1);
 	return n;
@@ -184,7 +184,7 @@ ipprefix_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* for
 	else
 		s = fmtip4(PREFIX_ADDR(value->number), PREFIX_BITS(value->number));
 	n = strlen(s);
-	if ((n + 1) >= size)
+	if ((n + 1) > size)
 		return n + 1;
 	memcpy(buf, s, n + 1);
 	return n;
@@ -371,6 +371,31 @@ static Cxmatch_t	match_prefix =
 	match_prefix_free
 };
 
+static int
+op_match_NP(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	Ptaddr_t	aa;
+	Ptaddr_t	ba;
+	int		ab;
+	int		bb;
+
+	aa = PREFIX_ADDR(a->value.number);
+	ab = PREFIX_BITS(a->value.number);
+	ba = PREFIX_ADDR(b->value.number);
+	bb = PREFIX_BITS(b->value.number);
+	r->value.number = (PTMIN(aa,ab) >= PTMIN(ba,bb) && PTMAX(aa,ab) <= PTMAX(ba,bb)) == (pc->op == CX_MATCH);
+	return 0;
+}
+
+static Cxcallout_t callouts[] =
+{
+
+CXC(CX_MATCH,	"number",	"ipprefix_t",	op_match_NP,	0)
+
+{0}
+
+};
+
 static Cxtype_t types[] =
 {
 { "aspath_t", "A sequence of as_t autonomous system numbers.", {0}, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_aspath },
@@ -390,4 +415,5 @@ Dsslib_t dss_lib_ip_t =
 	0,
 	0,
 	&types[0],
+	&callouts[0],
 };

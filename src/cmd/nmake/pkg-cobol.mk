@@ -20,6 +20,7 @@ freeze COBOL
 .SCAN.cob : .SCAN
 	I|\T COPY % |M$$(.INCLUDE.SUFFIX. cob)|
 	I|\T \D COPY % |M$$(.INCLUDE.SUFFIX. cob)|
+	I|\D *. COPY % |M$$(.INCLUDE.SUFFIX. cob)|
 
 $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 

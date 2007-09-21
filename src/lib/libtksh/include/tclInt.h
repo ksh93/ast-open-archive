@@ -49,8 +49,8 @@ extern void             TclExprFloatError _ANSI_ARGS_((Tcl_Interp *interp,
 #undef NO_STDLIB_H
 #endif
 
-extern double strtod();
 #if 0
+extern double strtod();
 /* Bug in sprintf */
 #ifdef sprintf
 #undef sprintf

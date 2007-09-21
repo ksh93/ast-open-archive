@@ -157,7 +157,7 @@ elapsed_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 
 	s = fmtelapsed((unsigned long)value->number, 1000);
 	n = strlen(s);
-	if ((n + 1) >= size)
+	if ((n + 1) > size)
 		return n + 1;
 	memcpy(buf, s, n + 1);
 	return n;
@@ -189,14 +189,14 @@ tm_hour_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 		if (v > 12)
 			v -= 12;
 		n = strlen(s) + (v >= 10) + 2;
-		if ((n + 1) >= size)
+		if ((n + 1) > size)
 			return n + 1;
 		n = sfsprintf(buf, size, "%d%s", v, s);
 	}
 	else
 	{
 		n = sfsprintf(buf, size, details, v);
-		if ((n + 1) >= size)
+		if ((n + 1) > size)
 			n++;
 	}
 	return n;
@@ -232,14 +232,14 @@ tm_mon_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 	{
 		s = tm_info.format[TM_MONTH + v];
 		n = strlen(s);
-		if ((n + 1) >= size)
+		if ((n + 1) > size)
 			return n + 1;
 		strcpy(buf, s);
 	}
 	else
 	{
 		n = sfsprintf(buf, size, details, v + 1);
-		if ((n + 1) >= size)
+		if ((n + 1) > size)
 			n++;
 	}
 	return n;
@@ -283,14 +283,14 @@ tm_wday_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 	{
 		s = tm_info.format[TM_DAY + v];
 		n = strlen(s);
-		if ((n + 1) >= size)
+		if ((n + 1) > size)
 			return n + 1;
 		strcpy(buf, s);
 	}
 	else
 	{
 		n = sfsprintf(buf, size, details, v + 1);
-		if ((n + 1) >= size)
+		if ((n + 1) > size)
 			n++;
 	}
 	return n;

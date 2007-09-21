@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -170,17 +170,17 @@ eval(Cx_t* cx, register Cxexpr_t* expr, void* data, Cxoperand_t* rv)
 	{
 		expr->queried++;
 		if ((t = expr->group ? eval(cx, expr->group, data, rv) : expr->query->sel ? (*expr->query->sel)(cx, expr, data, cx->disc) : expr->query->prog ? execute(cx, expr->query->prog, data, rv, cx->disc) : 1) < 0)
-			return -1;
+			return t;
 		if (t)
 		{
 			expr->selected++;
-			if (expr->query->act && (*expr->query->act)(cx, expr, data, cx->disc) < 0)
-				return -1;
+			if (expr->query->act && (t = (*expr->query->act)(cx, expr, data, cx->disc)) < 0)
+				return t;
 			if (expr->pass && (t = eval(cx, expr->pass, data, rv)) < 0)
-				return -1;
+				return t;
 		}
 		else if (expr->fail && (t = eval(cx, expr->fail, data, rv)) < 0)
-			return -1;
+			return t;
 		if (t)
 			r = 1;
 	} while (expr = expr->next);
@@ -194,6 +194,10 @@ eval(Cx_t* cx, register Cxexpr_t* expr, void* data, Cxoperand_t* rv)
 int
 cxeval(Cx_t* cx, register Cxexpr_t* expr, void* data, Cxoperand_t* rv)
 {
+	int	r;
+
 	vmclear(cx->em);
-	return eval(cx, expr, data, rv);
+	if ((r = eval(cx, expr, data, rv)) < -1)
+		r = -(r + 2);
+	return r;
 }

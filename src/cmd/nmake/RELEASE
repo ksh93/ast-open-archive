@@ -1,3 +1,8 @@
+07-09-11 Makerules.mk: fix --force-shared docs to match semantics
+07-09-07 scan.c: tweak ANY logic (leading ANY still does not play nice)
+07-09-07 pkg-cobol.mk: handle ``ID. COPY ...''
+07-08-28 bind.c: handle assoc foo=>bar alias
+07-07-31 rule.c,object.c: handle include - f, f missing in .mo, then exists
 07-06-28 Makerules.mk: fix .SHARED.LIST.EXCLUDE. plugin bug (sortlib/vcodex)
 07-06-25 rules-win32.mk: let $(CPP) do the %.rc=>%.res preprocessing
 07-06-21 Makerules.mk: .IGNORE shared only if ! "$(CC.SUFFIX.DYNAMIC)"

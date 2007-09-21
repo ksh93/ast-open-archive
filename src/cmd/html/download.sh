@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1996-2005 AT&T Corp.                  #
+#           Copyright (c) 1996-2007 AT&T Knowledge Ventures            #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                      by AT&T Knowledge Ventures                      #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -24,7 +24,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: download (AT&T Labs Research) 2000-12-07 $
+@(#)$Id: download (AT&T Research) 2000-12-07 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?download - generate web site download instructions for an mm document]
@@ -44,7 +44,7 @@ item [ type ... ]
 	;;
 *)	ARGV0=""
 	USAGE='i:[file] [ file ... ]'
-	id='mm2html (AT&T Labs Research) 1999-04-15'
+	id='mm2html (AT&T Research) 1999-04-15'
 	;;
 esac
 

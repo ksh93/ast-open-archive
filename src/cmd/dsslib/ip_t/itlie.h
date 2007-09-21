@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -89,10 +89,15 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details,
 			else if (g == (j + 1) && ap[i] == (ITLINT)(~0))
 			{
 				i++;
-				g = i + ap[i];
+				if (ap[i])
+				{
+					g = i + ap[i];
+					sfprintf(sp, "%s", sep);
+					t = "{";
+				}
+				else
+					t = sep;
 				i++;
-				sfprintf(sp, "%s", sep);
-				t = "{";
 			}
 			else
 				t = sep;
@@ -147,7 +152,7 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details,
 		s = "";
 		i = 0;
 	}
-	if ((i + 1) >= size)
+	if ((i + 1) > size)
 		return i + 1;
 	memcpy(buf, s, i + 1);
 	return i;
@@ -196,7 +201,7 @@ ITLINTERNAL(Cx_t* cx, Cxvalue_t* value, int tuple, int group, const char* buf, s
 			sfwrite(sp, &n, sizeof(n));
 			if (group && n == (ITLINT)(~0))
 			{
-				n = 1;
+				n = 0;
 				sfwrite(sp, &n, sizeof(n));
 				n = (ITLINT)(~0);
 				sfwrite(sp, &n, sizeof(n));

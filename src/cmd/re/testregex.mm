@@ -1,12 +1,12 @@
 .xx meta.keywords="regular expression pattern match regression test"
 .MT 4
 .TL
-AT&T Labs Research regex(3) regression tests
-.AF "AT&T Labs Research - Florham Park NJ"
+AT&T Research regex(3) regression tests
+.AF "AT&T Research - Florham Park NJ"
 .AU "Glenn Fowler <gsf@research.att.com>"
 .H 1
 .xx link="testregex.c	testregex.c 2004-05-31"
-is the latest source for the AT&T Labs Research regression test
+is the latest source for the AT&T Research regression test
 harness for the
 .xx link="http://www.opengroup.org/onlinepubs/007904975/functions/regcomp.html	X/Open regex"
 pattern match interface.

@@ -1185,3 +1185,20 @@ TEST 12 'tw 32x4 memsum algorithm'
 		OUTPUT - $'2t0Ly00mL@E01UvwO01fOoO0 chars.dat'
 	EXEC	-x tw zero.dat
 		OUTPUT - $'2N6s402zI@800vNTk01gUZQ0 zero.dat'
+
+TEST 13 'solaris -r algorithm'
+	DO	DATA big.dat chars.dat xyz.dat zyx.dat zero.dat
+	EXEC	-r
+		OUTPUT - $'0 0'
+	EXEC	-r /dev/null
+		OUTPUT - $'0 0 /dev/null'
+	EXEC	-r xyz.dat zyx.dat
+		OUTPUT - $'93 1 xyz.dat\n4188 1 zyx.dat'
+	EXEC	-r -t xyz.dat zyx.dat
+		OUTPUT - $'4097 1 2'
+	EXEC	-r big.dat
+		OUTPUT - $'50647 96 big.dat'
+	EXEC	-r chars.dat
+		OUTPUT - $'512 1 chars.dat'
+	EXEC	-r zero.dat
+		OUTPUT - $'0 1 zero.dat'

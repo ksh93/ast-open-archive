@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -815,14 +815,14 @@ puttrailer(register Archive_t* ap, register File_t* f)
 		{
 			if (!f->link->checksum)
 			{
-				sumprint(state.checksum.sum, state.tmp.str, 0);
+				sumprint(state.checksum.sum, state.tmp.str, 0, 0);
 				if (!(s = sfstruse(state.tmp.str)) || !(f->link->checksum = strdup(s)))
 					nospace();
 			}
 			sfputr(state.checksum.sp, f->link->checksum, -1);
 		}
 		else
-			sumprint(state.checksum.sum, state.checksum.sp, 0);
+			sumprint(state.checksum.sum, state.checksum.sp, 0, 0);
 		sfprintf(state.checksum.sp, " %04o %s %s %s\n"
 			, modex(f->st->st_mode & S_IPERM)
 			, (f->st->st_uid != state.uid && ((f->st->st_mode & S_ISUID) || (f->st->st_mode & S_IRUSR) && !(f->st->st_mode & (S_IRGRP|S_IROTH)) || (f->st->st_mode & S_IXUSR) && !(f->st->st_mode & (S_IXGRP|S_IXOTH)))) ? fmtuid(f->st->st_uid) : "-"

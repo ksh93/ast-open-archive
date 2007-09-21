@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -48,6 +48,7 @@
 #define ACT_EVAL		4
 #define ACT_INTERMEDIATE	5
 #define ACT_LIST		6
+#define ACT_SNAPSHOT		7
 
 #define CMD_IMPLICIT	(CMD_USER<<0)
 
@@ -78,51 +79,53 @@
 #define F_local		14
 #define F_mode		15
 #define F_magic		16
-#define F_mime		17
-#define F_mtime		18
-#define F_name		19
-#define F_nlink		20
-#define F_parent	21
-#define F_perm		22
-#define F_path		23
-#define F_rdev		24
-#define F_size		25
-#define F_status	26
-#define F_symlink	27
-#define F_type		28
-#define F_uid		29
-#define F_uidok		30
-#define F_view		31
-#define F_visit		32
+#define F_md5sum	17
+#define F_mime		18
+#define F_mtime		19
+#define F_name		20
+#define F_nlink		21
+#define F_parent	22
+#define F_perm		23
+#define F_path		24
+#define F_rdev		25
+#define F_size		26
+#define F_status	27
+#define F_symlink	28
+#define F_type		29
+#define F_uid		30
+#define F_uidok		31
+#define F_url		32
+#define F_view		33
+#define F_visit		34
 
-#define C_AGAIN		33
-#define C_BLK		34
-#define C_C		35
-#define C_CHR		36
-#define C_CTG		37
-#define C_D		38
-#define C_DC		39
-#define C_DIR		40
-#define C_DNR		41
-#define C_DNX		42
-#define C_DOOR		43
-#define C_DP		44
-#define C_FIFO		45
-#define C_FMT		46
-#define C_FOLLOW	47
-#define C_LNK		48
-#define C_NOPOST	49
-#define C_NR		50
-#define C_NS		51
-#define C_NX		52
-#define C_REG		53
-#define C_SOCK		54
-#define C_SKIP		55
+#define C_AGAIN		35
+#define C_BLK		36
+#define C_C		37
+#define C_CHR		38
+#define C_CTG		39
+#define C_D		40
+#define C_DC		41
+#define C_DIR		42
+#define C_DNR		43
+#define C_DNX		44
+#define C_DOOR		45
+#define C_DP		46
+#define C_FIFO		47
+#define C_FMT		48
+#define C_FOLLOW	49
+#define C_LNK		50
+#define C_NOPOST	51
+#define C_NR		52
+#define C_NS		53
+#define C_NX		54
+#define C_REG		55
+#define C_SOCK		56
+#define C_SKIP		57
 
-#define X_cmdarg	56
-#define X_cmdflush	57
+#define X_cmdarg	58
+#define X_cmdflush	59
 
-#define M_MEMBER	58
+#define M_MEMBER	60
 
 typedef struct				/* unique file identifier	*/
 {
@@ -141,6 +144,20 @@ typedef struct Local_s			/* local struct			*/
 	struct Local_s*	next;		/* next in free list		*/
 	Extype_t	value[1];	/* member values		*/
 } Local_t;
+
+typedef struct Snapshot_s		/* snapshot state		*/
+{
+	Sfio_t*		sp;		/* previous snapshot stream	*/
+	Sfio_t*		tmp;		/* tmp string stream		*/
+	char*		prev;		/* previous snapshot record	*/
+	struct
+	{
+	char*		path;		/* path format			*/
+	char*		easy;		/* easy format			*/
+	char*		hard;		/* hard format			*/
+	int		delim;		/* format delimiter char	*/
+	}		format;
+} Snapshot_t;
 
 typedef struct				/* program state		*/
 {
@@ -172,6 +189,7 @@ typedef struct				/* program state		*/
 	int		reverse;	/* reverse sort sense		*/
 	Exnode_t*	select;		/* select expression		*/
 	int		separator;	/* xargs list separator		*/
+	Snapshot_t	snapshot;	/* snapshot state		*/
 	int		(*sort)(Ftw_t*, Ftw_t*); 	/* sorter	*/
 	Exnode_t*	sortkey;	/* sort key list		*/
 	Dt_t*		vistab;		/* visit hash table		*/
@@ -183,3 +201,4 @@ extern State_t		state;
 extern void		compile(char*);
 extern long		eval(Exnode_t*, Ftw_t*);
 extern long		getnum(Exid_t*, Ftw_t*);
+extern ssize_t		print(Sfio_t*, Ftw_t*, const char*);

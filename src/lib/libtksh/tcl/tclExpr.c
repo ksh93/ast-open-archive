@@ -252,6 +252,14 @@ static int		ExprUnaryFunc _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, Tcl_Value *args,
 			    Tcl_Value *resultPtr));
 
+#ifndef TCL_NO_MATH
+#if _WIN32
+static double local_floor(double x) { return floor(x); }
+#undef	floor
+#define	floor	local_floor
+#endif
+#endif
+
 /*
  * Built-in math functions:
  */

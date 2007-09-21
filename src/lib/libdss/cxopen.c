@@ -1204,22 +1204,22 @@ cxcallout(Cx_t* cx, int code, Cxtype_t* type1, Cxtype_t* type2, Cxdisc_t* disc)
 	Cxcallout_t*	callout;
 	Cxop_t		op;
 
-	switch (code)
-	{
-	case CX_NOMATCH:
-		code = CX_MATCH;
-		/*FALLTHROUGH*/
-	case CX_MATCH:
-		type2 = 0;
-		break;
-	}
 	memset(&op, 0, sizeof(op));
-	op.code = code;
+	op.code = code;;
 	if (!(op.type1 = type1))
 		op.type1 = state.type_void;
 	if (!(op.type2 = type2))
 		op.type2 = state.type_void;
-	return (callout = (Cxcallout_t*)dtmatch(cx ? cx->callouts : state.callouts, &op)) ? callout->callout : (Cxcallout_f)0;
+	while (!(callout = (Cxcallout_t*)dtmatch(cx ? cx->callouts : state.callouts, &op)))
+	{
+		if (op.code == CX_NOMATCH)
+			op.code = CX_MATCH;
+		else if (op.type2 == state.type_void)
+			return 0;
+		else
+			op.type2 = state.type_void;
+	}
+	return callout->callout;
 }
 
 /*
@@ -1632,9 +1632,13 @@ cxaddvariable(register Cx_t* cx, register Cxvariable_t* variable, Cxdisc_t* disc
 			return -1;
 		}
 	}
-	referenced(variable->type);
 	dtinsert(cx->variables, variable);
-	dtinsert(cx->fields, variable);
+	if (!(variable->header.flags & CX_INITIALIZED))
+	{
+		variable->header.flags |= CX_INITIALIZED;
+		referenced(variable->type);
+		dtinsert(cx->fields, variable);
+	}
 	return 0;
 }
 

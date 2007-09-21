@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss library (AT&T Research) 2007-04-02 $\n]"
+"[-?\n@(#)$Id: dss library (AT&T Research) 2007-09-20 $\n]"
 USAGE_LICENSE
 "[+NAME?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method schema is a pure XML (tags only)"
@@ -244,6 +244,7 @@ static Dssmeth_t	dss_method =
 #include "dss-count.h"
 #include "dss-null.h"
 #include "dss-print.h"
+#include "dss-return.h"
 #include "dss-scan.h"
 #include "dss-write.h"
 
@@ -253,6 +254,7 @@ static Cxquery_t	queries[] =
 	QUERY_count,
 	QUERY_null,
 	QUERY_print,
+	QUERY_return,
 	QUERY_scan,
 	QUERY_write,
 	{0}
@@ -526,16 +528,22 @@ dss_mem_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxope
 	return 0;
 }
 
-static Cxmember_t	dss_member =
+static Cxmember_t	dss_mem =
 {
 	dss_mem_get,
 	0,
 	(Dt_t*)&dss_mem_struct[0]
 };
 
-static Cxtype_t dss_mem_type =
+static Cxtype_t		dss_type[] =
 {
-	&id[0],	"Global state.", {0}, (Cxtype_t*)"void", 0, 0, 0, 0, 0, { 0 }, 0, &dss_member
+	{ DSS_ID "_s", "Global state struct.", {0}, (Cxtype_t*)"void", 0, 0, 0, 0, 0, { 0 }, 0, &dss_mem },
+	{ DSS_ID "_t", "Global state.", {0}, (Cxtype_t*)DSS_ID "_s" },
+};
+
+static Cxvariable_t	dss_var[] =
+{
+	CXV(DSS_ID,	DSS_ID "_t",	0,	"Global State.")
 };
 
 /*
@@ -550,6 +558,8 @@ dssopen(Dssflags_t flags, Dssflags_t test, Dssdisc_t* disc, Dssmeth_t* meth)
 	Cxvariable_t*		var;
 	Cxtype_t*		type;
 	Dsslib_t*		lib;
+	int			i;
+	int			n;
 
 	if (!disc)
 		return 0;
@@ -603,19 +613,18 @@ dssopen(Dssflags_t flags, Dssflags_t test, Dssdisc_t* disc, Dssmeth_t* meth)
 	for (var = (Cxvariable_t*)dtfirst(dss->cx->variables); var; var = (Cxvariable_t*)dtnext(dss->cx->variables, var))
 		if (var->format.map)
 			var->format.map->header.flags |= CX_REFERENCED;
-	if (cxaddtype(dss->cx, &dss_mem_type, disc) || !(type = cxtype(dss->cx, dss_mem_type.name, disc)))
-		goto bad;
-	dss_mem_type = *type;
-	if (!(var = vmnewof(vm, 0, Cxvariable_t, 1, 0)))
+	for (i = 0; i < elementsof(dss_type); i++)
+		if (!cxtype(NiL, dss_type[i].name, disc) && cxaddtype(NiL, &dss_type[i], disc))
+			goto bad;
+	for (i = 0; i < elementsof(dss_var); i++)
 	{
-		if (disc->errorf)
-			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
-		goto bad;
+		if (!(var = vmnewof(vm, 0, Cxvariable_t, 1, 0)))
+			goto bad;
+		*var = dss_var[i];
+		var->header.flags |= CX_INITIALIZED;
+		if (cxaddvariable(dss->cx, var, disc))
+			goto bad;
 	}
-	var->name = id;
-	var->type = dss->cx->state->type_void;
-	var->type->base = type;
-	dtinsert(dss->cx->variables, var);
 	return state.dss = dss;
  bad:
 	dssclose(dss);
