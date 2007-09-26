@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -32,7 +32,7 @@
 #include <namval.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: coshell (AT&T Research) 2006-09-19 $\n]"
+"[-?\n@(#)$Id: coshell (AT&T Research) 2007-09-25 $\n]"
 USAGE_LICENSE
 "[+NAME?coshell - network shell coprocess server]"
 "[+DESCRIPTION?\bcoshell\b is a local network shell coprocess server for "
@@ -428,6 +428,7 @@ service(void* handle, register int fd)
 		{
 			state.con[fd].type = PASS;
 			state.con[fd].info.pass.job = jp->pid ? jp : 0;
+			state.con[fd].info.pass.serialize = (jp->flags & CO_SERIALIZE) ? sfstropen() : (Sfio_t*)0;
 		}
 		break;
 	case IDENT:
@@ -605,7 +606,12 @@ service(void* handle, register int fd)
 					cswrite(state.con[fd].info.pass.fd, cmd, n);
 				}
 			}
-			if (cswrite(state.con[fd].info.pass.fd, state.buf, i) != i)
+			if (state.con[fd].info.pass.serialize)
+			{
+				if (sfwrite(state.con[fd].info.pass.serialize, state.buf, i) != i)
+					drop(fd);
+			}
+			else if (cswrite(state.con[fd].info.pass.fd, state.buf, i) != i)
 				drop(fd);
 		}
 		break;

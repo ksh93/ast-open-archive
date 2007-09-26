@@ -1446,7 +1446,7 @@ static Dssformat_t flat_format =
 {
 	"flat",
 	"Flat format.",
-	{0},
+	CXH,
 	flatident,
 	flatfopen,
 	flatread,
@@ -3757,7 +3757,7 @@ static Dssmeth_t method =
 	"Fixed-width and/or field-delimited flat file; the method schema is"
 	" the name of an XML description file. Public schemas are usually"
 	" placed in a ../lib/dss sibling directory on $PATH.",
-	{0},
+	CXH,
 	flatmeth,
 	flatopen,
 	0,
@@ -4095,7 +4095,7 @@ convert_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 static Cxquery_t queries[] =
 {
 { "flat",	"convert to flat schema format",
-		{0}, convert_beg, 0, convert_act, convert_end },
+		CXH, convert_beg, 0, convert_act, convert_end },
 {0}
 };
 
@@ -4103,7 +4103,7 @@ Dsslib_t dss_lib_flat =
 {
 	"flat",
 	"flat method",
-	{0},
+	CXH,
 	0,
 	&method,
 	0,

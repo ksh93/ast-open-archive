@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -38,6 +38,9 @@ drop(register int fd)
 	register int	n;
 	Coshell_t*	sp;
 	Cojob_t*	jp;
+	Sfio_t*		tp;
+	char*		s;
+	size_t		z;
 
 	switch (state.con[fd].type)
 	{
@@ -65,10 +68,18 @@ drop(register int fd)
 			free(state.con[fd].info.user.expr);
 		break;
 	case PASS:
+		if (tp = state.con[fd].info.pass.serialize)
+		{
+			state.con[fd].info.pass.serialize = 0;
+			cswrite(state.con[fd].info.pass.fd, sfstrbase(tp), sfstrtell(tp));
+			sfstrclose(tp);
+		}
 		if ((jp = state.con[fd].info.pass.job) && jp->pid)
 		{
-			if (--jp->ref <= 0) jobdone(jp);
-			else if (!jp->lost) jp->lost = cs.time + UPDATE;
+			if (--jp->ref <= 0)
+				jobdone(jp);
+			else if (!jp->lost)
+				jp->lost = cs.time + UPDATE;
 		}
 		break;
 	case POLL:

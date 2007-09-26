@@ -1,5 +1,5 @@
 ast-open :PACKAGE: \
-		ksh93 pax html proto bzip libast libardir libcmd libdll \
+		ksh93 kshlib pax html proto bzip libast libardir libcmd libdll \
 		libexpr libodelta librecsort libsum libuu libvdelta libbz \
 		libz tests 3d coshell cpp cs mam msgcc nmake probe ss \
 		libcoshell libcs libmam libpp libcodex paxlib codexlib \

@@ -1,3 +1,5 @@
+07-09-27 cx.h: add CX_HEADER_INIT for sun4 K&R
+07-09-24 cx.h: add Cxvariable_t.header.index set by cxaddvariable()
 07-09-21 dss-return.h: document it via return_beg() -- doh
 07-09-20 dssopen.c: fix dss var initialization base type loop
 07-09-06 dssopen.c: add dss-return.h

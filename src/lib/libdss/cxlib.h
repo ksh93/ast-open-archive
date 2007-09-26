@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -53,6 +53,7 @@ struct Cxinclude_s; typedef struct Cxinclude_s Cxinclude_t;
 	int			balanced; \
 	int			collecting; \
 	int			head; \
+	int			index; \
 	int			jump; \
 	int			paren; \
 	int			reclaim; \
@@ -125,6 +126,7 @@ struct Cxinclude_s; typedef struct Cxinclude_s Cxinclude_t;
 #define CX_VIEW_types		(1<<7)
 #define CX_VIEW_variables	(1<<8)
 
+#define CXH			CX_HEADER_INIT
 #define CXC(o,l,r,f,d)		CX_CALLOUT_INIT(o,l,r,f,d)
 #define CXF(n,t,f,p,d)		CX_FUNCTION_INIT(n,t,f,p,d)
 #define CXR(o,l,r,f,d)		CX_RECODE_INIT(o,l,r,f,d)

@@ -1,5 +1,7 @@
 # regression tests for the codex(1) compress method
 
+TITLE + compress
+
 KEEP '*.dat'
 
 TEST 01 'basics'

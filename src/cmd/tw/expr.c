@@ -186,7 +186,7 @@ md5sum(const char* path)
 	suminit(sum);
 	if (!(sp = sfopen(NiL, path, "r")))
 		goto bad;
-	while (s = (unsigned char*)sfreserve(sp, SF_UNBOUND, 0))
+	while (s = (char*)sfreserve(sp, SF_UNBOUND, 0))
 		sumblock(sum, s, sfvalue(sp));
 	r = !!sfvalue(sp);
 	if (sfclose(sp) || r)

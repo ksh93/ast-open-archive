@@ -34,7 +34,7 @@ USAGE_LICENSE
 "	the scan is terminated and \bdss\b returns exit status \b1\b.]"
 "\n"
 "\n [ status ]\n"
-"\n";
+"\n"
 ;
 
 static int
@@ -89,7 +89,7 @@ return_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	{ \
 		"return", \
 		"return from the current record query", \
-		{0}, \
+		CXH, \
 		return_beg, \
 		0, \
 		return_act, \

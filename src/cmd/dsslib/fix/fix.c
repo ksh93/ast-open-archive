@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -337,7 +337,7 @@ static Cxquery_t	queries[] =
 	{
 		"fix",
 		"generate fixed binary schema from input schema",
-		{0},
+		CXH,
 		fix_beg,
 		0,
 		fix_act,
@@ -350,7 +350,7 @@ static Dsslib_t		lib =
 {
 	"fix",
 	"fix query",
-	{0},
+	CXH,
 	0,
 	0,
 	0,

@@ -2266,6 +2266,7 @@ All recorded changes follow.
 
 :::::::: coshell ::::::::
 
+07-09-25 handle CO_SERIALIZE
 06-10-11 add sfstropen()/sfstruse() error checks
 06-09-19 command.c,cotest.c: sysconf() => astconf()
 06-08-15 shell.c: unset CO_ENV_SHELL
@@ -4981,6 +4982,8 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+07-09-25 sfio/sfgetr.c: no limit on string stream line size
+07-09-25 sfio/sfextern.c: increase _Sfmaxr to 256*1024
 07-09-18 misc/procopen.c: tighten up SIGCHLD logic between parent/child
 07-09-18 misc/signal.c: unblock SIG_DFL after setting handler, sig<0 => don't unblock
 07-09-13 misc/fs3d.c: no $LD_PRELOAD => no 3d and avoids invalid mount(2) call
@@ -7478,6 +7481,10 @@ All recorded changes follow.
 
 :::::::: libcodex ::::::::
 
+07-09-26 code-uu.c: uu_sync() => flush() for encode only -- doh
+07-09-22 code-uu.c: fix uu_read() partial reads
+07-09-22 codex.c: handle PASSPHRASE=* as documented
+07-09-22 codex.c: handle quoted parameter values
 06-08-23 code-uu.c: fix remainder output *and* input bugs
 05-09-25 add '^' equivalent to '|'
 04-02-14 codex.c: SFDCNEXT() and SFDCPREV() now provided by <sfio_t.h>
@@ -7532,6 +7539,8 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+07-09-27 cx.h: add CX_HEADER_INIT for sun4 K&R
+07-09-24 cx.h: add Cxvariable_t.header.index set by cxaddvariable()
 07-09-21 dss-return.h: document it via return_beg() -- doh
 07-09-20 dssopen.c: fix dss var initialization base type loop
 07-09-06 dssopen.c: add dss-return.h

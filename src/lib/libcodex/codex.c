@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -102,7 +102,7 @@ codex_except(Sfio_t* sp, int op, void* data, Sfdisc_t* disc)
 			}
 			if (code->flags & CODEX_ACTIVE)
 				code->flags &= ~CODEX_ACTIVE;
-			else
+			else if (!(code->flags & CODEX_CACHED))
 			{
 				if (code->meth->closef)
 					r = (*code->meth->closef)(code);
@@ -198,7 +198,7 @@ trace_read(Sfio_t* f, void* buf, size_t n, Sfdisc_t* disc)
 	if (!meth->readf)
 		return 0;
 	r = (*meth->readf)(f, buf, n, disc);
-	sfprintf(sfstderr, "codex: %d: %s: read(%I*u)=%I*d\n", CODEX(disc)->index, meth->name, sizeof(n), n, sizeof(r), r);
+	sfprintf(sfstderr, "codex: %d: %s: read(%I*u,%s)=%I*d\n", CODEX(disc)->index, meth->name, sizeof(n), n, (CODEX(disc)->flags & CODEX_VERBOSE) ? fmtquote(buf, "\"", "\"", r, 0) : "''", sizeof(r), r, buf);
 	return r;
 }
 
@@ -211,7 +211,7 @@ trace_write(Sfio_t* f, const void* buf, size_t n, Sfdisc_t* disc)
 	if (!meth->writef)
 		return 0;
 	r = (*meth->writef)(f, buf, n, disc);
-	sfprintf(sfstderr, "codex: %d: %s: write(%I*u)=%I*d\n", CODEX(disc)->index, meth->name, sizeof(n), n, sizeof(r), r);
+	sfprintf(sfstderr, "codex: %d: %s: write(%I*u,%s)=%I*d\n", CODEX(disc)->index, meth->name, sizeof(n), n, (CODEX(disc)->flags & CODEX_VERBOSE) ? fmtquote(buf, "\"", "\"", r, 0) : "''", sizeof(r), r);
 	return r;
 }
 
@@ -287,7 +287,7 @@ trace_except(Sfio_t* f, int op, void* data, Sfdisc_t* disc)
 		sfsprintf(event = tmp, sizeof(tmp), "%d", op);
 		break;
 	}
-	sfprintf(sfstderr, "codex: %d: %s: except(%s,%p)=%d\n", CODEX(disc)->index, meth->name, event, data, r);
+	sfprintf(sfstderr, "codex: %d: %s: except(%s,%p%s%s)=%d\n", CODEX(disc)->index, meth->name, event, data, (CODEX(disc)->flags & CODEX_ACTIVE) ? "|ACTIVE" : "", (CODEX(disc)->flags & CODEX_CACHED) ? "|CACHED" : "", r);
 	return r;
 }
 
@@ -326,7 +326,10 @@ trace_data(Codex_t* code, Codexdata_t* data)
 	unsigned char*	u;
 
 	if (!meth->dataf)
+	{
+		data->size = 0;
 		return 0;
+	}
 	r = (*meth->dataf)(code, data);
 	sfprintf(sfstderr, "codex: %d: %s: data()=%d", code->index, meth->name, r);
 	if (r >= 0)
@@ -421,6 +424,7 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 	register char*		s;
 	register char*		b;
 	register int		c;
+	register int		q;
 	char*			v;
 	int			f;
 	int			namelen;
@@ -443,7 +447,16 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 	cache = 0;
 	deen = flags & (CODEX_DECODE|CODEX_ENCODE);
 	s = (char*)name;
-	namelen = (b = strchr(s, '+')) ? (b - s) : strlen(s);
+	q = 0;
+	b = s;
+	while (c = *b++)
+		if (c == q)
+			q = 0;
+		else if (c == '"' || c == '\'')
+			q = c;
+		else if (!q && c == '+')
+			break;
+	namelen = b - s - 1;
 	for (cp = codexstate.cache; cp < &codexstate.cache[elementsof(codexstate.cache)]; cp++)
 		if (!cp->code)
 			(cache = cp)->cached = 0;
@@ -481,41 +494,52 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 		a = arg;
 		*a++ = (char*)s;
 		*a++ = b = can;
+		q = -1;
 		do
 		{
 			c = *s++;
-			if (c == '-' || c == '+' || c == 0)
+			if (c == q)
+				q = -1;
+			else if (c == '"' || c == '\'')
+				q = c;
+			else if (c == 0 || q < 0 && (c == '-' || c == '+'))
 			{
 				*b++ = 0;
-				if (streq(*(a - 1), "RETAIN"))
+				v = *(a - 1);
+				if (strneq(v, "PASSPHRASE=", 11))
+				{
+					disc->passphrase = v + 11;
+					b = v;
+				}
+				else if (streq(v, "RETAIN"))
 				{
 					flags |= CODEX_RETAIN;
-					b = *(a - 1);
+					b = v;
 				}
-				else if (strneq(*(a - 1), "SIZE=", 5))
+				else if (strneq(v, "SIZE=", 5))
 				{
-					size = strtoll(*(a - 1) + 5, NiL, 0);
-					b = *(a - 1);
+					size = strtoll(v + 5, NiL, 0);
+					b = v;
 				}
-				else if (strneq(*(a - 1), "SOURCE=", 7))
+				else if (strneq(v, "SOURCE=", 7))
 				{
-					if (!(code->dp = sfopen(NiL, *(a - 1) + 7, "r")))
+					if (!(code->dp = sfopen(NiL, v + 7, "r")))
 					{
 						if (disc->errorf)
-							(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: cannot read delta source", *(a - 1) + 7);
+							(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: cannot read delta source", v + 7);
 						goto bad;
 					}
-					b = *(a - 1);
+					b = v;
 				}
-				else if (streq(*(a - 1), "TRACE"))
+				else if (streq(v, "TRACE"))
 				{
 					flags |= CODEX_TRACE;
-					b = *(a - 1);
+					b = v;
 				}
-				else if (streq(*(a - 1), "VERBOSE"))
+				else if (streq(v, "VERBOSE"))
 				{
 					flags |= CODEX_VERBOSE;
-					b = *(a - 1);
+					b = v;
 				}
 				else
 				{
@@ -596,7 +620,7 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 			}
 		}
 	if (cache)
-		code->flags |= CODEX_ACTIVE;
+		code->flags |= CODEX_CACHED|CODEX_ACTIVE;
 	if (code->meth == &codex_copy)
 	{
 		c = 0;
@@ -708,6 +732,7 @@ codex(Sfio_t* ip, Sfio_t* op, const char* name, Codexnum_t flags, Codexdisc_t* d
 	register char*		s;
 	register Part_t*	p;
 	register int		c;
+	register int		q;
 	char*			m;
 	Part_t*			b;
 	Part_t*			e;
@@ -782,10 +807,23 @@ codex(Sfio_t* ip, Sfio_t* op, const char* name, Codexnum_t flags, Codexdisc_t* d
 	else
 		p->flags = 0;
 	p->name = s;
+	q = 0;
 	do
 	{
 		if (!(c = *s++))
 			;
+		else if (c == q)
+		{
+			q = 0;
+			continue;
+		}
+		else if (q)
+			continue;
+		else if (c == '"' || c == '\'')
+		{
+			q = c;
+			continue;
+		}
 		else if (c == '<')
 			f = decode;
 		else if (c == '>')
@@ -871,7 +909,7 @@ codex(Sfio_t* ip, Sfio_t* op, const char* name, Codexnum_t flags, Codexdisc_t* d
 			break;
 		p++;
 	}
-#if 1
+#if 0
 	p = b;
 	for (;;)
 	{

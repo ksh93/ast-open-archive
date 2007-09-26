@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -136,7 +136,7 @@ static Dssformat_t opaque_format =
 {
 	"opaque",
 	"Opaque format.",
-	{0},
+	CXH,
 	opaqueident,
 	opaquefopen,
 	opaqueread,
@@ -214,7 +214,7 @@ static Dssmeth_t method =
 	"opaque",
 	"Opaque fixed record data with optional magic. Field names and"
 	" expressions are not supported.",
-	{0},
+	CXH,
 	opaquemeth
 };
 
@@ -222,7 +222,7 @@ static Dsslib_t lib =
 {
 	"opaque",
 	"opaque method",
-	{0},
+	CXH,
 	0,
 	&method
 };

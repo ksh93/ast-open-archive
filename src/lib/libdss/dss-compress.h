@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -106,7 +106,7 @@ compress_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	{ \
 		"compress", \
 		"compress parent output stream", \
-		{0}, \
+		CXH, \
 		compress_beg, \
 		0, \
 		0, \

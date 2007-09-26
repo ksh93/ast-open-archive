@@ -223,7 +223,7 @@ static Cxmatch_t	match_aspath =
 {
 	"aspath-re",
 	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. For example, '[!1 100]' matches all lists that contain neither 1 nor 100, and '^[!1 100]-701$' matches all lists that don't start with 1 or 100 and end with 701.",
-	{0},
+	CXH,
 	aspath_match_comp,
 	match_list_exec,
 	match_list_free
@@ -233,7 +233,7 @@ static Cxmatch_t	match_cluster =
 {
 	"cluster-re",
 	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. For example, '[!1 100]' matches all lists that contain neither 1 nor 100, and '^[!1 100]-701$' matches all lists that don't start with 1 or 100 and end with 701.",
-	{0},
+	CXH,
 	cluster_match_comp,
 	match_list_exec,
 	match_list_free
@@ -243,7 +243,7 @@ static Cxmatch_t	match_community =
 {
 	"community-re",
 	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. Pairs are separated by :. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. If a : tuple separator is omitted then :.* is assumed. For example, '[!1 100]' matches all lists that contain neither 1 nor 100 as the first pair element, and '^[!1: :100]-701:999$' matches all lists that don't start with 1 as the first pair element or 100 as the second pair element and end with 701:999.",
-	{0},
+	CXH,
 	community_match_comp,
 	match_list_exec,
 	match_list_free
@@ -365,7 +365,7 @@ static Cxmatch_t	match_prefix =
 {
 	"prefix-match",
 	"Matches on this type treat a string pattern as a prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is an \bipprefix_t\b then matches test if the subject is matched by the prefix.",
-	{0},
+	CXH,
 	match_prefix_comp,
 	match_prefix_exec,
 	match_prefix_free
@@ -398,12 +398,12 @@ CXC(CX_MATCH,	"number",	"ipprefix_t",	op_match_NP,	0)
 
 static Cxtype_t types[] =
 {
-{ "aspath_t", "A sequence of as_t autonomous system numbers.", {0}, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_aspath },
-{ "as_t", "An unsigned 16 bit autonomous system number.", {0}, (Cxtype_t*)"number", 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 2, 5 }, 0 },
-{ "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", {0}, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
-{ "community_t", "A sequence of unsigned 16 bit integer pairs.", {0}, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
-{ "ipaddr_t",	"A dotted quad ipv4 address.", {0}, (Cxtype_t*)"number", 0, ipaddr_external, ipaddr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefix },
-{ "ipprefix_t",	"/length appended to an ipaddr_t prefix.", {0}, (Cxtype_t*)"number", 0, ipprefix_external, ipprefix_internal, 0, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_prefix },
+{ "aspath_t", "A sequence of as_t autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_aspath },
+{ "as_t", "An unsigned 16 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 2, 5 }, 0 },
+{ "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
+{ "community_t", "A sequence of unsigned 16 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
+{ "ipaddr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, ipaddr_external, ipaddr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefix },
+{ "ipprefix_t",	"/length appended to an ipaddr_t prefix.", CXH, (Cxtype_t*)"number", 0, ipprefix_external, ipprefix_internal, 0, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_prefix },
 {0}
 };
 
@@ -411,7 +411,7 @@ Dsslib_t dss_lib_ip_t =
 {
 	"ip_t",
 	"IP type support",
-	{0},
+	CXH,
 	0,
 	0,
 	&types[0],

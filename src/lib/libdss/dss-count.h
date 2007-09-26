@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -80,7 +80,7 @@ count_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	{ \
 		"count", \
 		"print parent expression record counts", \
-		{0}, \
+		CXH, \
 		count_beg, \
 		0, \
 		0, \

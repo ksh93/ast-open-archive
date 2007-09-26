@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -432,7 +432,7 @@ static Cxquery_t	queries[] =
 	{
 		"validate",
 		"validate field value constraints",
-		{0},
+		CXH,
 		validate_beg,
 		validate_sel,
 		0,
@@ -445,7 +445,7 @@ static Dsslib_t		lib =
 {
 	"validate",
 	"validate query",
-	{0},
+	CXH,
 	0,
 	0,
 	0,

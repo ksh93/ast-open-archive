@@ -455,7 +455,7 @@ server(int fd, int op, int sub, int arg, char* dat)
 					sfprintf(state.string, "%3d  mesg  %s %s\n", n, ffmtmode(n, 0), state.mesg);
 					break;
 				case PASS:
-					if (jp = con[n].info.pass.job) sfprintf(state.string, "%3d  pass  %-3d %s %d\n", n, con[n].info.pass.fd, jp->shell->name, jp->pid);
+					if (jp = con[n].info.pass.job) sfprintf(state.string, "%3d  pass  %-3d %s %d%s\n", n, con[n].info.pass.fd, jp->shell->name, jp->pid, con[n].info.pass.serialize ? " serialize" : "");
 					else sfprintf(state.string, "%3d  pass  %-3d zombie\n", n, con[n].info.pass.fd);
 					break;
 				case POLL:

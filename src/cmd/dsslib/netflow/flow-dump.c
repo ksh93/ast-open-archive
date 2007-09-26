@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -500,7 +500,7 @@ Dssformat_t netflow_dump_format =
 {
 	"dump",
 	"Cisco netflow dump format.",
-	{0},
+	CXH,
 	dumpident,
 	dumpfopen,
 	dumpfread,

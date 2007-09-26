@@ -146,16 +146,17 @@
 #define CXDETAILS(d,f,t,v) \
 	((d)?(d):((d)=(f)&&(f)->details?(f)->details:(t)->format.details?(t)->format.details:(v)))
 
+#define CX_HEADER_INIT	{{0},0}
 #define CX_CALLOUT_INIT(op,type1,type2,callout,description) \
-	{0,description,{0},op,(Cxtype_t*)type1,(Cxtype_t*)type2,callout},
+	{0,description,CX_HEADER_INIT,op,(Cxtype_t*)type1,(Cxtype_t*)type2,callout},
 #define CX_FUNCTION_INIT(name,type,function,prototype,description) \
-	{name,description,{0},function,(Cxtype_t*)type,prototype},
+	{name,description,CX_HEADER_INIT,function,(Cxtype_t*)type,prototype},
 #define CX_RECODE_INIT(op,type1,type2,recode,description) \
-	{0,description,{0},op,(Cxtype_t*)type1,(Cxtype_t*)type2,recode},
+	{0,description,CX_HEADER_INIT,op,(Cxtype_t*)type1,(Cxtype_t*)type2,recode},
 #define CX_TYPE_INIT(name,base,external,internal,match,description) \
-	{name,description,{0},(Cxtype_t*)base,0,external,internal,0,0,{0},match},
+	{name,description,CX_HEADER_INIT,(Cxtype_t*)base,0,external,internal,0,0,CX_HEADER_INIT,match},
 #define CX_VARIABLE_INIT(name,type,index,description) \
-	{name,description,{0},0,(Cxtype_t*)type,0,index},
+	{name,description,CX_HEADER_INIT,0,(Cxtype_t*)type,0,index},
 
 #define cxrepresentation(t)	((t)->representation)
 #define cxisbuffer(t)		(cxrepresentation(t)==CX_buffer)
@@ -211,8 +212,9 @@ struct Cxop_s				/* callout/recode op		*/
 	const char*	description;	/* description			*/
 
 #define _CX_HEADER_LINK_ \
-	Cxflags_t	flags;		/* CX_INITIALIZED|CX_REFERENCED	*/ \
-	Dtlink_t	link;		/* dictionary link		*/
+	Dtlink_t	link;		/* dictionary link		*/ \
+	uint16_t	flags;		/* CX_INITIALIZED|CX_REFERENCED	*/ \
+	uint16_t	index;		/* member index			*/
 
 #define _CX_NAME_HEADER_ \
 	_CX_HEADER_ \

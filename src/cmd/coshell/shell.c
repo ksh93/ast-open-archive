@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -298,6 +298,7 @@ shellexec(Cojob_t* jp, char* msg, int fd)
 		sp->running++;
 		sp->total++;
 	}
+	jp->flags = flags;
 	jp->start = cs.time;
 	if (!(msg = jp->cmd)) state.jobwait++;
 	jp->cmd = cmd;

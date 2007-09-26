@@ -1,3 +1,7 @@
+07-09-26 code-uu.c: uu_sync() => flush() for encode only -- doh
+07-09-22 code-uu.c: fix uu_read() partial reads
+07-09-22 codex.c: handle PASSPHRASE=* as documented
+07-09-22 codex.c: handle quoted parameter values
 06-08-23 code-uu.c: fix remainder output *and* input bugs
 05-09-25 add '^' equivalent to '|'
 04-02-14 codex.c: SFDCNEXT() and SFDCPREV() now provided by <sfio_t.h>

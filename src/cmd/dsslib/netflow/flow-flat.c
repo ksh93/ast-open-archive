@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -228,7 +228,7 @@ Dssformat_t netflow_flat_format =
 {
 	"flat",
 	"Cisco netflow flat format. A |-separated, \\n-terminated record of these fields: src_addr, dst_addr, hop, input, output, packets, bytes, first, last, src_port, dst_port, flags, tcp_flags, prot, tos, src_as, dst_as, src_mask, dst_mask, flow_sequence.",
-	{0},
+	CXH,
 	flatident,
 	flatopen,
 	flatread,

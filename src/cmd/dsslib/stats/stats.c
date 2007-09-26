@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -700,7 +700,7 @@ static Cxquery_t	queries[] =
 	{
 		"stats",
 		"collect numeric field value statistics",
-		{0},
+		CXH,
 		stats_beg,
 		0,
 		stats_act,
@@ -713,7 +713,7 @@ static Dsslib_t		lib =
 {
 	"stats",
 	"stats query",
-	{0},
+	CXH,
 	0,
 	0,
 	0,

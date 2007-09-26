@@ -96,7 +96,7 @@ static Cxmatch_t	match_string =
 {
 	"regex",
 	"Matches on this type treat the pattern as a regex(3) pattern string.",
-	{0},
+	CXH,
 	match_string_comp,
 	match_string_exec,
 	match_string_free
@@ -296,7 +296,7 @@ buffer_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 	return r;
 }
 
-#define BT(r,n,s,d,e,i,m)	{s,{n,d,{0},0,0,e,i,r,0,{0},m},},
+#define BT(r,n,s,d,e,i,m)	{s,{n,d,CXH,0,0,e,i,r,0,{0},m},},
 
 /*
  * NOTE: void must be first
@@ -933,11 +933,7 @@ cxscope(Cx_t* top, Cx_t* bot, Cxflags_t flags, Cxflags_t test, Cxdisc_t* disc)
 		if (top->view & CX_VIEW_variables)
 			dtview(top->variables, NiL);
 		top->scope = 0;
-		if (--bot->scoped <= 0)
-		{
-			cxclose(bot);
-			bot = 0;
-		}
+		bot->scoped--;
 	}
 	else
 		bot = top;
@@ -969,12 +965,12 @@ cxclose(register Cx_t* cx)
 			dtclose(cx->recodes);
 		if (cx->view & CX_VIEW_types)
 			dtclose(cx->types);
-		if (cx->fields)
+		if (cx->view & CX_VIEW_fields)
 			dtclose(cx->fields);
-		if (cx->variables)
+		if (cx->view & CX_VIEW_variables)
 			dtclose(cx->variables);
 		if (cx->scope)
-			cxclose(cx->scope);
+			cx->scope->scoped--;
 		if (cx->buf)
 			sfclose(cx->buf);
 		if (cx->tp)
@@ -1004,6 +1000,7 @@ cxaddtype(Cx_t* cx, register Cxtype_t* type, Cxdisc_t* disc)
 	Dt_t*		dict;
 	Cxtype_t*	copy;
 	Cxrecode_t*	re;
+	int		i;
 
 	if (cx)
 	{
@@ -1068,7 +1065,7 @@ cxaddtype(Cx_t* cx, register Cxtype_t* type, Cxdisc_t* disc)
 					(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 				return -1;
 			}
-			for (; member->name; member++)
+			for (i = 0; member->name; member++)
 			{
 				v = member;
 				if ((base = (char*)v->type) && !(v->type = cxtype(cx, base, disc)))
@@ -1078,6 +1075,7 @@ cxaddtype(Cx_t* cx, register Cxtype_t* type, Cxdisc_t* disc)
 					return -1;
 				}
 				v->member = type;
+				v->header.index = i++;
 				dtinsert(type->member->members, v);
 			}
 		}
@@ -1607,6 +1605,7 @@ referenced(register Cxtype_t* type)
 int
 cxaddvariable(register Cx_t* cx, register Cxvariable_t* variable, Cxdisc_t* disc)
 {
+	Cx_t*	sx;
 	char*	name;
 
 	if (!cx)
@@ -1633,6 +1632,13 @@ cxaddvariable(register Cx_t* cx, register Cxvariable_t* variable, Cxdisc_t* disc
 		}
 	}
 	dtinsert(cx->variables, variable);
+	if (sx = cx->scope)
+	{
+		variable->header.index = sx->index++;
+		cx->index = sx->index;
+	}
+	else
+		variable->header.index = cx->index++;
 	if (!(variable->header.flags & CX_INITIALIZED))
 	{
 		variable->header.flags |= CX_INITIALIZED;

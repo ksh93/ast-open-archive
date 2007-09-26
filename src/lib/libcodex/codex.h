@@ -47,6 +47,7 @@
 #define CODEX_SUM	0x0800		/* checksum			*/
 #define CODEX_UU	0x1000		/* uuencode (ISO text)		*/
 
+#define CODEX_CACHED	0x10000000L	/* cached entry			*/
 #define CODEX_SERIAL	0x20000000L	/* serial number assigned	*/
 #define CODEX_FLUSH	0x40000000L	/* flush-only sync		*/
 #define CODEX_ACTIVE	0x80000000L	/* active cache entry		*/
@@ -119,7 +120,7 @@ struct Codexmeth_s			/* coder method			*/
 	Codexmeth_t*	next;		/* next in list of all coders	*/
 };
 
-#if _BLD_codex
+#if _BLD_codex && !defined(main)
 
 #include <codexlib.h>
 

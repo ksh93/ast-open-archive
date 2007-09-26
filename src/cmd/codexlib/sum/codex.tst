@@ -1,5 +1,7 @@
 # regression tests for the codex(1) sum methods
 
+TITLE + sum
+
 KEEP "*.dat"
 
 function DATA

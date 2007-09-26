@@ -412,7 +412,7 @@ static Dssformat_t text_format =
 {
 	"text",
 	"Text format.",
-	{0},
+	CXH,
 	textident,
 	textfopen,
 	textread,
@@ -652,7 +652,7 @@ static Dssmeth_t	method =
 	"Newline-terminated field-delimited text file; the method schema is"
 	" a scanf(3) like format string with embedded field names of the form:"
 	" %(field1)format-char delimiter ...",
-	{0},
+	CXH,
 	textmeth,
 	textopen,
 	0,
@@ -663,7 +663,7 @@ static Dsslib_t		lib =
 {
 	"text",
 	"text method",
-	{0},
+	CXH,
 	0,
 	&method,
 };

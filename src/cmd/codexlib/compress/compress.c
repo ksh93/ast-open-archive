@@ -110,6 +110,7 @@ typedef struct s_zstate {
 	int zs_offset;
 	long zs_in_count;		/* Length of input. */
 	long zs_bytes_out;		/* Length of compressed output. */
+	long zs_sync_out;		/* bytes_out at last sync */
 	long zs_out_count;		/* # of codes output (for debugging). */
 	char_type zs_buf[BITS];
 	union {
@@ -146,6 +147,7 @@ typedef struct s_zstate {
 #define	offset		zs->zs_offset
 #define	in_count	zs->zs_in_count
 #define	bytes_out	zs->zs_bytes_out
+#define	sync_out	zs->zs_sync_out
 #define	out_count	zs->zs_out_count
 #define	buf		zs->zs_buf
 #define	fcode		zs->u.w.zs_fcode
@@ -402,6 +404,8 @@ cl_block(State_t* zs, Sfio_t* f, Sfdisc_t* dp)/* Table clear for block compress.
 
 	checkpoint = in_count + CHECK_GAP;
 
+	if (sync_out == bytes_out)
+		return(0);
 	if (in_count > 0x007fffff) {	/* Shift will overflow. */
 		rat = bytes_out >> 8;
 		if (rat == 0)		/* Don't divide by zero. */
@@ -420,6 +424,7 @@ cl_block(State_t* zs, Sfio_t* f, Sfdisc_t* dp)/* Table clear for block compress.
 		if (output(zs, f, (code_int) CLEAR, dp) == -1)
 			return (-1);
 	}
+	sync_out = bytes_out;
 	return (0);
 }
 
@@ -485,6 +490,7 @@ lzw_init(Codex_t* p)
 		if (sfwr(p->sp, header, sizeof(header), &p->sfdisc) != sizeof(header))
 			return -1;
 		offset = 0;
+		sync_out = 0;
 		bytes_out = sizeof(header);
 		out_count = 0;			/* # of codes output (for debugging). */
 		hshift = 0;

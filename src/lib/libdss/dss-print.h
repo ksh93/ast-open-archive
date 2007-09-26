@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -100,7 +100,7 @@ print_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	{ \
 		"print", \
 		"format and print the current record", \
-		{0}, \
+		CXH, \
 		print_beg, \
 		0, \
 		print_act, \

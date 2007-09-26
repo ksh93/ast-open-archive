@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -264,5 +264,8 @@ main(int argc, register char** argv)
 	checkdata(op);
 	if (sfsync(op) || sferror(op))
 		error(ERROR_SYSTEM|2, "write error");
+#ifdef main
+	codexpop(ip, op, 0);
+#endif
 	return error_info.errors != 0;
 }

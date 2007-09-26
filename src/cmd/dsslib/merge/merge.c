@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                      by AT&T Knowledge Ventures                      *
@@ -283,7 +283,7 @@ static Cxquery_t	queries[] =
 	{
 		"merge",
 		"merge input files",
-		{0},
+		CXH,
 		merge_beg,
 		0,
 		0,
@@ -298,7 +298,7 @@ static Dsslib_t		lib =
 {
 	"merge",
 	"merge query",
-	{0},
+	CXH,
 	0,
 	0,
 	0,

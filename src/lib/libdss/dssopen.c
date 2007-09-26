@@ -167,7 +167,7 @@ static Dssformat_t	dss_format =
 {
 	&id[0],
 	"pseudo-format that treats all files as /dev/null",
-	{0},
+	CXH,
 	dssidentf,
 	dssopenf,
 	dssreadf,
@@ -236,7 +236,7 @@ static Dssmeth_t	dss_method =
 {
 	&id[0],
 	"A pseudo-method that specifies a method, value maps and constraints.",
-	{0},
+	CXH,
 	dssmethf
 };
 
@@ -257,14 +257,14 @@ static Cxquery_t	queries[] =
 	QUERY_return,
 	QUERY_scan,
 	QUERY_write,
-	{0}
+	{0},
 };
 
 static Dsslib_t		dss_library =
 {
 	&id[0],
 	"dss method",
-	{0},
+	CXH,
 	0,
 	&dss_method,
 	0,
@@ -537,8 +537,8 @@ static Cxmember_t	dss_mem =
 
 static Cxtype_t		dss_type[] =
 {
-	{ DSS_ID "_s", "Global state struct.", {0}, (Cxtype_t*)"void", 0, 0, 0, 0, 0, { 0 }, 0, &dss_mem },
-	{ DSS_ID "_t", "Global state.", {0}, (Cxtype_t*)DSS_ID "_s" },
+	{ DSS_ID "_s", "Global state struct.", CXH, (Cxtype_t*)"void", 0, 0, 0, 0, 0, {0}, 0, &dss_mem },
+	{ DSS_ID "_t", "Global state.", CXH, (Cxtype_t*)DSS_ID "_s" },
 };
 
 static Cxvariable_t	dss_var[] =

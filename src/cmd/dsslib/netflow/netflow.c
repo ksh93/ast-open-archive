@@ -311,7 +311,7 @@ static Dssmeth_t	method =
 {
 	"netflow",
 	"Cisco router netflow dump.",
-	{0},
+	CXH,
 	netflowmeth,
 	netflowopen,
 	0,
@@ -323,7 +323,7 @@ static Dsslib_t		lib =
 {
 	"netflow",
 	"netflow method",
-	{0},
+	CXH,
 	&libraries[0],
 	&method,
 };

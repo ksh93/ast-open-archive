@@ -510,14 +510,14 @@ static Cxmember_t	tm_member =
 
 static Cxtype_t types[] =
 {
-	{ "tm_hour_t",	"Hour since midnight with optional meridian (AM/PM).", {0}, (Cxtype_t*)"number", 0, tm_hour_external, tm_hour_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%d", CX_UNSIGNED|CX_INTEGER, 1 } },
-	{ "tm_mon_t",	"Month name represented as a number [0-11], starting at January.", {0}, (Cxtype_t*)"number", 0, tm_mon_external, tm_mon_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
-	{ "tm_wday_t",	"Weekday name represented as a number [0-6], starting at Sunday.", {0}, (Cxtype_t*)"number", 0, tm_wday_external, tm_wday_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
-	{ "tm_t",	"Time parts.", {0}, (Cxtype_t*)"number", tm_init, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4 }, 0, &tm_member	},
-	{ "elapsed_t",	"Elapsed time in milliseconds.", {0}, (Cxtype_t*)"number", 0, elapsed_external, elapsed_internal, 0, 0, { 0, 0, CX_INTEGER, 4 }	},
-	{ "ns_t",	"64 bit nanoseconds since the epoch.", {0}, (Cxtype_t*)"tm_t", ns_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 8 } },
-	{ "stamp_t",	"64 bit 1/2**32 seconds since the epoch.", {0}, (Cxtype_t*)"tm_t", stamp_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 8 } },
-	{ "time_t",	"32 bit seconds since the epoch.", {0}, (Cxtype_t*)"tm_t", 0, time_external, time_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 4 } },
+	{ "tm_hour_t",	"Hour since midnight with optional meridian (AM/PM).", CXH, (Cxtype_t*)"number", 0, tm_hour_external, tm_hour_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%d", CX_UNSIGNED|CX_INTEGER, 1 } },
+	{ "tm_mon_t",	"Month name represented as a number [0-11], starting at January.", CXH, (Cxtype_t*)"number", 0, tm_mon_external, tm_mon_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
+	{ "tm_wday_t",	"Weekday name represented as a number [0-6], starting at Sunday.", CXH, (Cxtype_t*)"number", 0, tm_wday_external, tm_wday_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
+	{ "tm_t",	"Time parts.", CXH, (Cxtype_t*)"number", tm_init, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4 }, 0, &tm_member	},
+	{ "elapsed_t",	"Elapsed time in milliseconds.", CXH, (Cxtype_t*)"number", 0, elapsed_external, elapsed_internal, 0, 0, { 0, 0, CX_INTEGER, 4 }	},
+	{ "ns_t",	"64 bit nanoseconds since the epoch.", CXH, (Cxtype_t*)"tm_t", ns_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 8 } },
+	{ "stamp_t",	"64 bit 1/2**32 seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", stamp_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 8 } },
+	{ "time_t",	"32 bit seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", 0, time_external, time_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 4 } },
 	{ 0, 0 }
 };
 
@@ -525,7 +525,7 @@ Dsslib_t dss_lib_time_t =
 {
 	"time_t",
 	"time type support",
-	{0},
+	CXH,
 	0,
 	0,
 	&types[0],

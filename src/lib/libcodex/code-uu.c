@@ -55,6 +55,8 @@ typedef struct State_s
 	unsigned char*	bl;
 	unsigned char*	be;
 	unsigned char*	map;
+	unsigned char*	pb;
+	unsigned char*	pp;
 
 	int		c1;
 	int		c2;
@@ -63,6 +65,7 @@ typedef struct State_s
 
 	unsigned char	mapbuf[UCHAR_MAX + 2];
 	unsigned char	buf[SF_BUFSIZE];
+	unsigned char	peek[UUIN];
 } State_t;
 
 static const Data_t	uu_base64 =
@@ -89,7 +92,8 @@ static const Data_t	uu_posix =
 	" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
 };
 
-#define GETCHAR(p)	((p)->bp < (p)->be ? (int)*(p)->bp++ : fill(p))
+#define GETCHAR(p)		((p)->bp < (p)->be ? (int)*(p)->bp++ : fill(p))
+#define PUTCHAR(p,s,e,c)	((s<e) ? (*s++=(c)) : (*p->pp++=(c)))
 
 static int
 fill(State_t* state)
@@ -207,9 +211,9 @@ uu_init(Codex_t* p)
 	register State_t*	state = (State_t*)p->data;
 	int			n;
 
+	state->bp = state->buf;
 	if (p->flags & CODEX_ENCODE)
 	{
-		state->bp = state->buf;
 		n = UUOUT * UUCHUNK + state->data->length + 1;
 		state->be = state->bp + (sizeof(state->buf) / n) * n;
 		if (state->data->length)
@@ -220,8 +224,14 @@ uu_init(Codex_t* p)
 		state->bl = state->bp + UUOUT * UUCHUNK;
 		state->c1 = state->c2 = -1;
 	}
-	else if (state->data->length)
-		state->nl = -1;
+	else
+	{
+		state->be = state->bp;
+		state->pb = state->pp = state->peek;
+		if (state->data->length)
+			state->nl = -1;
+		state->c1 = state->c2 = -1;
+	}
 	return 0;
 }
 
@@ -230,11 +240,18 @@ uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 {
 	register State_t*	state = (State_t*)CODEX(disc)->data;
 	register char*		s = (char*)buf;
-	register char*		e = s + n - UUIN + 1;
+	register char*		e = s + n;
 	register uint32_t	b;
 	register int		c;
 	register int		x;
 
+	if (state->pb < state->pp)
+	{
+		while (s < e && state->pb < state->pp)
+			*s++ = *state->pb++;
+		if (state->pb == state->pp)
+			state->pb = state->pp = state->peek;
+	}
 	if (state->data->length)
 		while (s < e)
 		{
@@ -269,17 +286,17 @@ uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 				if (state->text)
 				{
 					if ((c = (b >> 16) & 0xFF) != '\r')
-						*s++ = c;
+						PUTCHAR(state, s, e, c);
 					if ((c = (b >> 8) & 0xFF) != '\r')
-						*s++ = c;
+						PUTCHAR(state, s, e, c);
 					if ((c = b & 0xFF) != '\r')
-						*s++ = c;
+						PUTCHAR(state, s, e, c);
 				}
 				else
 				{
-					*s++ = (b >> 16);
-					*s++ = (b >> 8);
-					*s++ = b;
+					PUTCHAR(state, s, e, (b >> 16));
+					PUTCHAR(state, s, e, (b >> 8));
+					PUTCHAR(state, s, e, b);
 				}
 				if ((state->nl -= 3) < 0)
 					while (state->nl++ < 0)
@@ -307,10 +324,10 @@ uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 					if (state->text)
 					{
 						if ((x = (b >> 4) & 0xFF) != '\r')
-							*s++ = x;
+							PUTCHAR(state, s, e, x);
 					}
 					else
-						*s++ = b >> 4;
+						PUTCHAR(state, s, e, (b >> 4));
 					goto done;
 				}
 			b = (b << 6) | c;
@@ -320,14 +337,14 @@ uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 					if (state->text)
 					{
 						if ((x = (b >> 10) & 0xFF) != '\r')
-							*s++ = x;
+							PUTCHAR(state, s, e, x);
 						if ((x = (b >> 2) & 0xFF) != '\r')
-							*s++ = x;
+							PUTCHAR(state, s, e, x);
 					}
 					else
 					{
-						*s++ = b >> 10;
-						*s++ = b >> 2;
+						PUTCHAR(state, s, e, (b >> 10));
+						PUTCHAR(state, s, e, (b >> 2));
 					}
 					goto done;
 				}
@@ -335,17 +352,17 @@ uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 			if (state->text)
 			{
 				if ((x = (b >> 16) & 0xFF) != '\r')
-					*s++ = x;
+					PUTCHAR(state, s, e, x);
 				if ((x = (b >> 8) & 0xFF) != '\r')
-					*s++ = x;
+					PUTCHAR(state, s, e, x);
 				if ((x = b & 0xFF) != '\r')
-					*s++ = x;
+					PUTCHAR(state, s, e, x);
 			}
 			else
 			{
-				*s++ = b >> 16;
-				*s++ = b >> 8;
-				*s++ = b;
+				PUTCHAR(state, s, e, (b >> 16));
+				PUTCHAR(state, s, e, (b >> 8));
+				PUTCHAR(state, s, e, b);
 			}
 		}
  done:
@@ -447,7 +464,7 @@ uu_write(Sfio_t* sp, const void* buf, size_t n, Sfdisc_t* disc)
 static int
 uu_sync(Codex_t* p)
 {
-	return flush((State_t*)p->data);
+	return (p->flags & CODEX_ENCODE) ? flush((State_t*)p->data) : 0;
 }
 
 Codexmeth_t	codex_uu =
