@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -601,6 +601,7 @@ extern int		cxcast(Cx_t*, Cxoperand_t*, Cxvariable_t*, Cxtype_t*, void*, const c
 extern char*		cxcontext(Cx_t*);
 extern char*		cxlocation(Cx_t*, void*);
 
+extern void		cxcodetrace(Cx_t*, const char*, Cxinstruction_t*, unsigned int);
 extern char*		cxcodename(int);
 extern char*		cxopname(int, Cxtype_t*, Cxtype_t*);
 

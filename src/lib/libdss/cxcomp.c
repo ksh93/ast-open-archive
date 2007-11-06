@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -249,6 +249,30 @@ cxcodename(int code)
 }
 
 /*
+ * trace instruction at pc to the standard error
+ */
+
+void
+cxcodetrace(Cx_t* cx, const char* fun, Cxinstruction_t* pc, unsigned int offset)
+{
+	char*	o;
+	char	val[64];
+
+	o = cxcodename(pc->op);
+	if ((*o == 'G' || *o == 'S') && *(o + 1) == 'E')
+		sfsprintf(val, sizeof(val), "  %s", pc->data.variable->name);
+	else if (pc->type == cx->state->type_string)
+		sfsprintf(val, sizeof(val), "  \"%s\"", pc->data.string);
+	else if (pc->type == cx->state->type_number)
+		sfsprintf(val, sizeof(val), "  %Lf", pc->data.number);
+	else if (pc->type != cx->state->type_void || *o == 'C')
+		sfsprintf(val, sizeof(val), "  %08x", pc->data.pointer);
+	else
+		val[0] = 0;
+	error(0, "%s %04u %8s %-12s  pp %2d%s", fun, offset, o, pc->type->name, pc->pp, val);
+}
+
+/*
  * return operator name
  */
 
@@ -475,10 +499,10 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 		cx->depth = cx->pp;
 	if (!pointer)
 		x.data.number = number;
-	else if (cxisstring(type1))
-		x.data.string.size = strlen(x.data.string.data = (char*)pointer);
-	else
+	else if (op == CX_GET || op == CX_SET || op == CX_REF || op == CX_CALL || !cxisstring(type1))
 		x.data.pointer = pointer;
+	else
+		x.data.string.size = strlen(x.data.string.data = (char*)pointer);
 	x.callout = 0;
 	if (op == CX_REF || op == CX_GET)
 	{
@@ -491,6 +515,8 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 		}
 		i1 = i2 = (Cxinstruction_t*)(sfstrseek(cx->xp, 0, SEEK_CUR) - 1 * sizeof(Cxinstruction_t));
 		v1 = v2 = i1->data.variable;
+		if (op != CX_REF)
+			type1 = type2 = i1->type;
 	}
 	else
 	{
@@ -542,6 +568,8 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 				c.type = type1;
 				c.data.number = 0;
 				c.pp = 0;
+				if ((cx->flags & CX_DEBUG) && sfstrtell(cx->xp))
+					cxcodetrace(cx, "comp", &c, (unsigned int)sfstrtell(cx->xp) / sizeof(c));
 				sfwrite(cx->xp, &c, sizeof(c));
 				goto done;
 			}
@@ -617,7 +645,7 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 	return 0;
  done:
 	if ((cx->flags & CX_DEBUG) && sfstrtell(cx->xp))
-		error(0, "comp %04u %8s %-12s  pp %2d  %08x %Lf", (unsigned int)sfstrtell(cx->xp) / sizeof(x), cxcodename(x.op), x.type->name, x.pp, x.data.pointer, x.data.pointer ? (Cxnumber_t)0 : x.data.number);
+		cxcodetrace(cx, "comp", &x, (unsigned int)sfstrtell(cx->xp) / sizeof(x));
 	if (sfwrite(cx->xp, &x, sizeof(x)) != sizeof(x))
 	{
 		if (cx->disc->errorf)

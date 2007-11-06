@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -2288,7 +2288,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 
 				if (*s != '%' || *(s + 1) != ATTRNAME || !(x = getrule(s + 1)) || !(x->property & P_attribute))
 					x = makerule(s);
-				addprereq(in, x, *(s + strlen(s) - 1) == '%' ? PREREQ_APPEND : PREREQ_INSERT);
+				addprereq(in, x, ((set.op & A_insert) || *(s + strlen(s) - 1) != '%') ? PREREQ_INSERT : PREREQ_APPEND);
 				if (set.op & A_negate)
 				{
 					*name = ATTRCLEAR;

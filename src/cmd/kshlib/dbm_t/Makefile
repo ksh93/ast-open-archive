@@ -2,7 +2,7 @@
 
 LICENSE = since=2007,author=dgk
 
-dbm_t 1.0 plugin=ksh :LIBRARY: dbm_t.c -ldbm -lshell
+dbm_t plugin=ksh :LIBRARY: dbm_t.c -ldbm -lshell
 
 :TEST: dbm_t.tst $$(SHELL)
 

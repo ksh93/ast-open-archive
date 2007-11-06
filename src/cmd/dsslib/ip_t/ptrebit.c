@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1985-2007 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -15,20 +15,28 @@
 *                           Florham Park NJ                            *
 *                                                                      *
 *                 Glenn Fowler <gsf@research.att.com>                  *
-*                  David Korn <dgk@research.att.com>                   *
-*                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
-#ifndef _CCODE_H
-#define _CCODE_H	1
+#pragma prototyped
 
-#define CC_bel	'\a'
-#define CC_esc	'\033'
-#define CC_vt	'\v'
+#include "ptlib.h"
 
-#define CC_ASCII	0
-#define CC_NATIVE	CC_ASCII
+/*
+ * return a copy of table a with prefixes limited to a maximum of m bits
+ */
 
-#define ccmapc(c,f,t)	(c)
+Pt_t*
+ptrebit(Pt_t* a, int m)
+{
+	Pt_t*		b;
+	Ptprefix_t*	ap;
 
-#endif
+	if (b = ptopen(a->disc))
+		for (ap = (Ptprefix_t*)dtfirst(a->dict); ap; ap = (Ptprefix_t*)dtnext(a->dict, ap))
+			if (ptinsert(b, PTMIN(ap->min, m), PTMAX(ap->max, m)))
+			{
+				ptclose(b);
+				return 0;
+			}
+	return b;
+}

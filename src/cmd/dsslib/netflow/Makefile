@@ -4,7 +4,7 @@ LICENSE = since=2002,author=gsf
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
-netflow 1.0 plugin=dss :LIBRARY: netflow.c \
+netflow plugin=dss :LIBRARY: netflow.c \
 	flow-dump.c flow-fixed.c flow-flat.c flow-tool.c \
 	-ldss
 

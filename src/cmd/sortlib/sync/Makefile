@@ -4,9 +4,9 @@ LICENSE = since=2003,author=gsf
 
 CCFLAGS = $(CC.DLL) $(CC.OPTIMIZE)
 
-sync 1.0 plugin=sort :LIBRARY: sync.c ss.c -lrecsort
+sync plugin=sort :LIBRARY: sync.c ss.c -lrecsort
 
-test 1.0 plugin=sort :LIBRARY: test.c
+test plugin=sort :LIBRARY: test.c
 
 $(INCLUDEDIR) :INSTALLDIR: ssexit.h
 

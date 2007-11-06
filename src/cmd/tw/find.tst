@@ -51,6 +51,12 @@ function DATA
 				done > size/$Z
 			done
 			;;
+		time)	mkdir time
+			touch -t 'midnight' time/day-0
+			touch -t 'midnight 1 day ago' time/day-1
+			touch -t 'midnight 2 day ago' time/day-2
+			touch -t 'midnight 3 day ago' time/day-3
+			;;
 		esac
 	done
 }
@@ -1111,3 +1117,34 @@ TEST 07 '[ -exec -xargs ] X {} X [ ; + ]'
 		ERROR - $'find: incomplete statement'
 		EXIT 1
 	EXEC	mode -sort -name -xargs echo '+'
+
+TEST 08 '-mtime [-+]N'
+	DO	DATA time
+	EXEC	time -type f -mtime 0
+		OUTPUT - $'time/day-0'
+	EXEC	time -type f -mtime 1
+		OUTPUT - $'time/day-1'
+	EXEC	time -type f -mtime 2
+		OUTPUT - $'time/day-2'
+	EXEC	time -type f -mtime 3
+		OUTPUT - $'time/day-3'
+	EXEC	time -type f -mtime 4
+		OUTPUT -
+	EXEC	time -sort name -type f -mtime -0
+	EXEC	time -sort name -type f -mtime -1
+		OUTPUT - $'time/day-0'
+	EXEC	time -sort name -type f -mtime -2
+		OUTPUT - $'time/day-0\ntime/day-1'
+	EXEC	time -sort name -type f -mtime -3
+		OUTPUT - $'time/day-0\ntime/day-1\ntime/day-2'
+	EXEC	time -sort name -type f -mtime -4
+		OUTPUT - $'time/day-0\ntime/day-1\ntime/day-2\ntime/day-3'
+	EXEC	time -sort name -type f -mtime +0
+		OUTPUT - $'time/day-1\ntime/day-2\ntime/day-3'
+	EXEC	time -sort name -type f -mtime +1
+		OUTPUT - $'time/day-2\ntime/day-3'
+	EXEC	time -sort name -type f -mtime +2
+		OUTPUT - $'time/day-3'
+	EXEC	time -sort name -type f -mtime +3
+		OUTPUT -
+	EXEC	time -sort name -type f -mtime +4

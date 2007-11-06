@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2007-05-08 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2007-10-26 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -830,7 +830,7 @@ format(State_t* state, register char* s)
  */
 
 static int
-compile(State_t* state, char** argv, register Node_t* np)
+compile(State_t* state, char** argv, register Node_t* np, int nested)
 {
 	register char*		b;
 	register Node_t*	oldnp = 0;
@@ -971,8 +971,13 @@ compile(State_t* state, char** argv, register Node_t* np)
 		case LPAREN:
 			tp = state->topnode;
 			state->topnode = np + 1;
-			if ((i = compile(state, argv, state->topnode)) < 0)
+			if ((i = compile(state, argv, state->topnode, 1)) < 0)
 				return i;
+			if (!streq(argv[opt_info.index-1], "-end"))
+			{
+				error(2, "(...) imbalance -- closing ) expected", np->name);
+				return -1;
+			}
 			np->first.np = state->topnode;
 			state->topnode = tp;
 			oldnp = np;
@@ -980,9 +985,9 @@ compile(State_t* state, char** argv, register Node_t* np)
 			np += i;
 			continue;
 		case RPAREN:
-			if (!oldnp)
+			if (!oldnp || !nested)
 			{
-				error(2, "(...) imbalance", np->name);
+				error(2, "(...) imbalance -- opening ( omitted", np->name);
 				return -1;
 			}
 			oldnp->next = 0;
@@ -1035,16 +1040,16 @@ compile(State_t* state, char** argv, register Node_t* np)
 			switch (np->second.i)
 			{
 			case '+':
-				np->second.u = state->day - np->first.u * DAY;
+				np->second.u = state->day - (np->first.u + 1) * DAY - 1;
 				np->first.u = 0;
 				break;
 			case '-':
-				np->first.u = state->day - np->first.u * DAY;
 				np->second.u = ~0;
+				np->first.u = state->day - np->first.u * DAY + 1;
 				break;
 			default:
-				np->second.u = state->day - np->first.u * DAY;
-				np->first.u = np->second.u - DAY;
+				np->second.u = state->day - np->first.u * DAY - 1;
+				np->first.u = state->day - (np->first.u + 1) * DAY;
 				break;
 			}
 			break;
@@ -1329,10 +1334,11 @@ static int
 execute(State_t* state, FTSENT* ent)
 {
 	register Node_t*	np = state->topnode;
-	register int		val;
+	register int		val = 0;
 	register unsigned long	u;
 	unsigned long		m;
 	int			not = 1;
+	char*			bp;
 	Sfio_t*			fp;
 	Node_t*			tp;
 	struct stat		st;
@@ -1534,10 +1540,12 @@ execute(State_t* state, FTSENT* ent)
 			val = !cmdarg(np->first.xp, ent->fts_path, ent->fts_pathlen);
 			break;
 		case NAME:
-			val = strgrpmatch(ent->fts_name, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ent->ignorecase) != 0;
-			break;
 		case INAME:
-			val = strgrpmatch(ent->fts_name, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|STR_ICASE) != 0;
+			if (bp = ent->fts_level ? (char*)0 : strchr(ent->fts_name, '/'))
+				*bp = 0;
+			val = strgrpmatch(ent->fts_name, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|(np->action == INAME ? STR_ICASE : ent->ignorecase)) != 0;
+			if (bp)
+				*bp = '/';
 			break;
 		case LNAME:
 			val = S_ISLNK(ent->fts_statp->st_mode) && pathgetlink(PATH(ent), state->txt, sizeof(state->txt)) > 0 && strgrpmatch(state->txt, np->first.cp, NiL, 0, STR_MAXIMAL|STR_LEFT|STR_RIGHT|ent->ignorecase);
@@ -1763,36 +1771,30 @@ main(int argc, char** argv)
 	}
 	state.day = state.now = (unsigned long)time(NiL);
 	state.output = sfstdout;
-	if (!(state.topnode = vmnewof(state.vm, 0, Node_t, argc + 1, 0)))
+	if (!(state.topnode = vmnewof(state.vm, 0, Node_t, argc + 3, 0)))
 	{
 		error(2, "not enough space for expressions");
 		goto done;
 	}
-	if (compile(&state, argv, state.topnode) < 0)
+	if (compile(&state, argv, state.topnode, 0) < 0)
 		goto done;
 	op = argv + opt_info.index;
-	for (;;)
+	while (cp = argv[opt_info.index])
 	{
-		if (!(cp = argv[opt_info.index]))
-		{
-			argv = (char**)defopts;
-			opt_info.index = 0;
-			break;
-		}
 		if (*cp == '-' || (*cp == '!' || *cp == '(' || *cp == ')' || *cp == ',') && *(cp + 1) == 0)
 		{
 			r = opt_info.index;
-			if (compile(&state, argv, state.topnode) < 0)
+			if (compile(&state, argv, state.topnode, 0) < 0)
 				goto done;
 			argv[r] = 0;
+			if (cp = argv[opt_info.index])
+			{
+				error(2, "%s: invalid argument", cp);
+				goto done;
+			}
 			break;
 		}
 		opt_info.index++;
-	}
-	if (cp = argv[opt_info.index])
-	{
-		error(2, "%s: invalid argument", cp);
-		goto done;
 	}
 	if (!*op)
 		op = (char**)defpath;
@@ -1823,12 +1825,15 @@ main(int argc, char** argv)
 	{
 		if (!state.primary)
 		{
-			if (state.lastnode)
-				state.lastnode->next = state.nextnode;
-			else if (state.topnode)
-				state.nextnode = state.topnode;
-			else
+			if (!state.topnode)
 				state.topnode = state.nextnode;
+			else if (state.topnode != state.nextnode)
+			{
+				state.nextnode->action = LPAREN;
+				state.nextnode->first.np = state.topnode;
+				state.nextnode->next = state.nextnode + 1;
+				state.topnode = state.nextnode++;
+			}
 			state.nextnode->action = PRINT;
 			state.nextnode->first.fp = state.output;
 			state.nextnode->second.i = '\n';

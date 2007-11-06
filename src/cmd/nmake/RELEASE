@@ -1,3 +1,5 @@
+07-10-22 Makerules.mk: initialize (CC.SHARED.LIBS.target) to match .SHARED.LIST.LIBS.
+07-10-18 parse.c: handle .assoc.*%* : .INSERT to insert into assoc list
 07-09-11 Makerules.mk: fix --force-shared docs to match semantics
 07-09-07 scan.c: tweak ANY logic (leading ANY still does not play nice)
 07-09-07 pkg-cobol.mk: handle ``ID. COPY ...''

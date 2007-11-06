@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -114,6 +114,7 @@ struct Dssfile_s			/* typed file handle		*/
 	Sfio_t*		io;		/* io stream			*/
 	char*		path;		/* original path		*/
 	Dssformat_t*	format;		/* file format			*/
+	void*		caller;		/* caller defined handle	*/
 #ifdef _DSS_FILE_PRIVATE_
 	_DSS_FILE_PRIVATE_
 #endif

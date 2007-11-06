@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -47,7 +47,7 @@
 #define LONG_MAX	((long)(~((unsigned long)0)) >> 1)
 #endif
 
-#define INSIZE		(64*1024*1024)	/* default insize		*/
+#define INSIZE		PROCSIZE	/* default insize		*/
 #define OUTSIZE		(64*1024)	/* default outsize		*/
 #define PROCSIZE	(4*1024*1024)	/* default procsize		*/
 
@@ -114,6 +114,8 @@ typedef struct
 	Field_t*	head;		/* accumulate list head		*/ \
 	Field_t*	tail;		/* accumulate list tail		*/ \
 	}		accumulate;	/* accumulate field info	*/ \
+	unsigned char*	xfrmbuf;	/* strxfrm buffer		*/ \
+	unsigned int	xfrmsiz;	/* strxfrm buffer size		*/ \
 	unsigned long	shuffle;	/* shuffle seed			*/ \
 	unsigned char	coded;		/* coded keys specified		*/
 

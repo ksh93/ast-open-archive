@@ -6,7 +6,7 @@ LICENSE = since=2007,author=gsf
 
 main == b_codex
 
-codex 1.0 plugin=ksh :LIBRARY: codex.c -lcodex -lshell
+codex plugin=ksh :LIBRARY: codex.c -lcodex -lshell
 
 :TEST: codex.tst $$(SHELL)
 

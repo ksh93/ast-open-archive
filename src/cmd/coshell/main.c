@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -32,7 +32,7 @@
 #include <namval.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: coshell (AT&T Research) 2007-09-25 $\n]"
+"[-?\n@(#)$Id: coshell (AT&T Research) 2007-10-23 $\n]"
 USAGE_LICENSE
 "[+NAME?coshell - network shell coprocess server]"
 "[+DESCRIPTION?\bcoshell\b is a local network shell coprocess server for "
@@ -249,6 +249,24 @@ user(void* handle, int fd, Cs_id_t* id, int clone, char** argv)
 	state.con[fd].info.user.expr = 0;
 	return(0);
 }
+
+#ifdef O_NONBLOCK
+
+static int
+nonblocking(int fd)
+{
+	int	flags;
+
+	if ((flags = fcntl(fd, F_GETFL)) < 0)
+		return flags;
+	return fcntl(fd, F_SETFL, flags|O_NONBLOCK);
+}
+
+#else
+
+#define nonblocking(f)
+
+#endif
 
 /*
  * service a read event
@@ -531,7 +549,11 @@ service(void* handle, register int fd)
 				drop(fd);
 				break;
 			}
-			else state.con[state.con[fd].info.user.fds[1]].type = UOUT;
+			else
+			{
+				nonblocking(state.con[fd].info.user.fds[1]);
+				state.con[state.con[fd].info.user.fds[1]].type = UOUT;
+			}
 			if (state.con[fd].info.user.flags & USER_DUP) state.con[fd].info.user.fds[2] = state.con[fd].info.user.fds[1];
 			else if ((state.con[fd].info.user.fds[2] = csopen(state.con[fd].info.user.pump, 0)) < 0 ||
 				cswrite(state.con[fd].info.user.fds[2], "#00002\n", 7) != 7)

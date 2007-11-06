@@ -1,3 +1,6 @@
+07-10-26 cxcomp.c: fix s="S"; print(s,s) cast bug
+07-10-25 cxcomp.c: pretty up CX_DEBUG instruction code trace
+07-10-01 dss.h: add void* Dssfile_t.caller caller defined handle
 07-09-27 cx.h: add CX_HEADER_INIT for sun4 K&R
 07-09-24 cx.h: add Cxvariable_t.header.index set by cxaddvariable()
 07-09-21 dss-return.h: document it via return_beg() -- doh

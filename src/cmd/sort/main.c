@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -798,13 +798,15 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	if ((sp->test & TEST_reserve) || !(sp->test & TEST_read))
 	{
 		sp->map = 1;
+		if (z)
+			x = key->procsize;
 		if (fixed)
 			x += fixed - x % fixed;
 	}
 	else
 	{
 		if (z)
-			x = key->procsize / 4;
+			x = key->procsize;
 		for (;;)
 		{
 			if (fixed)

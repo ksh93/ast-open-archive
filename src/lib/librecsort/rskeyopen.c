@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
 
 #include "rskeyhdr.h"
 
-static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2007-04-16 $\0\n";
+static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2007-10-30 $\0\n";
 
 static const char lib[] = "librecsort:rskey";
 
@@ -45,6 +45,7 @@ initialize()
 {
 	register int	i;
 
+	setlocale(LC_ALL, "");
 	for (i = 0; i <= UCHAR_MAX; i++)
 	{
 		state.all[i] = 1;
@@ -93,6 +94,15 @@ Rskeydisc_t*	disc;
 	kp->field.head = kp->field.tail = &kp->field.global;
 	kp->field.global.end.field = MAXFIELD;
 	kp->meth = Rsrasp;
+	if (mbcoll())
+	{
+		kp->xfrmsiz = 256;
+		if (!(kp->xfrmbuf = vmnewof(Vmheap, 0, unsigned char, kp->xfrmsiz, 0)))
+		{
+			vmfree(Vmheap, kp);
+			kp = 0;
+		}
+	}
 	return kp;
 }
 

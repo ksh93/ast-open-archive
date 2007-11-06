@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -97,6 +97,7 @@ extern Pt_t*		ptintersect(Pt_t*, Pt_t*);
 extern Pt_t*		ptunion(Pt_t*, Pt_t*);
 extern Pt_t*		ptdifference(Pt_t*, Pt_t*);
 extern Pt_t*		ptcover(Pt_t*, Pt_t*);
+extern Pt_t*		ptrebit(Pt_t*, int);
 
 extern int		ptequal(Pt_t*, Pt_t*);
 extern int		ptsubset(Pt_t*, Pt_t*);

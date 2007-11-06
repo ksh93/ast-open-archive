@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-09-07
+info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -88,6 +88,12 @@ make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
@@ -97,14 +103,9 @@ make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
@@ -355,7 +356,15 @@ meta ptdump.o %.c>%.o ptdump.c ptdump
 prev ptdump.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptdump.c
 done ptdump.o generated
-exec - ${AR} cr libdssip_t.a ip_t.o lib.o ire.o itl.o ptaddresses.o ptcopy.o ptcover.o ptdifference.o ptequal.o ptintersect.o ptinvert.o ptmatch.o ptopen.o ptprint.o ptranges.o ptsize.o ptstats.o ptsubset.o ptunion.o ptdump.o
+make ptrebit.o
+make ptrebit.c
+prev ptlib.h implicit
+done ptrebit.c
+meta ptrebit.o %.c>%.o ptrebit.c ptrebit
+prev ptrebit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptrebit.c
+done ptrebit.o generated
+exec - ${AR} cr libdssip_t.a ip_t.o lib.o ire.o itl.o ptaddresses.o ptcopy.o ptcover.o ptdifference.o ptequal.o ptintersect.o ptinvert.o ptmatch.o ptopen.o ptprint.o ptranges.o ptsize.o ptstats.o ptsubset.o ptunion.o ptdump.o ptrebit.o
 exec - (ranlib libdssip_t.a) >/dev/null 2>&1 || true
 done libdssip_t.a generated
 done ip_t virtual

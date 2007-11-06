@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*          Copyright (c) 1995-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -36,8 +36,13 @@ recomp(Text *rebuf, Text *t, int sub)
 		assure(rebuf, sizeof(regex_t));
 		if (code = regcomp((regex_t*)rebuf->w,(char*)t->w,reflags|REG_DELIMITED|REG_MUSTDELIM|((reflags&REG_LENIENT)?0:REG_ESCAPE)))
 			badre((regex_t*)rebuf->w,code);
-		lastre = rebuf->w - rebuf->s;
 		t->w += ((regex_t*)rebuf->w)->re_npat;
+		if (*t->w == 'I') {
+			if (!(reflags&REG_ICASE) && (code = regcomp((regex_t*)rebuf->w,(char*)t->w-((regex_t*)rebuf->w)->re_npat,reflags|REG_ICASE|REG_DELIMITED|REG_MUSTDELIM|((reflags&REG_LENIENT)?0:REG_ESCAPE))))
+				badre((regex_t*)rebuf->w,code);
+			t->w++;
+		}
+		lastre = rebuf->w - rebuf->s;
 		rebuf->w += sizeof(regex_t);
 	} else if(rebuf->w == rebuf->s)
 		syntax("no previous regular expression");

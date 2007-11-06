@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -322,8 +322,14 @@ int		len;
 	 * sign
 	 */
 
-	if (trans[*(ep - 1)] & 0x10)
+	switch (trans[*(ep - 1)] & 0xF0)
+	{
+	case 0x70: /* ascii */
+	case 0xB0: /* ebcdic alternate */
+	case 0xD0: /* ebcdic preferred */
 		neg ^= 1;
+		break;
+	}
 	while (xp < ep)
 	{
 		c = trans[*xp++];
@@ -398,17 +404,46 @@ int		len;
 {
 	unsigned char*	xp = cp;
 	int		c;
+	int		i;
+	int		n;
+	int		m;
 	unsigned char*	keep = f->keep;
 	unsigned char*	trans = f->trans;
+	unsigned char*	bp;
 	int		reverse = f->rflag ? ~0: 0;
 
-	while (--len >= 0)
+	if (kp->xfrmbuf)
 	{
-		c = *dp++;
-		if (keep[c])
+		n = ((len + 1) * 4);
+		for (;;)
 		{
-			c = trans[c];
-			if(c <= 1)
+			if (kp->xfrmsiz < n)
+			{
+				kp->xfrmsiz = n = roundof(n, 256);
+				if (!(kp->xfrmbuf = vmnewof(Vmheap, kp->xfrmbuf, unsigned char, n, 0)))
+				{
+					if (kp->keydisc->errorf)
+						(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: numeric field overflow", dp);
+					goto native;
+				}
+			}
+			bp = kp->xfrmbuf;
+			for (i = 0; i < len; i++)
+				if (keep[c = dp[i]])
+					*bp++ = trans[c];
+			*bp++ = 0;
+			m = kp->xfrmsiz - (bp - kp->xfrmbuf);
+			if ((n = mbxfrm(bp, kp->xfrmbuf, m)) <= m)
+			{
+				dp = bp;
+				break;
+			}
+			n += n - m + (bp - kp->xfrmbuf);
+		}
+		while (--n >= 0)
+		{
+			c = *dp++;
+			if (c <= 1)
 			{
 				/*
 				 * anti-ambiguity
@@ -425,8 +460,34 @@ int		len;
 			*xp++ = c ^ reverse;
 		}
 	}
-	if (xp)
-		*xp++ = reverse;
+	else
+	{
+	native:
+		while (--len >= 0)
+		{
+			c = *dp++;
+			if (keep[c])
+			{
+				c = trans[c];
+				if (c <= 1)
+				{
+					/*
+					 * anti-ambiguity
+					 */
+
+					*xp++ = 1 ^ reverse;
+					c++;
+				}
+				else if (c >= 254)
+				{
+					*xp++ = 255 ^ reverse;
+					c--;
+				}
+				*xp++ = c ^ reverse;
+			}
+		}
+	}
+	*xp++ = reverse;
 	return xp - cp;
 }
 
@@ -1140,6 +1201,8 @@ register Rskey_t*	kp;
 		else
 			kp->coded = 1;
 	}
+	else if (kp->field.head->flag == 't' && kp->xfrmbuf)
+		kp->coded = 1;
 	if (kp->coded)
 	{
 		kp->field.maxfield += 2;

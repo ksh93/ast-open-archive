@@ -1,6 +1,8 @@
 # regression tests for the sort utility
 # 01..22 were generated from the gnu perl tests
 
+export LC_ALL=C
+
 TEST 01 'simple checks'
 	EXEC	-c f1
 		INPUT f1 $'A\nB\nC'

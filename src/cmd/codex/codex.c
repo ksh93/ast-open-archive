@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2007 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -186,6 +186,13 @@ checkdata(Sfio_t* sp)
 			sfprintf(sfstderr, "%0*I*x\n", data.size * 2, sizeof(data.num), data.num);
 	}
 }
+
+#if defined(main)
+#if defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+extern
+#endif
 
 int
 main(int argc, register char** argv)

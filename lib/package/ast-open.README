@@ -92,10 +92,19 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-07-09-20  --- Release ksh93s+  ---
+07-11-05  --- Release ksh93s+  ---
+07-11-05  A bug in which printf %d "'AB" did not diagnose unconverted characters
+	  has been fixed.
+07-11-05  printf %g "'A" support added for all floating point formats.
+07-11-01  A bug in which typeset -f fun did not display the function definition
+          when invoked in a subshell has been fixed.
+07-10-29  The sleep builtin was fixed so that all floating point constants
+	  are valid operands.
+07-10-10  A bug in which the locale was not being restored after
+          LANG=value command has been fixed.
 07-09-20  A bug in which a nameref to a compound variable that was local
 	  to the calling function would not expand correctly when displaying
-	  its value has been fixed.
+	  is value has been fixed.
 07-09-19  A bug which cause cause a core dump if .sh.edchar returned
 	  80 characters or more from a keyboard trap has been fixed.
 07-09-14  A bug in which could cause a core dump when more than 8 file
@@ -2266,6 +2275,7 @@ All recorded changes follow.
 
 :::::::: coshell ::::::::
 
+07-10-23 main.c: avoid UOUT CO_SERIALIZE cswrite hangs via O_NONBLOCK
 07-09-25 handle CO_SERIALIZE
 06-10-11 add sfstropen()/sfstruse() error checks
 06-09-19 command.c,cotest.c: sysconf() => astconf()
@@ -2443,6 +2453,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-10-22 Makerules.mk: initialize (CC.SHARED.LIBS.target) to match .SHARED.LIST.LIBS.
+07-10-18 parse.c: handle .assoc.*%* : .INSERT to insert into assoc list
 07-09-11 Makerules.mk: fix --force-shared docs to match semantics
 07-09-07 scan.c: tweak ANY logic (leading ANY still does not play nice)
 07-09-07 pkg-cobol.mk: handle ``ID. COPY ...''
@@ -4067,6 +4079,7 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+07-10-25 ptrebit.c: add
 07-09-12 itlie.h: <(~0),1> is the value (~0), not a group marker
 07-09-05 ip_t.c: handle ("1.2.3.4/5" =~ prefix)
 06-10-11 itlie.h: add sfstruse() error checks
@@ -4364,6 +4377,7 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+07-10-16 sed: add /RE/I... => ignore case
 07-03-19 testregex.c: add regdecomp() harness
 07-03-19 testdecomp.dat: add regdecomp() tests
 06-10-11 add sfstruse() error checks
@@ -4513,6 +4527,8 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+07-10-30 main.c: default insize == procsize -- worth ~25% time!
+07-10-30 sort.tst,testsort.sh: export LC_ALL=C
 07-01-25 main.c: v format size is max of all input files
 06-07-17 main.c: RS_POP before checking output
 06-07-17 main.c: handle empty file for record format data sample
@@ -4859,6 +4875,8 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+07-10-26 find.c: fix default -print w.r.t. -o
+07-10-03 find.c: fix { -atime -ctime -mtime } [-+]N logic
 07-09-21 expr.c: add sumprint() default scale arg
 07-08-17 tw.c: add --snapshot
 07-05-08 find.c: fix -printf => sfvprintf() translation
@@ -4982,6 +5000,21 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+07-10-31 regex/regcomp.c: fix REX_COLL_CLASS node allocation size
+07-10-31 sfio/sfcvt.c: use signbit() if available
+07-10-31 features/isoc99: _ISOC99_SOURCE tests
+07-10-31 port/astmath.c: add -DN=8 for signbit()
+07-10-31 sfio/sfstrtod.h: don't forget about -0.0
+07-10-26 features/map.c: add { optopt optarg optind opterr }
+07-10-26 features/stdio: add _filbuf => _ast__filbuf
+07-10-26 comp/getsubopt.c: fix #undef that interfered with <ast_map.h>
+07-10-26 regex/regcomp.c: fix bug that missed ')' in ~(F)...
+07-10-12 port/astconf.c: fix CONF_ALLOC 16 bit overflow
+07-10-12 misc/fts.c: fix fts_close() to free the handle -- doh
+07-10-11 comp/setlocale.c: second and subsequent setlocale(*,"") reverts to previous
+07-10-11 path/pathprobe.c: add vfs ST_NOSUID check
+07-10-10 comp/conf.tab: add a few more xpg6 deferrals
+07-09-28 astsa: update to share with mainline src via _PACKAGE_astsa
 07-09-25 sfio/sfgetr.c: no limit on string stream line size
 07-09-25 sfio/sfextern.c: increase _Sfmaxr to 256*1024
 07-09-18 misc/procopen.c: tighten up SIGCHLD logic between parent/child
@@ -6443,6 +6476,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+07-10-29 cksum.c: add SUM_LEGACY for -r
+07-10-12 cp.c: plug usage string memory leak by using per-builtin state
 07-09-21 cksum.c: add sumprint() default scale arg, --scale, --bsd for solaris
 07-09-10 chmod.c: add --show,-n
 07-07-27 wclib.c: bias <wchar.h> checks for modern unix
@@ -6768,6 +6803,9 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+07-10-30 rshdr.h: default INSIZE == PROCSIZE -- worth ~25% time!
+07-10-30 rskey.h,rskeyopen.c,rskey.c: honor locale collation order
+07-10-10 rskey.c: handle ascii signed zoned decimal (0x70 => negative)
 07-04-16 recsort.h,rskey.c: add RSKEY_KEYS
 06-12-15 rskeyhdr.h: increase MAXFIELD to INT_MAX
 06-07-17 rsprocess.c: re-key after RS_READ calout
@@ -6840,6 +6878,7 @@ All recorded changes follow.
 
 :::::::: libsum ::::::::
 
+07-10-29 sum.h,sumlib.c: add SUM_LEGACY for legacy output format
 07-09-21 sum-sha1.c: reinstate Steve Reid's public domain implementation
 07-07-26 sumlib.c: drop GPL sum-sha1.c
 05-02-14 sumlib.c: split into sum-*.c
@@ -6915,6 +6954,7 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+07-10-29 coshell.h,coexec.c: fix procrun()/system() intercept logic
 07-08-15 add CO_SEPARATE,CO_MODE_SEPARATE for separate shell+wait per action
 07-04-09 Makefile: $(CC.PIC) to allow archive to be pulled into other dlls
 06-08-22 coshell.h: procrun => coprocrun, system => cosystem
@@ -7539,6 +7579,9 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+07-10-26 cxcomp.c: fix s="S"; print(s,s) cast bug
+07-10-25 cxcomp.c: pretty up CX_DEBUG instruction code trace
+07-10-01 dss.h: add void* Dssfile_t.caller caller defined handle
 07-09-27 cx.h: add CX_HEADER_INIT for sun4 K&R
 07-09-24 cx.h: add Cxvariable_t.header.index set by cxaddvariable()
 07-09-21 dss-return.h: document it via return_beg() -- doh

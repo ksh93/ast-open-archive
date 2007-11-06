@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-09-07
+info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_X11 ${INSTALLROOT}
 setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include
@@ -93,6 +93,12 @@ make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${INSTALLROOT}/include/ast/prototyped.h dontcare
 done ${INSTALLROOT}/include/ast/regex.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_map.h implicit
 make ${INSTALLROOT}/include/ast/ast_botch.h implicit
 done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
@@ -102,14 +108,9 @@ make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
 make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
 done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
-make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
-make ${INSTALLROOT}/include/ast/ast_sys.h implicit
-make ${INSTALLROOT}/include/ast/getopt.h implicit
 prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_sys.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
 prev ${INSTALLROOT}/include/ast/endian.h implicit
 prev ${INSTALLROOT}/include/ast/endian.h implicit
 done ${INSTALLROOT}/include/ast/ast_sys.h dontcare

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-09-11 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-10-22 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -87,7 +87,7 @@ set virtual:=1
 
 .OPTION.COMPATIBILITY : .MAKE .VIRTUAL .FORCE
 	local N O
-	if .MAKEVERSION. < 20080101
+	if .MAKEVERSION. < 20090101
 		O =
 		N =
 		if ! "$(-?clobber)" && "$("clobber":T=QV)"
@@ -1647,7 +1647,7 @@ end
 		end
 		if TL
 			TL := CC.SHARED.LIBS.$(T0)
-			$(TL) := $$(*$(T0):A=.ARCHIVE:N=-l*:U)
+			$(TL) := $$(*$(T0):VBFUI:A=.ARCHIVE:N=-l*:U)
 			($(TL)) : .PARAMETER
 			TP += ($(TL))
 		end
@@ -2004,14 +2004,16 @@ end
 	end
 
 /*
- * <name> [<major.minor> [option ...]] :LIBRARY: <source> -[lL]*
+ * <name> [<major.minor>] [option ...] :LIBRARY: <source> -[lL]*
  */
 
 ":LIBRARY:" : .MAKE .OPERATOR .PROBE.INIT
 	local A B L P R S T V X
 	P := $(.PACKAGE.plugin)
-	for T $(<:O>2)
-		if T == "DLL*"
+	for T $(<:O>1)
+		if T == "+([-+.0-9])"
+			V := $(T)
+		elif T == "DLL*"
 			if "$(PWD:B)" == "cc-*"
 				.DLL.LIST. += $(B)
 			else
@@ -2024,6 +2026,17 @@ end
 			A = 1
 		end
 	end
+	if ! V
+		if P
+			V = 0.0
+		else
+			V = 1.0
+		end
+	elif V == "-"
+		V =
+	elif ! VERSION
+		VERSION := $(V)
+	end
 	B := $(<:O=1)
 	if "$(B:A=.TARGET)"
 		T := .ALL
@@ -2035,7 +2048,7 @@ end
 	if ! .MAIN.TARGET.
 		.MAIN.TARGET. := $(B:B:S)
 	end
-	L := $(.LIB.NAME. $(P)$(B) $(<:O=2))
+	L := $(.LIB.NAME. $(P)$(B) $(V))
 	$(L) : .ARCHIVE$(CC.SUFFIX.OBJECT)
 	.PLUGIN.$(B) := $(P)
 	.RETAIN : .PLUGIN.$(B)
@@ -2043,10 +2056,10 @@ end
 		if ! A
 			:INSTALLDIR: $(L)
 		end
-		X := $(.DLL.NAME. $(B) $(<:O=2):B:C%\..*%%)
+		X := $(.DLL.NAME. $(B) $(V):B:C%\..*%%)
 		if CC.SHARED.REGISTRY
 			.CC.SHARED.REGISTRY.$(X) := $(LIBDIR)/$(P)/registry.ld
-			$(.DLL.NAME. $(B) $(<:O=2)) : .CC.DLL.DIR.INIT
+			$(.DLL.NAME. $(B) $(V)) : .CC.DLL.DIR.INIT
 			.CC.DLL.DIR.INIT : .VIRTUAL .IGNORE $(LIBDIR)/$(P)
 			$(LIBDIR)/$(P) : .DO.INSTALL.DIR
 		end
@@ -2061,13 +2074,6 @@ end
 	end
 	.INSTALL : .DLL.CHECK.$(B)
 	.DLL.CHECK.$(B) : .DLL.CHECK
-	if ! ( V = "$(<:O=2)" )
-		V = 1.0
-	elif V == "-"
-		V =
-	elif ! VERSION
-		VERSION := $(V)
-	end
 	$(B).VERSION := $(V)
 	D := $(>:V:N=-L*)
 	if ! P || A

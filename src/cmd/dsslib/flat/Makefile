@@ -4,7 +4,7 @@ LICENSE = since=2002,author=gsf
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
-flat 1.0 plugin=dss static :LIBRARY: flat.c lib.c -ldss
+flat plugin=dss static :LIBRARY: flat.c lib.c -ldss
 
 :TEST: dss
 

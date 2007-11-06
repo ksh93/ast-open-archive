@@ -1,3 +1,4 @@
+07-10-16 sed: add /RE/I... => ignore case
 07-03-19 testregex.c: add regdecomp() harness
 07-03-19 testdecomp.dat: add regdecomp() tests
 06-10-11 add sfstruse() error checks
