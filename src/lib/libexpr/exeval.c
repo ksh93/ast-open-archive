@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -213,7 +213,7 @@ prformat(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	}
 	if (dp->n_str > 0)
 	{
-		if (!fmt->tmp || !(fmt->tmp = sfstropen()))
+		if (!fmt->tmp && !(fmt->tmp = sfstropen()))
 			txt = exnospace();
 		else
 		{

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,12 +26,12 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: df (AT&T Research) 2005-04-06 $\n]"
+"[-?\n@(#)$Id: df (AT&T Research) 2008-01-26 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
-"	of each file argument. If no \afile\a arguments are given then the"
-"	all mounted filesystems are displayed.]"
+"	of each file argument. If no \afile\a arguments are given then all"
+"	mounted filesystems are displayed.]"
 
 "[b:blockbytes?Measure disk usage in 512 byte blocks. This is the default"
 "	if \bgetconf CONFORMANCE\b is \bstandard\b.]"
@@ -46,7 +46,8 @@ USAGE_LICENSE
 "	%[#-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
 "	If \b#\b is specified then the internal width and precision are used."
 "	If \abase\a is non-zero and \b--posix\b is not on then the field values"
-"	are wrapped when they exceed the field width. If \achar\a is \bs\b then""	the string form of the item is listed, otherwise the corresponding"
+"	are wrapped when they exceed the field width. If \achar\a is \bs\b then"
+"	the string form of the item is listed, otherwise the corresponding"
 "	numeric form is listed. If \achar\a is \bq\b then the string form of"
 "	the item is $'...' quoted if it contains space or non-printing"
 "	characters. If \awidth\a is omitted then the default width"
@@ -69,7 +70,7 @@ USAGE_LICENSE
 "[P:portable?Display each filesystem on one line. By default output is"
 "	folded for readability. Also implies \b--blockbytes\b.]"
 "[s:sync?Call \bsync\b(2) before querying the filesystems.]"
-"[F:type?Display all filesystems of type \atype\a. Unknown types are"
+"[F|t:type?Display all filesystems of type \atype\a. Unknown types are"
 "	listed as \blocal\b. Typical (but not supported on all systems) values"
 "	are:]:[type]{"
 "		[+ufs?default UNIX file system]"
@@ -85,7 +86,7 @@ USAGE_LICENSE
 "		[+lofs?loopback file system for submounts]"
 "}"
 "[v:verbose?Report all filesystem query errors.]"
-"[q|t?Ignored by this implementation.]"
+"[q|T?Ignored by this implementation.]"
 
 "\n"
 "\n[ file ... ]\n"
@@ -739,6 +740,7 @@ main(int argc, register char** argv)
 			append(fmt, opt_info.arg);
 			continue;
 		case 'F':
+		case 't':
 			state.type = opt_info.arg;
 			continue;
 		case 'g':
@@ -776,7 +778,7 @@ main(int argc, register char** argv)
 		case 's':
 			state.sync = opt_info.num;
 			continue;
-		case 't':
+		case 'T':
 			continue;
 		case 'v':
 			state.verbose = ERROR_SYSTEM|1;
@@ -873,8 +875,9 @@ main(int argc, register char** argv)
 	{
 		sfkeyprintf(head ? sfstdout : state.tmp, NiL, format, key, NiL);
 		sfstrseek(state.tmp, 0, SEEK_SET);
-		if (rem = argc)
+		if (argc)
 		{
+			rem = argc;
 			if (!(dev = newof(0, dev_t, argc, 0)))
 				error(ERROR_SYSTEM|3, "out of space [dev_t]");
 			for (n = 0; n < argc; n++)
@@ -891,6 +894,8 @@ main(int argc, register char** argv)
 #endif
 					st.st_dev;
 		}
+		else
+			rem = 0;
 		if (rem && (match = newof(0, int, n, 0)))
 		{
 			/*
@@ -938,8 +943,8 @@ main(int argc, register char** argv)
 				continue;
 			}
 			dirdev = st.st_dev;
-			mntdev = *df.mnt->fs != '/' || stat(df.mnt->fs, &st) ? dirdev : st.st_dev;
-			if (argc)
+			mntdev = (!rem || *df.mnt->fs != '/' || stat(df.mnt->fs, &st)) ? dirdev : st.st_dev;
+			if (rem)
 			{
 				for (n = 0; n < argc; n++)
 					if (argv[n] && (dev[n] == dirdev || dev[n] == mntdev))
@@ -953,7 +958,7 @@ main(int argc, register char** argv)
 			}
 			if (!status(df.mnt->dir, &df.vfs) || !status(df.mnt->fs, &df.vfs))
 				entry(&df, format);
-			if (argc > 0)
+			if (rem)
 			{
 				while (++n < argc)
 					if (dev[n] == dirdev || dev[n] == mntdev)

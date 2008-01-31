@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -27,7 +27,7 @@
  * setgid to kmem for better performance
  */
 
-static const char id[] = "\n@(#)$Id: ssd (AT&T Research) 2003-07-29 $\0\n";
+static const char id[] = "\n@(#)$Id: ssd (AT&T Research) 2007-11-19 $\0\n";
 
 #include <ast.h>
 #include <cs.h>
@@ -122,13 +122,9 @@ struct whod
 #define _PATH_UTMP	_PATH_UTMPX
 #endif     
 
-#define X		"x"
-
 #else
 
 #include <utmp.h>
-
-#define X
 
 #endif
 
@@ -149,9 +145,14 @@ static char*		usrfiles[] =
 #ifdef	_PATH_UTMP
 	_PATH_UTMP,
 #endif
-	"/etc/utmp" X,
-	"/var/adm/utmp" X,
-	"/var/run/utmp" X
+#if _hdr_utmpx
+	"/etc/utmpx",
+	"/var/adm/utmpx",
+	"/var/run/utmpx",
+#endif
+	"/etc/utmp",
+	"/var/adm/utmp",
+	"/var/run/utmp"
 };
 
 static char*		usrfile;

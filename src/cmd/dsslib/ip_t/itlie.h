@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -40,7 +40,7 @@
  */
 
 ssize_t
-ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details, Cxformat_t** formats, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int dots, int tuple, int group, const char* details, Cxformat_t** formats, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
 	ITLINT*		ap;
 	Sfio_t*		sp;
@@ -55,6 +55,8 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details,
 	int		i;
 	int		j;
 	int		k;
+	int		m;
+	int		n;
 	int		g;
 
 	if (j = value->buffer.size / sizeof(ITLINT))
@@ -109,12 +111,6 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details,
 				else if (ap[i])
 					switch (fmt)
 					{
-					case '.':
-						v = ap[i];
-						b = sizeof(ITLINT) * 8;
-						while ((b -= 8) >= 0)
-							sfprintf(sp, "%u%s", (v >> b) & 0xff, b ? "." : "");
-						break;
 					case 'd':
 						sfprintf(sp, "%d", ap[i]);
 						break;
@@ -124,7 +120,27 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details,
 					case 'x':
 						sfprintf(sp, "0x%0*x", sizeof(ITLINT) * 2, ap[i]);
 						break;
+					case '.':
+						n = 8;
+						goto dotted;
+					case '1':
+					case '2':
+					case '4':
+					case '8':
+						n = (n - '0') * 8;
+					dotted:
+						v = ap[i];
+						b = sizeof(ITLINT) * 8;
+						m = (1 << n) - 1;
+						while ((b -= n) >= 0)
+							sfprintf(sp, "%u%s", (v >> b) & m, b ? "." : "");
+						break;
 					default:
+						if (dots)
+						{
+							n = dots * 8;
+							goto dotted;
+						}
 						sfprintf(sp, "%u", ap[i]);
 						break;
 					}
@@ -164,7 +180,7 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details,
  */
 
 ssize_t
-ITLINTERNAL(Cx_t* cx, Cxvalue_t* value, int tuple, int group, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+ITLINTERNAL(Cx_t* cx, Cxvalue_t* value, int dots, int tuple, int group, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	register char*	s;
 	register char*	e;
@@ -173,6 +189,7 @@ ITLINTERNAL(Cx_t* cx, Cxvalue_t* value, int tuple, int group, const char* buf, s
 	Sfio_t*		sp;
 	ITLINT*		vp;
 	ITLINT		n;
+	ITLINT		m;
 	size_t		o;
 	size_t		z;
 
@@ -181,6 +198,11 @@ ITLINTERNAL(Cx_t* cx, Cxvalue_t* value, int tuple, int group, const char* buf, s
 	t = 0;
 	s = (char*)buf;
 	e = s + size;
+	if (!dots)
+		dots = 1;
+	dots *= 8;
+	m = 1;
+	m = (m << dots) - 1;
 	for (; s < e; s++)
 		if (*s == ':' || isdigit(*s))
 		{
@@ -195,7 +217,7 @@ ITLINTERNAL(Cx_t* cx, Cxvalue_t* value, int tuple, int group, const char* buf, s
 					s = p;
 					if (s >= e || *s != '.')
 						break;
-					n = (n << 8) | (strntol(s, e - s, &p, 0) & 0xff);
+					n = (n << dots) | (strntol(s, e - s, &p, 0) & m);
 				}
 			}
 			sfwrite(sp, &n, sizeof(n));

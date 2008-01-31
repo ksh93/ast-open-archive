@@ -9,7 +9,7 @@
 
 LICENSE = since=1999,author=gsf
 
-:TEST: astconf opt strelapsed strtoi strntoi strtof strntof
+:TEST: astconf opt strelapsed strtoi strtof
 
 base64 :TEST: base64.c
 

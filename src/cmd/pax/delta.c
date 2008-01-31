@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -454,7 +454,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 	f->delta.same = 0;
 	if (d = op->delta && op->delta->tab && f->name ? (Member_t*)hashget(op->delta->tab, f->name) : (Member_t*)0)
 		d->mark = 1;
-	if (op->delta && op->delta->format->variant == DELTA_94)
+	if (op->delta && (op->delta->format->flags & DELTAIO))
 	{
 		if (f->type == X_IFREG && f->linktype == NOLINK && (!d || f->st->st_mtime != d->mtime.tv_sec || (f->st->st_mode & X_IPERM) != (d->mode & X_IPERM)))
 		{
@@ -650,7 +650,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 				if (validout(op, f) && selectfile(op, f))
 				{
 					paxdelta(ip, op, f, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, 0);
-					if (op->delta && op->delta->format->variant == DELTA_94)
+					if (op->delta && (op->delta->format->flags & DELTAIO))
 					{
 						f->delta.op = DELTA_create;
 						paxdelta(ip, op, f, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_SIZE, f->fd, f->st->st_size, DELTA_DEL|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
@@ -663,7 +663,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 			case DELTA_pass:
 				if (validout(op, f) && selectfile(op, f))
 				{
-					if (ip->delta && ip->delta->format->variant == DELTA_94)
+					if (ip->delta && (ip->delta->format->flags & DELTAIO))
 					{
 						f->delta.op = DELTA_create;
 						paxdelta(ip, op, f, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
@@ -725,7 +725,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 				{
 					if (state.ordered) paxdelta(ip, op, f, DELTA_SRC|DELTA_BIO|DELTA_SIZE, ip->delta->base, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, 0);
 					else paxdelta(ip, op, f, DELTA_SRC|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ip->delta->base->io->fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, 0);
-					if (op->delta && op->delta->format->variant == DELTA_94)
+					if (op->delta && (op->delta->format->flags & DELTAIO))
 					{
 						f->delta.op = DELTA_create;
 						paxdelta(ip, op, f, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_SIZE, f->fd, f->st->st_size, DELTA_DEL|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
@@ -1065,6 +1065,12 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 #endif
 
 	va_start(vp, op);
+#if 0
+	if (ap && ap->delta && !ap->delta->format)
+		ap->delta->format = getformat(FMT_DELTA, 1);
+	if (ip && ip->delta && !ip->delta->format)
+		ip->delta->format = getformat(FMT_DELTA, 1);
+#else
 	if (ap && ap->delta)
 	{
 		if (!ap->delta->format)
@@ -1077,6 +1083,7 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 			ip->delta->format = getformat(FMT_DELTA, 1);
 		fp = ip->delta->format;
 	}
+#endif
 #if DEBUG
 	if (error_info.trace <= -5) mp = sfstropen();
 #endif
@@ -1184,7 +1191,11 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 		op = va_arg(vp, int);
 	}
 	va_end(vp);
-	if (!gen) error(PANIC, "paxdelta(): no DELTA_OUTPUT");
+	if (!gen)
+		error(PANIC, "paxdelta(): no DELTA_OUTPUT");
+#if 0
+	fp = (gen == &data[DELTA_DEL]) ? ap->delta->format : ip->delta->format;
+#endif
 	if (gen->pfd)
 	{
 		if (!(state.test & 0000020) && fp->variant != DELTA_88 && (state.buffer[bufferclash ? (state.delta.bufferindex = !state.delta.bufferindex) : state.delta.bufferindex].base || (state.buffer[state.delta.bufferindex].base = newof(0, char, state.delta.buffersize, 0)) || (state.delta.buffersize >>= 1) && (state.buffer[state.delta.bufferindex].base = newof(0, char, state.delta.buffersize, 0))))
@@ -1200,6 +1211,7 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 	switch (fp->variant)
 	{
 	case DELTA_88:
+	case DELTA_PATCH:
 		/*
 		 * force the new interface into the old
 		 * not the most efficient way but at least
@@ -1245,7 +1257,16 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 						break;
 					}
 				}
-				n = delta(data[DELTA_SRC].vd.data, data[DELTA_SRC].vd.size, data[DELTA_TAR].vd.data, data[DELTA_TAR].vd.size, data[DELTA_DEL].fd) ? -1L : lseek(data[DELTA_DEL].fd, (off_t)0, SEEK_END);
+				switch (fp->variant)
+				{
+				case DELTA_88:
+					n = delta(data[DELTA_SRC].vd.data, data[DELTA_SRC].vd.size, data[DELTA_TAR].vd.data, data[DELTA_TAR].vd.size, data[DELTA_DEL].fd) ? -1L : lseek(data[DELTA_DEL].fd, (off_t)0, SEEK_END);
+					break;
+				case DELTA_PATCH:
+					error(1, "AHA %s %s/%s SRC=%d:%p TAR=%d:%p DEL=%d:%p", fp->name, ap->name, f->path, data[DELTA_SRC].vd.size, data[DELTA_SRC].vd.data, data[DELTA_TAR].vd.size, data[DELTA_TAR].vd.data, data[DELTA_DEL].vd.size, data[DELTA_DEL].vd.data);
+					n = 0;
+					break;
+				}
 			}
 			else
 			{
@@ -1289,7 +1310,15 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 						break;
 					}
 				}
-				n = update(data[DELTA_SRC].fd, data[DELTA_SRC].base, data[DELTA_DEL].fd, data[DELTA_TAR].fd) ? -1L : lseek(data[DELTA_TAR].fd, (off_t)0, SEEK_END);
+				switch (fp->variant)
+				{
+				case DELTA_88:
+					n = update(data[DELTA_SRC].fd, data[DELTA_SRC].base, data[DELTA_DEL].fd, data[DELTA_TAR].fd) ? -1L : lseek(data[DELTA_TAR].fd, (off_t)0, SEEK_END);
+					break;
+				case DELTA_PATCH:
+					error(PANIC, "paxdelta: %s update not supported", fp->name);
+					break;
+				}
 			}
 		}
 		break;

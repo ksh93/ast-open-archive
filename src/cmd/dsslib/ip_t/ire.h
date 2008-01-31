@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -55,6 +55,7 @@ struct Ire_s				/* RE handle			*/
 {
 	const char*	id;		/* interface id			*/
 	int		element;	/* element size			*/
+	int		dots;		/* element dots			*/
 	int		tuple;		/* tuple size			*/
 	unsigned long	group;		/* embedded group mark		*/
 #ifdef _IRE_PRIVATE_
@@ -66,7 +67,7 @@ struct Ire_s				/* RE handle			*/
 #define extern		__EXPORT__
 #endif
 
-extern Ire_t*		irecomp(const char*, int, int, int, Iredisc_t*);
+extern Ire_t*		irecomp(const char*, int, int, int, int, Iredisc_t*);
 extern int		ireexec(Ire_t*, void*, size_t);
 extern int		irefree(Ire_t*);
 

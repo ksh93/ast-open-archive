@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#           Copyright (c) 1996-2007 AT&T Knowledge Ventures            #
+#          Copyright (c) 1996-2008 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                      by AT&T Knowledge Ventures                      #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -29,13 +29,13 @@
 # .xx ref="URL\tMIME-TYPE"	head link hint
 
 command=mm2bb
-version='mm2bb (AT&T Research) 2007-08-11' # NOTE: repeated in USAGE
+version='mm2bb (AT&T Research) 2007-12-11' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2bb (AT&T Research) 2007-08-11 $
+@(#)$Id: mm2bb (AT&T Research) 2007-12-11 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2bb - convert mm/man subset to bb code]
@@ -197,15 +197,15 @@ function getfiles
 	-e 's%\\u\([^\\]*\)\\d%\1%g' \
 	-e 's%\\v\(.\)-\([^\\]*\)\1\(.*\)\\v\1+*\2\1%\3%g' \
 	-e 's%\\v\(.\)+*\([^\\]*\)\1\(.*\)\\v\1-\2\1%\3%g' \
-	-e 's%\\h'\''0\*\\w"\([abcdefghijklmnopqrstuvwxyz]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url="\1"]\2[/url]%g' \
-	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url="\1"]\2[/url]%g' \
-	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url="\1"]\2[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%[url="\1"]\1[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\([abcdefghijklmnopqrstuvwxyz]*:[^'\'']*\)\\h'\''0'\''%[url="\1"]\1[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%[url="\1"]\1[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%[url="\1"]\1[/url]%g' \
-	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url="\1"]\2[/url]%g' \
-	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%[url="\1"]\1[/url]%g' \
+	-e 's%\\h'\''0\*\\w"\([abcdefghijklmnopqrstuvwxyz]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
+	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
+	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
+	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
+	-e 's%\\h'\''0\*1'\''\([abcdefghijklmnopqrstuvwxyz]*:[^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
+	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
+	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
+	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
+	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
 	-e 's%\\s+\(.\)\([^\\]*\)\\s-\1%[size='$size_big']\2[/size]%g' \
 	-e 's%\\s+\(.\)\([^\\]*\)\\s0%[size='$size_big']\2[/size]%g' \
 	-e 's%\\s-\(.\)\([^\\]*\)\\s+\1%[size='$size_small']\2[/size]%g' \
@@ -234,8 +234,8 @@ function getfiles
 	-e 's%</X>%[/code]%g' \
 	-e 's%<CW>%[code]%g' \
 	-e 's%</CW>%[/code]%g' \
-	-e 's%<i>\([^<]*\)</i>(\([0123456789]\))%[url="../man\2/\1.html"][i]\1[/i][/url]\2%g' \
-	-e 's%<b>\([^<]*\)</b>(\([0123456789]\))%[url="../man\2/\1.html"][b]\1[/b][/url]\2%g' \
+	-e 's%<i>\([^<]*\)</i>(\([0123456789]\))%[url=../man\2/\1.html][i]\1[/i][/url]\2%g' \
+	-e 's%<b>\([^<]*\)</b>(\([0123456789]\))%[url=../man\2/\1.html][b]\1[/b][/url]\2%g' \
 	-e 's%\\s+\(.\)\(.*\)\\s-\1%[size='$size_big']\2[/size]%g' \
 	-e 's%\\s-\(.\)\(.*\)\\s+\1%[size='$size_small']\2[/size]%g' \
 	-e 's%\\e%\&#0092;%g' \
@@ -259,10 +259,7 @@ function space
 function flush
 {
 	if	[[ $fill ]]
-	then	if	(( tex ))
-		then	print -r -- "${fill#?}"
-		else	print -r -- "${fill#?}" | fmt
-		fi
+	then	print -r -- "${fill#?}"
 		fill=
 		spaced=0
 	fi
@@ -308,7 +305,7 @@ function putopt
 function getline
 {
 	integer i n
-	typeset data a c q v x d
+	typeset data a c d q v x d
 	if	(( peek ))
 	then	(( peek = 0 ))
 		trap 'set -- "${text[@]}"' 0
@@ -362,6 +359,11 @@ function getline
 						case $c in
 						\()	c=${data:i:2}
 							(( i += 2 ))
+							;;
+						\[)	c=${data:i}
+							c=${c%%]*}
+							(( i += ${#c} + 1 ))
+							x='*'
 							;;
 						esac
 						case $x in
@@ -553,7 +555,7 @@ function getline
 								label[labels++]=$txt
 								if	(( tex ))
 								then	puttext '\newurl{'$url,$txt'}'
-								else	puttext "[url=\"$url\"]$txt[/url]"
+								else	puttext "[url=$url]$txt[/url]"
 								fi
 							fi
 							;;
@@ -572,7 +574,7 @@ function getline
 							nam=href
 							if	(( tex ))
 							then	data="${data}\\newurl{$pfx$url,$txt}"
-							else	data="${data}[url=\"$pfx$url\"]$txt[/url]"
+							else	data="${data}[url=$pfx$url]$txt[/url]"
 							fi
 							;;
 						esac
@@ -622,8 +624,8 @@ function getline
 							*)	font1=i ;;
 							esac
 							case $macros in
-							man)	set -A text -- "[url=\"../man$n/$1.html\"][$font1]$1[/$font1][/url]$y$x" ;;
-							*)	set -A text -- "[url=\"${html.man:=../man}/man$n/$1.html\"][$font1]$1[/$font1][/url]$y$x" ;;
+							man)	set -A text -- "[url=../man$n/$1.html][$font1]$1[/$font1][/url]$y$x" ;;
+							*)	set -A text -- "[url=${html.man:=../man}/man$n/$1.html][$font1]$1[/$font1][/url]$y$x" ;;
 							esac
 						fi
 						break
@@ -934,10 +936,12 @@ do	getline || {
 				esac
 				if	(( tex ))
 				then	putopn '\olist{'
+				else	putop '[list]'
 				fi
 				;;
 			.[IR]S)	if	(( tex ))
 				then	putopn '\list{'
+				else	putop '[list]'
 				fi
 				;;
 			.VL)	case $1 in
@@ -947,6 +951,7 @@ do	getline || {
 				esac
 				if	(( tex ))
 				then	putopn '\list{'
+				else	putop '[list]'
 				fi
 				;;
 			esac
@@ -1081,8 +1086,7 @@ do	getline || {
 			esac
 			mm_AU="${mm_AU}$nl$1"
 			;;
-		.BL)
-			i=
+		.BL)	i=
 			for ((n = 1; n <= lists; n++))
 			do	i=$i${list[n]}
 			done
@@ -1095,6 +1099,7 @@ do	getline || {
 			list[lists]=UL
 			if	(( tex ))
 			then	putopn '\list{'
+			else	putop "[list]"
 			fi
 			;;
 		.BP)	unset parm
@@ -1269,37 +1274,35 @@ do	getline || {
 				esac
 				;;
 			esac
-			case ${list[lists]} in
-			"")	warning "$op: no current list"
-				;;
-			DL)	case $# in
-				0)	getline ;;
-				esac
+			if	[[ ${list[lists]} ]]
+			then	if	[[ ${list[lists]} == DL ]] && (( ! $# ))
+				then	getline
+				fi
 				if	(( tex ))
 				then	case $* in
-					'')	putopn ;;
-					'\b{'*)	putopn "$* " ;;
-					*)	putopn "\\b{$*} " ;;
+					'')			putopn ;;
+					'\b{'*)			putopn "$* " ;;
+					*)			putopn "\\b{$*} " ;;
 					esac
-				else	putop "[list][b]$*[/b][/list]"
-				fi
-				;;
-			*)	if	(( tex ))
-				then	case $* in
-					'')	putopn ;;
-					'\b{'*)	putopn "$* " ;;
-					*)	putopn "\\b{$*} " ;;
+				else	case $* in
+					'['*']'[[:alpnum:]]*)	putopn "[*]$* " ;;
+					'['*)			putopn "[*]$*: " ;;
+					'')			putopn "[*] " ;;
+					[[:alpnum:]]*)		putopn "[*][b]$*[/b] " ;;
+					*)			putopn "[*][b]$*[/b]: " ;;
 					esac
-				else	putop "[list][b]$*[/b][/list]"
 				fi
-				;;
-			esac
+			else	warning "$op: no current list"
+			fi
 			;;
 		.IX)	: ignore $op
 			;;
 		.LE|.[IR]E)
-			if	(( tex )) && [[ $op == ".LE" ]]
-			then	putopt '}'
+			if	[[ $op == ".LE" ]]
+			then	if	(( tex ))
+				then	putopt '}'
+				else	putop '[/list]'
+				fi
 			fi
 			case ${type[@]} in
 			*.[Aa][Ll]*)
@@ -1332,6 +1335,7 @@ do	getline || {
 			list[lists]=OL
 			if	(( tex ))
 			then	putopn '\olist{'
+			else	putop '[list]'
 			fi
 			;;
 		.OK)	mm.keywords="$*"

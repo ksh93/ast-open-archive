@@ -25,9 +25,9 @@ Source Package Installation Instructions:
       use the package(1) command to do the actual download:
 		bin/package authorize "NAME" password "PASSWORD" \
 			setup source $URL PACKAGE ...
-      This downloads the closure of latest source package(s); covered and
+      This downloads the closure of the latest source package(s); covered and
       up-to-date packages are not downloaded again unless package force ...
-      is specified. Package content is verified using . If the package
+      is specified. Package content is verified using md5sum. If the package
       root will contain only one architecture then you can install in bin and
       lib instead of arch/HOSTTYPE/bin and arch/HOSTTYPE/lib by running this
       instead:
@@ -92,7 +92,66 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-07-11-05  --- Release ksh93s+  ---
+08-01-31  --- Release ksh93s+  ---
+08-01-31  A bug in which command substitution inside ((...)) could cause
+	  syntax errors or lead to core dumps has been fixed.
+08-01-17  A bug in which discipline functions could be deleted when invoked
+	  from a subshell has been fixed.
+08-01-17  A bug in which a command substitution consisting only of
+	  assignments was treated as a noop has been fixed.
+08-01-17  A bug in which discipline functions invoked from withing a
+	  compound assignment could fail has been fixed.
+08-01-16  Incomplete arithmetic assigments, for example ((x += )), now
+	  generate an error message.
+08-01-16  A bug in which a set discipline defined for a variable before
+	  an array assignment could cause a core dump has been fixed. 
+08-01-03  A bug in on some systems in which exit status 0 is incorrectly
+	  returned by a process that catches the SIGCONT signal is stopped 
+	  and then continued.
+07-12-13  A race condition in which a program that has been stopped and then
+	  continued could loose the exit status has been fixed.
+07-12-12  Code to check for file system out of space write errors for all
+	  writes has been added.
+07-12-11  A bug in the macro expander for multibyte characters in which
+	  part of the character contains a file pattern byte has been fixed. 
+07-12-06  A bug in the emacs edit mode when multiline was set that output
+	  a backspace before the newline to the screen has been fixed.
+07-12-04  A bug in which using <n>TAB after a variable name listing expansion
+	  in the edit modes would cause the $ to disappear has been fixed.
+07-11-28  A bug in which setting IFS to readonly could cause a subsequent
+	  command substitution to fail has been fixed.
+07-11-27  A work around for a gcc 4.* C99 "feature" that could cause a job
+	  control shell to go into an infinite loop by adding the volatile
+	  attribute to some auto vars in functions that call setjmp().
+07-11-27  A bug in which the shell could read ahead on a pipe causing the
+	  standard input to be incorrectly positioned has been fixed.
+07-11-27  A bug in which compound variable UTF-8 multibyte values were not
+	  expanded or traced properly has been fixed.
+07-11-21  A bug where an unbalanced '[' in a command argument was not treated
+	  properly has been fixed.
+07-11-15  A bug in which compatibility mode (no long option names) getopts(1)
+	  incorrectly set the value of OPTARG for flag options has been fixed.
+07-11-15  A bug in which "hash -- name" treated "--" as an invalid name operand
+	  has been fixed.
+07-11-15  typeset now handles "-t -- [-r] [--]" for s5r4 hash(1) compatibility.
+07-11-15  A bug in which the umask builtin mis-handled symbolic mode operands
+	  has been fixed.
+07-11-15  Bugs in which shell arithmetic and the printf builtin mis-handled the
+	  signs of { -NaN -Inf -0.0 } have been fixed.
+07-11-15  The full { SIGRTMIN SIGRTMIN+1 ... SIGRTMAX-1 SIGRTMAX } range
+	  of signals, determined at runtime, are now supported.
+07-11-15  A bug in which creating an index array with only subscript 0 created
+	  only a simple variable has been fixed.
+07-11-14  A bug in which appending to an indexed array using the form
+	  name+=([sub]=value) could cause the array to become an associative
+	  array has been fixed.
+07-11-14  A bug in which typeset without arguments could coredump if a
+	  variable is declared as in indexed array and  has no elements has
+	  been fixed.
+07-11-14  A bug in which creating a local SECONDS variable with typeset in
+	  a function could corrupt memory has been fixed.
+07-11-14  A bug which could cause a core dump when a script invoked by name
+	  from a function used compound variables has been fixed.
 07-11-05  A bug in which printf %d "'AB" did not diagnose unconverted characters
 	  has been fixed.
 07-11-05  printf %g "'A" support added for all floating point formats.
@@ -1618,6 +1677,8 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+07-12-11 delta2patch.sh: dro pax -v, add pax --nosummary
+07-12-06 delta2patch.sh: add
 07-09-21 format.c: add sumprint() default scale arg
 07-05-01 pax-tar.c,options.c: fix pax extended header for >=2**32 size
 07-03-14 pax-tnef.c: swap op == 3 for all arch!
@@ -1923,6 +1984,8 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+07-12-11 mm2bb.sh: fix bb list and fill logic, add long name \n[CC...]
+07-12-11 mm2html.sh: add long name \n[CC...]
 07-08-11 mm2bb.sh: --texish for tex style bb code
 07-04-20 mm2bb.sh: add for mm => bb code
 07-02-09 mm2html.sh: expand \*(.. rather than escape to \\(*..
@@ -2056,6 +2119,9 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+08-01-18 strn*.tst: consolidate into str*.tst
+08-10-15 strn*tof.(c|tst): handle +/- nan|inf|0
+08-10-15 strn*toi.(c|tst): handle bitsof(long) -- {32 64 }
 07-05-21 date*.*: update for ISO 8601:2000 %F == %Y-%m-%d
 07-04-11 sfio/tprintf.c: update for { inf INF nan NAN }
 06-09-14 datey2k.dat: yield to the gentlemen from congress
@@ -2453,6 +2519,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+07-12-15 Scanrules.mk: add "set stdio HEADER" to .SCAN.iffe
+07-11-26 Makerules.mk: handle a.req => -lfoo -lbar, and -la does not exists
 07-10-22 Makerules.mk: initialize (CC.SHARED.LIBS.target) to match .SHARED.LIST.LIBS.
 07-10-18 parse.c: handle .assoc.*%* : .INSERT to insert into assoc list
 07-09-11 Makerules.mk: fix --force-shared docs to match semantics
@@ -3750,6 +3818,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+08-01-30 expr.tst: add substr * 1 * tests
 07-09-21 cksum.tst: drop sha1, add -r compatibility
 07-02-23 cksum.tst: add -x tw tests
 07-02-07 cksum: handle std => libcmd move
@@ -3992,10 +4061,14 @@ All recorded changes follow.
 
 :::::::: att ::::::::
 
+07-11-14 dshield.dss: add
 07-02-14 mrd-mail.dss: add
 
 :::::::: bgp ::::::::
 
+08-01-15 bgp.c,bgp-cisco.c: add { BGP_rib_failure BGP_stale }
+07-12-13 bgp-mrt.c: unknown format: <hex-flag>:<dec-type>:<dec-size>:<mime-encoded-data>;
+07-12-06 bgp.c: add { agg_addr32 agg_as32 path32 path32_len unknown }
 07-09-12 bgp-ipma.c,bgp-mrt.c: <(~0),1> is the value (~0), not a group marker
 07-09-06 dss.tst: add message group and dss {return} tests
 07-09-05 bgp.c: add MESSAGE group bit and message index
@@ -4079,6 +4152,9 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+08-01-15 bgp.h: add { BGP_rib_failure BGP_stale }
+07-12-06 ip_t.c: add as32 support
+07-12-06 ire,itl: add dots arg for dotted representation
 07-10-25 ptrebit.c: add
 07-09-12 itlie.h: <(~0),1> is the value (~0), not a group marker
 07-09-05 ip_t.c: handle ("1.2.3.4/5" =~ prefix)
@@ -4174,6 +4250,7 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+08-01-15 cmd3.c: add `if f?path' so old Mail doesn't carp
 07-02-06 cmd2.c: "S name" => .../From/name
 06-10-11 data.c: ARG_MAX => private ARGMAX
 06-10-11 add sfstropen()/sfstruse() error checks
@@ -4377,6 +4454,7 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+07-11-19 sed: /RE/I *except* for substitute command
 07-10-16 sed: add /RE/I... => ignore case
 07-03-19 testregex.c: add regdecomp() harness
 07-03-19 testdecomp.dat: add regdecomp() tests
@@ -4593,6 +4671,9 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+08-01-26 df.c: belay some of that delay (automounts foiled it)
+07-11-19 df.c: delay stat()/statfs() until necessary
+07-11-15 pss-procfs.c: handle pr_pgrp and (...) with embedded space
 07-08-03 ls.c: use return from main() instead of exit()
 07-06-27 seq.sh: error messages to the standard error -- oops
 07-06-01 Makefiles: add $(PACKAGE_LOCALE)umount link
@@ -5000,6 +5081,14 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+08-01-31 comp/conf.sh,conf.tab: handle /bin/sh \ in read data, redir subshell
+08-01-18 misc/magic.tab: amd-x68, 64-bit => x86-64
+08-01-18 string/strnton.c,strntonll.c: add
+07-12-10 string/strelapsed.c: "0" is a valid elapsed time!
+07-12-02 sfio/sfreserve.c: preserve SF_SHARE sfrd() via sfreserve(f,0,0)
+07-11-21 comp/setlocale.c: add sjis_mbtowc() to work around [\~] translation
+07-11-15 features/signal.c: RT(1) .. RT(MAX-1) => RTMIN+1 .. RTMAX-1
+07-11-14 features/float: favor sscanf() due to gnu strto[l]d() nan bugs
 07-10-31 regex/regcomp.c: fix REX_COLL_CLASS node allocation size
 07-10-31 sfio/sfcvt.c: use signbit() if available
 07-10-31 features/isoc99: _ISOC99_SOURCE tests
@@ -6476,6 +6565,13 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+08-01-30 expr.c: fix <=0 type that broke substr * 1 * -- wow
+07-12-13 cp.c: fix builtin state reinitialization
+07-11-29 rev.c: honor multibyte locales
+07-11-27 cp.c: open non-existent destination with O_EXCL
+07-11-27 stty.c: add -t,--terminal-group to list tty pgrp
+07-11-27 cksum.c: --silent -s => -S, -s == -x sys5 for gnu compatibility
+07-11-11 tee.c: drop ancient bsd compatibility "-" operand => SIGINT
 07-10-29 cksum.c: add SUM_LEGACY for -r
 07-10-12 cp.c: plug usage string memory leak by using per-builtin state
 07-09-21 cksum.c: add sumprint() default scale arg, --scale, --bsd for solaris
@@ -6803,6 +6899,7 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+07-12-14 rskey.c: fix mb fixed field offset >= 99 key gen 
 07-10-30 rshdr.h: default INSIZE == PROCSIZE -- worth ~25% time!
 07-10-30 rskey.h,rskeyopen.c,rskey.c: honor locale collation order
 07-10-10 rskey.c: handle ascii signed zoned decimal (0x70 => negative)
@@ -6917,6 +7014,7 @@ All recorded changes follow.
 
 :::::::: libz ::::::::
 
+07-11-29 sfdcgzip.c: add seekf() for first buffer rewind
 07-06-11 rename ARCH macros to ZLIB_ARCH to cut down namespace pollution
 07-05-09 Makefile: :INSTALLPROTO: zconf.h for win32 <ast_*> post edit
 07-01-25 zlib.h,gzio.c: add gzbopen() to handle buffered unseekable data
@@ -7579,6 +7677,7 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+07-11-28 cxcomp.c,cxmap.c: fix num=>str cast logic
 07-10-26 cxcomp.c: fix s="S"; print(s,s) cast bug
 07-10-25 cxcomp.c: pretty up CX_DEBUG instruction code trace
 07-10-01 dss.h: add void* Dssfile_t.caller caller defined handle

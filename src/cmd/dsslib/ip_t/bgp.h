@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -30,7 +30,7 @@
 
 #include <ast_common.h>
 
-#define BGP_VERSION		20070906L	/* interface version	*/
+#define BGP_VERSION		20080115L	/* interface version	*/
 
 #define BGP_SET			0xffff		/* as path set marker	*/
 
@@ -44,10 +44,12 @@
 #define BGP_damped		(1<<4)
 #define BGP_history		(1<<5)
 #define BGP_internal		(1<<6)
-#define BGP_slot		(1<<7)
-#define BGP_suppressed		(1<<8)
-#define BGP_valid		(1<<9)
-#define BGP_PART		(1<<10)
+#define BGP_rib_failure		(1<<7)
+#define BGP_slot		(1<<8)
+#define BGP_stale		(1<<9)
+#define BGP_suppressed		(1<<10)
+#define BGP_valid		(1<<11)
+#define BGP_PART		(1<<15)
 
 /*
  * indices (odd, 2 bits set)
@@ -78,8 +80,14 @@
 #define BGP_new_state		((23<<1)|1)
 #define BGP_stamp		((24<<1)|1)
 #define BGP_message		((25<<1)|1)
+#define BGP_as32		((26<<1)|1)
+#define BGP_addr32		((27<<1)|1)
+#define BGP_path32		((28<<1)|1)
+#define BGP_agg_addr32		((29<<1)|1)
+#define BGP_agg_as32		((30<<1)|1)
+#define BGP_unknown		((31<<1)|1)
 
-#define BGP_LAST		25
+#define BGP_LAST		31
 
 /*
  * BGP_type
@@ -104,6 +112,7 @@
 #define BGPCLUSTER(r)		((Bgpnum_t*)((r)->data+(r)->cluster.offset))
 #define BGPCOMMUNITY(r)		((Bgpasn_t*)((r)->data+(r)->community.offset))
 #define BGPPATH(r)		((Bgpasn_t*)((r)->data+(r)->path.offset))
+#define BGPPATH32(r)		((Bgpasn_t*)((r)->data+(r)->path32.offset))
 
 struct Bgproute_s; typedef struct Bgproute_s Bgproute_t;
 struct Bgpvec_s; typedef struct Bgpvec_s Bgpvec_t;
@@ -140,6 +149,8 @@ struct Bgpvec_s				/* vector data			*/
 
 struct Bgproute_s
 {
+	/* 32 bit members */
+
 	Bgpnum_t	size;		/* actual record size		*/
 	Bgpnum_t	addr;		/* prefix address		*/
 	Bgpnum_t	hop;		/* next hop address		*/
@@ -153,22 +164,34 @@ struct Bgproute_s
 	Bgpnum_t	dpa_addr;	/* dpa addr			*/
 	Bgpnum_t	dst_addr;	/* destination addr		*/
 	Bgpnum_t	src_addr;	/* source addr			*/
+	Bgpnum_t	message;	/* message group index		*/
+	Bgpnum_t	agg_addr32;	/* aggregator as32 addr		*/
+	Bgpnum_t	agg_as32;	/* aggregator as32		*/
+
+	/* 16 bit members */
+
 	Bgpvec_t	path;		/* as path			*/
 	Bgpvec_t	cluster;	/* clusters			*/
 	Bgpvec_t	community;	/* communities			*/
+	Bgpvec_t	path32;		/* as32 path			*/
+	Bgpvec_t	unknown;	/* unknown attributes		*/
+
 	Bgpasn_t	attr;		/* BGP_[a-z]* route attributes	*/
 	Bgpasn_t	agg_as;		/* aggregator as		*/
 	Bgpasn_t	dpa_as;		/* dpa as			*/
 	Bgpasn_t	dst_as;		/* destination as		*/
 	Bgpasn_t	src_as;		/* source as			*/
+
+	/* 8 bit members */
+
 	unsigned char	bits;		/* prefix bits			*/
 	unsigned char	type;		/* BGP_TYPE_*			*/
 	unsigned char	origin;		/* BGP_ORIGIN_*			*/
 	unsigned char	blocks;		/* # blocks for this record	*/
 	unsigned char	p1;		/* parameter 1			*/
 	unsigned char	p2;		/* parameter 2			*/
-	Bgpnum_t	message;	/* message group index		*/
-	char		data[926];	/* vector data			*/
+
+	char		data[904];	/* vector data (round to 1K)	*/
 };
 
 #endif

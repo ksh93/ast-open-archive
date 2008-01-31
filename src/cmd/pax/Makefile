@@ -29,6 +29,8 @@ bax :: bax.1 bax.sh
 
 cpio :: cpio.sh
 
+delta2patch :: delta2patch.sh
+
 rpm2cpio :: rpm2cpio.sh
 
 tar :: tar.sh

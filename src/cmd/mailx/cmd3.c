@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2008 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -893,7 +893,7 @@ cmdif(char** argv)
 	}
 	else if (n = *s == '!')
 		s++;
-	if (*s && !*(s + 1))
+	if (*s && (!*(s + 1) || *(s + 1) == '?') && !x && *(x = s + 2)) {
 		switch (*s) {
 		case 'd':
 			if (!x || t)
@@ -918,6 +918,7 @@ cmdif(char** argv)
 			state.cond = n ? RECEIVE : SEND;
 			return 0;
 		}
+	}
 	if (!x)
 		n ^= varget(s) != 0;
 	else if (!t || n)

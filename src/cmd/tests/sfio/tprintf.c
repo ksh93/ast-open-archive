@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -246,7 +246,8 @@ MAIN()
 {
 	char		buf1[1024], buf2[1024], *list[4], *s;
 	double		x=0.0051, y;
-	Sfdouble_t	lx, ly;
+	double		pnan, nnan, pinf, ninf, pnil, nnil;
+	Sfdouble_t	pnanl, nnanl, pinfl, ninfl, pnill, nnill;
 	int		i, j;
 	long		k;
 	Sffmt_t		fe;
@@ -589,22 +590,37 @@ MAIN()
 	}
 #endif
 
-	x = 0;
-	y = 1;
-	sfsprintf(buf1, sizeof(buf1), "%g %g %g", x/x, y/x, (-y)/x);
-	if (strcmp(buf1, "nan inf -inf") != 0)
-		terror("double NaN Inf error: %s", buf1);
-	sfsprintf(buf1, sizeof(buf1), "%G %G %G", x/x, y/x, (-y)/x);
-	if (strcmp(buf1, "NAN INF -INF") != 0)
-		terror("double NaN Inf error: %s", buf1);
-	sfsprintf(buf1, sizeof(buf1), "%05g %05g %05g", x/x, y/x, (-y)/x);
-	if (strcmp(buf1, "  nan   inf  -inf") != 0)
-		terror("double NaN Inf error: %s", buf1);
-	lx = 0;
-	ly = 1;
-	sfsprintf(buf1, sizeof(buf1), "%Lg %Lg %Lg", lx/lx, ly/lx, (-ly)/lx);
-	if (strcmp(buf1, "nan inf -inf") != 0)
-		terror("Sfdbouble_t NaN Inf error: %s", buf1);
+	pnan = strtod("NaN", NIL(char));
+	nnan = strtod("-NaN", NIL(char));
+	pinf = strtod("Inf", NIL(char));
+	ninf = strtod("-Inf", NIL(char));
+	pnil = strtod("0.0", NIL(char));
+	nnil = strtod("-0.0", NIL(char));
+	sfsprintf(buf1, sizeof(buf1), "%g %g %g %g %g %g", pnan, nnan, pinf, ninf, pnil, nnil);
+	if (strcmp(buf1, "nan -nan inf -inf 0 -0") != 0)
+		terror("double NaN Inf 0.0 error: %s", buf1);
+	sfsprintf(buf1, sizeof(buf1), "%G %G %G %G %G %G", pnan, nnan, pinf, ninf, pnil, nnil);
+	if (strcmp(buf1, "NAN -NAN INF -INF 0 -0") != 0)
+		terror("double NaN Inf 0.0 error: %s", buf1);
+	sfsprintf(buf1, sizeof(buf1), "%05g %05g %05g %05g %05g %05g", pnan, nnan, pinf, ninf, pnil, nnil);
+	if (strcmp(buf1, "  nan  -nan   inf  -inf 00000 -0000") != 0)
+		terror("double NaN Inf 0.0 error: %s", buf1);
+
+	pnanl = strtold("NaN", NIL(char));
+	nnanl = strtold("-NaN", NIL(char));
+	pinfl = strtold("Inf", NIL(char));
+	ninfl = strtold("-Inf", NIL(char));
+	pnill = strtold("0.0", NIL(char));
+	nnill = strtold("-0.0", NIL(char));
+	sfsprintf(buf1, sizeof(buf1), "%Lg %Lg %Lg %Lg %Lg %Lg", pnanl, nnanl, pinfl, ninfl, pnill, nnill);
+	if (strcmp(buf1, "nan -nan inf -inf 0 -0") != 0)
+		terror("long double NaN Inf 0.0 error: %s", buf1);
+	sfsprintf(buf1, sizeof(buf1), "%LG %LG %LG %LG %LG %LG", pnanl, nnanl, pinfl, ninfl, pnill, nnill);
+	if (strcmp(buf1, "NAN -NAN INF -INF 0 -0") != 0)
+		terror("long double NaN Inf 0.0 error: %s", buf1);
+	sfsprintf(buf1, sizeof(buf1), "%05Lg %05Lg %05Lg %05Lg %05Lg %05Lg", pnanl, nnanl, pinfl, ninfl, pnill, nnill);
+	if (strcmp(buf1, "  nan  -nan   inf  -inf 00000 -0000") != 0)
+		terror("long double NaN Inf 0.0 error: %s", buf1);
 
 	/* test the sfaprints() function */
 	if(sfaprints(&s, "%d", 123) != 4 || strcmp(s, "123") != 0)

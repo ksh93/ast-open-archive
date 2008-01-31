@@ -1,3 +1,4 @@
+08-01-15 cmd3.c: add `if f?path' so old Mail doesn't carp
 07-02-06 cmd2.c: "S name" => .../From/name
 06-10-11 data.c: ARG_MAX => private ARGMAX
 06-10-11 add sfstropen()/sfstruse() error checks

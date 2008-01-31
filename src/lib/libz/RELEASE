@@ -1,3 +1,4 @@
+07-11-29 sfdcgzip.c: add seekf() for first buffer rewind
 07-06-11 rename ARCH macros to ZLIB_ARCH to cut down namespace pollution
 07-05-09 Makefile: :INSTALLPROTO: zconf.h for win32 <ast_*> post edit
 07-01-25 zlib.h,gzio.c: add gzbopen() to handle buffered unseekable data

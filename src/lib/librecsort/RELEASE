@@ -1,3 +1,4 @@
+07-12-14 rskey.c: fix mb fixed field offset >= 99 key gen 
 07-10-30 rshdr.h: default INSIZE == PROCSIZE -- worth ~25% time!
 07-10-30 rskey.h,rskeyopen.c,rskey.c: honor locale collation order
 07-10-10 rskey.c: handle ascii signed zoned decimal (0x70 => negative)

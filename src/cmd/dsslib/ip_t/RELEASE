@@ -1,3 +1,6 @@
+08-01-15 bgp.h: add { BGP_rib_failure BGP_stale }
+07-12-06 ip_t.c: add as32 support
+07-12-06 ire,itl: add dots arg for dotted representation
 07-10-25 ptrebit.c: add
 07-09-12 itlie.h: <(~0),1> is the value (~0), not a group marker
 07-09-05 ip_t.c: handle ("1.2.3.4/5" =~ prefix)

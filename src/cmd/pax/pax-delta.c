@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -33,7 +33,7 @@ Format_t	pax_delta_format =
 	"delta94|vdelta",
 	"vdelta difference/compression",
 	DELTA_94,
-	DELTA|IN|OUT,
+	DELTA|DELTAIO|IN|OUT,
 	0,
 	0,
 	0,

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -54,6 +54,7 @@
 #define PAX_SLASHDIR	(1<<14)		/* trailing slash => directory	*/
 #define PAX_STANDARD	(1L<<15)	/* the standard format		*/
 #define PAX_SUM		(1L<<16)	/* inline member checksum	*/
+#define PAX_DELTAIO	(1L<<17)	/* separate delta io		*/
 
 #define PAX_FORMAT	(1L<<24)	/* first format specific flag	*/
 

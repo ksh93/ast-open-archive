@@ -1,3 +1,5 @@
+07-12-11 mm2bb.sh: fix bb list and fill logic, add long name \n[CC...]
+07-12-11 mm2html.sh: add long name \n[CC...]
 07-08-11 mm2bb.sh: --texish for tex style bb code
 07-04-20 mm2bb.sh: add for mm => bb code
 07-02-09 mm2html.sh: expand \*(.. rather than escape to \\(*..

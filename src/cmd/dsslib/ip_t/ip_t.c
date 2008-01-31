@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,7 +25,7 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2007-09-05 $\0\n";
+static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2007-12-06 $\0\n";
 
 #include <dsslib.h>
 #include <bgp.h>
@@ -64,13 +64,13 @@ static Iredisc_t	iredisc;
 static ssize_t
 aspath_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
-	return itl2external(cx, type, 1, 1, details, &format, value, buf, size, disc);
+	return itl2external(cx, type, 0, 1, 1, details, &format, value, buf, size, disc);
 }
 
 static ssize_t
 aspath_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
-	return itl2internal(cx, value, 1, 1, buf, size, vm, disc);
+	return itl2internal(cx, value, 0, 1, 1, buf, size, vm, disc);
 }
 
 static void*
@@ -84,19 +84,80 @@ aspath_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc
 	}
 	iredisc.version = IRE_VERSION;
 	iredisc.errorf = disc->errorf;
-	return irecomp(val->string.data, 2, 1, 1, &iredisc);
+	return irecomp(val->string.data, 2, 0, 1, 1, &iredisc);
+}
+
+static ssize_t
+as32_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+{
+	unsigned long	as;
+	int		n;
+
+	as = value->number;
+	n = sfsprintf(buf, size, "%lu.%lu", (as >> 16) & 0xffff, as & 0xffff);
+	if (n >= size)
+		return n + 1;
+	return n;
+}
+
+static ssize_t
+as32_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+{
+	char*		e;
+	unsigned long	as;
+
+	as = (unsigned int)strtoul(buf, &e, 10);
+	if (*e == '.')
+	{
+		as <<= 16;
+		as += (unsigned int)strtoul(e, &e, 10);
+	}
+	if (*e)
+	{
+		if (disc->errorf && !(cx->flags & CX_QUIET))
+			(*disc->errorf)(cx, disc, 1, "%-.*s: invalid as32 number", size, buf);
+		return -1;
+	}
+	value->number = as;
+	return e - (char*)buf;
+}
+
+static ssize_t
+as32path_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+{
+	return itl4external(cx, type, 2, 1, 1, details, &format, value, buf, size, disc);
+}
+
+static ssize_t
+as32path_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+{
+	return itl4internal(cx, value, 2, 1, 1, buf, size, vm, disc);
+}
+
+static void*
+as32path_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc_t* disc)
+{
+	if (!cxisstring(pat))
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: match requires %s pattern", sub->name, cx->state->type_string->name, sub->name);
+		return 0;
+	}
+	iredisc.version = IRE_VERSION;
+	iredisc.errorf = disc->errorf;
+	return irecomp(val->string.data, 4, 1, 1, 1, &iredisc);
 }
 
 static ssize_t
 cluster_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
-	return itl4external(cx, type, 1, 0, details, &format, value, buf, size, disc);
+	return itl4external(cx, type, 0, 1, 0, details, &format, value, buf, size, disc);
 }
 
 static ssize_t
 cluster_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
-	return itl4internal(cx, value, 1, 0, buf, size, vm, disc);
+	return itl4internal(cx, value, 0, 1, 0, buf, size, vm, disc);
 }
 
 static void*
@@ -110,7 +171,7 @@ cluster_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdis
 	}
 	iredisc.version = IRE_VERSION;
 	iredisc.errorf = disc->errorf;
-	return irecomp(val->string.data, 4, 2, 0, &iredisc);
+	return irecomp(val->string.data, 4, 0, 2, 0, &iredisc);
 }
 
 static ssize_t
@@ -120,13 +181,13 @@ community_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* fo
 
 	formats[0] = 0;
 	formats[1] = format;
-	return itl2external(cx, type, 2, 0, details, formats, value, buf, size, disc);
+	return itl2external(cx, type, 0, 2, 0, details, formats, value, buf, size, disc);
 }
 
 static ssize_t
 community_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
-	return itl2internal(cx, value, 2, 0, buf, size, vm, disc);
+	return itl2internal(cx, value, 0, 2, 0, buf, size, vm, disc);
 }
 
 static void*
@@ -140,7 +201,7 @@ community_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxd
 	}
 	iredisc.version = IRE_VERSION;
 	iredisc.errorf = disc->errorf;
-	return irecomp(val->string.data, 2, 2, 0, &iredisc);
+	return irecomp(val->string.data, 2, 0, 2, 0, &iredisc);
 }
 
 static ssize_t
@@ -222,9 +283,19 @@ match_list_free(Cx_t* cx, void* data, Cxdisc_t* disc)
 static Cxmatch_t	match_aspath =
 {
 	"aspath-re",
-	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. For example, '[!1 100]' matches all lists that contain neither 1 nor 100, and '^[!1 100]-701$' matches all lists that don't start with 1 or 100 and end with 701.",
+	"Matches on this type treat a string pattern as an ire(3) 16 bit integer list regular expression. Each number in the list is a distinct token. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. For example, '[!1 100]' matches all lists that contain neither 1 nor 100, and '^[!1 100]-701$' matches all lists that don't start with 1 or 100 and end with 701.",
 	CXH,
 	aspath_match_comp,
+	match_list_exec,
+	match_list_free
+};
+
+static Cxmatch_t	match_as32path =
+{
+	"as32path-re",
+	"Matches on this type treat a string pattern as an ire(3) 32 bit integer list regular expression. Each number in the list is a distinct token. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. For example, '[!1 100]' matches all lists that contain neither 1 nor 100, and '^[!1 100]-701$' matches all lists that don't start with 1 or 100 and end with 701.",
+	CXH,
+	as32path_match_comp,
 	match_list_exec,
 	match_list_free
 };
@@ -398,8 +469,10 @@ CXC(CX_MATCH,	"number",	"ipprefix_t",	op_match_NP,	0)
 
 static Cxtype_t types[] =
 {
-{ "aspath_t", "A sequence of as_t autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_aspath },
+{ "aspath_t", "A sequence of as_t 16 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal (default)), followed by the separator string.", "u," }, &match_aspath },
+{ "as32path_t", "A sequence of as32_t 32 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, as32path_external, as32path_internal, 0, 0, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \b2\b: dotted 2-byte (default), \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal), followed by the separator string.", "u," }, &match_as32path },
 { "as_t", "An unsigned 16 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 2, 5 }, 0 },
+{ "as32_t",	"A dotted pair 32 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, as32_external, as32_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 11 }, 0 },
 { "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
 { "community_t", "A sequence of unsigned 16 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
 { "ipaddr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, ipaddr_external, ipaddr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefix },

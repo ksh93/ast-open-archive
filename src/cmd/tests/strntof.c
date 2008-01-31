@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <locale.h>
+#include <float.h>
 
 #ifndef ERANGE
 #define ERANGE	EINVAL
@@ -50,6 +51,10 @@ extern int	errno;
 #undef	printf
 #endif
 
+#ifndef LDBL_DIG
+#define LDBL_DIG	DBL_DIG
+#endif
+
 int
 main(int argc, char** argv)
 {
@@ -60,6 +65,11 @@ main(int argc, char** argv)
 	int			sep = 0;
 	size_t			size = 0;
 
+	if (argc <= 1)
+	{
+		printf("%u\n", LDBL_DIG);
+		return 0;
+	}
 	while (s = *++argv)
 	{
 		if (!strncmp(s, "LC_ALL=", 7))

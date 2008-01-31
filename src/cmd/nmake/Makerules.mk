@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-10-22 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-11-26 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -920,7 +920,7 @@ end
 		DL := $(%:T=WF:P=D)
 		DR := $(T:P=D)
 		if DL != "$(DR)"
-			for D $(*.SOURCE.%.ARCHIVE)
+			for D $(*.SOURCE.%.ARCHIVE:N!=.)
 				if D == "$(DR)"
 					break
 				end

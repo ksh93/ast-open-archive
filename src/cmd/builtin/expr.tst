@@ -71,8 +71,18 @@ TEST 06 'function-like extensions'
 	EXEC	abc : '.*'
 		OUTPUT - 3
 	EXEC	match abc '.*'
+	EXEC	substr abcdef 1 3
+		OUTPUT - abc
+	EXEC	substr abcdef 2 3
+		OUTPUT - bcd
 	EXEC	substr abcdef 3 3
 		OUTPUT - cde
+	EXEC	substr abcdef 4 3
+		OUTPUT - def
+	EXEC	substr abcdef 5 3
+		OUTPUT - ef
+	EXEC	substr abcdef 6 3
+		OUTPUT - f
 	EXEC	index abc b
 		OUTPUT - 2
 	EXEC	length abc
@@ -81,3 +91,6 @@ TEST 06 'function-like extensions'
 		OUTPUT - 0
 		EXIT 1
 	EXEC	index abc z
+	EXEC	substr abcdef 0 3
+		OUTPUT -
+	EXEC	substr abcdef 7 3

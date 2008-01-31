@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -245,7 +245,7 @@ main(int argc, char** argv)
 			if ((sp = *sv)->fail)
 				sfprintf(sfstdout, "%-12s %s\n", sp->name, sp->fail);
 			else
-				sfprintf(sfstdout, "%-12s%4s%7s,%3d user%s idle%7s, load%3d.%02d, %%usr%3d, %%sys%3d\n", sp->name, sp->stat.up < 0 ? "down" : "up", fmtelapsed(sp->stat.up < 0 ? -sp->stat.up : sp->stat.up, 1), sp->stat.users, sp->stat.users == 1 ? ", " : "s,", fmtelapsed(sp->stat.idle, 1), sp->stat.load / 100, sp->stat.load % 100, sp->stat.pctusr, sp->stat.pctsys);
+				sfprintf(sfstdout, "%-12s%4s%7s,%3d user%s idle%7s, load%3d.%02d, %%usr%3d, %%sys%3d\n", sp->name, sp->stat.up < 0 ? "down" : "up", fmtelapsed(sp->stat.up < 0 ? -sp->stat.up : sp->stat.up, 1), sp->stat.users, sp->stat.users == 1 ? ", " : "s,", sp->stat.idle > sp->stat.up ? "%" : fmtelapsed(sp->stat.idle, 1), sp->stat.load / 100, sp->stat.load % 100, sp->stat.pctusr, sp->stat.pctsys);
 	}
 	return error_info.errors != 0;
 }

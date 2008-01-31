@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -277,7 +277,7 @@ static const char usage2[] =
 "		[+<0?Debug message, enabled when the absolute value of"
 "			\alevel\a is greater than or equal to the"
 "			\b--debug\b level. Debug diagnostics are prefixed"
-"			by \bdebug\b\alevel\a\b:\b.]"
+"			by \bdebug\b-\alevel\a\b:\b.]"
 "		[+1?Warning message, disabled by \b--silent\b. Warning"
 "			diagnostics are prefixed by \bwarning\a\b:\b]"
 "		[+2?Non-fatal error message. Processing continues after"

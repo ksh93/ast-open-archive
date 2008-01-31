@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#           Copyright (c) 1996-2007 AT&T Knowledge Ventures            #
+#          Copyright (c) 1996-2008 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                      by AT&T Knowledge Ventures                      #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -41,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2007-02-09' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2007-12-11' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2007-02-09 $
+@(#)$Id: mm2html (AT&T Research) 2007-12-11 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -455,6 +455,11 @@ function getline
 						case $c in
 						\()	c=${data:i:2}
 							(( i += 2 ))
+							;;
+						\[)	c=${data:i}
+							c=${c%%]*}
+							(( i += ${#c} + 1 ))
+							x='*'
 							;;
 						esac
 						case $x in

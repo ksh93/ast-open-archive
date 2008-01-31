@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2007 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -37,7 +37,7 @@ recomp(Text *rebuf, Text *t, int sub)
 		if (code = regcomp((regex_t*)rebuf->w,(char*)t->w,reflags|REG_DELIMITED|REG_MUSTDELIM|((reflags&REG_LENIENT)?0:REG_ESCAPE)))
 			badre((regex_t*)rebuf->w,code);
 		t->w += ((regex_t*)rebuf->w)->re_npat;
-		if (*t->w == 'I') {
+		if (!sub && *t->w == 'I') {
 			if (!(reflags&REG_ICASE) && (code = regcomp((regex_t*)rebuf->w,(char*)t->w-((regex_t*)rebuf->w)->re_npat,reflags|REG_ICASE|REG_DELIMITED|REG_MUSTDELIM|((reflags&REG_LENIENT)?0:REG_ESCAPE))))
 				badre((regex_t*)rebuf->w,code);
 			t->w++;

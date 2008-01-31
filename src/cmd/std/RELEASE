@@ -1,3 +1,6 @@
+08-01-26 df.c: belay some of that delay (automounts foiled it)
+07-11-19 df.c: delay stat()/statfs() until necessary
+07-11-15 pss-procfs.c: handle pr_pgrp and (...) with embedded space
 07-08-03 ls.c: use return from main() instead of exit()
 07-06-27 seq.sh: error messages to the standard error -- oops
 07-06-01 Makefiles: add $(PACKAGE_LOCALE)umount link

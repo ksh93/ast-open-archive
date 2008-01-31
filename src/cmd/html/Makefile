@@ -10,6 +10,8 @@ html2rtf :: html2rtf.1 html2rtf.h html2rtf.c
 
 html2db :: html2db.c
 
+bb2tok :: bb2tok.c
+
 htmlrefs :: htmlrefs.c
 
 mm2html :: mm2html.1 mm2html.sh

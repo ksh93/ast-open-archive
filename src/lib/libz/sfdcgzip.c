@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1995-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *
@@ -130,6 +130,16 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 }
 
 /*
+ * sfio gzip discipline seek
+ */
+
+static Sfoff_t
+sfgzseek(Sfio_t* fp, Sfoff_t off, int op, Sfdisc_t* dp)
+{
+	return sfsk(fp, off, op, dp);
+}
+
+/*
  * sfio gzip discipline read
  */
 
@@ -190,7 +200,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 		 *
 		 *	0x1f8b....	sfdcgzip	gzip	
 		 *	0x1f9d....	sfdclzw		compress
-		 *	0xd6c3c4d8	sfpopen		vzunzip
+		 *	0xd6c3c4d8	sfpopen		vcunzip
 		 */
 		
 #if PRIVATE
@@ -245,6 +255,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 		gz->disc.readf = sfgzread;
 	else
 		gz->disc.writef = sfgzwrite;
+	gz->disc.seekf = sfgzseek;
 	m = mode;
 	*m++ = rd ? 'r' : 'w';
 	*m++ = 'b';

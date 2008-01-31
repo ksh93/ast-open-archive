@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -64,6 +64,16 @@ csnote(register Cs_t* state, const char* name, register Csstat_t* sp)
 		idle = sp->idle;
 		up = sp->up;
 	}
+#if 0
+	{
+		unsigned long	a;
+		unsigned long	m;
+
+		a = (encode(up) << 16) | encode(idle);
+		m = (((sp->load >> 3) & 0377) << 24) | ((sp->pctsys & 0377) << 16) | ((sp->pctusr & 0377) << 8) | (sp->users & 0377);
+		error(-1, "csnote: <%lu,%lu> load=%lu:%lu pctsys=%lu:%lu pctusr=%lu:%lu users=%lu:%lu idle=%lu:%lu", sp->load, ((m >> 24) & 0xff) << 3, sp->pctsys, (m >> 16) & 0xff, sp->pctusr, (m >> 8) & 0xff, sp->users, m & 0xff, sp->idle, sp->users ? ((a & 0x7ff) << ((a >> 11) & 0x1f)) : ~0, a, m);
+	}
+#endif
 	return touch(name, (encode(up) << 16) | encode(idle), (((sp->load >> 3) & 0377) << 24) | ((sp->pctsys & 0377) << 16) | ((sp->pctusr & 0377) << 8) | (sp->users & 0377), -1);
 }
 

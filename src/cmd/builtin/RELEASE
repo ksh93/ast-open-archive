@@ -1,3 +1,4 @@
+08-01-30 expr.tst: add substr * 1 * tests
 07-09-21 cksum.tst: drop sha1, add -r compatibility
 07-02-23 cksum.tst: add -x tw tests
 07-02-07 cksum: handle std => libcmd move

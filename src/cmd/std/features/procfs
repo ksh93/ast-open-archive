@@ -92,6 +92,7 @@ tst	run{
 	#define pr_addr		pr_startcode
 	#define pr_fname	pr_comm
 	#define pr_flag		pr_state
+	#define pr_pgrp		pr_pgrp
 	#define pr_pri		pr_priority
 	#define pr_rssize	pr_rss
 	#define pr_sid		pr_session

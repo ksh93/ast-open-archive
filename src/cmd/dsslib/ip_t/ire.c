@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -125,7 +125,7 @@ irenum(const char* s, char** e)
  */
 
 Ire_t*
-irecomp(const char* pattern, int element, int tuple, int group, Iredisc_t* disc)
+irecomp(const char* pattern, int element, int dots, int tuple, int group, Iredisc_t* disc)
 {
 	register char*	s;
 	char*		e;
@@ -184,6 +184,7 @@ irecomp(const char* pattern, int element, int tuple, int group, Iredisc_t* disc)
 	ire->disc = disc;
 	ire->vm = vm;
 	ire->element = element;
+	ire->dots = dots;
 	ire->tuple = tuple;
 	s = (char*)pattern;
 	pe = 0;

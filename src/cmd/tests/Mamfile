@@ -155,7 +155,12 @@ done strtoi.tst
 make strtoi
 make strtoi.o
 make strtoi.c
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+make ../../lib/libast/ast_stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ../../lib/libast/ast_stdio.h
+done ${PACKAGE_ast_INCLUDE}/stdio.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done strtoi.c
 meta strtoi.o %.c>%.o strtoi.c strtoi
@@ -166,35 +171,13 @@ exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${I
 done strtoi generated
 exec - regress  strtoi.tst strtoi
 done test.strtoi virtual
-make test.strntoi
-make strntoi.tst
-done strntoi.tst
-make strntoi
-make strntoi.o
-make strntoi.c
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done strntoi.c
-meta strntoi.o %.c>%.o strntoi.c strntoi
-prev strntoi.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntoi.c
-done strntoi.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o strntoi strntoi.o ${mam_libast}
-done strntoi generated
-exec - regress  strntoi.tst strntoi
-done test.strntoi virtual
 make test.strtof
 make strtof.tst
 done strtof.tst
 make strtof
 make strtof.o
 make strtof.c
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ../../lib/libast/ast_stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ../../lib/libast/ast_stdio.h
-done ${PACKAGE_ast_INCLUDE}/stdio.h
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done strtof.c
 meta strtof.o %.c>%.o strtof.c strtof
@@ -205,23 +188,6 @@ exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${I
 done strtof generated
 exec - regress  strtof.tst strtof
 done test.strtof virtual
-make test.strntof
-make strntof.tst
-done strntof.tst
-make strntof
-make strntof.o
-make strntof.c
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done strntof.c
-meta strntof.o %.c>%.o strntof.c strntof
-prev strntof.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntof.c
-done strntof.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o strntof strntof.o ${mam_libast}
-done strntof generated
-exec - regress  strntof.tst strntof
-done test.strntof virtual
 make test.base64
 make base64
 make base64.o

@@ -153,7 +153,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done stats.c
 meta stats.o %.c>%.o stats.c stats
 prev stats.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2007 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssstats]"\" -c stats.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssstats]"\" -c stats.c
 done stats.o generated
 exec - ${AR} cr libdssstats.a stats.o
 exec - (ranlib libdssstats.a) >/dev/null 2>&1 || true

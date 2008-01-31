@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2007 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -412,7 +412,7 @@ int		len;
 	unsigned char*	bp;
 	int		reverse = f->rflag ? ~0: 0;
 
-	if (kp->xfrmbuf)
+	if (kp->xfrmbuf && len)
 	{
 		n = ((len + 1) * 4);
 		for (;;)
@@ -423,7 +423,7 @@ int		len;
 				if (!(kp->xfrmbuf = vmnewof(Vmheap, kp->xfrmbuf, unsigned char, n, 0)))
 				{
 					if (kp->keydisc->errorf)
-						(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: numeric field overflow", dp);
+						(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: multibyte field overflow", dp);
 					goto native;
 				}
 			}
@@ -1207,7 +1207,7 @@ register Rskey_t*	kp;
 	{
 		kp->field.maxfield += 2;
 		kp->disc->defkeyf = code;
-		kp->disc->key = 2 * kp->field.maxfield;
+		kp->disc->key = (mbcoll() ? 5 : 2) * kp->field.maxfield;
 		if (!(kp->field.positions = vmnewof(Vmheap, 0, unsigned char*, kp->field.maxfield, 0)))
 		{
 			if (kp->keydisc->errorf)

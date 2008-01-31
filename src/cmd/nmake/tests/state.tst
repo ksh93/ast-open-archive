@@ -8,9 +8,9 @@ TEST 01 'state views'
 		INPUT Makefile $'all : one two
 one : .ALWAYS .VIRTUAL .FORCE
 	cd $(<)
-	MAKEPATH=.. ../$(PWD:P=R=$(MAKE)) $(-) -f main.mk CODE==$(code)
+	MAKEPATH=.. $(MAKE) $(-) -f main.mk CODE==$(code)
 two : .ALWAYS .VIRTUAL .FORCE
-	$(PWD:P=R=$(MAKE)) $(-) -f main.mk CODE==$(code)'
+	$(MAKE) $(-) -f main.mk CODE==$(code)'
 		INPUT cc.probe
 		INPUT one/
 		INPUT main.mk $'%.o : %.c
@@ -22,7 +22,7 @@ app :: a.c b.c c.c'
 		INPUT b.c $'extern int c(); int b() { return c() + CODE; }'
 		INPUT c.c $'int c() { return CODE; }'
 		ERROR - $'+ cd one
-+ ../../nmake --nojobs -f main.mk CODE==2
++ nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..
 + : -DCODE=2
 + 1> a.o
@@ -35,13 +35,13 @@ app :: a.c b.c c.c'
 
 	EXEC	--nojobs one code=2
 		ERROR - $'+ cd one
-+ ../../nmake --nojobs -f main.mk CODE==2
++ nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..'
 
 	EXEC	--nojobs one code=2
 
 	EXEC	--nojobs two code=0
-		ERROR - $'+ ../nmake --nojobs -f main.mk CODE==0
+		ERROR - $'+ nmake --nojobs -f main.mk CODE==0
 + : -DCODE=0
 + 1> a.o
 + : -DCODE=0
@@ -53,11 +53,11 @@ app :: a.c b.c c.c'
 
 	EXEC	--nojobs two code=0
 		INPUT two/
-		ERROR - $'+ ../nmake --nojobs -f main.mk CODE==0'
+		ERROR - $'+ nmake --nojobs -f main.mk CODE==0'
 
 	EXEC	--nojobs one code=2
 		ERROR - $'+ cd one
-+ ../../nmake --nojobs -f main.mk CODE==2
++ nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..
 + : -DCODE=2
 + 1> a.o

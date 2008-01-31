@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2007 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -489,6 +489,7 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 	Cxoperand_t		r;
 	Cxrecode_f		f;
 	Cxunsigned_t		m;
+	char*			s;
 
 	static Cxformat_t	format;
 
@@ -605,6 +606,32 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 		}
 		if (type1->fundamental == type2->fundamental && (x.callout = cxcallout(cx, op, type1->fundamental, type1->fundamental, cx->disc)))
 			goto done;
+		if (v1 && cxisstring(type1) && !v2 && cxisnumber(type2) && (x.callout = cxcallout(cx, op, type1->fundamental, type1->fundamental, cx->disc)) && !cxnum2str(cx, &v1->format, i2->data.number, &s))
+		{
+			i2->op = CX_STR;
+			i2->type = type1->fundamental;
+			if (!(i2->data.string.data = vmstrdup(cx->pm, s)))
+			{
+				if (cx->disc->errorf)
+					(*cx->disc->errorf)(cx, cx->disc, 2, "out of space");
+				return 0;
+			}
+			i2->data.string.size = strlen(s);
+			goto done;
+		}
+		if (v2 && cxisstring(type2) && !v1 && cxisnumber(type1) && (x.callout = cxcallout(cx, op, type2->fundamental, type2->fundamental, cx->disc)) && !cxnum2str(cx, &v2->format, i1->data.number, &s))
+		{
+			i1->op = CX_STR;
+			i1->type = type2->fundamental;
+			if (!(i1->data.string.data = vmstrdup(cx->pm, s)))
+			{
+				if (cx->disc->errorf)
+					(*cx->disc->errorf)(cx, cx->disc, 2, "out of space");
+				return 0;
+			}
+			i1->data.string.size = strlen(s);
+			goto done;
+		}
 		if (cxisstring(type2) && type1->internalf && (x.callout = cxcallout(cx, op, type1->fundamental, type1->fundamental, cx->disc)))
 		{
 			if (cxisnumber(type1) && v1 && v1->format.map && !cxstr2num(cx, &v1->format, i2->data.string.data, i2->data.string.size, &m))
@@ -614,12 +641,15 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 				i2->data.number = (Cxinteger_t)m;
 				goto done;
 			}
-			if ((*type1->internalf)(cx, type1, NiL, &format, &r.value, i2->data.string.data, i2->data.string.size, cx->pm, cx->disc) < 0)
-				return 0;
-			i2->op = CX_NUM;
-			i2->type = type1->fundamental;
-			i2->data = r.value;
-			goto done;
+			if (!v2)
+			{
+				if ((*type1->internalf)(cx, type1, NiL, &format, &r.value, i2->data.string.data, i2->data.string.size, cx->pm, cx->disc) < 0)
+					return 0;
+				i2->op = CX_NUM;
+				i2->type = type1->fundamental;
+				i2->data = r.value;
+				goto done;
+			}
 		}
 		if (cxisstring(type1) && type2->internalf && (x.callout = cxcallout(cx, op, type2->fundamental, type2, cx->disc)))
 		{
@@ -630,12 +660,15 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 				i1->data.number = (Cxinteger_t)m;
 				goto done;
 			}
-			if ((*type2->internalf)(cx, type2, NiL, &format, &r.value, i1->data.string.data, i1->data.string.size, cx->pm, cx->disc) < 0)
-				return 0;
-			i1->op = CX_NUM;
-			i1->type = type2->fundamental;
-			i1->data = r.value;
-			goto done;
+			if (!v1)
+			{
+				if ((*type2->internalf)(cx, type2, NiL, &format, &r.value, i1->data.string.data, i1->data.string.size, cx->pm, cx->disc) < 0)
+					return 0;
+				i1->op = CX_NUM;
+				i1->type = type2->fundamental;
+				i1->data = r.value;
+				goto done;
+			}
 		}
 	}
 	if (x.callout = cxcallout(cx, op, cx->state->type_void, cx->state->type_void, cx->disc))
