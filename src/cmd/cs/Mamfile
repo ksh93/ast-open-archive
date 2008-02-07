@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-10-18
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-02-02
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -170,7 +170,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast 
 done cs.o generated
 bind -lcs
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o cs cs.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o cs cs.o ${mam_libcs} ${mam_libast}
 done cs generated
 make css
 make css.o
@@ -187,7 +187,7 @@ meta css.o %.c>%.o css.c css
 prev css.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c css.c
 done css.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o css css.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o css css.o ${mam_libcs} ${mam_libast}
 done css generated
 make cat.svc
 make cat.o
@@ -205,7 +205,7 @@ meta cat.o %.c>%.o cat.c cat
 prev cat.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cat.c
 done cat.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o cat.svc cat.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o cat.svc cat.o ${mam_libcs} ${mam_libast}
 done cat.svc generated
 make dbm.svc
 make dbm.o
@@ -229,7 +229,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_
 done dbm.o generated
 make ${mam_libdbm} archive
 done ${mam_libdbm} dontcare virtual
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o dbm.svc dbm.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o dbm.svc dbm.o ${mam_libcs} ${mam_libast}
 done dbm.svc generated
 make fs_env.svc
 make fs_env.o
@@ -247,7 +247,7 @@ meta fs_env.o %.c>%.o fs_env.c fs_env
 prev fs_env.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c fs_env.c
 done fs_env.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o fs_env.svc fs_env.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o fs_env.svc fs_env.o ${mam_libcs} ${mam_libast}
 done fs_env.svc generated
 make mbb.svc
 make mbb.o
@@ -261,7 +261,7 @@ meta mbb.o %.c>%.o mbb.c mbb
 prev mbb.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c mbb.c
 done mbb.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mbb.svc mbb.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mbb.svc mbb.o ${mam_libcs} ${mam_libast}
 done mbb.svc generated
 make nam.svc
 make nam.o
@@ -275,7 +275,7 @@ meta nam.o %.c>%.o nam.c nam
 prev nam.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c nam.c
 done nam.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o nam.svc nam.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o nam.svc nam.o ${mam_libcs} ${mam_libast}
 done nam.svc generated
 make pid.svc
 make pid.o
@@ -290,7 +290,7 @@ meta pid.o %.c>%.o pid.c pid
 prev pid.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pid.c
 done pid.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o pid.svc pid.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pid.svc pid.o ${mam_libcs} ${mam_libast}
 done pid.svc generated
 make rsh.svc
 make rsh.o
@@ -308,7 +308,7 @@ meta rsh.o %.c>%.o rsh.c rsh
 prev rsh.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c rsh.c
 done rsh.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o rsh.svc rsh.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o rsh.svc rsh.o ${mam_libcs} ${mam_libast}
 done rsh.svc generated
 make tst-old.svc
 make tst-old.o
@@ -321,7 +321,7 @@ meta tst-old.o %.c>%.o tst-old.c tst-old
 prev tst-old.c
 exec - ${CC} -g -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tst-old.c
 done tst-old.o generated
-exec - ${CC} ${CCLDFLAGS} -g ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o tst-old.svc tst-old.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} -g ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tst-old.svc tst-old.o ${mam_libcs} ${mam_libast}
 done tst-old.svc generated
 make tst.svc
 make tst.o
@@ -334,7 +334,7 @@ meta tst.o %.c>%.o tst.c tst
 prev tst.c
 exec - ${CC} -g -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tst.c
 done tst.o generated
-exec - ${CC} ${CCLDFLAGS} -g ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o tst.svc tst.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} -g ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tst.svc tst.o ${mam_libcs} ${mam_libast}
 done tst.svc generated
 make 6263.svc
 make 6263.o
@@ -346,7 +346,7 @@ meta 6263.o %.c>%.o 6263.c 6263
 prev 6263.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c 6263.c
 done 6263.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o 6263.svc 6263.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o 6263.svc 6263.o ${mam_libcs} ${mam_libast}
 done 6263.svc generated
 make imount
 make mnt_imount.o
@@ -417,7 +417,7 @@ meta mnt_vcs.o %.c>%.o vcs_src/mnt_vcs.c mnt_vcs
 prev vcs_src/mnt_vcs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_vcs.c
 done mnt_vcs.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o imount mnt_imount.o mnt_list.o mnt_mount.o mnt_mtab.o mnt_touch.o mnt_umount.o mnt_vcs.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o imount mnt_imount.o mnt_list.o mnt_mount.o mnt_mtab.o mnt_touch.o mnt_umount.o mnt_vcs.o ${mam_libcs} ${mam_libast}
 done imount generated
 make vcs.svc
 make vcs.o
@@ -611,7 +611,7 @@ prev vcs_src/vcs_replica.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_replica.c
 done vcs_replica.o generated
 bind -lodelta
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o vcs.svc vcs.o ifs_agent.o ifs_network.o ifs_func.o ifs_ftp.o ifs_gopher.o ifs_http.o ifs_news.o ifs_rsh.o vcs_rscs.o vcs_checkout.o vcs_attr.o vcs_dir.o vcs_tag.o vcs_misc.o vcs_message.o vcs_search.o vcs_marker.o vcs_replica.o ${mam_libodelta} ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o vcs.svc vcs.o ifs_agent.o ifs_network.o ifs_func.o ifs_ftp.o ifs_gopher.o ifs_http.o ifs_news.o ifs_rsh.o vcs_rscs.o vcs_checkout.o vcs_attr.o vcs_dir.o vcs_tag.o vcs_misc.o vcs_message.o vcs_search.o vcs_marker.o vcs_replica.o ${mam_libodelta} ${mam_libcs} ${mam_libast}
 done vcs.svc generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin

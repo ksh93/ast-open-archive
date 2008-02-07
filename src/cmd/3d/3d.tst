@@ -333,7 +333,7 @@ TEST 06 symlink spaghetti &&
 	LN -s usr/bin bin
 	LN -s ../../sbin/cmd usr/bin/cmd
 	CD bin
-	cmd
+	PATH=:$PATH cmd
 }
 
 TEST 07 PWD==top top exists, bot virtual &&

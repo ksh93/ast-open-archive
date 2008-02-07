@@ -1,3 +1,5 @@
+08-02-02 --- release 5.3 ---
+08-02-02 Makerules.mk: add LDRUNPATH init from $(CC.RUNPATH)
 07-12-15 Scanrules.mk: add "set stdio HEADER" to .SCAN.iffe
 07-11-26 Makerules.mk: handle a.req => -lfoo -lbar, and -la does not exists
 07-10-22 Makerules.mk: initialize (CC.SHARED.LIBS.target) to match .SHARED.LIST.LIBS.

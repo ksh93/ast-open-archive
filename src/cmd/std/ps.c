@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2006-11-23 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2008-01-31 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -340,7 +340,7 @@ static Key_t	keys[] =
 	{
 		"npid",
 		"NPID",
-		"native process id.",
+		"Native process id.",
 		PSS_npid,
 		KEY_npid,
 		5, 0,
@@ -392,7 +392,7 @@ static Key_t	keys[] =
 	{
 		"refcount",
 		"REFS",
-		"reference count.",
+		"Reference count.",
 		PSS_refcount,
 		KEY_refcount,
 		4, 0,

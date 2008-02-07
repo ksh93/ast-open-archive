@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2007-11-26 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-02-02 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -392,7 +392,7 @@ IGNORE = ignore
 LD = $(CC.LD)
 LDFLAGS =
 LDSHARED = $(CC.SHARED.LD|CC.LD)
-LDRUNPATH =
+LDRUNPATH = $(CC.RUNPATH)
 if "$(sh if $(FLEX) $(FLEXFLAGS) --version >/dev/null 2>&1; then echo 0; else echo 1; fi)" == "0"
 LEX = $(FLEX)
 LEXFLAGS = $(FLEXFLAGS)
@@ -4088,13 +4088,13 @@ PACKAGES : .SPECIAL .FUNCTION
 	if "$(-mam:N=(regress|static)*)"
 		LDFLAGS &= $(T3:V)
 	else
+		if "$(CC.LD.ORIGIN:V)"
+			T4 += $$(CC.LD.ORIGIN)
+		end
 		if "$(CC.LD.RUNPATH:V)"
 			T4 += $$(.CC.LD.RUNPATH.)
 		end
 		LDFLAGS &= $$(*.SOURCE.%.ARCHIVE:I=$$$(*:N=-l*:P=D):$(.CC.NOSTDLIB.):P=A:/^/-L/) $(T3:V)
-	end
-	if "$(CC.LD.ORIGIN:V)"
-		T4 += $$(CC.LD.ORIGIN)
 	end
 	CCLDFLAGS &= $$(CCFLAGS:N!=-[DIU]*:@C@$$(CC.ALTPP.FLAGS)@@) $$(LDFLAGS) $(T4:V)
 	if "$(CC.LD.STRIP:V)"
@@ -4349,7 +4349,7 @@ test : .SPECIAL .DONTCARE .ONOBJECT $$("check":A=.TARGET:A!=.ARCHIVE|.COMMAND|.O
 .CC-INSTALL : .ONOBJECT .ALL $$(*.INSTALL:N=*-*$$(CC.SUFFIX.ARCHIVE))
 
 .CC.LD.RUNPATH. : .FUNCTION
-	if LDRUNPATH && CC.LD.RUNPATH && "$(CC.DIALECT:N=DYNAMIC)" && ( "$(CCLDFLAGS:V:N=$(CC.DYNAMIC)|$\(CC.DYNAMIC\))" || ! "$(CCLDFLAGS:V:N=$(CC.STATIC)|$\(CC.STATIC\))" )
+	if "$(LDRUNPATH)" && CC.LD.RUNPATH && "$(CC.DIALECT:N=DYNAMIC)" && ( "$(CCLDFLAGS:V:N=$(CC.DYNAMIC)|$\(CC.DYNAMIC\))" || ! "$(CCLDFLAGS:V:N=$(CC.STATIC)|$\(CC.STATIC\))" )
 		local T
 		T := $(LDRUNPATH:N!=.) $(*.SOURCE.%.ARCHIVE:I=$$(**:N=-l*:P=D):N!=.:$(.CC.NOSTDLIB.):P=A:N!=$(LIBDIR))
 		if T = "$(T:@/ /:/G)"

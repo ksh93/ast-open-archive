@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.2 2007-10-18
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-02-02
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -162,7 +162,7 @@ prev proto.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libpp -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?proto]"\" -c proto.c
 done proto.o generated
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o proto proto.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o proto proto.o ${mam_libast}
 done proto generated
 make mamake
 make mamake.o
@@ -178,7 +178,7 @@ setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/mamake.c
 done mamake.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mamake mamake.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mamake mamake.o ${mam_libast}
 done mamake generated
 make ratz
 make ratz.o
@@ -204,7 +204,7 @@ meta ratz.o %.c>%.o ../INIT/ratz.c ratz
 prev ../INIT/ratz.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ../INIT/ratz.c
 done ratz.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o ratz ratz.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o ratz ratz.o ${mam_libast}
 done ratz generated
 make release
 make release.o
@@ -219,7 +219,7 @@ setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/release.c
 done release.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o release release.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o release release.o ${mam_libast}
 done release generated
 make sear
 make sear.sh
