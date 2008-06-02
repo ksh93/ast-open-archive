@@ -2,9 +2,9 @@
 
 INCLUDE test.def
 
-KEEP BIN cc.probe pp.probe pkg-cobol.mk
+KEEP usrbin cc.probe pp.probe pkg-cobol.mk
 
-export ARFLAGS=cr PATH=$TWD/BIN:$PATH
+export ARFLAGS=cr PATH=$TWD/usrbin:$PATH
 export MAKE_OPTIONS="$MAKE_OPTIONS CC.PROBE=$TWD/cc.probe CC.PROBEPP=$TWD/pp.probe"
 
 TEST 00 'initialize cc intercepts'
@@ -131,11 +131,11 @@ CC.UNIVERSE = att
 #pragma pp:map "/#(pragma )?sccs>/"
 !
 
-mkdir $TWD/BIN
+mkdir $TWD/usrbin
 
 cmd=$(whence cc 2>/dev/null)
 [[ $cmd ]] || cmd=gcc
-cat > $TWD/BIN/cc <<!
+cat > $TWD/usrbin/cc <<!
 case " \$* " in
 *" -shared "*)
 	while	:
@@ -154,13 +154,13 @@ case " \$* " in
 	;;
 esac
 !
-chmod +x $TWD/BIN/cc
+chmod +x $TWD/usrbin/cc
 
 if ! whence ranlib >/dev/null 2>&1
-then	cat > $TWD/BIN/ranlib <<'!'
+then	cat > $TWD/usrbin/ranlib <<'!'
 exit 0
 !
-	chmod +x $TWD/BIN/ranlib
+	chmod +x $TWD/usrbin/ranlib
 fi
 
 cat > pkg-cobol.mk <<'!'

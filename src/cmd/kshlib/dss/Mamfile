@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -41,6 +41,7 @@ make dss
 make libkshdss.a archive
 make dss.o
 make dss.c
+make ${PACKAGE_ast_INCLUDE}/dsslib.h implicit
 make ${PACKAGE_ast_INCLUDE}/dss.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -124,7 +125,28 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cx.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/dss.h
+done ${PACKAGE_ast_INCLUDE}/dss.h dontcare
+make ${PACKAGE_ast_INCLUDE}/cxlib.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cx.h implicit
+prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/cxlib.h dontcare
+make ${PACKAGE_ast_INCLUDE}/tag.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/tag.h dontcare
+make ${PACKAGE_ast_INCLUDE}/swap.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/swap.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/dt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/dsslib.h
 make ${PACKAGE_ast_INCLUDE}/shell.h implicit
 make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
@@ -147,6 +169,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
 make ${PACKAGE_ast_INCLUDE}/nval.h implicit
+prev ${PACKAGE_ast_INCLUDE}/option.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -160,7 +183,7 @@ done ${PACKAGE_ast_INCLUDE}/shell.h
 done dss.c
 meta dss.o %.c>%.o dss.c dss
 prev dss.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshdss]"\" -D_PACKAGE_ast -c dss.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshdss]"\" -D_BLD_dss -D_PACKAGE_ast -D_BLD_DEBUG -c dss.c
 done dss.o generated
 exec - ${AR} cr libkshdss.a dss.o
 exec - (ranlib libkshdss.a) >/dev/null 2>&1 || true

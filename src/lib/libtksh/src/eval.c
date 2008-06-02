@@ -15,9 +15,10 @@ static int inEval;
 static int tksh_command(int argc, char *argv[], void *data)
 {
 	int result, commandType, oldInterpType;
-	TkshCommandData *commandData = (TkshCommandData *) data;
+	TkshCommandData *commandData = (TkshCommandData *)((Shbltin_t*)data)->ptr;
 	Interp *interp = (Interp *) commandData->interp;
 
+	interp->shbltin = data;
 	Tcl_ResetResult(commandData->interp);
 
 	commandType = commandData->commandType;

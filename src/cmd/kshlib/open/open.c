@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*              Copyright (c) 2007 AT&T Knowledge Ventures              *
+*          Copyright (c) 2007-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -244,7 +244,6 @@ static Namval_t *fieldcreate(Namval_t *np, const char *name, int flags, Namfun_t
 	Namval_t *nq,**nodes = (Namval_t**)(dcp+1);
 	int n = fp-sp->fields;
 	int len =  strlen(fp->name);
-	void *data = (void*)np->nvalue;
 	if(!(nq=nodes[n]))
 	{
 		nodes[n] = nq = sh_newnode(fp,np);

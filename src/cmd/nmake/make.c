@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -681,8 +681,12 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 			{
 				if (r->time < r0->event && (r1 = staterule(PREREQS, r, NiL, 0)) && r1->time >= r0->event)
 					r->time = r1->time;
+				else if (!r->time)
+					r0->event = OLDTIME;
+				else if (r->time < r0->event)
+					r->time = r0->event;
 				else
-					r0->event = r->time ? r->time : OLDTIME;
+					r0->event = r->time;
 				state.savestate = 1;
 			}
 			else

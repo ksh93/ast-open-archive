@@ -177,6 +177,53 @@ final day feb 1996			NULL	Thu Feb 29 00:00:00 EST 1996
 2000-02-29 00:00:00			NULL	Tue Feb 29 00:00:00 EST 2000
 
 #
+# ISO 8601:2000 forms
+#
+
+1995-02-04				NULL	Sat Feb  4 12:19:47 EST 1995
+19950204				NULL	Sat Feb  4 12:19:47 EST 1995
+1995-02					NULL	Wed Feb 22 12:19:47 EST 1995
+199502					NULL	Wed Feb 22 12:19:47 EST 1995
+1995					NULL	Fri Sep 22 12:19:47 EDT 1995
+1997-W01				NULL	Mon Dec 30 12:19:47 EST 1996
+1997W01					NULL	Mon Dec 30 12:19:47 EST 1996
+1997-W01-2				NULL	Tue Dec 31 12:19:47 EST 1996
+1997W012				NULL	Tue Dec 31 12:19:47 EST 1996
+1997W071				NULL	Mon Feb 10 12:19:47 EST 1997
+1997W081				NULL	Mon Feb 17 12:19:47 EST 1997
+1997W091				NULL	Mon Feb 24 12:19:47 EST 1997
+1976-W53-7				NULL	Sun Jan  2 12:19:47 EST 1977
+2008W26-6				NULL	Sat Jun 28 12:19:47 EDT 2008
+2008W27-6				NULL	Sat Jul  5 12:19:47 EDT 2008
+2008W28-6				NULL	Sat Jul 12 12:19:47 EDT 2008
+2009W26-6				NULL	Sat Jun 27 12:19:47 EDT 2009
+2009W27-6				NULL	Sat Jul  4 12:19:47 EDT 2009
+2009W28-6				NULL	Sat Jul 11 12:19:47 EDT 2009
+1995-039				NULL	Wed Feb  8 12:19:47 EST 1995
+1995039					NULL	Wed Feb  8 00:00:00 EST 1995
+2000-01-02T03.04.05			NULL	Sun Jan  2 03:04:05 EST 2000
+2000-01-02T03.04.05.678901		NULL	Sun Jan  2 03:04:05 EST 2000
+1996-02-29T10:32:54			NULL	Thu Feb 29 10:32:54 EST 1996
+1998-02-29T10:32:54			NULL	Sun Mar  1 10:32:54 EST 1998
+1995031					NULL	Tue Jan 31 00:00:00 EST 1995
+1995041					NULL	Fri Feb 10 00:00:00 EST 1995
+1995-031				NULL	Tue Jan 31 12:19:47 EST 1995
+1995-041				NULL	Fri Feb 10 12:19:47 EST 1995
+1995031Z				NULL	Mon Jan 30 19:00:00 EST 1995
+1995041Z				NULL	Thu Feb  9 19:00:00 EST 1995
+1995-031Z				NULL	Tue Jan 31 07:19:47 EST 1995
+1995-041Z				NULL	Fri Feb 10 07:19:47 EST 1995
+1996-02-29T10:32:54Z			NULL	Thu Feb 29 05:32:54 EST 1996
+1996-02-29T10:32:54.67890Z		NULL	Thu Feb 29 05:32:54 EST 1996
+1998-02-29T10:32:54Z			NULL	Sun Mar  1 05:32:54 EST 1998
+1998-02-29T10:32:54.67890Z		NULL	Sun Mar  1 05:32:54 EST 1998
+1996-02-29T10.32.54Z			NULL	Thu Feb 29 05:32:54 EST 1996
+1996-02-29T10.32.54.67890Z		NULL	Thu Feb 29 05:32:54 EST 1996
+1998-02-29T10.32.54Z			NULL	Sun Mar  1 05:32:54 EST 1998
+1998-02-29T10.32.54.67890Z		NULL	Sun Mar  1 05:32:54 EST 1998
+2009W28-6Z				NULL	Sat Jul 11 08:19:47 EDT 2009
+
+#
 # signed upper limit
 #
 
@@ -331,6 +378,81 @@ next 01:00 pm				NULL	Mon Sep 22 13:00:00 EDT 1986
 ,#986713199				NULL	Sun Apr  8 02:59:59 EDT 2001
 ,#986713200				NULL	Sun Apr  8 03:00:00 EDT 2001
 ,#986713201				NULL	Sun Apr  8 03:00:01 EDT 2001
+
+# testdate.sh tests
+
+SET					NOW	2008-05-01+01:02:03
+
+now					NULL	Thu May  1 01:02:03 EDT 2008
+
+sunday					NULL	Sun May  4 01:02:03 EDT 2008
+monday					NULL	Mon May  5 01:02:03 EDT 2008
+tuesday					NULL	Tue May  6 01:02:03 EDT 2008
+wednesday				NULL	Wed May  7 01:02:03 EDT 2008
+thursday				NULL	Thu May  1 01:02:03 EDT 2008
+friday					NULL	Fri May  2 01:02:03 EDT 2008
+saturday				NULL	Sat May  3 01:02:03 EDT 2008
+
+this month				NULL	Thu May  1 00:00:00 EDT 2008
+last month				NULL	Tue Apr  1 00:00:00 EDT 2008
+next month				NULL	Sun Jun  1 00:00:00 EDT 2008
+
+this month 1st monday			NULL	Mon May  5 00:00:00 EDT 2008
+this month first monday			NULL	Mon May  5 00:00:00 EDT 2008
+1st monday may 2008			NULL	Mon May  5 00:00:00 EDT 2008
+first monday may 2008			NULL	Mon May  5 00:00:00 EDT 2008
+
+this month 2nd monday			NULL	Mon May 12 00:00:00 EDT 2008
+this month second monday		NULL	Mon May 12 00:00:00 EDT 2008
+2nd monday may 2008			NULL	Mon May 12 00:00:00 EDT 2008
+second monday may 2008			NULL	Mon May 12 00:00:00 EDT 2008
+
+this month 3rd monday			NULL	Mon May 19 00:00:00 EDT 2008
+this month third monday			NULL	Mon May 19 00:00:00 EDT 2008
+3rd monday may 2008			NULL	Mon May 19 00:00:00 EDT 2008
+third monday may 2008			NULL	Mon May 19 00:00:00 EDT 2008
+
+this month 4th monday			NULL	Mon May 26 00:00:00 EDT 2008
+this month fourth monday		NULL	Mon May 26 00:00:00 EDT 2008
+4th monday may 2008			NULL	Mon May 26 00:00:00 EDT 2008
+fourth monday may 2008			NULL	Mon May 26 00:00:00 EDT 2008
+
+this month 5th monday			NULL	Mon Jun  2 00:00:00 EDT 2008
+this month fifth monday			NULL	Mon Jun  2 00:00:00 EDT 2008
+5th monday may 2008			NULL	Mon Jun  2 00:00:00 EDT 2008
+fifth monday may 2008			NULL	Mon Jun  2 00:00:00 EDT 2008
+
+this month 6th monday			NULL	Mon Jun  9 00:00:00 EDT 2008
+this month sixth monday			NULL	Mon Jun  9 00:00:00 EDT 2008
+6th monday may 2008			NULL	Mon Jun  9 00:00:00 EDT 2008
+sixth monday may 2008			NULL	Mon Jun  9 00:00:00 EDT 2008
+
+this month nth monday			NULL	Mon May 26 00:00:00 EDT 2008
+this month final monday			NULL	Mon May 26 00:00:00 EDT 2008
+nth monday may 2008			NULL	Mon May 26 00:00:00 EDT 2008
+final monday may 2008			NULL	Mon May 26 00:00:00 EDT 2008
+
+last month first monday			NULL	Mon Apr  7 00:00:00 EDT 2008
+last month 1st monday			NULL	Mon Apr  7 00:00:00 EDT 2008
+last month second monday		NULL	Mon Apr 14 00:00:00 EDT 2008
+last month 2nd monday			NULL	Mon Apr 14 00:00:00 EDT 2008
+last month third monday			NULL	Mon Apr 21 00:00:00 EDT 2008
+last month 3rd monday			NULL	Mon Apr 21 00:00:00 EDT 2008
+last month fourth monday		NULL	Mon Apr 28 00:00:00 EDT 2008
+last month 4th monday			NULL	Mon Apr 28 00:00:00 EDT 2008
+last month final monday			NULL	Mon Apr 28 00:00:00 EDT 2008
+last month nth monday			NULL	Mon Apr 28 00:00:00 EDT 2008
+
+next month first monday			NULL	Mon Jun  2 00:00:00 EDT 2008
+next month 1st monday			NULL	Mon Jun  2 00:00:00 EDT 2008
+next month second monday		NULL	Mon Jun  9 00:00:00 EDT 2008
+next month 2nd monday			NULL	Mon Jun  9 00:00:00 EDT 2008
+next month third monday			NULL	Mon Jun 16 00:00:00 EDT 2008
+next month 3rd monday			NULL	Mon Jun 16 00:00:00 EDT 2008
+next month fourth monday		NULL	Mon Jun 23 00:00:00 EDT 2008
+next month 4th monday			NULL	Mon Jun 23 00:00:00 EDT 2008
+next month final monday			NULL	Mon Jun 30 00:00:00 EDT 2008
+next month nth monday			NULL	Mon Jun 30 00:00:00 EDT 2008
 
 # format tests
 

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -169,8 +169,20 @@ number_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 		*f = 0;
 		n = sfsprintf(buf, size, fmt, (intmax_t)value->number);
 	}
+	else if (format->width)
+	{
+		int	w;
+
+		w = format->width - ((value->number < 0) ? 2 : 1);
+		n = sfsprintf(buf, size, "%#.*I*g", w, sizeof(value->number), value->number);
+		if (n != w)
+		{
+			w += w - n;
+			n = sfsprintf(buf, size, "%#.*I*g", w, sizeof(value->number), value->number);
+		}
+	}
 	else
-		n = sfsprintf(buf, size, "%1.*Lg", format->width ? format->width : 15, value->number);
+		n = sfsprintf(buf, size, "%1.15I*g", sizeof(value->number), value->number);
 	if (n < 0)
 		return -1;
 	if (n > size)

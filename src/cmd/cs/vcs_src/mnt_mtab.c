@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -77,7 +77,6 @@ int im_restart(argc, argv)
 	register int	n;
 	int		fd;
 	int 		do_call();
-	char*		kcmd= "kill";
 
 	error_info.id = argv[0];
 	opt_info.index = 1;

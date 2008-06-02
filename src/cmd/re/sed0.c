@@ -22,7 +22,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Research) 2007-11-19 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Research) 2008-02-02 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"
@@ -48,6 +48,7 @@ USAGE_LICENSE
 "[S:strict?Enable strict regular expression interpretation. This is the"
 "	default if \bgetconf CONFORMANCE\b is \bstandard\b. You'd be"
 "	suprised what the lenient mode lets by.]"
+"[m?multi-digit-reference?Enable \a\\dd\a multi-digit backreferences.]"
 "[d?Ignored by this implementation.]"
 
 "\n"
@@ -107,8 +108,13 @@ main(int argc, char **argv)
 		case 'f':
 			readscript(&data, opt_info.arg);
 			break;
+		case 'm':
+			reflags |= REG_MULTIREF;
+			break;
 		case 'n':
 			nflag++;
+			break;
+		case 'd':
 			break;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);

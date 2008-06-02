@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2007 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Research) 2007-09-05 $\n]"
+"[-n?\n@(#)$Id: sort (AT&T Research) 2008-04-24 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"

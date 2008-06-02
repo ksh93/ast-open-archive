@@ -1,12 +1,12 @@
 # regression tests for the pack utilitiy
 
-VIEW data pack.c
+VIEW data pack.dat
 
 TEST 01 'basics'
 	DO cp $data .
-	EXEC	pack.c
-		OUTPUT - $'pack: pack.c : 31.8% Compression'
-	PROG	unpack pack.c
-		OUTPUT - $'unpack: pack.c.z: unpacked'
-	PROG	cmp $data pack.c
+	EXEC	pack.dat
+		OUTPUT - $'pack: pack.dat : 31.8% Compression'
+	PROG	unpack pack.dat
+		OUTPUT - $'unpack: pack.dat.z: unpacked'
+	PROG	cmp $data pack.dat
 		OUTPUT -

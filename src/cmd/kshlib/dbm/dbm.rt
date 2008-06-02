@@ -2,7 +2,7 @@ NOTE regression tests for the ksh dbm plugin
 
 UNIT ksh
 
-TEST '--create, --read, --write'
+TEST '--read, --write'
 
 	EXEC -c 'builtin -f dbm dbm_open dbm_get dbm_set dbm_close
 		set \
@@ -20,6 +20,19 @@ TEST '--create, --read, --write'
 		do	dbm_set "$1" "$2"
 			shift 2
 		done
+		dbm_close
+	'
+
+	EXEC -c 'builtin -f dbm dbm_open dbm_get dbm_set dbm_close
+		dbm_open --read tst.dbm
+		set -s -- $(
+			while	:
+			do	key=$(dbm_get)
+				[[ $key ]] || break
+				print -r -- "$key"
+			done
+		)
+		print -r "$@"
 		dbm_close
 	'
 

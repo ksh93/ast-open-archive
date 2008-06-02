@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -801,7 +801,6 @@ typedef struct State_s			/* program state		*/
 	unsigned char	preprocess;	/* preprocess all makefiles	*/
 	unsigned char	reading;	/* currently reading makefile	*/
 	unsigned char	readonly;	/* current vars|opts readonly	*/
-	unsigned char	regress;	/* output for regression test	*/
 	unsigned char	ruledump;	/* dump rule information	*/
 	unsigned char	savestate;	/* must save state variables	*/
 	unsigned char	scan;		/* scan|check implicit prereqs	*/
@@ -842,6 +841,7 @@ typedef struct State_s			/* program state		*/
 	char*		loading;	/* loading this object file	*/
 	char*		makefile;	/* first makefile name		*/
 	char*		objectfile;	/* make object file name	*/
+	char*		regress;	/* output for regression test	*/
 	char*		rules;		/* base rules base name		*/
 	char*		statefile;	/* state variable file name	*/
 	char*		targetprefix;	/* target prefix dir separator	*/

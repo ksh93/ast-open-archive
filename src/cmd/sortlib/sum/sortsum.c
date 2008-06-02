@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2006-01-15 $\n]"
+"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2008-05-08 $\n]"
 USAGE_LICENSE
 "[+NAME?sortsum - sort uniq summary discipline]"
 "[+DESCRIPTION?The \bsortsum\b \bsort\b(1) discipline applies "
@@ -201,7 +201,8 @@ record(register State_t* state, register Rsobj_t* r, int op)
 		}
 		else
 			a = z = s;
-		w = sum->format.width = z - a;
+		w = z - a;
+		sum->format.width = RECTYPE(state->fmt) == REC_fixed ? w : (!(sum->format.flags & CX_FLOAT) || sum->end.index || w >= 8) ? 0 : 8;
 		if (map = sum->map)
 		{
 			ASSURE(state, &state->tmp, w + 2);
@@ -257,17 +258,19 @@ record(register State_t* state, register Rsobj_t* r, int op)
 						*a++ = sum->set;
 					continue;
 				}
-				n = w;
-				do
+				n = (RECTYPE(state->fmt) == REC_fixed || w < 7) ? 7 : w;
+				for (;;)
 				{
-					y = n + 2;
+					y = n + 1;
 					ASSURE(state, &state->tmp, y);
 					if ((n = (*sum->type->externalf)(cx, sum->type, NiL, &sum->format, &v, (char*)state->tmp.buf, y, cx->disc)) < 0)
 					{
 						error(2, "%s value %I*g conversion error", sum->type->name, sizeof(v.number), v.number);
 						return -1;
 					}
-				} while (n >= y);
+					if (n < y)
+						break;
+				}
 				if (n > w)
 				{
 					if (sum->end.index || RECTYPE(state->fmt) == REC_fixed)

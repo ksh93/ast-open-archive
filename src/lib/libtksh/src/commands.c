@@ -145,7 +145,7 @@ int b_TkshSetlistCmd(argc, argv, data)
 	char *argv[];
 	void *data;
 {
-	Tcl_Interp *interp = (Tcl_Interp *) data;
+	Tcl_Interp *interp = (Tcl_Interp *)((Shbltin_t*)data)->ptr;
 	char *kshList;
 
 	if (argc < 2)
@@ -172,7 +172,7 @@ int b_TkshInfoCmd(argc, argv, data)
 {
 	char c;
 	int length;
-	Interp *iPtr = (Interp *) data;
+	Interp *iPtr = (Interp *)((Shbltin_t*)data)->ptr;
 	if (argc < 2)
 	{
 	     sfprintf(sfstderr,

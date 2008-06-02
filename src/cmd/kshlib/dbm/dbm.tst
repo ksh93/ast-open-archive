@@ -4,7 +4,7 @@
 
 UNIT ksh
 
-TEST 01 '--create, --read, --write'
+TEST 01 '--read, --write'
 
 	EXEC	-c $'builtin -f dbm dbm_open dbm_get dbm_set dbm_close
 \t\tset \\
@@ -24,6 +24,20 @@ TEST 01 '--create, --read, --write'
 \t\tdone
 \t\tdbm_close
 \t'
+
+	EXEC	-c $'builtin -f dbm dbm_open dbm_get dbm_set dbm_close
+\t\tdbm_open --read tst.dbm
+\t\tset -s -- $(
+\t\t\twhile\t:
+\t\t\tdo\tkey=$(dbm_get)
+\t\t\t\t[[ $key ]] || break
+\t\t\t\tprint -r -- "$key"
+\t\t\tdone
+\t\t)
+\t\tprint -r "$@"
+\t\tdbm_close
+\t'
+		OUTPUT - 'aaa bbb ccc ppp qqq rrr xxx yyy zzz'
 
 	EXEC	-c $'builtin -f dbm dbm_open dbm_get dbm_set dbm_close
 \t\tdbm_open --read tst.dbm

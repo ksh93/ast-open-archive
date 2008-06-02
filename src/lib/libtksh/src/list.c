@@ -41,7 +41,7 @@ static int tksh_cmd_split(int argc, char *argv[], void *data)
 	int i, size=0;
 	char **newargv;
 	char *newptr;
-	TkshArgcArgv *args = (TkshArgcArgv *) data;
+	TkshArgcArgv *args = (TkshArgcArgv *)((Shbltin_t*)data)->ptr;
 
 	for (i=1; i < argc; i++)
 		size += strlen(argv[i]);

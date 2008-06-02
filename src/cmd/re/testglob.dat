@@ -1,4 +1,4 @@
-: X/Open glob tests 2006-08-22
+: X/Open glob tests 2008-04-30
 
 # test workspace
 
@@ -262,48 +262,48 @@ Sr	**/*/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
 Sr	**/**/*/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
 Sr	**/**/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h
 
-S	~(R)*			OK		TT* TTfoo a[b ab ab?(cd| abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)**			OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)*/*			OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab?(cd|/cd)
-S	~(R)*/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)**/*		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)**/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)*/*/*		OK		ab/pp/p.h ab/pp/qq ab/pp/rr
-S	~(R)*/*/**		OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd|/cd)
-S	~(R)*/**/*		OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd|/cd)
-S	~(R)*/**/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)**/*/*		OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd|/cd)
-#S	~(R)**/*/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)**/**/*		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
-S	~(R)**/**/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)*			OK		TT* TTfoo a[b ab ab?(cd| abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)**			OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)*/*			OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab?(cd|/cd)
+S	~(O)*/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)**/*		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)**/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)*/*/*		OK		ab/pp/p.h ab/pp/qq ab/pp/rr
+S	~(O)*/*/**		OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd|/cd)
+S	~(O)*/**/*		OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd|/cd)
+S	~(O)*/**/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)**/*/*		OK		a[b/c]d ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd|/cd)
+#S	~(O)**/*/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)**/**/*		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
+S	~(O)**/**/**		OK		TT* TTfoo a[b a[b/c]d ab ab/?(.|a)z ab/cd ab/hb.h ab/pp ab/pp/p.h ab/pp/qq ab/pp/qq/q.h ab/pp/rr ab/pp/rr/r.h ab?(cd| ab?(cd|/cd) abcd c[d c[d( c[dx cd ha.h xxx
 
-S	~(R)*/			OK		a[b/ ab/ ab?(cd|/
-S	~(R)**/			OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
-S	~(R)*/*/		OK		ab/?(.|a)z/ ab/pp/
-S	~(R)*/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
-S	~(R)**/*/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
-S	~(R)**/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
-S	~(R)*/*/*/		OK		ab/pp/qq/ ab/pp/rr/
-S	~(R)*/*/**/		OK		ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/
-S	~(R)*/**/*/		OK		ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/
-S	~(R)*/**/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
-S	~(R)**/*/*/		OK		ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/
-#S	~(R)**/*/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
-S	~(R)**/**/*/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
-S	~(R)**/**/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)*/			OK		a[b/ ab/ ab?(cd|/
+S	~(O)**/			OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)*/*/		OK		ab/?(.|a)z/ ab/pp/
+S	~(O)*/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)**/*/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)**/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)*/*/*/		OK		ab/pp/qq/ ab/pp/rr/
+S	~(O)*/*/**/		OK		ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/
+S	~(O)*/**/*/		OK		ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/
+S	~(O)*/**/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)**/*/*/		OK		ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/
+#S	~(O)**/*/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)**/**/*/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
+S	~(O)**/**/**/		OK		a[b/ ab/ ab/?(.|a)z/ ab/pp/ ab/pp/qq/ ab/pp/rr/ ab?(cd|/
 
-S	~(R)*.h			OK		ha.h
-S	~(R)*/*.h		OK		ab/hb.h
-S	~(R)**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h
-S	~(R)*/*/*.h		OK		ab/pp/p.h
-S	~(R)*/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)**/*/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)**/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h
-S	~(R)*/*/*/*.h		OK		ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)*/*/**/*.h		OK		ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)*/**/*/*.h		OK		ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)*/**/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)**/*/*/*.h		OK		ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-#S	~(R)**/*/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)**/**/*/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
-S	~(R)**/**/**/*.h	OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h
+S	~(O)*.h			OK		ha.h
+S	~(O)*/*.h		OK		ab/hb.h
+S	~(O)**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h
+S	~(O)*/*/*.h		OK		ab/pp/p.h
+S	~(O)*/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)**/*/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)**/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h
+S	~(O)*/*/*/*.h		OK		ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)*/*/**/*.h		OK		ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)*/**/*/*.h		OK		ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)*/**/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)**/*/*/*.h		OK		ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+#S	~(O)**/*/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)**/**/*/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
+S	~(O)**/**/**/*.h	OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h

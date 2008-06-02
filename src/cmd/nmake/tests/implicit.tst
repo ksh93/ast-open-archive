@@ -4,7 +4,7 @@ INCLUDE cc.def
 
 TEST 01 '.PFX.INCLUDE vs. .STD.INCLUDE --noprefix-include'
 
-	EXEC	--regress --noprefix-include
+	EXEC	--regress=sync --noprefix-include
 		INPUT Makefile $'.SOURCE.G : uhdr
 .SOURCE.h : hdr
 %.h : %.G
@@ -40,7 +40,7 @@ bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
  prerequisites: hdr/foo.h==foo.h 
 '
 
-	EXEC	--regress --noprefix-include
+	EXEC	--regress=sync --noprefix-include
 		ERROR - $'
 foo.c : [recent] .SCAN.c regular scanned EXISTS
 
@@ -64,11 +64,11 @@ bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
  prerequisites: hdr/foo.h==foo.h 
 '
 
-	EXEC	--regress --noprefix-include
+	EXEC	--regress=sync --noprefix-include
 
 TEST 02 '.PFX.INCLUDE vs. .STD.INCLUDE subdir --prefix-include'
 
-	EXEC	--regress --prefix-include
+	EXEC	--regress=sync --prefix-include
 		INPUT Makefile $'.SOURCE.G : uhdr
 .SOURCE.h : hdr
 %.h : %.G
@@ -104,7 +104,7 @@ bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
  prerequisites: hdr/foo.h==foo.h 
 '
 
-	EXEC	--regress --prefix-include
+	EXEC	--regress=sync --prefix-include
 		ERROR - $'
 foo.c : [recent] .SCAN.c regular scanned EXISTS
 
@@ -128,11 +128,11 @@ bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
  prerequisites: hdr/foo.h==foo.h 
 '
 
-	EXEC	--regress --prefix-include
+	EXEC	--regress=sync --prefix-include
 
 TEST 03 '.PFX.INCLUDE vs. .PFX.INCLUDE . --noprefix-include'
 
-	EXEC	--regress --noprefix-include
+	EXEC	--regress=sync --noprefix-include
 		INPUT Makefile $'.SOURCE.G : uhdr
 .SOURCE.h : hdr
 %.h : %.G
@@ -168,7 +168,7 @@ bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
  prerequisites: foo.h 
 '
 
-	EXEC	--regress --noprefix-include
+	EXEC	--regress=sync --noprefix-include
 		ERROR - $'
 foo.c : [recent] .SCAN.c regular scanned EXISTS
 
@@ -192,11 +192,11 @@ bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
  prerequisites: foo.h 
 '
 
-	EXEC	--regress --noprefix-include
+	EXEC	--regress=sync --noprefix-include
 
 TEST 04 '.PFX.INCLUDE vs. .PFX.INCLUDE . --prefix-include'
 
-	EXEC	--regress --prefix-include
+	EXEC	--regress=sync --prefix-include
 		INPUT Makefile $'.SOURCE.G : uhdr
 .SOURCE.h : hdr
 %.h : %.G
@@ -232,7 +232,7 @@ bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
  prerequisites: foo.h 
 '
 
-	EXEC	--regress --prefix-include
+	EXEC	--regress=sync --prefix-include
 		ERROR - $'
 foo.c : [recent] .SCAN.c regular scanned EXISTS
 
@@ -256,7 +256,7 @@ bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
  prerequisites: foo.h 
 '
 
-	EXEC	--regress --prefix-include
+	EXEC	--regress=sync --prefix-include
 
 TEST 05 'generate implicit include'
 

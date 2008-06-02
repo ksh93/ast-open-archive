@@ -1,8 +1,6 @@
 /*
  * regression tests for library functions
  * `tests' runs all tests visible from .. with output in tests.out
- *
- * test management is still in the design phase
  */
 
 :PACKAGE: ast
@@ -60,7 +58,11 @@ vmalloc :TEST: testvmalloc vmtest.h +last \
 test.vm : testvmalloc vmtest.h +last $$(*.ARGS:D:B:S=.c) .CLEARARGS
 	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
-:: RELEASE y2k.dat
+:: RELEASE testdate.sh y2k.dat \
+	strtof-6.128-15.1024-15.1024.rt strtof-6.128-15.1024-15.1024.tst \
+	strtof-6.128-15.1024-18.16384.rt strtof-6.128-15.1024-18.16384.tst \
+	strtof-6.128-15.1024-31.1024.rt strtof-6.128-15.1024-31.1024.tst \
+	strtof-6.128-15.1024-33.16384.rt strtof-6.128-15.1024-33.16384.tst
 
 install :
 	: only tests in this directory : nothing to install :

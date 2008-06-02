@@ -556,10 +556,8 @@ dssopen(Dssflags_t flags, Dssflags_t test, Dssdisc_t* disc, Dssmeth_t* meth)
 	register Dss_t*		dss;
 	register Vmalloc_t*	vm;
 	Cxvariable_t*		var;
-	Cxtype_t*		type;
 	Dsslib_t*		lib;
 	int			i;
-	int			n;
 
 	if (!disc)
 		return 0;

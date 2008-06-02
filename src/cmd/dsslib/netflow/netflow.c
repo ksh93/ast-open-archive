@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -149,31 +149,31 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 	switch (vp->index)
 	{
 	case NETFLOW_src_addr:
-		r->value.number = rp->src_addr;
+		r->value.number = rp->ipv4_src_addr;
 		break;
 	case NETFLOW_dst_addr:
-		r->value.number = rp->dst_addr;
+		r->value.number = rp->ipv4_dst_addr;
 		break;
 	case NETFLOW_hop:
-		r->value.number = rp->hop;
+		r->value.number = rp->ipv4_next_hop;
 		break;
 	case NETFLOW_input:
-		r->value.number = rp->input;
+		r->value.number = rp->input_snmp;
 		break;
 	case NETFLOW_output:
-		r->value.number = rp->output;
+		r->value.number = rp->output_snmp;
 		break;
 	case NETFLOW_packets:
-		r->value.number = rp->packets;
+		r->value.number = rp->in_pkts;
 		break;
 	case NETFLOW_bytes:
-		r->value.number = rp->bytes;
+		r->value.number = rp->in_bytes;
 		break;
 	case NETFLOW_first:
-		r->value.number = rp->first;
+		r->value.number = rp->first_switched;
 		break;
 	case NETFLOW_last:
-		r->value.number = rp->last;
+		r->value.number = rp->first_switched;
 		break;
 	case NETFLOW_src_port:
 		r->value.number = rp->src_port;
@@ -182,16 +182,16 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.number = rp->dst_port;
 		break;
 	case NETFLOW_flags:
-		r->value.number = rp->flags;
+		r->value.number = rp->forwarding_code;
 		break;
 	case NETFLOW_tcp_flags:
 		r->value.number = rp->tcp_flags;
 		break;
 	case NETFLOW_prot:
-		r->value.number = rp->prot;
+		r->value.number = rp->protocol;
 		break;
 	case NETFLOW_tos:
-		r->value.number = rp->tos;
+		r->value.number = rp->src_tos;
 		break;
 	case NETFLOW_src_as:
 		r->value.number = rp->src_as;
@@ -245,7 +245,7 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.number = rp->sampling_interval;
 		break;
 	case NETFLOW_sampling_mode:
-		r->value.number = rp->sampling_mode;
+		r->value.number = rp->flow_sampler_mode;
 		break;
 	case NETFLOW_start:
 #if _typ_int64_t

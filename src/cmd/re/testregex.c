@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2007-03-19 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2008-05-15 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -561,6 +561,9 @@ quote(char* s, int len, unsigned long test)
 	unsigned char*	u = (unsigned char*)s;
 	unsigned char*	e;
 	int		c;
+#ifdef MB_CUR_MAX
+	int		w;
+#endif
 
 	if (!u)
 		printf("NIL");
@@ -610,6 +613,15 @@ quote(char* s, int len, unsigned long test)
 				printf("\\v");
 				break;
 			default:
+#ifdef MB_CUR_MAX
+				s = (char*)u - 1;
+				if ((w = mblen(s, (char*)e - s)) > 1)
+				{
+					u += w - 1;
+					fwrite(s, 1, w, stdout);
+				}
+				else
+#endif
 				if (!iscntrl(c) && isprint(c))
 					putchar(c);
 				else

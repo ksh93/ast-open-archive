@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -245,7 +245,7 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 				}
 				else
 					memcpy(&rp->version, state->data, n);
-				rp->sampling_mode = (rp->sampling_interval >> 14) & ((1<<2)-1);
+				rp->flow_sampler_mode = (rp->sampling_interval >> 14) & ((1<<2)-1);
 				rp->sampling_interval &= ((1<<14)-1);
 				break;
 			case 7:
@@ -280,9 +280,9 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 		r1 = (Rec_1_t*)state->data;
 		if (state->swap)
 		{
-			swapmem(3, state->data, &rp->src_addr, 12);
-			swapmem(1, state->data + 12, &rp->input, 4);
-			swapmem(3, state->data + 16, &rp->packets, 16);
+			swapmem(3, state->data, &rp->ipv4_src_addr, 12);
+			swapmem(1, state->data + 12, &rp->input_snmp, 4);
+			swapmem(3, state->data + 16, &rp->in_pkts, 16);
 			swapmem(1, state->data + 32, &rp->src_port, 4);
 			memcpy(&rp->flags, state->data + 36, 4);
 		}
@@ -290,15 +290,17 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 			memcpy(rp, r1, sizeof(Rec_1_t));
 		state->data += sizeof(Rec_1_t);
 		rp->flags = r1->flags;
+#if 0
 		memcpy(&rp->pad1, &r1->flags, 4);
+#endif
 		memset(&rp->src_as, 0, 12);
 		break;
 	case 5:
 		if (state->swap)
 		{
-			swapmem(3, state->data, &rp->src_addr, 12);
-			swapmem(1, state->data + 12, &rp->input, 4);
-			swapmem(3, state->data + 16, &rp->packets, 16);
+			swapmem(3, state->data, &rp->ipv4_src_addr, 12);
+			swapmem(1, state->data + 12, &rp->input_snmp, 4);
+			swapmem(3, state->data + 16, &rp->in_pkts, 16);
 			swapmem(1, state->data + 32, &rp->src_port, 4);
 			memcpy(&rp->flags, state->data + 36, 4);
 			swapmem(1, state->data + 40, &rp->src_as, 4);
@@ -308,14 +310,16 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 			memcpy(rp, state->data, sizeof(Rec_5_t));
 		state->data += sizeof(Rec_5_t);
 		rp->flags = 0;
+#if 0
 		memset(&rp->pad2, 0, 10);
+#endif
 		break;
 	case 7:
 		if (state->swap)
 		{
-			swapmem(3, state->data, &rp->src_addr, 12);
-			swapmem(1, state->data + 12, &rp->input, 4);
-			swapmem(3, state->data + 16, &rp->packets, 16);
+			swapmem(3, state->data, &rp->ipv4_src_addr, 12);
+			swapmem(1, state->data + 12, &rp->input_snmp, 4);
+			swapmem(3, state->data + 16, &rp->in_pkts, 16);
 			swapmem(1, state->data + 32, &rp->src_port, 4);
 			memcpy(&rp->flags, state->data + 36, 4);
 			swapmem(1, state->data + 40, &rp->src_as, 4);
@@ -327,8 +331,8 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 		state->data += sizeof(Rec_7_t);
 		break;
 	}
-	rp->start = state->boot + (Nftime_t)rp->first * US;
-	rp->end = state->boot + (Nftime_t)rp->last * US;
+	rp->start = state->boot + (Nftime_t)rp->first_switched * US;
+	rp->end = state->boot + (Nftime_t)rp->last_switched * US;
 	record->size = sizeof(*rp);
 	record->data = rp;
 	return 1;
@@ -370,12 +374,12 @@ dumpfwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(3, &rp->uptime, state->data + 4, 16);
 				memcpy(state->data + 20, &rp->engine_type, 2);
 				swapmem(1, &rp->sampling_interval, state->data + 22, 2);
-				*(state->data + 23) |= rp->sampling_mode << 6;
+				*(state->data + 23) |= rp->flow_sampler_mode << 6;
 			}
 			else
 			{
 				memcpy(state->data, &rp->version, n);
-				*(state->data + 22) |= rp->sampling_mode << 6;
+				*(state->data + 22) |= rp->flow_sampler_mode << 6;
 			}
 			break;
 		case 7:
@@ -405,24 +409,26 @@ dumpfwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		n = sizeof(Rec_1_t);
 		if (state->swap)
 		{
-			swapmem(3, &rp->src_addr, state->next, 12);
-			swapmem(1, &rp->input, state->next + 12, 4);
-			swapmem(3, &rp->packets, state->next + 16, 16);
+			swapmem(3, &rp->ipv4_src_addr, state->next, 12);
+			swapmem(1, &rp->input_snmp, state->next + 12, 4);
+			swapmem(3, &rp->in_pkts, state->next + 16, 16);
 			swapmem(1, &rp->src_port, state->next + 32, 4);
 			memcpy(state->next + 36, &rp->flags, 4);
 		}
 		else
 			memcpy(state->next, rp, n);
+#if 0
 		memcpy(&rp->pad1, state->next + 40, 4);
+#endif
 		*(state->next + 44) = rp->flags;
 		break;
 	case 5:
 		n = sizeof(Rec_5_t);
 		if (state->swap)
 		{
-			swapmem(3, &rp->src_addr, state->next, 12);
-			swapmem(1, &rp->input, state->next + 12, 4);
-			swapmem(3, &rp->packets, state->next + 16, 16);
+			swapmem(3, &rp->ipv4_src_addr, state->next, 12);
+			swapmem(1, &rp->input_snmp, state->next + 12, 4);
+			swapmem(3, &rp->in_pkts, state->next + 16, 16);
 			swapmem(1, &rp->src_port, state->next + 32, 4);
 			memcpy(state->next + 36, &rp->flags, 4);
 			swapmem(1, &rp->src_as, state->next + 40, 4);
@@ -438,9 +444,9 @@ dumpfwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		n = sizeof(Rec_7_t);
 		if (state->swap)
 		{
-			swapmem(3, &rp->src_addr, state->next, 12);
-			swapmem(1, &rp->input, state->next + 12, 4);
-			swapmem(3, &rp->packets, state->next + 16, 16);
+			swapmem(3, &rp->ipv4_src_addr, state->next, 12);
+			swapmem(1, &rp->input_snmp, state->next + 12, 4);
+			swapmem(3, &rp->in_pkts, state->next + 16, 16);
 			swapmem(1, &rp->src_port, state->next + 32, 4);
 			memcpy(state->next + 36, &rp->flags, 4);
 			swapmem(1, &rp->src_as, state->next + 40, 4);

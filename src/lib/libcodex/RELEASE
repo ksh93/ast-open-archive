@@ -1,3 +1,4 @@
+08-05-23 code-qp.c: avoid isprint()/iscntrl() for CC_NATIVE==CC_ASCII
 07-09-26 code-uu.c: uu_sync() => flush() for encode only -- doh
 07-09-22 code-uu.c: fix uu_read() partial reads
 07-09-22 codex.c: handle PASSPHRASE=* as documented

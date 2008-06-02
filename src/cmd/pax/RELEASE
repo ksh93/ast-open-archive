@@ -1,3 +1,5 @@
+08-05-08 pax.tst: handle systems with privileged chmod +t / mkfifo
+08-05-01 pax-tar.c: handle sfsprintf() '\0'
 07-12-11 delta2patch.sh: dro pax -v, add pax --nosummary
 07-12-06 delta2patch.sh: add
 07-09-21 format.c: add sumprint() default scale arg

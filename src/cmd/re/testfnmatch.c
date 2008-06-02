@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -23,7 +23,7 @@
  * see testfnmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2005-05-20 $\0\n";
+static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2008-04-30 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -884,19 +884,16 @@ main(int argc, char** argv)
 				eret = fnmatch(re, s, eflags);
 			if (eret)
 			{
-				if (!streq(ans, "NOMATCH") && *ans != 'E')
+				if (query)
+					skip = note(level, skip, msg);
+				else if (!streq(ans, "NOMATCH") && *ans != 'E')
 				{
-					if (query)
-						skip = note(level, skip, msg);
+					report("failed: ", re, s, msg, unspecified, expand);
+					if (eret == FNM_NOMATCH)
+						printf("OK expected, NOMATCH returned");
 					else
-					{
-						report("failed: ", re, s, msg, unspecified, expand);
-						if (eret == FNM_NOMATCH)
-							printf("OK expected, NOMATCH returned");
-						else
-							printf("OK expected, error %d returned", eret);
-						printf("\n");
-					}
+						printf("OK expected, error %d returned", eret);
+					printf("\n");
 				}
 			}
 			else if (streq(ans, "NOMATCH") || *ans == 'E')

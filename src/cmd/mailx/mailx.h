@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2008 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -150,7 +150,7 @@ extern int	opterr;
 #define ESCAPE		'~'		/* Default escape for sending */
 #define NMLSIZE		1024		/* max names in a message list */
 #define PATHSIZE	MAXPATHLEN	/* Size of pathnames throughout */
-#define LINESIZE	BUFSIZ		/* max readable line width */
+#define LINESIZE	(32*STRINGLEN)	/* max readable line width */
 #define HEADSIZE	128		/* maximum header line length */
 #define LASTSIZE	256		/* max saved cmd line size */
 #define STRINGSIZE	((unsigned)128)	/* Dynamic allocation units */

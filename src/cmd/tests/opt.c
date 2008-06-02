@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -52,6 +52,10 @@ infof(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		return sfprintf(sp, "[K:kill?kill all processes.]");
 	if (streq(s, "more#4"))
 		return sfprintf(sp, "[F:fudge?Fudge the statistics to satisfy everyone.]");
+	if (streq(s, "more#5"))
+		return sfprintf(sp, "\bred\b, \borange\b, \byellow\b, \bgreen\b, \bblue\b, \bindigo\b, \bviolet\b");
+	if (streq(s, "more#6"))
+		return sfprintf(sp, "\bred\b");
 	return sfprintf(sp, "<* %s info ok *>", s);
 }
 

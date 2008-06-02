@@ -280,7 +280,7 @@ int h()
 
 TEST 11 'attribute propagation'
 
-	EXEC	--regress -n
+	EXEC	--regress=sync -n
 		INPUT Makefile $'all : foo.bar
 .SRC : .ATTRIBUTE
 .SOURCE.%.SRC : src
@@ -322,7 +322,7 @@ bar :
 
 TEST 13 '.MEMBER'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'x :: main.c -ltst
 tst :LIBRARY: a.c b.c
 .DONE : .done
@@ -342,7 +342,7 @@ tst :LIBRARY: a.c b.c
 + rm -f a.o b.o
 + cc -O -o x main.o libtst.a'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		OUTPUT - $': a.o b.o :'
 		ERROR -
 
@@ -463,7 +463,7 @@ set jobs=2
 all : a b c
 x : .SEMAPHORE
 fix : .AFTER .FORCE .REPEAT
-	silent sleep 1
+	silent sleep 2
 	: $(<) : $(<<) :
 a b : x fix
 	: $(<) : $(<<) :

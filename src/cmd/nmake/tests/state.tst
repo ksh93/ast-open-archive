@@ -98,7 +98,7 @@ YY = yy
 
 TEST 03 'error status'
 
-	EXEC	--regress -NFMstatic
+	EXEC	--regress=sync -NFMstatic
 		INPUT Makefile $'a : b y z
 	echo aha $(*)
 b :

@@ -4,6 +4,8 @@ UNIT - --swap=0
 
 KEEP "*.dat"
 
+export LC_ALL=C
+
 function DATA
 {
 	typeset f

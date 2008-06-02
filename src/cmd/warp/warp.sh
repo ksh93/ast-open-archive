@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1998-2005 AT&T Corp.                  #
+#          Copyright (c) 1998-2008 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -149,13 +149,13 @@ set -A path $PATH
 IFS=$ifs
 for root in ${path[@]}
 do	root=${root%/*}
-	set -A lib $root/@(bin|lib)/@(lib|)warp*([0-9]).@(dll|s[ol]*([0-9.]))
+	set -A lib $root/@(bin|lib)/@(lib|)warp*([0-9]).@(dll|dylib|s[ol]*([0-9.]))
 	dll=${lib[${#lib[@]}-1]}
 	if	test -f $dll
 	then	break
 	fi
 done
-prefix=${dll%.@(dll|s[ol]*([0-9.]))}
+prefix=${dll%.@(dll|dylib|s[ol]*([0-9.]))}
 suffix=${dll##$prefix}
 prefix=${prefix#$root/}
 
@@ -206,7 +206,7 @@ esac
 
 : hack the preload magic, and we mean hack
 
-env="WARP='$opt$warp' LD_PRELOAD='$root/$prefix$suffix${LD_PRELOAD:+ $LD_PRELOAD}'"
+env="WARP='$opt$warp' LD_PRELOAD='$root/$prefix$suffix${LD_PRELOAD:+ $LD_PRELOAD}' DYLD_INSERT_LIBRARIES='$root/$prefix$suffix${DYLD_INSERT_LIBRARIES:+ $DYLD_INSERT_LIBRARIES}'" 
 case $root in
 *-n32)	env="$env _RLDN32_LIST=$root/$prefix$suffix"
 	case $_RLDN32_LIST in

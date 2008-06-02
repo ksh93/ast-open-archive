@@ -103,6 +103,27 @@ TEST 04 'flat conversion'
 	EXEC -I $data -x pwd-bin '{flat pwd-txt}' $data/pwd-bin.dat
 		SAME OUTPUT $data/pwd-txt.dat
 		ERROR -
+
+	EXEC -I $data -x pwd-bin '{print "%(name)s %(uid)d"}' $data/pwd-bin.dat
+		OUTPUT - $'root 0
+sysadm 0
+diag 0
+daemon 1
+bin 2
+uucp 3
+sys 4
+adm 5
+aha 0
+lp 9
+auditor 11
+ftp 112
+demos 993
+guest 998
+as 30001
+he 30002
+noaccess 60002
+nobody 60001'
+
 	for typ in txt bin
 	do
 

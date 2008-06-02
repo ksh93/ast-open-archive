@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1992-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pr (AT&T Research) 2004-07-01 $\n]"
+"[-n?\n@(#)$Id: pr (AT&T Research) 2004-07-01 $\n]"
 USAGE_LICENSE
 "[+NAME?pr - print files]"
 "[+DESCRIPTION?\bpr\b formats and prints files to the standard output."

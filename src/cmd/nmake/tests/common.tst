@@ -7,7 +7,7 @@ TEST 01 'install with --compare and --clobber'
 	EXPORT INSTALLROOT=.
 	EXPORT SHELL=/bin/sh
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		INPUT Makefile $'t :: t.sh'
 		INPUT t.sh
 		ERROR - $'+ cp t.sh t
@@ -17,19 +17,19 @@ TEST 01 'install with --compare and --clobber'
 
 	DO	touch t.sh
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		ERROR - $'+ cp t.sh t'
 
 	DO	touch t.sh
 
-	EXEC	--regress --nocompare install
+	EXEC	--regress=sync --nocompare install
 		ERROR - $'+ cp t.sh t
 + mv -f bin/t bin/t.old
 + ignore cp t bin/t'
 
 	DO	touch t.sh
 
-	EXEC	--regress install compare=0 # obsolete compatibility
+	EXEC	--regress=sync install compare=0 # obsolete compatibility
 		ERROR - $'make: warning: compare=0: obsolete: use --nocompare
 + cp t.sh t
 + mv -f bin/t bin/t.old
@@ -37,14 +37,14 @@ TEST 01 'install with --compare and --clobber'
 
 	DO	touch t.sh
 
-	EXEC	--regress --nocompare --clobber install
+	EXEC	--regress=sync --nocompare --clobber install
 		ERROR - $'+ cp t.sh t
 + rm -f bin/t
 + ignore cp t bin/t'
 
 	DO	touch t.sh
 
-	EXEC	--regress install compare=0 clobber=1 # obsolete compatibility
+	EXEC	--regress=sync install compare=0 clobber=1 # obsolete compatibility
 		ERROR - $'make: warning: clobber=1 compare=0: obsolete: use --clobber --nocompare
 + cp t.sh t
 + rm -f bin/t
@@ -182,10 +182,12 @@ aha :LIBRARY: aha.c'
 		OUTPUT - $'+ echo "" -ltst -laha > tst.req
 + cc -O   -c tst.c
 + ar cr libtst.a tst.o
++ ignore ranlib libtst.a
 + rm -f tst.o
 + echo "" -laha > aha.req
 + cc -O   -c aha.c
 + ar cr libaha.a aha.o
++ ignore ranlib libaha.a
 + rm -f aha.o
 + if	silent test ! -d root/lib
 + then	mkdir -p root/lib 		    		   
@@ -202,6 +204,7 @@ aha :LIBRARY: aha.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib root/lib/libtst.a
 + if	silent test ! -d root/lib/lib
 + then	mkdir -p root/lib/lib 		    		   
 + fi
@@ -229,6 +232,7 @@ aha :LIBRARY: aha.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib root/lib/libaha.a
 + if	silent test \'\' != "aha.req"
 + then	if	silent test -d "aha.req"
 + 	then	cp -pr aha.req root/lib/lib
@@ -246,10 +250,12 @@ aha :LIBRARY: aha.c'
 		OUTPUT - $'+ echo "" -ltst -laha > tst.req
 + cc -O   -c tst.c
 + ar cr libtst.a tst.o
++ ignore ranlib libtst.a
 + rm -f tst.o
 + echo "" -laha > aha.req
 + cc -O   -c aha.c
 + ar cr libaha.a aha.o
++ ignore ranlib libaha.a
 + rm -f aha.o
 + if	silent test ! -d root/lib
 + then	mkdir -p root/lib 		    		   
@@ -266,6 +272,7 @@ aha :LIBRARY: aha.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib root/lib/libtst.a
 + if	silent test ! -d root/lib/lib
 + then	mkdir -p root/lib/lib 		    		   
 + fi
@@ -293,6 +300,7 @@ aha :LIBRARY: aha.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib root/lib/libaha.a
 + if	silent test \'\' != "aha.req"
 + then	if	silent test -d "aha.req"
 + 	then	cp -pr aha.req root/lib/lib
@@ -328,6 +336,7 @@ lib :LIBRARY: lib.c'
 + echo "" -llib > lib.req
 + TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc -O   -c lib.c
 + ar cr liblib-tra.a lib.o
++ ignore ranlib liblib-tra.a
 + rm -f lib.o
 + TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc  -O   -o cmd cmd.o liblib-tra.a'
 		ERROR - $'make: warning: instrument=transmorgrify: obsolete: use --instrument=transmorgrify'
@@ -363,6 +372,8 @@ stdio.h : .SCAN.IGNORE'
 ;;;'$TWD$'/cmd/tcl/foo.c;cmd/tcl/foo.c
 ;;;'$TWD$'/lib/libl/Makefile;lib/libl/Makefile
 ;;;'$TWD$'/lib/libl/l.c;lib/libl/l.c
+;;;'$TWD$'/lib/Makefile;lib/Makefile
+;;;'$TWD$'/cmd/Makefile;cmd/Makefile
 ;;;'$TWD$'/cc.probe;cc.probe
 ;;;'$TWD$'/Makefile;Makefile
 ;;;'$TWD$'/cmd/Makefile;cmd/Makefile
@@ -381,6 +392,7 @@ TEST 10 '--arclean=edit-op'
 + cc -O   -c explicit.c
 + cc -O   -c implicit.c
 + ar cr libtst.a explicit.o implicit.o
++ ignore ranlib libtst.a
 + rm -f explicit.o implicit.o'
 
 	EXEC	-n --arclean=A=.IMPLICIT all
@@ -388,11 +400,12 @@ TEST 10 '--arclean=edit-op'
 + cc -O   -c explicit.c
 + cc -O   -c implicit.c
 + ar cr libtst.a explicit.o implicit.o
++ ignore ranlib libtst.a
 + rm -f implicit.o'
 
 TEST 11 'ar member deletion'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'tst :LIBRARY: a.c b.c'
 		INPUT a.c 'int a(){return 0;}'
 		INPUT b.c 'int b(){return 0;}'
@@ -404,7 +417,7 @@ TEST 11 'ar member deletion'
 + ignore ranlib libtst.a
 + rm -f a.o b.o'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'tst :LIBRARY: b.c'
 		ERROR - $'+ ignore ar d libtst.a a.o
 + ignore ranlib libtst.a'
@@ -436,10 +449,12 @@ t4 :LIBRARY: c.c'
 + cc  -O   -o t2 main.o a.o
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
 + ar cr t3.a a.o b.o
++ ignore ranlib t3.a
 + rm -f a.o b.o
 + echo "" -lt4 > t4.req
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
 + ar cr libt4.a c.o
++ ignore ranlib libt4.a
 + rm -f c.o
 + cc  -shared  -o libt4.so.1.0 -all libt4.a -notall '
 
@@ -450,10 +465,12 @@ t4 :LIBRARY: c.c'
 + cc  -O   -o t2 main.o a.o
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
 + ar cr t3.a a.o b.o
++ ignore ranlib t3.a
 + rm -f a.o b.o
 + echo "" -lt4 > t4.req
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
 + ar cr libt4.a c.o
++ ignore ranlib libt4.a
 + rm -f c.o
 + cc  -shared  -o libt4.so.1.0 -all libt4.a -notall 
 + if	silent test ! -d ../bin
@@ -498,6 +515,7 @@ t4 :LIBRARY: c.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib ../lib/t3.a
 + if	silent test \'\' != "libt4.a"
 + then	if	silent test -d "libt4.a"
 + 	then	cp -pr libt4.a ../lib
@@ -510,6 +528,7 @@ t4 :LIBRARY: c.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib ../lib/libt4.a
 + if	silent test ! -d ../lib/lib
 + then	mkdir -p ../lib/lib 		    		   
 + fi
@@ -540,7 +559,7 @@ t4 :LIBRARY: c.c'
 + fi
 + chmod -w ../lib/libt4.so.1.0'
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		OUTPUT -
 		ERROR - $'+ cc -O -D_BLD_DLL -D_BLD_PIC -c main.c
 + cc -O -o t1 main.o
@@ -603,7 +622,7 @@ lib/libt4.so'
 
 TEST 13 'clobber + joint metarule'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'%.c c_%.c %.h : %.sch
 	sed s/FUN/fun/g $(>) > $(>:B:S=.c)
 	echo "#include \\"$(>:B).h\\"" > c_$(>:B:S=.c)
@@ -647,10 +666,12 @@ TEST 14 'cc-'
 		OUTPUT - $'+ echo "" -lt > t.req
 + cc -O   -c t.c
 + ar cr libt.a t.o
++ ignore ranlib libt.a
 + rm -f t.o
 + echo "" -lt > t.req
 + cc -g   -c ../t.c
 + ar cr libt-g.a t.o
++ ignore ranlib libt-g.a
 + rm -f t.o'
 		ERROR - $'cc-g:'
 
@@ -658,7 +679,7 @@ TEST 15 'install + link=name'
 
 	EXPORT	INSTALLROOT=.
 
-	EXEC	-n --regress install
+	EXEC	-n --regress=sync install
 		INPUT Makefile $'
 .SOURCE : src
 $(INCLUDEDIR) :INSTALLDIR: t.h
@@ -750,7 +771,7 @@ t :LIBRARY: a.c'
 + 	fi
 + fi'
 
-	EXEC	-n --regress install link=t
+	EXEC	-n --regress=sync install link=t
 		OUTPUT - $'+ cc -O   -c main.c
 + cc  -O   -o t main.o
 + cc  -O   -o t2 main.o
@@ -840,7 +861,7 @@ TEST 16 'install + link=*'
 
 	CD	ofc/src
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		INPUT Makefile $'INSTALLROOT=../..
 t :LIBRARY: a.c b.c c.c'
 		INPUT a.c $'int a(){return 0;}'
@@ -860,15 +881,15 @@ t :LIBRARY: a.c b.c c.c'
 + mkdir -p ../../lib/lib
 + ignore cp t.req ../../lib/lib/t'
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		ERROR -
 
 	CD	../../dev/src
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		ERROR -
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		ERROR -
 
 TEST 17 'install + list.install + clobber.install'
@@ -879,11 +900,7 @@ TEST 17 'install + list.install + clobber.install'
 		INPUT Makefile $'INSTALLROOT = ..
 t :: t.sh'
 		INPUT t.sh
-		ERROR - $'+ '$SHELL$' -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\'
-+ 2> /dev/null
-+ '$SHELL$' -n t.sh
-+ ENV=\'\'
-+ cp t.sh t
+		ERROR - $'+ cp t.sh t
 + chmod u+w,+x t
 + mkdir -p ../bin
 + ignore cp t ../bin/t'

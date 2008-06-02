@@ -72,6 +72,7 @@ typedef struct Ar_s
 	char		method[128];
 	unsigned int	index;
 	unsigned long	checksum;
+	off_t		end;
 	Dt_t*		mem;
 	Vmalloc_t*	vm;
 } Ar_t;
@@ -104,6 +105,8 @@ zip_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_
 	unsigned long		magic;
 	unsigned char*		hdr;
 	int			n;
+	int			ext;
+	int			com;
 	off_t			pos;
 	Mem_t*			mem;
 	Vmalloc_t*		vm;
@@ -136,6 +139,7 @@ zip_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_
 			zip_done(pax, ap);
 			return -1;
 		}
+		ar->end = pos;
 		while ((hdr = paxget(pax, ap, -ZIP_CEN_HEADER, NiL)) && swapget(0, &hdr[0], 4) == ZIP_CEN_MAGIC)
 		{
 			n = swapget(3, &hdr[ZIP_CEN_NAM], 2);
@@ -144,6 +148,11 @@ zip_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_
 				zip_done(pax, ap);
 				return paxnospace(pax);
 			}
+			mem->encoded = swapget(3, &hdr[ZIP_CEN_SIZ], 4);
+			mem->decoded = swapget(3, &hdr[ZIP_CEN_LEN], 4);
+			mem->checksum = swapget(3, &hdr[ZIP_CEN_CRC], 4);
+			ext = swapget(3, &hdr[ZIP_CEN_EXT], 2);
+			com = swapget(3, &hdr[ZIP_CEN_COM], 2);
 			if (paxread(pax, ap, mem->name, (off_t)n, (off_t)0, 0) <= 0)
 			{
 				(*pax->errorf)(NiL, pax, 2, "%s: invalid %s format verification header name [size=%I*u]", ap->name, fp->name, sizeof(n), n);
@@ -153,21 +162,18 @@ zip_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_
 			if (mem->name[n - 1] == '/')
 				n--;
 			mem->name[n] = 0;
-			if ((n = swapget(3, &hdr[ZIP_CEN_EXT], 2)) && paxread(pax, ap, NiL, (off_t)n, (off_t)0, 0) <= 0)
+			if (ext && paxread(pax, ap, NiL, (off_t)ext, (off_t)0, 0) <= 0)
 			{
-				(*pax->errorf)(NiL, pax, 2, "%s: %s: invalid %s format verification header extended data [size=%I*u]", ap->name, mem->name, ap->format->name, sizeof(n), n);
+				(*pax->errorf)(NiL, pax, 2, "%s: %s: invalid %s format verification header extended data [size=%I*u]", ap->name, mem->name, fp->name, sizeof(ext), ext);
 				zip_done(pax, ap);
 				return -1;
 			}
-			if ((n = swapget(3, &hdr[ZIP_CEN_COM], 2)) && paxread(pax, ap, NiL, (off_t)n, (off_t)0, 0) <= 0)
+			if (com && paxread(pax, ap, NiL, (off_t)com, (off_t)0, 0) <= 0)
 			{
-				(*pax->errorf)(NiL, pax, 2, "%s: %s: invalid %s format verification header comment data [size=%I*u]", ap->name, mem->name, ap->format->name, sizeof(n), n);
+				(*pax->errorf)(NiL, pax, 2, "%s: %s: invalid %s format verification header comment data [size=%I*u]", ap->name, mem->name, fp->name, sizeof(com), com);
 				zip_done(pax, ap);
 				return -1;
 			}
-			mem->encoded = swapget(3, &hdr[ZIP_CEN_SIZ], 4);
-			mem->decoded = swapget(3, &hdr[ZIP_CEN_LEN], 4);
-			mem->checksum = swapget(3, &hdr[ZIP_CEN_CRC], 4);
 			dtinsert(ar->mem, mem);
 		}
 		if (paxseek(pax, ap, (off_t)0, SEEK_SET, 1))
@@ -201,10 +207,13 @@ zip_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 		{
 		case ZIP_LOC_MAGIC:
 			n = swapget(3, &hdr[ZIP_LOC_NAM], 2);
+			m = swapget(3, &hdr[ZIP_LOC_EXT], 2);
+			paxunread(pax, ap, hdr, num);
+			num += n + m;
+			if (!(hdr = paxget(pax, ap, -num, NiL)))
+				break;
 			f->name = paxstash(pax, &ap->stash.head, NiL, n);
-			if (paxread(pax, ap, f->name, (off_t)n, (off_t)0, 0) <= 0)
-				return 0;
-			num += n;
+			memcpy(f->name, hdr + ZIP_LOC_HEADER, n);
 			if (n > 0 && f->name[n - 1] == '/' || !n && f->name[0] == '/')
 			{
 				if (n)
@@ -215,12 +224,6 @@ zip_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 				f->st->st_mode = (X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IWGRP|X_IROTH|X_IWOTH);
 			f->st->st_mode &= pax->modemask;
 			f->name[n] = 0;
-			if ((n = swapget(3, &hdr[ZIP_LOC_EXT], 2)) > 0)
-			{
-				if (paxread(pax, ap, NiL, (off_t)n, (off_t)0, 0) <= 0)
-					return 0;
-				num += n;
-			}
 			f->st->st_dev = 0;
 			f->st->st_ino = 0;
 			f->st->st_uid = pax->uid;
@@ -271,6 +274,8 @@ zip_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 			break;
 		default:
 			paxunread(pax, ap, hdr, num);
+			if (paxseek(pax, ap, (off_t)0, SEEK_CUR, 0) == ar->end)
+				paxseek(pax, ap, (off_t)0, SEEK_END, 1);
 			return 0;
 		}
 	}

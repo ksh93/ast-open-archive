@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2007-06-05 $\n]"
+"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2008-08-10 $\n]"
 USAGE_LICENSE
 "[+NAME?flat - dss flat method schema description]"
 "[+DESCRIPTION?The \bdss\b flat method schema is an XML file.]"
@@ -1335,8 +1335,10 @@ flatfopen(Dssfile_t* file, Dssdisc_t* disc)
 
 	if (file->flags & DSS_FILE_READ)
 	{
+#if 0
 		if (file->ident)
 			goto noswap;
+#endif
 #if 0
 		if (flat->variable)
 		{
@@ -2902,6 +2904,7 @@ static Tags_t	tags_flat_physical_key[] =
 	"UNKNOWN",	"Span unknown but otherwise syntactically correct"
 			" keys.",
 			0,0,flat_field_key_unknown_dat,0,
+	0
 };
 
 static Tags_t*

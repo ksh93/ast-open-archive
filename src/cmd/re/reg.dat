@@ -517,6 +517,8 @@ E$	(a*)*		bc		(0,0)(0,0)
 
 # again ugh
 
+{C	C
+
 BE	a[c]e		ace		(0,3)
 BE	a[c]h		ach		(0,3)
 BE	a[[.ch.]]	ach		ECOLLATE
@@ -539,6 +541,8 @@ BE	a[^b]		ac		(0,2)
 BE	a[^b]		ace		(0,2)
 BE	a[^b]		ach		(0,2)
 BE	a[^b]		abe		NOMATCH
+
+}
 
 # lookahead constraints
 

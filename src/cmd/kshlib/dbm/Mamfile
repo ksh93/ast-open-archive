@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -41,15 +41,8 @@ make dbm
 make libkshdbm.a archive
 make dbm.o
 make dbm.c
-make dbmlib.h implicit
-meta dbmlib.h %.iffe>%.h dbmlib.iffe dbmlib
-make dbmlib.iffe
-done dbmlib.iffe
-bind -last
-exec - iffe -o dbmlib.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run dbmlib.iffe
-make ndbm.h implicit
-done ndbm.h dontcare virtual
-done dbmlib.h generated
+make ${PACKAGE_ast_INCLUDE}/ast_ndbm.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_ndbm.h
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/option.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -138,7 +131,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done dbm.c
 meta dbm.o %.c>%.o dbm.c dbm
 prev dbm.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm"\" -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshdbm]"\" -D_PACKAGE_ast -c dbm.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm"\" -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshdbm]"\" -D_PACKAGE_ast -c dbm.c
 done dbm.o generated
 exec - ${AR} cr libkshdbm.a dbm.o
 exec - (ranlib libkshdbm.a) >/dev/null 2>&1 || true

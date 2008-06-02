@@ -1,5 +1,7 @@
 UNIT $SHELL
 
+export PATH=/opt/ast/bin:$PATH
+
 TEST 01 synthesized getconf
 	EXEC -c '
 		_AST_FEATURES="" $SHELL -c "

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -253,6 +253,12 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_
 done code-rot13.o generated
 make code-qp.o
 make code-qp.c
+make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev codex.h implicit
 done code-qp.c
@@ -272,12 +278,7 @@ make code-iconv.o
 make code-iconv.c
 make ${PACKAGE_ast_INCLUDE}/iconv.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_iconv.h implicit
-make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ccode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_iconv.h
 done ${PACKAGE_ast_INCLUDE}/iconv.h

@@ -41,7 +41,7 @@
 #define nv_setsub(np,sub) (nv_putsub((np),(sub),ARRAY_ADD) && nv_getsub(np) && \
 				(! nv_isnull(nv_opensub(np))) )
 #undef nv_isnull
-#define nv_isnull(nv)	((nv)->nvalue == NULL )
+#define nv_isnull(nv)	(!(nv) || !(nv)->nvalue)
 #define nv_subnull(np)	  ( (!nv_getsub(np)) || nv_isnull(nv_opensub(np)))
 #define nv_subnullf(np)	  (nv_isnull(nv_opensub(np))&& !(nv_opensub(np)->nvfun))
 

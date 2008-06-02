@@ -112,7 +112,15 @@ all :
 + : ARCH_MAKEFILE : Item.arch.mk :
 + : ../../../../../../../../../lmf/src/api/mmomc/include/nmake/desc.mk :'
 		ERROR - $'lmf/src/api/mmomc/tools/src/item/libsrc/item:
-make [lmf/src/api/mmomc/tools/src/item/libsrc/item]: warning: hit desc.mk'
+make [lmf/src/api/mmomc/tools/src/item/libsrc/item]: warning: hit desc.mk
+lmf/src/api/mmomc/tools/src/item/libsrc:
+lmf/src/api/mmomc/tools/src/item:
+lmf/src/api/mmomc/tools/src:
+lmf/src/api/mmomc/tools:
+lmf/src/api/mmomc:
+lmf/src/api:
+lmf/src:
+lmf:'
 
 TEST 06 'VROOT'
 
@@ -290,7 +298,7 @@ TEST 12 'header overlay'
 
 	CD	bot
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'t :LIBRARY: t.c'
 		INPUT t.c $'#include "t.h"\nint t(){return 0;}'
 		INPUT t.h $'#define T 1'
@@ -301,12 +309,12 @@ TEST 12 'header overlay'
 + ignore ranlib libt.a
 + rm -f t.o'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		ERROR -
 
 	CD	../top
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT t.h $'#define T 2'
 		ERROR - $'+ cc -O -I. -c '$TWD$'/bot/t.c
 + cp '$TWD$'/bot/libt.a libt.a
@@ -314,15 +322,15 @@ TEST 12 'header overlay'
 + ignore ranlib libt.a
 + rm -f t.o'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		ERROR -
 
-	EXEC	--regress clobber
+	EXEC	--regress=sync clobber
 		ERROR - $'+ ignore rm -f -r libt.a Makefile.ms'
 
 	CD	../bot
 
-	EXEC	--regress clobber
+	EXEC	--regress=sync clobber
 		ERROR - $'+ ignore rm -f -r libt.a Makefile.mo Makefile.ms t.req'
 
 TEST 13 'joint metarule overlay'

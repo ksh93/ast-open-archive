@@ -154,7 +154,6 @@ static Namval_t *TkshOpenVar(Tcl_Interp *interp, char **name1, char **name2,
 		{
 			if ( ! nv_isarray(namval))
 				ov_return(needArray);
-
 			if (! nv_setsub(namval, part2))
 			{
 				if (! namval->nvfun)
@@ -186,6 +185,9 @@ static Namval_t *TkshOpenVar(Tcl_Interp *interp, char **name1, char **name2,
 					ov_return(needArray);
 				/* nv_makearray(namval); */
 				nv_setarray(namval, nv_associative);
+#if 0
+fprintf(stderr, "AHA#%s#%d nv_setarray(%s)\n", __func__, __LINE__, nv_name(namval));
+#endif
 			}
 			if (! nv_putsub(namval, part2, ARRAY_ADD))
 				ov_return(noSuchVar);
@@ -384,6 +386,9 @@ char *Tcl_SetVar2(Tcl_Interp *interp, char *part1, char *part2,
 	if (newValue)
 	{
 		put_result = NULL;	/* Get around putval non-return val */
+#if 0
+if (part2) { fprintf(stderr, "AHA#%s#%d %s%s%s%s=%s %s\n", __func__, __LINE__, nv_name(namval), part2 ? "[" : "", part2 ? part2 : "", part2 ? "]" : "", newValue, nv_getsub(namval)); fflush(stderr); }
+#endif
 		nv_putval(namval, newValue, 0);
 		if (put_result)		/* Error in set trace */
 		{
@@ -414,7 +419,7 @@ char *Tcl_SetVar2(Tcl_Interp *interp, char *part1, char *part2,
 char *Tcl_GetVar2(Tcl_Interp *interp, char *part1, char *part2, int flags)
 {
 	Namval_t *namval;
-	char *result = NULL;
+	char *errmsg, *result = NULL;
 
 	dprintf(("Tksh: Getting var %s[%s]\n", part1,part2? part2: ""));
 
@@ -434,6 +439,8 @@ char *Tcl_GetVar2(Tcl_Interp *interp, char *part1, char *part2, int flags)
 	}
 
 	nv_close(namval);
+	if (part2 && !*result)
+		ov_return(noSuchElement);
 	return result;
 
   scalar:

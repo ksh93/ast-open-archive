@@ -82,7 +82,7 @@ int
 substitute(regex_t *re, Text *data)
 {
 	int n;
-	regmatch_t matches[10];
+	regmatch_t matches[100];
 	if(reexec(re, (char*)data->s, data->w - data->s, elementsof(matches), matches, 0))
 		return 0;
 	if(n = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {

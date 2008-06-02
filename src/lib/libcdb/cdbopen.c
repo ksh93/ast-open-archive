@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1997-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1997-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -46,7 +46,7 @@
  * example:	"{;}d3p2*3I4i321*i"
  */
 
-static const char id[] = "\n@(#)$Id: cdb library 2.2 (AT&T Research) 2001-07-17 $\0\n";
+static const char id[] = "\n@(#)$Id: cdb library 2.2 (AT&T Research) 2008-05-11 $\0\n";
 
 #include "cdblib.h"
 
@@ -1145,6 +1145,7 @@ cdbschema(register Cdb_t* cdb, Cdbmap_t* map)
 	register int		i;
 	register int		ie;
 	register int		im;
+	int			x;
 	char*			delimiter;
 	char*			escape;
 	char*			quotebegin;
@@ -1203,7 +1204,14 @@ cdbschema(register Cdb_t* cdb, Cdbmap_t* map)
 		{
 			im = i + 1;
 			if (cp)
-				fp = sp->format + cp[i].input.index;
+			{
+				if ((x = cp[i].input.index) < 0)
+				{
+					sfputc(bp, 'x');
+					continue;
+				}
+				fp = sp->format + x;
+			}
 			else
 				fp = sp->format + i;
 			if (fp->code != code && !(fp->flags & CDB_BINARY) && !(flags & CDB_MAP_NATIVE))
@@ -1238,7 +1246,11 @@ cdbschema(register Cdb_t* cdb, Cdbmap_t* map)
 			for (c = 1; im < ie; im++)
 			{
 				if (cp)
-					ip = sp->format + cp[im].input.index;
+				{
+					if ((x = cp[im].input.index) < 0)
+						break;
+					ip = sp->format + x;
+				}
 				else
 					ip = sp->format + im;
 				if (ip->ptype != fp->ptype && (fp > sp->format || !cdb->sized || ip->type != fp->type))

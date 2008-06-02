@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -47,8 +47,9 @@
 #define SORT_first	((SORT_MASK+1)<<0)
 #define SORT_force	((SORT_MASK+1)<<1)
 #define SORT_qualified	((SORT_MASK+1)<<2)
-#define SORT_sort	((SORT_MASK+1)<<3)
-#define SORT_uniq	((SORT_MASK+1)<<4)
+#define SORT_reverse	((SORT_MASK+1)<<3)
+#define SORT_sort	((SORT_MASK+1)<<4)
+#define SORT_uniq	((SORT_MASK+1)<<5)
 
 typedef int (*Cmp_f)(const char*, const char*);
 
@@ -1018,6 +1019,7 @@ static void
 sort(Sfio_t* xp, register char* s, int flags)
 {
 	register char**	p;
+	register char**	r;
 	char*		tok;
 	long		n;
 	Sfio_t*		vec;
@@ -1028,19 +1030,29 @@ sort(Sfio_t* xp, register char* s, int flags)
 	while (s = tokread(tok))
 		putptr(vec, s);
 	tokclose(tok);
-	if (n = sfstrtell(vec))
+	if (n = sfstrtell(vec) / sizeof(s))
 	{
 		putptr(vec, 0);
-		cmp = sortcmpf(flags);
-		strsort((char**)sfstrbase(vec), n / sizeof(s), cmp);
 		p = (char**)sfstrbase(vec);
-		sfputr(xp, *p, -1);
-		if (!(flags & SORT_first))
+		if (flags & SORT_reverse)
 		{
-			flags &= SORT_uniq;
-			while (s = *++p)
-				if (!flags || (*cmp)(s, *(p - 1)))
-					sfprintf(xp, " %s", s);
+			r = p + n - 1;
+			sfputr(xp, *r, -1);
+			while (--r >= p)
+				sfprintf(xp, " %s", *r);
+		}
+		else
+		{
+			cmp = sortcmpf(flags);
+			strsort((char**)sfstrbase(vec), n, cmp);
+			sfputr(xp, *p, -1);
+			if (!(flags & SORT_first))
+			{
+				flags &= SORT_uniq;
+				while (s = *++p)
+					if (!flags || (*cmp)(s, *(p - 1)))
+						sfprintf(xp, " %s", s);
+			}
 		}
 	}
 	sfstrclose(vec);
@@ -4140,6 +4152,10 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					case 'N':
 					case 'n':
 						n |= SORT_numeric;
+						continue;
+					case 'O':
+					case 'o':
+						n |= SORT_reverse;
 						continue;
 					case 'P':
 					case 'p':

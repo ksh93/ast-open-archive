@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-02-02 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-05-22 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2241,23 +2241,21 @@ end
 	return $(~~:VBFUI)
 
 .SHARED.LIST. : .FUNCTION
-	local A D L M R T N=0 X
+	local A D L M R S T U N=0 X
 	X := $(.SHARED.LIST.EXCLUDE.)
 	M := [-+]l*|*$(CC.SUFFIX.ARCHIVE)|*$(CC.SUFFIX.SHARED)
-	for L $(%:$(X))
-		if A
-			L := $(L:/^$(CC.PREFIX.ARCHIVE)\(.*\)\$(CC.SUFFIX.ARCHIVE)/+l\1/)
-		end
-		A := $(L) $(A)
+	S := $(%:O=1)
+	A := $(%:O>1:$(X):/^$(CC.PREFIX.ARCHIVE)\(.*\)\$(CC.SUFFIX.ARCHIVE)/+l\1/)
+	for L $(A)
 		if L == "{"
 			let N = N + 1
 		elif L == "}"
 			let N = N - 1
 		elif N <= 1
-			T := $(T) $(L)
+			T += $(L)
 		end
 	end
-	for L $(A)
+	for L $(A:H=O)
 		if L == "+l*"
 			if ! "$(T:N=$(L))" && ! "$(R:N=$(L))"
 				D := $(L:/+/-/)
@@ -2267,10 +2265,10 @@ end
 			end
 		end
 		if L != "$(M)" || ! "$(R:N=$(L))"
-			R := $(L) $(R)
+			R += $(L)
 		end
 	end
-	return $(R:T=F)
+	return $(S:T=F) $(R:H=O:T=F)
 
 .SHARED. : .FUNCTION
 	local A B D L S T
@@ -4069,9 +4067,9 @@ PACKAGES : .SPECIAL .FUNCTION
 	end
 	if "$(CC.ARFLAGS)"
 		.ARCHIVE.o : .CLEAR .USE .ARPREVIOUS (CC) (AR)
-			$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(CC) $(CC.ARFLAGS) -o $(<) $(*)
+			$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(CC) $(CC.ARFLAGS) $(CCLDFLAGS) -o $(<) $(*)
 		.SHARED.o : .CLEAR .USE (LDSHARED)
-			$(LDSHARED) $(CC.SHARED) -o $(<) $(*$(**):N!=*$(CC.SUFFIX.ARCHIVE))
+			$(LDSHARED) $(CC.SHARED) $(CCLDFLAGS) -o $(<) $(*$(**):N!=*$(CC.SUFFIX.ARCHIVE))
 		.ATTRIBUTE.%.a : -ARCHIVE
 	end
 	IFFEFLAGS += -c '$$(IFFECC) $$(IFFECCFLAGS) $$(IFFELDFLAGS)' $$(-mam:N=(regress|static)*:??-S '$$(CC.STATIC)')
@@ -4557,7 +4555,7 @@ end
 		print $(.MANIFEST.:/ /$("\n")/G)
 	end
 
-.LIST.PACKAGE.DIRS. = $(VROOT:T=F:P=L*) $(INSTALLROOT) $(PACKAGEROOT)
+.LIST.PACKAGE.DIRS. = $(VROOT:T=F:P=L=*) $(INSTALLROOT) $(PACKAGEROOT)
 
 .LIST.PACKAGE.BINARY.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:C%\(.*\)/arch/$(CC.HOSTTYPE)$%\1%:C%\(.*\)/arch$%\1%:H=RU:C,.*,C%^&/%%,:C, ,:,G)
 .LIST.PACKAGE.SOURCE.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:H=RU:C,.*,C%^&/%%,:C, ,:,G)

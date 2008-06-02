@@ -145,7 +145,7 @@ mid : .MAKE .VIRTUAL .FORCE
 
 TEST 06 'concurrency check'
 
-	EXEC
+	EXEC	--regress
 		INPUT Makefile $'all : .FORCE
 	silent $(MAKE) $(-) $(=)'
 		ERROR - $'make: warning: another make is running on Makefile in .
@@ -688,10 +688,10 @@ TEST 13 'self-documentation'
 	EXEC	-f - --???man
 
 	EXEC	--short
-		ERROR - $'Usage: make [-AabCcJnxeFiKGklNRqrOsVtvwP] [-B level] [-X[action]] [-d level]
+		ERROR - $'Usage: make [-AabCcJnxeFiKGklNRrOsVtvwP] [-B level] [-X[action]] [-d level]
             [-E id] [-f file] [-g file] [-I directory] [-j level]
             [-M type[,subtype][:file[:parent[:directory]]]] [-Q mask]
-            [-S[level]] [-T mask] [-z seconds] [-o name[=value]]
+            [-S[level]] [-q[action]] [-T mask] [-z seconds] [-o name[=value]]
             [-D name[=value]] [-U name] [ script ... ] [ target ... ]'
 
 	EXEC	-f - --short
@@ -705,8 +705,8 @@ TEST 13 'self-documentation'
             [--list] [--mam=type[,subtype][:file[:parent[:directory]]]]
             [--never] [--option=\'char;name;flags;set;description;values\']
             [--override] [--questionable=mask] [--readonly]
-            [--readstate[=level]] [--regress] [--reread] [--ruledump] [--scan]
-            [--serialize] [--silent] [--strictview] [--target-context]
+            [--readstate[=level]] [--regress[=action]] [--reread] [--ruledump]
+            [--scan] [--serialize] [--silent] [--strictview] [--target-context]
             [--target-prefix=separator] [--test=mask] [--tolerance=seconds]
             [--touch] [--vardump] [--warn] [--writeobject[=file]]
             [--writestate[=file]] [--byname=name[=value]]

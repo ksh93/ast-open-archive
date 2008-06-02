@@ -1,8 +1,10 @@
 # regression tests for the uuencode/uudecode utilitiy
 
-UMASK 022
+umask 022
 
 KEEP "*.dat"
+
+export LC_ALL=C
 
 function DATA
 {

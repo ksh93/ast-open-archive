@@ -1,3 +1,4 @@
+08-05-11 ppproto.c: fix proto test 10 regression
 07-09-21 ppproto.c: add "Public Domain" to the noticed list
 07-08-11 probe.win32: add cl.exe setuid workaround, CC.VERSION[.STRING]
 07-06-12 pplex.c: finish -D:preserve logic update for imake

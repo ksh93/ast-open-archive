@@ -20,7 +20,7 @@ TEST 02 'state var quote'
 		INPUT Makefile $'TST == "tst aha"
 tst :: tst.sh'
 		INPUT tst.sh $'echo $TST'
-		OUTPUT - $'+ case :$OPTIND:$RANDOM in
+		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null

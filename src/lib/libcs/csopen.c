@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -54,41 +54,51 @@ mkmount(register Cs_t* state, int mode, int uid, int gid, char* endserv, char* e
 	if (eaccess(state->mount, R_OK|W_OK|X_OK))
 	{
 		if (errno != ENOENT)
-			return -1;
+			goto bad;
 		if (!endserv && !(endserv = strrchr(state->mount, '/')))
-			return -1;
+			goto bad;
 		*endserv = 0;
 		if (eaccess(state->mount, X_OK))
 		{
 			if (!endhost && !(endhost = strrchr(state->mount, '/')))
-				return -1;
+				goto bad;
 			*endhost = 0;
 			if (eaccess(state->mount, X_OK))
 			{
 				if (!endtype && !(endtype = strrchr(state->mount, '/')))
-					return -1;
+					goto bad;
 				*endtype = 0;
 				if (eaccess(state->mount, X_OK) && (mkdir(state->mount, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(state->mount, S_IRWXU|S_IRWXG|S_IRWXO)))
-					return -1;
+					goto bad;
 				*endtype = '/';
 				if (mkdir(state->mount, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(state->mount, S_IRWXU|S_IRWXG|S_IRWXO))
-					return -1;
+					goto bad;
 			}
 			*endhost = '/';
 			if (mkdir(state->mount, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(state->mount, S_IRWXU|S_IRWXG|S_IRWXO))
-				return -1;
+				goto bad;
 		}
 		*endserv = '/';
 		if (mkdir(state->mount, mode))
-			return -1;
+			goto bad;
 		if (mode != (S_IRWXU|S_IRWXG|S_IRWXO) && (uid >= 0 || gid >= 0 && (mode |= S_ISGID)) && (chown(state->mount, uid, gid) || chmod(state->mount, mode)))
 		{
 			rmdir(state->mount);
-			return -1;
+			goto bad;
 		}
 	}
 	*(state->control - 1) = '/';
 	return 0;
+ bad:
+	if (endtype && !*endtype)
+		*endtype = '/';
+	if (endhost && !*endhost)
+		*endhost = '/';
+	if (endserv && !*endserv)
+		*endserv = '/';
+	*(state->control - 1) = '/';
+	messagef((state->id, NiL, -1, "mkmount: %s: cannot access physical mount directory", state->mount));
+	return -1;
 }
 
 /*
@@ -434,7 +444,7 @@ doattach(register Cs_t* state, const char* path, int op, int mode, char* user, c
 	char			c;
 	struct sockaddr_un	nam;
 
-	messagef((state->id, NiL, -8, "AHA:%s:%d state.path=`%s' state.mount=`%s' path=`%s' opath=`%s' user=`%s' serv=`%s'", __FILE__, __LINE__, state->path, state->mount, path, opath, user, serv));
+	messagef((state->id, NiL, -8, "%s:%d state.path=`%s' state.mount=`%s' path=`%s' opath=`%s' user=`%s' serv=`%s'", __FILE__, __LINE__, state->path, state->mount, path, opath, user, serv));
 	nam.sun_family = AF_UNIX;
 	strcpy(nam.sun_path, path);
 	namlen = sizeof(nam.sun_family) + strlen(path) + 1;
@@ -1034,7 +1044,7 @@ csopen(register Cs_t* state, const char* apath, int op)
 			b += sfsprintf(b, sizeof(state->mount) - (b - path), "/0x%X.%X.%X.%X", a[0], a[1], a[2], a[3]);
 		}
 	}
-	messagef((state->id, NiL, -8, "AHA:%s:%d host=`%s' path=`%s'", __FILE__, __LINE__, host, path));
+	messagef((state->id, NiL, -8, "%s:%d host=`%s' path=`%s'", __FILE__, __LINE__, host, path));
 	if (!serv)
 	{
 		*(state->control = b + 1) = 0;
@@ -1104,7 +1114,7 @@ csopen(register Cs_t* state, const char* apath, int op)
 	*b++ = '/';
 	*b = CS_MNT_STREAM;
 	strcpy(b + 1, CS_MNT_TAIL);
-	messagef((state->id, NiL, -8, "AHA:%s:%d %s", __FILE__, __LINE__, state->mount));
+	messagef((state->id, NiL, -8, "%s:%d %s", __FILE__, __LINE__, state->mount));
 	state->control = b;
 
 	/*
@@ -1139,7 +1149,7 @@ csopen(register Cs_t* state, const char* apath, int op)
 		 * {tcp,udp}
 		 */
 
-		messagef((state->id, NiL, -8, "AHA:%s:%d %s", __FILE__, __LINE__, state->mount));
+		messagef((state->id, NiL, -8, "%s:%d %s", __FILE__, __LINE__, state->mount));
 		if ((fd = reopen(state, path)) < 0)
 		{
 			/*

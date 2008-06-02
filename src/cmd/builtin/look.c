@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1992-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -30,7 +30,7 @@
 #endif
 
 static const char usage[] =
-"[-?@(#)$Id: look (AT&T Research) 2002-04-15 $\n]"
+"[-?@(#)$Id: look (AT&T Research) 2008-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?look - displays lines beginning with a given prefix]"
 "[+DESCRIPTION?\blook\b displays all lines in the sorted \afile\a arguments"
@@ -65,7 +65,7 @@ USAGE_LICENSE
 
 #define CLOSE		256
 
-#define EXTRACT(p,b,n)	((b)?extract(p,b,n):(p))
+#define EXTRACT(f,p,b,n)	(((b)&&((f)&D_FLAG))?extract(p,b,n):(p))
 
 static char*
 extract(register const char* cp, char* buff, int len)
@@ -134,12 +134,13 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 		return 1;
 	if (flags & H_FLAG)
 		while (sfgetr(fp, '\n', 0) && sfvalue(fp) > 1);
-	if ((low = sfseek(fp, (Sfoff_t)0, SEEK_CUR)) < 0 || (high = sfsize(fp)) <= 0)
+	if ((low = sfseek(fp, (Sfoff_t)0, SEEK_CUR)) < 0 || (high = sfseek(fp, (Sfoff_t)0, SEEK_END)) <= 0)
 	{
 		found = 0;
+		n = 0;
 		while (cp = sfgetr(fp, '\n', 0))
 		{
-			n = (*compare)(prefix, EXTRACT(cp, buff, len), len);
+			n = (*compare)(prefix, EXTRACT(flags, cp, buff, len), len);
 			if (n <= 0)
 				break;
 		}
@@ -149,7 +150,7 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 		{
 			prefix = maxprefix;
 			len = strlen(prefix);
-			if (n && (*compare)(prefix, EXTRACT(cp, buff, len), len) >= 0)
+			if (n && (*compare)(prefix, EXTRACT(flags, cp, buff, len), len) >= 0)
 				n = 0;
 		}
 		found = !n;
@@ -158,7 +159,7 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 			sfprintf(sfstdout, "%.*s", sfvalue(fp), cp);
 			if (!(cp = sfgetr(fp, '\n', 0)))
 				break;
-			n = (*compare)(prefix, EXTRACT(cp, buff, len), len);
+			n = (*compare)(prefix, EXTRACT(flags, cp, buff, len), len);
 			if (maxprefix && n > 0)
 				n = 0;
 		}
@@ -177,7 +178,7 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 				low = mid;
 			else
 			{
-				n = (*compare)(prefix, EXTRACT(cp, buff, len), len);
+				n = (*compare)(prefix, EXTRACT(flags, cp, buff, len), len);
 				if (n < 0)
 					high = mid - len;
 				else if (n > 0)
@@ -195,7 +196,7 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 		{
 			if (!(cp = sfgetr(fp, '\n', 0)))
 				return 1;
-			n = (*compare)(prefix, EXTRACT(cp, buff, len), len);
+			n = (*compare)(prefix, EXTRACT(flags, cp, buff, len), len);
 			if (n <= 0)
 				break;
 			low += sfvalue(fp);
@@ -204,7 +205,7 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 		{
 			prefix = maxprefix;
 			len = strlen(prefix);
-			if (n && (*compare)(prefix, EXTRACT(cp, buff, len), len) >= 0)
+			if (n && (*compare)(prefix, EXTRACT(flags, cp, buff, len), len) >= 0)
 				n = 0;
 		}
 		found = !n;
@@ -213,7 +214,7 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 			sfprintf(sfstdout, "%.*s", sfvalue(fp), cp);
 			if (!(cp = sfgetr(fp, '\n', 0)))
 				break;
-			n = (*compare)(prefix, EXTRACT(cp, buff, len), len);
+			n = (*compare)(prefix, EXTRACT(flags, cp, buff, len), len);
 			if (maxprefix && n > 0)
 				n = 0;
 		}
@@ -233,7 +234,7 @@ b_look(int argc, char** argv, void* context)
 	char*			bp;
 	char*			file;
 
-	static const char*	dict[] = { DICT_FILE, "/usr/lib/dict/words" };
+	static const char*	dict[] = { DICT_FILE, "/usr/share/dict/words", "/usr/lib/dict/words" };
 
 	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	for (;;)
@@ -285,9 +286,8 @@ b_look(int argc, char** argv, void* context)
 				break;
 			}
 		if (!file)
-			error(ERROR_system(1), "$s: not found", dict[0]);
+			error(ERROR_system(1), "%s: not found", dict[0]);
 		flags |= (D_FLAG|F_FLAG);
-		argv--;
 	}
 	n = 0;
 	do

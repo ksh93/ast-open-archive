@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -561,7 +561,14 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 			free(code);
 			code = 0;
 		}
-		if (((flags & (CODEX_TRACE|CODEX_VERBOSE)) || codexstate.trace && strmatch(name, codexstate.trace) && (flags |= CODEX_TRACE) || codexstate.verbose && strmatch(name, codexstate.verbose) && (flags |= CODEX_VERBOSE)) && (trace = memdup(&codex_trace, sizeof(codex_trace))))
+		if ((flags & (CODEX_TRACE|CODEX_VERBOSE)) != (CODEX_TRACE|CODEX_VERBOSE))
+		{
+			if (codexstate.trace && strmatch(name, codexstate.trace))
+				flags |= CODEX_TRACE;
+			if (codexstate.verbose && strmatch(name, codexstate.verbose))
+				flags |= CODEX_VERBOSE;
+		}
+		if ((flags & (CODEX_TRACE|CODEX_VERBOSE)) && (trace = memdup(&codex_trace, sizeof(codex_trace))))
 			sfprintf(sfstderr, "codex: %d: %s: open(\"%s\",%s,%s)\n", code ? code->index : 0, meth->name, arg[0], (sp->_flags & SF_READ) ? "READ" : "WRITE", (deen & CODEX_DECODE) ? "DECODE" : "ENCODE");
 		else
 			trace = 0;

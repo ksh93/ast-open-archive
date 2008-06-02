@@ -14,4 +14,4 @@ huff 1.0 :LIBRARY: huff.3 huffman.h \
 
 :TEST: pack
 
-:: RELEASE
+:: RELEASE pack.dat

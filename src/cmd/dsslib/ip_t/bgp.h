@@ -29,8 +29,9 @@
 #define _BGP_H
 
 #include <ast_common.h>
+#include <ip6.h>
 
-#define BGP_VERSION		20080115L	/* interface version	*/
+#define BGP_VERSION		20080218L	/* interface version	*/
 
 #define BGP_SET			0xffff		/* as path set marker	*/
 

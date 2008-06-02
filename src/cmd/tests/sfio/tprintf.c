@@ -627,5 +627,10 @@ MAIN()
 		terror("sfaprints() failed");
 	free(s);
 
+	/* test 64-bit linux %g */
+	sfsprintf(buf1, sizeof(buf1), "%1.15g", (double)987654321098782.0);
+	if(strcmp(buf1, "987654321098782") != 0)
+		terror("(double)987654321098782.0 %%1.15g format error: %s", buf1);
+
 	TSTEXIT(0);
 }

@@ -5,7 +5,8 @@ INCLUDE test.def
 TEST 01 'alternate base rules'
 
 	EXEC	-bcf myrules.mk
-		INPUT myrules.mk $'COPY = cp
+		INPUT myrules.mk $'set --regress
+COPY = cp
 COPYFLAGS =
 %.to : %.from (COPY) (COPYFLAGS)
 	$(COPY) $(COPYFLAGS) $(>) $(<)'

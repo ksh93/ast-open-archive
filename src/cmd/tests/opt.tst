@@ -112,7 +112,7 @@ OPTIONS
   -n, --show      Show but don\'t execute.'
 	EXEC	cmd "$usage" --??api
 		OUTPUT - $'return=? option=-? name=--??api num=0'
-		ERROR - $'.SH SYNOPSIS\ncmd [ options ] pattern ...\n.SH OPTIONS\n.OP x method string:ignorecase:oneof:optional algorithm\nOne of\n.H3 a\nmethod a\n.H3 b\nmethod b\n.H3 c\nmethod c\n.PP\nThe option value may be omitted.\n.OP - - oneof\n.OP y yes flag -\nYes.\n.OP - no flag -\nNo.\n.OP - - anyof\n.OP d database string path\nFile database path.\n.OP z size number sizeX\nImportant size.\n.OP V vernum flag -\nList program version and exit.\n.OP v verbose flag -\nEnable verbose trace.\n.OP n show flag -\nShow but don\'t execute.\n.SH IMPLEMENTATION\n.H1 version\ntestopt (AT&T Research) 1999-02-02\n.H1 author\nGlenn Fowler <gsf@research.att.com>'
+		ERROR - $'.SH SYNOPSIS\ncmd [ options ] pattern ...\n.SH OPTIONS\n.OP x method string:ignorecase:oneof:optional algorithm\nOne of\n.H2 a\nmethod a\n.H2 b\nmethod b\n.H2 c\nmethod c\n.SP\nThe option value may be omitted.\n.OP - - oneof\n.OP y yes flag -\nYes.\n.OP - no flag -\nNo.\n.OP - - anyof\n.OP d database string path\nFile database path.\n.OP z size number sizeX\nImportant size.\n.OP V vernum flag -\nList program version and exit.\n.OP v verbose flag -\nEnable verbose trace.\n.OP n show flag -\nShow but don\'t execute.\n.SH IMPLEMENTATION\n.H0 version\ntestopt (AT&T Research) 1999-02-02\n.H0 author\nGlenn Fowler <gsf@research.att.com>'
 	EXEC	cmd "$usage" --?help
 		OUTPUT - $'return=? option=-? name=--?help num=0'
 		ERROR - $'Usage: cmd [ options ]
@@ -256,6 +256,17 @@ OPTIONS
                     doo   aroni
                     after append
                   The option value may be omitted.'
+	usage=$'[-][+NAME?Color_t - Color enum type][+Color_t?Values are \fmore#5\f.  The default value is \fmore#6\f.]'
+	EXEC	Color_t "$usage" --man
+		ERROR - $'NAME
+  Color_t - Color enum type
+
+SYNOPSIS
+  Color_t [ options ]
+
+Color_t
+  Values are red, orange, yellow, green, blue, indigo, violet. The default
+  value is red.'
 
 TEST 04 'oh man'
 	usage=$'
@@ -787,7 +798,7 @@ An end of options was encountered.
 .H1 2
 A usage or information message was generated.
 .SH IMPLEMENTATION
-.H1 version
+.H0 version
 getopts (AT&T Research) 1999-02-02'
 	EXEC	getopts "$usage" '--??html'
 		OUTPUT - $'return=? option=-? name=--??html num=0'
@@ -1020,7 +1031,7 @@ tst [ options ]
 Yada yada.
  On by default; -j means --nojjj.
 .SH IMPLEMENTATION
-.PP'
+.SP'
 
 TEST 08 'optstr() tests'
 	usage=$'[-][a:aaa?AAA][v:vvv?VVV]:[xxx]'
@@ -1178,13 +1189,85 @@ tst [ options ]
 .OP c - flag:hidden -'
 
 TEST 10 'numeric options'
+	new=$'[-n][b:ignoreblanks][K:oldkey?Obsolete]#[old-key]'
+	alt=$'[-n][b:ignoreblanks][K|X:oldkey?Obsolete]#[old-key]'
 	old=$'bK#[old-key]'
-	new=$'[-][b:ignoreblanks][K:oldkey?Obsolete]#[old-key]'
-	alt=$'[-][b:ignoreblanks][K|X:oldkey?Obsolete]#[old-key]'
-	EXEC sort "$old" -1 +2 file
-		OUTPUT - $'return=K option=-K name=-1 arg=1 num=1\nreturn=K option=+K name=+2 arg=2 num=2\nargument=1 value="file"'
 	EXEC sort "$new" -1 +2 file
+		OUTPUT - $'return=K option=-K name=-1 arg=1 num=1\nreturn=K option=+K name=+2 arg=2 num=2\nargument=1 value="file"'
 	EXEC sort "$alt" -1 +2 file
+	EXEC sort "$old" -1 +2 file
+		OUTPUT - $'return=: option= name=-1 num=0 str=bK#[old-key]\nargument=1 value="+2"\nargument=2 value="file"'
+		ERROR - $'sort: -1: unknown option'
+		EXIT 1
+
+	usage=$'[-][x:trace?Trace.][m:max?Max.]#[num]'
+	EXEC set "$usage" -x
+		OUTPUT - $'return=x option=-x name=-x arg=(null) num=1'
+		ERROR -
+		EXIT 0
+	EXEC set "$usage" +x
+		OUTPUT - $'argument=1 value="+x"'
+	EXEC set "$usage" -4
+		OUTPUT - $'return=: option= name=-4 num=0 str=[-][x:trace?Trace.][m:max?Max.]#[num]'
+		ERROR - $'set: -4: unknown option'
+		EXIT 1
+	EXEC set "$usage" +4
+		OUTPUT - $'argument=1 value="+4"'
+		ERROR -
+		EXIT 0
+
+	usage=$'+[-][x:trace?Trace.][m:max?Max.]#[num]'
+	EXEC set "$usage" -x
+		OUTPUT - $'return=x option=-x name=-x arg=(null) num=1'
+	EXEC set "$usage" +x
+		OUTPUT - $'return=x option=+x name=+x arg=(null) num=1'
+		ERROR -
+	EXEC set "$usage" -4
+		OUTPUT - $'return=: option= name=-4 num=0 str=+[-][x:trace?Trace.][m:max?Max.]#[num]'
+		ERROR - $'set: -4: unknown option'
+		EXIT 1
+	EXEC set "$usage" +4
+		OUTPUT - $'return=: option= name=+4 num=0 str=+[-][x:trace?Trace.][m:max?Max.]#[num]'
+		ERROR - $'set: +4: unknown option'
+
+	usage=$'[-+][x:trace?Trace.][m:max?Max.]#[num]'
+	EXEC set "$usage" -x
+		OUTPUT - $'return=x option=-x name=-x arg=(null) num=1'
+		ERROR -
+		EXIT 0
+	EXEC set "$usage" +x
+		OUTPUT - $'return=x option=+x name=+x arg=(null) num=1'
+	EXEC set "$usage" -4
+		OUTPUT - $'return=: option= name=-4 num=0 str=[-+][x:trace?Trace.][m:max?Max.]#[num]'
+		ERROR - $'set: -4: unknown option'
+		EXIT 1
+	EXEC set "$usage" +4
+		OUTPUT - $'return=: option= name=+4 num=0 str=[-+][x:trace?Trace.][m:max?Max.]#[num]'
+		ERROR - $'set: +4: unknown option'
+
+	usage=$'+[-n][x:trace?Trace.][m:max?Max.]#[num]'
+	EXEC set "$usage" -x
+		OUTPUT - $'return=x option=-x name=-x arg=(null) num=1'
+		ERROR -
+		EXIT 0
+	EXEC set "$usage" +x
+		OUTPUT - $'return=x option=+x name=+x arg=(null) num=1'
+	EXEC set "$usage" -4
+		OUTPUT - $'return=m option=-m name=-4 arg=4 num=4'
+	EXEC set "$usage" +4
+		OUTPUT - $'return=m option=+m name=+4 arg=4 num=4'
+
+	usage=$'[-+n][x:trace?Trace.][m:max?Max.]#[num]'
+	EXEC set "$usage" -x
+		OUTPUT - $'return=x option=-x name=-x arg=(null) num=1'
+		ERROR -
+		EXIT 0
+	EXEC set "$usage" +x
+		OUTPUT - $'return=x option=+x name=+x arg=(null) num=1'
+	EXEC set "$usage" -4
+		OUTPUT - $'return=m option=-m name=-4 arg=4 num=4'
+	EXEC set "$usage" +4
+		OUTPUT - $'return=m option=+m name=+4 arg=4 num=4'
 
 TEST 11 'find style!'
 	find=$'[-1p1][+NAME?\bfind\b - find files][13:amin?File was last accessed \aminutes\a minutes ago.]#[minutes][17:chop?Chop leading \b./\b from printed pathnames.]\n\n[ path ... ] [ option ]\n\n[+SEE ALSO?cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)]'
@@ -1221,41 +1304,39 @@ TEST 11 'find style!'
 		OUTPUT - $'return=? option=- name=-nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
 .fp 5 CW
-.nr mI 0
-.de mI
-.if \\\\n(mI>\\\\$1 \\{
-.nr mI \\\\n(mI-1
-.RE
-.mI \\\\$1
-.\\}
-.if \\\\n(mI<\\\\$1 \\{
-.nr mI \\\\n(mI+1
-.RS
-.mI \\\\$1
-.\\}
+.nr mH 5
+.de H0
+.nr mH 0
+.in 5n
+\\fB\\\\$1\\fP
+.in 7n
 ..
 .de H1
-.mI 1
-.TP
+.nr mH 1
+.in 7n
 \\fB\\\\$1\\fP
+.in 9n
 ..
 .de H2
-.mI 2
-.TP
+.nr mH 2
+.in 11n
 \\fB\\\\$1\\fP
+.in 13n
 ..
 .de H3
-.mI 3
-.TP
+.nr mH 3
+.in 15n
 \\fB\\\\$1\\fP
+.in 17n
 ..
 .de H4
-.mI 4
-.TP
+.nr mH 4
+.in 19n
 \\fB\\\\$1\\fP
+.in 21n
 ..
 .de OP
-.mI 0
+.nr mH 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -1271,13 +1352,30 @@ TEST 11 'find style!'
 .as mO \\\\*(mS\\\\fB\\\\-\\\\$2\\\\fP
 .if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
 .\\}
-.TP
+.in 5n
 \\\\*(mO
+.in 9n
+..
+.de SP
+.if \\\\n(mH==2 .in 9n
+.if \\\\n(mH==3 .in 13n
+.if \\\\n(mH==4 .in 17n
 ..
 .de FN
-.mI 0
-.TP
+.nr mH 0
+.in 5n
 \\\\$1 \\\\$2
+.in 9n
+..
+.de DS
+.in +3n
+.ft 5
+.nf
+..
+.de DE
+.fi
+.ft R
+.in -3n
 ..
 .TH find 1
 .SH NAME
@@ -1445,52 +1543,50 @@ zwei [ options ]
 magic\\sesame
 .OP x - string bar
 foo
-.H3 a[b:c[d[,e]]?f[:g]]
+.H2 a[b:c[d[,e]]?f[:g]]
 A?B:C[]
-.H3 p \'d\' "q"
+.H2 p \'d\' "q"
 duh
 .OP z zoom flag -
 .SH IMPLEMENTATION
-.PP'
+.SP'
 	EXEC	zwei "$usage" --nroff
 		OUTPUT - $'return=? option=- name=--nroff num=0'
-		ERROR - $'.\\\" format with nroff|troff|groff -man
+		ERROR - $'.\\" format with nroff|troff|groff -man
 .fp 5 CW
-.nr mI 0
-.de mI
-.if \\\\n(mI>\\\\$1 \\{
-.nr mI \\\\n(mI-1
-.RE
-.mI \\\\$1
-.\\}
-.if \\\\n(mI<\\\\$1 \\{
-.nr mI \\\\n(mI+1
-.RS
-.mI \\\\$1
-.\\}
+.nr mH 5
+.de H0
+.nr mH 0
+.in 5n
+\\fB\\\\$1\\fP
+.in 7n
 ..
 .de H1
-.mI 1
-.TP
+.nr mH 1
+.in 7n
 \\fB\\\\$1\\fP
+.in 9n
 ..
 .de H2
-.mI 2
-.TP
+.nr mH 2
+.in 11n
 \\fB\\\\$1\\fP
+.in 13n
 ..
 .de H3
-.mI 3
-.TP
+.nr mH 3
+.in 15n
 \\fB\\\\$1\\fP
+.in 17n
 ..
 .de H4
-.mI 4
-.TP
+.nr mH 4
+.in 19n
 \\fB\\\\$1\\fP
+.in 21n
 ..
 .de OP
-.mI 0
+.nr mH 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -1506,13 +1602,30 @@ duh
 .as mO \\\\*(mS\\\\fB\\\\-\\\\-\\\\$2\\\\fP
 .if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
 .\\}
-.TP
+.in 5n
 \\\\*(mO
+.in 9n
+..
+.de SP
+.if \\\\n(mH==2 .in 9n
+.if \\\\n(mH==3 .in 13n
+.if \\\\n(mH==4 .in 17n
 ..
 .de FN
-.mI 0
-.TP
+.nr mH 0
+.in 5n
 \\\\$1 \\\\$2
+.in 9n
+..
+.de DS
+.in +3n
+.ft 5
+.nf
+..
+.de DE
+.fi
+.ft R
+.in -3n
 ..
 .TH zwei 1
 .SH SYNOPSIS
@@ -1522,13 +1635,13 @@ duh
 magic\\esesame
 .OP x - string bar
 foo
-.H3 a[b:c[d[,e]]?f[:g]]
+.H2 a[b:c[d[,e]]?f[:g]]
 A?B:C[]
-.H3 p\\ \'d\'\\ "q"
+.H2 p\\ \'d\'\\ "q"
 duh
 .OP z zoom flag -
 .SH IMPLEMENTATION
-.PP'
+.SP'
 
 TEST 18 'more compatibility'
 	usage=$'CD:[macro[=value]]EI:?[dir]MPU:[macro]V?A:[assertion]HTX:[dialect]Y:[stdinclude] [input [output]]'
@@ -1561,7 +1674,7 @@ TEST 18 'more compatibility'
 		ERROR - $'Usage: none [ options ] file'
 	EXEC	none "$usage" --api
 		OUTPUT - $'return=? option=- name=--api num=0'
-		ERROR - $'.SH SYNOPSIS\nnone [ options ] file\n.SH IMPLEMENTATION\n.PP'
+		ERROR - $'.SH SYNOPSIS\nnone [ options ] file\n.SH IMPLEMENTATION\n.SP'
 
 TEST 19 'mutual exclusion'
 	usage=$'[-][\t[a:A][b:B][c:C]\t][d:D]\n\n[ file ... ]'
@@ -1614,7 +1727,7 @@ alt [ options ] file ...
 .OP n|m meth string meth
 .OP x bar flag -
 .SH IMPLEMENTATION
-.PP'
+.SP'
 
 TEST 21 'justification and emphasis'
 	usage=$'[-][w!:warn?Warn about invalid \b--check\b lines.][f:format?hours:minutes:seconds.\t\aid\a may be  followed  by [maybe]] \b:case:\b\ap1\a:\as1\a:...:\apn\a:\asn\a which expands to \asi\a if]\n\n[ file ... ]'
@@ -1856,7 +1969,7 @@ TEST 27 'opt_info.num with opt_info.arg'
 		EXIT 1
 
 TEST 28 'user defined optget return value'
-	usage=$'[-][n:count]#[number][234:ZZZ]'
+	usage=$'[-n][n:count]#[number][234:ZZZ]'
 	EXEC	num "$usage" -123
 		OUTPUT - $'return=n option=-n name=-1 arg=123 num=123'
 	EXEC	num "$usage" -234
@@ -1958,41 +2071,39 @@ href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 		OUTPUT - $'return=? option=- name=nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
 .fp 5 CW
-.nr mI 0
-.de mI
-.if \\\\n(mI>\\\\$1 \\{
-.nr mI \\\\n(mI-1
-.RE
-.mI \\\\$1
-.\\}
-.if \\\\n(mI<\\\\$1 \\{
-.nr mI \\\\n(mI+1
-.RS
-.mI \\\\$1
-.\\}
+.nr mH 5
+.de H0
+.nr mH 0
+.in 5n
+\\fB\\\\$1\\fP
+.in 7n
 ..
 .de H1
-.mI 1
-.TP
+.nr mH 1
+.in 7n
 \\fB\\\\$1\\fP
+.in 9n
 ..
 .de H2
-.mI 2
-.TP
+.nr mH 2
+.in 11n
 \\fB\\\\$1\\fP
+.in 13n
 ..
 .de H3
-.mI 3
-.TP
+.nr mH 3
+.in 15n
 \\fB\\\\$1\\fP
+.in 17n
 ..
 .de H4
-.mI 4
-.TP
+.nr mH 4
+.in 19n
 \\fB\\\\$1\\fP
+.in 21n
 ..
 .de OP
-.mI 0
+.nr mH 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -2008,13 +2119,30 @@ href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 .as mO \\\\*(mS\\\\fB\\\\$2\\\\fP
 .if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
 .\\}
-.TP
+.in 5n
 \\\\*(mO
+.in 9n
+..
+.de SP
+.if \\\\n(mH==2 .in 9n
+.if \\\\n(mH==3 .in 13n
+.if \\\\n(mH==4 .in 17n
 ..
 .de FN
-.mI 0
-.TP
+.nr mH 0
+.in 5n
 \\\\$1 \\\\$2
+.in 9n
+..
+.de DS
+.in +3n
+.ft 5
+.nf
+..
+.de DE
+.fi
+.ft R
+.in -3n
 ..
 .TH sum 3
 .SH NAME
@@ -2031,51 +2159,27 @@ Close a sum handle \\fIsum\\fP previously returned by \\fBsumopen\\fP\\&.
 .SH SEE\\ ALSO
 \\fBcksum\\fP(1)
 .SH IMPLEMENTATION
-.H1 version
+.H0 version
 sum (AT&T Research) 1999\\-12\\-11
-.H1 author
+.H0 author
 Glenn Fowler <gsf@research\\&.att\\&.com>
-.H1 copyright
+.H0 copyright
 Copyright (c) 1995\\-1999 AT&T Corp\\&.
-.H1 license
+.H0 license
 http://www\\&.research\\&.att\\&.com/sw/license/ast\\-open\\&.html'
-	EXEC	sum "$usage" --api
-		OUTPUT - $'return=? option=- name=api num=0'
-		ERROR - $'.SH NAME
-sum - checksum library
-.SH SYNOPSIS
-#include <sum.h>
-.SH DESCRIPTION
-sum is a checksum library.
-.SH FUNCTIONS
-.FN Sum_t* sumopen(const char* method)
-Open a sum handle for method.
-.FN int sumclose(Sum_t* sum)
-Close a sum handle sum previously returned by sumopen.
-.SH SEE ALSO
-cksum(1)
-.SH IMPLEMENTATION
-.H1 version
-sum (AT&T Research) 1999-12-11
-.H1 author
-Glenn Fowler <gsf@research.att.com>
-.H1 copyright
-Copyright (c) 1995-1999 AT&T Corp.
-.H1 license
-http://www.research.att.com/sw/license/ast-open.html'
 
 TEST 31 'off by one -- my epitaph'
-	short_usage=$'[-][n]#[s]:\n\npid ...'
-	long_usage=$'[-][n:number]#[s:name]:\n\npid ...'
+	short_usage=$'[-n][n]#[s]:\n\npid ...'
+	long_usage=$'[-n][n:number]#[s:name]:\n\npid ...'
 	EXEC	kill "$short_usage" -0 123
 		OUTPUT - $'return=n option=-n name=-0 arg=0 num=0\nargument=1 value="123"'
 	EXEC	kill "$long_usage" -0 123
 	EXEC	kill "$short_usage" -T 123
-		OUTPUT - $'return=: option= name=-T num=0 str=[-][n]#[s]:\n\npid ...\nargument=1 value="123"'
+		OUTPUT - $'return=: option= name=-T num=0 str=[-n][n]#[s]:\n\npid ...\nargument=1 value="123"'
 		ERROR - $'kill: -T: unknown option'
 		EXIT 1
 	EXEC	kill "$long_usage" -T 123
-		OUTPUT - $'return=: option= name=-T num=0 str=[-][n:number]#[s:name]:\n\npid ...\nargument=1 value="123"'
+		OUTPUT - $'return=: option= name=-T num=0 str=[-n][n:number]#[s:name]:\n\npid ...\nargument=1 value="123"'
 
 TEST 32 'miscellaneous'
 	usage=$'[-][+NAME?wow - zowee][a|b:aORb?A or B.][y|z:yORz?Y or Z.]\n\n[ file ... ]'
@@ -2084,41 +2188,39 @@ TEST 32 'miscellaneous'
 		OUTPUT - $'return=? option=- name=--nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
 .fp 5 CW
-.nr mI 0
-.de mI
-.if \\\\n(mI>\\\\$1 \\{
-.nr mI \\\\n(mI-1
-.RE
-.mI \\\\$1
-.\\}
-.if \\\\n(mI<\\\\$1 \\{
-.nr mI \\\\n(mI+1
-.RS
-.mI \\\\$1
-.\\}
+.nr mH 5
+.de H0
+.nr mH 0
+.in 5n
+\\fB\\\\$1\\fP
+.in 7n
 ..
 .de H1
-.mI 1
-.TP
+.nr mH 1
+.in 7n
 \\fB\\\\$1\\fP
+.in 9n
 ..
 .de H2
-.mI 2
-.TP
+.nr mH 2
+.in 11n
 \\fB\\\\$1\\fP
+.in 13n
 ..
 .de H3
-.mI 3
-.TP
+.nr mH 3
+.in 15n
 \\fB\\\\$1\\fP
+.in 17n
 ..
 .de H4
-.mI 4
-.TP
+.nr mH 4
+.in 19n
 \\fB\\\\$1\\fP
+.in 21n
 ..
 .de OP
-.mI 0
+.nr mH 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -2134,13 +2236,30 @@ TEST 32 'miscellaneous'
 .as mO \\\\*(mS\\\\fB\\\\-\\\\-\\\\$2\\\\fP
 .if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
 .\\}
-.TP
+.in 5n
 \\\\*(mO
+.in 9n
+..
+.de SP
+.if \\\\n(mH==2 .in 9n
+.if \\\\n(mH==3 .in 13n
+.if \\\\n(mH==4 .in 17n
 ..
 .de FN
-.mI 0
-.TP
+.nr mH 0
+.in 5n
 \\\\$1 \\\\$2
+.in 9n
+..
+.de DS
+.in +3n
+.ft 5
+.nf
+..
+.de DE
+.fi
+.ft R
+.in -3n
 ..
 .TH wow 1
 .SH NAME
@@ -2153,18 +2272,7 @@ A or B\\&.
 .OP y|z yORz flag -
 Y or Z\\&.
 .SH IMPLEMENTATION
-.PP'
-	usage=$'[-][+NAME?wow - zowee][n:new-test?New test.][o:old-test?Old test.]\n\n[ file ... ]'
-	EXEC	wow "$usage" --?new
-		EXIT 2
-		OUTPUT - $'return=? option=-? name=--?new num=0'
-		ERROR - $'Usage: wow [ options ] [ file ... ]
-OPTIONS
-  -n, --new-test  New test.'
-	EXEC	wow "$usage" --?new-test
-		OUTPUT - $'return=? option=-? name=--?new-test num=0'
-	EXEC	wow "$usage" --?newtest
-		OUTPUT - $'return=? option=-? name=--?newtest num=0'
+.SP'
 
 TEST 33 'never thought of that'
 	usage=$'n: path'
@@ -2178,11 +2286,17 @@ TEST 33 'never thought of that'
 	EXEC	printf "$usage" +1
 	usage=$'n# path'
 	EXEC	printf "$usage" +1
-		OUTPUT - $'return=n option=+n name=+1 arg=1 num=1'
 	usage=$'n#[val] path'
 	EXEC	printf "$usage" +1
 	usage=$'[-][+NAME?printf][n:num?number]#[#]\n\npath'
 	EXEC	printf "$usage" +1
+	usage=$'[-n][+NAME?printf][n:num?number]#[#]\n\npath'
+	EXEC	printf "$usage" +1
+		OUTPUT - $'return=n option=+n name=+1 arg=1 num=1'
+	EXEC	printf "$usage" -1
+		OUTPUT - $'return=n option=-n name=-1 arg=1 num=1'
+	EXEC	printf "$usage" +1 -1
+		OUTPUT - $'return=n option=+n name=+1 arg=1 num=1\nreturn=n option=-n name=-1 arg=1 num=1'
 	usage=$'[-][x:xxx]#[yyy?could be:]{[+seeing?double]}'
 	EXEC	kill "$usage" --man
 		EXIT 2
@@ -2404,41 +2518,39 @@ IMPLEMENTATION
 		OUTPUT - 'return=? option=- name=--nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
 .fp 5 CW
-.nr mI 0
-.de mI
-.if \\\\n(mI>\\\\$1 \\{
-.nr mI \\\\n(mI-1
-.RE
-.mI \\\\$1
-.\\}
-.if \\\\n(mI<\\\\$1 \\{
-.nr mI \\\\n(mI+1
-.RS
-.mI \\\\$1
-.\\}
+.nr mH 5
+.de H0
+.nr mH 0
+.in 5n
+\\fB\\\\$1\\fP
+.in 7n
 ..
 .de H1
-.mI 1
-.TP
+.nr mH 1
+.in 7n
 \\fB\\\\$1\\fP
+.in 9n
 ..
 .de H2
-.mI 2
-.TP
+.nr mH 2
+.in 11n
 \\fB\\\\$1\\fP
+.in 13n
 ..
 .de H3
-.mI 3
-.TP
+.nr mH 3
+.in 15n
 \\fB\\\\$1\\fP
+.in 17n
 ..
 .de H4
-.mI 4
-.TP
+.nr mH 4
+.in 19n
 \\fB\\\\$1\\fP
+.in 21n
 ..
 .de OP
-.mI 0
+.nr mH 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -2454,13 +2566,30 @@ IMPLEMENTATION
 .as mO \\\\*(mS\\\\fB\\\\-\\\\-\\\\$2\\\\fP
 .if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
 .\\}
-.TP
+.in 5n
 \\\\*(mO
+.in 9n
+..
+.de SP
+.if \\\\n(mH==2 .in 9n
+.if \\\\n(mH==3 .in 13n
+.if \\\\n(mH==4 .in 17n
 ..
 .de FN
-.mI 0
-.TP
+.nr mH 0
+.in 5n
 \\\\$1 \\\\$2
+.in 9n
+..
+.de DS
+.in +3n
+.ft 5
+.nf
+..
+.de DE
+.fi
+.ft R
+.in -3n
 ..
 .TH eg 1
 .SH NAME
@@ -2487,10 +2616,11 @@ six\\fP
 .SH SEE\\ ALSO
 \\fBegman\\fP(1)
 .SH IMPLEMENTATION
-.H1 version
+.H0 version
 aha
-.H1 catalog
+.H0 catalog
 SpamCo'
+
 	EXEC eg "$usage" --html
 		OUTPUT - 'return=? option=- name=--html num=0'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
@@ -3231,27 +3361,41 @@ TEST 57 'and the new format does old options'
 		ERROR - $'fn:s:'
 		EXIT 2
 
+TEST 58 'various --* combinations'
+	usage=$'[-][f:format]:[format]'
+	EXEC printf "$usage" - operand
+		OUTPUT - $'argument=1 value="-"\nargument=2 value="operand"'
+	EXEC printf "$usage" -- operand
+		OUTPUT - $'argument=1 value="operand"'
+	EXEC printf "$usage" -- --operand
+		OUTPUT - $'argument=1 value="--operand"'
+	EXEC printf "$usage" -- ---operand
+		OUTPUT - $'argument=1 value="---operand"'
+	EXEC printf "$usage" ---operand
+		OUTPUT - $'argument=1 value="---operand"'
+	EXEC
+
 # skip non-astsa (standalone ast) tests
 
-[[ $(COMMAND -+ query '[-]' '--???about' 2>/dev/null) == *catalog=libast* ]] || exit
+[[ $($COMMAND -+ astsa '[-]' '--???about' 2>/dev/null) == *catalog=libast* ]] || exit
 
 TEST 98 'translation'
 	usage=$'[-][+NAME?aha - just do it][+DESCRIPTION?Bla bla.]{\fzero\f}\n\n[ dialect ]\n\n[+SEE ALSO?Bla.]'
 	EXEC -+ aha "$usage" --man
-		OUTPUT - $'id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
+		OUTPUT - $'id=aha catalog=libast text="about"
+id=aha catalog=libast text="api"
+id=aha catalog=libast text="help"
+id=aha catalog=libast text="html"
+id=aha catalog=libast text="keys"
+id=aha catalog=libast text="long"
+id=aha catalog=libast text="man"
+id=aha catalog=libast text="about"
+id=aha catalog=libast text="api"
+id=aha catalog=libast text="help"
+id=aha catalog=libast text="html"
+id=aha catalog=libast text="keys"
+id=aha catalog=libast text="long"
+id=aha catalog=libast text="man"
 id=aha catalog=libast text="NAME"
 id=aha catalog=libast text="aha - just do it"
 id=aha catalog=libast text="DESCRIPTION"
@@ -3261,10 +3405,10 @@ id=aha catalog=libast text="aroni"
 id=aha catalog=libast text="SEE ALSO"
 id=aha catalog=libast text="Bla."
 id=aha catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=aha catalog=libast text="options"
 id=aha catalog=libast text="[ dialect ]"
 return=? option=- name=--man num=0
-id=(null) catalog=libast text="Usage"'
+id=aha catalog=libast text="Usage"'
 		ERROR - $'ANZR
   nun - whfg qb vg
 
@@ -3282,20 +3426,20 @@ FRR NYFB
 	usage=$getopts_usage
 	EXEC	-+ getopts "$usage" '--man'
 		OUTPUT - $'id=getopts catalog=libast text="command"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
+id=getopts catalog=libast text="about"
+id=getopts catalog=libast text="api"
+id=getopts catalog=libast text="help"
+id=getopts catalog=libast text="html"
+id=getopts catalog=libast text="keys"
+id=getopts catalog=libast text="long"
+id=getopts catalog=libast text="man"
+id=getopts catalog=libast text="about"
+id=getopts catalog=libast text="api"
+id=getopts catalog=libast text="help"
+id=getopts catalog=libast text="html"
+id=getopts catalog=libast text="keys"
+id=getopts catalog=libast text="long"
+id=getopts catalog=libast text="man"
 id=getopts catalog=libast text="version"
 id=getopts catalog=libast text="getopts (AT&T Research) 1999-02-02
 "
@@ -3304,13 +3448,13 @@ id=getopts catalog=libast text="? - parse utility options"
 id=getopts catalog=libast text="OPTIONS"
 id=getopts catalog=libast text="command"
 id=getopts catalog=libast text="name"
-id=getopts catalog=libast text="Use name instead of the command name in usage messages."
+id=getopts catalog=libast text="Use \aname\a instead of the command name in usage messages."
 id=getopts catalog=libast text="DESCRIPTION"
-id=getopts catalog=libast text="The getopts utility can be used to retrieve options and
-arguments from a list of arguments give by args or the positional
-parameters if args is omitted.  It can also generate usage messages
-and a man page for the command based on the information in optstring."
-id=getopts catalog=libast text="The optstring string consists of alpha-numeric characters,
+id=getopts catalog=libast text="The \bgetopts\b utility can be used to retrieve options and
+arguments from a list of arguments give by \aargs\a or the positional
+parameters if \aargs\a is omitted.  It can also generate usage messages
+and a man page for the command based on the information in \aoptstring\a."
+id=getopts catalog=libast text="The \aoptstring\a string consists of alpha-numeric characters,
 the special characters +, -, ?, :, and <space>, or character groups
 enclosed in [...].  Character groups may be nested in {...}.
 Outside of a [...] group, a single new-line followed by zero or
@@ -3329,13 +3473,13 @@ that the text should be emboldened when displayed.
 Text between two \\a (bell) characters indicates that the text should
 be emphasised or italicised when displayed."
 id=getopts catalog=libast text="There are four types of groups:"
-id=getopts catalog=libast text="An option specifiation of the form option:longname.
+id=getopts catalog=libast text="An option specifiation of the form \aoption\a:\alongname\a.
 	In this case the first field is the option character.  If there
 	is no option character, then a two digit number should be specified
 	that corresponds to the long options.  This negative of this number
-	will be returned as the value of name by getopts if the long
-	option is matched. A longname is matched with --longname.  A
-	* in the longname field indicates that only characters up that
+	will be returned as the value of \aname\a by \bgetopts\b if the long
+	option is matched. A longname is matched with \b--\b\alongname\a.  A
+	* in the \alongname\a field indicates that only characters up that
 	point need to match provided any additional characters match the option.
 	The [ and ] can be omitted for options that don\'t have longnames
 	or descriptive text."
@@ -3344,7 +3488,7 @@ id=getopts catalog=libast text="A string option argument specification.
 	group specification.  An option group specification consists
 	of a name for the option argument as field 1.   The remaining
 	fields are a typename and zero or more of the special attribute words
-	listof, oneof, and ignorecase.
+	\blistof\b, \boneof\b, and \bignorecase\b.
 	The option specification can be followed
 	by a list of option value descriptions enclosed in parenthesis."
 id=getopts catalog=libast text="A option value description."
@@ -3353,35 +3497,35 @@ id=getopts catalog=libast text="A argument specification. A list of valid option
 		the option argument specification.  Each of the permitted
 		values can be specified with a [...] containing the
 		value followed by a description."
-id=getopts catalog=libast text="If the leading character of optstring is +, then arguments
+id=getopts catalog=libast text="If the leading character of \aoptstring\a is +, then arguments
 beginning with + will also be considered options."
-id=getopts catalog=libast text="A leading : character or a : following a leading + in optstring
+id=getopts catalog=libast text="A leading : character or a : following a leading + in \aoptstring\a
 affects the way errors are handled.  If an option character or longname
-argument not specified in optstring is encountered when processing
-options, the shell variable whose name is name will be set to the ?
-character.  The shell variable OPTARG will be set to
+argument not specified in \aoptstring\a is encountered when processing
+options, the shell variable whose name is \aname\a will be set to the ?
+character.  The shell variable \bOPTARG\b will be set to
 the character found.  If an option argument is missing or has an invalid
-value, then name will be set to the : character and the shell variable
-OPTARG will be set to the option character found.
-Without the leading :, name will be set to the ? character, OPTARG
+value, then \aname\a will be set to the : character and the shell variable
+\bOPTARG\b will be set to the option character found.
+Without the leading :, \aname\a will be set to the ? character, \bOPTARG\b
 will be unset, and an error message will be written to standard error
 when errors are encountered."
 id=getopts catalog=libast text="The end of options occurs when:"
-id=getopts catalog=libast text="The special argument --."
-id=getopts catalog=libast text="An argument that does not beging with a -."
+id=getopts catalog=libast text="The special argument \b--\b."
+id=getopts catalog=libast text="An argument that does not beging with a \b-\b."
 id=getopts catalog=libast text="A help argument is specified."
 id=getopts catalog=libast text="An error is encountered."
-id=getopts catalog=libast text="If OPTARG is set to the value 1, a new set of arguments
+id=getopts catalog=libast text="If \bOPTARG\b is set to the value \b1\b, a new set of arguments
 can be used."
-id=getopts catalog=libast text="getopts can also be used to generate help messages containing command
-usage and detailed descriptions.  Specify args as:"
+id=getopts catalog=libast text="\bgetopts\b can also be used to generate help messages containing command
+usage and detailed descriptions.  Specify \aargs\a as:"
 id=getopts catalog=libast text="To generate a usage synopsis."
 id=getopts catalog=libast text="To generate a verbose usage message."
 id=getopts catalog=libast text="To generate a formatted man page."
 id=getopts catalog=libast text="To generate an easy to parse usage message."
-id=getopts catalog=libast text="To generate a man page in html format."
-id=getopts catalog=libast text="When the end of options is encountered, getopts exits with a
-non-zero return value and the variable OPTIND is set to the
+id=getopts catalog=libast text="To generate a man page in \bhtml\b format."
+id=getopts catalog=libast text="When the end of options is encountered, \bgetopts\b exits with a
+non-zero return value and the variable \bOPTIND\b is set to the
 index of the first non-option argument."
 id=getopts catalog=libast text="EXIT STATUS"
 id=getopts catalog=libast text="An option specified was found."
@@ -3389,10 +3533,10 @@ id=getopts catalog=libast text="An end of options was encountered."
 id=getopts catalog=libast text="A usage or information message was generated."
 id=getopts catalog=libast text="IMPLEMENTATION"
 id=getopts catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=getopts catalog=libast text="options"
 id=getopts catalog=libast text="opstring name [args...]"
 return=? option=- name=--man num=0
-id=(null) catalog=libast text="Usage"'
+id=getopts catalog=libast text="Usage"'
 		ERROR - $'ANZR
   getopts - cnefr hgvyvgl bcgvbaf
 
@@ -3517,14 +3661,14 @@ return=b option=-b name=--onpx arg=(null) num=1'
 		EXIT 1
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="method"
-id=(null) catalog=libast text="value expected"
+id=xlate catalog=libast text="value expected"
 return=: option=-a name=--algorithm num=0
 id=xlate catalog=libast text="%s"'
 		ERROR - $'xlate: --algorithm: zrgubq inyhr rkcrpgrq'
 	EXEC -+ xlate "$usage" --nytbevguz
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="method"
-id=(null) catalog=libast text="value expected"
+id=xlate catalog=libast text="value expected"
 return=: option=-a name=--nytbevguz num=0
 id=xlate catalog=libast text="%s"'
 		ERROR - $'xlate: --nytbevguz: zrgubq inyhr rkcrpgrq'
@@ -3532,20 +3676,20 @@ id=xlate catalog=libast text="%s"'
 		EXIT 2
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
 id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="xlate 1.0
 "
@@ -3557,9 +3701,9 @@ id=xlate catalog=libast text="method"
 id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=- name=--man num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'FLABCFVF
   xlate [ bcgvbaf ]
 
@@ -3572,18 +3716,18 @@ VZCYRZRAGNGVBA
   nhgube          Pby. Ulqr'
 	EXEC -+ xlate "$usage" -?
 		OUTPUT - $'id=xlate catalog=libast text="method"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=-? name=-? num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'Hfntr: xlate [-b] [-a zrgubq]'
 	EXEC -+ xlate "$usage" --?
 		OUTPUT - $'id=xlate catalog=libast text="OPTIONS"
 id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="method"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=-? name=--? num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'Hfntr: xlate [ bcgvbaf ]
 BCGVBAF
   -a, --nytbevguz|algorithm=zrgubq
@@ -3600,9 +3744,9 @@ id=xlate catalog=libast text="method"
 id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=-? name=--?? num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'FLABCFVF
   xlate [ bcgvbaf ]
 
@@ -3614,22 +3758,22 @@ VZCYRZRAGNGVBA
   irefvba         kyngr 1.0 
   nhgube          Pby. Ulqr'
 	EXEC -+ xlate "$usage" --???
-		OUTPUT - $'id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
+		OUTPUT - $'id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
+id=xlate catalog=libast text="nroff"
+id=xlate catalog=libast text="options"
+id=xlate catalog=libast text="posix"
+id=xlate catalog=libast text="short"
+id=xlate catalog=libast text="usage"
 id=xlate catalog=libast text="NAME"
-id=xlate catalog=libast text="options available to all ast commands"
+id=xlate catalog=libast text="options available to all \bast\b commands"
 id=xlate catalog=libast text="DESCRIPTION"
-id=xlate catalog=libast text="-? and --?* options are the same for all ast commands. For any item below, if --item is not supported by a given command then it is equivalent to --??item. The --?? form should be used for portability. All output is written to the standard error."
+id=xlate catalog=libast text="\b-?\b and \b--?\b* options are the same for all \bast\b commands. For any \aitem\a below, if \b--\b\aitem\a is not supported by a given command then it is equivalent to \b--??\b\aitem\a. The \b--??\b form should be used for portability. All output is written to the standard error."
 id=xlate catalog=libast text="OPTIONS"
 id=xlate catalog=libast text="about"
 id=xlate catalog=libast text="List all implementation info."
@@ -3655,26 +3799,26 @@ id=xlate catalog=libast text="short"
 id=xlate catalog=libast text="List short option usage."
 id=xlate catalog=libast text="usage"
 id=xlate catalog=libast text="List the usage string with C style escapes."
-id=xlate catalog=libast text="?-label"
-id=xlate catalog=libast text="List implementation info matching label*."
-id=xlate catalog=libast text="?name"
-id=xlate catalog=libast text="Equivalent to --help=name."
+id=xlate catalog=libast text="?-\alabel\a"
+id=xlate catalog=libast text="List implementation info matching \alabel\a*."
+id=xlate catalog=libast text="?\aname\a"
+id=xlate catalog=libast text="Equivalent to \b--help=\b\aname\a."
 id=xlate catalog=libast text="?"
-id=xlate catalog=libast text="Equivalent to --??options."
+id=xlate catalog=libast text="Equivalent to \b--??options\b."
 id=xlate catalog=libast text="??"
-id=xlate catalog=libast text="Equivalent to --??man."
+id=xlate catalog=libast text="Equivalent to \b--??man\b."
 id=xlate catalog=libast text="???"
-id=xlate catalog=libast text="Equivalent to --??help."
-id=xlate catalog=libast text="???item"
-id=xlate catalog=libast text="If the next argument is --option then list the option output in the item style. Otherwise print version=n where n>0 if --??item is supported, 0 if not."
+id=xlate catalog=libast text="Equivalent to \b--??help\b."
+id=xlate catalog=libast text="???\aitem\a"
+id=xlate catalog=libast text="If the next argument is \b--\b\aoption\a then list the \aoption\a output in the \aitem\a style. Otherwise print \bversion=\b\an\a where \an\a>0 if \b--??\b\aitem\a is supported, \b0\b if not."
 id=xlate catalog=libast text="???ESC"
 id=xlate catalog=libast text="Emit escape codes even if output is not a terminal."
 id=xlate catalog=libast text="???TEST"
 id=xlate catalog=libast text="Massage the output for regression testing."
 id=xlate catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=-? name=--??? num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'ANZR
   bcgvbaf ninvynoyr gb nyy ast pbzznaqf
 
@@ -3717,18 +3861,18 @@ BCGVBAF
 	EXEC -+ xlate "$usage" --keys
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
 return=? option=- name=--keys num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'"algorithm"
 "method"
 "again|back"'
@@ -3736,18 +3880,18 @@ id=(null) catalog=libast text="Usage"'
 	EXEC -+ xlate "$usage" --keys
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
 return=? option=- name=--keys num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'"algorithm"
 "method"
 "again|back"
@@ -3760,20 +3904,20 @@ id=(null) catalog=libast text="Usage"'
 	EXEC -+ xlate "$usage" --man
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
 id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="xlate 1.0
 "
@@ -3786,15 +3930,15 @@ id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
 id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="bar"
+id=xlate catalog=libast text="\abar\a"
 id=xlate catalog=libast text="Bar foo."
 id=xlate catalog=libast text="More e.g."
 id=xlate catalog=libast text="AHA"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=- name=--man num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'BCGVBAF
   -a, --nytbevguz|algorithm=zrgubq
   -b, --ntnva|onpx|again|back
@@ -3815,64 +3959,50 @@ VZCYRZRAGNGVBA
   nhgube          Pby. Ulqr'
 	EXEC -+ xlate "$usage" --?-auth
 		OUTPUT - $'id=xlate catalog=libast text="version"
+id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="author"
+id=xlate catalog=libast text="author?Col. Hyde][a:algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="author"
+id=xlate catalog=libast text="Col. Hyde"
 id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="unknown option"
-return=: option=-? name=--?-auth num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: -auth: haxabja bcgvba'
-		EXIT 1
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+return=? option=-? name=--?-auth num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'  nhgube          Pby. Ulqr'
+		EXIT 2
 	EXEC -+ xlate "$usage" --?-nhgu
 		OUTPUT - $'id=xlate catalog=libast text="version"
+id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="author"
+id=xlate catalog=libast text="author?Col. Hyde][a:algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="author"
+id=xlate catalog=libast text="Col. Hyde"
 id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="unknown option"
-return=: option=-? name=--?-nhgu num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: -nhgu: haxabja bcgvba'
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+return=? option=-? name=--?-nhgu num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'  nhgube          Pby. Ulqr'
 	EXEC -+ xlate "$usage" --zna
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
 id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="xlate 1.0
 "
@@ -3885,15 +4015,15 @@ id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
 id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="bar"
+id=xlate catalog=libast text="\abar\a"
 id=xlate catalog=libast text="Bar foo."
 id=xlate catalog=libast text="More e.g."
 id=xlate catalog=libast text="AHA"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=- name=--zna num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'BCGVBAF
   -a, --nytbevguz|algorithm=zrgubq
   -b, --ntnva|onpx|again|back
@@ -3914,13 +4044,13 @@ VZCYRZRAGNGVBA
   nhgube          Pby. Ulqr'
 		EXIT 2
 	EXEC -+ xlate "$usage" --??zna
-		OUTPUT - $'id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
+		OUTPUT - $'id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
 id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="xlate 1.0
 "
@@ -3933,174 +4063,144 @@ id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
 id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="bar"
+id=xlate catalog=libast text="\abar\a"
 id=xlate catalog=libast text="Bar foo."
 id=xlate catalog=libast text="More e.g."
 id=xlate catalog=libast text="AHA"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
+id=xlate catalog=libast text="options"
 return=? option=-? name=--??zna num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 	EXEC -+ xlate "$usage" --?again
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="unknown option"
-return=: option=-? name=--?again num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: --?again: haxabja bcgvba'
-		EXIT 1
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="OPTIONS"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="options"
+return=? option=-? name=--?again num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'Hfntr: xlate [ bcgvbaf ]
+BCGVBAF
+  -b, --ntnva|onpx|again|back'
+		EXIT 2
 	EXEC -+ xlate "$usage" --?ntnva
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="unknown option"
-return=: option=-? name=--?ntnva num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: --?ntnva: haxabja bcgvba'
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="OPTIONS"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="options"
+return=? option=-? name=--?ntnva num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'Hfntr: xlate [ bcgvbaf ]
+BCGVBAF
+  -b, --ntnva|onpx|again|back'
 	EXEC -+ xlate "$usage" --?back
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="unknown option"
-return=: option=-? name=--?back num=0
-id=xlate catalog=libast text="%s"'
-	 	ERROR - $'xlate: --?back: haxabja bcgvba'
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="OPTIONS"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="options"
+return=? option=-? name=--?back num=0
+id=xlate catalog=libast text="Usage"'
+	 	ERROR - $'Hfntr: xlate [ bcgvbaf ]
+BCGVBAF
+  -b, --ntnva|onpx|again|back'
 	EXEC -+ xlate "$usage" --?onpx
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="unknown option"
-return=: option=-? name=--?onpx num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: --?onpx: haxabja bcgvba'
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="OPTIONS"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="options"
+return=? option=-? name=--?onpx num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'Hfntr: xlate [ bcgvbaf ]
+BCGVBAF
+  -b, --ntnva|onpx|again|back'
 	EXEC -+ xlate "$usage" --?+EXAMPLES
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="EXAMPLES"
-id=xlate catalog=libast text=""
-id=(null) catalog=libast text="?More e.g.]{[+aha?AHA]}"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="section not found"
-return=: option=-? name=--?+EXAMPLES num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: --?+EXAMPLES: frpgvba abg sbhaq'
+id=xlate catalog=libast text="EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="Examples."
+id=xlate catalog=libast text="Foo bar."
+id=xlate catalog=libast text="\abar\a"
+id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
+return=? option=-? name=--?+EXAMPLES num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'  EXAMPLES        Rknzcyrf.
+                    foo   Sbb one.
+                    one   One sbb.
+                  Zber r.t.
+                    aha   NUN'
 	EXEC -+ xlate "$usage" --?+EX
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="EXAMPLES"
-id=xlate catalog=libast text=""
-id=(null) catalog=libast text="?More e.g.]{[+aha?AHA]}"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="section not found"
-return=: option=-? name=--?+EX num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: --?+EX: frpgvba abg sbhaq'
+id=xlate catalog=libast text="EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="Examples."
+id=xlate catalog=libast text="Foo bar."
+id=xlate catalog=libast text="\abar\a"
+id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
+return=? option=-? name=--?+EX num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'  EXAMPLES        Rknzcyrf.
+                    foo   Sbb one.
+                    one   One sbb.
+                  Zber r.t.
+                    aha   NUN'
 	EXEC -+ xlate "$usage" --?+RKNZCYRF
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="algorithm]:[method][b:again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="again|back][+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
 id=xlate catalog=libast text="EXAMPLES"
-id=xlate catalog=libast text=""
-id=(null) catalog=libast text="?More e.g.]{[+aha?AHA]}"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="nroff"
-id=(null) catalog=libast text="options"
-id=(null) catalog=libast text="posix"
-id=(null) catalog=libast text="short"
-id=(null) catalog=libast text="usage"
-id=(null) catalog=libast text="section not found"
-return=: option=-? name=--?+RKNZCYRF num=0
-id=xlate catalog=libast text="%s"'
-		ERROR - $'xlate: --?+RKNZCYRF: frpgvba abg sbhaq'
+id=xlate catalog=libast text="EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}"
+id=xlate catalog=libast text="Examples."
+id=xlate catalog=libast text="Foo bar."
+id=xlate catalog=libast text="\abar\a"
+id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
+return=? option=-? name=--?+RKNZCYRF num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'  EXAMPLES        Rknzcyrf.
+                    foo   Sbb one.
+                    one   One sbb.
+                  Zber r.t.
+                    aha   NUN'
 	usage=$'[-?\n@(#)xlate 1.0\n][-author?Col. Hyde][a:algorithm?\fone\f]:[method]{[+?\fthree\f]}[b:again|back?\ftwo\f]'
 	EXEC -+ xlate "$usage" --keys
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
 return=? option=- name=--keys num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text="Usage"'
 		ERROR - $'"algorithm"
 "\\fone\\f"
 "method"
@@ -4157,6 +4257,8 @@ IMPLEMENTATION
 
 	EXPORT	LC_ALL=debug LC_MESSAGES=debug
 
+	IF '[[ $(LC_ALL=debug $COMMAND query "[-][+NAME]" --man 2>&1 >/dev/null) == "(libast,3,325)"* ]]'
+
 	EXEC ls "$usage" --man
 		OUTPUT - 'return=? option=- name=--man num=0'
 		ERROR - '(libast,3,372)
@@ -4185,7 +4287,7 @@ IMPLEMENTATION
   (libast,3,812)  (debug,ls,SpamCo,"aha ")
   (libast,3,499)  (debug,ls,SpamCo,"SpamCo")'
 	usage=$'[-][+NAME?small]\n\nfile\n\n[+SEE?\btbig\b(1)]'
-	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC small "$usage" --man
+	EXEC small "$usage" --man
 		EXIT 2
 		OUTPUT - $'return=? option=- name=--man num=0'
 		ERROR - $'(libast,3,325)
@@ -4197,7 +4299,7 @@ IMPLEMENTATION
 (debug,small,libast,"SEE")
   (debug,small,libast,"tbig(1)")'
 	usage=$'[-][Y:layout?Listing layout \akey\a:]:[key]{\n[a:across|horizontal?Multi-column across the page.][1:single-column?One column down the page.]\n}'
-	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC ls "$usage" --man
+	EXEC ls "$usage" --man
 		ERROR - $'(libast,3,372)
   ls [ (libast,3,709) ]
 
@@ -4208,3 +4310,46 @@ IMPLEMENTATION
                           (debug,ls,libast,"Multi-column across the page.")
                     (debug,ls,libast,"single-column")
                           (debug,ls,libast,"One column down the page.")'
+
+	ELSE '$INSTALLROOT/share/lib/local/C/LC_MESSAGES/libast not installed'
+
+	EXEC ls "$usage" --man
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - '(debug,ls,libast,"SYNOPSIS")
+  ls [ (debug,ls,libast,"options") ]
+
+(debug,ls,libast,"OPTIONS")
+  -Y, --(debug,ls,libast,"layout")|layout=(debug,ls,libast,"key")
+                  (debug,ls,libast,"Listing layout key:")
+                    (debug,ls,libast,"across|horizontal")
+                          (debug,ls,libast,"Multi-column across the page.")
+                    (debug,ls,libast,"single-column")
+                          (debug,ls,libast,"One column down the page.")'
+
+	usage=$'[-][+NAME?small]\n\nfile\n\n[+SEE?\btbig\b(1)]'
+	EXEC small "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'(debug,small,libast,"NAME")
+  (debug,small,libast,"small")
+
+(debug,small,libast,"SYNOPSIS")
+  small [ (debug,small,libast,"options") ] (debug,small,libast,"file")
+
+(debug,small,libast,"SEE")
+  (debug,small,libast,"tbig(1)")'
+
+	usage=$'[-][Y:layout?Listing layout \akey\a:]:[key]{\n[a:across|horizontal?Multi-column across the page.][1:single-column?One column down the page.]\n}'
+	EXEC ls "$usage" --man
+		ERROR - $'(debug,ls,libast,"SYNOPSIS")
+  ls [ (debug,ls,libast,"options") ]
+
+(debug,ls,libast,"OPTIONS")
+  -Y, --(debug,ls,libast,"layout")|layout=(debug,ls,libast,"key")
+                  (debug,ls,libast,"Listing layout key:")
+                    (debug,ls,libast,"across|horizontal")
+                          (debug,ls,libast,"Multi-column across the page.")
+                    (debug,ls,libast,"single-column")
+                          (debug,ls,libast,"One column down the page.")'
+
+	FI

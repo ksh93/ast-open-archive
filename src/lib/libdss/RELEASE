@@ -1,3 +1,4 @@
+08-05-08 cxopen.c: fix number_external() width logic
 07-11-28 cxcomp.c,cxmap.c: fix num=>str cast logic
 07-10-26 cxcomp.c: fix s="S"; print(s,s) cast bug
 07-10-25 cxcomp.c: pretty up CX_DEBUG instruction code trace

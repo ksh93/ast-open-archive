@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2008 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -196,7 +196,7 @@ alarmed(int sig)
 int
 filelock(const char* name, FILE* fp, int set)
 {
-#if defined(LOCK_EX) && defined(LOCK_UN) || defined(F_SETLKW) && defined(F_WRLCK) && defined(F_UNLCK)
+#if defined(F_SETLKW) && defined(F_WRLCK) && defined(F_UNLCK) || defined(LOCK_EX) && defined(LOCK_UN)
 	int	r;
 	sig_t	savealrm;
 
@@ -207,9 +207,7 @@ filelock(const char* name, FILE* fp, int set)
 		if (!(r = strtol(state.var.lock, NiL, 10)))
 			r = 5;
 		alarm(r);
-#if defined(LOCK_EX) && defined(LOCK_UN)
-		r = flock(fileno(fp), set ? LOCK_EX : LOCK_UN);
-#else
+#if defined(F_SETLKW) && defined(F_WRLCK) && defined(F_UNLCK)
 		{
 			struct flock	lck;
 
@@ -219,6 +217,8 @@ filelock(const char* name, FILE* fp, int set)
 			lck.l_len = 0;
 			r = fcntl(fileno(fp), F_SETLKW, &lck);
 		}
+#else
+		r = flock(fileno(fp), set ? LOCK_EX : LOCK_UN);
 #endif
 		alarm(0);
 		signal(SIGALRM, savealrm);

@@ -4,7 +4,7 @@ INCLUDE cc.def
 
 TEST 01 ':LIBRARY: with .ARUPDATE'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'cmd :: cmd.c -llib
 lib :LIBRARY: lib.c
 .ARUPDATE : .ARENHANCE
@@ -62,7 +62,7 @@ TEST 03 ':: vs metarules'
 
 TEST 04 ':LIBRARY:'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'cmd :: cmd.c -ltst
 tst :LIBRARY: tst.c'
 		INPUT cmd.c $'int main(){return 0;}'
@@ -129,7 +129,7 @@ TEST 07 ':INSTALLDIR:'
 		OUTPUT - $'+ if	silent test ! -d fun
 + then	mkdir -p fun 		    		   
 + fi
-+ case :$OPTIND:$RANDOM in
++ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
@@ -260,6 +260,7 @@ int foo() { return 123; }'
 + echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c lib.c
 + ar cr libfoo.a lib.o
++ ignore ranlib libfoo.a
 + rm -f lib.o
 + cc     -o foo foo.o libfoo.a libbar.a
 + cc  -shared  -o libfoo.so.1.0 -all libfoo.a -notall '
@@ -276,7 +277,7 @@ TEST 12 'multi-level :MAKE:'
 	EXEC	-n
 		INPUT foo/Makefile $':MAKE:'
 		OUTPUT - $'+ : bar\n+ : fum'
-		ERROR - $'bar:\nfoo/fum:'
+		ERROR - $'bar:\nfoo/fum:\nfoo:'
 
 TEST 13 ':JOINT: inference'
 
@@ -359,7 +360,7 @@ TEST 15 ':: .sh rhs mismatch with lhs'
 		INPUT Makefile $'bin/foo :: foo.sh\nbar :: huh.sh'
 		INPUT foo.sh
 		INPUT huh.sh
-		OUTPUT - $'+ case :$OPTIND:$RANDOM in
+		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
@@ -429,6 +430,7 @@ libtestlib.a :LINK: $(.LIB.NAME. test)'
 		OUTPUT - $'+ echo "" -ltest > test.req
 + cc -O   -c lib.c
 + ar cr libtest.a lib.o
++ ignore ranlib libtest.a
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
 + then	cp libtestlib.a libtestlib.a.old
@@ -442,6 +444,7 @@ libtest.a :: lib.c
 libtestlib.a :LINK: libtest.a'
 		OUTPUT - $'+ cc -O   -c lib.c
 + ar cr libtest.a lib.o
++ ignore ranlib libtest.a
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
 + then	cp libtestlib.a libtestlib.a.old
@@ -455,6 +458,7 @@ testlib.a :: lib.c
 libtestlib.a :LINK: testlib.a'
 		OUTPUT - $'+ cc -O   -c lib.c
 + ar cr testlib.a lib.o
++ ignore ranlib testlib.a
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
 + then	cp libtestlib.a libtestlib.a.old
@@ -469,7 +473,7 @@ TEST 19 ':LINK: + install'
 gg :: gg.sh
 ug gu :LINK: gg'
 		INPUT gg.sh
-		OUTPUT - $'+ case :$OPTIND:$RANDOM in
+		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
@@ -599,7 +603,7 @@ BBB :: BBB.sh'
 		INPUT AAA.sh
 		INPUT BBB.sh
 		INPUT bin/
-		OUTPUT - $'+ case :$OPTIND:$RANDOM in
+		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
@@ -630,7 +634,7 @@ BBB :: BBB.sh'
 + 	;;
 + esac
 + silent test -w bin/AAA -a -x bin/AAA || chmod u+w,+x bin/AAA
-+ case :$OPTIND:$RANDOM in
++ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
@@ -693,15 +697,15 @@ echo "#define ONE 1" > color.h
 fi
 echo making ColorSM.h
 echo "#define TWO 2" > ColorSM.h'
-		INPUT traffic.c $'#include "Color.h"
+		INPUT traffic.c $'#include "Kolor.h"
 int main()
 {
 	hello();
 	return 0;
 }'
-		INPUT Color.h $'#include "ColorSM.h"
+		INPUT Kolor.h $'#include "ColorSM.h"
 #include "color.h"'
-		INPUT color.sm $'#include "Color.h"
+		INPUT color.sm $'#include "Kolor.h"
 hello()
 {}'
 		OUTPUT - $'making color.
@@ -842,7 +846,7 @@ TEST 26 ':LIBRARY: + version + options'
 
 	EXPORT	INSTALLROOT=.
 
-	EXEC	--regress all VERSION=2.4
+	EXEC	--regress=sync all VERSION=2.4
 		INPUT Makefile $'VERSION = 1.0
 CCFLAGS += $$(CC.DLL)
 t $(VERSION) :LIBRARY: a.c z.c'
@@ -857,19 +861,19 @@ t $(VERSION) :LIBRARY: a.c z.c'
 + rm -f a.o z.o
 + cc -shared -o libt.so.2.4 -all libt.a -notall'
 
-	EXEC	--regress all VERSION=2.4
+	EXEC	--regress=sync all VERSION=2.4
 		ERROR -
 
-	EXEC	--regress all VERSION=5.0
+	EXEC	--regress=sync all VERSION=5.0
 		ERROR - $'+ cc -shared -o libt.so.5.0 -all libt.a -notall'
 
-	EXEC	--regress all VERSION=5.0
+	EXEC	--regress=sync all VERSION=5.0
 		ERROR -
 
-	EXEC	--regress clobber
+	EXEC	--regress=sync clobber
 		ERROR - $'+ ignore rm -f -r libt.so.2.4 libt.a Makefile.mo Makefile.ms t.req libt.so.5.0'
 
-	EXEC	--regress install VERSION='7.1 plugin=foo'
+	EXEC	--regress=sync install VERSION='7.1 plugin=foo'
 		ERROR - $'+ cc -O -D_BLD_DLL -D_BLD_PIC -c a.c
 + cc -O -D_BLD_DLL -D_BLD_PIC -c z.c
 + ar cr libfoot.a a.o z.o
@@ -881,7 +885,7 @@ t $(VERSION) :LIBRARY: a.c z.c'
 + /bin/ln lib/foo/libt.so.7.1 lib/foo/libt.so
 + chmod -w lib/foo/libt.so.7.1'
 
-	EXEC	--regress install VERSION='7.1 plugin=foo'
+	EXEC	--regress=sync install VERSION='7.1 plugin=foo'
 		ERROR -
 
 TEST 27 ':MAKE: + install + file name clash'
@@ -1113,7 +1117,7 @@ b.o a.o :JOINT: j.c
 
 TEST 34 ':JOINT: vs :LIBRARY:'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'tst :LIBRARY: b.o a.o
 b.o a.o :JOINT: fun.c
 	$(CC) -DFUN=$(<:O=1:B) -c $(*)
@@ -1151,6 +1155,7 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
 + ar cr liblibraryC.a a.o b.o c.o
++ ignore ranlib liblibraryC.a
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC.so.1.0 -all liblibraryC.a -notall 
 + echo "" -llibraryC++ > libraryC++.req
@@ -1158,6 +1163,7 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 + CC -O -D_BLD_DLL -D_BLD_PIC   -c ../b.c
 + CC -O -D_BLD_DLL -D_BLD_PIC   -c ../c.c
 + ar cr liblibraryC++.a a.o b.o c.o
++ ignore ranlib liblibraryC++.a
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC++.so.1.0 -all liblibraryC++.a -notall 
 + echo "" -llibraryC2 > libraryC2.req
@@ -1165,6 +1171,7 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 + cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../b.c
 + cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../c.c
 + ar cr liblibraryC2.a a.o b.o c.o
++ ignore ranlib liblibraryC2.a
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC2.so.1.0 -all liblibraryC2.a -notall '
 			ERROR - $'cc-++:\ncc-2:'

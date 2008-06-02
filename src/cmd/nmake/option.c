@@ -154,7 +154,7 @@ static Option_t		options[] =	/* option table			*/
 	" shell actions." },
 { "option",	OPT_option,	0,				0,
 	"Define a new option. The definition is a delimiter separated field"
-	" list. Any non-alpha-numberic delimiter other than \b-\b may be used."
+	" list. Any non-alpha-numeric delimiter other than \b-\b may be used."
 	" \b;\b is used in this description. Makefile \bset option\b"
 	" definitions must be '...' quoted. Two adjacent delimiters specifies"
 	" the literal delimiter character and a \b-\b field value specifies an"
@@ -188,7 +188,12 @@ static Option_t		options[] =	/* option table			*/
 	" ignores state files on all view levels. The top view is level 0.",
 	"level:=0" },
 { "regress",	OPT_regress,	(char*)&state.regress,		0,
-	"Massage output for regression testing." },
+	"Massage output for regression testing. \aaction\a may be one of:",
+	"[action:!message]"
+	"{"
+	"	[+message?alter messages only]"
+	"	[+sync?sync 1-second clocks if necessacy and alter messages]"
+	"}" },
 { "reread",	OPT_reread,	(char*)&state.reread,		0,
 	"Ignore any previously generated \b.mo\b files and re-read all"
 	" input makefiles." },
@@ -607,20 +612,23 @@ mamwrite(Sfio_t* fp, const void* buf, size_t n, Sfdisc_t* dp)
  */
 
 static void
-regressinit(void)
+regressinit(const char* type)
 {
 	Stat_t	st;
 	Time_t	t;
 	int	i;
 
 	error_info.version = 0;
-	t = CURTIME;
-	if (i = tmxnsec(t) && !stat(".", &st) && !tmxnsec(tmxgetatime(&st)) && !tmxnsec(tmxgetmtime(&st)))
-		state.start = tmxsns(tmxsec(t)+1, 0);
-	while (state.start >= (t = CURTIME))
-		tmsleep(0L, 100000000L);
-	if (!i)
-		state.start = t;
+	if (*type == 's')
+	{
+		t = CURTIME;
+		if (i = tmxnsec(t) && !stat(".", &st) && !tmxnsec(tmxgetatime(&st)) && !tmxnsec(tmxgetmtime(&st)))
+			state.start = tmxsns(tmxsec(t)+1, 0);
+		while (state.start >= (t = CURTIME))
+			tmsleep(0L, 100000000L);
+		if (!i)
+			state.start = t;
+	}
 }
 
 /*
@@ -914,11 +922,12 @@ setop(register Option_t* op, register int n, char* s, int type)
 				state.mam.dynamic = 1;
 			else if (*s == *(state.mam.type = "regress") && (!*(s + 1) || !strcmp(s, state.mam.type)))
 			{
-				state.regress = state.mam.regress = 1;
+				state.regress = "sync";
+				state.mam.regress = 1;
 				state.silent = 1;
 				if (!table.regress)
 					table.regress = hashalloc(table.rule, HASH_name, "regress-paths", 0);
-				regressinit();
+				regressinit(state.regress);
 			}
 			else if (*s == *(state.mam.type = "static") && (!*(s + 1) || !strcmp(s, state.mam.type)))
 				state.mam.statix = 1;
@@ -1187,8 +1196,24 @@ setop(register Option_t* op, register int n, char* s, int type)
 			state.exec = 0;
 		return;
 	case OPT(OPT_regress):
-		if (state.regress = n)
-			regressinit();
+		if (n)
+		{
+			if (!s)
+				s = "-";
+			if ((*s == *(state.regress = "message") || *s == '-') && (!*(s + 1) || !strcmp(s, state.regress)))
+				;
+			else if (*s == *(state.regress = "sync") && (!*(s + 1) || !strcmp(s, state.regress)))
+				;
+			else
+			{
+				state.regress = 0;
+				error(2, "%s: invalid regress action", s);
+			}
+			if (state.regress)
+				regressinit(state.regress);
+		}
+		else
+			state.regress = 0;
 		return;
 	case OPT(OPT_reread):
 		if (state.reread = n)
@@ -1341,6 +1366,7 @@ setop(register Option_t* op, register int n, char* s, int type)
  * generate a single option setting in sp given the option pointer
  * setting:
  *	 0  only the value is generated, "" if option not set
+ *	'+' only the value is generated, "" if Os option not set, 0 for Ob|Oi not set
  *	'-' option name and value suitable for set()
  *	'?' 1 if OPT_SET, "" otherwise
  *	'#' table attributes with the current value
@@ -1386,6 +1412,7 @@ genop(register Sfio_t* sp, register Option_t* op, int setting, int flag)
 			if (!n)
 				return;
 			/*FALLTHROUGH*/
+		case '+':
 		case '#':
 			break;
 		default:
@@ -1420,6 +1447,7 @@ genop(register Sfio_t* sp, register Option_t* op, int setting, int flag)
 			if (!n)
 				return;
 			/*FALLTHROUGH*/
+		case '+':
 		case '#':
 			break;
 		default:
@@ -1446,6 +1474,7 @@ genop(register Sfio_t* sp, register Option_t* op, int setting, int flag)
 				if (!p)
 					return;
 				/*FALLTHROUGH*/
+			case '+':
 			case '#':
 				break;
 			default:
@@ -1482,6 +1511,8 @@ genop(register Sfio_t* sp, register Option_t* op, int setting, int flag)
 				if (!v)
 					return;
 				setting = 0;
+				break;
+			case '+':
 				break;
 			default:
 				if (op->flags & OPT_DEFAULT)

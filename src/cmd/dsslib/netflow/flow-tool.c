@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -365,21 +365,21 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R1(fp)->srcport, &R1(fp)->srcport, (char*)&R1(fp)->prot - (char*)&R1(fp)->srcport);
 			}
 		}
-		rp->src_addr = R1(fp)->srcaddr;
-		rp->dst_addr = R1(fp)->dstaddr;
-		rp->hop = R1(fp)->nexthop;
-		rp->input = R1(fp)->input;
-		rp->output = R1(fp)->output;
-		rp->packets = R1(fp)->dPkts;
-		rp->bytes = R1(fp)->dOctets;
-		rp->first = R1(fp)->First;
-		rp->last = R1(fp)->Last;
+		rp->ipv4_src_addr = R1(fp)->srcaddr;
+		rp->ipv4_dst_addr = R1(fp)->dstaddr;
+		rp->ipv4_next_hop = R1(fp)->nexthop;
+		rp->input_snmp = R1(fp)->input;
+		rp->output_snmp = R1(fp)->output;
+		rp->in_pkts = rp->out_pkts = R1(fp)->dPkts;
+		rp->in_bytes = rp->out_bytes = R1(fp)->dOctets;
+		rp->first_switched = R1(fp)->First;
+		rp->last_switched = R1(fp)->Last;
 		rp->src_port = R1(fp)->srcport;
 		rp->dst_port = R1(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R1(fp)->tcp_flags;
-		rp->prot = R1(fp)->prot;
-		rp->tos = R1(fp)->tos;
+		rp->protocol = R1(fp)->prot;
+		rp->src_tos = rp->dst_tos = R1(fp)->tos;
 		rp->time = R1(fp)->unix_secs;
 		rp->nsec = R1(fp)->unix_nsecs;
 		rp->uptime = R1(fp)->sysUpTime;
@@ -396,21 +396,21 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R5(fp)->src_as, &R5(fp)->src_as, (char*)(R5(fp)+1) - (char*)&R5(fp)->src_as);
 			}
 		}
-		rp->src_addr = R5(fp)->srcaddr;
-		rp->dst_addr = R5(fp)->dstaddr;
-		rp->hop = R5(fp)->nexthop;
-		rp->input = R5(fp)->input;
-		rp->output = R5(fp)->output;
-		rp->packets = R5(fp)->dPkts;
-		rp->bytes = R5(fp)->dOctets;
-		rp->first = R5(fp)->First;
-		rp->last = R5(fp)->Last;
+		rp->ipv4_src_addr = R5(fp)->srcaddr;
+		rp->ipv4_dst_addr = R5(fp)->dstaddr;
+		rp->ipv4_next_hop = R5(fp)->nexthop;
+		rp->input_snmp = R5(fp)->input;
+		rp->output_snmp = R5(fp)->output;
+		rp->in_pkts = rp->out_pkts = R5(fp)->dPkts;
+		rp->in_bytes = rp->out_bytes = R5(fp)->dOctets;
+		rp->first_switched = R5(fp)->First;
+		rp->last_switched = R5(fp)->Last;
 		rp->src_port = R5(fp)->srcport;
 		rp->dst_port = R5(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R5(fp)->tcp_flags;
-		rp->prot = R5(fp)->prot;
-		rp->tos = R5(fp)->tos;
+		rp->protocol = R5(fp)->prot;
+		rp->src_tos = rp->dst_tos = R5(fp)->tos;
 		rp->engine_type = R5(fp)->engine_type;
 		rp->engine_id = R5(fp)->engine_id;
 		rp->src_as = R5(fp)->src_as;
@@ -433,21 +433,21 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R6(fp)->src_as, &R6(fp)->src_as, (char*)(R6(fp)+1) - (char*)&R6(fp)->src_as);
 			}
 		}
-		rp->src_addr = R6(fp)->srcaddr;
-		rp->dst_addr = R6(fp)->dstaddr;
-		rp->hop = R6(fp)->nexthop;
-		rp->input = R6(fp)->input;
-		rp->output = R6(fp)->output;
-		rp->packets = R6(fp)->dPkts;
-		rp->bytes = R6(fp)->dOctets;
-		rp->first = R6(fp)->First;
-		rp->last = R6(fp)->Last;
+		rp->ipv4_src_addr = R6(fp)->srcaddr;
+		rp->ipv4_dst_addr = R6(fp)->dstaddr;
+		rp->ipv4_next_hop = R6(fp)->nexthop;
+		rp->input_snmp = R6(fp)->input;
+		rp->output_snmp = R6(fp)->output;
+		rp->in_pkts = rp->out_pkts = R6(fp)->dPkts;
+		rp->in_bytes = rp->out_bytes = R6(fp)->dOctets;
+		rp->first_switched = R6(fp)->First;
+		rp->last_switched = R6(fp)->Last;
 		rp->src_port = R6(fp)->srcport;
 		rp->dst_port = R6(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R6(fp)->tcp_flags;
-		rp->prot = R6(fp)->prot;
-		rp->tos = R6(fp)->tos;
+		rp->protocol = R6(fp)->prot;
+		rp->src_tos = rp->dst_tos = R6(fp)->tos;
 		rp->engine_type = R6(fp)->engine_type;
 		rp->engine_id = R6(fp)->engine_id;
 		rp->src_as = R6(fp)->src_as;
@@ -470,21 +470,21 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R7(fp)->src_as, &R7(fp)->src_as, (char*)(R7(fp)+1) - (char*)&R7(fp)->src_as);
 			}
 		}
-		rp->src_addr = R7(fp)->srcaddr;
-		rp->dst_addr = R7(fp)->dstaddr;
-		rp->hop = R7(fp)->nexthop;
-		rp->input = R7(fp)->input;
-		rp->output = R7(fp)->output;
-		rp->packets = R7(fp)->dPkts;
-		rp->bytes = R7(fp)->dOctets;
-		rp->first = R7(fp)->First;
-		rp->last = R7(fp)->Last;
+		rp->ipv4_src_addr = R7(fp)->srcaddr;
+		rp->ipv4_dst_addr = R7(fp)->dstaddr;
+		rp->ipv4_next_hop = R7(fp)->nexthop;
+		rp->input_snmp = R7(fp)->input;
+		rp->output_snmp = R7(fp)->output;
+		rp->in_pkts = rp->out_pkts = R7(fp)->dPkts;
+		rp->in_bytes = rp->out_bytes = R7(fp)->dOctets;
+		rp->first_switched = R7(fp)->First;
+		rp->last_switched = R7(fp)->Last;
 		rp->src_port = R7(fp)->srcport;
 		rp->dst_port = R7(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R7(fp)->tcp_flags;
-		rp->prot = R7(fp)->prot;
-		rp->tos = R7(fp)->tos;
+		rp->protocol = R7(fp)->prot;
+		rp->src_tos = rp->dst_tos = R7(fp)->tos;
 		rp->engine_type = R7(fp)->engine_type;
 		rp->engine_id = R7(fp)->engine_id;
 		rp->src_as = R7(fp)->src_as;
@@ -497,8 +497,8 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 		break;
 	}
 	boot = ((Nftime_t)rp->time * MS - (Nftime_t)rp->uptime) * US + (Nftime_t)rp->nsec;
-	rp->start = boot + (Nftime_t)rp->first * US;
-	rp->end = boot + (Nftime_t)rp->last * US;
+	rp->start = boot + (Nftime_t)rp->first_switched * US;
+	rp->end = boot + (Nftime_t)rp->last_switched * US;
 	record->size = sizeof(*rp);
 	record->data = rp;
 	return 1;

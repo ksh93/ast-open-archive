@@ -1,3 +1,5 @@
+08-04-09 csopen.c: fix mkmount() path cleanup
+08-04-09 csopen.c: add debug=-1 mkmount() error message
 07-06-05 csclient.c: add CS_CLIENT_SEP
 06-09-19 css.c: sysconf() => astconf()
 06-08-15 csclient.c: fix prompt logic

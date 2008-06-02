@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2007-12-15 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2008-04-01 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -70,8 +70,8 @@
 	D| \# define %|
 	B| \# if|
 	E| \# endif|
-	I| \# include <%>|A.STD.INCLUDE|M$$(%:S:?$$(%)??)|
-	I| \# include "%"|A.LCL.INCLUDE|$(-prefix-include:+M$$$(.PREFIX.INCLUDE.))|
+	I| \# include <%>|A.STD.INCLUDE|R$$(%:P=U:D:S:N=.:?$$$(%)??):.TERMINAL|
+	I| \# include "%"|A.LCL.INCLUDE|R$$(%:P=U:D:S:N=.:?$$$(%)??):.TERMINAL|$(-prefix-include:+M$$$(.PREFIX.INCLUDE.))|
 	I| \# pragma library "%"|A.VIRTUAL|A.ACCEPT|M.LIBRARY.$$(%)|
 
 $("$(.SUFFIX.c) $(.SUFFIX.C) .h .S":/^/.ATTRIBUTE.%/) : .SCAN.c
@@ -168,8 +168,14 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 .ATTRIBUTE.features/%.sh : .SCAN.exec.sh
 
 .INCLUDE.SUFFIX. : .FUNCTION
-	local F L Q S T
-	L := $(%:O=1)
+	local F L Q S T ignorecase
+	for L $(%)
+		if L == "--ignorecase"
+			ignorecase = 1
+		elif L != "--*"
+			break
+		end
+	end
 	F := $(%%:/ .*//:/\.$//:/'\(.*\)'/\1/)
 	Q := $("\"")
 	if F == "$(Q)*$(Q)"
@@ -182,6 +188,23 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 			if "$(T:T=F)"
 				F := $(T)
 				break
+			end
+			if ignorecase
+				if T != "*[[:lower:]]*"
+					Q := $(T:F=%(lower)s)
+					$(Q) : .SCAN.$(L)
+					if "$(Q:T=F)"
+						F := $(Q)
+						break
+					end
+				elif T != "[*[[:upper:]]*"
+					Q := $(T:F=%(upper)s)
+					$(Q) : .SCAN.$(L)
+					if "$(Q:T=F)"
+						F := $(Q)
+						break
+					end
+				end
 			end
 		end
 	end

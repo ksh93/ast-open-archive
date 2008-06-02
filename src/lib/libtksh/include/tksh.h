@@ -200,6 +200,8 @@ typedef struct Interp {
                                  * this interpreter. Cleaned up when
                                  * this interpreter is deleted. */
 
+    void* shbltin;		/* shell (Shbltin_t*) */
+
     char resultSpace[TCL_RESULT_SIZE+1];
                                 /* Static space for storing small results. */
 } Interp;

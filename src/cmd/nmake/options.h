@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -85,7 +85,7 @@
 #define OPT_questionable ('Q'|On)	/* enable questionable code	*/
 #define OPT_readonly	('R'|Ob)	/* current vars|opts readonly	*/
 #define OPT_readstate	('S'|On|Ov)	/* read state file on startup	*/
-#define OPT_regress	('q'|Ob)	/* output for regression test	*/
+#define OPT_regress	('q'|Os|Ov)	/* output for regression test	*/
 #define OPT_reread	(103|Ob|Of|Ox)	/* force re-read all makefiles	*/
 #define OPT_ruledump	('r'|Ob|Ox)	/* dump rule definitions	*/
 #define OPT_scan	(104|Ob|Of)	/* scan|check implicit prereqs	*/

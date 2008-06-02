@@ -18,9 +18,10 @@ freeze COBOL
 .SUFFIX.HEADER.cob = .cpy .CPY
 
 .SCAN.cob : .SCAN
+	I|COPY % |M$$(.INCLUDE.SUFFIX. cob)|
 	I|\T COPY % |M$$(.INCLUDE.SUFFIX. cob)|
 	I|\T \D COPY % |M$$(.INCLUDE.SUFFIX. cob)|
-	I|\D *. COPY % |M$$(.INCLUDE.SUFFIX. cob)|
+	#I|\D *. COPY % |M$$(.INCLUDE.SUFFIX. cob)| # this one is trouble for ^[[:space:]]*COPY sqlca.cbl$
 
 $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 

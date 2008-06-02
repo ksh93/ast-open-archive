@@ -92,7 +92,165 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-08-01-31  --- Release ksh93s+  ---
+08-06-02  --- Release ksh93t-  ---
+08-06-02  When defining a type, the typeset -r attribute causes this field
+	  to be required to be specified for each instance of the type and
+	  does not allow a default value.  Currently undocumented. 
+08-06-02  Several bugs in which compound variables were modified by
+	  subshells have been fixed.
+08-05-22  The ceil function has been added to the math functions.
+08-05-21  A bug in which a name reference defined in a function and passed
+	  as an argument to another function could cause an incorrect binding.
+08-05-21  A bug in freeing compound variables that are local to functions
+	  has been fixed.
+08-05-19  The array expansions ${array[sub1..sub2]} and ${!array[sub1..sub2]}
+	  to expand to the value (or subscripts) for array between sub1 and
+	  sub2 inclusive.  For associative arrays, the range is based on
+	  location in the POSIX locale.  The .. must be explicit and cannot
+	  result from an expansion.
+08-05-15  The trap on SIGCLD is no longer triggered by the completion of
+	  the foreground job as with ksh88.
+08-05-14  A bug in the implementation of the editing feature added on 
+	  07-09-19 in emacs mode has been fixed.
+08-05-12  A bug in processing the test built-in with parenthesis has been
+	  fixed.
+08-05-12  The unset built-in now returns non-zero when deleting an array
+	  subscript that is not set.
+08-05-08  Changing the value of HISTFILE or HISTSIZE will cause the old
+	  history file to be close and reopened with the new name or size.
+08-05-08  When FPATH is changed functions that were found via a path search
+	  will be searched for again.
+08-05-08  A parser bug in which reserved words and labels were recognized
+	  inside compound indexed array assignment after a new-line has
+	  been fixed.
+08-05-07  A bug in getopts when handling numerical option arguments has
+	  been fixed.
+08-05-07  The typeset -S option was added for variables outside type
+	  definitions to provide a storage class similar to C static
+	  inside a function defined with function name.  When outside
+	  type definitions and outside a function, the -S option cause
+	  the specified variable so be unset before the assignment and
+	  before the remaining attributes are supplied.
+08-05-07  A bug that affected the cursor movement in multiline mode when
+	  a character was deleted from near the beginning of the any
+	  line other than the first.
+08-05-01  In multiline edit mode, the refresh operation will now clear
+	  the remaining portion of the last line.
+08-05-01  A bug in computing prompt widths for the edit modes for prompts
+	  with multibyte characters has been fixed.
+08-05-01  A bug in the multiline edit mode which could cause the current
+	  line to be displayed incorrectly when moving backwards from third
+	  or higher line to the previous line has been fixed.
+08-05-01  A bug in which options set in functions declared with the function
+	  name syntax were carried across into functions invoked by these
+	  functions has been fixed.
+08-04-30  A bug which could cause a coprocess to hang when the read end
+	  is a builtin command has been fixed.
+08-04-30  The emacs and vi editors have been modified to handle window
+	  change commands as soon as they happen rather than waiting for
+	  the next command.
+08-04-28  A bug in which ${!x} did not expand to x when x was unset has been
+	  fixed.
+08-04-27  A bug in which the assignment x=(typeset -a foo=([0]=abc)) created
+	  x.foo as an associative array has been fixed.
+08-04-25  A bug in which $# did not report correctly when there were more
+	  than 32K positional parameters has been fixed.
+08-04-04  Choose the name _ as the sub-variable that holds type or instance
+	  specific data used by discipline functions.
+08-03-27  A bug in which the terminal group was not given back to the parent
+	  shell when the last part of a pipeline was handled by the parent shell
+	  and the other parts of the pipeline complete has been fixed. 
+	  The symtom was that the pipeline became uninterruptable.
+08-03-25  A bug in restricted mode introduced in ksh93s that caused scripts
+	  that did not use #! to executed in restriected mode has been fixed.
+08-03-25  A bug in which the pipefail option did not work for a pipeline
+	  within a pipeline has been fixed.
+08-03-24  A bug in which OPTIND was not set correctly in subshells has
+	  been fixed.
+08-03-24  A bug which could cause a memory exception when a compound variable
+	  containing an indexed array with only element 0 defined was expanded.
+08-03-20  A bug in which ${!var[sub].*} was treated as an error has been fixed.
+08-03-20  Associative array assignments of the form ([name]=value ...)
+	  now allow ; as well as space tab and new line to separate elements.
+08-03-18  A buffering problem in which standard error was sometimes
+	  not flushed before sleep has been fixed.
+08-03-17  A bug in which a signal sent to $$ while in a subshell would be
+	  sent to the subshell rather than the parent has been fixed.
+08-03-17  --default option added to set(1) to handle set +o POSIX semantics.
+	  set --state added as a long name alias for set +o.
+08-03-14  A bug in which using monitor mode from within a script could
+	  cause the terminal group to change has been fixed.
+08-03-10  The new ${...} command substitution will treat the trailing }
+	  as a reserved word even if it is not at the beginning of a command,
+	  for example, ${ date }.
+08-03-10  If the name of the ENV begins with /./ or ././ then the
+	  /etc/ksh.kshrc file will not be executed on systems that support
+	  this interactive initialization file.
+08-03-07  A bug in which ksh -i did not run the ENV file has been fixed.
+08-03-07  A bug in which ulimit did not always produce the same output as
+	  ulimit -fS has been fixed.
+08-03-04  A bug in multiline mode in emacs and vi mode which could cause the
+	  cursor to be on the wrong line when interrupt was hit has been fixed.
+08-03-03  The change made in ksh93s+ on 07-06-18 in which braces became
+	  optional for ${a[i]} inside  [[...]] was restored in the case
+	  where the argument can be a pattern.
+08-03-03  A bug in which creating a name reference to an associative array
+	  instance would fail when the subscript contained characters [ or
+	  ] has been fixed.
+08-02-29  The redirection operator >; has been added which for non-special
+	  files, generates the output in a temporary file and writes the
+	  specified file only of the command has completed successfully.
+08-02-15  A bug in ${var/pattern/string} for patterns of the form ?(*) and +(*)
+	  has bee fixed.
+08-02-07  A bug in which test \( ! -e \) produced an error has been fixed.
+08-02-14  The typeset -a option can now optionally be followed by the name
+	  of an enumerication type which allows subscripts to be enumerations.
+08-02-14  The enum builtin which creates enumeration types has been added.
+08-02-12  The backoff logic when there are no more processes has been fixed.
+08-02-07  The -X option has been added to typeset.  The -X option creates
+	  a double precision number that gets displayed using the C99 %a
+	  format.  It can be used along with -l for long double.
+08-01-31  The -T option to typeset has been added for creating typed
+	  variables.  Also the -h and -S options have been added to
+	  typeset that are only applicable when defining a type.
+08-01-31  The prefix expansion operator @ has been added.  ${@name}
+	  expandes to the type of name or yields the attributes.
+07-11-15  A bug in the macro expander for multibyte characters in which
+	  part of the character contains a file pattern byte has been fixed. 
+07-10-03  A bug in which : was not allowed as part of an alias name has been
+	  fixed.
+07-09-26  A bug in which appending a compound variable to a compound variable
+	  or to an index array didn't work has been fixed.
+07-09-19  In both emacs and vi edit mode, the escape sequence \E[A (usually
+	  cursor up, when the cursor is at the end of the line will fetch
+	  the most recent line starting with the current line.
+07-09-18  The value of ${!var} was correct when var was a reference to an
+	  array instance.
+07-09-18  The value of ${!var[sub]} was not expanding to var[sub] and this
+	  was fixed.  It also fixed ${name} where name is a name reference
+	  to var[sub].
+07-09-18  It is now legal to create a name reference without an initialization.
+	  It will be bound to a variable on the first assignment.
+07-08-30  A discipline function can be invoked as ${x.foo} and is equivalent
+	  to ${ x.foo;} and can be invoked as x.foo inside ((...)).
+07-07-09  A bug in which typeset -a did not list indexed arrays has been
+	  fixed.
+07-07-03  The command substitution ${ command;} has been added.  It behaves
+	  like $(command) except that command is executed in the current
+	  shell environment.  The ${ must be followed by a blank or an
+	  operator.
+
+08-04-17  --- Release ksh93s+  ---
+08-04-17  A bug in which umask was not being restored correctly after a
+          subshell has been fixed.
+08-04-15  A bug in which sending a STOP signal to a job control shell started
+	  from within a shell function caused cause the invoking shell to
+	  terminate has been fixed.
+08-04-11  A bug which caused $(exec > /dev/null) to go into an infinite loop
+	  has been fixed.
+08-03-27  A bug in which typeset -LZ was being treated as -RZ has been fixed.
+08-03-06  A bug with ksh -P on systems that support the the profile shell,
+          in which it would exit after running a non-builtin has been fixed.
 08-01-31  A bug in which command substitution inside ((...)) could cause
 	  syntax errors or lead to core dumps has been fixed.
 08-01-17  A bug in which discipline functions could be deleted when invoked
@@ -1677,6 +1835,8 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+08-05-08 pax.tst: handle systems with privileged chmod +t / mkfifo
+08-05-01 pax-tar.c: handle sfsprintf() '\0'
 07-12-11 delta2patch.sh: dro pax -v, add pax --nosummary
 07-12-06 delta2patch.sh: add
 07-09-21 format.c: add sumprint() default scale arg
@@ -2119,6 +2279,9 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+08-05-22 testdate.sh: add date.dat supplement test case generator
+08-05-20 strtof*.rt: reorganize strtof tests for easy(ier) change
+08-02-11 date.dat: add more ISO 8601:2000 tests
 08-01-18 strn*.tst: consolidate into str*.tst
 08-10-15 strn*tof.(c|tst): handle +/- nan|inf|0
 08-10-15 strn*toi.(c|tst): handle bitsof(long) -- {32 64 }
@@ -2341,6 +2504,7 @@ All recorded changes follow.
 
 :::::::: coshell ::::::::
 
+08-04-08 event.c: use dbmlib.iffe
 07-10-23 main.c: avoid UOUT CO_SERIALIZE cswrite hangs via O_NONBLOCK
 07-09-25 handle CO_SERIALIZE
 06-10-11 add sfstropen()/sfstruse() error checks
@@ -2519,7 +2683,18 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
-08-02-02 --- release 5.3 ---
+08-05-22 Makerules.mk: $(CC.ARFLAGS) also needs $(CCLDFLAGS)
+08-05-20 tests/test.def: add SET local -- nfs can't keep up
+08-04-28 make.c: fix .ACCEPT to propagate state event time
+08-04-28 option.c: split --regress into --regress={message|sync}
+08-04-28 tests: --regress for all tests, --regress=sync for timing only
+08-04-01 Scanrules.mk: .SCAN.c <nosuffix> => nosuffix : .TERMINAL
+08-03-27 Scanrules.mk: add --ignorecase option to .INCLUDE.SUFFIX.
+08-03-27 scan.c: fix buffer boundary slide bug
+08-02-29 --- release 5.3 ---
+08-02-29 option.c,variable.c: $(-+name) => option value
+08-02-29 expand.c: add :H=O: to reverse token list
+08-02-09 Makerules.mk: fix .SHARED.LIST. to allow multiple explicit lib prereqs
 08-02-02 Makerules.mk: add LDRUNPATH init from $(CC.RUNPATH)
 07-12-15 Scanrules.mk: add "set stdio HEADER" to .SCAN.iffe
 07-11-26 Makerules.mk: handle a.req => -lfoo -lbar, and -la does not exists
@@ -3820,6 +3995,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+08-02-14 look.c: fix operand parse / diagnostic bugs
 08-01-30 expr.tst: add substr * 1 * tests
 07-09-21 cksum.tst: drop sha1, add -r compatibility
 07-02-23 cksum.tst: add -x tw tests
@@ -3929,6 +4105,7 @@ All recorded changes follow.
 
 :::::::: codex ::::::::
 
+08-05-08 codex.c: Codexdisc_t can't be on main()'s stack due to SF_ATEXIT
 06-08-23 codex.tst: add uu boundary and text tests
 04-01-11 doc update
 04-01-01 add --passphrase
@@ -4252,6 +4429,7 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+08-02-12 local.c: favor fcntl() lock over flock() for N(otan)FS
 08-01-15 cmd3.c: add `if f?path' so old Mail doesn't carp
 07-02-06 cmd2.c: "S name" => .../From/name
 06-10-11 data.c: ARG_MAX => private ARGMAX
@@ -4456,6 +4634,10 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+08-05-14 *.dat: update tests for UTF-8 vs. ISO-8859-1
+08-03-05 testregex.dat: add K {,*}(...) tests
+08-02-14 sed.tst: sync with regsubexec() fixes
+08-02-02 sed: add -m, --multi-digit-reference
 07-11-19 sed: /RE/I *except* for substitute command
 07-10-16 sed: add /RE/I... => ignore case
 07-03-19 testregex.c: add regdecomp() harness
@@ -4607,6 +4789,7 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+08-04-24 main.c: add optget() 'n' option for -1 => -K1
 07-10-30 main.c: default insize == procsize -- worth ~25% time!
 07-10-30 sort.tst,testsort.sh: export LC_ALL=C
 07-01-25 main.c: v format size is max of all input files
@@ -5084,6 +5267,29 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+08-06-02 features/ndbm: add to tame dbmlib.iffe replication
+08-06-01 comp/resolvepath.c,realpath.c: fix resolvepath() return value type
+08-05-22 tm/tmxdate.c: fix a few ordinal/last/this/next bugs
+08-05-18 string/fmtre.c: fix omitted stack var initialization bug
+08-05-14 regex/regcomp.c,regcoll.c: fix UTF-8 collation sequence logic
+08-05-11 tm/tmxfmt.c: :NOOPTIMIZE:, otherwise %Q/../../ fails
+08-05-01 tm/tmxdate.c: mon 1..12 => mon[13] -- doh
+08-04-30 misc/glob.c,reegex/regcomp.c: ~(R) => ~(O) to avoid pcre clash
+08-04-24 port/astconf.c: 'name = value' does assignment without system init
+08-04-15 port/astconf.c: SC#N treated like 'SC(N)'
+08-04-14 misc/optget.c: clean up nroff output
+08-04-01 port/astconf.c: add RELEASE => /proc/version fallback
+08-03-30 misc/optget.c: [-n]... to enable -number & +number options
+08-03-06 misc/optget.c: ---* and +++* are now operands
+08-03-06 misc/errorx.c: fix old error_info.translate workaround
+08-02-05 regex/regcomp.c: allow REG_SHELL {,n}... => {0,n}...
+08-02-27 misc/stk.c: top element during allocation relocated to top 
+08-02-18 include/ip6.h,string/strtoip6.c,fmtip6.c: add ipv6 addr support
+08-02-14 regex/regsubexec.c: fix null match (tricky)
+08-02-14 regex/regsubcomp.c: fix SRE to match ksh
+08-02-11 comp/spawnveg.c: return proper errno on [v]fork() failure
+08-02-11 tm/tmxdate.c,tmdata.c: handle more ISO 8601:2000 forms
+08-02-02 regex/reglib.h: add REGMULTIREF to REG_COMP
 08-02-02 string/strmatch.c: fix str="" pat="" sub values
 08-01-31 comp/conf.sh,conf.tab: handle /bin/sh \ in read data, redir subshell
 08-01-18 misc/magic.tab: amd-x68, 64-bit => x86-64
@@ -6569,6 +6775,16 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+08-04-24 uniq.c: add optget() 'n' option for -1 => -f1
+08-04-24 getconf.c: clarify diffs between "name - value" and "name = value"
+08-04-01 cut.c: add write error check
+08-04-01 paste.c: fix --noserial stream vector access bug
+08-04-01 pids.c: add ls/ps style --format=format
+08-04-01 stty.c: fix off2 unitialized reference
+08-03-28 chgrp.c: add --before=file
+08-03-14 pids.c: add
+08-03-11 chgrp.c: fix -m to use uid:gid as lookup key
+08-02-11 Makefile: add -lmd possibly required by sumlib.o -- hack alert
 08-01-30 expr.c: fix <=0 type that broke substr * 1 * -- wow
 07-12-13 cp.c: fix builtin state reinitialization
 07-11-29 rev.c: honor multibyte locales
@@ -6810,6 +7026,7 @@ All recorded changes follow.
 
 :::::::: libdll ::::::::
 
+08-05-12 dllscan.c: LIBSUFFIX==.dylib => default plugin version match 0.0
 06-10-11 dllscan.c: check sfstruse() return values -- doh
 06-01-25 dllplug.c: add errorf() library message for dlopen() error
 05-02-14 dllscan.c: "" || "-" => NiL
@@ -6979,6 +7196,8 @@ All recorded changes follow.
 
 :::::::: libsum ::::::::
 
+08-05-01 sumlib.c: add some -lmd verification checks
+08-02-11 sum-lmd.c,features/sum: add wrapper for solaris -lmd
 07-10-29 sum.h,sumlib.c: add SUM_LEGACY for legacy output format
 07-09-21 sum-sha1.c: reinstate Steve Reid's public domain implementation
 07-07-26 sumlib.c: drop GPL sum-sha1.c
@@ -7056,6 +7275,7 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+08-04-28 coexec.c: check for fd 1,2 equivalence before CO_SERIALIZE 2>&1
 07-10-29 coshell.h,coexec.c: fix procrun()/system() intercept logic
 07-08-15 add CO_SEPARATE,CO_MODE_SEPARATE for separate shell+wait per action
 07-04-09 Makefile: $(CC.PIC) to allow archive to be pulled into other dlls
@@ -7092,6 +7312,8 @@ All recorded changes follow.
 
 :::::::: libcs ::::::::
 
+08-04-09 csopen.c: fix mkmount() path cleanup
+08-04-09 csopen.c: add debug=-1 mkmount() error message
 07-06-05 csclient.c: add CS_CLIENT_SEP
 06-09-19 css.c: sysconf() => astconf()
 06-08-15 csclient.c: fix prompt logic
@@ -7181,6 +7403,7 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+08-05-11 ppproto.c: fix proto test 10 regression
 07-09-21 ppproto.c: add "Public Domain" to the noticed list
 07-08-11 probe.win32: add cl.exe setuid workaround, CC.VERSION[.STRING]
 07-06-12 pplex.c: finish -D:preserve logic update for imake
@@ -7623,6 +7846,7 @@ All recorded changes follow.
 
 :::::::: libcodex ::::::::
 
+08-05-23 code-qp.c: avoid isprint()/iscntrl() for CC_NATIVE==CC_ASCII
 07-09-26 code-uu.c: uu_sync() => flush() for encode only -- doh
 07-09-22 code-uu.c: fix uu_read() partial reads
 07-09-22 codex.c: handle PASSPHRASE=* as documented
@@ -7681,6 +7905,7 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+08-05-08 cxopen.c: fix number_external() width logic
 07-11-28 cxcomp.c,cxmap.c: fix num=>str cast logic
 07-10-26 cxcomp.c: fix s="S"; print(s,s) cast bug
 07-10-25 cxcomp.c: pretty up CX_DEBUG instruction code trace

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -790,7 +790,7 @@ tar_putheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		}
 		s = f->name + i;
 	}
-	sfsprintf(tar->header.name, TARSIZEOF(name), "%s%s", s, f->type == X_IFDIR ? "/" : "");
+	sfsprintf(tar->header.name, TARSIZEOF(name) + 1, "%s%s", s, f->type == X_IFDIR ? "/" : "");
 	i = 0;
 	if (f->extended)
 		tar->header.typeflag = f->extended;
@@ -800,7 +800,7 @@ tar_putheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		case HARDLINK:
 			tar->header.typeflag = LNKTYPE;
 		linked:
-			sfsprintf(tar->header.linkname, TARSIZEOF(linkname), "%s", f->longlink ? headname(ap, f, "@PaxLinkFile.%(sequence)s") : f->linkpath);
+			sfsprintf(tar->header.linkname, TARSIZEOF(linkname) + 1, "%s", f->longlink ? headname(ap, f, "@PaxLinkFile.%(sequence)s") : f->linkpath);
 			break;
 		case SOFTLINK:
 			tar->header.typeflag = SYMTYPE;

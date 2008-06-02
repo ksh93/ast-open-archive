@@ -1,4 +1,15 @@
-08-02-02 --- release 5.3 ---
+08-05-22 Makerules.mk: $(CC.ARFLAGS) also needs $(CCLDFLAGS)
+08-05-20 tests/test.def: add SET local -- nfs can't keep up
+08-04-28 make.c: fix .ACCEPT to propagate state event time
+08-04-28 option.c: split --regress into --regress={message|sync}
+08-04-28 tests: --regress for all tests, --regress=sync for timing only
+08-04-01 Scanrules.mk: .SCAN.c <nosuffix> => nosuffix : .TERMINAL
+08-03-27 Scanrules.mk: add --ignorecase option to .INCLUDE.SUFFIX.
+08-03-27 scan.c: fix buffer boundary slide bug
+08-02-29 --- release 5.3 ---
+08-02-29 option.c,variable.c: $(-+name) => option value
+08-02-29 expand.c: add :H=O: to reverse token list
+08-02-09 Makerules.mk: fix .SHARED.LIST. to allow multiple explicit lib prereqs
 08-02-02 Makerules.mk: add LDRUNPATH init from $(CC.RUNPATH)
 07-12-15 Scanrules.mk: add "set stdio HEADER" to .SCAN.iffe
 07-11-26 Makerules.mk: handle a.req => -lfoo -lbar, and -la does not exists

@@ -40,28 +40,28 @@ TEST 03 'arg limit'
 		OUTPUT - $'1 2\n3 4\n5'
 
 TEST 04 'size limit'
-	unset FOO
-	min=$($COMMAND -s1 echo </dev/null 2>&1 | sed 's/[^0-9]//g')
-	per=$(( $(FOO=BAR $COMMAND -s1 echo </dev/null 2>&1 | sed 's/[^0-9]//g') - min - 8 ))
-	if	(( per == 4 ))
-	then	dec=(0 6 10 18)
-	else	dec=(0 7 21 29)
-	fi
-	min=$((min+4*(per+2)))
-	EXEC -s$((min-${dec[0]})) echo
-		INPUT - $'1\n2\n3\n4'
-		OUTPUT - $'1 2 3 4'
-	EXEC -s$((min-${dec[1]})) echo
-		INPUT - $'1\n2\n3\n4'
-		OUTPUT - $'1 2 3\n4'
-	EXEC -s$((min-${dec[2]})) echo
-		INPUT - $'1\n2\n3\n4'
-		OUTPUT - $'1 2\n3 4'
-	EXEC -s$((min-${dec[3]})) echo
+	EXEC
+	size=(
+		$(COMMAND -s1 echo 1 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+		$(COMMAND -s1 echo 1 2 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+		$(COMMAND -s1 echo 1 2 3 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+		$(COMMAND -s1 echo 1 2 3 4 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+	)
+	EXEC -s${size[0]} echo
 		INPUT - $'1\n2\n3\n4'
 		OUTPUT - $'1\n2\n3\n4'
+	EXEC -s${size[1]} echo
+		INPUT - $'1\n2\n3\n4'
+		OUTPUT - $'1 2\n3 4'
+	EXEC -s${size[2]} echo
+		INPUT - $'1\n2\n3\n4'
+		OUTPUT - $'1 2 3\n4'
+	EXEC -s${size[3]} echo
+		INPUT - $'1\n2\n3\n4'
+		OUTPUT - $'1 2 3 4'
 
 TEST 05 'extensions'
 	EXEC -z echo test
+		INPUT -
 		INPUT -
 		OUTPUT -

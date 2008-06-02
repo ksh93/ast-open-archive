@@ -382,6 +382,7 @@ Tcl_TclEval(interp, cmd)
 	nv=nv_search(TkshMapName(argv[0]),sh_bltin_tree(),0);
 	if (nv && nv->nvalue)
 	{
+		Shbltin_t bd;
 		Sfio_t *f = NIL(Sfio_t *); char *s;
 		if (! nv->nvfun)	/* KSH builtin */
 		{
@@ -390,8 +391,11 @@ Tcl_TclEval(interp, cmd)
 		}
 		else
 			dprintfArgs("Tcl_Eval (Tcl direct)", argc, argv);
-		result = (*((ShellProc_t) nv->nvalue))(argc, argv,
-			nv->nvfun ? (void*)nv->nvfun : (void*)&sh);
+		/* NOTE: 2008-03-16 &sh is a cheat here */
+		bd = *(Shbltin_t*)((Interp*)interp)->shbltin;
+		bd.shp = &sh;
+		bd.ptr = nv->nvfun;
+		result = (*((ShellProc_t) nv->nvalue))(argc, argv, &bd);
 		if (f)
 		{
 			sfstack(sfstdout, NIL(Sfio_t *));

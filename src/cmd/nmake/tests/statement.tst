@@ -436,12 +436,12 @@ TEST 06 'open and print'
 
 TEST 07 'obsolete makefile pp'
 
-	EXEC	-n MAKEPP=cpp MAKEPPFLAGS=-I.
+	EXEC	-n MAKEPP=cpp MAKEPPFLAGS="-I-D -I."
 		INPUT Makefile $'#include "pp.mk"'
 		INPUT pp.mk $'all :
 	: pp'
 		OUTPUT - $'+ : pp'
-		ERROR - $'+ cpp -I. Makefile'
+		ERROR - $'+ cpp -I-D -I. Makefile'
 
 TEST 08 'include vs. .SOURCE.mk'
 

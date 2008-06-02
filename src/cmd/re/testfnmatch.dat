@@ -22,7 +22,7 @@
 #               Ulrich Drepper <drepper@redhat.com>                #
 #                                                                  #
 ####################################################################
-: transcribed from the gnu glibc fnmatch() tests
+: transcribed from the gnu glibc fnmatch() tests : 2008-05-15
 
 # Derived from the IEEE 2003.2 text.  The standard only contains some
 # wording describing the situations to be tested.  It does not specify
@@ -402,93 +402,99 @@ Sgp	x?y			x/y/z		NOMATCH
 # locales other than the C locale.  The main focus of the tests is on the
 # handling of ranges and the recognition of character (vs bytes).
 
-{C	de_DE.ISO-8859-1
-S	[a-z]	a		OK
-S	[a-z]	z		OK
-S	[a-z]	ä		OK
-S	[a-z]	ö		OK
-S	[a-z]	ü		OK
-S	[a-z]	A		NOMATCH
-S	[a-z]	Z		NOMATCH
-S	[a-z]	Ä		NOMATCH
-S	[a-z]	Ö		NOMATCH
-S	[a-z]	Ü		NOMATCH
-S	[A-Z]	a		NOMATCH
-S	[A-Z]	z		NOMATCH
-S	[A-Z]	ä		NOMATCH
-S	[A-Z]	ö		NOMATCH
-S	[A-Z]	ü		NOMATCH
-S	[A-Z]	A		OK
-S	[A-Z]	Z		OK
-S	[A-Z]	Ä		OK
-S	[A-Z]	Ö		OK
-S	[A-Z]	Ü		OK
+{C	en_US.UTF-8
+
+{S$	?		\xC3\x89	(0,2)	locale does not support UTF-8
+
+S	[a-z]		a		OK
+S	[a-z]		z		OK
+S$	[a-z]		\xC3\xA4	OK
+S$	[a-z]		\xC3\xB6	OK
+S$	[a-z]		\xC3\xBC	OK
+S	[a-z]		A		NOMATCH
+S	[a-z]		Z		NOMATCH
+S$	[a-z]		\xC3\x84	NOMATCH
+S$	[a-z]		\xC3\x96	NOMATCH
+S$	[a-z]		\xC3\x9C	NOMATCH
+S	[A-Z]		a		NOMATCH
+S	[A-Z]		z		NOMATCH
+S$	[A-Z]		\xC3\xA4	NOMATCH
+S$	[A-Z]		\xC3\xB6	NOMATCH
+S$	[A-Z]		\xC3\xBC	NOMATCH
+S	[A-Z]		A		OK
+S	[A-Z]		Z		OK
+S$	[A-Z]		\xC3\x84	OK
+S$	[A-Z]		\xC3\x96	OK
+S$	[A-Z]		\xC3\x9C	OK
 S	[[:lower:]]	a		OK
 S	[[:lower:]]	z		OK
-S	[[:lower:]]	ä		OK
-S	[[:lower:]]	ö		OK
-S	[[:lower:]]	ü		OK
-S	[[:lower:]]	A	NOMATCH
-S	[[:lower:]]	Z	NOMATCH
-S	[[:lower:]]	Ä	NOMATCH
-S	[[:lower:]]	Ö	NOMATCH
-S	[[:lower:]]	Ü	NOMATCH
-S	[[:upper:]]	a	NOMATCH
-S	[[:upper:]]	z	NOMATCH
-S	[[:upper:]]	ä	NOMATCH
-S	[[:upper:]]	ö	NOMATCH
-S	[[:upper:]]	ü	NOMATCH
+S$	[[:lower:]]	\xC3\xA4	OK
+S$	[[:lower:]]	\xC3\xB6	OK
+S$	[[:lower:]]	\xC3\xBC	OK
+S	[[:lower:]]	A		NOMATCH
+S	[[:lower:]]	Z		NOMATCH
+S$	[[:lower:]]	\xC3\x84	NOMATCH
+S$	[[:lower:]]	\xC3\x96	NOMATCH
+S$	[[:lower:]]	\xC3\x9C	NOMATCH
+S	[[:upper:]]	a		NOMATCH
+S	[[:upper:]]	z		NOMATCH
+S$	[[:upper:]]	\xC3\xA4	NOMATCH
+S$	[[:upper:]]	\xC3\xB6	NOMATCH
+S$	[[:upper:]]	\xC3\xBC	NOMATCH
 S	[[:upper:]]	A		OK
 S	[[:upper:]]	Z		OK
-S	[[:upper:]]	Ä		OK
-S	[[:upper:]]	Ö		OK
-S	[[:upper:]]	Ü		OK
+S$	[[:upper:]]	\xC3\x84	OK
+S$	[[:upper:]]	\xC3\x96	OK
+S$	[[:upper:]]	\xC3\x9C	OK
 S	[[:alpha:]]	a		OK
 S	[[:alpha:]]	z		OK
-S	[[:alpha:]]	ä		OK
-S	[[:alpha:]]	ö		OK
-S	[[:alpha:]]	ü		OK
+S$	[[:alpha:]]	\xC3\xA4	OK
+S$	[[:alpha:]]	\xC3\xB6	OK
+S$	[[:alpha:]]	\xC3\xBC	OK
 S	[[:alpha:]]	A		OK
 S	[[:alpha:]]	Z		OK
-S	[[:alpha:]]	Ä		OK
-S	[[:alpha:]]	Ö		OK
-S	[[:alpha:]]	Ü		OK
+S$	[[:alpha:]]	\xC3\x84	OK
+S$	[[:alpha:]]	\xC3\x96	OK
+S$	[[:alpha:]]	\xC3\x9C	OK
 
 S	[[=a=]b]	a		OK
-S	[[=a=]b]	â		OK
-S	[[=a=]b]	à		OK
-S	[[=a=]b]	á		OK
-S	[[=a=]b]	ä		OK
+S$	[[=a=]b]	\xC3\xA2	OK
+S$	[[=a=]b]	\xC3\xA0	OK
+S$	[[=a=]b]	\xC3\xA1	OK
+S$	[[=a=]b]	\xC3\xA4	OK
 S	[[=a=]b]	b		OK
-S	[[=a=]b]	c	NOMATCH
-S	[[=â=]b]	a		OK
-S	[[=â=]b]	â		OK
-S	[[=â=]b]	à		OK
-S	[[=â=]b]	á		OK
-S	[[=â=]b]	ä		OK
-S	[[=â=]b]	b		OK
-S	[[=â=]b]	c	NOMATCH
-S	[[=à=]b]	a		OK
-S	[[=à=]b]	â		OK
-S	[[=à=]b]	à		OK
-S	[[=à=]b]	á		OK
-S	[[=à=]b]	ä		OK
-S	[[=à=]b]	b		OK
-S	[[=à=]b]	c	NOMATCH
-S	[[=á=]b]	a		OK
-S	[[=á=]b]	â		OK
-S	[[=á=]b]	à		OK
-S	[[=á=]b]	á		OK
-S	[[=á=]b]	ä		OK
-S	[[=á=]b]	b		OK
-S	[[=á=]b]	c	NOMATCH
-S	[[=ä=]b]	a		OK
-S	[[=ä=]b]	â		OK
-S	[[=ä=]b]	à		OK
-S	[[=ä=]b]	á		OK
-S	[[=ä=]b]	ä		OK
-S	[[=ä=]b]	b		OK
-S	[[=ä=]b]	c	NOMATCH
+S	[[=a=]b]	c		NOMATCH
+S$	[[=\xC3\xA2=]b]	a		OK
+S$	[[=\xC3\xA2=]b]	\xC3\xA2	OK
+S$	[[=\xC3\xA2=]b]	\xC3\xA0	OK
+S$	[[=\xC3\xA2=]b]	\xC3\xA1	OK
+S$	[[=\xC3\xA2=]b]	\xC3\xA4	OK
+S$	[[=\xC3\xA2=]b]	b		OK
+S$	[[=\xC3\xA2=]b]	c		NOMATCH
+S$	[[=\xC3\xA0=]b]	a		OK
+S$	[[=\xC3\xA0=]b]	\xC3\xA2	OK
+S$	[[=\xC3\xA0=]b]	\xC3\xA0	OK
+S$	[[=\xC3\xA0=]b]	\xC3\xA1	OK
+S$	[[=\xC3\xA0=]b]	\xC3\xA4	OK
+S$	[[=\xC3\xA0=]b]	b		OK
+S$	[[=\xC3\xA0=]b]	c		NOMATCH
+S$	[[=\xC3\xA1=]b]	a		OK
+S$	[[=\xC3\xA1=]b]	\xC3\xA2	OK
+S$	[[=\xC3\xA1=]b]	\xC3\xA0	OK
+S$	[[=\xC3\xA1=]b]	\xC3\xA1	OK
+S$	[[=\xC3\xA1=]b]	\xC3\xA4	OK
+S$	[[=\xC3\xA1=]b]	b		OK
+S$	[[=\xC3\xA1=]b]	c		NOMATCH
+S$	[[=\xC3\xA4=]b]	a		OK
+S$	[[=\xC3\xA4=]b]	\xC3\xA2	OK
+S$	[[=\xC3\xA4=]b]	\xC3\xA0	OK
+S$	[[=\xC3\xA4=]b]	\xC3\xA1	OK
+S$	[[=\xC3\xA4=]b]	\xC3\xA4	OK
+S$	[[=\xC3\xA4=]b]	b		OK
+S$	[[=\xC3\xA4=]b]	c		NOMATCH
+
+}
+
 }
 
 : transcribed from the gnu glibc testfnm.c

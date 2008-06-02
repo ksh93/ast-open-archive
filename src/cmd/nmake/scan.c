@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1051,6 +1051,8 @@ scanmatch(List_t* p, register Action_t* a, Rule_t* r, char* b, char* s, int ifle
 
 	static char	label[] = "X-scan-action";
 
+	if (state.test & 0x00100000)
+		error(2, "scanmatch: %s %c", s, a->type);
 	if (a->script || a->map)
 	{
 		o = state.frame->original;
@@ -1059,11 +1061,15 @@ scanmatch(List_t* p, register Action_t* a, Rule_t* r, char* b, char* s, int ifle
 		state.frame->stem = s;
 		if (a->script)
 		{
+			if (state.test & 0x00100000)
+				error(2, "scanmatch: %s %c script `%s'", s, a->type, a->script);
 			label[0] = a->type;
 			parse(NiL, a->script, label, NiL);
 		}
 		if (a->map)
 		{
+			if (state.test & 0x00100000)
+				error(2, "scanmatch: %s %c map `%s'", s, a->type, a->map);
 			tmp = sfstropen();
 			expand(tmp, a->map);
 			s = sfstruse(tmp);
@@ -1266,7 +1272,7 @@ scanexec(int fd, Rule_t* r, Scan_t* ss, List_t* p)
 	int			arg;
 	Scanstate_t*		state;
 	unsigned char*		buffer;
-	}			any[8], *pop;
+	}			any[8], *pop, *pp;
 	unsigned char		buf[2 * SCANBUFFER + 1];
 	struct
 	{
@@ -1323,19 +1329,27 @@ scanexec(int fd, Rule_t* r, Scan_t* ss, List_t* p)
 		next:
 			while (!(c = *g++))
 			{
-				if (b >= buf + SCANBUFFER)
+				c = g - b - 1;
+				g = buf + SCANBUFFER;
+				if (c && b >= g)
 				{
-					c = g - b - 1;
-					memcpy(buf + SCANBUFFER - c, b, c);
-					b = buf + SCANBUFFER - c;
+					memcpy(g - c, b, c);
+					c += b - g;
+					b -= c;
+					if (pb)
+						pb -= c;
+					for (pp = any; pp < pop; pp++)
+						pp->buffer -= c;
 				}
-				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
+				else
+					b = g;
+				if ((c = read(fd, g, SCANBUFFER)) <= 0)
 					goto done;
 				g[c] = 0;
 				if (state.test & 0x00000080)
 				{
 					for (x = g; *x && *x != '\n'; x++);
-					error(2, "scanexec: NXT \"%-.*s\"", x - g, g);
+					error(2, "scanexec: BUF \"%-.*s\"", x - g, g);
 				}
 			}
 			for (;;)

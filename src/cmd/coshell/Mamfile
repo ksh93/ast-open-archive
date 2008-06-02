@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -227,14 +227,8 @@ done coshell.svc generated
 make event.svc
 make event.o
 make event.c
-make ndbm.h implicit
-done ndbm.h dontcare virtual
-make FEATURE/ndbm implicit
-meta FEATURE/ndbm features/%>FEATURE/% features/ndbm ndbm
-make features/ndbm
-done features/ndbm
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/ndbm
-done FEATURE/ndbm generated
+make ${PACKAGE_ast_INCLUDE}/ast_ndbm.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_ndbm.h
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/tok.h implicit
 make ${PACKAGE_ast_INCLUDE}/swap.h implicit
@@ -258,7 +252,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done event.c
 meta event.o %.c>%.o event.c event
 prev event.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?coshell]"\" -c event.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?coshell]"\" -c event.c
 done event.o generated
 make ${mam_libdbm} archive
 done ${mam_libdbm} dontcare virtual

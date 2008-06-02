@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*              Copyright (c) 2007 AT&T Knowledge Ventures              *
+*          Copyright (c) 2007-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -17,30 +17,30 @@
 *                  David Korn <dgk@research.att.com>                   *
 *                                                                      *
 ***********************************************************************/
-#pragma prototyped
-
 #include	<shell.h>
-#include	"dbmlib.h"
+#include	<ast_ndbm.h>
 
 static const char dbm_usage[] =
-"[-?@(#)$Id: Dbm_t (AT&T Research) 2007-09-07 $\n]"
+"[-?@(#)$Id: Dbm_t (AT&T Research) 2008-05-09 $\n]"
 USAGE_LICENSE
 "[+NAME?Dbm_t - create an associative array containing contents of a dbm file]"
 "[+DESCRIPTION?\bDbm_t\b is a declaration command that creates an associative "
 	"array corresponding to the dbm file whose name is the value of the "
-	"variable \avarname\a.  The variable \avarname\a becomes an associative "
+	"variable \avname\a.  The variable \avname\a becomes an associative "
 	"array with subscripts corresponding to keys in the dbm file.]"
-"[+?The keys in the file cannot contain the NUL character, \b\\0\b, except as "
-	"the last character.  In this case all keys must have \b\\0\b as the "
-	"last characer.  The \b-z\b option adds a trailing NUL to each key.]"
+"[+?Unless hte \b-T\b option is specified, the keys in the file cannot contain "
+	"the NUL character, \b\\0\b, except as the last character.  In this "
+	" case all keys must have \b\\0\b as the last characer.  The \b-z\b "
+	"option adds a trailing NUL to each key.]"
 "[+?If no options are specified, \bDbm_t\b defaults to \b-r\b.]"
+"[T]:[tname?The type of each element will be \atname\a.]"
 "[c:create?Clear the dbm file if it already exists or create it.]"
 "[e:exclusive?Open for exclusive access.]"
-"[r:read?Open for read access only.  \avarname\a becomes a readonly variable.]"
+"[r:read?Open for read access only.  \avname\a becomes a readonly variable.]"
 "[w:write?Open for read and write access.]"
 "[z:zero?When used with \b-c\b, a \b\\0\b byte is appended to each key.]"
 "\n"
-"\nvarname=file\n"
+"\nvarname\n"
 "\n"
 "[+EXIT STATUS]"
     "{"
@@ -53,18 +53,27 @@ USAGE_LICENSE
 struct dbm_array
 {
 	Namarr_t	header;
+	Shell_t		*shp;
 	DBM		*dbm;
-	Namval_t	*pos;
-	char		*name;
+	Sfio_t		*strbuf;
 	Namval_t	*cur;
+	Namval_t	*pos;
+	char		*val;
+	char		*name;
 	size_t		namlen;
+	size_t		vallen;
 	Namval_t	node;
 	datum		key;
-	int		addzero;
+	char		addzero;
+	char		modified;
+	char		init;
+	
 };
 
 extern Namarr_t		*nv_arrayptr(Namval_t*);
-#define NV_ASETSUB       8
+#ifndef NV_ASETSUB
+#	define NV_ASETSUB       8
+#endif
 
 static const Namdisc_t	*array_disc(Namval_t *np)
 {
@@ -76,7 +85,6 @@ static const Namdisc_t	*array_disc(Namval_t *np)
 	nv_disc(np,&ap->hdr,NV_POP);
 	return(dp);
 }
-
 
 static size_t check_size(char **buff, size_t olds, size_t news)
 {
@@ -109,15 +117,31 @@ static void dbm_setname(struct dbm_array *ap)
 
 static void dbm_get(struct dbm_array *ap)
 {
+	char *val;
 	datum data;
 	dbm_clearerr(ap->dbm);
 	data = dbm_fetch(ap->dbm,ap->key);
-	if(data.dptr)
+	if(data.dsize && (val = (char*)data.dptr))
 	{
-		ap->node.nvsize = check_size(&ap->node.nvalue,ap->node.nvsize,data.dsize);
-		memcpy(ap->node.nvalue,data.dptr,data.dsize);
-		ap->node.nvalue[data.dsize] = 0;
+		if(!ap->header.hdr.type && data.dsize>1 && *val==0 && val[1]) 
+		{
+			*val = '(';
+			if(!ap->strbuf)
+				ap->strbuf = sfstropen();
+			ap->node.nvname = ap->key.dptr;
+			sfprintf(ap->strbuf,"%s=%s\0",nv_name(&ap->node),val);
+			val = sfstruse(ap->strbuf);
+			sh_trap(val,0);
+		}
+		else
+		{
+			ap->vallen = check_size(&ap->node.nvalue,ap->vallen,data.dsize);
+			memcpy(ap->node.nvalue,data.dptr,data.dsize);
+			ap->node.nvalue[data.dsize] = 0;
+		}
 		ap->cur = &ap->node;
+		if(ap->header.hdr.type)
+			nv_setsize(ap->cur,data.dsize);
 	}
 	else
 	{
@@ -131,22 +155,44 @@ static void dbm_get(struct dbm_array *ap)
 	}
 }
 
+static void dbm_put(struct dbm_array *ap)
+{
+	datum data;
+	if(ap->node.nvsize)
+	{
+		data.dsize = ap->node.nvsize; 
+		data.dptr = ap->node.nvalue; 
+	}
+	else
+	{
+		char *val = nv_getval(&ap->node);
+		data.dsize = strlen(val)+ap->addzero;
+		if(nv_isvtree(&ap->node) && *val=='(')
+			*val = 0;
+		data.dptr=(char*)val;
+	}
+	dbm_store(ap->dbm,ap->key,data,DBM_REPLACE);
+	ap->modified = 0;
+}
+
 static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 {
 	register struct dbm_array *ap = (struct dbm_array*)nv_arrayptr(np);
+	register int keylen;
 	switch(mode)
 	{
 	    case NV_AINIT:
 	    {
-		DBM *dp = (DBM*)np->nvalue;
-		np->nvalue = 0;
 		if(ap = (struct dbm_array*)calloc(1,sizeof(struct dbm_array)))
 		{
+			Namfun_t *fp = nv_disc(np,NULL,NV_POP);
 			ap->header.hdr.disc = array_disc(np);
+			if(fp)
+				nv_disc(np,fp,  NV_FIRST);
 			nv_disc(np,(Namfun_t*)ap, NV_FIRST);
-			ap->dbm = dp;
-			ap->header.hdr.nofree = 1;
-			ap->node.nvalue = (char*)malloc(ap->node.nvsize=40);
+			ap->header.hdr.nofree = 0;
+			ap->header.hdr.dsize = sizeof(struct dbm_array);
+			ap->val = (char*)malloc(ap->vallen=40);
 			if(nv_isattr(np, NV_ZFILL))
 			{
 				nv_offattr(np,NV_ZFILL);
@@ -156,6 +202,8 @@ static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 		return((void*)ap);
 	    }
 	    case NV_ADELETE:
+		if(ap->modified)
+			dbm_put(ap);
 		if(ap->pos)
 			ap->header.nelem = 1;
 		else if(ap->cur)
@@ -163,19 +211,24 @@ static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 		ap->pos = ap->cur = 0;
 		return((void*)ap);
 	    case NV_AFREE:
+		if(ap->modified)
+			dbm_put(ap);
 		ap->cur = ap->pos = 0;
 		if(ap->name)
 		{
 			free((void*)ap->name);
 			ap->namlen = 0;
 		}
-		free((void*)ap->node.nvalue);
+		if(ap->vallen)
+			free((void*)ap->val);
 		ap->node.nvalue = 0;
 		ap->node.nvsize = 0;
 		dbm_close(ap->dbm);
 		ap->dbm = 0;
 		return((void*)ap);
 	    case NV_ANEXT:
+		if(ap->modified)
+			dbm_put(ap);
 		if(!ap->pos)
 		{
 			ap->pos = &ap->node;
@@ -193,21 +246,29 @@ static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 			ap->pos = 0;
 		return((void*)0);
 	    case NV_ASETSUB:
-		ap->key.dsize = strlen(sp)+ap->addzero;
-		ap->namlen = check_size(&ap->name,ap->namlen, ap->key.dsize);
-		ap->key.dptr = memcpy(ap->name,sp,ap->key.dsize+1);
-		ap->node.nvname = ap->key.dptr;
+		if(ap->modified)
+			dbm_put(ap);
+		if(sp)
+		{
+			ap->key.dsize = strlen(sp)+ap->addzero;
+			ap->namlen = check_size(&ap->name,ap->namlen, ap->key.dsize);
+			ap->key.dptr = memcpy(ap->name,sp,ap->key.dsize+1);
+			ap->node.nvname = ap->key.dptr;
+		}
 		ap->cur = (Namval_t*)sp;
+		ap->pos = 0;
 		/* FALL THROUGH*/
 	    case NV_ACURRENT:
 		if(ap->pos)
 			dbm_get(ap);
+		if(ap->cur)
+			ap->cur->nvprivate = (char*)np;
 		return((void*)ap->cur);
 	    case NV_ANAME:
 		if(ap->cur && ap->cur!= &ap->node)
 			ap->cur = &ap->node;
 		if(ap->cur)
-			return((void*)nv_name(ap->cur));
+			return((void*)ap->cur->nvname);
 		return((void*)0);
 	    default:
 		if(sp)
@@ -217,12 +278,13 @@ static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 				ap->cur = 0;
 				return(0);
 			}
-			else if(!(ap->header.nelem&ARRAY_SCAN))
-				ap->pos = 0;
-			ap->key.dsize = strlen(sp)+ap->addzero;
-			if(mode==NV_AADD && ap->key.dsize==1 && *sp=='0' && ap->header.nelem==0 && !ap->addzero) 
+			keylen = strlen(sp)+ap->addzero;
+			if(!ap->init)
 			{
-				/* only happens during initialization */
+				ap->init = 1;
+				ap->node.nvprivate = (char*)np;
+				if(ap->node.nvsize==0)
+					ap->node.nvalue = ap->val;
 				ap->key = dbm_firstkey(ap->dbm);
 				if(ap->key.dptr && ((char*)ap->key.dptr)[ap->key.dsize-1]==0)
 					ap->addzero = 1;
@@ -231,13 +293,32 @@ static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 					ap->header.nelem++;
 					ap->key = dbm_nextkey(ap->dbm);
 				}
-				return((void*)(&ap->cur));
 			}
-			ap->namlen = check_size(&ap->name,ap->namlen, ap->key.dsize);
-			ap->key.dptr = memcpy(ap->name,sp,ap->key.dsize+1);
-			dbm_get(ap);
+			if(keylen!=ap->key.dsize || !ap->key.dptr || strcmp(sp,ap->key.dptr))
+			{
+				if(ap->modified)
+					dbm_put(ap);
+				ap->key.dsize = keylen;
+				ap->namlen = check_size(&ap->name,ap->namlen, ap->key.dsize);
+				ap->key.dptr = memcpy(ap->name,sp,ap->key.dsize+1);
+				dbm_get(ap);
+			}
 			if(ap->cur)
 				dbm_setname(ap);
+			if(mode&NV_AADD)
+			{
+				if(ap->shp->subshell)
+					sfprintf(sfstderr,"subshell=%d subscript=%s will be modified, need to save \n",ap->shp->subshell,sp);
+				ap->modified = 1;
+				if(!ap->cur)
+				{
+					ap->header.nelem++;
+					ap->cur = &ap->node;
+					dbm_setname(ap);
+				}
+			}
+			if(ap->pos != &ap->node && !(ap->header.nelem&ARRAY_SCAN))
+				ap->pos = 0;
 		}
 		if(ap->cur)
 		{
@@ -249,61 +330,15 @@ static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 	}
 }
 
-static void put_dbm(Namval_t* np, const char* val, int flag, Namfun_t* fp)
-{
-	struct dbm_array *ap = (struct dbm_array*)nv_arrayptr(np);
-	datum data;
-	if(val)
-	{
-		data.dptr=(char*)val;
-		data.dsize = strlen(val)+ap->addzero;
-		dbm_store(ap->dbm,ap->key,data,DBM_REPLACE);
-	}
-	else if(!ap)
-		np->nvalue = 0;
-}
-
-static const Namdisc_t dbm_disc =
-{
-	0,
-	put_dbm,
-};
-
-static Namfun_t *clone_dbm(Namval_t* np, Namval_t *mp, int flags, Namfun_t *fp)
-{
-	Namfun_t *pp;
-	pp = (Namfun_t*)calloc(1,sizeof(Namfun_t));
-	pp->dsize = sizeof(Namfun_t);
-	pp->type = np;
-	pp->disc = &dbm_disc;
-	return(pp);
-}
-static Namval_t *create_dbm(Namval_t *np,const char *name,int flag,Namfun_t *fp)
-{
-	return(0);
-}
-
-static const Namdisc_t Dbm_disc =
-{
-	0,
-	0,
-	0,
-	0,
-	0,
-	create_dbm,
-	clone_dbm,
-};
-
 static int dbm_create(int argc, char** argv, void* context)
 {
-	int		oflags = 0, zflag=0;
-	Namval_t	*np;
-	Namfun_t	*fp;
-	Namtype_t	*tp = (Namtype_t*)context;
-	Namarr_t	*ap;
-	char		*dbfile;
-	DBM		*db;
-	int		fds[10],n=0;
+	int			oflags = 0, zflag=0;
+	Namval_t		*np;
+	Shbltin_t		*bp = (Shbltin_t*)context;
+	struct dbm_array	*ap;
+	char			*dbfile, *tname=0;
+	DBM			*db;
+	int			fds[10],n=0;
 
 	cmdinit(argc, argv, context, ERROR_CATALOG, ERROR_NOTIFY);
 #if _use_ndbm
@@ -311,6 +346,9 @@ static int dbm_create(int argc, char** argv, void* context)
 	{
 		switch (optget(argv, dbm_usage))
 		{
+		case 'T':
+			tname = opt_info.arg;
+			continue;
 		case 'c':
 			oflags |= O_CREAT|O_TRUNC|O_RDWR;
 			continue;
@@ -354,13 +392,26 @@ static int dbm_create(int argc, char** argv, void* context)
 	while(n>0)
 		close(fds[--n]);
 	nv_unset(np);
-	np->nvalue = (char*)db;
 	if(zflag && (oflags&O_CREAT))
 		nv_onattr(np,NV_ZFILL);
-	if((ap=nv_setarray(np, dbm_associative)) && ap->nelem>0)
-		ap->nelem--;
-	fp = clone_dbm(tp->np,np, 0, tp->np->nvfun);
-	nv_disc(np,fp,NV_LAST);
+	if(ap=(struct dbm_array*)nv_setarray(np, dbm_associative))
+		ap->dbm = db;
+	else
+		error(ERROR_exit(1),"%s: unable to create array",nv_name(np));
+	ap->shp = bp->shp;
+	if(tname)
+	{
+		Namval_t *tp;
+		char	*tmp = (char*)malloc(n=sizeof(NV_CLASS)+strlen(tname)+2);
+		sfsprintf(tmp, n, "%s.%s", NV_CLASS,tname);
+		tp = nv_open(tmp,0,NV_VARNAME|NV_NOARRAY|NV_NOASSIGN|NV_NOADD);
+		free(tmp);
+		if(!tp)
+			error(ERROR_exit(1),"%s: unknown type",tname);
+		nv_settype(np,tp,0);
+		nv_settype(&ap->node, ap->header.hdr.type,0);
+		ap->node.nvsize = tp->nvsize;
+	}
 	if(!(oflags&O_RDWR))
 		nv_onattr(np,NV_RDONLY);
 	return error_info.errors != 0;
@@ -373,20 +424,10 @@ static int dbm_create(int argc, char** argv, void* context)
 void lib_init(int flag, void* context)
 {
 	Shell_t		*shp = ((Shbltin_t*)context)->shp;
-	Namval_t	*mp,*np,*bp;
-	Namfun_t	*nfp = newof(NiL,Namfun_t,1,0);
-	Namtype_t	*tp;
-	char tmp[sizeof(NV_CLASS)+17];
-	sfsprintf(tmp, sizeof(tmp), "%s.Dbm_t", NV_CLASS);
-	np = nv_open(tmp, shp->var_tree, NV_VARNAME);
-	nfp->type = np;
-	nfp->disc = &Dbm_disc;
-	nv_disc(np,nfp,NV_FIRST);
-	tp = newof(NiL,Namtype_t,1,0);
-	tp->optstring = dbm_usage;
-	tp->shp = (void*)shp;
-	tp->np = np;
-	bp = sh_addbuiltin("Dbm_t", dbm_create, (void*)tp); 
+	Namval_t	*mp,*bp;
+	if(flag)
+		return;
+	bp = sh_addbuiltin("Dbm_t", dbm_create, (void*)0); 
 	mp = nv_search("typeset",shp->bltin_tree,0);
 	nv_onattr(bp,nv_isattr(mp,NV_PUBLIC));
 }

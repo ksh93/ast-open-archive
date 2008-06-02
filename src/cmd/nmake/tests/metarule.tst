@@ -543,7 +543,7 @@ TEST 18 'metarule with a view'
 
 	EXPORT	VPATH=$TWD/top:$TWD/bot INSTALLROOT=../..
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		INPUT $TWD/bot/lib/Makefile $'
 G2DIR = /usr/add-on/g2
 G2CC = $(G2DIR)/bin/g2comp
@@ -582,12 +582,12 @@ $(LIBDIR)/g2 :INSTALLDIR: $(G2SRC)'
 + ignore cp '$TWD$'/bot/src/p_e.g ../../lib/g2/p_e.g
 + ignore cp '$TWD$'/bot/src/p_f.g ../../lib/g2/p_f.g'
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		ERROR -
 
 	DO	{ sleep 1; touch p_e.h; } # ccs *.[ao] 1 sec granulatity
 
-	EXEC	--regress install
+	EXEC	--regress=sync install
 		ERROR - $'+ cp '$TWD$'/bot/src/p_e.g p_e.c
 + cp '$TWD$'/bot/src/p_e.g p_e.h
 + cc -O -c p_e.c

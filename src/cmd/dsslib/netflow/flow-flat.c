@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -99,28 +99,28 @@ flatread(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		}
 		return 0;
 	}
-	if (strtoip4(a, &b, &rp->src_addr, NiL) || *b++ != '|')
+	if (strtoip4(a, &b, &rp->ipv4_src_addr, NiL) || *b++ != '|')
 		goto bad;
-	if (strtoip4(b, &a, &rp->dst_addr, NiL) || *a++ != '|')
+	if (strtoip4(b, &a, &rp->ipv4_dst_addr, NiL) || *a++ != '|')
 		goto bad;
-	if (strtoip4(a, &b, &rp->hop, NiL) || *b++ != '|')
+	if (strtoip4(a, &b, &rp->ipv4_next_hop, NiL) || *b++ != '|')
 		goto bad;
-	rp->input = strtoul(b, &a, 10);
+	rp->input_snmp = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->output = strtoul(a, &b, 10);
+	rp->output_snmp = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
-	rp->packets = strtoul(b, &a, 10);
+	rp->in_pkts = rp->out_pkts = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->bytes = strtoul(a, &b, 10);
+	rp->in_bytes = rp->out_bytes = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
-	rp->first = strtoul(b, &a, 10);
+	rp->first_switched = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->last = strtoul(a, &b, 10);
+	rp->last_switched = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
 	rp->src_port = strtoul(b, &a, 10);
@@ -135,10 +135,10 @@ flatread(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 	rp->tcp_flags = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
-	rp->prot = strtoul(b, &a, 10);
+	rp->protocol = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->tos = strtoul(a, &b, 10);
+	rp->src_tos = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
 	rp->src_as = strtoul(b, &a, 10);
@@ -156,8 +156,8 @@ flatread(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 	rp->flow_sequence = strtoul(b, &a, 10);
 	if (*a++ != '\n')
 		goto bad;
-	rp->start = (Nftime_t)rp->first * NS;
-	rp->end = (Nftime_t)rp->last * NS;
+	rp->start = (Nftime_t)rp->first_switched * NS;
+	rp->end = (Nftime_t)rp->last_switched * NS;
 	record->data = rp;
 	record->size = sizeof(*rp);
 	return 1;
@@ -183,21 +183,21 @@ flatwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 	register Netflow_t*	rp = (Netflow_t*)record->data;
 
 	if (sfprintf(file->io, "%d.%d.%d.%d|%d.%d.%d.%d|%d.%d.%d.%d|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u\n"
-		, IPQ(rp->src_addr)
-		, IPQ(rp->dst_addr)
-		, IPQ(rp->hop)
-		, rp->input
-		, rp->output
-		, rp->packets
-		, rp->bytes
+		, IPQ(rp->ipv4_src_addr)
+		, IPQ(rp->ipv4_dst_addr)
+		, IPQ(rp->ipv4_next_hop)
+		, rp->input_snmp
+		, rp->output_snmp
+		, rp->in_pkts
+		, rp->in_bytes
 		, (unsigned long)(rp->start / NS)
 		, (unsigned long)(rp->end / NS)
 		, rp->src_port
 		, rp->dst_port
 		, rp->flags
 		, rp->tcp_flags
-		, rp->prot
-		, rp->tos
+		, rp->protocol
+		, rp->src_tos
 		, rp->src_as
 		, rp->dst_as
 		, rp->src_mask

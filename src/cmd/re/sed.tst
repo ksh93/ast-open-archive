@@ -135,7 +135,7 @@ TEST 09 'null matches'
 	EXEC -f script
 		INPUT script $'1,2s/a*/x/g'
 		INPUT - $'123\naaa'
-		OUTPUT - $'x1x2x3x\nxx'
+		OUTPUT - $'x1x2x3x\nx'
 
 TEST 10 'longest match, unmatched subexpressions'
 	EXEC -f script
@@ -242,13 +242,17 @@ TEST 22 'substitution null string combinations'
 		NOTE 'global substitution for null string'
 		INPUT script $'s/a*/b/g'
 		INPUT - $'aaa\nccc'
-		OUTPUT - $'bb\nbcbcbcb'
+		OUTPUT - $'b\nbcbcbcb'
+		NOTE 'count 1 substitution for null string'
+	EXEC -f script
+		INPUT script $'s/a*/b/1'
+		OUTPUT - $'b\nbccc'
 		NOTE 'count 2 substitution for null string'
 	EXEC -f script
 		INPUT script $'s/a*/b/2'
-		OUTPUT - $'aaab\ncbcc'
+		OUTPUT - $'aaa\ncbcc'
 	EXEC -f script
-		NOTE 'count 2 substitution for null string'
+		NOTE 'count 3 substitution for null string'
 		INPUT script $'s/a*/b/3'
 		OUTPUT - $'aaa\nccbc'
 

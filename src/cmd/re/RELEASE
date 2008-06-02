@@ -1,3 +1,7 @@
+08-05-14 *.dat: update tests for UTF-8 vs. ISO-8859-1
+08-03-05 testregex.dat: add K {,*}(...) tests
+08-02-14 sed.tst: sync with regsubexec() fixes
+08-02-02 sed: add -m, --multi-digit-reference
 07-11-19 sed: /RE/I *except* for substitute command
 07-10-16 sed: add /RE/I... => ignore case
 07-03-19 testregex.c: add regdecomp() harness

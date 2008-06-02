@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -169,16 +169,19 @@ getval(register char* s, int op)
 		switch (var = *s)
 		{
 
-#if __OBSOLETE__ < 20090101
+#if __OBSOLETE__ < 20100101
 		case '+':	/* 20051122 restore for backwards compatibility -- shoulda thunk it */
 #if __OBSOLETE__ > 20070101
 			error(1, "$(%s): obsolete -- use $(-...)", var);
 #endif
+			s--;
+			/*FALLTHROUGH*/
 #endif
 		case '-':	/* option settings suitable for command line */
 			/*
 			 * -name	option value if set
 			 * --name	option name and value for subsequent set
+			 * -+name	option value
 			 * -?name	1 if option value was set/unset
 			 * -		non-default settings
 			 * -+		non-default internal settings

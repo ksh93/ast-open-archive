@@ -566,21 +566,44 @@ TEST 09 'prereq error'
 	EXEC
 		ERROR -
 
-	EXEC
-		INPUT file2 $'error'	# simulate compilation error
-		INPUT file3 $'good'	# simulate good patch
-		ERROR - $'+ : COMPILE file2 file3
+	if	[[ -f file2 && $(date -m -f %N file2) == +(0) ]]
+	then
+
+		EXEC
+			INPUT file2 $'error'	# simulate compilation error
+			INPUT file3 $'good'	# simulate good patch
+			ERROR - $'+ : COMPILE file1 file2 file3 file4
 + grep -q error file1 file2 file3 file4
 + exit 1
 make: *** exit code 1 making target'
-		EXIT 1
+			EXIT 1
 
-	EXEC
-		INPUT file2 $'better'	# simulate good repatch
-		ERROR - $'+ : COMPILE file2 file3
+		EXEC
+			INPUT file2 $'better'	# simulate good repatch
+			ERROR - $'+ : COMPILE file1 file2 file3 file4
 + grep -q error file1 file2 file3 file4
 + touch target'
-		EXIT 0
+			EXIT 0
+
+	else
+
+		EXEC
+			INPUT file2 $'error'	# simulate compilation error
+			INPUT file3 $'good'	# simulate good patch
+			ERROR - $'+ : COMPILE file2 file3
++ grep -q error file1 file2 file3 file4
++ exit 1
+make: *** exit code 1 making target'
+			EXIT 1
+
+		EXEC
+			INPUT file2 $'better'	# simulate good repatch
+			ERROR - $'+ : COMPILE file2 file3
++ grep -q error file1 file2 file3 file4
++ touch target'
+			EXIT 0
+
+	fi
 
 	EXEC
 		ERROR -
@@ -610,6 +633,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 		OUTPUT - $'+ echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + ar cr libfoo.a foo.o
++ ignore ranlib libfoo.a
 + rm -f foo.o
 + cc  -shared  -o libfoo.so -all libfoo.a -notall 
 + if	silent test ! -d lib
@@ -627,6 +651,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib lib/libfoo.a
 + if	silent test ! -d lib/lib
 + then	mkdir -p lib/lib 		    		   
 + fi
@@ -661,6 +686,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 		OUTPUT - $'+ echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + ar cr libfoo.a foo.o
++ ignore ranlib libfoo.a
 + rm -f foo.o
 + cc  -shared  -o libfoo.so.1.0 -all libfoo.a -notall 
 + if	silent test ! -d lib
@@ -678,6 +704,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib lib/libfoo.a
 + if	silent test ! -d lib/lib
 + then	mkdir -p lib/lib 		    		   
 + fi
@@ -712,6 +739,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 		OUTPUT - $'+ echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + ar cr libfoo.a foo.o
++ ignore ranlib libfoo.a
 + rm -f foo.o
 + cc  -shared  -o libfoo.so.3.4.5 -all libfoo.a -notall 
 + if	silent test ! -d lib
@@ -729,6 +757,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 		}
 + 	fi
 + fi
++ ignore ranlib lib/libfoo.a
 + if	silent test ! -d lib/lib
 + then	mkdir -p lib/lib 		    		   
 + fi

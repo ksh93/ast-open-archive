@@ -1,15 +1,20 @@
-: converted from the pcre testdata/testinput4 2001-06-19
+: converted from the pcre testdata/testinput4 2008-05-14
 
-{C	es_ES
-E$	^[\\w]+	École	(0,5)
-E$	^[\\w]+	École	(0,5)
-E$	^[\\w]+	École	(0,5)
-E$	^[\\W]+	École	NOMATCH
-E$	^[\\W]+	École	NOMATCH
 E$	[\\b]	\b	(0,1)
 E$	SAME	a	NOMATCH
-E$	^\\w+	École	(0,5)
-E$	^\\w+	École	(0,5)
+
+{C	es_ES.ISO-8859-1
+
+{E	\w	É	(0,1)	locale does not recognize ISO-8859-1 8 bit E-acute alpha
+
+E	^[\w]+	École	(0,5)
+E	^[\w]+	École	(0,5)
+E	^[\w]+	École	(0,5)
+E	^[\W]+	École	NOMATCH
+E	^[\W]+	École	NOMATCH
+E	^\w+	École	(0,5)
+E	^\w+	École	(0,5)
+
 E$	(.+)\\b(.+)	:École:	(0,7)(0,6)(6,7)
 Ei	École	École	(0,5)
 Ei	SAME	école	(0,5)
@@ -31,4 +36,7 @@ E$x	^[\xc8-\xc9]	École	(0,1)
 E$x	SAME	école	NOMATCH
 E$x	^\xc9	École	(0,1)
 E$x	SAME	école	NOMATCH
+
+}
+
 }

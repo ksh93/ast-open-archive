@@ -779,7 +779,7 @@ TEST 13 'date and elapsed time'
 				i2, (elapsed_t)i2);
 		}
 		'
-	OUTPUT - $'894401095\tMay  5  1998\n441756060\tDec 31  1983\n1234567\t3h25m\n362880000\t1M02w\n863197345\tMay  9  1997\n7654321\t21h15m'
+	OUTPUT - $'894401095\tMay  5  1998\n441756060\tDec 31  1983\n1234567\t3h25m\n362880000\t1M11d\n863197345\tMay  9  1997\n7654321\t21h15m'
 
 TEST 14 'format conversion'
 	EXEC	-I$data -l -f emp.cql

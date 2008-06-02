@@ -25,7 +25,7 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2007-12-06 $\0\n";
+static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2008-04-01 $\0\n";
 
 #include <dsslib.h>
 #include <bgp.h>
@@ -205,7 +205,7 @@ community_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxd
 }
 
 static ssize_t
-ipaddr_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+ip4addr_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
 	char*	s;
 	ssize_t	n;
@@ -219,7 +219,7 @@ ipaddr_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 }
 
 static ssize_t
-ipaddr_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+ip4addr_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*		e;
 	Ptaddr_t	addr;
@@ -227,7 +227,7 @@ ipaddr_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 	if (strtoip4(buf, &e, &addr, NiL))
 	{
 		if (disc->errorf && !(cx->flags & CX_QUIET))
-			(*disc->errorf)(cx, disc, 1, "%-.*s: invalid ip address", size, buf);
+			(*disc->errorf)(cx, disc, 1, "%-.*s: invalid ipv4 address", size, buf);
 		return -1;
 	}
 	value->number = addr;
@@ -235,7 +235,7 @@ ipaddr_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 }
 
 static ssize_t
-ipprefix_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+ip4prefix_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
 	char*	s;
 	ssize_t	n;
@@ -252,7 +252,7 @@ ipprefix_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* for
 }
 
 static ssize_t
-ipprefix_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+ip4prefix_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*		e;
 	Ptaddr_t	addr;
@@ -261,10 +261,97 @@ ipprefix_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* for
 	if (strtoip4(buf, &e, &addr, &bits))
 	{
 		if (disc->errorf && !(cx->flags & CX_QUIET))
-			(*disc->errorf)(cx, disc, 1, "%-.*s: invalid ip prefix", size, buf);
+			(*disc->errorf)(cx, disc, 1, "%-.*s: invalid ipv4 prefix", size, buf);
 		return -1;
 	}
 	value->number = PREFIX(addr, bits);
+	return e - (char*)buf;
+}
+
+static ssize_t
+ip6addr_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+{
+	char*	s;
+	ssize_t	n;
+
+	error(-1, "AHA ip6addr_external %p(%u) = %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", value->buffer.data, value->buffer.size, ((unsigned char*)value->buffer.data)[0], ((unsigned char*)value->buffer.data)[1], ((unsigned char*)value->buffer.data)[2], ((unsigned char*)value->buffer.data)[3], ((unsigned char*)value->buffer.data)[4], ((unsigned char*)value->buffer.data)[5], ((unsigned char*)value->buffer.data)[6], ((unsigned char*)value->buffer.data)[7], ((unsigned char*)value->buffer.data)[8], ((unsigned char*)value->buffer.data)[9], ((unsigned char*)value->buffer.data)[10], ((unsigned char*)value->buffer.data)[11], ((unsigned char*)value->buffer.data)[12], ((unsigned char*)value->buffer.data)[13], ((unsigned char*)value->buffer.data)[14], ((unsigned char*)value->buffer.data)[15]);
+	s = fmtip6((Ip6addr_t*)value->buffer.data, -1);
+	n = strlen(s);
+	if ((n + 1) > size)
+		return n + 1;
+	memcpy(buf, s, n + 1);
+	return n;
+}
+
+static ssize_t
+ip6addr_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+{
+	char*		e;
+	Ip6addr_t*	ap;
+	Ip6addr_t	addr;
+
+	if (strtoip6(buf, &e, &addr, NiL))
+	{
+		if (disc->errorf && !(cx->flags & CX_QUIET))
+			(*disc->errorf)(cx, disc, 1, "%-.*s: invalid ipv6 address", size, buf);
+		return -1;
+	}
+	if (!vm)
+		vm = Vmregion;
+	if (!(ap = vmnewof(vm, 0, Ip6addr_t, 1, 0)))
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
+		return -1;
+	}
+	memcpy(ap, &addr, sizeof(addr));
+	value->buffer.data = ap;
+	value->buffer.size = sizeof(*ap);
+	error(-1, "AHA ip6addr_internal %p(%d) = %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", ap,  value->buffer.size, ((unsigned char*)ap)[0], ((unsigned char*)ap)[1], ((unsigned char*)ap)[2], ((unsigned char*)ap)[3], ((unsigned char*)ap)[4], ((unsigned char*)ap)[5], ((unsigned char*)ap)[6], ((unsigned char*)ap)[7], ((unsigned char*)ap)[8], ((unsigned char*)ap)[9], ((unsigned char*)ap)[10], ((unsigned char*)ap)[11], ((unsigned char*)ap)[12], ((unsigned char*)ap)[13], ((unsigned char*)ap)[14], ((unsigned char*)ap)[15]);
+	return e - (char*)buf;
+}
+
+static ssize_t
+ip6prefix_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+{
+	char*		s;
+	Ip6prefix_t*	pp;
+	ssize_t		n;
+
+	pp = (Ip6prefix_t*)value->buffer.data;
+	/* XXX: CXDETAILS like ip4? */
+	s = fmtip6(&pp->addr, pp->bits);
+	n = strlen(s);
+	if ((n + 1) > size)
+		return n + 1;
+	memcpy(buf, s, n + 1);
+	return n;
+}
+
+static ssize_t
+ip6prefix_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+{
+	char*		e;
+	Ip6prefix_t*	pp;
+	Ip6prefix_t	prefix;
+
+	if (strtoip6(buf, &e, &prefix.addr, &prefix.bits))
+	{
+		if (disc->errorf && !(cx->flags & CX_QUIET))
+			(*disc->errorf)(cx, disc, 1, "%-.*s: invalid ipv6 address", size, buf);
+		return -1;
+	}
+	if (!vm)
+		vm = Vmregion;
+	if (!(pp = vmnewof(vm, 0, Ip6prefix_t, 1, 0)))
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
+		return -1;
+	}
+	*pp = prefix;
+	value->buffer.data = pp;
+	value->buffer.size = sizeof(*pp);
 	return e - (char*)buf;
 }
 
@@ -327,7 +414,7 @@ typedef struct Matchdisc_s
 } Matchdisc_t;
 
 static void*
-match_prefix_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc_t* disc)
+match_ip4prefix_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc_t* disc)
 {
 	Pt_t*		pt;
 	Dssmeth_t*	meth;
@@ -340,10 +427,10 @@ match_prefix_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc
 	unsigned char	bits;
 	Matchdisc_t*	matchdisc;
 
-	if (!cxisstring(pat) && pat->externalf != ipprefix_external)
+	if (!cxisstring(pat) && pat->externalf != ip4prefix_external)
 	{
 		if (disc->errorf)
-			(*disc->errorf)(NiL, disc, 2, "%s: match requires %s or ipprefix_t pattern", sub->name, cx->state->type_string->name);
+			(*disc->errorf)(NiL, disc, 2, "%s: match requires %s or ip4prefix_t pattern", sub->name, cx->state->type_string->name);
 		return 0;
 	}
 	if (!(matchdisc = newof(0, Matchdisc_t, 1, 0)))
@@ -354,7 +441,7 @@ match_prefix_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc
 	}
 	ptinit(&matchdisc->ptdisc);
 	matchdisc->ptdisc.errorf = disc->errorf;
-	matchdisc->prefix = sub->externalf == ipprefix_external;
+	matchdisc->prefix = sub->externalf == ip4prefix_external;
 	if (!(pt = ptopen(&matchdisc->ptdisc)))
 		return 0;
 	if (!cxisstring(pat))
@@ -398,7 +485,7 @@ match_prefix_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc
 }
 
 static int
-match_prefix_exec(Cx_t* cx, void* data, Cxvalue_t* val, Cxdisc_t* disc)
+match_ip4prefix_exec(Cx_t* cx, void* data, Cxvalue_t* val, Cxdisc_t* disc)
 {
 	Pt_t*		pt = (Pt_t*)data;
 	Ptprefix_t*	prefix;
@@ -416,7 +503,7 @@ match_prefix_exec(Cx_t* cx, void* data, Cxvalue_t* val, Cxdisc_t* disc)
 }
 
 static int
-match_prefix_free(Cx_t* cx, void* data, Cxdisc_t* disc)
+match_ip4prefix_free(Cx_t* cx, void* data, Cxdisc_t* disc)
 {
 	Pt_t*		pt = (Pt_t*)data;
 	Ptdisc_t*	ptdisc;
@@ -432,14 +519,42 @@ match_prefix_free(Cx_t* cx, void* data, Cxdisc_t* disc)
 	return 0;
 }
 
-static Cxmatch_t	match_prefix =
+static Cxmatch_t	match_ip4prefix =
 {
-	"prefix-match",
-	"Matches on this type treat a string pattern as a prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is an \bipprefix_t\b then matches test if the subject is matched by the prefix.",
+	"ip4-prefix-match",
+	"Matches on this type treat a string pattern as an ipv4 prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is an \bip4prefix_t\b then matches test if the subject is matched by the prefix.",
 	CXH,
-	match_prefix_comp,
-	match_prefix_exec,
-	match_prefix_free
+	match_ip4prefix_comp,
+	match_ip4prefix_exec,
+	match_ip4prefix_free
+};
+
+static void*
+match_ip6prefix_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc_t* disc)
+{
+	return 0;
+}
+
+static int
+match_ip6prefix_exec(Cx_t* cx, void* data, Cxvalue_t* val, Cxdisc_t* disc)
+{
+	return 0;
+}
+
+static int
+match_ip6prefix_free(Cx_t* cx, void* data, Cxdisc_t* disc)
+{
+	return 0;
+}
+
+static Cxmatch_t	match_ip6prefix =
+{
+	"ip6-prefix-match",
+	"Matches on this type treat a string pattern as an ipv6 prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is an \bip6prefix_t\b then matches test if the subject is matched by the prefix.",
+	CXH,
+	match_ip6prefix_comp,
+	match_ip6prefix_exec,
+	match_ip6prefix_free
 };
 
 static int
@@ -461,7 +576,7 @@ op_match_NP(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxope
 static Cxcallout_t callouts[] =
 {
 
-CXC(CX_MATCH,	"number",	"ipprefix_t",	op_match_NP,	0)
+CXC(CX_MATCH,	"number",	"ip4prefix_t",	op_match_NP,	0)
 
 {0}
 
@@ -475,8 +590,12 @@ static Cxtype_t types[] =
 { "as32_t",	"A dotted pair 32 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, as32_external, as32_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 11 }, 0 },
 { "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
 { "community_t", "A sequence of unsigned 16 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
-{ "ipaddr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, ipaddr_external, ipaddr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefix },
-{ "ipprefix_t",	"/length appended to an ipaddr_t prefix.", CXH, (Cxtype_t*)"number", 0, ipprefix_external, ipprefix_internal, 0, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_prefix },
+{ "ip4addr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, ip4addr_external, ip4addr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_ip4prefix },
+{ "ip4prefix_t","/length appended to an ip4addr_t prefix.", CXH, (Cxtype_t*)"number", 0, ip4prefix_external, ip4prefix_internal, 0, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_ip4prefix },
+{ "ip6addr_t",	"A dotted quad ipv6 address.", CXH, (Cxtype_t*)"buffer", 0, ip6addr_external, ip6addr_internal, 0, 0, { 0 }, &match_ip6prefix },
+{ "ip6prefix_t","/length appended to an ip6addr_t prefix.", CXH, (Cxtype_t*)"buffer", 0, ip6prefix_external, ip6prefix_internal, 0, 0, { 0 }, &match_ip6prefix },
+{ "ipaddr_t",	"A dotted quad ipv4 address. Obsolete: use ip4addr_t.", CXH, (Cxtype_t*)"number", 0, ip4addr_external, ip4addr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_ip4prefix },
+{ "ipprefix_t",	"/length appended to an ip4addr_t prefix. Obsolete: use ip4prefix_t.", CXH, (Cxtype_t*)"number", 0, ip4prefix_external, ip4prefix_internal, 0, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_ip4prefix },
 {0}
 };
 

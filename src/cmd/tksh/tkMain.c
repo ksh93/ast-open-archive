@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -530,7 +530,7 @@ static void bindsetup(Tcl_Interp *interp)
 }
 static int b_tkloop(int argc, char **argv, void *data)
 {
-	Tcl_Interp *interp = (Tcl_Interp *) data;
+	Tcl_Interp *interp = (Tcl_Interp *)((Shbltin_t*)data)->ptr;
 	Tksh_BeginBlock(interp, INTERP_TCL);
 	Tk_MainLoop();
 	Tksh_EndBlock(interp);
@@ -688,6 +688,8 @@ int b_tkinit(int argc, char *argv[], void *data)
 {
         static char *av[] = { "tkinit", 0 };
 
+	if (data)
+		data = ((Shbltin_t*)data)->ptr;
         if (argc == 0)
         {
                 argc = 1;

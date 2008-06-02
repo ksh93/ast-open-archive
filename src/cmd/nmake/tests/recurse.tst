@@ -45,7 +45,10 @@ cmd/be
 lib/libnet
 -
 cmd/genutil
-lib/libsort'
+lib/libsort
++
+lib
+cmd'
 
 	EXEC	-n --recurse=prereqs
 		OUTPUT - $'cmd/tstdata : cmd/tstutil
@@ -59,7 +62,7 @@ lib/libtstgen : lib/libtstasm
 cmd/genutil : lib/libnet lib/libdb lib/libtstasm libsys
 lib/libnet : cmd/be lib/libnetgen
 lib/libsort : libsys
-all : cmd/genutil lib/libsort'
+all : lib/libsort cmd/genutil'
 
 TEST 02 'common action recursion'
 

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -41,15 +41,8 @@ make dbm_t
 make libkshdbm_t.a archive
 make dbm_t.o
 make dbm_t.c
-make dbmlib.h implicit
-meta dbmlib.h %.iffe>%.h dbmlib.iffe dbmlib
-make dbmlib.iffe
-done dbmlib.iffe
-bind -last
-exec - iffe -o dbmlib.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run dbmlib.iffe
-make ndbm.h implicit
-done ndbm.h dontcare virtual
-done dbmlib.h generated
+make ${PACKAGE_ast_INCLUDE}/ast_ndbm.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_ndbm.h
 make ${PACKAGE_ast_INCLUDE}/shell.h implicit
 make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
@@ -135,6 +128,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
 make ${PACKAGE_ast_INCLUDE}/nval.h implicit
+prev ${PACKAGE_ast_INCLUDE}/option.h implicit
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -151,7 +145,7 @@ done ${PACKAGE_ast_INCLUDE}/shell.h
 done dbm_t.c
 meta dbm_t.o %.c>%.o dbm_t.c dbm_t
 prev dbm_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm_t"\" -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshdbm_t]"\" -D_PACKAGE_ast -c dbm_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm_t"\" -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshdbm_t]"\" -D_PACKAGE_ast -D_BLD_DEBUG -c dbm_t.c
 done dbm_t.o generated
 exec - ${AR} cr libkshdbm_t.a dbm_t.o
 exec - (ranlib libkshdbm_t.a) >/dev/null 2>&1 || true

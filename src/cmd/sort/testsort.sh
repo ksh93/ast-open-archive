@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1996-2007 AT&T Intellectual Property          #
+#          Copyright (c) 1996-2008 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -728,8 +728,8 @@ $SORT -u -k 1,1 in >xx
 TEST=19; echo $TEST	"-i, -d, -f"
 cat >xx.c <<!
 #include <stdio.h>
-void run(i,j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
-main(){	run(0, 011);		/* 012=='\n' */
+static void run(int i, int j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
+int main(){	run(0, 011);		/* 012=='\n' */
 	run(013, 0377);
 	return 0; }
 !
@@ -737,8 +737,8 @@ $CC -o xx.exe xx.c
 ./xx.exe >in
 cat >xx.c <<!
 #include <stdio.h>
-void run(i,j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
-main(){ run(0, 011);
+static void run(int i, int j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
+int main(){ run(0, 011);
 	run(013, ' '-1);
 	run(0177, 0377);
 	run(' ', 0176);
@@ -751,8 +751,8 @@ $CC -o xx.exe xx.c
 
 cat >xx.c <<!
 #include <stdio.h>
-void run(i,j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
-main(){	run(0, 010);		/* 011=='\t', 012=='\n' */
+static void run(int i, int j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
+int main(){	run(0, 010);		/* 011=='\t', 012=='\n' */
 	run(013, ' '-1);
 	run(' '+1, '0'-1);
 	run('9'+1, 'A'-1);
@@ -772,8 +772,8 @@ $CC -o xx.exe xx.c
 
 cat >xx.c <<!
 #include <stdio.h>
-void run(i,j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
-main(){	int i;
+static void run(int i, int j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
+int main(){	int i;
 	run(0, 011);
 	run(013, 'A'-1);
 	for(i='A'; i<='Z'; i++) 
@@ -813,7 +813,7 @@ a
 TEST=21; echo $TEST	"behavior of null bytes"
 cat >xx.c <<'!'
 #include <stdio.h>
-main() { printf("\n%cb\n%ca\n",0,0); return 0; }
+int main() { printf("\n%cb\n%ca\n",0,0); return 0; }
 !
 $CC -o xx.exe xx.c
 ./xx.exe >in

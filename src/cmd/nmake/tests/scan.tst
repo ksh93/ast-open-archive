@@ -192,7 +192,7 @@ all : x.G
 
 TEST 09 'ar scan'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		INPUT Makefile $'
 tst :LIBRARY: \\
 	12345678901.c \\
@@ -228,7 +228,7 @@ tst :LIBRARY: \\
 + ignore ranlib libtst.a
 + rm -f 12345678901.o 123456789012.o 1234567890123.o 12345678901234.o 123456789012345.o 1234567890123456.o 12345678901234567.o 123456789012345678.o 1234567890123456789.o'
 
-	EXEC	--regress
+	EXEC	--regress=sync
 		ERROR -
 
 TEST 10 'f77/c crossover'
@@ -279,7 +279,7 @@ SDL INTERFACE'
 
 TEST 12 'multi-line implicit prereq include'
 
-	EXEC	--regress --noexec --force --mam=static
+	EXEC	--regress=sync --noexec --force --mam=static
 		INPUT Makefile $'.SCAN.x : .SCAN
 	OS
 	Q|/*|*/||C|
@@ -463,7 +463,7 @@ all : .MAKE n.G y.G
 
 TEST 18 '.SCAN today gone tomorrow'
 
-	EXEC	--regress ASCAN=0
+	EXEC	--regress=sync ASCAN=0
 		INPUT Makefile $'if ASCAN
 .SCAN.aaa : .SCAN
 	OS
@@ -495,7 +495,7 @@ b.bbb : [current] .SCAN.bbb must=1 compiled regular scanned EXISTS
  prerequisites: (BBB) 
 '
 
-	EXEC	--regress ASCAN=1
+	EXEC	--regress=sync ASCAN=1
 		ERROR - $'+ cp a.aaa a
 
 a.aaa : [current] .SCAN.aaa compiled regular scanned EXISTS
@@ -509,7 +509,7 @@ b.bbb : [recent] .SCAN.bbb compiled regular scanned EXISTS
  prerequisites: (BBB) 
 '
 
-	EXEC	--regress ASCAN=0
+	EXEC	--regress=sync ASCAN=0
 		ERROR - $'
 a.aaa : [recent] compiled regular EXISTS
 
@@ -521,9 +521,9 @@ b.bbb : [recent] .SCAN.bbb compiled regular scanned EXISTS
  prerequisites: (BBB) 
 '
 
-	EXEC	--regress ASCAN=0
+	EXEC	--regress=sync ASCAN=0
 
-	EXEC	--regress ASCAN=1
+	EXEC	--regress=sync ASCAN=1
 		ERROR - $'+ cp a.aaa a
 
 a.aaa : [current] .SCAN.aaa compiled regular scanned EXISTS
@@ -537,7 +537,7 @@ b.bbb : [recent] .SCAN.bbb compiled regular scanned EXISTS
  prerequisites: (BBB) 
 '
 
-	EXEC	--regress ASCAN=1
+	EXEC	--regress=sync ASCAN=1
 		ERROR - $'
 a.aaa : [recent] .SCAN.aaa compiled regular scanned EXISTS
 
@@ -561,7 +561,7 @@ echo $STATE
 		INPUT a.sh
 		INPUT b.sh
 		INPUT c.sh
-		OUTPUT - $'+ case :$OPTIND:$RANDOM in
+		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null

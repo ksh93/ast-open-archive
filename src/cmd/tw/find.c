@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2007 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1738,7 +1738,6 @@ main(int argc, char** argv)
 	State_t				state;
 
 	static const char* const	defpath[] = { ".", 0 };
-	static const char* const	defopts[] = { 0, "-print", 0 };
 
 	setlocale(LC_ALL, "");
 	error_info.id = "find";

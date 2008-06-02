@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2008 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -373,6 +373,7 @@ headline(register struct parse* pp)
 {
 	register char*	s;
 	register char*	e;
+	register char*	t;
 	register int	c;
 	register int	n;
 
@@ -392,6 +393,7 @@ headline(register struct parse* pp)
 				ungetc(c, pp->fp);
 				break;
 			}
+			t = s;
 			if (s < e) {
 				*(s - 1) = ' ';
 				*s++ = ' ';
@@ -405,7 +407,7 @@ headline(register struct parse* pp)
 					break;
 			}
 			pp->count -= n;
-			pp->length += n;
+			pp->length += s - t;
 		}
 	}
 	*s = 0;

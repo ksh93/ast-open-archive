@@ -1,5 +1,7 @@
 # regression tests for the POSIX grep utilitiy
 
+export LC_ALL=C
+
 KEEP "*.[pd]at"
 
 function DATA
