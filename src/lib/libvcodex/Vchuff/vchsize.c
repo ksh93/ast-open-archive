@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -47,8 +47,13 @@ Void_t* two;
 Void_t* disc;
 #endif
 {
-	Vchtree_t *o = *((Vchtree_t**)one), *t = *((Vchtree_t**)two);
-	return (int)(o->freq - t->freq);
+	int		d;
+	Vchtree_t	*o = *((Vchtree_t**)one);
+	Vchtree_t	*t = *((Vchtree_t**)two);
+
+	if((d = o->freq - t->freq) != 0 )
+		return d;
+	else	return o < t ? -1 : o == t ? 0 : 1;
 }
 
 #if __STD_C
@@ -62,10 +67,11 @@ int*		runb;	/* the run byte if any	*/
 #endif
 {
 	ssize_t		k, c, notz, max, min;
+	Vchtree_t	*tree, **sort;
 	Vchtree_t	*f, *s, *p, *list, *tail, *head;
-	Vchtree_t	*tree, tr[1024], **sort, *so[1024];
 
-	if(!ARRAYMAKE(Vchtree_t, tree, nsym, tr) || !ARRAYMAKE(Vchtree_t*, sort, nsym, so) )
+	if(!(tree = (Vchtree_t*)malloc(nsym*sizeof(Vchtree_t))) ||
+	   !(sort = (Vchtree_t**)malloc(nsym*sizeof(Vchtree_t*))) )
 		return -1;
 
 	/* construct list of elements with non-zero weights */
@@ -91,9 +97,8 @@ int*		runb;	/* the run byte if any	*/
 	if(notz <= 1) /* no Huffman code needed */
 	{	if(notz == 1 && runb)
 			*runb = (int)(sort[0]-tree);
-
-		ARRAYFREE(tree, nsym, tr);
-		ARRAYFREE(sort, nsym, so);
+		free(tree);
+		free(sort);
 		return 0;
 	}
 
@@ -177,11 +182,11 @@ int*		runb;	/* the run byte if any	*/
 	for(c = 0; s; s = s->link)
 	{	if((size[s-tree] += size[s->next-tree]) > c)
 			c = size[s-tree];
-		/**/ASSERT(size[s-tree] > 0 && size[s-tree] <= 32);
+		/**/DEBUG_ASSERT(size[s-tree] > 0 && size[s-tree] <= 32);
 	}
 
-	ARRAYFREE(tree, nsym, tr);
-	ARRAYFREE(sort, nsym, so);
+	free(tree);
+	free(sort);
 
 	return c;
 }

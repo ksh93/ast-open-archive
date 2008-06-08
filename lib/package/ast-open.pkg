@@ -5,7 +5,7 @@ ast-open :PACKAGE: \
 		libcoshell libcs libmam libpp libcodex paxlib codexlib \
 		at builtin codex cql dss dsslib ie mailx mam ncsl pack pzip \
 		re sort sortlib std tksh tw warp libcdb libdss libpz \
-		libtksh libtk vczip libvcodex
+		libtksh libtk vczip libvcodex libgraph
 
 :COVERS: ast-base
 

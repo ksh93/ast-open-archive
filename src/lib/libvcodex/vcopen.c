@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -19,7 +19,7 @@
 ***********************************************************************/
 #include	"vchdr.h"
 
-static char*	Version = "\r\n@(#)vcodex (AT&T Research - kpv) 2006-01-24\0\r\n";
+static char*	Version = "\r\n@(#)vcodex (AT&T Shannon Laboratory - Kiem-Phong Vo) 2008-05-01\0\r\n";
 
 /*	Open a handle for data coding
 **
@@ -57,45 +57,108 @@ int		flags;	/* control flags		*/
 	vc->disc = disc;
 	vc->meth = meth;
 	vc->coder = coder;
-	vc->undone = 0;
-
 	vc->flags = flags & VC_FLAGS;
 
-	vc->csize = 0;
-	vc->ctop = 0;
-	vc->cnow = -1;
-	vc->ctxt = NIL(Void_t*);
-
-	vc->head = 0;
-	vc->buf = NIL(Void_t*);
-	vc->bsize = vc->bhead = 0;
-	vc->blist = NIL(Vcbuf_t*);
-
-	vc->mtdata = NIL(Void_t*);
-
-	if(disc && disc->eventf &&
-	   (*disc->eventf)(vc, VC_OPENING, NIL(Void_t*), disc) < 0)
-	{	if(vc->coder && vc->coder != coder)
-			vcclose(vc->coder);
-		free(vc);
+	if(disc && disc->eventf && (*disc->eventf)(vc, VC_OPENING, NIL(Void_t*), disc) < 0)
+	{	free(vc);
 		return NIL(Vcodex_t*);
 	}
 
 	if(meth->eventf && (*meth->eventf)(vc, VC_OPENING, init) < 0)
-	{	if(disc && disc->eventf)
-			(void)(*disc->eventf)(vc, VC_OPENING, meth, disc);
-		if(vc->coder && vc->coder != coder)
-			vcclose(vc->coder);
-		free(vc);
+	{	free(vc);
 		return NIL(Vcodex_t*);
 	}
 
-	/* initialize context structure */
-	if(vc->csize <= 0)
-		vc->csize = sizeof(Vcctxt_t);
-	if(vccontext(vc, -1) < 0)
-	{	vcclose(vc);
+	return vc;
+}
+
+
+/* construct a handle from a list of methods and arguments */
+typedef struct _meth_s
+{	struct _meth_s*	next;
+	Vcmethod_t*	vcmt;	/* actual Vcodex method	*/
+	char		args[1]; /* initialization data	*/
+} Meth_t;
+
+typedef struct Stack_s
+{
+	char	*spec;
+	char	buf[256];
+} Stack_t;
+
+#if __STD_C
+Vcodex_t* vcmake(char* spec, int type)
+#else
+Vcodex_t* vcmake(spec, type)
+char*	spec;	/* method specification	*/
+int	type;	/* VC_ENCODE, VC_DECODE	*/
+#endif
+{
+	Meth_t		*list, *mt;
+	ssize_t		m;
+	char		*args, *s, meth[1024];
+	Vcmethod_t	*vcmt;
+	Vcodex_t	*coder;
+	Vcodex_t	*vc = NIL(Vcodex_t*);
+	Stack_t		stack[4];
+	Stack_t		*sp = &stack[0];
+
+	if(type != VC_ENCODE && type != VC_DECODE)
 		return NIL(Vcodex_t*);
+
+	for(list = NIL(Meth_t*);;)
+	{	/* get one method specification */
+		if(!(spec = vcsubstring(spec, VC_METHSEP, meth, sizeof(meth), 0)) )
+		{	if(sp <= stack)
+				break;
+			sp--;
+			spec - sp->spec;
+			continue;
+		}
+		for(m = 0; meth[m]; ++m)
+			if(!isalnum(meth[m]))
+				break;
+		if(m == 0)
+			break;
+
+		/* any arguments to the method are after separator */
+		args = meth + m + (meth[m] == VC_ARGSEP ? 1 : 0);
+		meth[m] = 0;
+
+		/* find the actual method structure */
+		if(!(vcmt = vcgetmeth(meth, 0)))
+		{	if(sp >= &stack[sizeof(stack)/sizeof(stack[0])])
+				goto done;
+			if(!(s = vcgetalias(meth, sp->buf, sizeof(sp->buf))))
+				goto done;
+			sp->spec = spec;
+			spec = s;
+			sp++;
+			continue;
+		}
+
+		/* allocate structure to hold data for now */
+		if(!(mt = (Meth_t*)malloc(sizeof(Meth_t)+strlen(args))) )
+			goto done;
+		mt->vcmt = vcmt;
+		strcpy(mt->args,args);
+
+		mt->next = list; list = mt;
+	}
+
+	vc = NIL(Vcodex_t*);
+	for(mt = list; mt; mt = mt->next)
+	{	if(!(coder = vcopen(0, mt->vcmt, (Void_t*)mt->args, vc, type|VC_CLOSECODER)) )
+		{	vcclose(vc);
+			vc = NIL(Vcodex_t*);
+			goto done;
+		}
+		else	vc = coder;
+	}
+
+done:	for(; list; list = mt)
+	{	mt = list->next;
+		free(list);
 	}
 
 	return vc;

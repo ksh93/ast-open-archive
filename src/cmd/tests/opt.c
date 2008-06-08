@@ -34,10 +34,26 @@
 #define name	option
 #endif
 
+typedef struct Info_s Info_t;
+
+struct Info_s
+{
+	Info_t*		next;
+	char*		name;
+	char*		value;
+};
+
+static Info_t*		info;
+
 #if NEW
 static int
 infof(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 {
+	Info_t*		ip;
+
+	for (ip = info; ip; ip = ip->next)
+		if (streq(s, ip->name))
+			return sfprintf(sp, "%s", ip->value);
 	if (*s == ':')
 		return sfprintf(sp, "%s", *(s + 1) == 'n' ? "" : (s + 2));
 	if (streq(s, "options"))
@@ -130,6 +146,7 @@ translate(const char* locale, const char* id, const char* catalog, const char* m
 }
 #endif
 
+int
 main(int argc, char** argv)
 {
 	int		n;
@@ -137,6 +154,8 @@ main(int argc, char** argv)
 	int		ostr;
 	int		str;
 	int		loop;
+	Info_t*		ip;
+	char*		s;
 	char*		command;
 	char*		usage;
 	char**		extra;
@@ -153,7 +172,20 @@ main(int argc, char** argv)
 	str = 0;
 	while (command = *(argv + 1))
 	{
-		if (streq(command, "-"))
+		if (*command == '=' && (s = strchr(command + 1, '=')))
+		{
+			argv++;
+			*s++ = 0;
+			command++;
+			if (ip = newof(0, Info_t, 1, 0))
+			{
+				ip->name = command;
+				ip->value = s;
+				ip->next = info;
+				info = ip;
+			}
+		}
+		else if (streq(command, "-"))
 		{
 			argv++;
 			str = NEW;

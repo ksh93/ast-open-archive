@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,7 +20,7 @@
 #ifndef _VCHHDR_H
 #define _VCHHDR_H	1
 
-#include	"vcmeth.h"
+#include	"vchdr.h"
 
 #define Vchobj_t	Vcchar_t	/* object type in Huffman code	*/
 #define VCH_SIZE	256		/* max alphabet size		*/
@@ -115,11 +115,5 @@ do {	Vchobj_t* oo = (Vchobj_t*)(o); Vcchar_t* ff = (Vcchar_t*)(f); \
 	ssize_t nn = (ssize_t)(n); v = 0; \
 	for(; nn > 0; nn -= VCH_SW) GRPsize(v, sz, oo, ff, nn >= VCH_SW ? VCH_SW : nn); \
 } while(0)
-
-/* to make a temporary array */
-#define ARRAYMAKE(typ,ary,na,tmp) \
-	(ary = na <= sizeof(tmp)/sizeof(tmp[0]) ? tmp : (typ*)malloc(na*sizeof(tmp[0])) )
-#define ARRAYFREE(ary,na,tmp) \
-	(na <= sizeof(tmp)/sizeof(tmp[0]) ? 0 : (free(ary),0) )
 
 #endif

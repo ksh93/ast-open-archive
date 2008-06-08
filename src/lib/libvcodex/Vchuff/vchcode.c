@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -91,13 +91,13 @@ Vcchar_t*	data;	/* data buffer for output	*/
 size_t		dtsz;	/* buffer size (need >= 256)	*/ 
 #endif
 {
-	reg ssize_t	n, k, nl, cs, ns;
+	reg ssize_t	n, k, nl, cs;
+	Vcchar_t	*len;
 	Vcbit_t		b;
 	Vcio_t		io;
-	Vcchar_t	*len, le[1024];
 
-	nl = ns = 2*nsym;
-	if(!ARRAYMAKE(Vcchar_t, len, ns, le))
+	nl = 2*nsym;
+	if(!(len = (Vcchar_t*)malloc(nl*sizeof(Vcchar_t*))) )
 		return -1;
 
 	/* # of bits used to output the code table for this coding */
@@ -106,12 +106,12 @@ size_t		dtsz;	/* buffer size (need >= 256)	*/
 
 	/* run-length-encode the code table in the alphabet [0...maxs+2] */
 	if((nl = rlcode(nsym, clen, maxs, len, nl, 1)) < 0 )
-	{	ARRAYFREE(len, ns, le);
+	{	free(len);
 		return -1;
 	}
 
 	vcioinit(&io,data,dtsz);
-	vcioputu(&io, nl); /**/PRINT(2,"Runlength=%d\n",nl);
+	vcioputu(&io, nl); /**/DEBUG_PRINT(2,"Runlength=%d\n",nl);
 
 	vciosetb(&io, b, n, VC_ENCODE);
 	for(k = 0; k < nl; ++k)
@@ -121,7 +121,7 @@ size_t		dtsz;	/* buffer size (need >= 256)	*/
 	}
 	vcioendb(&io, b, n, VC_ENCODE);
 
-	ARRAYFREE(len, ns, le);
+	free(len);
 	return vciosize(&io);
 }
 
@@ -137,11 +137,11 @@ size_t		dtsz;	/* size of above data buffer		*/
 #endif
 {
 	ssize_t		i, n, k, nl, cs;
+	Vcchar_t	*len;
 	Vcbit_t		b;
 	Vcio_t		io;
-	Vcchar_t	*len, le[1024];
 
-	if(!ARRAYMAKE(Vcchar_t, len, nsym, le))
+	if(!(len = (Vcchar_t*)malloc(nsym*sizeof(Vcchar_t*))) )
 		return -1;
 
 	/* # of bits used to output the code table for this coding */
@@ -151,7 +151,7 @@ size_t		dtsz;	/* size of above data buffer		*/
 	/* The length of the rle sequence should have been coded with vcioputu()
 	** so it could be decoded by simply using vciogetu(). However, an older
 	** and buggy version used vcioputc() and could not handle values >= 256.
-	** The below loop detects and handles the buggy old case.
+	** The below loop tries to detect and handle those old cases.
 	*/
 	for(i = 0; i < 2; i += 1)
 	{	vcioinit(&io, data, dtsz);
@@ -174,11 +174,11 @@ size_t		dtsz;	/* size of above data buffer		*/
 
 		/* now see if clen[] can be reconstructed */
 		if(rlcode(nsym, clen, maxs, len, nl, 0) >= 0)
-		{	ARRAYFREE(len, nsym, le);
+		{	free(len);
 			return vciosize(&io);
 		}
 	}
 
-	ARRAYFREE(len, nsym, le);
+	free(len);
 	return -1;
 }

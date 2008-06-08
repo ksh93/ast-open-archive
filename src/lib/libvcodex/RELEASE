@@ -1,3 +1,4 @@
+08-06-04 sync with kpv
 06-07-26 vcgetmeth.c,vcextract.c: handle CC_NATIVE!=CC_ASCII
 06-02-14 vcodex.h: add __EXPORT__ to plugin declaration
 06-02-08 vcsfio.c: simply magic logic by just peeking 4 byte magic

@@ -41,14 +41,8 @@ make vcodex
 make libsortvcodex.a archive
 make vcodex.o
 make vcodex.c
-make ${PACKAGE_ast_INCLUDE}/vcsfio.h implicit
 make ${PACKAGE_ast_INCLUDE}/vcodex.h implicit
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
@@ -58,6 +52,9 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
 done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
@@ -88,6 +85,12 @@ done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
+done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
@@ -97,8 +100,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/vcodex.h dontcare
-done ${PACKAGE_ast_INCLUDE}/vcsfio.h
+done ${PACKAGE_ast_INCLUDE}/vcodex.h
 make ${PACKAGE_ast_INCLUDE}/recsort.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/recsort.h

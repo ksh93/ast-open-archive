@@ -1,3 +1,4 @@
+08-06-06 Makerules.mk: drop -G from _BLD_DEBUG trigger -- doh
 08-05-22 Makerules.mk: $(CC.ARFLAGS) also needs $(CCLDFLAGS)
 08-05-20 tests/test.def: add SET local -- nfs can't keep up
 08-04-28 make.c: fix .ACCEPT to propagate state event time

@@ -92,10 +92,12 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-08-06-02  --- Release ksh93t-  ---
+08-06-06  --- Release ksh93t-  ---
+08-06-06  A bug when processing `` command substitution with the character
+	  sequence \$' has been fixed.
 08-06-02  When defining a type, the typeset -r attribute causes this field
 	  to be required to be specified for each instance of the type and
-	  does not allow a default value.  Currently undocumented. 
+	  does not allow a default value.
 08-06-02  Several bugs in which compound variables were modified by
 	  subshells have been fixed.
 08-05-22  The ceil function has been added to the math functions.
@@ -2683,6 +2685,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+08-06-06 Makerules.mk: drop -G from _BLD_DEBUG trigger -- doh
 08-05-22 Makerules.mk: $(CC.ARFLAGS) also needs $(CCLDFLAGS)
 08-05-20 tests/test.def: add SET local -- nfs can't keep up
 08-04-28 make.c: fix .ACCEPT to propagate state event time
@@ -5260,6 +5263,7 @@ All recorded changes follow.
 
 :::::::: vczip ::::::::
 
+08-06-06 sync with kpv; add ast plugins and optget() usage
 05-09-25 vczip.c: fix empty input test for pipes
 05-06-16 vczip.c: snarf from kpv
 05-06-30 vczip.c: handle vcsfmeth interface change
@@ -5267,6 +5271,9 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+08-06-06 misc/optget.c: handle sub-component about details
+08-06-04 misc/optget.c: fix [-n?\n...\n] version parse
+08-06-04 include/debug.h,misc/debug.c: merge with kpvdebug.h
 08-06-02 features/ndbm: add to tame dbmlib.iffe replication
 08-06-01 comp/resolvepath.c,realpath.c: fix resolvepath() return value type
 08-05-22 tm/tmxdate.c: fix a few ordinal/last/this/next bugs
@@ -7196,6 +7203,7 @@ All recorded changes follow.
 
 :::::::: libsum ::::::::
 
+08-06-05 sum-lmd.c: align context to largest int
 08-05-01 sumlib.c: add some -lmd verification checks
 08-02-11 sum-lmd.c,features/sum: add wrapper for solaris -lmd
 07-10-29 sum.h,sumlib.c: add SUM_LEGACY for legacy output format
@@ -8280,6 +8288,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+08-06-04 sync with kpv
 06-07-26 vcgetmeth.c,vcextract.c: handle CC_NATIVE!=CC_ASCII
 06-02-14 vcodex.h: add __EXPORT__ to plugin declaration
 06-02-08 vcsfio.c: simply magic logic by just peeking 4 byte magic
@@ -8299,3 +8308,7 @@ All recorded changes follow.
 	 change ident to char* (from unsigned char*) for pedantic cc
 	 Vcdelta/vcdtblinit.c: init { _Vcdtbl _Vcdindex } to avoid dyn common
 05-06-28 snarf from kpv
+
+:::::::: libgraph ::::::::
+
+08-05-21 first release for -lvcodex

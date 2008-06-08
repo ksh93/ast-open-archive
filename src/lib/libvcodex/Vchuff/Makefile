@@ -5,7 +5,7 @@ INCDIR=	../../../../include
 LIBDIR=	../../../../lib
 
 CXINCS=
-CCINCS= -I. -I.. -I$(INCDIR) $(CXINCS)
+CCINCS= -I$(INCDIR) -I. -I.. $(CXINCS)
 CXFLAGS=
 CCMODE= -O
 CCFLAGS= $(CCMODE) $(CXFLAGS) $(CCINCS)

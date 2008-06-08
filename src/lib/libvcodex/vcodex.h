@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,10 +20,13 @@
 #ifndef _VCODEX_H
 #define _VCODEX_H	1
 
-#define VCSFIO		1	/* 1 for using sfio.h, 0 for stdio.h	*/
+#define VCSFIO		1	/* one for sfio.h, zero for stdio.h	*/
+#define VCPROPRIETARY	0	/* one to include proprietary functions	*/
 
 #if _PACKAGE_ast
 #include	<ast_std.h>
+#undef	VCSFIO
+#define VCSFIO		1
 #else
 #include	<ast_common.h>
 #endif
@@ -34,12 +37,14 @@
 #include	<stdio.h>
 #endif
 
+#include	<cdt.h>
+
 /*	VCODEX = COmpression + DElta + X (encryption, etc.)
 **
 **	Written by Kiem-Phong Vo (kpv@research.att.com)
 */
 
-#define VC_VERSION	20050805L
+#define VC_VERSION	20080604L	/* what/when/whereever, ILUNDV	*/
 #define VC_ID		"vcodex"	/* package identification	*/
 #define VC_LIB		"vcodex_lib"	/* function name		*/
 
@@ -83,18 +88,47 @@ extern Sfoff_t		sfsize _ARG_((Sfio_t*));
 extern int		sfclose _ARG_((Sfio_t*));
 #endif
 
+/* define 32-bit integer types */
+#if !defined(Vcint32_t) && _typ_int32_t
+#define Vcint32_t	int32_t
+#endif
+#if !defined(Vcint32_t) && _ast_int4_t
+#define Vcint32_t	_ast_int4_t
+#endif
+#if !defined(Vcint32_t)
+Help needed to define signed 32-bit integer type.
+#endif
+
+#if !defined(Vcuint32_t) && _typ_uint32_t
+#define Vcuint32_t	uint32_t
+#endif
+#if !defined(Vcuint32_t) && _ast_int4_t
+#define Vcuint32_t	unsigned _ast_int4_t
+#endif
+#if !defined(Vcuint32_t)
+Help needed to define unsigned 32-bit integer type.
+#endif
+
 typedef unsigned char		Vcchar_t;
 typedef struct _vcodex_s	Vcodex_t;
 typedef struct _vcdisc_s	Vcdisc_t;
 typedef struct _vcmethod_s	Vcmethod_t;
 typedef struct _vcmtarg_s	Vcmtarg_t;
+typedef struct _vcmtcode_s	Vcmtcode_t;
+typedef struct _vccontext_s	Vccontext_t;
 typedef int			(*Vcevent_f)_ARG_((Vcodex_t*, int, Void_t*, Vcdisc_t*));
 typedef ssize_t			(*Vcapply_f)_ARG_((Vcodex_t*, const Void_t*, size_t, Void_t**));
 
+typedef int			(*Vcwalk_f)_ARG_((Void_t*, char*, char*, Void_t*));
+
+/* type of buffers allocated for transformed data */
+typedef struct _vcbuffer_s	Vcbuffer_t;
+typedef int			(*Vcbuffer_f)_ARG_((Vcodex_t*, Vcbuffer_t*, Vcmethod_t*));
+
 /* types to encode/decode bits and integers */
-typedef uint32_t		Vcbit_t; 	/* 32-bit accumulator	*/
+typedef Vcuint32_t		Vcbit_t; 	/* 32-bit accumulator	*/
 #define VC_BITSIZE		(sizeof(Vcbit_t)*8 )
-typedef int32_t			Vcint_t;	/* 32-bit integers	*/
+typedef Vcint32_t		Vcint_t;	/* 32-bit integers	*/
 #define VC_INTSIZE		(sizeof(Vcint_t)*8 )
 
 /* Vcio_t: handle to perform IO functions on strings */
@@ -106,34 +140,43 @@ typedef struct _vcio_s
 	ssize_t		nbits;		/* # of bits cached in "bits"	*/
 } Vcio_t;
 
-/* discipline structure: what application supplies */
+/* Discipline structure: what application supplies */
 struct _vcdisc_s
 {	Void_t*		data;		/* data, key string, etc.	*/
 	ssize_t		size;		/* size of data or just an int	*/
 	Vcevent_f	eventf;		/* call-back function on events	*/
 };
 
+/* Arguments to a method */
 struct _vcmtarg_s
-{	
-	char*		name;		/* string name for arg		*/
-	char*		ident;		/* 'name' written in ASCII	*/
+{	char*		name;		/* argument name - alphanumeric	*/
 	char*		desc;		/* short description of arg	*/
-	Void_t*		data;		/* associated data, if any	*/
+	Void_t*		data;		/* predefined data, if any	*/
 };
 
-/* method structure: what a tranform looks like */
+/* structure to extract/restore a handle by its private code */
+struct _vcmtcode_s
+{	Vcchar_t*	data;		/* the encoding data for handle	*/
+	ssize_t		size;		/* the data size		*/
+	Vcodex_t*	coder;		/* the reconstructed coder	*/
+};
+
+/* Method structure: what a tranform looks like */
 struct _vcmethod_s
 {	Vcapply_f	encodef;	/* function to encode		*/
 	Vcapply_f	decodef;	/* function to decode		*/
-	ssize_t		(*extractf)_ARG_((Vcodex_t*, Void_t**, int));
-	Vcodex_t*	(*restoref)_ARG_((Vcodex_t*, Void_t*, ssize_t));
 	int		(*eventf)_ARG_((Vcodex_t*, int, Void_t*));
 	char*		name;		/* string name, 0-terminated	*/
-	char*		ident;		/* same as above but in ASCII	*/
 	char*		desc;		/* description, 0-terminated	*/
+	char*		about;		/* [-name?value]...0-terminated	*/
 	Vcmtarg_t*	args;		/* list of possible arguments	*/
 	ssize_t		window;		/* suggested window size	*/
-	Vcmethod_t*	link;		/* library private link		*/
+	int		type;		/* flags telling type of method	*/
+};
+
+/* Method writers: note that this should be first in any context type */
+struct _vccontext_s
+{	Vccontext_t	*next;
 };
 
 /* Vcodex_t handle structure: to keep states */
@@ -144,20 +187,21 @@ struct _vcodex_s
 	Vcodex_t*	coder;		/* continuation coder		*/
 	size_t		undone;		/* left-over after vcapply()	*/
 	unsigned int	flags;		/* bits to control operations	*/
+	Vccontext_t*	ctxt;		/* list of contexts		*/
+	Void_t*		data;		/* private method data		*/
+	ssize_t		head;		/* required buffer head size	*/
+	char*		file;		/* file with allocation request	*/
+	int		line;		/* line number in file		*/
 #ifdef _VCODEX_PRIVATE
 	_VCODEX_PRIVATE
 #endif
 };
 
-/* flags passable to vcopen() or vcsfio() */
-#define VC_FLAGS		000777	/* all supported flags		*/
+/* flags passable to vcopen() */
+#define VC_FLAGS		007777	/* all supported flags		*/
 #define VC_ENCODE		000001	/* handle for encoding data	*/
 #define VC_DECODE		000002	/* handle to decode data	*/
 #define VC_CLOSECODER		000010	/* 2nd-ary coders to be closed	*/
-
-/* the below are for vcsfio() only. */
-#define VCSF_CLOSEWINDOW	000100	/* close window handle		*/
-#define VCSF_VCDIFFHEADER	000200	/* output RFC3284 VCDIFF header	*/
 
 /* event types passable to discipline event handlers */
 #define VC_OPENING		1	/* opening event		*/
@@ -165,29 +209,38 @@ struct _vcodex_s
 #define VC_DISC			3	/* changing discipline		*/
 
 /* event types to be processed by method event handlers */
-#define VC_INITCTXT		101	/* initializing a context	*/
-#define VC_ENDCTXT		102	/* closing a context		*/
-#define VC_FREEBUF		103	/* free all associated buffers	*/
-#define VC_GETARG		104	/* get method argument		*/
+#define VC_INITCONTEXT		101	/* setting/creating a context	*/
+#define VC_FREECONTEXT		102	/* freeing one or all contexts	*/
+#define VC_FREEBUFFER		103	/* free all associated buffers	*/
+#define VC_SETMTARG		104	/* set an argument to a method	*/
+#define VC_EXTRACT		105	/* extract code for handle	*/
+#define VC_RESTORE		106	/* restoring a handle from code	*/
+#define VC_GETIDENT		107	/* get method ID		*/
+#define VC_TELLBUFFER		108	/* announce buffer data	*/
+
+/* flags defining certain method attributes */
+#define VC_MTSOURCE		000001	/* use source data (Vcdelta)	*/
+
+/* separators for arguments */
+#define VC_ARGSEP		'.'	/* separator for method args	*/
+#define VC_METHSEP		','	/* separator for methods	*/
 
 /* function to initialize a discipline structure */
 #define VCDISC(dc,dt,sz,fn) \
 		((dc)->data = (dt), (dc)->size = (sz), (dc)->eventf = (fn) )
 
+/* return vcodex discipline event */
+#define VCSF_DISC	((((int)('V'))<<7)|((int)('C')))
+
 _BEGIN_EXTERNS_
 
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-#if !_BLD_vcodex && defined(__IMPORT__)
-#define extern		extern __IMPORT__
-#endif
-
 extern Vcmethod_t*	Vcdelta;	/* delta compression		*/
-extern Vcmethod_t*	Vcapprox;	/* approximate matching		*/
+extern Vcmethod_t*	Vchamming;	/* byte-wise delta of data	*/
+
 extern Vcmethod_t*	Vchuffman;	/* Huffman compression		*/
 extern Vcmethod_t*	Vchuffgroup;	/* Huffman with grouping	*/
 extern Vcmethod_t*	Vchuffpart;	/* Huffman with partitioning	*/
+
 extern Vcmethod_t*	Vcbwt;		/* Burrows-Wheeler transform	*/
 extern Vcmethod_t*	Vcrle;		/* run-length compressor	*/
 extern Vcmethod_t*	Vcmtf;		/* move-to-front transform	*/
@@ -195,31 +248,36 @@ extern Vcmethod_t*	Vcmtf;		/* move-to-front transform	*/
 extern Vcmethod_t*	Vcmap;		/* mapping codeset to codeset	*/
 extern Vcmethod_t*	Vctranspose;	/* swap rows and columns	*/
 
-#undef	extern
-
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-
 /* public functions */
 extern Vcodex_t*	vcopen _ARG_((Vcdisc_t*, Vcmethod_t*, Void_t*, Vcodex_t*, int));
-extern ssize_t		vcextract _ARG_((Vcodex_t*, Void_t**, int));
-extern Vcodex_t*	vcrestore _ARG_((Vcodex_t*, Void_t*, size_t));
+extern Vcodex_t*	vcmake _ARG_((char*, int));
+extern ssize_t		vcextract _ARG_((Vcodex_t*, Void_t**));
+extern Vcodex_t*	vcrestore _ARG_((Void_t*, size_t));
 extern int		vcclose _ARG_((Vcodex_t*));
-extern int		vccontext _ARG_((Vcodex_t*, int));
 extern ssize_t		vcapply _ARG_((Vcodex_t*, Void_t*, size_t, Void_t**));
 extern size_t		vcundone _ARG_((Vcodex_t*));
 extern Vcdisc_t*	vcdisc _ARG_((Vcodex_t*, Vcdisc_t*));
-extern Vcchar_t*	vcsetbuf _ARG_((Vcodex_t*, Vcchar_t*, ssize_t, ssize_t));
 
-extern Vcmethod_t*	vcgetmeth _ARG_((const char*, const char*, char**));
-extern Vcmethod_t*	vcnextmeth _ARG_((Vcmethod_t*));
+extern int		vcaddmeth _ARG_((Vcmethod_t**, ssize_t));
+extern Vcmethod_t*	vcgetmeth _ARG_((char*, int));
+extern int		vcwalkmeth _ARG_((Vcwalk_f, Void_t*));
 
-extern double		vclog _ARG_((unsigned int)); /* fast log2 */
+extern char*		vcgetident _ARG_((Vcmethod_t*, char*, ssize_t));
+extern char*		vcgetmtarg _ARG_((char*, char*, ssize_t, Vcmtarg_t*, Vcmtarg_t**));
+extern int              vcsetmtarg _ARG_((Vcodex_t*, char*, Void_t*, int));
+
+extern char*		vcsubstring _ARG_((char*, int, char*, ssize_t, int));
+extern double		vclog _ARG_((size_t)); /* fast log2 */
+extern size_t		vclogi _ARG_((size_t)); /* integer part of log2 */
 extern ssize_t		vcbcktsort _ARG_((ssize_t*, ssize_t*, ssize_t, Vcchar_t*, ssize_t*));
 
-typedef int		(*Vcqsort_f)_ARG_((Void_t*, Void_t*, Void_t*));
-extern Void_t		vcqsort _ARG_((Void_t*, ssize_t, ssize_t, Vcqsort_f, Void_t*));
+typedef int		(*Vccompare_f)_ARG_((Void_t*, Void_t*, Void_t*));
+extern Void_t		vcqsort _ARG_((Void_t*, ssize_t, ssize_t, Vccompare_f, Void_t*));
+
+extern Vcint_t		vcatoi _ARG_((char*));
+extern ssize_t		vcitoa _ARG_((Vcint_t, char*, ssize_t));
+extern Vcint_t		vcintcode _ARG_((Vcint_t, Vcint_t, Vcint_t, Vcint_t, int));
+extern char*		vcstrcode _ARG_((char*, char*, ssize_t));
 
 extern ssize_t		vcioputc _ARG_((Vcio_t*, int));
 extern int		vciogetc _ARG_((Vcio_t*));
@@ -234,8 +292,8 @@ extern ssize_t		vcioput2 _ARG_((Vcio_t*, Vcchar_t, Vcchar_t, Vcint_t));
 extern Vcint_t		vcioget2 _ARG_((Vcio_t*, Vcchar_t, Vcchar_t));
 extern ssize_t		vcioputg _ARG_((Vcio_t*, Vcint_t));
 extern Vcint_t		vciogetg _ARG_((Vcio_t*));
-extern ssize_t		vcioputl _ARG_((Vcio_t*, Vcint_t*, ssize_t));
-extern ssize_t		vciogetl _ARG_((Vcio_t*, Vcint_t*, ssize_t));
+extern ssize_t		vcioputlist _ARG_((Vcio_t*, Vcint_t*, ssize_t));
+extern ssize_t		vciogetlist _ARG_((Vcio_t*, Vcint_t*, ssize_t));
 
 extern ssize_t		_vcioputu _ARG_((Vcio_t*, Vcint_t));
 extern Vcint_t		_vciogetu _ARG_((Vcio_t*));
@@ -246,13 +304,10 @@ extern Vcint_t		_vcioget2 _ARG_((Vcio_t*, Vcchar_t, Vcchar_t));
 extern ssize_t		_vcioputg _ARG_((Vcio_t*, Vcint_t));
 extern Vcint_t		_vciogetg _ARG_((Vcio_t*));
 
-#undef	extern
-
 _END_EXTERNS_
 
-#define vcapply(vc,s,sz,b)	(*(vc)->applyf)((vc), \
-					(Void_t*)(s), (size_t)(sz), (Void_t**)(b) )
-#define vcundone(vc)		((vc)->undone)
+#define vcapply(vc,s,sz,b)	(*(vc)->applyf)((vc), (Void_t*)(s), (size_t)(sz), (Void_t**)(b) )
+#define vcundone(vc)		((vc)->undone)	/* amount left unprocessed by transform	*/
 
 /* subsystem for fast I/O on strings */
 #define vcioinit(io,b,n)	((io)->data = (io)->next = (Vcchar_t*)(b), \
@@ -279,6 +334,10 @@ _END_EXTERNS_
 #define vcioget2(io, a, z)	_vcioget2((io),(Vcchar_t)(a),(Vcchar_t)(z))
 #define vcioputg(io, v)		_vcioputg((io), (Vcint_t)(v))
 #define vciogetg(io)		_vciogetg((io))
+
+/* size of an integer coded by vcioputu() and vcputm() */
+#define vcsizeu(v)		((v)<(1<<7) ? 1 : (v)<(1<<14) ? 2 : (v)<(1<<21) ? 3 : 4)
+#define vcsizem(v)		((v)<(1<<8) ? 1 : (v)<(1<<16) ? 2 : (v)<(1<<24) ? 3 : 4)
 
 /* The below bit I/O macro functions use (bt,nb) for bit accumulation. These
 ** are (register) variables that will be modified in place to keep states.
@@ -325,127 +384,72 @@ do {	if((tp) == VC_ENCODE) \
 } while(0)
 
 
+
 /*************************************************************************
-	TYPES AND FUNCTIONS RELATED TO THE STREAM INTERFACE
+	TYPES AND FUNCTIONS RELATED TO STRING, SUFFIX SORTING 
 *************************************************************************/
 
-#if _SFIO_H
-#define Vcsfio_t	Sfio_t
-#define vcsfread	sfread
-#define vcsfwrite	sfwrite
-#define vcsfsync	sfsync
-#define vcsfclose	sfclose
+#if VCSFXINT /* may be desirable when sizeof(int) < sizeof(ssize_t) */
+#define Vcsfxint_t	int
 #else
-#define Vcsfio_t	Void_t
-#endif /*_SFIO_H*/
-
-#define VCSF_MAX	64		/* max # of methods allowed 	*/
-
-#define VCSF_WINDOW	(Vcmethod_t*)(-1) /* window data		*/
-#define VCSF_STATES	(Vcmethod_t*)(-3) /* file storing states	*/
-#define VCSF_CHAIN	(Vcmethod_t*)(-5) /* list chaining		*/
-
-typedef struct _vcsfmeth_s
-{	Vcmethod_t*	meth;	/* the requested method to invoke 	*/
-	Void_t*		data;	/* method argument or init parameters	*/
-	ssize_t		size;	/* data size, if windowing		*/
-} Vcsfmeth_t;
-
-_BEGIN_EXTERNS_
-
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
+#define Vcsfxint_t	ssize_t
 #endif
-
-extern Vcsfio_t*	vcsfio _ARG_((Sfio_t*, Vcsfmeth_t*, ssize_t, unsigned int));
-extern Vcsfmeth_t*	vcsfmeth _ARG_((Vcsfio_t*, ssize_t*));
-
-#if !_SFIO_H
-
-extern ssize_t		vcsfread _ARG_((Vcsfio_t*, Void_t*, size_t));
-extern ssize_t		vcsfwrite _ARG_((Vcsfio_t*, const Void_t*, size_t));
-extern int		vcsfsync _ARG_((Vcsfio_t*));
-extern int		vcsfclose _ARG_((Vcsfio_t*));
-
-#endif
-
-#undef	extern
-
-_END_EXTERNS_
-
-
-/*************************************************************************
-	TYPES AND FUNCTIONS RELATED TO SUFFIX ARRAYS
-*************************************************************************/
-
 typedef struct _vcsfx_s
-{	ssize_t*	idx;	/* the sorted suffix array		*/
-	ssize_t*	inv;	/* the inverted indices/ranks		*/
+{	Vcsfxint_t*	idx;	/* the sorted suffix array		*/
+	Vcsfxint_t*	inv;	/* the inverted indices/ranks		*/
 	Vcchar_t*	str;	/* the source string			*/
-	size_t		nstr;
+	Vcsfxint_t	nstr;
 } Vcsfx_t;
 
 _BEGIN_EXTERNS_
-
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-
-extern Vcsfx_t*	vcsfxsort _ARG_((const Void_t*, size_t));
-extern ssize_t	vcperiod _ARG_((const Void_t*, size_t));
-
-#undef	extern
-
+extern Vcsfx_t*	vcsfxsort _ARG_((const Void_t*, ssize_t));
+extern ssize_t	vcperiod _ARG_((const Void_t*, ssize_t));
 _END_EXTERNS_
 
 
 /*************************************************************************
-	TYPES AND FUNCTIONS RELATED TO STRING PARSING
+	TYPES AND FUNCTIONS RELATED TO GENERALIZED LZ-PARSING
 *************************************************************************/
 
-/* (*parsef)(Vcparse_t* vcpa, int type, ssize_t undt, ssize_t here, ssize_t mtsz, ssize_t mtch);
+/* (*parsef)(Vclzparse_t* vcpa, int type, Vcmatch_t* mtch, ssize_t n)
    Arguments:
 	vcpa: structure describing source&target data and matching requirements.
-	type: VC_REVERSE, VC_APPROX, VC_MAP.
-	unmt: starting position of unmatchable data.
-	here: current position in target data.
-	mtsz: matchable data size.
-	mtch: matching address if mtsz > 0.
+	type: type of match, VC_REVERSE, VCP_MAP, etc.
+	mtch: array of matched data.
+	n:    number of elements in mtch.
    Return values:
-	> 0: instruction processed successfully.
-	= 0: instruction cannot be used, treat as unmatched.
+	> 0: amount of data used up.
+	= 0: all given data should be considered unmatchable.
 	< 0: processing failed, quit and return immediately.
 */
 
-#define VC_REVERSE	0020	/* reverse matching		*/
-#define VC_MAP		0040	/* matching by mapping bytes 	*/
-#define VC_APPROX	0100	/* use approximate matching	*/
+#define VCLZ_REVERSE	0001	/* use/do reverse matching 	*/
+#define VCLZ_MAP	0002	/* matching by mapping bytes	*/
 
-typedef struct _vcparse_s	Vcparse_t;
-typedef int			(*Vcparse_f)_ARG_((Vcparse_t*,int,ssize_t,ssize_t,ssize_t,ssize_t));
+typedef struct _vclzparse_s	Vclzparse_t;
+typedef struct _vclzmatch_s	Vclzmatch_t;
+typedef ssize_t			(*Vclzparse_f)_ARG_((Vclzparse_t*,int,Vclzmatch_t*,ssize_t));
 
-struct _vcparse_s
-{	Vcparse_f	parsef;	/* function to process a parsed string	*/
+/* tpos is monotonically increasing in an array of these */
+struct _vclzmatch_s
+{	ssize_t		tpos;	/* position in target to match	*/
+	ssize_t		mpos;	/* match pos or <0 for none	*/
+	ssize_t		size;	/* length of data involved	*/
+};
+
+struct _vclzparse_s
+{	Vclzparse_f	parsef;	/* function to process parsed segments	*/
 	Vcchar_t*	src;	/* source string, if any, to learn from	*/
 	ssize_t		nsrc;
 	Vcchar_t*	tar;	/* target string to be parsed		*/
 	ssize_t		ntar;
-	int		type;	/* VC_REVERSE, VC_APPROX, etc. 		*/
 	ssize_t		mmin;	/* minimum acceptable match length	*/
-	ssize_t		miss;	/* max consecutive misses allowed 	*/	
-	Vcchar_t*	map;	/* map of characters for matching	*/
+	Vcchar_t*	cmap;	/* character map for matching		*/
+	int		type;	/* VCP_REVERSE, VCP_MAP			*/
 };
 
 _BEGIN_EXTERNS_
-
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-
-extern int	vcparse _ARG_((Vcparse_t*, ssize_t));
-
-#undef	extern
-
+extern int	vclzparse _ARG_((Vclzparse_t*, ssize_t));
 _END_EXTERNS_
 
 
@@ -471,20 +475,12 @@ typedef struct _vchtrie_s
 } Vchtrie_t;
 
 _BEGIN_EXTERNS_
-
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-
 extern ssize_t		vchsize _ARG_((ssize_t, ssize_t*, ssize_t*, int*));
 extern ssize_t		vchbits _ARG_((ssize_t, ssize_t*, Vcbit_t*));
 extern Vchtrie_t*	vchbldtrie _ARG_((ssize_t, ssize_t*, Vcbit_t*));
 extern Void_t		vchdeltrie _ARG_((Vchtrie_t*));
 extern ssize_t		vchgetcode _ARG_((ssize_t, ssize_t*, ssize_t, Vcchar_t*, size_t));
 extern ssize_t		vchputcode _ARG_((ssize_t, ssize_t*, ssize_t, Vcchar_t*, size_t));
-
-#undef	extern
-
 _END_EXTERNS_
 
 /*************************************************************************
@@ -570,16 +566,8 @@ struct _vcdtable_s
 };
 
 _BEGIN_EXTERNS_
-
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-
 extern ssize_t		vcdputtable _ARG_((Vcdtable_t*, Void_t*, size_t));
 extern int		vcdgettable _ARG_((Vcdtable_t*, Void_t*, size_t));
-
-#undef	extern
-
 _END_EXTERNS_
 
 
@@ -606,6 +594,8 @@ struct _vcwmethod_s
 {	Vcwmatch_t*	(*applyf)_ARG_((Vcwindow_t*, Void_t*, size_t, Sfoff_t));
 	int		(*eventf)_ARG_((Vcwindow_t*, int));
 	char*		name;
+	char*		desc;
+	char*		about;		/* [-name?value]...0-terminated	*/
 }; 
 
 struct _vcwdisc_s
@@ -632,77 +622,253 @@ struct _vcwindow_s
 
 _BEGIN_EXTERNS_
 
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-#if !_BLD_vcodex && defined(__IMPORT__)
-#define extern		extern __IMPORT__
-#endif
-
 extern Vcwmethod_t*	Vcwmirror;
 extern Vcwmethod_t*	Vcwvote;
 extern Vcwmethod_t*	Vcwprefix;
 
-#undef	extern
-
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
-#endif
-
 extern Vcwindow_t*	vcwopen _ARG_((Vcwdisc_t*, Vcwmethod_t*));
 extern int		vcwclose _ARG_((Vcwindow_t*));
-extern Vcwmethod_t*	vcwgetmeth _ARG_((const char*));
-extern Vcwmethod_t*	vcwnextmeth _ARG_((Vcwmethod_t*));
-
-#undef	extern
+extern Vcwmethod_t*	vcwgetmeth _ARG_((char*));
+extern int		vcwwalkmeth _ARG_((Vcwalk_f, Void_t*));
 
 _END_EXTERNS_
 
 
 /*************************************************************************
-	TYPES AND FUNCTIONS RELATED TO TABLE COMPRESSION
+	TYPES AND FUNCTIONS FOR FIXED-LENGTH RECORDS TABLE TRANSFORM
 *************************************************************************/
 
-typedef struct _vcplcol_s /* transform specification for each column	*/
+#define VCTBL_RLE	0001	/* use run-length entropy (default)	*/
+#define VCTBL_CEE	0002	/* use conditional entropy		*/
+#define VCTBL_LEFT	0010	/* left to right dependency (default) 	*/
+#define VCTBL_RIGHT	0020	/* right to left dependency		*/
+#define VCTBL_SINGLE	0100	/* single predictor			*/
+
+typedef struct _vctblcolumn_s /* transform specification for each column	*/
 {	ssize_t		index;		/* column index			*/
 	ssize_t		pred1;		/* <0 if self compressing	*/
 	ssize_t		pred2;		/* >=0 if supporting pred1	*/
-} Vcplcol_t;
+} Vctblcolumn_t;
 
-typedef struct _vcplplan_s /* transform plan for all columns		*/
+typedef struct _vctblplan_s /* transform plan for all columns		*/
 {	ssize_t		ncols;		/* # of columns	or row size	*/
-	Vcplcol_t*	trans;		/* the plan to transform data	*/
+	Vctblcolumn_t*	trans;		/* the plan to transform data	*/
+	Vcodex_t*	zip;		/* to compress a plan encoding	*/
 	ssize_t		train;		/* size of training data	*/
 	ssize_t		dtsz;		/* last data size compressed	*/
 	ssize_t		cmpsz;		/* and result			*/
 	int		good;		/* training deemed good		*/
-	Vcodex_t*	zip;		/* to compress a plan encoding	*/
-} Vcplan_t;
+} Vctblplan_t;
 
 _BEGIN_EXTERNS_
+extern Vctblplan_t*	vctblmakeplan _ARG_((const Void_t*, size_t, size_t, int));
+extern void		vctblfreeplan _ARG_((Vctblplan_t*));
+extern ssize_t		vctblencodeplan _ARG_((Vctblplan_t*, Void_t**));
+extern Vctblplan_t*	vctbldecodeplan _ARG_((Void_t*, size_t));
+_END_EXTERNS_
 
-#if _BLD_vcodex && defined(__EXPORT__)
-#define extern		extern __EXPORT__
+
+/*************************************************************************
+	TYPES AND FUNCTIONS RELATED TO RELATIONAL DATABASE TRANSFORM
+*************************************************************************/
+
+
+#define VCRD_RECORD	00000010	/* data is record-oriented	*/
+#define VCRD_FIELD	00000020	/* data is field-oriented	*/
+#define VCRD_PAD	00000040	/* pad fields/records to full	*/
+#define VCRD_FIXED	00000100	/* fixed-length field		*/
+
+#define VCRD_DOT	00001000	/* field was of the form x.y...	*/
+#define VCRD_SLASH	00002000	/* like above but x.y.../z	*/
+
+#define VCRD_VECTOR	00100000	/* did transform vector already	*/
+
+/* function to weight string matching while computing a plan */
+typedef ssize_t		(*Vcrdweight_f)_ARG_((Vcchar_t*, ssize_t, Vcchar_t*, ssize_t));
+#define VCRD_NOPLAN	((Vcrdweight_f)(-1)) /* use the identity plan	*/
+
+/* Information about a set of relational data. There are two cases:
+** fldn > 0: fields may be fixed length or variable lengths:
+**	flen[f] > 0: field f is fixed length.
+**	flen[f] = 0: field f is variable length with delimiters.
+**	flen[f] < 0: field f was variable length but made into fixed.
+** fldn <= 0: records and fields with delimiters rsep and fsep.
+*/
+typedef struct _vcrdinfo_s
+{	ssize_t		recn;		/* >0 for total # of records	*/
+	ssize_t		fldn;		/* >0 for total # of fields	*/
+	ssize_t*	flen;		/* schema field lengths if any 	*/
+	int		fsep;		/* >= 0 for field separator	*/
+	int		rsep;		/* >= 0 for record separator	*/
+	int		dot;		/* the . character		*/
+	int		slash;		/* the / character		*/
+	int		digit[10];	/* the characters 0-9		*/
+} Vcrdinfo_t;
+
+/* structure of a field */
+typedef struct _vcrdrecord_s
+{	Vcchar_t*	data;		/* pointer to record data	*/
+	ssize_t		dtsz;		/* record length in a field	*/
+} Vcrdrecord_t;
+typedef struct _vcrdfield_s
+{	int		type;		/* DOT|SLASH|FIXED|... 		*/
+	Vcrdrecord_t*	rcrd;		/* data in all records		*/
+	ssize_t		maxz;		/* max size of any record	*/
+	ssize_t*	vect;		/* transform vector by this fld	*/
+	Vcchar_t*	data;		/* locally allocated field data	*/
+} Vcrdfield_t;
+
+/* structure of a table */
+typedef struct _vcrdtable_s
+{	Vcrdinfo_t*	info;
+	ssize_t		parz;		/* size of data just parsed	*/
+	ssize_t		recn;		/* number of records		*/
+	ssize_t		fldn;		/* number of fields per record	*/
+	Vcrdfield_t*	fld;		/* list of fields		*/
+} Vcrdtable_t;
+
+/* prediction plan */
+typedef struct _vcrdplan_s
+{	ssize_t		fldn;		/* number of fields		*/
+	ssize_t		pred[1];	/* predictor list		*/
+} Vcrdplan_t;
+
+/* to compute field and record separators */
+typedef struct _vcrdsepar_s
+{	int		fsep;		/* field separator		*/
+	int		rsep;		/* record separator		*/
+	ssize_t		size;		/* size of data used to compute	*/
+	ssize_t		recn;		/* number of records		*/
+	ssize_t		recf;		/* # of records containing fsep	*/
+	double		allz;		/* coding size over all		*/
+	double		fldz;		/* coding size by fields	*/
+} Vcrdsepar_t;
+
+#define vcrdsize(tbl)	((tbl)->parz)	/* size of data just parsed	*/
+
+_BEGIN_EXTERNS_
+extern ssize_t		vcrdsepar _ARG_((Vcrdsepar_t*, ssize_t, Vcchar_t*, ssize_t, int));
+
+extern ssize_t		vcrdweight _ARG_((Vcrdtable_t*, ssize_t, ssize_t*, Vcrdweight_f));
+extern Vcrdplan_t*	vcrdmakeplan _ARG_((Vcrdtable_t*, Vcrdweight_f));
+extern void		vcrdfreeplan _ARG_((Vcrdplan_t*));
+extern int		vcrdexecplan _ARG_((Vcrdtable_t*, Vcrdplan_t*, int));
+
+extern Vcrdtable_t*	vcrdparse _ARG_((Vcrdinfo_t*, Vcchar_t*, ssize_t, int));
+extern ssize_t		vcrdfield _ARG_((Vcrdtable_t*, ssize_t, ssize_t, Vcchar_t* data, ssize_t dtsz));
+extern int		vcrdattrs _ARG_((Vcrdtable_t*, ssize_t, int, int));
+extern ssize_t		vcrdextract _ARG_((Vcrdtable_t*, ssize_t, Vcchar_t*, ssize_t, int));
+extern void		vcrdclose _ARG_((Vcrdtable_t*));
+extern int		vcrdvector _ARG_((Vcrdtable_t*, ssize_t, Vcchar_t*, ssize_t, int));
+_END_EXTERNS_
+
+
+/*************************************************************************
+	TYPES AND FUNCTIONS RELATED TO STREAM PROCESSING
+*************************************************************************/
+
+#if _SFIO_H
+#define Vcsfio_t	Sfio_t
+#define vcsfread	sfread
+#define vcsfwrite	sfwrite
+#define vcsfsync	sfsync
+#define vcsfclose	sfclose
+#else
+#define Vcsfio_t	Void_t
+#endif /*_SFIO_H*/
+
+/* header processing modes */
+#define VCSF_VCDIFF	000001	/* output RFC3284 VCDIFF header	*/
+#define VCSF_PLAIN	000002	/* no header to be output	*/
+#define VCSF_TRANS	000004	/* set trans on VC_DECODE	*/
+#define VCSF_FREE	000010	/* free sfdt on disc pop	*/
+
+/* application-defined function to process error messages */
+typedef void		(*Vcsferror_f)_ARG_((const char*));
+
+/* data passed to vcsfio() to initialize a stream */
+typedef struct _vcsfdata_s
+{	int		type;	/* various types of processing	*/
+	char*		trans;	/* transformation specification	*/
+	char*		window;	/* window specification		*/
+	char*		source;	/* source file to delta against	*/
+	Vcsferror_f	errorf;	/* to process errors		*/
+} Vcsfdata_t;
+
+_BEGIN_EXTERNS_
+extern Vcsfio_t*	vcsfio _ARG_((Sfio_t*, Vcsfdata_t*, int));
+extern ssize_t		vcsfread _ARG_((Vcsfio_t*, Void_t*, size_t));
+extern ssize_t		vcsfwrite _ARG_((Vcsfio_t*, const Void_t*, size_t));
+extern int		vcsfsync _ARG_((Vcsfio_t*));
+extern int		vcsfclose _ARG_((Vcsfio_t*));
+
+extern void		vcaddalias _ARG_((char**));
+extern char*		vcgetalias _ARG_((char*, char*, ssize_t));
+extern int		vcwalkalias _ARG_((Vcwalk_f, Void_t*));
+_END_EXTERNS_
+
+
+/*************************************************************************
+	TYPES AND MACROS/FUNCTIONS USEFUL FOR WRITING METHODS
+*************************************************************************/
+
+
+typedef Vcuint32_t		Vchash_t;	/* 32-bit hash value	*/
+#define VCHASH(ky)		(((ky)>>13)^0x1add2b3^(ky) )
+#define	VCINDEX(ky,msk)		(VCHASH(ky) & (msk) ) 
+
+/* get/set private method data */
+#define vcgetmtdata(vc, tp)	((tp)(vc)->data)
+#define vcsetmtdata(vc, mt)	((vc)->data = (Void_t*)(mt))
+
+/* get disciplines */
+#define vcgetdisc(vc)		((vc)->disc)
+
+/* get context and coerce to the true type */
+#define vcgetcontext(vc, tp)	((tp)(vc)->ctxt)
+
+/* allocate/deallocate buffer.
+** bb: if !NULL, current buffer to resize.
+** zz: new size, 0 to deallocate.
+** hh: some slack amount at head of buffer to allow backward overwriting.
+*/
+#if defined(__FILE__) && defined(__LINE__)
+#define vcbuffer(vv,bb,zz,hh) \
+	(!(vv) ? NIL(Vcchar_t*) : \
+		((vv)->file = __FILE__, (vv)->line = __LINE__, _vcbuffer((vv),(bb),(zz),(hh)) ) )
+#else
+#define vcbuffer(vv,bb,zz,hh)	_vcbuffer((vv),(bb),(zz),(hh))
 #endif
 
-extern Vcplan_t*	vcplopen _ARG_((const Void_t*, size_t, size_t));
-extern void		vcplclose _ARG_((Vcplan_t*));
-extern ssize_t		vcplencode _ARG_((Vcplan_t*, Void_t**));
-extern Vcplan_t*	vcpldecode _ARG_((Void_t*, size_t));
+struct _vcbuffer_s /* type of a buffer */
+{	Vcbuffer_t*	next;
+	size_t		size;	/* total buffer size	*/
+	char*		file;	/* file allocating it	*/
+	int		line;	/* line number in file	*/
+	unsigned char	buf[1];	/* actual data buffer	*/
+};
 
-#undef	extern
-
+_BEGIN_EXTERNS_
+extern ssize_t		vcrecode _ARG_((Vcodex_t*, Vcchar_t**, ssize_t*, ssize_t));
+extern Vccontext_t*	vcinitcontext _ARG_((Vcodex_t*, Vccontext_t*));
+extern int		vcfreecontext _ARG_((Vcodex_t*, Vccontext_t*));
+extern Vcchar_t*	_vcbuffer _ARG_((Vcodex_t*, Vcchar_t*, ssize_t, ssize_t));
+extern int		vctellbuf _ARG_((Vcodex_t*, Vcbuffer_f));
 _END_EXTERNS_
 
 /*************************************************************************
 	BUILTIN AND PLUGIN METHOD LIST DEFINITIONS
 *************************************************************************/
 
-#ifndef VCNEXT
-#define VCNEXT(m)	0
+#ifdef _BLD_vcodex
+
+#if __STD_C
+#define VCLIB(m)	Vcmethod_t* m = &_##m;
+#else
+#define VCLIB(m)	Vcmethod_t* m = &_/**/m;
 #endif
 
-#ifndef VCLIB
+#else
 
 #ifdef __STDC__
 #if defined(__EXPORT__)

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -17,7 +17,7 @@
 *                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
-#include	<vchhdr.h>
+#include	"vchhdr.h"
 
 /* Construct the code bits given their lengths.
 **
@@ -50,10 +50,10 @@ Vcbit_t*	bits;	/* encoding bits to be computed	*/
 #endif
 {
 	int		i, notz, k, s;
+	ssize_t		**sort;
 	Vcbit_t		b = 0;
-	ssize_t		**sort, *so[1024];
 
-	if(!ARRAYMAKE(ssize_t*, sort, nsym, so))
+	if(!(sort = (ssize_t**)malloc(nsym*sizeof(ssize_t*))) )
 		return -1;
 
 	for(notz = 0, i = 0; i < nsym; ++i)
@@ -74,7 +74,6 @@ Vcbit_t*	bits;	/* encoding bits to be computed	*/
 	/* return the maximum size of any code */
 	s = notz <= 0 ? 0 : *sort[notz-1];
 
-	ARRAYFREE(sort, nsym, so);
-
+	free(sort);
 	return s;
 }

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -67,15 +67,14 @@ ssize_t		lev;	/* level in the trie		*/
 		p = m - len;
 
 	if((trie->next + (1<<p)) > trie->trsz)
-	{	s = trie->next + ((1<<p) < (1<<12) ? (1<<12) : (1<<p));
+	{	s = trie->next + ((1<<p) < (1<<8) ? (1<<8) : (1<<p));
 		if(!(node = (short*)malloc(2*s*sizeof(short))) )
 			return -1;
 		size = node+s;
+		memcpy(node, trie->node, trie->next*sizeof(short));
+		memcpy(size, trie->size, trie->next*sizeof(short));
 		if(trie->node)
-		{	memcpy(node, trie->node, trie->next*sizeof(short));
-			memcpy(size, trie->size, trie->next*sizeof(short));
 			free(trie->node);
-		}
 		trie->node = node;
 		trie->size = size;
 		trie->trsz = s;
@@ -157,15 +156,15 @@ Vcbit_t*	bits;	/* array of code bits		*/
 #endif
 {
 	ssize_t		k, ns;
+	Vcbit_t		**sort;
 	Vchtrie_t	*trie;
 	Node_t		root;
-	Vcbit_t		**sort, *so[1024];
 
-	if(!ARRAYMAKE(Vcbit_t*, sort, nsym, so))
+	if(!(sort = (Vcbit_t**)malloc(nsym*sizeof(Vcbit_t*))) )
 		return NIL(Vchtrie_t*);
 
 	if(!(trie = (Vchtrie_t*)malloc(sizeof(Vchtrie_t))) )
-	{	ARRAYFREE(sort, nsym, so);
+	{	free(sort);
 		return NIL(Vchtrie_t*);
 	}
 	trie->next = 0;
@@ -182,7 +181,7 @@ Vcbit_t*	bits;	/* array of code bits		*/
 	if(bldtrie(trie, size, bits, &root, 0, sort, ns, 0) < 0 )
 		return NIL(Vchtrie_t*);
 
-	ARRAYFREE(sort, nsym, so);
+	free(sort);
 
 	trie->ntop = -root.size;
 	return trie;

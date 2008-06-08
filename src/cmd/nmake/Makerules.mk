@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-05-22 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-06-06 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -4038,7 +4038,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			.REBIND : $(*$(<<):N=*$(CC.SUFFIX.OBJECT))
 		.APPEND.%.COMMAND : .TOUCHO
 	end
-	if "$(CCFLAGS:N=-[gG]|$(CC.DEBUG))"
+	if "$(CCFLAGS:N=-g|$(CC.DEBUG))"
 		_BLD_DEBUG == 1
 	end
 	if "$(-instrument)"

@@ -3375,6 +3375,87 @@ TEST 58 'various --* combinations'
 		OUTPUT - $'argument=1 value="---operand"'
 	EXEC
 
+TEST 59 'optget options'
+	usage=$'[-n?\n@(#)$Id: sort (AT&T Research) 2008-04-24 $\n]'
+	EXEC sort "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  sort [ options ]
+
+IMPLEMENTATION
+  version         sort (AT&T Research) 2008-04-24'
+		EXIT 2
+
+TEST 60 'about nested components'
+	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{[+hal?HAL]{[--hoo?HOO][-har?HAR][--huh?HUH]}[+bob?BOB]{[--boo?BOO][-bar?BAR][--buh?BUH]}}'
+	EXEC sort "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  boohoo
+
+SYNOPSIS
+  sort [ options ]
+
+OPTIONS
+  -m, --method    The methods are:
+                    hal   HAL
+                            (har)           HAR
+                            (-huh)          HUH
+                    bob   BOB
+                            (bar)           BAR
+                            (-buh)          BUH'
+		EXIT 2
+	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{[+hal?HAL]{[--hoo?HOO][-har?HAR]}[+bob?BOB]{[--boo?BOO][-bar?BAR]}}'
+	EXEC sort "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  boohoo
+
+SYNOPSIS
+  sort [ options ]
+
+OPTIONS
+  -m, --method    The methods are:
+                    hal   HAL
+                            (har)           HAR
+                    bob   BOB
+                            (bar)           BAR'
+	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{[+hal?HAL]{[+hoo?HOO][-har?HAR]}[+bob?BOB]{[-boo?BOO][+bar?BAR]}}'
+	EXEC sort "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  boohoo
+
+SYNOPSIS
+  sort [ options ]
+
+OPTIONS
+  -m, --method    The methods are:
+                    hal   HAL
+                            hoo   HOO
+                            (har)           HAR
+                    bob   BOB
+                            (boo)           BOO
+                            bar             BAR'
+	info=$'[+hal?HAL]{[--hoo?HOO][-har?HAR][--huh?HUH]}[+bob?BOB]{[--boo?BOO][-bar?BAR][--buh?BUH]}'
+	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{\fTEST\f}'
+	EXEC =TEST="$info" sort "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  boohoo
+
+SYNOPSIS
+  sort [ options ]
+
+OPTIONS
+  -m, --method    The methods are:
+                    hal   HAL
+                            (har)           HAR
+                            (-huh)          HUH
+                    bob   BOB
+                            (bar)           BAR
+                            (-buh)          BUH'
+
 # skip non-astsa (standalone ast) tests
 
 [[ $($COMMAND -+ astsa '[-]' '--???about' 2>/dev/null) == *catalog=libast* ]] || exit

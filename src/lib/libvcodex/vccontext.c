@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -19,62 +19,71 @@
 ***********************************************************************/
 #include	"vchdr.h"
 
-/*	A handle may be used to compress different types of data with
-**	states carried thru different vcapply() calls per type. For example,
-**	a handle using the method Vctable would compute a transform plan
-**	on the first vcapply() call, then reuse it in subsequent vcapply()'s.
-**	This would not work if different vcapply() calls are to process
-**	tables with different number of columns or with different
-**	characteristics. Assuming that the invoker of such a handle can
-**	separately determine the data characteristics, it could then create
-**	a different context per data type for processing. The computed
-**	transforms would then be specific per context.
-**
-**	Note that this process is made complicated by the fact that handles
-**	can be composed for secondary coding. In that case, contexts may need
-**	to be carried through all continuation coders. Any implementer of
-**	a method needs to be aware of this fact and code to anticipate
-**	such compositions. See the Vcrle method for an example.
+/*	If a method carries states across vcapply() calls, it needs to
+**	provide a way so that the invoker can set multiple contexts for
+**	transforming data. The below functions create/delete context.
 **
 **	Written by Kiem-Phong Vo (kpv@research.att.com)
 */
 
 #if __STD_C
-int vccontext(Vcodex_t* vc, int c)
+Vccontext_t* vcinitcontext(Vcodex_t* vc, Vccontext_t* ctxt)
 #else
-int vccontext(vc, c)
+Vccontext_t* vcinitcontext(vc, ctxt)
 Vcodex_t*	vc;
-int		c;	/* < 0 to create a new context	*/
+Vccontext_t*	ctxt;	/* if NULL, make a new one */
 #endif
 {
-	int	init = vc->ctxt ? 0 : 1;
+	Vccontext_t	*c, *p;
 
-	if(vc->ctop < 0) /* effort to change context failed earlier */
-		return -1;
+	if(ctxt)
+	{	for(p = NIL(Vccontext_t*), c = vc->ctxt; c; p = c, c = c->next)
+			if(c == ctxt)
+				break;
+		if(!c) /* non-existing context */
+			return NIL(Vccontext_t*);
+		if(!p) /* already at head of list */
+			return ctxt;
+		else	p->next = ctxt->next;
+	}
+	else
+	{	if(!vc->meth->eventf ||
+		   (*vc->meth->eventf)(vc, VC_INITCONTEXT, (Void_t*)(&ctxt)) < 0 || !ctxt)
+			return NIL(Vccontext_t*);
+	}
 
-	if(c < 0) /* creating a new context */
-		c = vc->ctop;
-	else if(c >= vc->ctop) /* cannot set an unknown context */
-		return -1;
+	ctxt->next = vc->ctxt;
+	vc->ctxt = ctxt;
+	return ctxt;
+}
 
-	if(init || (c > 0 && c == vc->ctop) )
-	{	if(!(vc->ctxt = realloc(vc->ctxt, (c+1)*vc->csize)) )
-		{	vc->ctop = -1;
+#if __STD_C
+int vcfreecontext(Vcodex_t* vc, Vccontext_t* ctxt)
+#else
+int vcfreecontext(vc, ctxt)
+Vcodex_t*	vc;
+Vccontext_t*	ctxt; /* if NULL, free all */
+#endif
+{
+	Vccontext_t	*next;
+
+	if(ctxt)
+	{	if(vcinitcontext(vc, ctxt) != ctxt)
 			return -1;
-		}
+		vc->ctxt = ctxt->next;
+		ctxt->next = NIL(Vccontext_t*);
+	}
+	else
+	{	ctxt = vc->ctxt;
+		vc->ctxt = NIL(Vccontext_t*);
 	}
 
-	if(c == vc->ctop) /* a new context, initialize it */
-	{	Void_t *ctxt = (Void_t*)(((Vcchar_t*)vc->ctxt) + c*vc->csize);
-
-		memset(ctxt, 0, vc->csize);
-		if(!vc->meth->eventf ||
-		   (*vc->meth->eventf)(vc, VC_INITCTXT, ctxt) == 0 )
-			((Vcctxt_t*)ctxt)->ctxt = -1;
-
-		if(!init)
-			vc->ctop += 1;
+	for(; ctxt; ctxt = next)
+	{	next = ctxt->next;
+		if(vc->meth->eventf &&
+		   (*vc->meth->eventf)(vc, VC_FREECONTEXT, (Void_t*)ctxt) < 0)
+			return -1;
 	}
 
-	return (vc->cnow = c);
+	return 0;
 }

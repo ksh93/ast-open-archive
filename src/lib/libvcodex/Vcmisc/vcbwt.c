@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -17,7 +17,7 @@
 *                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
-#include	"vcmeth.h"
+#include	<vclib.h>
 
 /*	Burrows-Wheeler transform.
 **
@@ -39,7 +39,6 @@ Void_t**	out;
 	Vcio_t		io;
 	Vcchar_t	*dt, *output, *bw;
 	ssize_t		rv = -1;
-	Vcctxt_t	*ctxt = VCGETCTXT(vc, Vcctxt_t*);
 
 	if(size == 0)
 		return 0;
@@ -54,9 +53,9 @@ Void_t**	out;
 			break;
 	sp = idx - sfx->idx;
 
-	hd = VCSIZEU(sp); /* encoding size of the 0th position after sorting */
+	hd = vcsizeu(sp); /* encoding size of the 0th position after sorting */
 	sz = size + 1; /* size of transformed data */
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), sz, hd)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, hd)) )
 		goto done;
 
 	/* compute the transform */
@@ -69,12 +68,11 @@ Void_t**	out;
 	*bw = dt[size-1];
 
 	/* filter data thru the continuation coder */
-	if(vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
-			goto done;
-		if(VCCODER(vc, vc->coder, hd, output, sz) < 0 )
-			goto done;
-	}
+	dt = output;
+	if(vcrecode(vc, &output, &sz, hd) < 0 )
+		goto done;
+	if(dt != output) /* got a new buffer, free old one */
+		vcbuffer(vc, dt, -1, -1);
 
 	/* write out the sorted location of position-0 in data */
 	output -= hd;
@@ -82,9 +80,11 @@ Void_t**	out;
 	vcioputu(&io, sp);
 	rv = hd+sz;
 
+	/* truncate buffer to size */
+	if(!(output = vcbuffer(vc, output, rv, -1)) )
+		return -1;
 	if(out)
 		*out = output;
-
 done:	free(sfx);
 	return rv;
 }
@@ -103,7 +103,6 @@ Void_t**	out;
 	Vcchar_t	*dt, *output, *o;
 	ssize_t		base[256], *offset;
 	Vcio_t		io;
-	Vcctxt_t	*ctxt = VCGETCTXT(vc, Vcctxt_t*);
 
 	if(size == 0)
 		return 0;
@@ -118,19 +117,15 @@ Void_t**	out;
 	dt = vcionext(&io);
 
 	/* invert continuation coder if there was one */
-	if(vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
-			return -1;
-		if((sz = vcapply(vc->coder, dt, sz, &dt)) <= 0)
-			return -1;
-	}
+	if(vcrecode(vc, &dt, &sz, 0) <= 0 )
+		return -1;
 	sz -= 1; /* actual data size */
 
 	if(sp >= sz) /* corrupted data */
 		return -1;
 
 	/* get space to decode */
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), sz, 0)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
 		return -1;
 
 	if(!(offset = (ssize_t*)malloc((sz+1)*sizeof(ssize_t))) )
@@ -160,10 +155,10 @@ Void_t**	out;
 	}
 
 	free(offset);
+	vcbuffer(vc, dt, -1, -1);
 
 	if(out)
 		*out = output;
-
 	return sz;
 }
 
@@ -172,12 +167,11 @@ Vcmethod_t _Vcbwt =
 {	vcbwt,
 	vcunbwt,
 	0,
-	0,
-	0,
-	"bwt", "\142\167\164", "Burrows-Wheeler transform",
+	"bwt", "Burrows-Wheeler transform.",
+	"[-version?bwt (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 	NIL(Vcmtarg_t*),
 	4*1024*1024,
-	VCNEXT(Vcbwt)
+	0
 };
 
 VCLIB(Vcbwt)

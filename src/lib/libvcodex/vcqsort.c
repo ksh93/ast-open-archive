@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -33,13 +33,13 @@ do {	Vcchar_t *ll = (Vcchar_t*)(le); \
 } while(0)
 
 #if __STD_C
-void vcqsort(Void_t* list, ssize_t n, ssize_t size, Vcqsort_f sortf, Void_t* disc)
+void vcqsort(Void_t* list, ssize_t n, ssize_t size, Vccompare_f comparf, Void_t* disc)
 #else
-Void_t vcqsort(list, n, size, sortf, disc)
+void vcqsort(list, n, size, sortf, disc)
 Void_t*		list;	/* list of objects to be sorted	*/
 ssize_t		n;	/* number of objects in list[]	*/
 ssize_t		size;	/* size in byte of each object	*/
-Vcqsort_f	sortf;	/* comparison function		*/
+Vccompare_f	comparf; /* comparison function		*/
 Void_t*		disc;	/* adjunct struct for sortf()	*/
 #endif
 {
@@ -50,13 +50,13 @@ Void_t*		disc;	/* adjunct struct for sortf()	*/
 		return;
 
 	if(n == 2)
-	{	if((*sortf)(base, base+size, disc) > 0)
+	{	if((*comparf)(base, base+size, disc) > 0)
 			SWAP(base, base+size, size);
 		return;
 	}
 
 	for(l = 1, r = n; l < r; ) /* pivot on element 0 */
-	{	if((*sortf)(base, base + l*size, disc) >= 0)
+	{	if((*comparf)(base, base + l*size, disc) >= 0)
 			l += 1;
 		else if((r -= 1) > l)
 			SWAP(base + l*size, base + r*size, size);
@@ -66,8 +66,8 @@ Void_t*		disc;	/* adjunct struct for sortf()	*/
 		SWAP(base, base + l*size, size);
 
 	if(l > 1)
-		vcqsort(base, l, size, sortf, disc);
+		vcqsort(base, l, size, comparf, disc);
 
 	if((n -= r) > 1)
-		vcqsort(base + r*size, n, size, sortf, disc);
+		vcqsort(base + r*size, n, size, comparf, disc);
 }

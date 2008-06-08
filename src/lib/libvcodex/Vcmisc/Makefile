@@ -5,14 +5,14 @@ INCDIR=	../../../../include
 LIBDIR=	../../../../lib
 
 CXINCS=
-CCINCS= -I. -I.. -I$(INCDIR) $(CXINCS)
+CCINCS= -I$(INCDIR) -I. -I.. $(CXINCS)
 CXFLAGS=
 CCMODE= -O
 CCFLAGS= $(CCMODE) $(CXFLAGS) $(CCINCS)
 CC=cc
 
-VCMSRCS=	vcmap.c vcrle.c vcmtf.c vcbwt.c
-VCMOBJS=	vcmap.o vcrle.o vcmtf.o vcbwt.o
+VCMSRCS=	vcmap.c vcrle.c vcmtf.c vcbwt.c vctranspose.c
+VCMOBJS=	vcmap.o vcrle.o vcmtf.o vcbwt.o vctranspose.o
 
 .c.o :
 	$(CC) -c $(CCFLAGS) $*.c

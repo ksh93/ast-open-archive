@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -278,11 +278,11 @@ done:	if(wm->type == 0)
 	wm->msize = dtsz;
 	wm->more = 0;
 
-	/**/PRINT(2,"here=%8d ",(ssize_t)here);
-	/**/PRINT(2,"dtsz=%8d ",(ssize_t)dtsz);
-	/**/PRINT(2,"mtch=%8d ",(ssize_t)wm->msize);
-	/**/PRINT(2,"wpos=%8d ",(ssize_t)wm->wpos);
-	/**/PRINT(2,"wsiz=%8d \n",(ssize_t)wm->wsize);
+	/**/DEBUG_PRINT(2,"here=%8d ",(ssize_t)here);
+	/**/DEBUG_PRINT(2,"dtsz=%8d ",(ssize_t)dtsz);
+	/**/DEBUG_PRINT(2,"mtch=%8d ",(ssize_t)wm->msize);
+	/**/DEBUG_PRINT(2,"wpos=%8d ",(ssize_t)wm->wpos);
+	/**/DEBUG_PRINT(2,"wsiz=%8d \n",(ssize_t)wm->wsize);
 
 	return wm;
 }
@@ -343,7 +343,9 @@ int		type;
 Vcwmethod_t	_Vcwvote =
 {	frmatch,
 	frevent,
-	"vote"
+	"vote",
+	"Find windows by voting for matches.",
+	"[-version?window::vote (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 };
 
 Vcwmethod_t*	Vcwvote = &_Vcwvote;

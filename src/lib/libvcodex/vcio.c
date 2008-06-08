@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -133,7 +133,7 @@ Vcint_t	max;
 	ptr = io->next;
 	v = *ptr++;
 	while((max >>= 8) > 0)
-		v = (v << 8) | *ptr++;
+		v = (v <<= 8) | *ptr++;
 	io->next = ptr;
 
 	return v;
@@ -386,11 +386,15 @@ static ssize_t _Nbits4[16] =
 #define NBITS16(v)	((v) > 0xff   ? (((v) >>=  8), (NBITS8(v)+8))   : NBITS8(v) )
 #define NBITS(v)	((v) > 0xffff ? (((v) >>= 16), (NBITS16(v)+16)) : NBITS16(v) )
 
-/* Coding a list of non-negative integers using a variable-length bit coding */
+/* Coding a list of non-negative integers using a variable-length bit coding.
+** Each integer is coded by a prefix telling the # of significant bits followed
+** by the significant bits themselves. The #'s of significant bits are coded
+** using a Huffman code.
+*/
 #if __STD_C
-ssize_t vcioputl(Vcio_t* io, Vcint_t* list, ssize_t nlist)
+ssize_t vcioputlist(Vcio_t* io, Vcint_t* list, ssize_t nlist)
 #else
-ssize_t vcioputl(io, list, nlist)
+ssize_t vcioputlist(io, list, nlist)
 Vcio_t*		io;
 Vcint_t*	list;
 ssize_t		nlist;
@@ -403,6 +407,7 @@ ssize_t		nlist;
 	Vcchar_t	*begs;
 	int		run;
 
+	/* compute the frequencies of the sizes of significant bits */
 	for(i = 0; i < VC_INTSIZE; ++i)
 		freq[i] = 0;
 	for(i = 0; i < nlist; ++i)
@@ -410,6 +415,7 @@ ssize_t		nlist;
 		freq[NBITS(v)-1] += 1;
 	}
 
+	/* compute the Huffman code for these #'s of significant bits */
 	if((s = vchsize(VC_INTSIZE, freq, size, &run)) < 0 ||
 	   (s > 0 && vchbits(VC_INTSIZE, size, bits) < 0) )
 		return -1;
@@ -457,9 +463,9 @@ ssize_t		nlist;
 }
 
 #if __STD_C
-ssize_t vciogetl(Vcio_t* io, Vcint_t* list, ssize_t nlist)
+ssize_t vciogetlist(Vcio_t* io, Vcint_t* list, ssize_t nlist)
 #else
-ssize_t vciogetl(io, list, nlist)
+ssize_t vciogetlist(io, list, nlist)
 Vcio_t*		io;
 Vcint_t*	list;
 ssize_t		nlist;
@@ -541,36 +547,24 @@ ssize_t		nlist;
 	return nl;
 }
 
-/* Encoding a list of integers by a few transforms to reduce space.
-** 0. Transform the list by successive differences.
+/* Transform a list of integers into non-negative integers.
 ** 1. Keep a sign indicator and if the current element is of this sign,
 **    code its absolute value; otherwise, code it as the negative value
-**    with the same magnitude.
+**    with the same magnitude. This turns a run into all positives except
+**    for the head of the run.
 ** 2. Then code all integers using only non-negative integers via
 **    a proportional method. Suppose that we want n negatives for each p
 **    positives, the codings for a negative x and a positive y would be:
 **	x -> ((-x-1)/n)*(n+p) + (-x-1)%n + 1 + p
 **	y -> ( (y-1)/p)*(n+p) + ( y-1)%p + 1
 */
-#if __STD_C
-ssize_t vcintlist(Vcint_t* list, ssize_t nlist, ssize_t* pos, ssize_t* neg, int type)
-#else
-ssize_t vcintlist(list, nlist, pos, neg, type)
-Vcint_t*	list;
-ssize_t		nlist;
-ssize_t*	pos;
-ssize_t*	neg;
-int		type;
-#endif
+ssize_t vcpositive(Vcint_t* list, ssize_t nlist, ssize_t* pos, ssize_t* neg, int type)
 {
 	ssize_t		k, p, n, s, g;
 	Vcint_t		v;
 
-	if(type != 0) /* encoding */
-	{	/* transform to differences */
-		for(k = nlist-1; k > 0; --k)
-			list[k] -= list[k-1];
-
+	if(type == VC_ENCODE) /* encoding */
+	{	
 		/* transform runs to positives */
 		for(type = 1, k = 0; k < nlist; ++k)
 		{	if((v = list[k]) < 0)
@@ -646,11 +640,232 @@ int		type;
 			if(v < 0)
 				type = -type;
 		}
-
-		/* undo the difference transformation */
-		for(k = 1; k < nlist; ++k)
-			list[k] += list[k-1];
 	}
 
 	return nlist;
+}
+
+
+/* Addresses of successive matches in the Lempel-Ziv parser tend to be close
+** to one another. So it is good to code an integer given another in such a
+** way that the coded value is small.
+*/
+#if __STD_C
+Vcint_t vcintcode(Vcint_t v, Vcint_t near, Vcint_t min, Vcint_t max, int type)
+#else
+Vcint_t vcintcode(v, near, min, max, type)
+Vcint_t		v;	/* value to be de/coded	*/
+Vcint_t		near;	/* like to be near this	*/
+Vcint_t		min;	/* range is [min,max)	*/
+Vcint_t		max;	/* excluded max value	*/
+int		type;	/* VC_ENCODE/VC_DECODE	*/
+#endif
+{
+	Vcint_t	a, n;
+
+	if(min >= max || near < min || near >= max)
+		return -1; /* an error in specification */
+
+	if(type == VC_ENCODE)
+	{	if(v < min || v >= max)
+			return -1; /* out of range */
+
+		a = (v -= near) < 0 ? -v : v;
+		near -= min; max -= min;
+		n = (n = max - near - 1) < near ? n : near;
+		if(a <= n)
+			return (a<<1) - (v <= 0 ? 0 : 1); 
+		else	return a + n;
+	}
+	else if(type == VC_DECODE)
+	{	near -= min; max -= min;
+		if(v < 0 || v >= max)
+			return -1; /* bad coded value */
+
+		n = (n = max - near - 1) < near ? n : near;
+		if(v <= (n<<1))
+			a = near + ((v&1) ? ((v+1)>>1) : -(v>>1) );
+		else	a = n == near ? v : near - (v - n);
+		return a + min;
+	}
+	else	return -1;
+}
+
+
+/* print/de-print an integer */
+#if __STD_C
+ssize_t vcitoa(Vcint_t i, char* a, ssize_t z)
+#else
+ssize_t vcitoa(i, a, z)
+Vcint_t		i;
+char*		a;
+ssize_t		z;
+#endif
+{
+	int	k;
+	char	buf[sizeof(Vcint_t)*4];
+
+	for(k = sizeof(buf)-1; k >= 0; --k)
+	{	buf[k] = '0' + (i%10);
+		if((i /= 10) == 0 )
+			break;
+	}
+	if((i = sizeof(buf) - k) >= z)
+		return -1;
+	else
+	{	memcpy(a, buf+k, i);
+		a[i] = 0;
+		return i;
+	}
+}
+
+#if __STD_C
+Vcint_t vcatoi(char* a)
+#else
+Vcint_t vcatoi(a)
+char*		a;
+#endif
+{
+	Vcint_t	i;
+
+	for(i = 0; *a && isdigit(*a); ++a)
+		i = i*10 + (*a - '0');
+	return i;
+}
+
+
+/* transform from a native string to its ASCII version for portability */
+#if __STD_C
+char* vcstrcode(char* s, char* a, ssize_t z)
+#else
+char* vcstrcode(s, a, z)
+char*	s;	/* string to be made portable	*/
+char*	a;	/* space to store asciized data	*/
+ssize_t z;	/* size of 'a'			*/
+#endif
+{
+	ssize_t		c;
+	static int	type = 0; /* unknown: 0, native != ASCII: -1, else: 1 */
+	static Vcchar_t	_ascii[256];
+
+	if(type == 0) /* construct the map from native to ascii */
+	{	for(c = 0; c < 256; ++c)
+			_ascii[c] = (char)c;
+		_ascii[(Vcchar_t)'\a'] = '\007';
+		_ascii[(Vcchar_t)'\b'] = '\010';
+		_ascii[(Vcchar_t)'\t'] = '\011';
+		_ascii[(Vcchar_t)'\n'] = '\012';
+		_ascii[(Vcchar_t)'\v'] = '\013';
+		_ascii[(Vcchar_t)'\f'] = '\014';
+		_ascii[(Vcchar_t)'\r'] = '\015';
+		_ascii[(Vcchar_t)' ' ] = '\040';
+		_ascii[(Vcchar_t)'!' ] = '\041';
+		_ascii[(Vcchar_t)'\"'] = '\042';
+		_ascii[(Vcchar_t)'#' ] = '\043';
+		_ascii[(Vcchar_t)'$' ] = '\044';
+		_ascii[(Vcchar_t)'%' ] = '\045';
+		_ascii[(Vcchar_t)'&' ] = '\046';
+		_ascii[(Vcchar_t)'\''] = '\047';
+		_ascii[(Vcchar_t)'(' ] = '\050';
+		_ascii[(Vcchar_t)')' ] = '\051';
+		_ascii[(Vcchar_t)'*' ] = '\052';
+		_ascii[(Vcchar_t)'+' ] = '\053';
+		_ascii[(Vcchar_t)',' ] = '\054';
+		_ascii[(Vcchar_t)'-' ] = '\055';
+		_ascii[(Vcchar_t)'.' ] = '\056';
+		_ascii[(Vcchar_t)'/' ] = '\057';
+		_ascii[(Vcchar_t)'0' ] = '\060';
+		_ascii[(Vcchar_t)'1' ] = '\061';
+		_ascii[(Vcchar_t)'2' ] = '\062';
+		_ascii[(Vcchar_t)'3' ] = '\063';
+		_ascii[(Vcchar_t)'4' ] = '\064';
+		_ascii[(Vcchar_t)'5' ] = '\065';
+		_ascii[(Vcchar_t)'6' ] = '\066';
+		_ascii[(Vcchar_t)'7' ] = '\067';
+		_ascii[(Vcchar_t)'8' ] = '\070';
+		_ascii[(Vcchar_t)'9' ] = '\071';
+		_ascii[(Vcchar_t)':' ] = '\072';
+		_ascii[(Vcchar_t)';' ] = '\073';
+		_ascii[(Vcchar_t)'<' ] = '\074';
+		_ascii[(Vcchar_t)'=' ] = '\075';
+		_ascii[(Vcchar_t)'>' ] = '\076';
+		_ascii[(Vcchar_t)'\?'] = '\077';
+		_ascii[(Vcchar_t)'@' ] = '\100';
+		_ascii[(Vcchar_t)'A' ] = '\101';
+		_ascii[(Vcchar_t)'B' ] = '\102';
+		_ascii[(Vcchar_t)'C' ] = '\103';
+		_ascii[(Vcchar_t)'D' ] = '\104';
+		_ascii[(Vcchar_t)'E' ] = '\105';
+		_ascii[(Vcchar_t)'F' ] = '\106';
+		_ascii[(Vcchar_t)'G' ] = '\107';
+		_ascii[(Vcchar_t)'H' ] = '\110';
+		_ascii[(Vcchar_t)'I' ] = '\111';
+		_ascii[(Vcchar_t)'J' ] = '\112';
+		_ascii[(Vcchar_t)'K' ] = '\113';
+		_ascii[(Vcchar_t)'L' ] = '\114';
+		_ascii[(Vcchar_t)'M' ] = '\115';
+		_ascii[(Vcchar_t)'N' ] = '\116';
+		_ascii[(Vcchar_t)'O' ] = '\117';
+		_ascii[(Vcchar_t)'P' ] = '\120';
+		_ascii[(Vcchar_t)'Q' ] = '\121';
+		_ascii[(Vcchar_t)'R' ] = '\122';
+		_ascii[(Vcchar_t)'S' ] = '\123';
+		_ascii[(Vcchar_t)'T' ] = '\124';
+		_ascii[(Vcchar_t)'U' ] = '\125';
+		_ascii[(Vcchar_t)'V' ] = '\126';
+		_ascii[(Vcchar_t)'W' ] = '\127';
+		_ascii[(Vcchar_t)'X' ] = '\130';
+		_ascii[(Vcchar_t)'Y' ] = '\131';
+		_ascii[(Vcchar_t)'Z' ] = '\132';
+		_ascii[(Vcchar_t)'[' ] = '\133';
+		_ascii[(Vcchar_t)'\\'] = '\134';
+		_ascii[(Vcchar_t)']' ] = '\135';
+		_ascii[(Vcchar_t)'^' ] = '\136';
+		_ascii[(Vcchar_t)'_' ] = '\137';
+		_ascii[(Vcchar_t)'`' ] = '\140';
+		_ascii[(Vcchar_t)'a' ] = '\141';
+		_ascii[(Vcchar_t)'b' ] = '\142';
+		_ascii[(Vcchar_t)'c' ] = '\143';
+		_ascii[(Vcchar_t)'d' ] = '\144';
+		_ascii[(Vcchar_t)'e' ] = '\145';
+		_ascii[(Vcchar_t)'f' ] = '\146';
+		_ascii[(Vcchar_t)'g' ] = '\147';
+		_ascii[(Vcchar_t)'h' ] = '\150';
+		_ascii[(Vcchar_t)'i' ] = '\151';
+		_ascii[(Vcchar_t)'j' ] = '\152';
+		_ascii[(Vcchar_t)'k' ] = '\153';
+		_ascii[(Vcchar_t)'l' ] = '\154';
+		_ascii[(Vcchar_t)'m' ] = '\155';
+		_ascii[(Vcchar_t)'n' ] = '\156';
+		_ascii[(Vcchar_t)'o' ] = '\157';
+		_ascii[(Vcchar_t)'p' ] = '\160';
+		_ascii[(Vcchar_t)'q' ] = '\161';
+		_ascii[(Vcchar_t)'r' ] = '\162';
+		_ascii[(Vcchar_t)'s' ] = '\163';
+		_ascii[(Vcchar_t)'t' ] = '\164';
+		_ascii[(Vcchar_t)'u' ] = '\165';
+		_ascii[(Vcchar_t)'v' ] = '\166';
+		_ascii[(Vcchar_t)'w' ] = '\167';
+		_ascii[(Vcchar_t)'x' ] = '\170';
+		_ascii[(Vcchar_t)'y' ] = '\171';
+		_ascii[(Vcchar_t)'z' ] = '\172';
+		_ascii[(Vcchar_t)'{' ] = '\173';
+		_ascii[(Vcchar_t)'|' ] = '\174';
+		_ascii[(Vcchar_t)'}' ] = '\175';
+		_ascii[(Vcchar_t)'~' ] = '\176';
+
+		for(c = 0; c < 256; ++c)
+			if(_ascii[c] != c)
+				break;
+		type = c < 256 ? -1 : 1;
+	}
+
+	if(type > 0 ) /* already ASCII */
+		return s;
+	else /* do translation */
+	{	for(c = 0; c < z; ++c)
+			if((a[c] = (char)_ascii[s[c]]) == 0 )
+				break;
+		return c < z ? a : NIL(char*);
+	}
 }

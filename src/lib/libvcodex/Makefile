@@ -6,13 +6,11 @@
 
 # The below parameters should be edited as appropriate per installation.
 # VCSFIO=1 if Sfio is used or 0 if Stdio is desired.
-#	In the latter case, -lsfio should be taken off "libs".
-# VCTABLE=1 if table transforms are included or 0 if excluded.
-# 	In the latter case,  vctable should be taken off "targets".
+# VCPROPRIETARY=1 if various proprietary transforms are to be included.
+# 	If VCPROPRIETARY=0, vc_prorprietary should be taken off "targets"
 VCSFIO=0
-libs=-lcdt #-lsfio
-VCTABLE=1
-targets=vcdelta vchuff vcmisc vctable
+VCPROPRIETARY=1
+targets=vc_delta vc_huff vc_misc vc_proprietary
 
 INCDIR=	../../../include
 LIBDIR=	../../../lib
@@ -22,39 +20,45 @@ MANDIR= ../../../man
 CC=cc
 CXINCS=
 CCINCS=	-I. -I$(INCDIR) $(CXINCS)
-CXFLAGS= -DVCSFIO=$(VCSFIO) -DVCTABLE=$(VCTABLE)
+CXFLAGS= 
 CCMODE= -O
 CCFLAGS= $(CCMODE) $(CXFLAGS) $(CCINCS)
 
 #### Common Vcodex functions ############################################
-VCSRCS=	vcopen.c vcclose.c vcio.c vcdisc.c vcextract.c \
+VCSRCS=	vcopen.c vcclose.c vcio.c vcdisc.c vcextract.c vcrecode.c \
 	vccontext.c vclog.c vcsfxsort.c vcperiod.c vclzparse.c \
-	vcsetbuf.c vcbcktsort.c vcgetmeth.c vcsfio.c
-VCOBJS=	vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o \
+	vcbuffer.c vcbcktsort.c vcqsort.c vcmethod.c vcsfio.c vcalias.c
+VCOBJS=	vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o \
 	vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o \
-	vcsetbuf.o vcbcktsort.o vcgetmeth.o vcsfio.o
-VCHDRS=	ast_common.h vcodex.h
+	vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcsfio.o vcalias.o
+VCHDRS=	vcodex.h
 
 #### Delta compression ##################################################
-VCDOBJS=Vcdelta/vcdelta.o Vcdelta/vcdbmove.o \
+VCDELTA=Vcdelta/vcdelta.o Vcdelta/vchamming.o \
 	Vcdelta/vcdcache.o Vcdelta/vcdtable.o Vcdelta/vcdtblinit.o \
 	Vcwindow/vcwopen.o Vcwindow/vcwclose.o Vcwindow/vcwfile.o \
-	Vcwindow/vcwgetmeth.o Vcwindow/vcwngram.o Vcwindow/vcwmirror.o \
+	Vcwindow/vcwmethod.o Vcwindow/vcwngram.o Vcwindow/vcwmirror.o \
 	Vcwindow/vcwvote.o Vcwindow/vcwdecode.o Vcwindow/vcwprefix.o
 
 #### Huffman coding methods #############################################
-VCHOBJS=Vchuff/vchsize.o Vchuff/vchbits.o \
+VCHUFF=Vchuff/vchsize.o Vchuff/vchbits.o \
 	Vchuff/vchtrie.o Vchuff/vchcode.o \
 	Vchuff/vchuffman.o Vchuff/vchuffpart.o Vchuff/vchuffgroup.o
 
 #### Miscellaneous methods ##############################################
-VCMOBJS=Vcmisc/vcmap.o Vcmisc/vcrle.o Vcmisc/vcmtf.o Vcmisc/vcbwt.o
+VCMISC=Vcmisc/vcmap.o Vcmisc/vcrle.o Vcmisc/vcmtf.o Vcmisc/vcbwt.o \
+	Vcmisc/vctranspose.o
 
-#### Table transform methods ############################################
-VCTOBJS=Vctable/vctranspose.o Vctable/vcplan.o Vctable/vctable.o \
-	VcATT/vcama.o VcATT/vcss7.o
+#### Proprietary to AT&T only ###########################################
+VCTABLE=Vctable/vctblplan.o Vctable/vctable.o Vctable/vcrtable.o
+VCRDB=Vcrdb/vcrdplan.o Vcrdb/vcrdb.o Vcrdb/vcrdsepar.o \
+	Vcrdb/vcrdparse.o Vcrdb/vcrdvector.o
+VCSIEVE=Vcsieve/vcsieve.o
+VCADHOC=Vcadhoc/vcama.o Vcadhoc/vcss7.o Vcadhoc/vcbdw.o \
+	Vcadhoc/vcamadiff.o Vcadhoc/vcnetflow.o
+VCPROPRI=$(VCTABLE) $(VCRDB) $(VCSIEVE) $(VCADHOC)
 
-OBJS=	$(VCOBJS) $(VCDOBJS) $(VCHOBJS) $(VCMOBJS)
+OBJS=	$(VCOBJS) $(VCDELTA) $(VCHUFF) $(VCMISC)
 HDRS=	$(VCHDRS)
 
 .c.o :
@@ -62,62 +66,63 @@ HDRS=	$(VCHDRS)
 
 all:	install
 
-libvcodex.a : ast_common.h FEATURE/vcodex $(VCOBJS) $(targets)
-	-(if test "$(VCTABLE)" = 1; then echo $(VCTOBJS) >tblobjs; else echo >tblobjs; fi)
-	ar cr libvcodex.a $(OBJS) `cat tblobjs`;
-	-(ranlib libvcodex.a; rm tblobjs; exit 0) >/dev/null 2>&1
+libvcodex.a: vcodex_h $(VCOBJS) $(targets)
+	-(if test "$(VCPROPRIETARY)" = 1; then echo $(VCPROPRI) >kpv_propri; else echo >kpv_propri; fi)
+	ar cr libvcodex.a $(OBJS) `cat kpv_propri; rm kpv_propri`;
+	-(ranlib libvcodex.a; exit 0) >/dev/null 2>&1
 
-ast_common.h: features/common
-	$(BINDIR)/iffe - set cc $(CC) $(CCMODE) $(CXFLAGS) : \
-		run features/common >ast_common.h
-FEATURE/vcodex: features/vcodex
-	$(BINDIR)/iffe set cc $(CC) $(CCFLAGS) : run features/vcodex
+vcodex_h: 
+	-(Vcodex.ed $(VCSFIO) $(VCPROPRIETARY); exit 0) >/dev/null 2>&1
 
-vcdelta: vcwindow
+vc_delta: vc_window
 	cd Vcdelta; \
 	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
 		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"
-vcwindow:
+vc_window:
 	cd Vcwindow; \
 	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
 		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"
 
-vchuff:
+vc_huff:
 	cd Vchuff; \
 	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
 		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"
 
-vcmisc:
+vc_misc:
 	cd Vcmisc; \
 	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
 		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"
 
-vctable: vcatt
+vc_proprietary: vc_table vc_rdb vc_sieve vc_adhoc
+vc_table:
 	cd Vctable; \
 	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
 		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"; 
-vcatt:
-	cd VcATT; \
+vc_rdb:
+	cd Vcrdb; \
+	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
+		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"; 
+vc_sieve:
+	cd Vcsieve; \
+	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
+		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"; 
+vc_adhoc:
+	cd Vcadhoc; \
 	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
 		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)";
 
-vczip:
-	cd Vczip; \
-	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
-		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)" libs="$(libs)" \
-		vczip; \
-	cd ..; \
-	(rm $(BINDIR)/vczip $(BINDIR)/vcunzip; exit 0) >/dev/null 2>&1; \
-	cp Vczip/vczip $(BINDIR); ln $(BINDIR)/vczip $(BINDIR)/vcunzip;
-
 install_me:	install
-install:	install_lib vczip
+install:	install_lib install_cmd
 install_lib:	libvcodex.a
-	cp vcodex.3 $(MANDIR)/man3; \
 	cp $(HDRS) $(INCDIR); \
 	cp libvcodex.a $(LIBDIR); \
-	(ranlib $(LIBDIR)/libvcodex.a; exit 0) >/dev/null 2>&1; \
+	(cp vcodex.3 $(MANDIR)/man3; exit 0) >/dev/null 2>&1; \
+	(ranlib $(LIBDIR)/libvcodex.a; exit 0) >/dev/null 2>&1
+
+install_cmd:
+	cd Vczip; \
+	$(MAKE) SHELL="$(SHELL)" CC="$(CC)" CCMODE="$(CCMODE)" \
+		CXFLAGS="$(CXFLAGS)" CXINCS="$(CXINCS)"; 
 
 clean :
-	-(rm -rf $(OBJS) ast_common.h FEATURE libvcodex.a; exit 0) >/dev/null 2>&1
-	-(rm Vczip/vczip Vczip/vcunzip; exit 0) >/dev/null 2>&1
+	-(rm -rf $(OBJS) $(VCIOBJS) libvcodex.a Vczip/vczip; exit 0) >/dev/null 2>&1

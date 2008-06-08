@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -172,15 +172,12 @@ Void_t**	out;	/* to return output buffer 	*/
 {
 	ssize_t		n, c, freq[VCH_SIZE];
 	double		e;
-	Vcchar_t	*output;
+	Vcchar_t	*output, *dt;
 	Vcio_t		io;
-	Vcctxt_t	*ctxt = VCGETCTXT(vc, Vcctxt_t*);
-	Part_t		*pt = VCGETMETH(vc, Part_t*);
+	Part_t		*pt = vcgetmtdata(vc, Part_t*);
 
 	if(size == 0)
 		return 0;
-
-	vcsetbuf(pt->vch, NIL(Vcchar_t*), -1, -1); /* free all existing buffers */
 
 	/* estimate table entropy */
 	e = entropy(freq, (Vcchar_t*)data, size);
@@ -193,7 +190,7 @@ Void_t**	out;	/* to return output buffer 	*/
 
 	/* get buffer space to write data */
 	n = size + VCH_SIZE;
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), n, 0)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), n, 0)) )
 		return -1;
 	vcioinit(&io, output, n);
 	pt->io = &io;
@@ -206,14 +203,13 @@ Void_t**	out;	/* to return output buffer 	*/
 
 	pt->io = NIL(Vcio_t*);
 
+	dt = output;
 	n = vciosize(&io); /* compressed data size */
-
-	if(vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
-			return -1;
-		if(VCCODER(vc, vc->coder, 0, output, n) < 0 )
-			return -1;
-	}
+	if(vcrecode(vc, &output, &n, 0) < 0)
+		return -1;
+	if(dt != output) /* free unused buffers */
+		vcbuffer(vc, dt, -1, -1);
+	vcbuffer(pt->vch, NIL(Vcchar_t*), -1, -1);
 
 	if(out)
 		*out = output;
@@ -222,33 +218,27 @@ Void_t**	out;	/* to return output buffer 	*/
 }
 
 #if __STD_C
-static ssize_t ptunhuff(Vcodex_t* vc, const Void_t* data, size_t size, Void_t** out)
+static ssize_t ptunhuff(Vcodex_t* vc, const Void_t* orig, size_t size, Void_t** out)
 #else
-static ssize_t ptunhuff(vc, data, size, out)
+static ssize_t ptunhuff(vc, orig, size, out)
 Vcodex_t*	vc;	/* Vcodex handle		*/
-Void_t*		data;	/* target data to be matched	*/
+Void_t*		orig;	/* target data to be matched	*/
 size_t		size;	/* data size			*/
 Void_t**	out;	/* to return output buffer 	*/
 #endif
 {
-	Vcchar_t	*output, *dt;
+	Vcchar_t	*output, *dt, *data;
 	ssize_t		sz, os, s, n;
 	Vcio_t		rd, wr;
-	Vcctxt_t	*ctxt = VCGETCTXT(vc, Vcctxt_t*);
-	Part_t		*pt = VCGETMETH(vc, Part_t*);
+	Part_t		*pt = vcgetmtdata(vc, Part_t*);
 
 	if(size == 0)
 		return 0;
 
-	vcsetbuf(pt->vch, NIL(Vcchar_t*), -1, -1); /* free all existing buffers */
-
-	if(vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
-			return -1;
-		if((sz = vcapply(vc->coder, data, size, &data)) <= 0)
-			return -1;
-		size = sz;
-	}
+	data = (Vcchar_t*)orig; sz = (ssize_t)size;
+	if(vcrecode(vc, &data, &sz, 0) <= 0 )
+		return -1;
+	size = sz;
 
 	/* get the size of uncompressed data */
 	vcioinit(&rd, data, size);
@@ -256,7 +246,7 @@ Void_t**	out;	/* to return output buffer 	*/
 		return -1;
 
 	/* set up buffer */
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), sz, 0)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
 		return -1;
 	vcioinit(&wr, output, sz);
 
@@ -277,11 +267,15 @@ Void_t**	out;	/* to return output buffer 	*/
 		vcioputs(&wr, dt, s);
 	}
 
+	/* free unused buffers */
+	if(data != orig)
+		vcbuffer(vc, data, -1, -1);
+	vcbuffer(pt->vch, NIL(Vcchar_t*), -1, -1);
+
 	sz = vciosize(&wr);
 
 	if(out)
 		*out = output;
-
 	return sz;
 }
 
@@ -310,21 +304,27 @@ Void_t*		params;
 		pt->ctab = 0;
 		pt->io = NIL(Vcio_t*);
 
-		VCSETMETH(vc, pt);
+		vcsetmtdata(vc, pt);
 		return 0;
 	}
 	else if(type == VC_CLOSING)
-	{	if((pt = VCGETMETH(vc, Part_t*)) )
+	{	if((pt = vcgetmtdata(vc, Part_t*)) )
 		{	if(pt->vch)
 				vcclose(pt->vch);
 			free(pt);
 		}
-		VCSETMETH(vc, NIL(Part_t*));
+		vcsetmtdata(vc, NIL(Part_t*));
 		return 0;
 	}
-	else if(type == VC_FREEBUF)
-	{	if((pt = VCGETMETH(vc, Part_t*)) && pt->vch)
-			vcsetbuf(pt->vch, NIL(Vcchar_t*), -1, -1);
+	else if(type == VC_FREEBUFFER)
+	{	if((pt = vcgetmtdata(vc, Part_t*)) && pt->vch)
+			vcbuffer(pt->vch, NIL(Vcchar_t*), -1, -1);
+		return 0;
+	}
+	else if(type == VC_TELLBUFFER)
+	{	if((pt = vcgetmtdata(vc, Part_t*)) && pt->vch &&
+		   vctellbuf(pt->vch, (Vcbuffer_f)params) < 0 )
+			return -1;
 		return 0;
 	}
 	else	return 0;
@@ -333,15 +333,12 @@ Void_t*		params;
 Vcmethod_t	_Vchuffpart =
 {	pthuff,
 	ptunhuff,
-	0,
-	0,
 	ptevent,
-	"huffpart",
-		"\150\165\146\146\160\141\162\164",
-		"Huffman encoding by parts",
+	"huffpart", "Huffman encoding by partitioning.",
+	"[-version?huffpart (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 	NIL(Vcmtarg_t*),
 	1024*1024,
-	VCNEXT(Vchuffpart)
+	0
 };
 
 VCLIB(Vchuffpart)

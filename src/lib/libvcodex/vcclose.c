@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -31,35 +31,24 @@ int vcclose(vc)
 Vcodex_t*	vc;
 #endif
 {
-	int		i;
-
 	if(!vc)
 		return -1;
-
-	vcsetbuf(vc, NIL(Vcchar_t*), -1, -1); /* free all cached buffers */
 
 	if(vc->disc && vc->disc->eventf &&
 	   (*vc->disc->eventf)(vc, VC_CLOSING, NIL(Void_t*), vc->disc) < 0 )
 		return -1;
 
+	vcbuffer(vc, NIL(Vcchar_t*), -1, -1); /* free all cached buffers */
+
+	if(vc->coder && (vc->flags&VC_CLOSECODER) && vcclose(vc->coder) < 0 )
+		return -1;
+
+	if(vcfreecontext(vc, NIL(Vccontext_t*)) < 0 )
+		return -1;
+
 	if(vc->meth && vc->meth->eventf &&
 	   (*vc->meth->eventf)(vc, VC_CLOSING, NIL(Void_t*)) < 0 )
 		return -1;
-
-	if(vc->coder && (vc->flags&VC_CLOSECODER) )
-	{	vcclose(vc->coder);
-		vc->coder = NIL(Vcodex_t*);
-	}
-
-	if(vc->ctxt ) /* free context data */
-	{	if(vc->meth && vc->meth->eventf)
-		{	Vcchar_t *ctxt = (Vcchar_t*)vc->ctxt;
-			for(i = 0; i < vc->ctop; ++i, ctxt += vc->csize)
-				(*vc->meth->eventf)(vc,VC_ENDCTXT,(Void_t*)ctxt);
-		}
-
-		free(vc->ctxt);
-	}
 
 	free(vc);
 

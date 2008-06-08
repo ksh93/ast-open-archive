@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -95,12 +95,38 @@ static double _Vclog2[256] = {
  7.9541963, 7.9600019, 7.9657843, 7.9715436, 7.9772799, 7.9829936, 7.9886847, 7.9943534 
 };
 
+#if __STD_C
+size_t vclogi(size_t v)
+#else
+size_t vclogi(v)
+size_t	v;
+#endif
+{
+	register size_t	lg, b;
+
+	switch(sizeof(v) ) /* find the left most non-zero byte */
+	{ default: /* in case sizeof(unsigned int) > 4 */
+		for(lg = (sizeof(v)-1)*8; lg >= 32; lg -= 8)
+			   if((b = v >> lg) != 0 )
+				goto got_byte;
+	  case 4: lg = 24; if((b = v >> 24) != 0)
+				goto got_byte;
+	  case 3: lg = 16; if((b = v >> 16) != 0)
+				goto got_byte;
+	  case 2: lg =  8; if((b = v >>  8) != 0)
+				goto got_byte;
+	  case 1: lg =  0; b = v;
+	}
+
+got_byte: return lg + _Vcpow2[b];
+}
+
 
 #if __STD_C
-double vclog(unsigned int v)
+double vclog(size_t v)
 #else
 double vclog(v)
-unsigned int	v;
+size_t	v;
 #endif
 {
 	register int	lg, b;

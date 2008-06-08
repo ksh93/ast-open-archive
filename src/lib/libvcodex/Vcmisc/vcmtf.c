@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -17,7 +17,7 @@
 *                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
-#include	"vcmeth.h"
+#include	<vclib.h>
 
 /*	Move-to-front transformers.
 **
@@ -25,6 +25,8 @@
 */
 
 typedef ssize_t	(*Mtf_f)_ARG_((Vcchar_t*, Vcchar_t*, Vcchar_t*, int));
+static ssize_t	mtfp _ARG_((Vcchar_t*, Vcchar_t*, Vcchar_t*, int));
+static ssize_t	mtf0 _ARG_((Vcchar_t*, Vcchar_t*, Vcchar_t*, int));
 
 #define MTFC(c,p,m,n) /* know byte, need to compute position */ \
 	{ m = mtf[p = 0]; \
@@ -39,6 +41,12 @@ typedef ssize_t	(*Mtf_f)_ARG_((Vcchar_t*, Vcchar_t*, Vcchar_t*, int));
 	  	{ n = mtf[m += 1]; mtf[m] = c; c = n; } \
 	  mtf[0] = c; \
 	}
+
+/* arguments to select move-to-front coder */
+static Vcmtarg_t _Mtfargs[] =
+{	{ "0", "Pure move-to-front strategy.", (Void_t*)mtf0 },
+	{  0 , "Move-to-front with prediction.", (Void_t*)mtfp }
+};
 
 #if __STD_C
 static ssize_t mtfp(Vcchar_t* dt, Vcchar_t* enddt, Vcchar_t* output, int encoding)
@@ -128,30 +136,27 @@ size_t		size;
 Void_t**	out;
 #endif
 {
-	Vcchar_t	*output;
+	Vcchar_t	*output, *dt;
 	ssize_t		sz;
-	Vcctxt_t	*ctxt = VCGETCTXT(vc, Vcctxt_t*);
-	Mtf_f		mtff = VCGETMETH(vc, Mtf_f);
+	Mtf_f		mtff = vcgetmtdata(vc, Mtf_f);
 
 	if((sz = size) == 0)
 		return 0;
 
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), sz, 0)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
 		return -1;
 
 	if((*mtff)((Vcchar_t*)data, ((Vcchar_t*)data)+sz, output, 1) != sz)
 		return -1;
 
-	if(vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
-			return -1;
-		if(VCCODER(vc, vc->coder, 0, output, sz) < 0 )
-			return -1;
-	}
+	dt = output;
+	if(vcrecode(vc, &output, &sz, 0) < 0)
+		return -1;
+	if(dt != output)
+		vcbuffer(vc, dt, -1, -1);
 
 	if(out)
 		*out = output;
-
 	return sz;
 }
 
@@ -167,81 +172,76 @@ Void_t**	out;
 {
 	Vcchar_t	*dt, *output;
 	ssize_t		sz;
-	Vcctxt_t	*ctxt = VCGETCTXT(vc, Vcctxt_t*);
-	Mtf_f		mtff = VCGETMETH(vc, Mtf_f);
+	Mtf_f		mtff = vcgetmtdata(vc, Mtf_f);
 
 	if(size == 0)
 		return 0;
 
-	dt = (Vcchar_t*)data;
-	sz = size;
-	if(vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
-			return -1;
-		if((sz = vcapply(vc->coder, dt, sz, &dt)) < 0)
-			return -1;
-	}
+	dt = (Vcchar_t*)data; sz = size;
+	if(vcrecode(vc, &dt, &sz, 0) < 0 )
+		return -1;
 
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), sz, 0)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
 		return -1;
 
 	if((*mtff)(dt, dt+sz, output, 0) != sz)
 		return -1;
 
+	if(dt != (Vcchar_t*)data)
+		vcbuffer(vc, dt, -1, -1);
+
 	if(out)
 		*out = output;
-
 	return sz;
 }
 
-/* arguments to select move-to-front coder */
-static Vcmtarg_t _Mtfargs[] =
-{	{ "0", "\060", "Pure move-to-front strategy", (Void_t*)mtf0 },
-	{  0 , 0, "Move-to-front with prediction", (Void_t*)mtfp }
-};
-
 #if __STD_C
-static ssize_t mtfextract(Vcodex_t* vc, Void_t** datap, int state)
+static ssize_t mtfextract(Vcodex_t* vc, Vcchar_t** datap)
 #else
-static ssize_t mtfextract(vc, datap, state)
+static ssize_t mtfextract(vc, datap)
 Vcodex_t*	vc;
-Void_t**	datap;	/* basis string for persistence	*/
-int		state;	/* should always be 0 for this	*/
+Vcchar_t**	datap;	/* basis string for persistence	*/
 #endif
 {
-	int	k;
-	Mtf_f	mtff = VCGETMETH(vc, Mtf_f);
+	Vcmtarg_t	*arg;
+	char		*ident;
+	ssize_t		n;
+	Void_t		*mtdt = vcgetmtdata(vc, Void_t*);
 
-	if(state) /* we only deal with header data here */
+	for(arg = _Mtfargs;; ++arg)
+		if(!arg->name || arg->data == mtdt)
+			break;
+	if(!arg->name)
 		return 0;
 
-	for(k = 0; _Mtfargs[k].name; ++k)
-		if(_Mtfargs[k].data == (Void_t*)mtff)
-			break;
+	n = strlen(arg->name);
+	if(!(ident = (char*)vcbuffer(vc, NIL(Vcchar_t*), sizeof(int)*n+1, 0)) )
+		return -1;
+	if(!(ident = vcstrcode(arg->name, ident, sizeof(int)*n+1)) )
+		return -1; 
 	if(datap)
-		*datap = (Void_t*)_Mtfargs[k].ident;
-	return _Mtfargs[k].ident ? strlen((char*)_Mtfargs[k].ident) : 0;
+		*datap = (Void_t*)ident;
+	return n;
 }
 
 #if __STD_C
-static Vcodex_t* mtfrestore(Vcodex_t* vc, Void_t* data, ssize_t dtsz)
+static Vcodex_t* mtfrestore(Vcchar_t* data, ssize_t dtsz)
 #else
-static Vcodex_t* mtfrestore(vc, data, dtsz)
-Vcodex_t*	vc;	/* handle to restore	*/
-Void_t*		data;	/* persistence data	*/
-ssize_t		dtsz;
+static Vcodex_t* mtfrestore(data, dtsz)
+Vcchar_t*	data;	/* persistence data	*/
+ssize_t		dtsz;	/* its length		*/
 #endif
 {
-	int	k;
+	Vcmtarg_t	*arg;
+	char		*ident, buf[1024];
 
-	if(vc)
-		return vc;
-
-	for(k = 0; _Mtfargs[k].name; ++k)
-		if(dtsz == strlen(_Mtfargs[k].name) &&
-		   strncmp((char*)_Mtfargs[k].ident, (char*)data, dtsz) == 0 )
+	for(arg = _Mtfargs; arg->name; ++arg)
+	{	if(!(ident = vcstrcode(arg->name, buf, sizeof(buf))) )
+			return NIL(Vcodex_t*);
+		if(dtsz == strlen(ident) && strncmp(ident, (Void_t*)data, dtsz) == 0)
 			break;
-	return vcopen(0, Vcmtf, _Mtfargs[k].name, 0, VC_DECODE);
+	}
+	return vcopen(0, Vcmtf, (Void_t*)arg->name, 0, VC_DECODE);
 }
 
 #if __STD_C
@@ -253,25 +253,36 @@ int		type;
 Void_t*		params;
 #endif
 {
-	int	k;
+	Vcmtarg_t	*arg;
+	Vcmtcode_t	*mtcd;
+	char		*data;
 
 	if(type == VC_OPENING )
-	{	for(k = 0; _Mtfargs[k].name; ++k)
-			if(params && strcmp((char*)params, _Mtfargs[k].name) == 0)
+	{	for(arg = NIL(Vcmtarg_t*), data = (char*)params; data && *data; )
+		{	data = vcgetmtarg(data, 0, 0, _Mtfargs, &arg);
+			if(arg && arg->name)
 				break;
-		VCSETMETH(vc, _Mtfargs[k].data);
-	}
-	else if(type == VC_GETARG)
-	{	char	*tp;
-		if((tp = VCGETMETH(vc, char*)) )
-		{	for(k = 0; _Mtfargs[k].name; ++k)
-			{	if(_Mtfargs[k].data == tp)
-				{	if(params)
-						*((char**)params) = _Mtfargs[k].name;
-					return 1;
-				}
-			}
 		}
+		if(!arg) /* get the default argument */
+			for(arg = _Mtfargs;; ++arg)
+				if(!arg->name)
+					break;
+		vcsetmtdata(vc, arg->data);
+		return 0;
+	}
+	else if(type == VC_EXTRACT)
+	{	if(!(mtcd = (Vcmtcode_t*)params) )
+			return -1;
+		if((mtcd->size = mtfextract(vc, &mtcd->data)) < 0 )
+			return -1;
+		return 1;
+	}
+	else if(type == VC_RESTORE)
+	{	if(!(mtcd = (Vcmtcode_t*)params) )
+			return -1;
+		if(!(mtcd->coder = mtfrestore(mtcd->data, mtcd->size)) )
+			return -1;
+		return 1;
 	}
 
 	return 0;
@@ -280,13 +291,12 @@ Void_t*		params;
 Vcmethod_t _Vcmtf =
 {	vcmtf,
 	vcunmtf,
-	mtfextract,
-	mtfrestore,
 	mtfevent,
-	"mtf", "\155\164\146", "Move-to-front transform",
+	"mtf", "Move-to-front transform.",
+	"[-version?mtf (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 	_Mtfargs,
 	1024*1024,
-	VCNEXT(Vcmtf)
+	0
 };
 
 VCLIB(Vcmtf)

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -17,7 +17,7 @@
 *                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
-#include	"vcmeth.h"
+#include	<vclib.h>
 
 /*	Map bytes from one to another (e.g., the rot13 program).
 **	If no mapping is specified, the identity map is used.
@@ -228,17 +228,17 @@ static Vcchar_t	H2A[] =
 };
 
 static Vcmtarg_t _Mapargs[] =
-{	{ "a2e", "\141\062\145", "ASCII -> Xopen dd(1) EBCDIC", A2E },
-	{ "e2a", "\145\062\141", "Xopen dd(1) EBCDIC -> ASCII", E2A },
-	{ "a2i", "\141\062\151", "ASCII -> Xopen dd(1) IBM", A2I },
-	{ "i2a", "\151\062\141", "Xopen dd(1) IBM -> ASCII", I2A },
-	{ "a2o", "\141\062\157", "ASCII -> IBM OpenEdition", A2O },
-	{ "o2a", "\157\062\141", "IBM OpenEdition -> ASCII", O2A },
-	{ "a2s", "\141\062\163", "ASCII -> Siemens Posix-bc", A2S },
-	{ "s2a", "\163\062\141", "Siemens Posix-bc -> ASCII", S2A },
-	{ "a2h", "\141\062\150", "ASCII -> IBM-37 AS/400", A2H },
-	{ "h2a", "\150\062\141", "IBM-37 AS/400 -> ASCII", H2A },
-	{   0  , 0, "Identity mapping", 0 }
+{	{ "a2e", "ASCII -> Xopen dd(1) EBCDIC.", A2E },
+	{ "e2a", "Xopen dd(1) EBCDIC -> ASCII.", E2A },
+	{ "a2i", "ASCII -> Xopen dd(1) IBM.", A2I },
+	{ "i2a", "Xopen dd(1) IBM -> ASCII.", I2A },
+	{ "a2o", "ASCII -> IBM OpenEdition.", A2O },
+	{ "o2a", "IBM OpenEdition -> ASCII.", O2A },
+	{ "a2s", "ASCII -> Siemens Posix-bc.", A2S },
+	{ "s2a", "Siemens Posix-bc -> ASCII.", S2A },
+	{ "a2h", "ASCII -> IBM-37 AS/400.", A2H },
+	{ "h2a", "IBM-37 AS/400 -> ASCII.", H2A },
+	{   0  , "Identity mapping.", 0 }
 };
 
 typedef struct _vcmap_s
@@ -258,9 +258,8 @@ Void_t**	out;
 	ssize_t		sz;
 	Vcchar_t	*dt, *enddt, *output, *o;
 	Vcchar_t	*map;
-	Vcmap_t		*vcm = VCGETMETH(vc, Vcmap_t*);
-	Vcdisc_t	*disc = VCGETDISC(vc);
-	Vcctxt_t	*ctxt = VCGETCTXT(vc, Vcctxt_t*);
+	Vcmap_t		*vcm = vcgetmtdata(vc, Vcmap_t*);
+	Vcdisc_t	*disc = vcgetdisc(vc);
 
 	if((sz = (ssize_t)size) == 0)
 		return 0;
@@ -271,14 +270,10 @@ Void_t**	out;
 		if(disc && disc->data)
 			map = disc->data;
 
-	if((vc->flags&VC_DECODE) && vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
-			return -1;
-		if(VCCODER(vc, vc->coder, 0, dt, sz) <= 0)
-			return -1;
-	}
+	if((vc->flags&VC_DECODE) && vcrecode(vc, &dt, &sz, 0) <= 0)
+		return -1;
 
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), sz, 0)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
 		return -1;
 
 	if(!map)
@@ -286,16 +281,19 @@ Void_t**	out;
 	else for(o = output, enddt = dt+sz; dt < enddt; )
 		*o++ = map[*dt++];
 
-	if((vc->flags&VC_ENCODE) && vc->coder)
-	{	if(VCSETCTXT(vc->coder, ctxt->ctxt) < 0)
+	if((vc->flags&VC_DECODE) && vc->coder)
+		vcbuffer(vc, dt-sz, -1, -1);
+
+	if(vc->flags&VC_ENCODE)
+	{	dt = output;
+		if(vcrecode(vc, &output, &sz, 0) <= 0 )
 			return -1;
-		if(VCCODER(vc, vc->coder, 0, output, sz) <= 0)
-			return -1;
+		if(dt != output)
+			vcbuffer(vc, dt, -1, -1);
 	}
 
 	if(out)
 		*out = output;
-
 	return sz;
 }
 
@@ -309,39 +307,24 @@ Void_t*		params;
 #endif
 {
 	Vcmap_t		*vcm;
-	int		k;
+	Vcmtarg_t	*arg;
 
 	if(type == VC_OPENING)
 	{	if(!(vcm = (Vcmap_t*)calloc(1, sizeof(Vcmap_t))) )
 			return -1;
 
-		if(params)
-		{	for(k = 0; _Mapargs[k].name && !vcm->map; ++k)
-				if(strcmp((char*)params, _Mapargs[k].name) == 0)
-					vcm->map =  _Mapargs[k].data;
-			if(!vcm->map) /* bad specification */
-			{	free(vcm);
-				return -1;
-			}
+		if(params) /* get the mapping type, if any */
+		{	vcgetmtarg((char*)params, 0, 0, _Mapargs, &arg);
+			if(arg)
+				vcm->map = arg->data;
 		}
 
-		VCSETMETH(vc, vcm);
+		vcsetmtdata(vc, vcm);
 	}
 	else if(type == VC_CLOSING)
-	{	if((vcm = VCGETMETH(vc, Vcmap_t*)) )
+	{	if((vcm = vcgetmtdata(vc, Vcmap_t*)) )
 			free(vcm);
-		VCSETMETH(vc, NIL(Vcmap_t*));
-	}
-	else if(type == VC_GETARG)
-	{	if(!(vcm = VCGETMETH(vc, Vcmap_t*)) )
-			return -1;
-		for(k = 0; _Mapargs[k].name; ++k)
-		{	if(vcm->map != _Mapargs[k].data)
-				continue;
-			if(params) /* found, return arguments */
-				*((char**)params) = _Mapargs[k].name;
-			return 1;
-		}
+		vcsetmtdata(vc, NIL(Vcmap_t*));
 	}
 
 	return 0;
@@ -350,13 +333,12 @@ Void_t*		params;
 Vcmethod_t _Vcmap =
 {	vcmap,
 	vcmap,
-	0,
-	0,
 	mapevent,
-	"map", "\155\141\160", "Mapping bytes from codeset to codeset",
+	"map", "Mapping bytes from codeset to codeset.",
+	"[-version?map (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 	_Mapargs,
 	1024*1024,
-	VCNEXT(Vcmap)
+	0
 };
 
 VCLIB(Vcmap)

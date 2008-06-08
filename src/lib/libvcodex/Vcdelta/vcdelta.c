@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -30,8 +30,8 @@
 #define FREETABLE	00010	/* free the coding table on closing	*/
 
 static Vcmtarg_t _Diffargs[] =
-{	{ "s", "\060", "Suffix sorting for string matching", (Void_t*)SFXSORT },
-	{  0 , 0, "Hashing for string matching", 0 }
+{	{ "s", "String matching via suffix sorting.", (Void_t*)SFXSORT },
+	{  0 , "String matching via hashing.", 0 }
 };
 
 #if __STD_C
@@ -98,23 +98,23 @@ ssize_t		md;
 }
 
 #if __STD_C
-static int vcdputcopy(Vcdiff_t* vcd, ssize_t dt, ssize_t cz, ssize_t mt)
+static ssize_t vcdputcopy(Vcdiff_t* vcd, ssize_t dt, ssize_t cz, ssize_t mt)
 #else
-static int vcdputcopy(vcd, dt, cz, mt)
+static ssize_t vcdputcopy(vcd, dt, cz, mt)
 Vcdiff_t*	vcd;
 ssize_t		dt;	/* data position	*/
 ssize_t		cz;	/* size of matched data	*/
 ssize_t		mt;	/* matched position	*/
 #endif
 {
-	ssize_t		ad, md;
+	ssize_t		ad, md, oz;
 	int		cd;
 	Vcchar_t	*data;
 	Vcdsave_t*	sav = vcd->save;
 	Vcdsize_t*	siz = vcd->size;
 	Vcdindex_t*	idx = vcd->index;
 
-	if(cz > 0) /* compute values to be encoded */
+	if((oz = cz) > 0) /* compute values to be encoded */
 		ad = vcdkasetaddr(vcd->cache, mt, dt, &md);
 	else	ad = md = -1;
 
@@ -142,13 +142,13 @@ ssize_t		mt;	/* matched position	*/
 	sav->addr = ad;
 	sav->mode = md;
 
-	return 1;
+	return oz;
 }
 
 #if __STD_C
-static int vcdputadd(Vcdiff_t* vcd, ssize_t dt, ssize_t az)
+static ssize_t vcdputadd(Vcdiff_t* vcd, ssize_t dt, ssize_t az)
 #else
-static int vcdputadd(vcd, dt, az)
+static ssize_t vcdputadd(vcd, dt, az)
 Vcdiff_t*	vcd;
 ssize_t		dt;
 ssize_t		az;
@@ -159,6 +159,7 @@ ssize_t		az;
 	Vcdsave_t*	sav = vcd->save;
 	Vcdsize_t*	siz = vcd->size;
 	Vcdindex_t*	idx = vcd->index;
+	ssize_t		oz = az;
 
 	if(sav->dtsz > 0) /* there is a saved instruction */
 	{	if(sav->mode < 0) /* parsing error? no two ADDs in a row possible */
@@ -182,30 +183,65 @@ ssize_t		az;
 	sav->addr = dt;
 	sav->mode = -1;
 
-	return 1;
+	return oz;
 }
 
 #if __STD_C
-static int vcdputinst(Vcparse_t* vcpa, int type, ssize_t ad, ssize_t dt, ssize_t sz, ssize_t mt)
+static ssize_t vcdputinst(Vclzparse_t* vcpa, int type, Vclzmatch_t* mtch, ssize_t n)
 #else
-static int vcdputinst(vcpa, type, ad, dt, sz, mt)
-Vcparse_t*	vcpa;
+static ssize_t vcdputinst(vcpa, type, mtch, n)
+Vclzparse_t*	vcpa;
 int		type;	/* type of instruction		*/
-ssize_t		ad;	/* start of unmatchable data	*/
-ssize_t		dt;	/* current position of data	*/
-ssize_t		sz;	/* matchable length		*/
-ssize_t		mt;	/* matched addr if any		*/
+Vclzmatch_t*	mtch;	/* list of matched fragments	*/
+ssize_t		n;	/* number of fragments		*/
 #endif
 {
+	ssize_t		len, l, here;
 	Vcdiff_t	*vcd = (Vcdiff_t*)vcpa;
 
-	if(ad < dt && vcdputadd(vcd, ad, (dt-ad)) < 0 )
-		return -1;
+#if 0
+{	Vcmatch_t* m;
+	if((m = mtch)->mpos < 0)
+	{	PRINT(2, "add %6d      ", mtch->size);
+		PRINT(2, "pos %6d\n", mtch->tpos - vcpa->nsrc);
+	}
+	if(m->mpos >= 0 || n > 1)
+	{	if(m->mpos < 0)
+			m += 1;
+		PRINT(2, "cpy %6d      ", mtch[n-1].tpos+mtch[n-1].size - m->tpos);
+		PRINT(2, "pos %6d      ", m->tpos - vcpa->nsrc);
+		PRINT(2, "adr %6d      ", m->mpos);
+		if((l = n - (m == mtch ? 0 : 1)) > 1 )
+			PRINT(2,"#frags %6d", l);
+		WRITE(2,"\n",1);
+	}
+}
+#endif
+	for(len = 0, here = mtch->tpos; n > 0; ++mtch, --n)
+	{	if((l = mtch->tpos - here) > 0)
+		{	if((l = vcdputadd(vcd, here, l)) != l )
+				return -1;
+			len += l;
+			here += l;
+		}
 
-	if(sz > 0 && vcdputcopy(vcd, dt, sz, mt) < 0 )
-		return -1;
+		if(mtch->size <= 0)
+			continue;
+		else if(mtch->mpos < 0)
+		{	if((l = vcdputadd(vcd, mtch->tpos, mtch->size)) != mtch->size )
+				return -1;
+			len += l;
+			here += l;
+		}
+		else
+		{	if((l = vcdputcopy(vcd, mtch->tpos, mtch->size, mtch->mpos)) != mtch->size)
+				return -1;
+			len += l;
+			here += l;
+		}
+	}
 
-	return 1; /* instruction was processed */
+	return len;
 }
 
 #if __STD_C
@@ -222,9 +258,8 @@ Void_t**	del;
 	Vcchar_t	*rd, *ri, *ra, *p, ctrl, *output;
 	Vcio_t		inst, addr, data;
 	Vcdsave_t	save;
-	Vcdiff_t	*vcd = VCGETMETH(vc, Vcdiff_t*);
-	Vcdctxt_t	*ctxt = VCGETCTXT(vc, Vcdctxt_t*);
-	Vcdisc_t	*disc = VCGETDISC(vc);
+	Vcdiff_t	*vcd = vcgetmtdata(vc, Vcdiff_t*);
+	Vcdisc_t	*disc = vcgetdisc(vc);
 
 	if(ntar == 0)
 		return 0;
@@ -234,12 +269,12 @@ Void_t**	del;
 	vcd->vcpa.nsrc = nsrc;
 	vcd->vcpa.tar  = (Vcchar_t*)tar;
 	vcd->vcpa.ntar = ntar;
-	vcd->vcpa.type = 0;
 	vcd->vcpa.mmin = COPYMIN;
-	vcd->vcpa.miss = 0;
+	vcd->vcpa.cmap = NIL(Vcchar_t*);
+	vcd->vcpa.type = 0;
 
 	/* obtain output buffer */
-	if(!(output = vcsetbuf(vc, NIL(Vcchar_t*), 3*(ntar+SLOP), 0)) )
+	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), 3*(ntar+SLOP), 0)) )
 		return -1;
 	vcd->data = &data; vcioinit(&data, output+SLOP, ntar);
 	vcd->inst = &inst; vcioinit(&inst, vcionext(&data)+ntar, ntar+SLOP);
@@ -249,7 +284,7 @@ Void_t**	del;
 	vcdkaclear(vcd->cache);
 	vcd->save = &save; save.dtsz = save.addr = save.mode = 0;
 
-	vcparse(&vcd->vcpa, (vcd->flags&SFXSORT) ? -1 : 32*1024);
+	vclzparse(&vcd->vcpa, (vcd->flags&SFXSORT) ? -1 : 32*1024);
 	vcdputcopy(vcd, 0, 0, 0);
 
 	ctrl = 0;
@@ -257,22 +292,14 @@ Void_t**	del;
 	i = vciosize(vcd->inst); ri = vciodata(vcd->inst);
 	a = vciosize(vcd->addr); ra = vciodata(vcd->addr);
 	if(vc->coder) /* continuation coding */
-	{	if(VCSETCTXT(vc->coder, ctxt->dctxt) < 0)
-			return -1;
-		if((n = vcapply(vc->coder, rd, d, &p)) >= 0 && n < d )
+	{	if((n = vcapply(vc->coder, rd, d, &p)) >= 0 && n < d )
 		{	d = n; rd = p;
 			ctrl |= VCD_DATACOMPRESS;
 		}
-
-		if(VCSETCTXT(vc->coder, ctxt->ictxt) < 0)
-			return -1;
 		if((n = vcapply(vc->coder, ri, i, &p)) >= 0 && n < i )
 		{	i = n; ri = p;
 			ctrl |= VCD_INSTCOMPRESS;
 		}
-
-		if(VCSETCTXT(vc->coder, ctxt->actxt) < 0)
-			return -1;
 		if((n = vcapply(vc->coder, ra, a, &p)) >= 0 && n < a )
 		{	a = n; ra = p;
 			ctrl |= VCD_ADDRCOMPRESS;
@@ -291,9 +318,10 @@ Void_t**	del;
 	vcioputs(&data, ra, a);
 	n = vciosize(&data);
 
+	if(!(output = vcbuffer(vc, output, n, -1)) ) /* truncate to size */
+		return -1;
 	if(del)
 		*del = output;
-
 	return n;
 }
 
@@ -315,9 +343,8 @@ Void_t**	out;
 	Vcdcode_t	*code;
 	Vcdcache_t	*ka;
 	int		ctrl;
-	Vcdiff_t	*vcd = VCGETMETH(vc, Vcdiff_t*);
-	Vcdctxt_t	*ctxt = VCGETCTXT(vc, Vcdctxt_t*);
-	Vcdisc_t	*disc = VCGETDISC(vc);
+	Vcdiff_t	*vcd = vcgetmtdata(vc, Vcdiff_t*);
+	Vcdisc_t	*disc = vcgetdisc(vc);
 
 	/* read size of data buffers */
 	vcioinit(&data, del, ndel);
@@ -329,7 +356,7 @@ Void_t**	out;
 
 	/* make sure we have enough data for decoding */
 	if((d+i+a) != vciomore(&data) )
-		RETURN(-1);
+		DEBUG_RETURN(-1);
 
 	/* data, instructions and COPY addresses */
 	rd = vcionext(&data);
@@ -339,22 +366,16 @@ Void_t**	out;
 	/* recompute the data, instruction and address streams if encoded */
 	if(vc->coder)
 	{	if(ctrl&VCD_DATACOMPRESS)
-		{	if(VCSETCTXT(vc->coder, ctxt->dctxt) < 0)
-				RETURN(-1);
-			if((d = vcapply(vc->coder, rd, d, &rd)) < 0 )
-				RETURN(-1);
+		{	if((d = vcapply(vc->coder, rd, d, &rd)) < 0 )
+				DEBUG_RETURN(-1);
 		}
 		if(ctrl&VCD_INSTCOMPRESS)
-		{	if(VCSETCTXT(vc->coder, ctxt->ictxt) < 0)
-				RETURN(-1);
-			if((i = vcapply(vc->coder, ri, i, &ri)) < 0 )
-				RETURN(-1);
+		{	if((i = vcapply(vc->coder, ri, i, &ri)) < 0 )
+				DEBUG_RETURN(-1);
 		}
 		if(ctrl&VCD_ADDRCOMPRESS)
-		{	if(VCSETCTXT(vc->coder, ctxt->actxt) < 0)
-				RETURN(-1);
-			if((a = vcapply(vc->coder, ra, a, &ra)) < 0 )
-				RETURN(-1);
+		{	if((a = vcapply(vc->coder, ra, a, &ra)) < 0 )
+				DEBUG_RETURN(-1);
 		}
 	}
 
@@ -367,8 +388,8 @@ Void_t**	out;
 		vcdkaclear(ka);
 
 	/* buffer to reconstruct data */
-	if(!(tar = vcsetbuf(vc, NIL(Vcchar_t*), ntar, 0)) )
-		RETURN(-1);
+	if(!(tar = vcbuffer(vc, NIL(Vcchar_t*), ntar, 0)) )
+		DEBUG_RETURN(-1);
 	etar = tar + ntar;
 	nsrc = disc ? disc->size : 0;
 	src  = disc ? (Vcchar_t*)disc->data : NIL(Vcchar_t*);
@@ -380,7 +401,7 @@ Void_t**	out;
 
 		/* get the pair of instructions */
 		if(vciomore(&inst) <= 0)
-			RETURN(-1);
+			DEBUG_RETURN(-1);
 		cd = code + vciogetc(&inst);
 
 		for(i = 0; i < 2; ++i)
@@ -390,12 +411,12 @@ Void_t**	out;
 
 			if((sz = in->size) == 0)
 			{	if(vciomore(&inst) <= 0)
-					RETURN(-1);
+					DEBUG_RETURN(-1);
 				sz = vciogetu(&inst);
 			}
 
 			if(t+sz > etar)
-				RETURN(-1);
+				DEBUG_RETURN(-1);
 
 			if(in->type == VCD_BYTE)
 			{	d = in->mode;
@@ -404,16 +425,16 @@ Void_t**	out;
 			}
 			else if(in->type == VCD_COPY)
 			{	if(vciomore(&addr) <= 0)
-					RETURN(-1);
+					DEBUG_RETURN(-1);
 				d = vcdkagetaddr(ka,&addr,(t-tar)+nsrc,in->mode);
 				if(d < nsrc)
 				{	if(d+sz > nsrc)
-						RETURN(-1);
+						DEBUG_RETURN(-1);
 					s = src+d;
 				}
 				else
 				{	if((d -= nsrc) >= (t-tar) || (d+sz) > ntar)
-						RETURN(-1);
+						DEBUG_RETURN(-1);
 					s = tar+d;
 				}
 				for(; sz > 0; --sz)
@@ -421,18 +442,18 @@ Void_t**	out;
 			}
 			else if(in->type == VCD_ADD)
 			{	if(vciomore(&data) < sz)
-					RETURN(-1);
+					DEBUG_RETURN(-1);
 				vciogets(&data, t, sz);
 				t += sz;
 			}
 			else if(in->type == VCD_RUN)
 			{	if(vciomore(&data) <= 0)
-					RETURN(-1);
+					DEBUG_RETURN(-1);
 				d = vciogetc(&data);
 				for(; sz > 0; --sz)
 					*t++ = (Vcchar_t)d;
 			}
-			else	RETURN(-1);
+			else	DEBUG_RETURN(-1);
 		}
 	}
 
@@ -455,9 +476,7 @@ Void_t*		init;
 #endif
 {
 	Vcdiff_t	*vcd;
-	Vcdctxt_t	*ctxt;
-	char		*args;
-	int		k, rv = -1;
+	Vcmtarg_t	*arg;
 
 	_vcdtblinit(); /* initialize default code tables */
 
@@ -466,43 +485,33 @@ Void_t*		init;
 			return -1;
 		VCDINIT(vcd);
 
-		for(args = (char*)init; args && *args; ++args)
-		{	for(k = 0; _Diffargs[k].name; ++k)
-				if(*args == _Diffargs[k].name[0])
-					vcd->flags |= (int)_Diffargs[k].data;
-		}
+		vcgetmtarg((char*)init, 0, 0, _Diffargs, &arg);
+		if(arg)
+			vcd->flags |= TYPECAST(int,arg->data);
 
 		vcd->table = _Vcdtbl;
 		vcd->index = &_Vcdindex;
 		vcd->size  = &_Vcdsize;
 		vcd->vcpa.parsef = vcdputinst;
 		if(!(vcd->cache = vcdkaopen(vcd->table->s_near,vcd->table->s_same)))
-			goto do_closing;
+		{	free(vcd);
+			return -1;
+		}
 
-		VCINITCTXT(vc, Vcdctxt_t);
-		VCSETMETH(vc, vcd);
+		vcsetmtdata(vc, vcd);
 		return 0;
 	}
 	else if(type == VC_CLOSING)
-	{	rv = 0;
-	do_closing:
-		if((vcd = VCGETMETH(vc, Vcdiff_t*)) )
+	{	if((vcd = vcgetmtdata(vc, Vcdiff_t*)) )
 		{	if(vcd->cache)
 				vcdkaclose(vcd->cache);
 			if(vcd->table && (vcd->flags&FREETABLE) )
 				free(vcd->table);
 			free(vcd);
 		}
-		VCSETMETH(vc, NIL(Vcdiff_t*));
-		return rv;
-	}
-	else if(type == VC_INITCTXT)
-	{	if(!(ctxt = (Vcdctxt_t*)init))
-			return -1;
-		else
-		{	ctxt->dctxt = ctxt->ictxt = ctxt->actxt = -1;
-			return 1;
-		}
+
+		vcsetmtdata(vc, NIL(Vcdiff_t*));
+		return 0;
 	}
 	else	return 0;
 }
@@ -510,13 +519,12 @@ Void_t*		init;
 Vcmethod_t _Vcdelta =
 {	vcddiff,
 	vcdundiff,
-	0,
-	0,
 	vcdevent,
-	"delta", "\144\145\154\164\141", "Delta compression",
+	"delta", "(Delta) Compression using the Vcdiff format.",
+	"[-version?delta (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 	_Diffargs,
 	1024*1024,
-	VCNEXT(Vcdelta)
+	VC_MTSOURCE
 };
 
 VCLIB(Vcdelta)

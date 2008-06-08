@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,10 +24,9 @@
 **	Written by Kiem-Phong Vo.
 */
 
-#define PF_MINBLKCNT	(1024)		/* min # of blocks		*/
-#define PF_MAXBLKCNT	(4*1024*1024)	/* max number of blocks		*/
-#define PF_BLKSIZE	(256)		/* initial block size to try	*/
-#define PF_MINFILE	(16)		/* minimum file size		*/
+#define PF_MINSIZE	(16)		/* minimum block size		*/
+#define PF_DFLTSIZE	(16*PF_MINSIZE)	/* default block size		*/
+#define PF_MAXSIZE	(64*PF_MINSIZE)	/* maximum block size		*/
 
 #define PFMERGE(bz)	(16*(bz))	/* merge if overlapped by this	*/
 #define PFSMALL(n,bz)	((n) <= 3*(bz))	/* window too small to use	*/
@@ -430,7 +429,7 @@ target_file: /* returning computed windows in target file */
 		for(dt += 1; dt < endd; ++dt)
 		{	k = pfnext(dt, pfx->blksz, k, pfx->coef);
 			*++key = k == PF_HUGE ? (k>>1) : k;
-			/**/ASSERT(k == pfhash(dt, pfx->blksz));
+			/**/DEBUG_ASSERT(k == pfhash(dt, pfx->blksz));
 		}
 		pfx->keyb = pfx->here = here; /* set base of calculated keys */
 
@@ -444,17 +443,17 @@ target_file: /* returning computed windows in target file */
 		}
 	}
 
-	/**/ASSERT(pf && pf == pfx->srcf && pf->dtsz > 0);
-	/**/ASSERT(pfx->here == here);
+	/**/DEBUG_ASSERT(pf && pf == pfx->srcf && pf->dtsz > 0);
+	/**/DEBUG_ASSERT(pfx->here == here);
 	if((rv = pfwindow(pf, wm, pfx->blksz)) < 0)
 		return NIL(Vcwmatch_t*);
 	else
 	{	pfx->here = here + wm->msize;
-		/**/PRINT(2,"here=%8d ",(ssize_t)here);
-		/**/PRINT(2,"dtsz=%8d ",(ssize_t)dtsz);
-		/**/PRINT(2,"mtch=%8d ",(ssize_t)wm->msize);
-		/**/PRINT(2,"wpos=%8d ",(ssize_t)wm->wpos);
-		/**/PRINT(2,"wsiz=%8d \n",(ssize_t)wm->wsize);
+		/**/DEBUG_PRINT(2,"here=%8d ",(ssize_t)here);
+		/**/DEBUG_PRINT(2,"dtsz=%8d ",(ssize_t)dtsz);
+		/**/DEBUG_PRINT(2,"mtch=%8d ",(ssize_t)wm->msize);
+		/**/DEBUG_PRINT(2,"wpos=%8d ",(ssize_t)wm->wpos);
+		/**/DEBUG_PRINT(2,"wsiz=%8d \n",(ssize_t)wm->wsize);
 		if(rv > 0)
 		{	wm->type = VCD_SOURCEFILE;
 			return wm;
@@ -498,20 +497,22 @@ int		type;
 		if(!(pfx = (Prefix_t*)calloc(1,sizeof(Prefix_t))) )
 			return -1;
 
-		/* compute block size so that #blocks is in [MINBLKCNT,MAXBLKCNT] */
+		/* compute a suitable block size between [MINSIZE,MAXSIZE] */
 		srcsz = vcw->disc->srcf ? sfsize(vcw->disc->srcf) : 0;
 		tarsz = vcw->disc->tarf ? sfsize(vcw->disc->tarf) : 0;
 		maxsz = srcsz > tarsz ? srcsz : tarsz;
-		if(maxsz < PF_MINFILE)
+		if(maxsz < PF_MINSIZE)
 			sz = 0;
 		else
-		{	sz = PF_BLKSIZE;
-			while(maxsz/sz > PF_MAXBLKCNT)
-				sz *= 2;
-			while(sz > PF_MINFILE && maxsz/sz < PF_MINBLKCNT)
-				sz /= 2;
+		{	sz = PF_DFLTSIZE;
+#define PF_MINBLKCNT	(8*1024)	/* aim for at least this many	*/
+#define PF_MAXBLKCNT	(16*1024*1024)	/* likewise for upper bound	*/
+			while(sz < PF_MAXSIZE && maxsz/sz > PF_MAXBLKCNT)
+				sz += PF_MINSIZE;
+			while(sz > PF_MINSIZE && maxsz/sz < PF_MINBLKCNT)
+				sz -= PF_MINSIZE;
 		} 
-		pfx->blksz = sz; /**/ PRINT(2,"blksz=%d\n",pfx->blksz);
+		pfx->blksz = sz; /**/ DEBUG_PRINT(2,"blksz=%d\n",pfx->blksz);
 
 		pfx->coef = 1; /* highest coef in hashing blocks */
 		for(; sz > 1; --sz)
@@ -565,7 +566,9 @@ int		type;
 Vcwmethod_t	_Vcwprefix =
 {	pfmatch,
 	pfevent,
-	"prefix"
+	"prefix",
+	"Find windows with matching prefixes.",
+	"[-version?window::prefix (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 };
 
 Vcwmethod_t*	Vcwprefix = &_Vcwprefix;

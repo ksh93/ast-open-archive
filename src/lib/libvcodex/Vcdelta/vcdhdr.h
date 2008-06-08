@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,7 +20,7 @@
 #ifndef _VCDHDR_H
 #define _VCDHDR_H	1
 
-#include	"vcmeth.h"
+#include	"vchdr.h"
 
 #define COPYMIN		(4)	/* min size for a COPY 		*/
 
@@ -72,17 +72,9 @@ struct _vcdsave_s
 	ssize_t		mode;		/* address encoding mode	*/
 };
 
-/* context initialization */
-typedef struct _vcdctxt_s
-{
-	int		dctxt;
-	int		ictxt;
-	int		actxt;
-} Vcdctxt_t;
-
 /* the Vcdiff/undiff handle */
 struct _vcdiff_s
-{	Vcparse_t	vcpa;
+{	Vclzparse_t	vcpa;
 
 	Vcdcache_t*	cache;		/* address caches		*/
 	Vcdtable_t*	table;		/* code table for compression	*/
@@ -121,7 +113,7 @@ extern ssize_t		vcdkasetaddr _ARG_((Vcdcache_t*, ssize_t, ssize_t, ssize_t*));
 extern ssize_t		vcdkagetaddr _ARG_((Vcdcache_t*, Vcio_t*, ssize_t, ssize_t));
 
 extern Vcdtable_t*	vcdbmtable();
-extern int		vcdbmputinst _ARG_((Vcparse_t*, ssize_t, ssize_t, ssize_t, ssize_t, int));
+extern int		vcdbmputinst _ARG_((Vclzparse_t*, ssize_t, ssize_t, ssize_t, ssize_t, int));
 _END_EXTERNS_
 
 #endif /*_VDELHDR_H*/

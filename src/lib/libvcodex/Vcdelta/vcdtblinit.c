@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -53,7 +53,7 @@ Vcdindex_t*	idx;
 {
 	int		i, m, maxm, s, maxs, t, maxt;
 	Vcdcode_t*	code = tbl->code;
-	/**/ DECLARE(int, k);
+	/**/DEBUG_DECLARE(int, k);
 
 	i = 0; /* the only RUN instruction has index 0	*/
 	code[i].inst1.type = VCD_RUN;
@@ -64,7 +64,7 @@ Vcdindex_t*	idx;
 	code[i].inst1.mode = 0;
 	i += 1;
 
-	/**/ SET(k,0); /* the single ADD instructions */
+	/**/DEBUG_SET(k,0); /* the single ADD instructions */
 	for(s = 0; s <= siz->add; ++s)
 	{	code[i].inst1.type = VCD_ADD;
 		code[i].inst1.size = s;
@@ -74,13 +74,13 @@ Vcdindex_t*	idx;
 		code[i].inst2.mode = 0;
 		if(idx)
 			idx->add[s] = i;
-		i += 1; /**/ COUNT(k);
-	} /**/ ASSERT(i < 256);
+		i += 1; /**/DEBUG_COUNT(k);
+	} /**/DEBUG_ASSERT(i < 256);
 
 	/* max address type */
 	maxm = tbl->s_same + tbl->s_near + 1;
 
-	/**/ SET(k,0); /* the single COPY instructions */
+	/**/DEBUG_SET(k,0); /* the single COPY instructions */
 	for(m = VCD_SELF; m <= maxm; ++m)
 	for(s = 0, maxs = siz->copy[m]; s <= maxs; s = s == 0 ? COPYMIN : s+1)
 	{	code[i].inst1.type = VCD_COPY;
@@ -91,10 +91,10 @@ Vcdindex_t*	idx;
 		code[i].inst2.mode = 0;
 		if(idx)
 			idx->copy[m][s] = i;
-		i += 1; /**/ COUNT(k);
-	} /**/ ASSERT(i <= 256);
+		i += 1; /**/DEBUG_COUNT(k);
+	} /**/DEBUG_ASSERT(i <= 256);
 
-	/**/ SET(k,0); /* merged ADD+COPY instructions */
+	/**/DEBUG_SET(k,0); /* merged ADD+COPY instructions */
 	for(m = VCD_SELF; m <= maxm; ++m)
 	for(s = 1, maxs = siz->add1[m]; s <= maxs; ++s)
 	for(t = COPYMIN, maxt = siz->copy2[m]; t <= maxt; ++t)
@@ -106,10 +106,10 @@ Vcdindex_t*	idx;
 		code[i].inst2.mode = m;
 		if(idx)
 			idx->addcopy[s][m][t] = i;
-		i += 1; /**/ COUNT(k);
-	} /**/ ASSERT(i <= 256);
+		i += 1; /**/DEBUG_COUNT(k);
+	} /**/DEBUG_ASSERT(i <= 256);
 
-	/**/ SET(k,0); /* merged COPY+ADD instructions */
+	/**/DEBUG_SET(k,0); /* merged COPY+ADD instructions */
 	for(m = VCD_SELF; m <= maxm; ++m)
 	for(s = COPYMIN, maxs = siz->copy1[m]; s <= maxs; ++s)
 	for(t = 1, maxt = siz->add2[m]; t <= maxt; ++t)
@@ -121,10 +121,10 @@ Vcdindex_t*	idx;
 		code[i].inst2.mode = 0;
 		if(idx)
 			idx->copyadd[m][s][t] = i;
-		i += 1; /**/ COUNT(k);
-	} /**/ ASSERT(i <= 256);
+		i += 1; /**/DEBUG_COUNT(k);
+	} /**/DEBUG_ASSERT(i <= 256);
 
-	/**/ ASSERT(i == 256);
+	/**/DEBUG_ASSERT(i == 256);
 }
 
 void _vcdtblinit()

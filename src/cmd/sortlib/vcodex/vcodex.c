@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2005-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2005-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortvcodex (AT&T Research) 2006-05-23 $\n]"
+"[-1lp0?\n@(#)$Id: sortvcodex (AT&T Research) 2008-06-06 $\n]"
 USAGE_LICENSE
 "[+NAME?sortvcodex - sort io vcodex discipline library]"
 "[+DESCRIPTION?The \bsortvcodex\b \bsort\b(1) discipline encodes and/or "
@@ -53,7 +53,7 @@ USAGE_LICENSE
 #include <error.h>
 #include <ls.h>
 #include <recsort.h>
-#include <vcsfio.h>
+#include <vcodex.h>
 
 struct Delay_s;
 typedef struct Delay_s Delay_t;
@@ -67,9 +67,9 @@ struct Delay_s
 
 typedef struct Encoding_s
 {
-	Vcsfmeth_t*	list;
-	ssize_t		size;
+	char*		trans;
 	char		suffix[16];
+	int		use;
 } Encoding_t;
 
 typedef struct State_s
@@ -95,19 +95,47 @@ zipit(const char* path)
 	return !path || ZIPSUFFIX(path, s);
 }
 
+static void
+vcsferror(const char* mesg)
+{	
+	error(2, "%s", mesg);
+}
+
+static int
+push(Sfio_t* sp, Encoding_t* code, const char* trans, int type)
+{
+	Vcsfdata_t*	vcsf;
+
+	if (!trans && !type)
+		return sfraise(sp, VCSF_DISC, NiL) == VCSF_DISC;
+	if (!(vcsf = newof(0, Vcsfdata_t, 1, 0)))
+		return -1;
+	vcsf->trans = (char*)trans;
+	vcsf->type = VCSF_FREE;
+	if (code)
+		vcsf->type |= VCSF_TRANS;
+	if (type)
+		vcsf->errorf = vcsferror;
+	if (!vcsfio(sp, vcsf, type))
+		return -1;
+	if (code && (code->trans = vcsf->trans))
+		code->use = 1;
+	return type ? 1 : vcsf->type;
+}
+
 static int
 encode(State_t* state, Sfio_t* sp, const char* path)
 {
 	char*		p;
 	struct stat	st;
 
-	if (!vcsfmeth(sp, NiL))
+	if (!push(sp, NiL, NiL, 0))
 	{
-		if (!state->output.size)
+		if (!state->output.use)
 			state->output = state->input;
-		if (sfdcvcodex(sp, state->output.list, state->output.size, VC_ENCODE) < 0)
+		if (push(sp, NiL, state->output.trans, VC_ENCODE) < 0)
 		{
-			error(2, "%s: cannot push vcodex encode discipline", path);
+			error(2, "%s: cannot push vcodex encode discipline (%s)", path, state->output.trans);
 			return -1;
 		}
 		if (!ZIPSUFFIX(path, p) && *state->input.suffix && !stat(path, &st) && S_ISREG(st.st_mode))
@@ -119,7 +147,7 @@ encode(State_t* state, Sfio_t* sp, const char* path)
 				path = (const char*)p;
 		}
 		if (state->verbose)
-			error(0, "sort vcodex encode %s", path);
+			error(0, "sort vcodex encode %s (%s)", path, state->output.trans);
 	}
 	return 0;
 }
@@ -144,9 +172,9 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 	switch (op)
 	{
 	case RS_FILE_WRITE:
-		if (((Sfio_t*)data == sfstdout || zipit(arg)) && (state->output.size > 0 || !state->output.size && state->input.size > 0))
+		if (((Sfio_t*)data == sfstdout || zipit(arg)) && (state->output.use > 0 || !state->output.use && state->input.use > 0))
 			return encode(state, (Sfio_t*)data, (char*)arg);
-		if (!state->output.size && zipit(arg) && (arg || (arg = (Void_t*)"(output-stream)")) && (delay = newof(0, Delay_t, 1, strlen(arg))))
+		if (!state->output.use && zipit(arg) && (arg || (arg = (Void_t*)"(output-stream)")) && (delay = newof(0, Delay_t, 1, strlen(arg))))
 		{
 			delay->sp = (Sfio_t*)data;
 			strcpy(delay->name, arg);
@@ -155,41 +183,28 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 		}
 		break;
 	case RS_FILE_READ:
-		if (state->input.size >= 0)
+		if (state->input.use >= 0)
 		{
-			if ((i = sfdcvcodex((Sfio_t*)data, state->input.list, state->input.size, VC_DECODE)) < 0)
+			if ((i = push((Sfio_t*)data, &state->input, NiL, VC_DECODE)) < 0)
 			{
-				error(2, "%s: cannot push vcodex decode discipline", arg);
+				error(2, "%s: cannot push vcodex decode discipline (%s)", arg, state->input.trans);
 				return -1;
 			}
 			else if (i > 0)
 			{
 				if (state->verbose)
-					error(0, "sort vcodex decode %s", arg);
-				if (!state->input.size)
+					error(0, "sort vcodex decode %s (%s)", arg, state->input.trans);
+				if (state->delay)
 				{
-					if (!(state->input.list = vcsfmeth((Sfio_t*)data, &state->input.size)))
+					i = 0;
+					while (delay = state->delay)
 					{
-						error(2, "%s: cannot query vcodex decode discipline", arg);
-						return -1;
+						if (!i && state->input.use > 0 && !sfseek(delay->sp, (Sfoff_t)0, SEEK_CUR))
+							i = encode(state, delay->sp, delay->name);
+						state->delay = delay->next;
+						free(delay);
 					}
-					if (!(state->input.list = vcsfdup(state->input.list, state->input.size)))
-					{
-						error(2, "%s: cannot dup vcodex decode discipline", arg);
-						return -1;
-					}
-					if (state->delay)
-					{
-						i = 0;
-						while (delay = state->delay)
-						{
-							if (!i && state->input.size > 0 && !sfseek(delay->sp, (Sfoff_t)0, SEEK_CUR))
-								i = encode(state, delay->sp, delay->name);
-							state->delay = delay->next;
-							free(delay);
-						}
-						return i;
-					}
+					return i;
 				}
 				if (!*state->input.suffix && ZIPSUFFIX(arg, s))
 					strncopy(state->input.suffix, s, sizeof(state->input.suffix));
@@ -197,31 +212,31 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 		}
 		break;
 	case RS_TEMP_WRITE:
-		if (state->temporary.size > 0 || !state->temporary.size && state->input.size > 0)
+		if (state->temporary.use > 0 || !state->temporary.use && state->input.use > 0)
 		{
-			if (!state->temporary.size)
+			if (!state->temporary.use)
 				state->temporary = state->input;
-			if (sfdcvcodex((Sfio_t*)data, state->temporary.list, state->temporary.size, VC_ENCODE) < 0)
+			if (push((Sfio_t*)data, NiL, state->temporary.trans, VC_ENCODE) < 0)
 			{
-				error(2, "temporary-%d: cannot push vcodex encode discipline", tempid(state, data));
+				error(2, "temporary-%d: cannot push vcodex encode discipline (%s)", tempid(state, data), state->temporary.trans);
 				return -1;
 			}
 			if (state->verbose)
-				error(0, "sort vcodex encode temporary-%d", tempid(state, data));
+				error(0, "sort vcodex encode temporary-%d (%s)", tempid(state, data), state->temporary.trans);
 			return 1;
 		}
 		break;
 	case RS_TEMP_READ:
-		if (state->temporary.size > 0 || !state->temporary.size && state->input.size > 0)
+		if (state->temporary.use > 0 || !state->temporary.use && state->input.use > 0)
 		{
-			if (!state->temporary.size)
+			if (!state->temporary.use)
 				state->temporary = state->input;
 			if (!sfdisc((Sfio_t*)data, SF_POPDISC) || sfseek((Sfio_t*)data, (Sfoff_t)0, SEEK_SET))
 			{
 				error(2, "temporary-%d: cannot rewind temporary data", tempid(state, data));
 				return -1;
 			}
-			if ((i = sfdcvcodex((Sfio_t*)data, NiL, 0, VC_DECODE)) < 0)
+			if ((i = push((Sfio_t*)data, NiL, NiL, VC_DECODE)) < 0)
 			{
 				error(2, "temporary-%d: cannot push vcodex decode discipline", tempid(state, data));
 				return -1;
@@ -254,30 +269,39 @@ rs_disc(Rskey_t* key, const char* options)
 				break;
 			case 'i':
 				if (!opt_info.arg)
-					state->input.size = -1;
+					state->input.use = -1;
 				else if (streq(opt_info.arg, "-"))
-					state->input.size = 0;
-				else if (!(state->input.list = vcsfcomp(opt_info.arg, &state->input.size, NiL, errorf)))
-					goto drop;
+					state->input.use = 0;
+				else
+				{
+					state->input.trans = opt_info.arg;
+					state->input.use = 1;
+				}
 				continue;
 			case 'o':
 				if (!opt_info.arg)
-					state->output.size = -1;
+					state->output.use = -1;
 				else if (streq(opt_info.arg, "-"))
-					state->output.size = 0;
-				else if (!(state->output.list = vcsfcomp(opt_info.arg, &state->output.size, NiL, errorf)))
-					goto drop;
+					state->output.use = 0;
+				else
+				{
+					state->output.trans = opt_info.arg;
+					state->output.use = 1;
+				}
 				continue;
 			case 'r':
 				state->regress = 1;
 				continue;
 			case 't':
 				if (!opt_info.arg)
-					state->temporary.size = -1;
+					state->temporary.use = -1;
 				else if (streq(opt_info.arg, "-"))
-					state->temporary.size = 0;
-				else if (!(state->temporary.list = vcsfcomp(opt_info.arg, &state->temporary.size, NiL, errorf)))
-					goto drop;
+					state->temporary.use = 0;
+				else
+				{
+					state->temporary.trans = opt_info.arg;
+					state->temporary.use = 1;
+				}
 				continue;
 			case 'v':
 				state->verbose = 1;
@@ -295,7 +319,7 @@ rs_disc(Rskey_t* key, const char* options)
 			break;
 		}
 	}
-	if (state->temporary.size >= 0)
+	if (state->temporary.use >= 0)
 		key->type |= RS_TEXT;
 	state->disc.eventf = vcodex;
 	state->disc.events = RS_FILE_WRITE|RS_FILE_READ|RS_TEMP_WRITE|RS_TEMP_READ;
