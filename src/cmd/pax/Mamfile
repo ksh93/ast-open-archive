@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -628,9 +628,9 @@ done ${INSTALLROOT}/bin/rpm2cpio generated
 done install virtual
 make test
 make test.pax
+prev pax
 make pax.tst
 done pax.tst
-prev pax
 exec - regress  pax.tst pax
 done test.pax virtual
 make test.testpax

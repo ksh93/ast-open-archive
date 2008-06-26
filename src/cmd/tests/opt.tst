@@ -3387,6 +3387,7 @@ IMPLEMENTATION
 		EXIT 2
 
 TEST 60 'about nested components'
+
 	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{[+hal?HAL]{[--hoo?HOO][-har?HAR][--huh?HUH]}[+bob?BOB]{[--boo?BOO][-bar?BAR][--buh?BUH]}}'
 	EXEC sort "$usage" --man
 		OUTPUT - $'return=? option=- name=--man num=0'
@@ -3400,11 +3401,12 @@ OPTIONS
   -m, --method    The methods are:
                     hal   HAL
                             (har)           HAR
-                            (-huh)          HUH
+                            (huh)           HUH
                     bob   BOB
                             (bar)           BAR
-                            (-buh)          BUH'
+                            (buh)           BUH'
 		EXIT 2
+
 	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{[+hal?HAL]{[--hoo?HOO][-har?HAR]}[+bob?BOB]{[--boo?BOO][-bar?BAR]}}'
 	EXEC sort "$usage" --man
 		OUTPUT - $'return=? option=- name=--man num=0'
@@ -3420,6 +3422,7 @@ OPTIONS
                             (har)           HAR
                     bob   BOB
                             (bar)           BAR'
+
 	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{[+hal?HAL]{[+hoo?HOO][-har?HAR]}[+bob?BOB]{[-boo?BOO][+bar?BAR]}}'
 	EXEC sort "$usage" --man
 		OUTPUT - $'return=? option=- name=--man num=0'
@@ -3437,9 +3440,9 @@ OPTIONS
                     bob   BOB
                             (boo)           BOO
                             bar             BAR'
-	info=$'[+hal?HAL]{[--hoo?HOO][-har?HAR][--huh?HUH]}[+bob?BOB]{[--boo?BOO][-bar?BAR][--buh?BUH]}'
-	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{\fTEST\f}'
-	EXEC =TEST="$info" sort "$usage" --man
+
+	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{[+hal?HAL]{[--hoo?HOO][-har?HAR][--huh?HUH]}[+bob?BOB]{[--boo?BOO][-bar?BAR][--buh?BUH]}}'
+	EXEC sort "$usage" --man
 		OUTPUT - $'return=? option=- name=--man num=0'
 		ERROR - $'NAME
   boohoo
@@ -3451,10 +3454,56 @@ OPTIONS
   -m, --method    The methods are:
                     hal   HAL
                             (har)           HAR
-                            (-huh)          HUH
+                            (huh)           HUH
                     bob   BOB
                             (bar)           BAR
-                            (-buh)          BUH'
+                            (buh)           BUH'
+
+	info=$'[+hal?HAL]{[--hoo?HOO][-har?HAR][--huh?HUH]}[+bob?BOB]{[--boo?BOO][-bar?BAR][--buh?BUH]}'
+	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{\fTEST\f}'
+	EXEC =TEST="$info" sort "$usage" --man
+
+	info=$'[+hal?HAL]{[+hoo?HOO][-?\n@(#)$Id: zip::hoo (AT&T Research) 2003-01-01 $\n][-har?HAR][--xxx?yyy][--catalog?zip][+aha?AHA]}[+bob?BOB]{[-?\n@(#)$Id: zip::boo (AT&T Research) 2003-01-01 $\n][-bar?BAR]}'
+	usage=$'[-][+NAME?boohoo][m:method?The methods are:]{\fTEST\f}'
+	EXEC =TEST="$info" sort "$usage" --man
+		ERROR - $'NAME
+  boohoo
+
+SYNOPSIS
+  sort [ options ]
+
+OPTIONS
+  -m, --method    The methods are:
+                    hal   HAL
+                            hoo   HOO
+                            (version)       zip::hoo (AT&T Research) 2003-01-01
+                            (har)           HAR
+                            (xxx)           yyy
+                            (catalog)       zip
+                            aha             AHA
+                    bob   BOB
+                            (version)       zip::boo (AT&T Research) 2003-01-01
+                            (bar)           BAR'
+
+	EXEC =TEST="$info" sort "$usage" --help
+		OUTPUT - $'return=? option=- name=--help num=0'
+		ERROR - $'Usage: sort [ options ]
+OPTIONS
+  -m, --method    The methods are:
+                    hal   HAL
+                            hoo   HOO
+                            aha   AHA
+                    bob   BOB'
+
+	EXEC =TEST="$info" sort "$usage" --?method
+		OUTPUT - $'return=? option=-? name=--?method num=0'
+		ERROR - $'Usage: sort [ options ]
+OPTIONS
+  -m, --method    The methods are:
+                    hal   HAL
+                            hoo   HOO
+                            aha   AHA
+                    bob   BOB'
 
 # skip non-astsa (standalone ast) tests
 

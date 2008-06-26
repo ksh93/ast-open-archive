@@ -1,3 +1,4 @@
+08-06-24 date.dat: update for tmxfmt() %z fix
 08-05-22 testdate.sh: add date.dat supplement test case generator
 08-05-20 strtof*.rt: reorganize strtof tests for easy(ier) change
 08-02-11 date.dat: add more ISO 8601:2000 tests

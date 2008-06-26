@@ -2920,6 +2920,23 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 }
 
 /*
+ * return 1 if fp is an active frame
+ */
+
+static int
+active(Rule_t* r, register Frame_t* fp)
+{
+	register Frame_t*	ap;
+
+	for (ap = state.frame; ap; ap = ap->parent)
+		if (fp == ap)
+			return 1;
+	error(1, "%s: parentage not in active frame", r->name);
+	dumprule(sfstderr, r);
+	return 0;
+}
+
+/*
  * construct the parentage of r in xp, starting with r
  * sep placed between names
  */
@@ -2927,7 +2944,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 void
 parentage(Sfio_t* xp, register Rule_t* r, char* sep)
 {
-	if (r->active && r->active->parent && !(r->active->parent->target->mark & M_mark) && r->active->parent->parent != r->active->parent)
+	if (r->active && active(r, r->active) && r->active->parent && !(r->active->parent->target->mark & M_mark) && r->active->parent->parent != r->active->parent)
 	{
 		r->mark |= M_mark;
 		parentage(xp, r->active->parent->target, sep);

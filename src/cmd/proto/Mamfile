@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -345,9 +345,9 @@ done ${INSTALLROOT}/lib/sear/sear.ico generated
 done install virtual
 make test
 make test.proto
+prev proto
 make proto.tst
 done proto.tst
-prev proto
 exec - regress  proto.tst proto
 done test.proto virtual
 done test dontcare virtual

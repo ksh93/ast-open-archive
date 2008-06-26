@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -178,9 +178,9 @@ done ${INSTALLROOT}/lib/acpp generated
 done install virtual
 make test
 make test.cpp
+prev cpp
 make cpp.tst
 done cpp.tst
-prev cpp
 exec - regress  cpp.tst cpp
 done test.cpp virtual
 done test dontcare virtual

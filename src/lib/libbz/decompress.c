@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *              This software is part of the bzip package               *
-*                       Copyright (c) 1996-2005                        *
+*                       Copyright (c) 1996-2008                        *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *

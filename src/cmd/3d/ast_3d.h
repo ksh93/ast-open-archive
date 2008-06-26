@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -28,8 +28,11 @@
 #define _NAME3D_AST_H
 
 #define _ast_state	_3d_ast_state
+#define _ast_getenv	_3d_ast_getenv
 #define _ast_info	_3d_ast_info
+#define _ast_setenviron	_3d_ast_setenviron
 #define _hash_info_	_3d_hash_info
+#define astintercept	_3d_astintercept
 #define fmterror	_3d_fmterror
 #define fmttime		_3d_fmttime
 #define hashalloc	_3d_hashalloc
@@ -53,5 +56,7 @@
 #include <ast_lib.h>
 
 #undef	_lib_fmterror
+
+extern char*		_3d_ast_getenv(const char*);
 
 #endif

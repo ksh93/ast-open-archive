@@ -466,7 +466,7 @@ NIL	%M_%n_%p_%r			09_\n_PM_03:09:47 PM
 NIL	%s_%S_%t_%T			527800187_47_\t_15:09:47
 NIL	%j_%U_%V_%W_%u_%w		265_38_39_38_1_1
 NIL	%x_%X_%y_%Y			09/22/86_15:09:47_86_1986
-NIL	%z_%Z				-0500_EDT
+NIL	%z_%Z				-0400_EDT
 NIL	%Y-%m-%d			1986-09-22
 
 NIL	%a		Mon
@@ -485,7 +485,7 @@ NIL	%g		86
 NIL	%G		1986
 NIL	%h		Sep
 NIL	%H		15
-NIL	%i		Mon Sep 22 15:09:47 -0500 EDT 1986
+NIL	%i		Mon Sep 22 15:09:47 -0400 EDT 1986
 NIL	%I		03
 NIL	%j		265
 NIL	%J		264
@@ -519,7 +519,7 @@ NIL	%x		09/22/86
 NIL	%X		15:09:47
 NIL	%y		86
 NIL	%Y		1986
-NIL	%z		-0500
+NIL	%z		-0400
 
 NIL	%0a		Mon
 NIL	%0A		Monday
@@ -537,7 +537,7 @@ NIL	%0g		86
 NIL	%0G		1986
 NIL	%0h		Sep
 NIL	%0H		15
-NIL	%0i		Mon Sep 22 15:09:47 -0500 EDT 1986
+NIL	%0i		Mon Sep 22 15:09:47 -0400 EDT 1986
 NIL	%0I		03
 NIL	%0j		265
 NIL	%0J		264
@@ -571,7 +571,7 @@ NIL	%0x		09/22/86
 NIL	%0X		15:09:47
 NIL	%0y		86
 NIL	%0Y		1986
-NIL	%0z		-0500
+NIL	%0z		-0400
 
 NIL	%-a		Mon
 NIL	%-A		Monday
@@ -589,7 +589,7 @@ NIL	%-g		86
 NIL	%-G		1986
 NIL	%-h		Sep
 NIL	%-H		15
-NIL	%-i		Mon Sep 22 15:09:47 -0500 EDT 1986
+NIL	%-i		Mon Sep 22 15:09:47 -0400 EDT 1986
 NIL	%-I		3
 NIL	%-j		265
 NIL	%-J		264
@@ -623,7 +623,7 @@ NIL	%-x		09/22/86
 NIL	%-X		15:09:47
 NIL	%-y		86
 NIL	%-Y		1986
-NIL	%-z		-0500
+NIL	%-z		-0400
 
 NIL	%_a		Mon
 NIL	%_A		Monday
@@ -641,7 +641,7 @@ NIL	%_g		86
 NIL	%_G		1986
 NIL	%_h		Sep
 NIL	%_H		15
-NIL	%_i		Mon Sep 22 15:09:47 -0500 EDT 1986
+NIL	%_i		Mon Sep 22 15:09:47 -0400 EDT 1986
 NIL	%_I		 3
 NIL	%_j		265
 NIL	%_J		264
@@ -675,4 +675,4 @@ NIL	%_x		09/22/86
 NIL	%_X		15:09:47
 NIL	%_y		86
 NIL	%_Y		1986
-NIL	%_z		-0500
+NIL	%_z		-0400
