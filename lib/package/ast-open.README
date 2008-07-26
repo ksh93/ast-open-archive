@@ -92,7 +92,63 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-08-06-06  --- Release ksh93t-  ---
+08-07-25  --- Release ksh93t  ---
+08-07-18  A bug in which a nameref caused a local variable to be created
+	  rather than binding to an existing variable in the global scope
+	  has been fixed.
+08-07-17  A bug which occured when a nameref was created from within a
+	  function that was  part of a pipeline has been fixed.
+08-07-14  The compile option SHOPT_STATS was added. With this option the
+	  compound variable .sh.stats keeps usage statistics that could help
+	  with performance tuning.
+08-07-10  The output of set now always uses a single line for each variable.
+	  For array variables, the complete set of values is now displayed.
+08-07-09  The typeset -C option can be used with arrays to indicate that
+	  each element should default to a compound variable.
+08-07-08  The %B format now outputs compound variables and arrays.  The
+	  alternate flag # can be used to cause output into a single line.
+08-07-03  When the window change signal, WINCH, is received, the current
+	  edit line is redrawn in place. 
+08-07-01  A bug in the handling of shared variables when inside an embedded
+	  type has been fixed.
+08-06-29  A bug in multiline edit mode which occured when the prompt length
+	  was three characters or less has been fixed.
+08-06-23  A bug in which the SIGCLD was not be triggered when background
+	  jobs completed has been fixed.
+08-06-23  KSH_VERSION added as a name reference to .sh.version.
+08-06-20  type now outputs 'special builtin' for special builtins.
+08-06-19  A couple of bugs in multi-dimensional arrays have been fxied.
+08-06-19  A bug in which a syntax error in a dot script could generated
+	  a syntax error in the next subsequent command has been fixed.
+08-06-17  Reduced the maximum function call depth to 2048 to avoid exceptions
+	  on some architectures.
+08-06-16  A bug in which printf "%B" could generate an exception when the
+	  specified variable was not set has been fixed.
+08-06-16  When typeset -p is followed by variable names, it now displays
+	  the attributes names and values for the specific names.
+08-06-14  A bug that could effect the drawing of the screen from multiline
+	  emacs or gmacs mode when walking up the history file has been fixed.
+08-06-13  A bug in which a compound variable defined in a subshell could
+	  have side effects into the parent shell has been fixed.
+08-06-13  A number of bugs related to using .sh.level to set the stack from
+	  for DEBUG traps have been fixed.
+08-06-13  The .sh.lineno variable has been added.  When .sh.level is changed
+	  inside a DEBUG trap, the .sh.lineno contains the calling line number
+	  for the specified stack frame.
+08-06-13  The .sh.level variable has been documented and now works.
+08-06-11  The -C option has been added to read for reading compound command
+	  definitions from a file.
+08-06-11  The . command is now permitted inside a compound command definition.
+	  The dot script can contain declaration commands and dot commands.
+08-06-09  Add -C option to typeset so that typeset -C foo, is equivalent
+	  to foo=().
+08-06-09  Added -n warning message for typeset option orderings that are valid
+	  with ksh88 but not valid with ksh93, for example Lx5.
+08-06-09  A bug in which the return value for an assignment command containing
+	  a command substitution with that failed was zero when the assignment
+	  contained redirections has been fixed.
+08-06-09  A bug in the quoting of $ inside a ERE pattern ~(E)(pattern)
+	  has been fixed.
 08-06-06  A bug when processing `` command substitution with the character
 	  sequence \$' has been fixed.
 08-06-02  When defining a type, the typeset -r attribute causes this field
@@ -2281,6 +2337,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+08-06-24 date.dat: update for tmxfmt() %z fix
 08-05-22 testdate.sh: add date.dat supplement test case generator
 08-05-20 strtof*.rt: reorganize strtof tests for easy(ier) change
 08-02-11 date.dat: add more ISO 8601:2000 tests
@@ -2362,6 +2419,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+08-06-20 ast_3d.h,ast.c: add libast/misc/setenviron.c
 07-03-26 Makefile: drop -L* from IFFEREFS -- handled by .IFFE.REF.
 07-03-21 lib_3d.h,error.c: handle error_info => *_error_data_
 06-12-04 3d.h: strmode() bsd conflict tweak
@@ -4114,104 +4172,9 @@ All recorded changes follow.
 04-01-01 add --passphrase
 03-12-18 add to ast -- still working on relationship with { -lvcodex -lz -lbz }
 
-:::::::: cql ::::::::
-
-04-07-22 hix.c: access() => eaccess()
-02-11-12 expr.c: save result before regfree() in cql.sub()
-02-09-06 cql: fix field update when old string value is NiL
-02-06-27 cql: fix file details 0 dereference when no file name
-02-05-20 cql: update to use regsubcomp(),regsubexec()
-01-07-17 cql: call dllerror() on dllfind() error
-01-02-14 cql: fix bug that didn't propagate details to cdbopen()
-	 cql: add --regenerate to force index regeneration
-01-02-07 cql.tst: add -l to TEST 19,20
-01-01-01 cql: the field default CDB_SPACE now strips leading/trailing spaces
-	 cql: add SCHEMA.details="nospace" to inhibit field space stripping
-	 cql: add space.cql test
-00-12-12 cql: fix 0 pointer deref in commit()
-00-09-13 cql: fix state.active repeat lookups (still should avoid generate())
-99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
-99-10-01 cql: fix up array[n] format
-99-09-22 cql: for (member[index]) support
-99-08-11 cql: all assignment in end() -- handy to check maps
-99-05-25 expr: fix %I* integer output, core dump
-99-05-01 cql,cdb: long options
-99-03-01 cql,cdb: +ldcb until pzip is opened up
-98-12-25 cql: fix ciao closure bug that accesses wrong db file
-98-11-11 cql: fix default delimiter/terminator values
-98-11-01 cql: fix last outstanding ciao bug
-98-10-20 cql: fix closure bugs introduced during <hash.h> => <cdt.h> conversion
-98-09-18 cql: add cdb indexf, :sorted key attribute
-98-06-04 cql: add terminator='.'
-98-05-28 cql: numerous bug fixes (with regression tests!)
-98-02-06 cql.tst add test for -lexpr update
-	 hix: fix sizeof(long)>sizeof(int) bugs
-97-12-07 long long integer arithmetic update
-97-10-01 regression tests pass
-	 cdb->io seeks eliminated
-97-09-26 first recode for cdb 2.0
-	 another will come when keys are added to cdb
-97-07-17 add first cdb code
-	 expr discipline interface
-	 add -cx.c to generate compiled code
-	 add -cx.so to load compiled code
-	 add -cx.cdb to generate cdb file
-	 add schema.comment='data-comment'
-	 add schema.permanent=<#permanent-fields>
-	 drop -Ldir; -Idir now used to find all files
-97-06-06 a few more direct access field optimizations
-	 -n means don't generate indices!
-97-05-09 allow 1 field with no delimiters -- duh
-	 handle direct access subfields by manipulating main field indices
-96-12-25 hix files now have .hix suffix unconditionally
-	 drop sfset(sfstdin,SF_SHARE,1)
-96-01-30 unused var cleanup
-96-01-01 AT&T Research now
-	 switch to <regex.h>
-95-11-24 fix -l bug that generated incorrect index file name
-	 sftmp(0) -> sftmp(SF_BUFSIZE)
-95-10-31 handle empty vdb in hixget()
-95-07-17 use local (.) index iff -l
-	 don't generate indices for empty vdb members!
-	 add -f file equivalent to -e "#include 'file'"
-	 -d, -e, -f parsed at same time
-	 add hixerror() for better error messages
-95-05-09 minor fixes via Ryan Wallach
-	 forgot <ctype.h> for is*()
-	 fix char* x[y]; schema members
-	 fix -e declarations+expressions
-	 <2M stdin read and hashed
-95-04-01 fix hixclose() index generation conflict with multiple hixopen()
-95-02-14 fix view overlay in record()
-	 add schema.scanlimit to limit the number of top level scan partitions
-95-01-19 fix index file lookup for non local db
-95-01-11 fix state.loop conflict caused by CLOSURE
-	 -e can now handle declarations followed by labeled expressions
-95-01-01 fix schema/member name conflict
-94-12-25 fix indirect here subfield access that lost field boundaries
-	 fix partition database overlays
-	 :: between partition files restricts self-reference to partition
-	 :: between partition files returns duplicates on scans
-	 add closure
-	 fix record bug that stomped on next record
-	 closure must be on edges, not just nodes!
-94-11-11 minor fixes
-94-08-11 initialize f=0 in expr.c/assign()
-94-03-19 fix switch limit check in collapse()
-93-10-11 fix views
-93-09-20 implement sort={...} by sandwiching around /bin/sort
-93-08-11 fix a.b.c reference optimization bug that bound to wrong field
-	 use vdb archive for hash index files - x.DB for x.db
-	 -g for g2 output
-93-04-01 fix partition references to remain in same level
-	 economize fd usage via ioopen/ioclose in hix
-	 add -a for (inter)active session on stdin/stdout
-92-09-16 add union db
-92-09-02 add partition db
-92-09-01 add virtual db
-
 :::::::: dss ::::::::
 
+08-07-17 dss.c: tweak self-docs
 06-10-11 add sfstruse() error checks
 03-02-06 dss.c: convert main loop to dssrun()
 03-01-23 dss.c: update stamp to reflect library version 20030123
@@ -4248,6 +4211,8 @@ All recorded changes follow.
 
 :::::::: bgp ::::::::
 
+08-07-16 bgp-mrt.c: fix MP_UNREACH_NLRI parse bug
+08-06-24 bgp-mrt.c: handle ipv6 extensions
 08-01-15 bgp.c,bgp-cisco.c: add { BGP_rib_failure BGP_stale }
 07-12-13 bgp-mrt.c: unknown format: <hex-flag>:<dec-type>:<dec-size>:<mime-encoded-data>;
 07-12-06 bgp.c: add { agg_addr32 agg_as32 path32 path32_len unknown }
@@ -4334,6 +4299,8 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+08-07-25 ip_t.c: add { %(prefix:C)s %(addr:C)s } for 0x%02x comma-separated value
+08-06-11 add { fv ptv } for ipv6
 08-01-15 bgp.h: add { BGP_rib_failure BGP_stale }
 07-12-06 ip_t.c: add as32 support
 07-12-06 ire,itl: add dots arg for dotted representation
@@ -4359,6 +4326,7 @@ All recorded changes follow.
 
 :::::::: lsa ::::::::
 
+08-06-11 ospf_lsa.c: handle generic ip address type binding
 03-02-07 change "time" to "ns_t" and u_int64 in the canonical record
 03-01-31 update rtid doc
 03-01-23 update for void* => Dssrecord_t*
@@ -5271,6 +5239,16 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+08-07-21 include/glob.h,misc/glob.c: GLOB_STARSTAR only forces lstat on chdir
+08-07-17 sfio: sync with kpv
+08-07-17 misc/optget.c: call astwinsize() each time terminal width required
+08-07-16 sfio/sfvscanf.c: fix %% to skip leading space per posix
+08-07-16 vmalloc/vmbest.c: add VMCHECK=m, VM_mmap to favor mmap() alloc
+08-07-16 features/stdio,stdio/f(read|write).c: size_t return value!! ouch
+08-06-24 tm/tmxfmt.c: fix %z to handle tm_isdst -- doh
+08-06-24 misc/astintercept.c,misc/getenv.c: split from misc/setenviron.c
+08-06-17 misc/setenviron.c: add { astintercept() getenv() }
+08-06-09 tm/tmlocale.c: use _DATE_FMT if defined for TM_DEFAULT
 08-06-06 misc/optget.c: handle sub-component about details
 08-06-04 misc/optget.c: fix [-n?\n...\n] version parse
 08-06-04 include/debug.h,misc/debug.c: merge with kpvdebug.h
@@ -6782,6 +6760,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+08-06-17 shcmd.h: move to libast
 08-04-24 uniq.c: add optget() 'n' option for -1 => -f1
 08-04-24 getconf.c: clarify diffs between "name - value" and "name = value"
 08-04-01 cut.c: add write error check
@@ -7876,43 +7855,10 @@ All recorded changes follow.
 03-12-15 { rot13 qp uu iconv } working
 03-12-11 first code
 
-:::::::: libcdb ::::::::
-
-06-10-11 add sfstruse()/sfstropen() error checks
-04-10-31 cdbcdb.c: fix CDB_OPEN vs. cdbhdrread() sfdisc() buffer flush bug
-04-02-29 cdb.h: fix data symbol __EXPORT__ logic
-02-02-14 Makefiles: add explicit -lz -ldll references
-01-07-17 cdblib: call dllerror() on failed dllfind()
-01-02-14 cdbtypes: add seed detail for {hash} and {rand} types
-01-01-01 cdbimage: drop span discipline that invalidated seeks
-	 cdbflat: check details in flatevent
-	 cdbflat: fix CDB_SPACE to strip both leading and trailing space
-00-02-14 cdbimage: fix record span bug that caused cql regression test failures
-99-10-01 add: cdbimage() CDB_IMAGE
-99-08-11 cdbopen: fix referenced checks
-	 cdbflat: add test for fixed length records with terminator
-	 cdbpzip: pass details to pzip discipline
-99-03-19 cdbopen.c: drop <dlfcn.h>
-98-12-25 fix cdbmove bug
-98-11-11 cdbflat: {.}q {.}Q
-98-09-18 2.2 Cdbdisc_t expansion
-	 Cdbdisc_t: add indexf(cdb,key,disc)
-	 cdbflat: add flatfixread() with test for indexf
-98-06-04 cdbopen: add magicmeth() to recognize !<cdb-METHOD[-MAJOR.MINOR]>\n
-98-05-28 {.}[+-]d for subdelimiter push/pop
-98-05-18 flatrecread: add delimiter==terminator
-	 cdbtypes: add heka numbers, *native* be+le CDB_FLOATING
-97-11-11 flatpureread: avoid sfgetr() '\n' reset -- HACK
-	 CDB_TEST1 required to enable flatpureread tests (util bugs fixed)
-97-10-01 initial release
-	 TBD: Cdbkey_t
-97-08-11 beta release
-	 2.0 cdb header format
-97-07-11 alpha release
-	 1.0, 1.1 cdb header format
-
 :::::::: libdss ::::::::
 
+08-06-24 dss.h: add per-Dssfile_t vm
+08-06-17 cx.h: add Cxtype_t* arg to Cxmatchexec_f for delayed eval
 08-05-08 cxopen.c: fix number_external() width logic
 07-11-28 cxcomp.c,cxmap.c: fix num=>str cast logic
 07-10-26 cxcomp.c: fix s="S"; print(s,s) cast bug
@@ -8288,6 +8234,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+08-07-23 vcodex.h: add __EXPORT__/__IMPORT__ extern attributes
 08-06-04 sync with kpv
 06-07-26 vcgetmeth.c,vcextract.c: handle CC_NATIVE!=CC_ASCII
 06-02-14 vcodex.h: add __EXPORT__ to plugin declaration

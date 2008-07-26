@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,21 +25,21 @@
 static char **av;
 static int ac;
 
-static void tksh_userinit(int subshell)
+static void tksh_userinit(Shell_t* shp, int subshell)
 {
 	char *end = av[0] + strlen(av[0]);
 	int len = strlen(av[0]);
 	char *args[2];
 	Namval_t *np;
 
-	if(np = nv_open("source",sh.alias_tree,NV_NOADD))
+	if(np = nv_open("source",shp->alias_tree,NV_NOADD))
 	{
 		nv_unset(np);
 		nv_close(np);
 	}
 	if (subshell < 0)
 	{
-		if(nv_open("tkloop",sh.fun_tree,NV_NOADD))
+		if(nv_open("tkloop",shp->fun_tree,NV_NOADD))
 			sh_trap("tkloop", 0);
 		return;
 	}

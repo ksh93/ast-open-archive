@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2008-08-10 $\n]"
+"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2008-06-11 $\n]"
 USAGE_LICENSE
 "[+NAME?flat - dss flat method schema description]"
 "[+DESCRIPTION?The \bdss\b flat method schema is an XML file.]"
@@ -70,7 +70,7 @@ struct Table_s; typedef struct Table_s Table_t;
 struct Value_s; typedef struct Value_s Value_t;
 
 typedef Cxvalue_t* (*Convertget_f)(Convert_t*, Cxvariable_t*, void*);
-typedef Cxvalue_t* (*Flatget_f)(Record_t*, int);
+typedef Cxoperand_t* (*Flatget_f)(Record_t*, int);
 
 struct Value_s
 {
@@ -140,8 +140,9 @@ struct Key_s				/* field key			*/
 
 struct Member_s				/* record member		*/
 {
-	Cxvalue_t	value;		/* value (first for dynamic Q)	*/
+	Cxoperand_t	ret;		/* value (first for dynamic Q)	*/
 	Field_t*	field;		/* static field info		*/
+	Cxtype_t*	type;		/* dynamic record data type	*/
 	size_t		off;		/* record data offset		*/
 	size_t		siz;		/* record data size		*/
 	unsigned int	serial;		/* read serial number		*/
@@ -271,13 +272,14 @@ struct Flat_s				/* Dssmeth_t.data		*/
 #define SWAP_be		0
 #define SWAP_le		7
 
-static Cxvalue_t	null;
+static Cxvalue_t	nullval;
+static Cxoperand_t	nullret;
 
 /*
  * lazy flat field retrieval
  */
 
-static Cxvalue_t*
+static Cxoperand_t*
 flatget(register Record_t* r, int index)
 {
 	Flat_t*			flat = r->flat;
@@ -293,7 +295,7 @@ flatget(register Record_t* r, int index)
 	unsigned char*		g;
 	unsigned char*		m;
 	Record_t*		b;
-	Cxvalue_t*		v;
+	Cxoperand_t*		v;
 	Key_t*			k;
 	Cxoperand_t		a;
 	int			c;
@@ -303,7 +305,7 @@ flatget(register Record_t* r, int index)
 	size_t			n;
 
 	if (index >= r->nfields)
-		return &null;
+		return &nullret;
 	w = &r->fields[index];
 	if (w->serial != r->serial)
 	{
@@ -317,9 +319,9 @@ flatget(register Record_t* r, int index)
 				b->index = b->offset;
 				if (!(v = flatget(r, w->field->structure.parent->index)))
 					goto empty;
-				if (b->buf = b->cur = v->string.data)
+				if (b->buf = b->cur = v->value.string.data)
 				{
-					b->siz = v->string.size;
+					b->siz = v->value.string.size;
 					r = b;
 				}
 			}
@@ -575,91 +577,101 @@ flatget(register Record_t* r, int index)
 		}
 		if (m = w->field->map)
 			s = (unsigned char*)ccmapcpy(m, fmtbuf(w->siz), (char*)s, w->siz);
-		if ((*w->field->physical.type->internalf)(r->cx, w->field->physical.type, NiL, &w->field->physical.format, &w->value, (char*)s, w->siz, r->cx->rm, r->cx->disc) < 0)
+		w->ret.type = w->field->variable.type;
+		if ((*w->field->physical.type->internalf)(r->cx, w->field->physical.type, NiL, &w->field->physical.format, &w->ret, (char*)s, w->siz, r->cx->rm, r->cx->disc) < 0)
 		{
 	empty:
-			if (cxisstring(w->field->variable.type))
+			w->ret.type = w->field->variable.type;
+			if (cxisstring(w->ret.type))
 			{
-				w->value.string.data = "";
-				w->value.string.size = 0;
+				w->ret.value.string.data = "";
+				w->ret.value.string.size = 0;
 			}
 			else
-				w->value.number = 0;
+				w->ret.value.number = 0;
 		}
+		if (w->ret.type->generic)
+			for (x = 0; w->ret.type->generic[x]; x++)
+				if (w->ret.type->generic[x]->base == w->field->physical.type || w->ret.type->generic[x]->base == w->field->physical.type->base)
+				{
+					w->ret.type = w->ret.type->generic[x];
+					break;
+				}
 	}
-	return &w->value;
+	return &w->ret;
 }
 
 /*
  * lazy flat field retrieval for aligned binary data
  */
 
-static Cxvalue_t*
+static Cxoperand_t*
 flatgetbinary(register Record_t* r, int index)
 {
 	register Member_t*	w = &r->fields[index];
 	register char*		s;
 
+	w->ret.type = w->field->variable.type;
 	if (w->serial != r->serial)
 	{
 		w->serial = r->serial;
 		switch (FW(w->field->physical.format.flags,w->field->physical.format.width))
 		{
 		case FW(CX_UNSIGNED|CX_INTEGER,1):
-			w->value.number = *(uint8_t*)(r->buf + w->off);
+			w->ret.value.number = *(uint8_t*)(r->buf + w->off);
 			break;
 		case FW(CX_UNSIGNED|CX_INTEGER,2):
-			w->value.number = *(uint16_t*)(r->buf + w->off);
+			w->ret.value.number = *(uint16_t*)(r->buf + w->off);
 			break;
 		case FW(CX_UNSIGNED|CX_INTEGER,4):
-			w->value.number = *(uint32_t*)(r->buf + w->off);
+			w->ret.value.number = *(uint32_t*)(r->buf + w->off);
 			break;
 #if _typ_int64_t
 		case FW(CX_UNSIGNED|CX_INTEGER,8):
-			w->value.number = (int64_t)(*(uint64_t*)(r->buf + w->off));
+			w->ret.value.number = (int64_t)(*(uint64_t*)(r->buf + w->off));
 			break;
 #endif
 		case FW(CX_INTEGER,1):
-			w->value.number = *(unsigned _ast_int1_t*)(r->buf + w->off);
+			w->ret.value.number = *(unsigned _ast_int1_t*)(r->buf + w->off);
 			break;
 		case FW(CX_INTEGER,2):
-			w->value.number = *(int16_t*)(r->buf + w->off);
+			w->ret.value.number = *(int16_t*)(r->buf + w->off);
 			break;
 		case FW(CX_INTEGER,4):
-			w->value.number = *(int32_t*)(r->buf + w->off);
+			w->ret.value.number = *(int32_t*)(r->buf + w->off);
 			break;
 #if _typ_int64_t
 		case FW(CX_INTEGER,8):
-			w->value.number = *(int64_t*)(r->buf + w->off);
+			w->ret.value.number = *(int64_t*)(r->buf + w->off);
 			break;
 #endif
 		case FW(CX_FLOAT,4):
-			w->value.number = *(_ast_flt4_t*)(r->buf + w->off);
+			w->ret.value.number = *(_ast_flt4_t*)(r->buf + w->off);
 			break;
 		case FW(CX_FLOAT,8):
-			w->value.number = *(_ast_flt8_t*)(r->buf + w->off);
+			w->ret.value.number = *(_ast_flt8_t*)(r->buf + w->off);
 			break;
 #ifdef _ast_flt12_t
 		case FW(CX_FLOAT,12):
-			w->value.number = *(_ast_flt12_t*)(r->buf + w->off);
+			w->ret.value.number = *(_ast_flt12_t*)(r->buf + w->off);
 			break;
 #endif
 #ifdef _ast_flt16_t
 		case FW(CX_FLOAT,16):
-			w->value.number = *(_ast_flt16_t*)(r->buf + w->off);
+			w->ret.value.number = *(_ast_flt16_t*)(r->buf + w->off);
 			break;
 #endif
 		default:
 			if (!(w->siz = w->field->physical.format.width))
-				w->value.string.size = 0;
+				w->ret.value.string.size = 0;
 			else if ((w->field->physical.format.flags & (CX_STRING|CX_NUL)) == CX_STRING)
-				w->value.string.size = (s = memchr(w->value.string.data = r->buf + w->off, 0, w->siz)) ? (s - (r->buf + w->off)) : w->siz;
+				w->ret.value.string.size = (s = memchr(w->ret.value.string.data = r->buf + w->off, 0, w->siz)) ? (s - (r->buf + w->off)) : w->siz;
 			else 
-				memcpy(&w->value.number, r->buf + w->off, w->siz);
+				memcpy(&w->ret.value.number, r->buf + w->off, w->siz);
 			break;
 		}
 	}
-	return &w->value;
+	return &w->ret;
 }
 
 /*
@@ -1003,6 +1015,7 @@ flatwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 	register Field_t*	f;
 	register int		i;
 	register unsigned char*	s;
+	Cxoperand_t*		v;
 	ssize_t			n;
 	unsigned char*		b;
 	unsigned char*		e;
@@ -1013,7 +1026,8 @@ flatwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 	for (i = 0; i < r->nfields; i++)
 	{
 		f = r->fields[i].field;
-		while ((n = (*f->physical.type->externalf)(r->cx, f->physical.type, NiL, &f->physical.format, (*f->flatgetf)(r, i), flat->valbuf, flat->valsiz, r->cx->disc)) > flat->valsiz)
+		v = (*f->flatgetf)(r, i);
+		while ((n = (*f->physical.type->externalf)(r->cx, f->physical.type, NiL, &f->physical.format, &v->value, flat->valbuf, flat->valsiz, r->cx->disc)) > flat->valsiz)
 		{
 			n = roundof(n, 32);
 			if (!(flat->valbuf = newof(flat->valbuf, char, n, 0)))
@@ -1463,7 +1477,7 @@ static Dssformat_t flat_format =
 static int
 op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
-	r->value = *(*(((Record_t*)DSSDATA(data))->getf))((Record_t*)DSSDATA(data), pc->data.variable->index);
+	*r = *(*(((Record_t*)DSSDATA(data))->getf))((Record_t*)DSSDATA(data), pc->data.variable->index);
 	return 0;
 }
 
@@ -3792,19 +3806,19 @@ convertget(register Convert_t* convert, Cxvariable_t* var, void* data)
 	{
 		x.data.variable = ref->variable;
 		if ((*convert->cx->getf)(convert->cx, &x, &convert->value, NiL, NiL, data, convert->cx->disc))
-			return &null;
+			return &nullval;
 		while (ref = ref->next)
 		{
 			x.data.variable = ref->variable;
 			if ((*ref->member->getf)(convert->cx, &x, &convert->value, NiL, NiL, NiL, convert->cx->disc))
-				return &null;
+				return &nullval;
 		}
 	}
 	else
 	{
 		x.data.variable = var;
 		if ((*convert->cx->getf)(convert->cx, &x, &convert->value, NiL, NiL, data, convert->cx->disc))
-			return &null;
+			return &nullval;
 	}
 	return &convert->value.value;
 }
@@ -3818,10 +3832,10 @@ convertnum2str(register Convert_t* convert, Cxvariable_t* var, void* data)
 {
 	Cxvalue_t*	val;
 
-	if ((val = convertget(convert, var, data)) != &null)
+	if ((val = convertget(convert, var, data)) != &nullval)
 	{
 		if (cxnum2str(convert->cx, &var->format, (Cxinteger_t)val->number, &val->string.data))
-			return &null;
+			return &nullval;
 		val->string.size = strlen(val->string.data);
 	}
 	return val;
@@ -3837,23 +3851,23 @@ convertstr2num(register Convert_t* convert, Cxvariable_t* var, void* data)
 	Cxvalue_t*	val;
 	Cxunsigned_t	u;
 
-	if ((val = convertget(convert, var, data)) != &null)
+	if ((val = convertget(convert, var, data)) != &nullval)
 	{
 		if (cxstr2num(convert->cx, &var->format, val->string.data, val->string.size, &u))
-			return &null;
+			return &nullval;
 		val->number = (Cxinteger_t)u;
 	}
 	return val;
 }
 
 /*
- * get null field value
+ * get nullval field value
  */
 
 static Cxvalue_t*
 convertnull(Convert_t* convert, Cxvariable_t* var, void* data)
 {
-	return &null;
+	return &nullval;
 }
 
 /*

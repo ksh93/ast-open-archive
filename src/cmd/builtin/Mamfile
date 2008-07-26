@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -492,9 +492,9 @@ done ${INSTALLROOT}/bin virtual
 done install virtual
 make test
 make test.asa
+prev asa
 make asa.tst
 done asa.tst
-prev asa
 exec - regress  asa.tst asa
 done test.asa virtual
 make test.chmod
@@ -565,9 +565,9 @@ done ln.tst
 exec - regress  ln.tst
 done test.ln virtual
 make test.look
+prev look
 make look.tst
 done look.tst
-prev look
 exec - regress  look.tst look
 done test.look virtual
 make test.mkdir
@@ -587,15 +587,15 @@ done mv.tst
 exec - regress  mv.tst
 done test.mv virtual
 make test.nl
+prev nl
 make nl.tst
 done nl.tst
-prev nl
 exec - regress  nl.tst nl
 done test.nl virtual
 make test.od
+prev od
 make od.tst
 done od.tst
-prev od
 exec - regress  od.tst od
 done test.od virtual
 make test.paste
@@ -609,9 +609,9 @@ done tail.tst
 exec - regress  tail.tst
 done test.tail virtual
 make test.tr
+prev tr
 make tr.tst
 done tr.tst
-prev tr
 exec - regress  tr.tst tr
 done test.tr virtual
 make test.uniq
@@ -626,9 +626,9 @@ done uniq.tst generated
 exec - regress  uniq.tst
 done test.uniq virtual
 make test.uuencode
+prev uuencode
 make uuencode.tst
 done uuencode.tst
-prev uuencode
 exec - regress  uuencode.tst uuencode
 done test.uuencode virtual
 make test.wc

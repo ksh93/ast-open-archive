@@ -350,6 +350,8 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 		}
 		state->count = 0;
 	}
+	memset(rp, 0, sizeof(*rp));
+	rp->set = NETFLOW_SET_src_addrv4|NETFLOW_SET_dst_addrv4|NETFLOW_SET_hopv4;
 	fp = state->data;
 	state->data += state->size;
 	switch (state->version)
@@ -365,21 +367,21 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R1(fp)->srcport, &R1(fp)->srcport, (char*)&R1(fp)->prot - (char*)&R1(fp)->srcport);
 			}
 		}
-		rp->ipv4_src_addr = R1(fp)->srcaddr;
-		rp->ipv4_dst_addr = R1(fp)->dstaddr;
-		rp->ipv4_next_hop = R1(fp)->nexthop;
-		rp->input_snmp = R1(fp)->input;
-		rp->output_snmp = R1(fp)->output;
-		rp->in_pkts = rp->out_pkts = R1(fp)->dPkts;
-		rp->in_bytes = rp->out_bytes = R1(fp)->dOctets;
-		rp->first_switched = R1(fp)->First;
-		rp->last_switched = R1(fp)->Last;
+		rp->src_addrv4 = R1(fp)->srcaddr;
+		rp->dst_addrv4 = R1(fp)->dstaddr;
+		rp->hopv4 = R1(fp)->nexthop;
+		rp->input = R1(fp)->input;
+		rp->output = R1(fp)->output;
+		rp->packets = R1(fp)->dPkts;
+		rp->bytes = R1(fp)->dOctets;
+		rp->first = R1(fp)->First;
+		rp->last = R1(fp)->Last;
 		rp->src_port = R1(fp)->srcport;
 		rp->dst_port = R1(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R1(fp)->tcp_flags;
 		rp->protocol = R1(fp)->prot;
-		rp->src_tos = rp->dst_tos = R1(fp)->tos;
+		rp->src_tos = R1(fp)->tos;
 		rp->time = R1(fp)->unix_secs;
 		rp->nsec = R1(fp)->unix_nsecs;
 		rp->uptime = R1(fp)->sysUpTime;
@@ -396,27 +398,27 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R5(fp)->src_as, &R5(fp)->src_as, (char*)(R5(fp)+1) - (char*)&R5(fp)->src_as);
 			}
 		}
-		rp->ipv4_src_addr = R5(fp)->srcaddr;
-		rp->ipv4_dst_addr = R5(fp)->dstaddr;
-		rp->ipv4_next_hop = R5(fp)->nexthop;
-		rp->input_snmp = R5(fp)->input;
-		rp->output_snmp = R5(fp)->output;
-		rp->in_pkts = rp->out_pkts = R5(fp)->dPkts;
-		rp->in_bytes = rp->out_bytes = R5(fp)->dOctets;
-		rp->first_switched = R5(fp)->First;
-		rp->last_switched = R5(fp)->Last;
+		rp->src_addrv4 = R5(fp)->srcaddr;
+		rp->dst_addrv4 = R5(fp)->dstaddr;
+		rp->hopv4 = R5(fp)->nexthop;
+		rp->input = R5(fp)->input;
+		rp->output = R5(fp)->output;
+		rp->packets = R5(fp)->dPkts;
+		rp->bytes = R5(fp)->dOctets;
+		rp->first = R5(fp)->First;
+		rp->last = R5(fp)->Last;
 		rp->src_port = R5(fp)->srcport;
 		rp->dst_port = R5(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R5(fp)->tcp_flags;
 		rp->protocol = R5(fp)->prot;
-		rp->src_tos = rp->dst_tos = R5(fp)->tos;
+		rp->src_tos = R5(fp)->tos;
 		rp->engine_type = R5(fp)->engine_type;
 		rp->engine_id = R5(fp)->engine_id;
-		rp->src_as = R5(fp)->src_as;
-		rp->dst_as = R5(fp)->dst_as;
-		rp->src_mask = R5(fp)->src_mask;
-		rp->dst_mask = R5(fp)->dst_mask;
+		rp->src_as16 = R5(fp)->src_as;
+		rp->dst_as16 = R5(fp)->dst_as;
+		rp->src_maskv4 = R5(fp)->src_mask;
+		rp->dst_maskv4 = R5(fp)->dst_mask;
 		rp->time = R5(fp)->unix_secs;
 		rp->nsec = R5(fp)->unix_nsecs;
 		rp->uptime = R5(fp)->sysUpTime;
@@ -433,27 +435,27 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R6(fp)->src_as, &R6(fp)->src_as, (char*)(R6(fp)+1) - (char*)&R6(fp)->src_as);
 			}
 		}
-		rp->ipv4_src_addr = R6(fp)->srcaddr;
-		rp->ipv4_dst_addr = R6(fp)->dstaddr;
-		rp->ipv4_next_hop = R6(fp)->nexthop;
-		rp->input_snmp = R6(fp)->input;
-		rp->output_snmp = R6(fp)->output;
-		rp->in_pkts = rp->out_pkts = R6(fp)->dPkts;
-		rp->in_bytes = rp->out_bytes = R6(fp)->dOctets;
-		rp->first_switched = R6(fp)->First;
-		rp->last_switched = R6(fp)->Last;
+		rp->src_addrv4 = R6(fp)->srcaddr;
+		rp->dst_addrv4 = R6(fp)->dstaddr;
+		rp->hopv4 = R6(fp)->nexthop;
+		rp->input = R6(fp)->input;
+		rp->output = R6(fp)->output;
+		rp->packets = R6(fp)->dPkts;
+		rp->bytes = R6(fp)->dOctets;
+		rp->first = R6(fp)->First;
+		rp->last = R6(fp)->Last;
 		rp->src_port = R6(fp)->srcport;
 		rp->dst_port = R6(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R6(fp)->tcp_flags;
 		rp->protocol = R6(fp)->prot;
-		rp->src_tos = rp->dst_tos = R6(fp)->tos;
+		rp->src_tos = R6(fp)->tos;
 		rp->engine_type = R6(fp)->engine_type;
 		rp->engine_id = R6(fp)->engine_id;
-		rp->src_as = R6(fp)->src_as;
-		rp->dst_as = R6(fp)->dst_as;
-		rp->src_mask = R6(fp)->src_mask;
-		rp->dst_mask = R6(fp)->dst_mask;
+		rp->src_as16 = R6(fp)->src_as;
+		rp->dst_as16 = R6(fp)->dst_as;
+		rp->src_maskv4 = R6(fp)->src_mask;
+		rp->dst_maskv4 = R6(fp)->dst_mask;
 		rp->time = R6(fp)->unix_secs;
 		rp->nsec = R6(fp)->unix_nsecs;
 		rp->uptime = R6(fp)->sysUpTime;
@@ -470,35 +472,35 @@ ftfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(n, &R7(fp)->src_as, &R7(fp)->src_as, (char*)(R7(fp)+1) - (char*)&R7(fp)->src_as);
 			}
 		}
-		rp->ipv4_src_addr = R7(fp)->srcaddr;
-		rp->ipv4_dst_addr = R7(fp)->dstaddr;
-		rp->ipv4_next_hop = R7(fp)->nexthop;
-		rp->input_snmp = R7(fp)->input;
-		rp->output_snmp = R7(fp)->output;
-		rp->in_pkts = rp->out_pkts = R7(fp)->dPkts;
-		rp->in_bytes = rp->out_bytes = R7(fp)->dOctets;
-		rp->first_switched = R7(fp)->First;
-		rp->last_switched = R7(fp)->Last;
+		rp->src_addrv4 = R7(fp)->srcaddr;
+		rp->dst_addrv4 = R7(fp)->dstaddr;
+		rp->hopv4 = R7(fp)->nexthop;
+		rp->input = R7(fp)->input;
+		rp->output = R7(fp)->output;
+		rp->packets = R7(fp)->dPkts;
+		rp->bytes = R7(fp)->dOctets;
+		rp->first = R7(fp)->First;
+		rp->last = R7(fp)->Last;
 		rp->src_port = R7(fp)->srcport;
 		rp->dst_port = R7(fp)->dstport;
 		rp->flags = 0;
 		rp->tcp_flags = R7(fp)->tcp_flags;
 		rp->protocol = R7(fp)->prot;
-		rp->src_tos = rp->dst_tos = R7(fp)->tos;
+		rp->src_tos = R7(fp)->tos;
 		rp->engine_type = R7(fp)->engine_type;
 		rp->engine_id = R7(fp)->engine_id;
-		rp->src_as = R7(fp)->src_as;
-		rp->dst_as = R7(fp)->dst_as;
-		rp->src_mask = R7(fp)->src_mask;
-		rp->dst_mask = R7(fp)->dst_mask;
+		rp->src_as16 = R7(fp)->src_as;
+		rp->dst_as16 = R7(fp)->dst_as;
+		rp->src_maskv4 = R7(fp)->src_mask;
+		rp->dst_maskv4 = R7(fp)->dst_mask;
 		rp->time = R7(fp)->unix_secs;
 		rp->nsec = R7(fp)->unix_nsecs;
 		rp->uptime = R7(fp)->sysUpTime;
 		break;
 	}
 	boot = ((Nftime_t)rp->time * MS - (Nftime_t)rp->uptime) * US + (Nftime_t)rp->nsec;
-	rp->start = boot + (Nftime_t)rp->first_switched * US;
-	rp->end = boot + (Nftime_t)rp->last_switched * US;
+	rp->start = boot + (Nftime_t)rp->first * US;
+	rp->end = boot + (Nftime_t)rp->last * US;
 	record->size = sizeof(*rp);
 	record->data = rp;
 	return 1;

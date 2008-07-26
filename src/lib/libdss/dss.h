@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2007 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -115,6 +115,7 @@ struct Dssfile_s			/* typed file handle		*/
 	char*		path;		/* original path		*/
 	Dssformat_t*	format;		/* file format			*/
 	void*		caller;		/* caller defined handle	*/
+	Vmalloc_t*	vm;		/* per file vm			*/
 #ifdef _DSS_FILE_PRIVATE_
 	_DSS_FILE_PRIVATE_
 #endif
@@ -170,7 +171,7 @@ struct Dss_s				/* dss handle			*/
 	const char*	id;		/* interface id			*/
 	Dssmeth_t*	meth;		/* method			*/
 	Dssdisc_t*	disc;		/* discipline			*/
-	Vmalloc_t*	vm;		/* handle vm			*/
+	Vmalloc_t*	vm;		/* per handle vm		*/
 	Dssflags_t	flags;		/* dssopen() flags		*/
 	Dssflags_t	test;		/* dssopen() test mask		*/
 	Cx_t*		cx;		/* expression handle		*/

@@ -23,6 +23,7 @@
 #define NIL(t)	((t)0)
 #endif
 
+#ifndef va_start
 #if __STD_C
 #include	<stdarg.h>
 #else
@@ -36,6 +37,7 @@
 #endif
 #if _hdr_string
 #include	<string.h>
+#endif
 #endif
 
 _BEGIN_EXTERNS_

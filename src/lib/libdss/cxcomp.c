@@ -585,7 +585,7 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 				}
 				if (type1->internalf)
 				{
-					if ((*type1->internalf)(cx, type1, NiL, &format, &r.value, i2->data.string.data, i2->data.string.size, cx->pm, cx->disc) < 0)
+					if ((*type1->internalf)(cx, type1, NiL, &format, &r, i2->data.string.data, i2->data.string.size, cx->pm, cx->disc) < 0)
 						return 0;
 					i2->op = CX_NUM;
 					i2->type = cx->state->type_number;
@@ -643,10 +643,11 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 			}
 			if (!v2)
 			{
-				if ((*type1->internalf)(cx, type1, NiL, &format, &r.value, i2->data.string.data, i2->data.string.size, cx->pm, cx->disc) < 0)
+				r.type = type1->fundamental;
+				if ((*type1->internalf)(cx, type1, NiL, &format, &r, i2->data.string.data, i2->data.string.size, cx->pm, cx->disc) < 0)
 					return 0;
 				i2->op = CX_NUM;
-				i2->type = type1->fundamental;
+				i2->type = r.type;
 				i2->data = r.value;
 				goto done;
 			}
@@ -662,10 +663,11 @@ code(Cx_t* cx, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1, Cxtype_t* type2,
 			}
 			if (!v1)
 			{
-				if ((*type2->internalf)(cx, type2, NiL, &format, &r.value, i1->data.string.data, i1->data.string.size, cx->pm, cx->disc) < 0)
+				r.type = type2->fundamental;
+				if ((*type2->internalf)(cx, type2, NiL, &format, &r, i1->data.string.data, i1->data.string.size, cx->pm, cx->disc) < 0)
 					return 0;
 				i1->op = CX_NUM;
-				i1->type = type2->fundamental;
+				i1->type = r.type;
 				i1->data = r.value;
 				goto done;
 			}

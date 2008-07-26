@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -42,6 +42,11 @@ make libdssnetflow.a archive
 make netflow.o
 make netflow.c
 make flowlib.h implicit
+make ${PACKAGE_ast_INCLUDE}/ip6.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ip6.h dontcare
 make netflow.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
@@ -60,9 +65,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
@@ -155,7 +158,7 @@ done flowlib.h
 done netflow.c
 meta netflow.o %.c>%.o netflow.c netflow
 prev netflow.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c netflow.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c netflow.c
 done netflow.o generated
 make flow-dump.o
 make flow-dump.c
@@ -164,8 +167,16 @@ prev flowlib.h implicit
 done flow-dump.c
 meta flow-dump.o %.c>%.o flow-dump.c flow-dump
 prev flow-dump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-dump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-dump.c
 done flow-dump.o generated
+make flow-dumpv9.o
+make flow-dumpv9.c
+prev flowlib.h implicit
+done flow-dumpv9.c
+meta flow-dumpv9.o %.c>%.o flow-dumpv9.c flow-dumpv9
+prev flow-dumpv9.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-dumpv9.c
+done flow-dumpv9.o generated
 make flow-fixed.o
 make flow-fixed.c
 prev ${PACKAGE_ast_INCLUDE}/swap.h implicit
@@ -177,7 +188,7 @@ prev flowlib.h implicit
 done flow-fixed.c
 meta flow-fixed.o %.c>%.o flow-fixed.c flow-fixed
 prev flow-fixed.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-fixed.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-fixed.c
 done flow-fixed.o generated
 make flow-flat.o
 make flow-flat.c
@@ -185,7 +196,7 @@ prev flowlib.h implicit
 done flow-flat.c
 meta flow-flat.o %.c>%.o flow-flat.c flow-flat
 prev flow-flat.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-flat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-flat.c
 done flow-flat.o generated
 make flow-tool.o
 make flow-tool.c
@@ -194,9 +205,9 @@ prev flowlib.h implicit
 done flow-tool.c
 meta flow-tool.o %.c>%.o flow-tool.c flow-tool
 prev flow-tool.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-tool.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-tool.c
 done flow-tool.o generated
-exec - ${AR} cr libdssnetflow.a netflow.o flow-dump.o flow-fixed.o flow-flat.o flow-tool.o
+exec - ${AR} cr libdssnetflow.a netflow.o flow-dump.o flow-dumpv9.o flow-fixed.o flow-flat.o flow-tool.o
 exec - (ranlib libdssnetflow.a) >/dev/null 2>&1 || true
 done libdssnetflow.a generated
 done netflow virtual

@@ -3,6 +3,7 @@
 unit=cdt
 
 inc=
+src=.
 lib=
 files=
 verbose=
@@ -21,7 +22,11 @@ esac
 while	:
 do	case $1 in
 	*.c)	files="$files $1" ;;
-	*/*.h)	inc="$inc -I${1%/*}" ;;
+	*/*.h)	inc="$inc -I${1%/*}"
+		case $1 in
+		*/dttest.h)	src=${1%/*} ;;
+		esac
+		;;
 	*.h)	inc="$inc -I." ;;
 	-l*)	lib="$lib $1" ;;
 	-*|*,*)	inc="$inc $1" ;;
@@ -39,7 +44,7 @@ done
 
 if	test -d $unit
 then	source=$unit
-else	source=.
+else	source=$src
 fi
 
 case $inc in

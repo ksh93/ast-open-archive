@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -72,6 +72,7 @@ Dssfile_t*
 dssfopen(Dss_t* dss, const char* path, Sfio_t* io, Dssflags_t flags, Dssformat_t* format)
 {
 	Dssfile_t*	file;
+	Vmalloc_t*	vm;
 	char*		s;
 	size_t		n;
 	int		i;
@@ -134,16 +135,24 @@ dssfopen(Dss_t* dss, const char* path, Sfio_t* io, Dssflags_t flags, Dssformat_t
 		return 0;
 	else
 		path = (const char*)buf;
-	if (!(file = vmnewof(dss->vm, 0, Dssfile_t, 1, strlen(path) + 1)))
+	if (!(vm = vmopen(Vmdcheap, Vmbest, 0)))
+	{
+		if (dss->disc->errorf)
+			(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "out of space");
+		return 0;
+	}
+	if (!(file = vmnewof(vm, 0, Dssfile_t, 1, strlen(path) + 1)))
 	{
 		if (dss->disc->errorf)
 			(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "out of space");
 		if (!(flags & DSS_FILE_KEEP))
 			sfclose(io);
+		vmclose(vm);
 		return 0;
 	}
 	strcpy(file->path = (char*)(file + 1), path);
 	file->dss = dss;
+	file->vm = vm;
 	file->io = io;
 	file->flags = flags;
 	if (flags & DSS_FILE_WRITE)
@@ -259,7 +268,7 @@ dssfclose(Dssfile_t* file)
 		if (!r && (file->flags & DSS_FILE_ERROR))
 			r = -1;
 	}
-	vmfree(dss->vm, file);
+	vmclose(file->vm);
 	return r;
 }
 

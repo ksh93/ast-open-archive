@@ -18,6 +18,9 @@
 *                                                                      *
 ***********************************************************************/
 #include	"sftest.h"
+
+#if vt_threaded
+
 #include	<vthread.h>
 #include	<signal.h>
 
@@ -66,7 +69,7 @@ void*	arg;
 	char*	s;
 	int	n;
 
-	s = Str[(int)arg];
+	s = Str[integralof(arg)];
 	for(n = 0; n < N_STR; ++n)
 	{	if(sfputr(Sf, s, '\n') != 10)
 		{	if(Inverted)
@@ -106,7 +109,6 @@ int     sig;
 
 MAIN()
 {
-#if vt_threaded
 	int		count[26];
 	char*		s;
 	int		i, k, n;
@@ -249,7 +251,14 @@ do_inverted: /* get back to here when trying to make things fail */
 	}
 	else	tmesg("\tUnsafe streams work ok on this platform!\n");
 
-#endif
-
 	TSTEXIT(0);
 }
+
+#else
+
+MAIN()
+{
+	TSTEXIT(0);
+}
+
+#endif

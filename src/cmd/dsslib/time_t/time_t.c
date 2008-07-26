@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,7 +25,7 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss time type library (AT&T Research) 2003-08-11 $\0\n";
+static const char id[] = "\n@(#)$Id: dss time type library (AT&T Research) 2008-06-11 $\0\n";
 
 #include <dsslib.h>
 #include <tm.h>
@@ -62,18 +62,18 @@ time_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 }
 
 static ssize_t
-time_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+time_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*	e;
 	char*	f;
 
 	if (CXDETAILS(details, format, type, 0))
 	{
-		value->number = tmscan(buf, &e, details, &f, NiL, 0);
+		ret->value.number = tmscan(buf, &e, details, &f, NiL, 0);
 		if (!*f && e > (char*)buf)
 			return e - (char*)buf;
 	}
-	value->number = tmdate(buf, &e, NiL);
+	ret->value.number = tmdate(buf, &e, NiL);
 	return e - (char*)buf;
 }
 
@@ -129,7 +129,7 @@ precise_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 }
 
 static ssize_t
-precise_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+precise_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*		e;
 	char*		f;
@@ -137,15 +137,15 @@ precise_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 
 	if (CXDETAILS(details, format, type, 0))
 	{
-		value->number = tmscan(buf, &e, details, &f, NiL, 0);
+		ret->value.number = tmscan(buf, &e, details, &f, NiL, 0);
 		if (*f || e == (char*)buf)
-			value->number = tmdate(buf, &e, NiL);
+			ret->value.number = tmdate(buf, &e, NiL);
 	}
 	else
-		value->number = tmdate(buf, &e, NiL);
-	value->number *= precise->seconds;
+		ret->value.number = tmdate(buf, &e, NiL);
+	ret->value.number *= precise->seconds;
 	if (*e == '.')
-		value->number += strtoul(e + 1, &e, 10);
+		ret->value.number += strtoul(e + 1, &e, 10);
 	return e - (char*)buf;
 }
 
@@ -164,11 +164,11 @@ elapsed_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 }
 
 static ssize_t
-elapsed_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+elapsed_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*	e;
 
-	value->number = strelapsed(buf, &e, 1000);
+	ret->value.number = strelapsed(buf, &e, 1000);
 	if (e == (char*)buf)
 		return -1;
 	return e - (char*)buf;
@@ -203,15 +203,15 @@ tm_hour_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 }
 
 static ssize_t
-tm_hour_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+tm_hour_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*	e;
 
-	value->number = strntol(buf, size, &e, 10);
+	ret->value.number = strntol(buf, size, &e, 10);
 	if (e == (char*)buf)
 		return -1;
 	if (tmlex(e, &e, tm_info.format + TM_MERIDIAN, TM_UT - TM_MERIDIAN, NiL, 0) == 1)
-		value->number += 12;
+		ret->value.number += 12;
 	return e - (char*)buf;
 }
 
@@ -246,7 +246,7 @@ tm_mon_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 }
 
 static ssize_t
-tm_mon_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+tm_mon_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*	e;
 	int	v;
@@ -262,7 +262,7 @@ tm_mon_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 		return -1;
 	else if (v >= 12)
 		v -= 12;
-	value->number = v;
+	ret->value.number = v;
 	return e - (char*)buf;
 }
 
@@ -297,7 +297,7 @@ tm_wday_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 }
 
 static ssize_t
-tm_wday_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+tm_wday_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	char*	e;
 	int	v;
@@ -313,7 +313,7 @@ tm_wday_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 		return -1;
 	else if (v >= 7)
 		v -= 7;
-	value->number = v;
+	ret->value.number = v;
 	return e - (char*)buf;
 }
 

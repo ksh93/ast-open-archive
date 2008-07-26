@@ -703,64 +703,25 @@ getopts [ options ] opstring name [args...]
 .OP a command string name
 Use name instead of the command name in usage messages.
 .SH DESCRIPTION
-The getopts utility can be used to retrieve options and arguments from a list
-of arguments give by args or the positional parameters if args is omitted. It
-can also generate usage messages and a man page for the command based on the
-information in optstring.
+The getopts utility can be used to retrieve options and arguments from a list of arguments give by args or the positional parameters if args is omitted. It can also generate usage messages and a man page for the command based on the information in optstring.
 .PP
-The optstring string consists of alpha-numeric characters, the special
-characters +, -, ?, :, and <space>, or character groups enclosed in [...].
-Character groups may be nested in {...}. Outside of a [...] group, a single
-new-line followed by zero or more blanks is ignored. One or more blank lines
-separates the options from the command argument synopsis.
+The optstring string consists of alpha-numeric characters, the special characters +, -, ?, :, and <space>, or character groups enclosed in [...]. Character groups may be nested in {...}. Outside of a [...] group, a single new-line followed by zero or more blanks is ignored. One or more blank lines separates the options from the command argument synopsis.
 .PP
-Each [...] group consists of an optional label, optional attributes separated
-by :, and an optional description string following ?. The characters from the ?
-to the end of the next ] are ignored for option parsing and short usage
-messages. They are used for generating verbose help or man pages. The :
-character may not appear in the label. The ? character must be specified as ??
-in label and the ] character must be specified as ]] in the description string.
-Text between two \\b (backspace) characters indicates that the text should be
-emboldened when displayed. Text between two \\a (bell) characters indicates that
-the text should be emphasised or italicised when displayed.
+Each [...] group consists of an optional label, optional attributes separated by :, and an optional description string following ?. The characters from the ? to the end of the next ] are ignored for option parsing and short usage messages. They are used for generating verbose help or man pages. The : character may not appear in the label. The ? character must be specified as ?? in label and the ] character must be specified as ]] in the description string. Text between two \\b (backspace) characters indicates that the text should be emboldened when displayed. Text between two \\a (bell) characters indicates that the text should be emphasised or italicised when displayed.
 .PP
 There are four types of groups:
 .H1 1.
-An option specifiation of the form option:longname. In this case the first
-field is the option character. If there is no option character, then a two
-digit number should be specified that corresponds to the long options. This
-negative of this number will be returned as the value of name by getopts if the
-long option is matched. A longname is matched with --longname. A * in the
-longname field indicates that only characters up that point need to match
-provided any additional characters match the option. The [ and ] can be omitted
-for options that don\'t have longnames or descriptive text.
+An option specifiation of the form option:longname. In this case the first field is the option character. If there is no option character, then a two digit number should be specified that corresponds to the long options. This negative of this number will be returned as the value of name by getopts if the long option is matched. A longname is matched with --longname. A * in the longname field indicates that only characters up that point need to match provided any additional characters match the option. The [ and ] can be omitted for options that don\'t have longnames or descriptive text.
 .H1 2.
-A string option argument specification. Options that take arguments can be
-followed by : or # and an option group specification. An option group
-specification consists of a name for the option argument as field 1. The
-remaining fields are a typename and zero or more of the special attribute words
-listof, oneof, and ignorecase. The option specification can be followed by a
-list of option value descriptions enclosed in parenthesis.
+A string option argument specification. Options that take arguments can be followed by : or # and an option group specification. An option group specification consists of a name for the option argument as field 1. The remaining fields are a typename and zero or more of the special attribute words listof, oneof, and ignorecase. The option specification can be followed by a list of option value descriptions enclosed in parenthesis.
 .H1 3.
 A option value description.
 .H1 4.
-A argument specification. A list of valid option argument values can be
-specified by enclosing them inside a {...} following the option argument
-specification. Each of the permitted values can be specified with a [...]
-containing the value followed by a description.
+A argument specification. A list of valid option argument values can be specified by enclosing them inside a {...} following the option argument specification. Each of the permitted values can be specified with a [...] containing the value followed by a description.
 .PP
-If the leading character of optstring is +, then arguments beginning with +
-will also be considered options.
+If the leading character of optstring is +, then arguments beginning with + will also be considered options.
 .PP
-A leading : character or a : following a leading + in optstring affects the way
-errors are handled. If an option character or longname argument not specified
-in optstring is encountered when processing options, the shell variable whose
-name is name will be set to the ? character. The shell variable OPTARG will be
-set to the character found. If an option argument is missing or has an invalid
-value, then name will be set to the : character and the shell variable OPTARG
-will be set to the option character found. Without the leading :, name will be
-set to the ? character, OPTARG will be unset, and an error message will be
-written to standard error when errors are encountered.
+A leading : character or a : following a leading + in optstring affects the way errors are handled. If an option character or longname argument not specified in optstring is encountered when processing options, the shell variable whose name is name will be set to the ? character. The shell variable OPTARG will be set to the character found. If an option argument is missing or has an invalid value, then name will be set to the : character and the shell variable OPTARG will be set to the option character found. Without the leading :, name will be set to the ? character, OPTARG will be unset, and an error message will be written to standard error when errors are encountered.
 .PP
 The end of options occurs when:
 .H1 1.
@@ -774,8 +735,7 @@ An error is encountered.
 .PP
 If OPTARG is set to the value 1, a new set of arguments can be used.
 .PP
-getopts can also be used to generate help messages containing command usage and
-detailed descriptions. Specify args as:
+getopts can also be used to generate help messages containing command usage and detailed descriptions. Specify args as:
 .H1 -?
 To generate a usage synopsis.
 .H1 --??
@@ -787,9 +747,7 @@ To generate an easy to parse usage message.
 .H1 --??html
 To generate a man page in html format.
 .PP
-When the end of options is encountered, getopts exits with a non-zero return
-value and the variable OPTIND is set to the index of the first non-option
-argument.
+When the end of options is encountered, getopts exits with a non-zero return value and the variable OPTIND is set to the index of the first non-option argument.
 .SH EXIT STATUS
 .H1 0
 An option specified was found.

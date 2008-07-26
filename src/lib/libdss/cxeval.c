@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2007 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -122,6 +122,7 @@ execute(Cx_t* cx, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxd
 	register Cxoperand_t*	so;
 	Cxinstruction_t*	pe = pc;
 	Cxoperand_t		r;
+	int			i;
 
 	sp = cx->stack + 1;
 	sp->type = (sp-1)->type = cx->state->type_void;
@@ -133,8 +134,12 @@ execute(Cx_t* cx, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxd
 		cx->jump = 1;
 		if (cx->flags & CX_DEBUG)
 			cxcodetrace(cx, "eval", pc, pc - pe + 1);
-		if ((*pc->callout)(cx, pc, &r, sp-1, sp, data, disc) < 0)
+		if ((i = (*pc->callout)(cx, pc, &r, sp-1, sp, data, disc)) < 0)
+		{
+			if (i < -1)
+				return -1;
 			break;
+		}
 		so = sp;
 		sp += pc->pp;
 		*sp = r;

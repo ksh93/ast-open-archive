@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -230,9 +230,9 @@ done ${INSTALLROOT}/bin/warp generated
 done install virtual
 make test
 make test.warp
+prev warp
 make warp.tst
 done warp.tst
-prev warp
 exec - regress  warp.tst warp
 done test.warp virtual
 done test dontcare virtual

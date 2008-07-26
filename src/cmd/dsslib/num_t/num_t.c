@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 2005-01-01 $\0\n";
+static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 2008-06-11 $\0\n";
 
 #include <dsslib.h>
 #include <hashpart.h>
@@ -34,8 +34,8 @@ static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 20
 
 #define FIXED_EXTERNAL(f,format,value)	{ \
 		int	i; \
-		f = value->number; \
-		if (i = format->fixedpoint) \
+		f = (value)->number; \
+		if (i = (format)->fixedpoint) \
 			for (;;) \
 			{ \
 				if (i < elementsof(pow10)) \
@@ -51,7 +51,7 @@ static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 20
 #define FIXED_INTERNAL(f,w,value,format)	{ \
 		int	i; \
 		f = (intmax_t)w; /* signed cast is msvc workaround */ \
-		if (i = format->fixedpoint) \
+		if (i = (format)->fixedpoint) \
 			for (;;) \
 			{ \
 				if (i < elementsof(pow10)) \
@@ -62,7 +62,7 @@ static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 20
 				f /= pow10[elementsof(pow10) - 1]; \
 				i -= elementsof(pow10); \
 			} \
-		value->number = f; \
+		(value)->number = f; \
 	}
 
 static const Cxnumber_t		pow10[] =
@@ -202,7 +202,7 @@ static const unsigned char	bcd_negative[] =
 };
 
 static ssize_t
-bcd_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+bcd_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	register unsigned char*		s = (unsigned char*)buf;
 	register unsigned char*		e;
@@ -243,7 +243,7 @@ bcd_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, 
 	case  0: w *=  10; w += p[*s >> 4];
 	case -1:if (bcd_negative[*s]) w = -w;
 	}
-	FIXED_INTERNAL(f, w, value, format);
+	FIXED_INTERNAL(f, w, &ret->value, format);
 	return format->width;
 }
 
@@ -295,7 +295,7 @@ be_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 }
 
 static ssize_t
-be_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+be_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	register unsigned char*	s = (unsigned char*)buf;
 	register unsigned char*	e;
@@ -320,7 +320,7 @@ be_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 			while (s < e)
 				*u++ = *s++;
 #endif
-			value->number = f4;
+			ret->value.number = f4;
 			break;
 		case 8:
 			u = (unsigned char*)&f8;
@@ -330,6 +330,7 @@ be_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 			while (s < e)
 				*u++ = *s++;
 #endif
+			ret->value.number = f8;
 			break;
 		}
 	}
@@ -341,7 +342,7 @@ be_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 			v <<= 8;
 			v |= *s++;
 		}
-		FIXED_INTERNAL(f, v, value, format);
+		FIXED_INTERNAL(f, v, &ret->value, format);
 	}
 	return format->width;
 }
@@ -426,7 +427,7 @@ hash_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 }
 
 static ssize_t
-hash_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+hash_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	Hash_t*			hp = (Hash_t*)type->data;
 	register unsigned char*	s;
@@ -445,8 +446,8 @@ hash_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 	}
 	if (!(t = vmnewof(vm, 0, unsigned char, format->width, 1)))
 		return -1;
-	value->string.data = (char*)t;
-	value->string.size = format->width;
+	ret->value.string.data = (char*)t;
+	ret->value.string.size = format->width;
 	s = (unsigned char*)buf;
 	e = s + size;
 	h = hp->hash;
@@ -502,7 +503,7 @@ static const unsigned char heka_unpack[UCHAR_MAX+1] =
 };
 
 static ssize_t
-heka_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+heka_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	register unsigned char*	s = (unsigned char*)buf;
 	register unsigned char*	e = s + format->width;
@@ -527,9 +528,9 @@ heka_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 	u = 0;
 	while (s < e)
 		u = u * 100 + heka_unpack[*s++];
-	FIXED_INTERNAL(f, u, value, format);
+	FIXED_INTERNAL(f, u, &ret->value, format);
 	if (neg)
-		value->number = -value->number;
+		ret->value.number = -ret->value.number;
 	return 0;
 }
 
@@ -951,7 +952,7 @@ ibm_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, 
 }
 
 static ssize_t
-ibm_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+ibm_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	register unsigned char*	s = (unsigned char*)buf;
 	register Cxinteger_t	i;
@@ -966,7 +967,7 @@ ibm_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, 
                   | (s[2] <<  8)
                   |  s[3];
 		f = i * (1.0 / 0x1000000) * ((s[0] < 0x80) ? ibm_exp[s[0]] : -ibm_exp[s[0] & 0x7F]);
-		value->number = f;
+		ret->value.number = f;
 		return 4;
 	case 8:
 		i = (s[1] << 16)
@@ -980,7 +981,7 @@ ibm_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, 
 		  |  s[7];
 		f += i * (((1.0 / 0x1000000) / (double)0x10000) / (double)0x10000);
 		f *= (s[0] < 0x80) ? ibm_exp[s[0]] : -ibm_exp[s[0] & 0x7F];
-		value->number = f;
+		ret->value.number = f;
 		return 8;
 	}
 	return -1;
@@ -1034,7 +1035,7 @@ le_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 }
 
 static ssize_t
-le_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+le_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	register unsigned char*	s = (unsigned char*)buf;
 	register unsigned char*	e;
@@ -1059,7 +1060,7 @@ le_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 			while (s < e)
 				*u++ = *s++;
 #endif
-			value->number = f4;
+			ret->value.number = f4;
 			break;
 		case 8:
 			u = (unsigned char*)&f8;
@@ -1069,6 +1070,7 @@ le_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 			while (s < e)
 				*u++ = *s++;
 #endif
+			ret->value.number = f8;
 			break;
 		}
 	}
@@ -1080,7 +1082,7 @@ le_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 			v <<= 8;
 			v |= *--e;
 		}
-		FIXED_INTERNAL(f, v, value, format);
+		FIXED_INTERNAL(f, v, &ret->value, format);
 	}
 	return format->width;
 }
@@ -1114,17 +1116,17 @@ sf_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 }
 
 static ssize_t
-sf_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+sf_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
 	if (!size)
 		return 4;
 	sfstrbuf(cx->buf, (void*)buf, size, 0);
 	if (format->flags & CX_FLOAT)
-		value->number = sfgetd(cx->buf);
+		ret->value.number = sfgetd(cx->buf);
 	else if (format->flags & CX_UNSIGNED)
-		value->number = (Cxinteger_t)sfgetu(cx->buf);
+		ret->value.number = (Cxinteger_t)sfgetu(cx->buf);
 	else
-		value->number = sfgetl(cx->buf);
+		ret->value.number = sfgetl(cx->buf);
 	if (sferror(cx->buf))
 		return size * 2;
 	return sfstrtell(cx->buf);

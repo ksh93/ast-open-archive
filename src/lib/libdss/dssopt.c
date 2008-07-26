@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -94,6 +94,9 @@ opttype(Sfio_t* sp, register Cxtype_t* tp, int members)
 {
 	register const char*	x;
 	register const char*	b;
+	register const char*	d;
+	register int		i;
+	Sfio_t*			tmp = 0;
 
 	if (tp->member)
 		x = "This structure type has the following members:";
@@ -111,12 +114,27 @@ opttype(Sfio_t* sp, register Cxtype_t* tp, int members)
 		else
 			x = tp->format.description;
 	}
-	if (optout(sp, tp->name, tp->base ? tp->base->name : (const char*)0, NiL, tp->description, x))
+	if (!(d = tp->description) && tp->generic && (tmp = sfstropen()))
+	{
+		sfprintf(tmp, "A generic type that maps to %s", tp->generic[0]->name);
+		for (i = 1; tp->generic[i]; i++)
+			sfprintf(tmp, "%s%s", tp->generic[i + 1] ? ", " : " or ", tp->generic[i]->name);
+		sfprintf(tmp, " at runtime.");
+		d = sfstruse(tmp);
+	}
+	i = optout(sp, tp->name, tp->base ? tp->base->name : (const char*)0, NiL, d, x);
+	if (tmp)
+		sfstrclose(tmp);
+	if (i)
 		return -1;
 	if (tp->member && optmem(sp, tp))
 		return -1;
 	else if (tp->base && tp->base->member && !(tp->base->header.flags & CX_REFERENCED) && opttype(sp, tp->base, 0))
 		return -1;
+	if (tp->generic)
+		for (i = 0; tp->generic[i]; i++)
+			if (!(tp->generic[i]->header.flags & CX_REFERENCED) && opttype(sp, tp->generic[i], 0))
+				return -1;
 	return 0;
 }
 /*

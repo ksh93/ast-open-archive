@@ -20,23 +20,28 @@
 #include	"sftest.h"
 
 static int	Type;
+static int	Mttype;
 
 #if __STD_C
-static void notify(Sfio_t* f, int type, int fd)
+static void notify(Sfio_t* f, int type, void* data)
 #else
-static void notify(f, type, fd)
+static void notify(f, type, data)
 Sfio_t*	f;
-int		type;
-int		fd;
+int	type;
+void*	data;
 #endif
 {
-	switch(Type = type)
+	switch(type)
 	{
 	case SF_NEW:
 	case SF_CLOSING:
 	case SF_SETFD:
 	case SF_READ:
 	case SF_WRITE:
+		Type = type;
+		return;
+	case SF_MTACCESS:
+		Mttype = type;
 		return;
 	default:
 		terror("Unexpected nofity-type: %d\n",type);

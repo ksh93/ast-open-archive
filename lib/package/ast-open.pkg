@@ -3,8 +3,8 @@ ast-open :PACKAGE: \
 		libexpr libodelta librecsort libsum libuu libvdelta libbz \
 		libz tests 3d coshell cpp cs mam msgcc nmake probe ss \
 		libcoshell libcs libmam libpp libcodex paxlib codexlib \
-		at builtin codex cql dss dsslib ie mailx mam ncsl pack pzip \
-		re sort sortlib std tksh tw warp libcdb libdss libpz \
+		at builtin codex dss dsslib ie mailx mam ncsl pack pzip \
+		re sort sortlib std tksh tw warp libdss libpz \
 		libtksh libtk vczip libvcodex libgraph
 
 :COVERS: ast-base

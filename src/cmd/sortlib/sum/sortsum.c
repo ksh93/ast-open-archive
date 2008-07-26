@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2008-05-08 $\n]"
+"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2008-06-20 $\n]"
 USAGE_LICENSE
 "[+NAME?sortsum - sort uniq summary discipline]"
 "[+DESCRIPTION?The \bsortsum\b \bsort\b(1) discipline applies "
@@ -166,7 +166,7 @@ record(register State_t* state, register Rsobj_t* r, int op)
 	size_t				w;
 	size_t				y;
 	ssize_t				n;
-	Cxvalue_t			v;
+	Cxoperand_t			v;
 
 	state->records++;
 	s = r->data;
@@ -214,44 +214,44 @@ record(register State_t* state, register Rsobj_t* r, int op)
 		else
 			x = a;
 		if (sum->op == 'v' || (*sum->type->internalf)(cx, sum->type, NiL, &sum->format, &v, (char*)x, w, cx->rm, cx->disc) < 0)
-			v.number = 0;
+			v.value.number = 0;
 		if (op < 0)
 		{
-			sum->value = v.number;
+			sum->value = v.value.number;
 			sum->count = 1;
 		}
 		else
 		{
 			if (count != 1)
-				v.number *= count;
+				v.value.number *= count;
 			switch (sum->op)
 			{
 			case 'a':
-				sum->value += v.number;
+				sum->value += v.value.number;
 				sum->count += count;
 				break;
 			case 'c':
-				count = v.number;
+				count = v.value.number;
 				continue;
 			case 'M':
-				if (sum->value < v.number)
-					sum->value = v.number;
+				if (sum->value < v.value.number)
+					sum->value = v.value.number;
 				break;
 			case 'm':
-				if (sum->value > v.number)
-					sum->value = v.number;
+				if (sum->value > v.value.number)
+					sum->value = v.value.number;
 				break;
 			case 's':
-				sum->value += v.number;
+				sum->value += v.value.number;
 				break;
 			}
 			if (op > 0)
 			{
-				v.number = sum->value;
+				v.value.number = sum->value;
 				switch (sum->op)
 				{
 				case 'a':
-					v.number /= sum->count;
+					v.value.number /= sum->count;
 					break;
 				case 'v':
 					while (a < z)
@@ -263,9 +263,9 @@ record(register State_t* state, register Rsobj_t* r, int op)
 				{
 					y = n + 1;
 					ASSURE(state, &state->tmp, y);
-					if ((n = (*sum->type->externalf)(cx, sum->type, NiL, &sum->format, &v, (char*)state->tmp.buf, y, cx->disc)) < 0)
+					if ((n = (*sum->type->externalf)(cx, sum->type, NiL, &sum->format, &v.value, (char*)state->tmp.buf, y, cx->disc)) < 0)
 					{
-						error(2, "%s value %I*g conversion error", sum->type->name, sizeof(v.number), v.number);
+						error(2, "%s value %I*g conversion error", sum->type->name, sizeof(v.value.number), v.value.number);
 						return -1;
 					}
 					if (n < y)
@@ -275,7 +275,7 @@ record(register State_t* state, register Rsobj_t* r, int op)
 				{
 					if (sum->end.index || RECTYPE(state->fmt) == REC_fixed)
 					{
-						error(2, "%s value %I*g width exceeds %d", sum->type->name, sizeof(v.number), v.number, w);
+						error(2, "%s value %I*g width exceeds %d", sum->type->name, sizeof(v.value.number), v.value.number, w);
 						return -1;
 					}
 					ext = &state->buf[state->alt = !state->alt];

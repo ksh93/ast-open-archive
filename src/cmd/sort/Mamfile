@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -199,9 +199,9 @@ done ${INSTALLROOT}/man/man1/sort.1 generated
 done install virtual
 make test
 make test.sort
+prev sort
 make sort.tst
 done sort.tst
-prev sort
 exec - regress  sort.tst sort
 done test.sort virtual
 make test.script

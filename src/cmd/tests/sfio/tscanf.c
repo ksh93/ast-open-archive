@@ -243,5 +243,18 @@ MAIN()
 	if(i != 2 || n != 123 || f <= 3.1414 || f >= 3.1416)
 		terror("%%! failed i=%d n=%d d=%g", i, n, f);
 
+	k = 0;
+	if(sfsscanf("%1", "%%%d", &k) != 1 || k != 1)
+		terror("%%%% failed");
+	k = 0;
+	if(sfsscanf(" %1", "%%%d", &k) != 1 || k != 1)
+		terror("%%%% does not skip leading space");
+	k = 0;
+	if(sfsscanf("%1", "%*[%]%d", &k) != 1 || k != 1)
+		terror("%%*%% failed");
+	k = 0;
+	if(sfsscanf(" %1", "%*[%]%d", &k) == 1 && k == 1)
+		terror("%%*%% skips leading space");
+
 	TSTEXIT(0);
 }

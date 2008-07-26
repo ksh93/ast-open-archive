@@ -31,7 +31,7 @@
 #include <ast_common.h>
 #include <ip6.h>
 
-#define BGP_VERSION		20080218L	/* interface version	*/
+#define BGP_VERSION		20080611L	/* interface version	*/
 
 #define BGP_SET			0xffff		/* as path set marker	*/
 
@@ -45,50 +45,100 @@
 #define BGP_damped		(1<<4)
 #define BGP_history		(1<<5)
 #define BGP_internal		(1<<6)
-#define BGP_rib_failure		(1<<7)
-#define BGP_slot		(1<<8)
-#define BGP_stale		(1<<9)
-#define BGP_suppressed		(1<<10)
-#define BGP_valid		(1<<11)
+#define BGP_ipv6		(1<<7)
+#define BGP_rib_failure		(1<<8)
+#define BGP_slot		(1<<9)
+#define BGP_stale		(1<<10)
+#define BGP_suppressed		(1<<11)
+#define BGP_valid		(1<<12)
 #define BGP_PART		(1<<15)
 
 /*
  * indices (odd, 2 bits set)
  */
 
-#define BGP_hop			((1<<1)|1)
-#define BGP_local		((2<<1)|1)
-#define BGP_med			((3<<1)|1)
-#define BGP_path		((4<<1)|1)
-#define BGP_prefix		((5<<1)|1)
-#define BGP_weight		((6<<1)|1)
-#define BGP_origin		((7<<1)|1)
-#define BGP_time		((8<<1)|1)
-#define BGP_agg_addr		((9<<1)|1)
-#define BGP_agg_as		((10<<1)|1)
-#define BGP_dpa_addr		((11<<1)|1)
-#define BGP_dpa_as		((12<<1)|1)
+#define BGP_agg_addr		((1<<1)|1)
+#define BGP_agg_addrv4		((2<<1)|1)
+#define BGP_agg_addrv6		((3<<1)|1)
+#define BGP_agg_addr32		((4<<1)|1)
+#define BGP_agg_addr32v4	((5<<1)|1)
+#define BGP_agg_addr32v6	((6<<1)|1)
+#define BGP_agg_as		((7<<1)|1)
+#define BGP_agg_as16		((8<<1)|1)
+#define BGP_agg_as32		((9<<1)|1)
+#define BGP_bits		((10<<1)|1)
+#define BGP_bitsv4		((11<<1)|1)
+#define BGP_bitsv6		((12<<1)|1)
 #define BGP_cluster		((13<<1)|1)
 #define BGP_community		((14<<1)|1)
-#define BGP_bits		((15<<1)|1)
-#define BGP_originator		((16<<1)|1)
-#define BGP_src_addr		((17<<1)|1)
-#define BGP_src_as		((18<<1)|1)
-#define BGP_dst_addr		((19<<1)|1)
-#define BGP_dst_as		((20<<1)|1)
-#define BGP_type		((21<<1)|1)
-#define BGP_old_state		((22<<1)|1)
-#define BGP_new_state		((23<<1)|1)
-#define BGP_stamp		((24<<1)|1)
-#define BGP_message		((25<<1)|1)
-#define BGP_as32		((26<<1)|1)
-#define BGP_addr32		((27<<1)|1)
-#define BGP_path32		((28<<1)|1)
-#define BGP_agg_addr32		((29<<1)|1)
-#define BGP_agg_as32		((30<<1)|1)
-#define BGP_unknown		((31<<1)|1)
+#define BGP_dpa_addr		((15<<1)|1)
+#define BGP_dpa_addrv4		((16<<1)|1)
+#define BGP_dpa_addrv6		((17<<1)|1)
+#define BGP_dpa_as		((18<<1)|1)
+#define BGP_dpa_as16		((19<<1)|1)
+#define BGP_dpa_as32		((20<<1)|1)
+#define BGP_dst_addr		((21<<1)|1)
+#define BGP_dst_addrv4		((22<<1)|1)
+#define BGP_dst_addrv6		((23<<1)|1)
+#define BGP_dst_as		((24<<1)|1)
+#define BGP_dst_as16		((25<<1)|1)
+#define BGP_dst_as32		((26<<1)|1)
+#define BGP_hop			((27<<1)|1)
+#define BGP_hopv4		((28<<1)|1)
+#define BGP_hopv6		((29<<1)|1)
+#define BGP_local		((30<<1)|1)
+#define BGP_med			((31<<1)|1)
+#define BGP_message		((32<<1)|1)
+#define BGP_new_state		((33<<1)|1)
+#define BGP_old_state		((34<<1)|1)
+#define BGP_origin		((35<<1)|1)
+#define BGP_originator		((36<<1)|1)
+#define BGP_path		((37<<1)|1)
+#define BGP_path16		((38<<1)|1)
+#define BGP_path32		((39<<1)|1)
+#define BGP_prefix		((40<<1)|1)
+#define BGP_prefixv4		((41<<1)|1)
+#define BGP_prefixv6		((42<<1)|1)
+#define BGP_safi		((43<<1)|1)
+#define BGP_src_addr		((44<<1)|1)
+#define BGP_src_addrv4		((45<<1)|1)
+#define BGP_src_addrv6		((46<<1)|1)
+#define BGP_src_as		((47<<1)|1)
+#define BGP_src_as16		((48<<1)|1)
+#define BGP_src_as32		((49<<1)|1)
+#define BGP_stamp		((50<<1)|1)
+#define BGP_time		((51<<1)|1)
+#define BGP_type		((52<<1)|1)
+#define BGP_weight		((53<<1)|1)
+#define BGP_unknown		((54<<1)|1)
 
-#define BGP_LAST		31
+#define BGP_LAST		54
+
+#define BGP_INDEX(x)		(((x)>>1)-1)
+
+/*
+ * field set bits
+ */
+
+#define BGP_SET_agg_addrv4	(1<<0)
+#define BGP_SET_agg_addrv6	(1<<1)
+#define BGP_SET_agg_addr32v4	(1<<2)
+#define BGP_SET_agg_addr32v6	(1<<3)
+#define BGP_SET_cluster		(1<<4)
+#define BGP_SET_community	(1<<5)
+#define BGP_SET_dpa_addrv4	(1<<6)
+#define BGP_SET_dpa_addrv6	(1<<7)
+#define BGP_SET_dst_addrv4	(1<<8)
+#define BGP_SET_dst_addrv6	(1<<9)
+#define BGP_SET_hopv4		(1<<10)
+#define BGP_SET_hopv6		(1<<11)
+#define BGP_SET_path16		(1<<12)
+#define BGP_SET_path32		(1<<13)
+#define BGP_SET_prefixv4	(1<<14)
+#define BGP_SET_prefixv6	(1L<<15)
+#define BGP_SET_src_addrv4	(1L<<16)
+#define BGP_SET_src_addrv6	(1L<<17)
+#define BGP_SET_unknown		(1L<<18)
 
 /*
  * BGP_type
@@ -168,6 +218,10 @@ struct Bgproute_s
 	Bgpnum_t	message;	/* message group index		*/
 	Bgpnum_t	agg_addr32;	/* aggregator as32 addr		*/
 	Bgpnum_t	agg_as32;	/* aggregator as32		*/
+	Bgpnum_t	dpa_as32;	/* dpa as32			*/
+	Bgpnum_t	dst_as32;	/* destination as32		*/
+	Bgpnum_t	src_as32;	/* source as32			*/
+	Bgpnum_t	set;		/* BGP_SET_* bitmask		*/
 
 	/* 16 bit members */
 
@@ -189,10 +243,22 @@ struct Bgproute_s
 	unsigned char	type;		/* BGP_TYPE_*			*/
 	unsigned char	origin;		/* BGP_ORIGIN_*			*/
 	unsigned char	blocks;		/* # blocks for this record	*/
+	unsigned char	safi;		/* announce subsequent afi	*/
 	unsigned char	p1;		/* parameter 1			*/
-	unsigned char	p2;		/* parameter 2			*/
 
-	char		data[904];	/* vector data (round to 1K)	*/
+	/* unaligned fixed buffer members */
+
+	unsigned char	hopv6[16];	/* next hop address		*/
+	unsigned char	agg_addrv6[16];	/* aggregator addr		*/
+	unsigned char	dpa_addrv6[16];	/* dpa addr			*/
+	unsigned char	dst_addrv6[16];	/* destination addr		*/
+	unsigned char	src_addrv6[16];	/* source addr			*/
+	unsigned char	agg_addr32v6[16];/* aggregator as32 addr	*/
+	unsigned char	prefixv6[17];	/* prefix			*/
+
+	char		pad[7];		/* pad to 8 byte boundary	*/
+
+	char		data[768];	/* vector data (round to 1K)	*/
 };
 
 #endif

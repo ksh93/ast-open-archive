@@ -99,28 +99,28 @@ flatread(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		}
 		return 0;
 	}
-	if (strtoip4(a, &b, &rp->ipv4_src_addr, NiL) || *b++ != '|')
+	if (strtoip4(a, &b, &rp->src_addrv4, NiL) || *b++ != '|')
 		goto bad;
-	if (strtoip4(b, &a, &rp->ipv4_dst_addr, NiL) || *a++ != '|')
+	if (strtoip4(b, &a, &rp->dst_addrv4, NiL) || *a++ != '|')
 		goto bad;
-	if (strtoip4(a, &b, &rp->ipv4_next_hop, NiL) || *b++ != '|')
+	if (strtoip4(a, &b, &rp->hopv4, NiL) || *b++ != '|')
 		goto bad;
-	rp->input_snmp = strtoul(b, &a, 10);
+	rp->input = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->output_snmp = strtoul(a, &b, 10);
+	rp->output = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
-	rp->in_pkts = rp->out_pkts = strtoul(b, &a, 10);
+	rp->packets = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->in_bytes = rp->out_bytes = strtoul(a, &b, 10);
+	rp->bytes = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
-	rp->first_switched = strtoul(b, &a, 10);
+	rp->first = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->last_switched = strtoul(a, &b, 10);
+	rp->last = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
 	rp->src_port = strtoul(b, &a, 10);
@@ -141,23 +141,23 @@ flatread(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 	rp->src_tos = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
-	rp->src_as = strtoul(b, &a, 10);
+	rp->src_as16 = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->dst_as = strtoul(a, &b, 10);
+	rp->dst_as16 = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
-	rp->src_mask = strtoul(b, &a, 10);
+	rp->src_maskv4 = strtoul(b, &a, 10);
 	if (*a++ != '|')
 		goto bad;
-	rp->dst_mask = strtoul(a, &b, 10);
+	rp->dst_maskv4 = strtoul(a, &b, 10);
 	if (*b++ != '|')
 		goto bad;
 	rp->flow_sequence = strtoul(b, &a, 10);
 	if (*a++ != '\n')
 		goto bad;
-	rp->start = (Nftime_t)rp->first_switched * NS;
-	rp->end = (Nftime_t)rp->last_switched * NS;
+	rp->start = (Nftime_t)rp->first * NS;
+	rp->end = (Nftime_t)rp->last * NS;
 	record->data = rp;
 	record->size = sizeof(*rp);
 	return 1;
@@ -183,13 +183,13 @@ flatwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 	register Netflow_t*	rp = (Netflow_t*)record->data;
 
 	if (sfprintf(file->io, "%d.%d.%d.%d|%d.%d.%d.%d|%d.%d.%d.%d|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u\n"
-		, IPQ(rp->ipv4_src_addr)
-		, IPQ(rp->ipv4_dst_addr)
-		, IPQ(rp->ipv4_next_hop)
-		, rp->input_snmp
-		, rp->output_snmp
-		, rp->in_pkts
-		, rp->in_bytes
+		, IPQ(rp->src_addrv4)
+		, IPQ(rp->dst_addrv4)
+		, IPQ(rp->hopv4)
+		, rp->input
+		, rp->output
+		, rp->packets
+		, rp->bytes
 		, (unsigned long)(rp->start / NS)
 		, (unsigned long)(rp->end / NS)
 		, rp->src_port
@@ -198,10 +198,10 @@ flatwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		, rp->tcp_flags
 		, rp->protocol
 		, rp->src_tos
-		, rp->src_as
-		, rp->dst_as
-		, rp->src_mask
-		, rp->dst_mask
+		, rp->src_as16
+		, rp->dst_as16
+		, rp->src_maskv4
+		, rp->dst_maskv4
 		, rp->flow_sequence
 			) < 0)
 	{

@@ -234,6 +234,13 @@ struct _vcodex_s
 
 _BEGIN_EXTERNS_
 
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern		extern __EXPORT__
+#endif
+#if !_BLD_vcodex && defined(__IMPORT__)
+#define extern		extern __IMPORT__
+#endif
+
 extern Vcmethod_t*	Vcdelta;	/* delta compression		*/
 extern Vcmethod_t*	Vchamming;	/* byte-wise delta of data	*/
 
@@ -247,6 +254,12 @@ extern Vcmethod_t*	Vcmtf;		/* move-to-front transform	*/
 
 extern Vcmethod_t*	Vcmap;		/* mapping codeset to codeset	*/
 extern Vcmethod_t*	Vctranspose;	/* swap rows and columns	*/
+
+#undef	extern
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
 
 /* public functions */
 extern Vcodex_t*	vcopen _ARG_((Vcdisc_t*, Vcmethod_t*, Void_t*, Vcodex_t*, int));
@@ -303,6 +316,8 @@ extern ssize_t		_vcioput2 _ARG_((Vcio_t*, Vcint_t, Vcchar_t, Vcchar_t));
 extern Vcint_t		_vcioget2 _ARG_((Vcio_t*, Vcchar_t, Vcchar_t));
 extern ssize_t		_vcioputg _ARG_((Vcio_t*, Vcint_t));
 extern Vcint_t		_vciogetg _ARG_((Vcio_t*));
+
+#undef	extern
 
 _END_EXTERNS_
 
@@ -402,10 +417,17 @@ typedef struct _vcsfx_s
 } Vcsfx_t;
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern Vcsfx_t*	vcsfxsort _ARG_((const Void_t*, ssize_t));
 extern ssize_t	vcperiod _ARG_((const Void_t*, ssize_t));
-_END_EXTERNS_
 
+#undef	extern
+
+_END_EXTERNS_
 
 /*************************************************************************
 	TYPES AND FUNCTIONS RELATED TO GENERALIZED LZ-PARSING
@@ -449,9 +471,16 @@ struct _vclzparse_s
 };
 
 _BEGIN_EXTERNS_
-extern int	vclzparse _ARG_((Vclzparse_t*, ssize_t));
-_END_EXTERNS_
 
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
+extern int	vclzparse _ARG_((Vclzparse_t*, ssize_t));
+
+#undef	extern
+
+_END_EXTERNS_
 
 /************************************************************************
 	TYPES AND FUNCTIONS RELATED TO HUFFMAN ENCODING
@@ -475,12 +504,20 @@ typedef struct _vchtrie_s
 } Vchtrie_t;
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern ssize_t		vchsize _ARG_((ssize_t, ssize_t*, ssize_t*, int*));
 extern ssize_t		vchbits _ARG_((ssize_t, ssize_t*, Vcbit_t*));
 extern Vchtrie_t*	vchbldtrie _ARG_((ssize_t, ssize_t*, Vcbit_t*));
 extern Void_t		vchdeltrie _ARG_((Vchtrie_t*));
 extern ssize_t		vchgetcode _ARG_((ssize_t, ssize_t*, ssize_t, Vcchar_t*, size_t));
 extern ssize_t		vchputcode _ARG_((ssize_t, ssize_t*, ssize_t, Vcchar_t*, size_t));
+
+#undef	extern
+
 _END_EXTERNS_
 
 /*************************************************************************
@@ -566,10 +603,17 @@ struct _vcdtable_s
 };
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern ssize_t		vcdputtable _ARG_((Vcdtable_t*, Void_t*, size_t));
 extern int		vcdgettable _ARG_((Vcdtable_t*, Void_t*, size_t));
-_END_EXTERNS_
 
+#undef	extern
+
+_END_EXTERNS_
 
 /*************************************************************************
 	TYPES AND FUNCTIONS RELATED TO MATCHING WINDOWS
@@ -622,14 +666,29 @@ struct _vcwindow_s
 
 _BEGIN_EXTERNS_
 
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern		extern __EXPORT__
+#endif
+#if !_BLD_vcodex && defined(__IMPORT__)
+#define extern		extern __IMPORT__
+#endif
+
 extern Vcwmethod_t*	Vcwmirror;
 extern Vcwmethod_t*	Vcwvote;
 extern Vcwmethod_t*	Vcwprefix;
+
+#undef	extern
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
 
 extern Vcwindow_t*	vcwopen _ARG_((Vcwdisc_t*, Vcwmethod_t*));
 extern int		vcwclose _ARG_((Vcwindow_t*));
 extern Vcwmethod_t*	vcwgetmeth _ARG_((char*));
 extern int		vcwwalkmeth _ARG_((Vcwalk_f, Void_t*));
+
+#undef	extern
 
 _END_EXTERNS_
 
@@ -661,12 +720,19 @@ typedef struct _vctblplan_s /* transform plan for all columns		*/
 } Vctblplan_t;
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern Vctblplan_t*	vctblmakeplan _ARG_((const Void_t*, size_t, size_t, int));
 extern void		vctblfreeplan _ARG_((Vctblplan_t*));
 extern ssize_t		vctblencodeplan _ARG_((Vctblplan_t*, Void_t**));
 extern Vctblplan_t*	vctbldecodeplan _ARG_((Void_t*, size_t));
-_END_EXTERNS_
 
+#undef	extern
+
+_END_EXTERNS_
 
 /*************************************************************************
 	TYPES AND FUNCTIONS RELATED TO RELATIONAL DATABASE TRANSFORM
@@ -747,6 +813,11 @@ typedef struct _vcrdsepar_s
 #define vcrdsize(tbl)	((tbl)->parz)	/* size of data just parsed	*/
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern ssize_t		vcrdsepar _ARG_((Vcrdsepar_t*, ssize_t, Vcchar_t*, ssize_t, int));
 
 extern ssize_t		vcrdweight _ARG_((Vcrdtable_t*, ssize_t, ssize_t*, Vcrdweight_f));
@@ -760,6 +831,9 @@ extern int		vcrdattrs _ARG_((Vcrdtable_t*, ssize_t, int, int));
 extern ssize_t		vcrdextract _ARG_((Vcrdtable_t*, ssize_t, Vcchar_t*, ssize_t, int));
 extern void		vcrdclose _ARG_((Vcrdtable_t*));
 extern int		vcrdvector _ARG_((Vcrdtable_t*, ssize_t, Vcchar_t*, ssize_t, int));
+
+#undef	extern
+
 _END_EXTERNS_
 
 
@@ -796,17 +870,29 @@ typedef struct _vcsfdata_s
 } Vcsfdata_t;
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern Vcsfio_t*	vcsfio _ARG_((Sfio_t*, Vcsfdata_t*, int));
+
+#if !_SFIO_H
+
 extern ssize_t		vcsfread _ARG_((Vcsfio_t*, Void_t*, size_t));
 extern ssize_t		vcsfwrite _ARG_((Vcsfio_t*, const Void_t*, size_t));
 extern int		vcsfsync _ARG_((Vcsfio_t*));
 extern int		vcsfclose _ARG_((Vcsfio_t*));
 
+#endif
+
 extern void		vcaddalias _ARG_((char**));
 extern char*		vcgetalias _ARG_((char*, char*, ssize_t));
 extern int		vcwalkalias _ARG_((Vcwalk_f, Void_t*));
-_END_EXTERNS_
 
+#undef	extern
+
+_END_EXTERNS_
 
 /*************************************************************************
 	TYPES AND MACROS/FUNCTIONS USEFUL FOR WRITING METHODS
@@ -849,11 +935,19 @@ struct _vcbuffer_s /* type of a buffer */
 };
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vcodex && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern ssize_t		vcrecode _ARG_((Vcodex_t*, Vcchar_t**, ssize_t*, ssize_t));
 extern Vccontext_t*	vcinitcontext _ARG_((Vcodex_t*, Vccontext_t*));
 extern int		vcfreecontext _ARG_((Vcodex_t*, Vccontext_t*));
 extern Vcchar_t*	_vcbuffer _ARG_((Vcodex_t*, Vcchar_t*, ssize_t, ssize_t));
 extern int		vctellbuf _ARG_((Vcodex_t*, Vcbuffer_f));
+
+#undef	extern
+
 _END_EXTERNS_
 
 /*************************************************************************

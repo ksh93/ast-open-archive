@@ -217,7 +217,7 @@ static void check_numeric(Namval_t *np, Cxtype_t *tp, Cxstate_t *sp)
 {
 	if(cxisnumber(tp))
 	{
-		nv_onattr(np,NV_LONG|NV_INTEGER|NV_DOUBLE|NV_EXPNOTE);
+		nv_onattr(np,NV_LDOUBLE|NV_EXPNOTE);
 		nv_setsize(np,10);
 	}
 	else if(cxisbuffer(tp))
@@ -498,7 +498,7 @@ static Namval_t *node(Cxvariable_t *vp,struct parent *dp)
 			else if(nfp = malloc(size))
 			{
 				memcpy((void*)nfp,(void*)fp,size);
-				nfp->nofree = 0;
+				nfp->nofree &= ~1;
 			}
 			if(nfp)
 				nv_disc(np,nfp,NV_FIRST);
@@ -617,7 +617,7 @@ static void dss_unset(Namval_t *np, struct parent *dp)
 	nv_disc(np,&dp->hdr.fun,NV_POP);
 	if(dp->hdr.nodes)
 		free((void*)dp->hdr.nodes);
-	if(!dp->hdr.fun.nofree)
+	if(!dp->hdr.fun.nofree&1)
 		free((void*)dp);
 }
 
@@ -870,7 +870,7 @@ static Namval_t *add_discipline(const char *typename, const char *name, int (*fu
 static void put_type(Namval_t* np, const char* val, int flag, Namfun_t* fp)
 {
 	struct type	*tp = (struct type*)fp;
-	Cxvalue_t	cval;
+	Cxoperand_t	cop;
 	Namval_t	*nq;
 	if(val && (nq=nv_open(val,sh.var_tree,NV_VARNAME|NV_ARRAY|NV_NOADD|NV_NOFAIL))) 
 	{
@@ -886,14 +886,15 @@ static void put_type(Namval_t* np, const char* val, int flag, Namfun_t* fp)
 	if(val && !(flag&NV_INTEGER) && tp->type->internalf && !cxisstring(tp->type))
 	{
 		size_t	 size = strlen(val);
-		if((*tp->type->internalf)(tp->cx, tp->type, NiL, NiL, &cval, val, size, Vmregion, &Dssdisc) <0)
+		cop.type = tp->type;
+		if((*tp->type->internalf)(tp->cx, tp->type, NiL, NiL, &cop, val, size, Vmregion, &Dssdisc) <0)
 			errormsg(SH_DICT,ERROR_exit(1),"%s: cannot covert to type dss.%s",val,tp->type->name);
-		if(cxisnumber(tp->type))
-			nv_putv(np,(char*)&cval.number,flag|NV_LONG|NV_INTEGER|NV_DOUBLE,fp);
+		if(cxisnumber(cop.type))
+			nv_putv(np,(char*)&cop.value.number,flag|NV_LDOUBLE,fp);
 		else
 		{
-			nv_setsize(np,cval.buffer.size);
-			nv_putv(np, (char*)cval.buffer.data, NV_RAW|NV_BINARY,fp);
+			nv_setsize(np,cop.value.buffer.size);
+			nv_putv(np, (char*)cop.value.buffer.data, NV_RAW|NV_BINARY,fp);
 		}
 	}
 	else
@@ -901,9 +902,9 @@ static void put_type(Namval_t* np, const char* val, int flag, Namfun_t* fp)
 	if(!val)
 	{
 		nv_disc(np,fp,NV_POP);
-		if(fp->nofree==0)
+		if(fp->nofree&~1)
 			free((void*)fp);
-		else if(--fp->nofree==0)
+		else
 		{
 			Namval_t *mp;
 			int i;
@@ -972,10 +973,10 @@ static Namfun_t *clone_type(Namval_t* np, Namval_t *mp, int flags, Namfun_t *fp)
 	{
 		struct type *dp = newof((struct type*)0, struct type,1,0);
 		*dp = *tp;
-		dp->fun.nofree = 0;
+		dp->fun.nofree &= ~0;
 		return(&dp->fun);
 	}
-	fp->nofree++;
+	fp->nofree |=1;
 	return(fp);
 }
 
@@ -1016,10 +1017,10 @@ static char *setdisc_type(Namval_t *np, const char *event, Namval_t* action, Nam
 	if(action==np)
 	{
 		/* clone the discipline for variable specific function */
-		if(fp->nofree && fp->type!=np)
+		if((fp->nofree&1) && fp->type!=np)
 		{
 			tp = (struct type*)nv_disc(np, fp, NV_CLONE);
-			fp->nofree--;
+			fp->nofree &= ~1;
 		}
 		action = tp->bltins[n];
 	}
@@ -1070,7 +1071,7 @@ static const Namdisc_t type_disc =
 };
 
 static const char sh_opttype[] =
-"[-1c?\n@(#)$Id: type (AT&T Research) 2008-04-17 $\n]"
+"[-1c?\n@(#)$Id: type (AT&T Research) 2008-06-09 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - set the type of variables to \b\f?\f\b]"
 "[+DESCRIPTION?\b\f?\f\b sets the type of each of the variables specified "
@@ -1237,7 +1238,7 @@ sfprintf(sfstderr,"tname=%s name=%s n=%d index=%d\n",name,vp->name,n,vp->header.
 	dp->type = tp;
 	dp->disc = &Dssdisc;
 	dp->hdr.childfun.fun.disc = meth?&mchild_disc:&child_disc;
-	dp->hdr.childfun.fun.nofree = n;
+	dp->hdr.childfun.fun.nofree = 1;
 	dp->hdr.childfun.ptype = &dp->hdr;
 	dp->parentfun.disc = &parent2_disc;
 	dp->parentfun.nofree = 1;
@@ -1536,7 +1537,7 @@ exec:
 	if(bp->vnode)
 		fp = nv_hasdisc(bp->vnode, &child_disc);
 	valp = getvalue(bp->vnode, fp, &cval);
-	n = (*mp->execf)(tp->cx, comp, valp, &Dssdisc);
+	n = (*mp->execf)(tp->cx, comp, tptr, valp, &Dssdisc);
 	if(!bp->data)
 		(*mp->freef)(tp->cx, comp, &Dssdisc);
 	return(n<0?4:!n);
@@ -1608,4 +1609,3 @@ void lib_init(int flag, void* context)
 	nfp->nnames = n;
 	nfp->sh = shp;
 }
-

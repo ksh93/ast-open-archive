@@ -523,7 +523,7 @@ glob_dirclose(glob_t* gp, void* handle)
  */
 
 static int
-glob_type(glob_t* gp, const char* path)
+glob_type(glob_t* gp, const char* path, int flags)
 {
 	register int		i;
 	register int		n;

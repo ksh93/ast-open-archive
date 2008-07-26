@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-04-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-06-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -755,30 +755,31 @@ done ${INSTALLROOT}/bin/expand generated
 done install virtual
 make test
 make test.csplit
+prev csplit
 make csplit.tst
 done csplit.tst
-prev csplit
 exec - regress  csplit.tst csplit
 done test.csplit virtual
 make test.dd
+prev dd
 make dd.tst
 done dd.tst
-prev dd
 exec - regress  dd.tst dd
 done test.dd virtual
 make test.locale
+prev locale
 make locale.tst
 done locale.tst
-prev locale
 exec - regress  locale.tst locale
 done test.locale virtual
 make test.ls
+prev ls
 make ls.tst
 done ls.tst
-prev ls
 exec - regress  ls.tst ls
 done test.ls virtual
 make test.seq
+prev seq
 make seq.tst
 meta seq.tst %.rt>%.tst seq.rt seq
 make seq.rt
@@ -787,19 +788,18 @@ exec - if	[[ "1" || "seq.rt" -nt "seq.tst" ]]
 exec - then	mktest --style=regress seq.rt > seq.tst
 exec - fi
 done seq.tst generated
-prev seq
 exec - regress  seq.tst seq
 done test.seq virtual
 make test.touch
+prev touch
 make touch.tst
 done touch.tst
-prev touch
 exec - regress  touch.tst touch
 done test.touch virtual
 make test.tsort
+prev tsort
 make tsort.tst
 done tsort.tst
-prev tsort
 exec - regress  tsort.tst tsort
 done test.tsort virtual
 done test dontcare virtual

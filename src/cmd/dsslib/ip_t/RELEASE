@@ -1,3 +1,5 @@
+08-07-25 ip_t.c: add { %(prefix:C)s %(addr:C)s } for 0x%02x comma-separated value
+08-06-11 add { fv ptv } for ipv6
 08-01-15 bgp.h: add { BGP_rib_failure BGP_stale }
 07-12-06 ip_t.c: add as32 support
 07-12-06 ire,itl: add dots arg for dotted representation

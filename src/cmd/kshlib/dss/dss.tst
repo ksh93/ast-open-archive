@@ -4,8 +4,6 @@ TITLE + type
 
 export LC_ALL=C TZ=EST5EDT
 
-VIEW data ../lsa/data
-
 builtin -f dss
 dss.load time_t
 typeset -T dss.time_t

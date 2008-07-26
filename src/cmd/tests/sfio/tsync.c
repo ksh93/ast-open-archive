@@ -31,7 +31,7 @@ Void_t*		arg;
 Sfdisc_t*	disc;
 #endif
 {
-	if(type == SF_SYNC && (int)arg == 1)
+	if(type == SF_SYNC && integralof(arg) == 1)
 		Count += 1;
 	return 0;
 }
@@ -54,7 +54,7 @@ Sfdisc_t*	disc;
 #endif
 {
 	if(type == SF_SYNC)
-		((Mydisc_t*)disc)->sync = (int)arg;
+		((Mydisc_t*)disc)->sync = integralof(arg);
 	return 0;
 }
 

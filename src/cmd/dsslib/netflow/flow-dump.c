@@ -133,6 +133,16 @@ typedef struct Rec_7_s
 	Nflong_t	router_sc;
 } Rec_7_t;
 
+#define FLOW_TEMPLATE	0
+#define FLOW_OPTION	1
+#define FLOW_META	255
+
+typedef struct Rec_9_s
+{
+	Nflong_t	flowset;
+	Nflong_t	size;
+} Rec_9_t;
+
 typedef struct State_s
 {
 	Netflow_t	record;
@@ -241,12 +251,12 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 					swapmem(1, state->data, &rp->version, 4);
 					swapmem(3, state->data + 4, &rp->uptime, 16);
 					memcpy(&rp->engine_type, state->data + 20, 2);
-					swapmem(1, state->data + 22, &rp->sampling_interval, 2);
+					swapmem(1, state->data + 22, &rp->sampler_interval, 2);
 				}
 				else
 					memcpy(&rp->version, state->data, n);
-				rp->flow_sampler_mode = (rp->sampling_interval >> 14) & ((1<<2)-1);
-				rp->sampling_interval &= ((1<<14)-1);
+				rp->sampler_mode = (rp->sampler_interval >> 14) & ((1<<2)-1);
+				rp->sampler_interval &= ((1<<14)-1);
 				break;
 			case 7:
 				n = 24;
@@ -265,7 +275,7 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 						(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%sheader corrupted", cxlocation(file->dss->cx, record));
 					return -1;
 				}
-				state->swap = 1;
+				state->swap = 7;
 				n = swapget(2, state->data, 2);
 				continue;
 			}
@@ -280,9 +290,9 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 		r1 = (Rec_1_t*)state->data;
 		if (state->swap)
 		{
-			swapmem(3, state->data, &rp->ipv4_src_addr, 12);
-			swapmem(1, state->data + 12, &rp->input_snmp, 4);
-			swapmem(3, state->data + 16, &rp->in_pkts, 16);
+			swapmem(3, state->data, &rp->src_addrv4, 12);
+			swapmem(1, state->data + 12, &rp->input, 4);
+			swapmem(3, state->data + 16, &rp->packets, 16);
 			swapmem(1, state->data + 32, &rp->src_port, 4);
 			memcpy(&rp->flags, state->data + 36, 4);
 		}
@@ -290,49 +300,43 @@ dumpfread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* dis
 			memcpy(rp, r1, sizeof(Rec_1_t));
 		state->data += sizeof(Rec_1_t);
 		rp->flags = r1->flags;
-#if 0
-		memcpy(&rp->pad1, &r1->flags, 4);
-#endif
-		memset(&rp->src_as, 0, 12);
+		memset(&rp->src_as16, 0, 12);
 		break;
 	case 5:
 		if (state->swap)
 		{
-			swapmem(3, state->data, &rp->ipv4_src_addr, 12);
-			swapmem(1, state->data + 12, &rp->input_snmp, 4);
-			swapmem(3, state->data + 16, &rp->in_pkts, 16);
+			swapmem(3, state->data, &rp->src_addrv4, 12);
+			swapmem(1, state->data + 12, &rp->input, 4);
+			swapmem(3, state->data + 16, &rp->packets, 16);
 			swapmem(1, state->data + 32, &rp->src_port, 4);
 			memcpy(&rp->flags, state->data + 36, 4);
-			swapmem(1, state->data + 40, &rp->src_as, 4);
-			memcpy(&rp->src_mask, state->data + 44, 2);
+			swapmem(1, state->data + 40, &rp->src_as16, 4);
+			memcpy(&rp->src_maskv4, state->data + 44, 2);
 		}
 		else
 			memcpy(rp, state->data, sizeof(Rec_5_t));
 		state->data += sizeof(Rec_5_t);
 		rp->flags = 0;
-#if 0
-		memset(&rp->pad2, 0, 10);
-#endif
 		break;
 	case 7:
 		if (state->swap)
 		{
-			swapmem(3, state->data, &rp->ipv4_src_addr, 12);
-			swapmem(1, state->data + 12, &rp->input_snmp, 4);
-			swapmem(3, state->data + 16, &rp->in_pkts, 16);
+			swapmem(3, state->data, &rp->src_addrv4, 12);
+			swapmem(1, state->data + 12, &rp->input, 4);
+			swapmem(3, state->data + 16, &rp->packets, 16);
 			swapmem(1, state->data + 32, &rp->src_port, 4);
 			memcpy(&rp->flags, state->data + 36, 4);
-			swapmem(1, state->data + 40, &rp->src_as, 4);
-			memcpy(&rp->src_mask, state->data + 44, 2);
-			swapmem(1, state->data + 48, &rp->router_sc, 4);
+			swapmem(1, state->data + 40, &rp->src_as16, 4);
+			memcpy(&rp->src_maskv4, state->data + 44, 2);
+			swapmem(1, state->data + 48, &rp->router_scv4, 4);
 		}
 		else
 			memcpy(rp, state->data, sizeof(Rec_7_t));
 		state->data += sizeof(Rec_7_t);
 		break;
 	}
-	rp->start = state->boot + (Nftime_t)rp->first_switched * US;
-	rp->end = state->boot + (Nftime_t)rp->last_switched * US;
+	rp->start = state->boot + (Nftime_t)rp->first * US;
+	rp->end = state->boot + (Nftime_t)rp->last * US;
 	record->size = sizeof(*rp);
 	record->data = rp;
 	return 1;
@@ -373,13 +377,13 @@ dumpfwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 				swapmem(1, &rp->version, state->data, 4);
 				swapmem(3, &rp->uptime, state->data + 4, 16);
 				memcpy(state->data + 20, &rp->engine_type, 2);
-				swapmem(1, &rp->sampling_interval, state->data + 22, 2);
-				*(state->data + 23) |= rp->flow_sampler_mode << 6;
+				swapmem(1, &rp->sampler_interval, state->data + 22, 2);
+				*(state->data + 23) |= rp->sampler_mode << 6;
 			}
 			else
 			{
 				memcpy(state->data, &rp->version, n);
-				*(state->data + 22) |= rp->flow_sampler_mode << 6;
+				*(state->data + 22) |= rp->sampler_mode << 6;
 			}
 			break;
 		case 7:
@@ -409,9 +413,9 @@ dumpfwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		n = sizeof(Rec_1_t);
 		if (state->swap)
 		{
-			swapmem(3, &rp->ipv4_src_addr, state->next, 12);
-			swapmem(1, &rp->input_snmp, state->next + 12, 4);
-			swapmem(3, &rp->in_pkts, state->next + 16, 16);
+			swapmem(3, &rp->src_addrv4, state->next, 12);
+			swapmem(1, &rp->input, state->next + 12, 4);
+			swapmem(3, &rp->packets, state->next + 16, 16);
 			swapmem(1, &rp->src_port, state->next + 32, 4);
 			memcpy(state->next + 36, &rp->flags, 4);
 		}
@@ -426,13 +430,13 @@ dumpfwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		n = sizeof(Rec_5_t);
 		if (state->swap)
 		{
-			swapmem(3, &rp->ipv4_src_addr, state->next, 12);
-			swapmem(1, &rp->input_snmp, state->next + 12, 4);
-			swapmem(3, &rp->in_pkts, state->next + 16, 16);
+			swapmem(3, &rp->src_addrv4, state->next, 12);
+			swapmem(1, &rp->input, state->next + 12, 4);
+			swapmem(3, &rp->packets, state->next + 16, 16);
 			swapmem(1, &rp->src_port, state->next + 32, 4);
 			memcpy(state->next + 36, &rp->flags, 4);
-			swapmem(1, &rp->src_as, state->next + 40, 4);
-			memcpy(state->next + 44, &rp->src_mask, 2);
+			swapmem(1, &rp->src_as16, state->next + 40, 4);
+			memcpy(state->next + 44, &rp->src_maskv4, 2);
 		}
 		else
 			memcpy(state->next, rp, n);
@@ -444,14 +448,14 @@ dumpfwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		n = sizeof(Rec_7_t);
 		if (state->swap)
 		{
-			swapmem(3, &rp->ipv4_src_addr, state->next, 12);
-			swapmem(1, &rp->input_snmp, state->next + 12, 4);
-			swapmem(3, &rp->in_pkts, state->next + 16, 16);
+			swapmem(3, &rp->src_addrv4, state->next, 12);
+			swapmem(1, &rp->input, state->next + 12, 4);
+			swapmem(3, &rp->packets, state->next + 16, 16);
 			swapmem(1, &rp->src_port, state->next + 32, 4);
 			memcpy(state->next + 36, &rp->flags, 4);
-			swapmem(1, &rp->src_as, state->next + 40, 4);
-			memcpy(state->next + 44, &rp->src_mask, 2);
-			swapmem(1, &rp->router_sc, state->next + 48, 4);
+			swapmem(1, &rp->src_as16, state->next + 40, 4);
+			memcpy(state->next + 44, &rp->src_maskv4, 2);
+			swapmem(1, &rp->router_scv4, state->next + 48, 4);
 		}
 		else
 			memcpy(state->next, rp, n);

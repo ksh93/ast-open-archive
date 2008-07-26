@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss library (AT&T Research) 2007-11-28 $\n]"
+"[-?\n@(#)$Id: dss library (AT&T Research) 2008-06-11 $\n]"
 USAGE_LICENSE
 "[+NAME?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method schema is a pure XML (tags only)"

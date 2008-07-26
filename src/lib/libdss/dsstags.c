@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -217,14 +217,13 @@ map_part_item_value_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t*
 {
 	register Dsstagdisc_t*	state = (Dsstagdisc_t*)disc;
 	char*			e;
-	Cxtype_t*		type;
-	Cxvalue_t		value;
+	Cxoperand_t		r;
 
-	if (type = ((Cxpart_t*)fp->prev->prev->data)->type)
+	if (r.type = ((Cxpart_t*)fp->prev->prev->data)->type)
 	{
-		if ((*type->internalf)(state->meth->cx, type, NiL, NiL, &value, data, strlen(data), NiL, state->disc) < 0)
+		if ((*r.type->internalf)(state->meth->cx, r.type, NiL, NiL, &r, data, strlen(data), NiL, state->disc) < 0)
 			return -1;
-		((Cxitem_t*)fp->prev->data)->value = (Cxinteger_t)value.number;
+		((Cxitem_t*)fp->prev->data)->value = (Cxinteger_t)r.value.number;
 	}
 	else if (isdigit(*data) || *data == '-' || *data == '+')
 	{

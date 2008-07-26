@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2007 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -286,12 +286,12 @@ typedef int	(*Cxfunction_f)	(Cx_t*, Cxvariable_t*, Cxoperand_t*,
 				 Cxoperand_t*, int, void*, Cxdisc_t*);
 typedef void*	(*Cxinit_f)	(void*, Cxdisc_t*);
 typedef ssize_t	(*Cxinternal_f)	(Cx_t*, Cxtype_t*, const char*, Cxformat_t*, 
-				 Cxvalue_t*, const char*, size_t, Vmalloc_t*, 
+				 Cxoperand_t*, const char*, size_t, Vmalloc_t*, 
 				 Cxdisc_t*);
 typedef int	(*Cxload_f)	(const char*, Cxdisc_t*);
 typedef char*	(*Cxlocation_f)	(Cx_t*, void*, Cxdisc_t*);
 typedef void*	(*Cxmatchcomp_f)(Cx_t*, Cxtype_t*, Cxtype_t*, Cxvalue_t*, Cxdisc_t*);
-typedef int	(*Cxmatchexec_f)(Cx_t*, void*, Cxvalue_t*, Cxdisc_t*);
+typedef int	(*Cxmatchexec_f)(Cx_t*, void*, Cxtype_t*, Cxvalue_t*, Cxdisc_t*);
 typedef int	(*Cxmatchfree_f)(Cx_t*, void*, Cxdisc_t*);
 typedef char*	(*Cxnum2str_f)	(Cx_t*, Cxunsigned_t, Cxdisc_t*);
 typedef int	(*Cxquery_f)	(Cx_t*, Cxexpr_t*, void*, Cxdisc_t*);
@@ -457,6 +457,7 @@ struct Cxtype_s				/* type info			*/
 	Cxformat_t	format;		/* format defaults		*/
 	Cxmatch_t*	match;		/* match info			*/
 	Cxmember_t*	member;		/* member info			*/
+	Cxtype_t**	generic;	/* generic implementation table	*/
 	Cxtype_t*	fundamental;	/* fundamental type		*/
 	void*		data;		/* private data			*/
 };

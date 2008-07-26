@@ -36,7 +36,6 @@ do	case $1 in
 	esac
 	shift
 done
-print -u2 AHA#$LINENO "$@"
 
 if	test -d $unit
 then	source=$unit

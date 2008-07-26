@@ -20,8 +20,8 @@ int _nv_scan(Hashtab_t *root, void (*fn)(Namval_t *,void*), void *data, int mask
 
 Hashtab_t *nv_globalscope()
 {
-	Hashtab_t *hp;
-	return ((hp=hashscope(sh.var_tree)) ? hp : sh.var_tree);
+	Hashtab_t *hp=hashscope(sh.var_tree), *hp2;
+	return hp ? ((hp2=hashscope(hp))?hp2:hp) : sh.var_tree;
 }
 
 int sh_openmax()
