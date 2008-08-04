@@ -1,3 +1,5 @@
+08-07-29 testglob.c: add workspace symlinks
+08-07-29 testglob.dat: add ** symlink => dir tests
 08-05-14 *.dat: update tests for UTF-8 vs. ISO-8859-1
 08-03-05 testregex.dat: add K {,*}(...) tests
 08-02-14 sed.tst: sync with regsubexec() fixes

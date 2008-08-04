@@ -660,6 +660,7 @@ static const Netflow_template_t	template =
 	0,
 	0,
 	0,
+	0,
 	{
 		NUMBER(in_bytes, 0),
 		NUMBER(in_packets, 0),

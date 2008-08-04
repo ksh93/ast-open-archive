@@ -1,0 +1,21 @@
+ipv6 address longest prefix match using an interval dictionary
+use this until the lpm(1) retrie implementation handles ipv6 addresses
+
+	Glenn Fowler
+	Network Services Research
+	gsf@research.att.com
+
+This directory contains the standalone code for ipv6 address longest
+prefix match using an interval dictionary. The code is currently
+AT&T PROPRIETARY, so don't propagate this outside of AT&T.
+
+To build the test harness and run:
+
+	make test
+
+The library interface is implemented in libptv.a; include ptv.h in your
+source and link your a.out with libptv.a. Makefile (used by old make) pulls
+in standalone headers and source.
+
+'testptv --man' lists the test harness man page on the standard error.
+See testptv.c for example api usage -- ptv(3) documentation real soon now.

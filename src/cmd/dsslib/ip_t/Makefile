@@ -24,4 +24,9 @@ $(INCLUDEDIR) :INSTALLPROTO: bgp.h pt.h ptv.h fv.h
 
 bgpsize :: bgpsize.c
 
-:: RELEASE
+PAXFILTER = ;*.[ch];$(PROTO) $(PROTOFLAGS) -c "" -p
+
+ptvsa.tgz : $$("ptvsa.manifest":T=F:T=I:/[[:space:]][[:space:]]*/ /G)
+	$(PAX) $(PAXFLAGS) -wvf $(<) -x $(<:/.*\.//) -s ',.*/,,' -A $(PAXFILTER:@Q) $(*)
+
+:: RELEASE README-ptvsa ptvsa.manifest ptvsa.omk

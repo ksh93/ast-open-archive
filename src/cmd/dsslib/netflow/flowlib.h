@@ -53,6 +53,7 @@ struct Netflow_template_s
 	unsigned int		elements;
 	unsigned int		size;
 	unsigned int		set;
+	unsigned int		options;
 	Netflow_field_t		field[NETFLOW_TEMPLATE+1];
 };
 

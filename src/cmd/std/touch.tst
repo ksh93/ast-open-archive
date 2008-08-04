@@ -80,7 +80,7 @@ TEST 02 'times'
 
 TEST 03 'subsecond times'
 
-	IF 'touch -t 2000-05-04+03:02:01.098 a; [[ $(ls --format="%(atime:time=%N)s" a) == 098000000 ]]'
+	IF 'touch -a -t 2000-05-04+03:02:01.098 a; [[ $(ls --format="%(atime:time=%N)s" a) == 098000000 ]]'
 
 	EXEC -a -t 2000-05-04+03:02:01.098 a
 	EXEC -m -t 2000-01-02+03:04:05.678 a

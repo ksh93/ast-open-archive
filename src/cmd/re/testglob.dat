@@ -1,8 +1,9 @@
-: X/Open glob tests 2008-04-30
+: X/Open glob tests 2008-07-29
 
 # test workspace
 
-W	glob.tmp
+Wtestglob.tmp
+W	01
 W		ab
 W			?(.|a)z
 W				.
@@ -307,3 +308,16 @@ S	~(O)**/*/*/*.h		OK		ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
 #S	~(O)**/*/**/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
 S	~(O)**/**/*/*.h		OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h
 S	~(O)**/**/**/*.h	OK		ab/hb.h ab/pp/p.h ab/pp/qq/q.h ab/pp/rr/r.h ha.h
+
+W	02
+W		dir
+W			file
+W		link	dir
+W		loop
+W			back	../..
+
+S	*			OK		dir link loop
+S	*/*			OK		dir/file link/file loop/back
+Sr	*			OK		dir link loop
+Sr	*/*			OK		dir/file link/file loop/back
+Sr	**			OK		dir dir/file link loop loop/back

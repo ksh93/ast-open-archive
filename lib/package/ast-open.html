@@ -1045,7 +1045,17 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-08-07-25  --- Release ksh93t  ---
+08-08-01  --- Release ksh93t  ---
+08-08-01  A bug with the pipefail option in which a nested pipeline could
+	  cause an asynchronous command to block has been fixed.
+08-08-01  A for loop optimizer bug that treates .sh.lineno as an invariant
+	  has been fixed.
+08-07-30  A bug in which expanding compound variable that had a get discipline
+	  from with a here document could cause a syntax error has been fixed.
+08-07-29  When the right hand side of an assignment is of the form, $name
+	  or ${name}, and name is a compound variable or a type defined by
+	  a compound variable, the assignment causes the left hand side to
+	  be a copy of the right hand side equivalent to eval "left=$name".
 08-07-18  A bug in which a nameref caused a local variable to be created
 	  rather than binding to an existing variable in the global scope
 	  has been fixed.
@@ -5327,6 +5337,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-07-31 ptvopen.c: fix ptvinsert() interval bug
 08-07-25 ip_t.c: add { %(prefix:C)s %(addr:C)s } for 0x%02x comma-separated value
 08-06-11 add { fv ptv } for ipv6
 08-01-15 bgp.h: add { BGP_rib_failure BGP_stale }
@@ -5675,6 +5686,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-07-29 testglob.c: add workspace symlinks
+08-07-29 testglob.dat: add ** symlink =&gt; dir tests
 08-05-14 *.dat: update tests for UTF-8 vs. ISO-8859-1
 08-03-05 testregex.dat: add K {,*}(...) tests
 08-02-14 sed.tst: sync with regsubexec() fixes
@@ -6330,6 +6343,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-08-05 features/ndbm: favor sleepycat ndbm compatibility
 08-07-21 include/glob.h,misc/glob.c: GLOB_STARSTAR only forces lstat on chdir
 08-07-17 sfio: sync with kpv
 08-07-17 misc/optget.c: call astwinsize() each time terminal width required
@@ -9414,7 +9428,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>July 26, 2008</TD>
+<TD align=right>August 05, 2008</TD>
 </TR>
 </TABLE>
 <P>

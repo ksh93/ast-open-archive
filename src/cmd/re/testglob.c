@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2006-07-28 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2008-07-29 $\0\n";
 
 #if _PACKAGE_ast
 
@@ -45,8 +45,7 @@ quniq(char** argv, int n)
 
 	ao = an = argv;
 	ae = ao + n;
-	while (++an < ae)
-	{
+	while (++an < ae) {
 		while (streq(*ao, *an))
 			if (++an >= ae)
 				return ao - argv + 1;
@@ -423,7 +422,8 @@ sigunblock(int s)
 		sigaddset(&mask, s);
 		op = SIG_UNBLOCK;
 	}
-	else op = SIG_SETMASK;
+	else
+		op = SIG_SETMASK;
 	sigprocmask(op, &mask, NiL);
 #else
 #ifdef sigmask
@@ -469,16 +469,14 @@ getline(void)
 	register char*	e = &buf[sizeof(buf)];
 	register char*	b;
 
-	for (;;)
-	{
+	for (;;) {
 		if (!(b = fgets(s, e - s, stdin)))
 			return 0;
 		state.lineno++;
 		s += strlen(s) - 1;
 		if (*s != '\n')
 			break;
-		if (s == b || *(s - 1) != '\\')
-		{
+		if (s == b || *(s - 1) != '\\') {
 			*s = 0;
 			break;
 		}
@@ -510,6 +508,7 @@ main(int argc, char** argv)
 	char*		pat;
 	char*		p;
 	char*		bp;
+	char*		k;
 	char*		s;
 	char*		bs;
 	char*		ans;
@@ -519,12 +518,14 @@ main(int argc, char** argv)
 	char*		field[5];
 	char		unit[64];
 	char		pathbuf[1024];
+	char		linkbuf[1024];
 	char*		buf;
 	char*		path;
 	char*		pathmax;
 	char*		work[16];
 	char*		av[256];
 	glob_t		gl;
+	struct stat	st;
 #if GLOB_DISC
 	char		fignore[128];
 #endif
@@ -615,6 +616,7 @@ main(int argc, char** argv)
 	path[0] = 0;
 	work[cwd] = path;
 	work[cwd + 1] = 0;
+	work[cwd + 2] = 0;
 	ok = 0;
 	extra = 0;
 	while (p = buf = getline()) {
@@ -631,9 +633,17 @@ main(int argc, char** argv)
 		if (*p == 'W') {
 			while (*++p == '\t');
 			if (*p) {
-				i = p - buf - 1;
+				i = p - buf;
 				if (i > (cwd + 1) || i >= elementsof(work))
 					bad("invalid workspace depth\n", NiL);
+				if (working) {
+					working = 0;
+					cwd = 1;
+					if (chdir("../.."))
+						bad("cannot chdir\n", "../..");
+					else if (verbose)
+						printf("test %-3d chdir ../..\n", state.lineno);
+				}
 				if (i > cwd) {
 					if (path[0] && access(path, F_OK)) {
 						if (verbose) {
@@ -646,37 +656,87 @@ main(int argc, char** argv)
 					}
 				}
 				else {
-					if (!streq(work[cwd - 1], ".") && access(path, F_OK)) {
-						if (verbose) {
-							printf("test %-3d touch ", state.lineno);
-							quote(path);
-							printf("\n");
+					if (access(path, F_OK)) {
+						if (k) {
+							if (verbose) {
+								printf("test %-3d  link ", state.lineno);
+								quote(path);
+								printf(" ");
+								quote(k);
+								printf("\n");
+							}
+							if (symlink(k, path))
+								bad("cannot create work link\n", path);
+							k = 0;
 						}
-						if (close(creat(path, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)))
-							bad("cannot create work file\n", path);
+						else if (!streq(work[cwd - 1], ".")) {
+							if (verbose) {
+								printf("test %-3d  file ", state.lineno);
+								quote(path);
+								printf("\n");
+							}
+							if (close(creat(path, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)))
+								bad("cannot create work file\n", path);
+						}
 					}
 					cwd = i - 1;
 				}
 				s = work[cwd];
 				*(s - 1) = '/';
-				while (s < pathmax && (*s = *p++))
-					s++;
+				k = 0;
+				while (s < pathmax && *p) {
+					if (*p == '\t') {
+						k = linkbuf;
+						while (k < &linkbuf[sizeof(linkbuf) - 1] && (*k = *++p))
+							k++;
+						*k = 0;
+						k = linkbuf;
+						break;
+					}
+					*s++ = *p++;
+				}
 				*s++ = 0;
 				work[cwd = i] = s;
 			}
 			continue;
 		}
-		if (work[1]) {
-			if (!streq(work[cwd-1], ".") && access(path, F_OK) && close(creat(path, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)))
-				bad("cannot create work file\n", path);
-			*(work[1] - 1) = 0;
+		if (work[2]) {
+			if (!streq(work[cwd-1], ".") && access(path, F_OK))
+				if (k) {
+					if (verbose) {
+						printf("test %-3d  link ", state.lineno);
+						quote(path);
+						printf(" ");
+						quote(k);
+						printf("\n");
+					}
+					if (symlink(k, path))
+						bad("cannot create work link\n", path);
+				}
+				else {
+					if (verbose) {
+						printf("test %-3d  file ", state.lineno);
+						quote(path);
+						printf("\n");
+					}
+					if (close(creat(path, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)))
+						bad("cannot create work file\n", path);
+				}
+			*(work[2] - 1) = 0;
 			if (!working)
 				working = 1;
-			else if (chdir(".."))
-				bad("cannot chdir\n", "..");
+			else if (chdir("../.."))
+				bad("cannot chdir\n", "../..");
+			else if (verbose)
+				printf("test %-3d chdir ..\n", state.lineno);
 			if (chdir(path))
 				bad("cannot chdir\n", path);
-			work[1] = 0;
+			else if (verbose) {
+				printf("test %-3d chdir ", state.lineno);
+				quote(path);
+				printf("\n");
+			}
+			work[2] = 0;
 		}
 #if GLOB_DISC
 		fignore[0] = 0;
@@ -813,8 +873,7 @@ main(int argc, char** argv)
 			case '}':
 				if (level == 1)
 					bad("invalid {...} nesting\n", NiL);
-				else
-				{
+				else {
 					if ((skip & level) && !(skip & (level>>1)))
 						printf("-%d\n", state.lineno);
 #if defined(LC_COLLATE) && defined(LC_CTYPE)
@@ -854,8 +913,7 @@ main(int argc, char** argv)
 		okre = kre;
 		osre = sre;
 		for (m = 0; m < nmodes; m++) {
-			if (modes[m])
-			{
+			if (modes[m]) {
 				if ((flags & modes[m]) == modes[m])
 					continue;
 				flags |= modes[m];
@@ -964,15 +1022,13 @@ main(int argc, char** argv)
 					n = gl.gl_pathc;
 					v = gl.gl_pathv;
 				}
-				if (verbose)
-				{
+				if (verbose) {
 					printf("    ");
 					for (i = 0; i < n; i++)
 						printf(" %s", v[i]);
 					printf("\n");
 				}
-				if (flags & (GLOB_LIST|GLOB_NOSORT))
-				{
+				if (flags & (GLOB_LIST|GLOB_NOSORT)) {
 					qsort(v, n, sizeof(*v), qstrcmp);
 					if ((flags & GLOB_STARSTAR) && !(gl.gl_flags & GLOB_STARSTAR))
 						v[n = quniq(v, n)] = 0;
@@ -981,12 +1037,10 @@ main(int argc, char** argv)
 					ans = "";
 				bs = s = ans;
 				bp = p = "";
-				for (i = 0; i < n; i++)
-				{
+				for (i = 0; i < n; i++) {
 					bp = p = v[i];
 					bs = s;
-					while (*p == *s && *s && *s != ' ')
-					{
+					while (*p == *s && *s && *s != ' ') {
 						p++;
 						s++;
 					}

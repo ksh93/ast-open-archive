@@ -299,6 +299,7 @@ Nflong_t	mpls_label_7;	/* Stack position 7 MPLS label: 20 bits MPLS label, 3 bit
 Nflong_t	mpls_label_8;	/* Stack position 8 MPLS label: 20 bits MPLS label, 3 bits experimental, 1 bit end-of-stack */
 Nflong_t	mpls_label_9;	/* Stack position 9 MPLS label: 20 bits MPLS label, 3 bits experimental, 1 bit end-of-stack */
 Nflong_t	mpls_label_10;	/* Stack position 10 MPLS label: 20 bits MPLS label, 3 bits experimental, 1 bit end-of-stack */
+Nflong_t	source_id;	/* flow source id */
 
 #define NETFLOW_GROUP_2_BEGIN	min_packet_length
 

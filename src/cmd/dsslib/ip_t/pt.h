@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2007 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -29,6 +29,7 @@
 #define _PT_H
 
 #include <ast.h>
+#include <cdt.h>
 
 #define PT_VERSION		20020329L
 

@@ -228,6 +228,12 @@ make event.svc
 make event.o
 make event.c
 make ${PACKAGE_ast_INCLUDE}/ast_ndbm.h implicit
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
+done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_ndbm.h
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/tok.h implicit

@@ -155,27 +155,27 @@ ptvinsert(Ptv_t* tab, Ptvaddr_t min, Ptvaddr_t max)
 	{
 		if (fvcmp(tab->size, key.min, xp->min) >= 0 && fvcmp(tab->size, key.max, xp->max) <= 0)
 			return 0;
-		if (fvcmp(tab->size, min, tab->r[2]) >= 0)
-		{
+		if (fvcmp(tab->size, xp->min, tab->r[2]) >= 0)
 			fvsub(tab->size, tab->r[3], xp->min, tab->r[2]);
-			if (fvcmp(tab->size, key.max, tab->r[3]) < 0)
-			{
-				dtinsert(tab->dict, &key);
-				return 0;
-			}
-		}
-		if (fvcmp(tab->size, key.min, xp->min) > 0)
-			key.min = xp->min;
-		do
+		else
+			fvset(tab->size, tab->r[3], 0);
+		if (fvcmp(tab->size, key.max, tab->r[3]) >= 0)
 		{
-			max = xp->max;
-			pp = xp;
-			xp = (Ptvprefix_t*)dtnext(tab->dict, xp);
-			dtdelete(tab->dict, pp);
-			fvsub(tab->size, tab->r[0], xp->min, tab->r[1]);
-		} while (xp && fvcmp(tab->size, key.max, tab->r[3]) >= 0);
-		if (fvcmp(tab->size, key.max, max) < 0)
-			key.max = max;
+			if (fvcmp(tab->size, key.min, xp->min) > 0)
+				key.min = xp->min;
+			do
+			{
+				max = xp->max;
+				pp = xp;
+				xp = (Ptvprefix_t*)dtnext(tab->dict, xp);
+				dtdelete(tab->dict, pp);
+				if (!xp)
+					break;
+				fvsub(tab->size, tab->r[3], xp->min, tab->r[1]);
+			} while (fvcmp(tab->size, key.max, tab->r[3]) >= 0);
+			if (fvcmp(tab->size, key.max, max) < 0)
+				key.max = max;
+		}
 	}
 	dtinsert(tab->dict, &key);
 	return 0;

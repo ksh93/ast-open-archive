@@ -29,6 +29,7 @@
 #define _PTV_H
 
 #include <ast.h>
+#include <cdt.h>
 #include <pt.h>
 
 #define PTV_VERSION		20080611L

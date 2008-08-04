@@ -182,16 +182,16 @@ prev ${INSTALLROOT}/lib/lib
 prev graph.req
 exec - test '' = 'graph.req' || ${STDCMP} 2>/dev/null -s graph.req ${INSTALLROOT}/lib/lib/graph || { ${STDMV} ${INSTALLROOT}/lib/lib/graph ${INSTALLROOT}/lib/lib/graph.old 2>/dev/null || true; ${STDCP} graph.req ${INSTALLROOT}/lib/lib/graph  		    		    ;}
 done ${INSTALLROOT}/lib/lib/graph generated
-make ${INSTALLROOT}/include
-exec - if	silent test ! -d ${INSTALLROOT}/include
-exec - then	mkdir -p ${INSTALLROOT}/include
-exec - fi
-done ${INSTALLROOT}/include generated
 make ${PACKAGE_ast_INCLUDE}
-prev ${INSTALLROOT}/include
-prev graph.h
-exec - test '' = 'graph.h' || ${STDCMP} 2>/dev/null -s graph.h ${PACKAGE_ast_INCLUDE} || { ${STDMV} ${PACKAGE_ast_INCLUDE} ${PACKAGE_ast_INCLUDE}.old 2>/dev/null || true; ${STDCP} graph.h ${PACKAGE_ast_INCLUDE}  		    		    ;}
+exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
+exec - then	mkdir -p ${PACKAGE_ast_INCLUDE}
+exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
+make ${PACKAGE_ast_INCLUDE}/graph.h
+prev ${PACKAGE_ast_INCLUDE}
+prev graph.h
+exec - test '' = 'graph.h' || ${STDCMP} 2>/dev/null -s graph.h ${PACKAGE_ast_INCLUDE}/graph.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/graph.h ${PACKAGE_ast_INCLUDE}/graph.h.old 2>/dev/null || true; ${STDCP} graph.h ${PACKAGE_ast_INCLUDE}/graph.h  		    		    ;}
+done ${PACKAGE_ast_INCLUDE}/graph.h generated
 done install virtual
 make test
 done test dontcare virtual

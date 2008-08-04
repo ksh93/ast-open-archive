@@ -5,6 +5,6 @@ CCFLAGS = $(CC.DLL) $(CC.OPTIMIZE)
 graph :LIBRARY: grhdr.h kpvdebug.h \
 	graph.c grbranching.c grfold.c grsearch.c
 
-$(INCLUDEDIR) :INSTALL: graph.h
+$(INCLUDEDIR) :INSTALLDIR: graph.h
 
 :: RELEASE Makefile
