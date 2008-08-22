@@ -83,36 +83,37 @@
 #define BGP_dst_as		((24<<1)|1)
 #define BGP_dst_as16		((25<<1)|1)
 #define BGP_dst_as32		((26<<1)|1)
-#define BGP_hop			((27<<1)|1)
-#define BGP_hopv4		((28<<1)|1)
-#define BGP_hopv6		((29<<1)|1)
-#define BGP_local		((30<<1)|1)
-#define BGP_med			((31<<1)|1)
-#define BGP_message		((32<<1)|1)
-#define BGP_new_state		((33<<1)|1)
-#define BGP_old_state		((34<<1)|1)
-#define BGP_origin		((35<<1)|1)
-#define BGP_originator		((36<<1)|1)
-#define BGP_path		((37<<1)|1)
-#define BGP_path16		((38<<1)|1)
-#define BGP_path32		((39<<1)|1)
-#define BGP_prefix		((40<<1)|1)
-#define BGP_prefixv4		((41<<1)|1)
-#define BGP_prefixv6		((42<<1)|1)
-#define BGP_safi		((43<<1)|1)
-#define BGP_src_addr		((44<<1)|1)
-#define BGP_src_addrv4		((45<<1)|1)
-#define BGP_src_addrv6		((46<<1)|1)
-#define BGP_src_as		((47<<1)|1)
-#define BGP_src_as16		((48<<1)|1)
-#define BGP_src_as32		((49<<1)|1)
-#define BGP_stamp		((50<<1)|1)
-#define BGP_time		((51<<1)|1)
-#define BGP_type		((52<<1)|1)
-#define BGP_weight		((53<<1)|1)
-#define BGP_unknown		((54<<1)|1)
+#define BGP_extended		((27<<1)|1)
+#define BGP_hop			((28<<1)|1)
+#define BGP_hopv4		((29<<1)|1)
+#define BGP_hopv6		((30<<1)|1)
+#define BGP_local		((31<<1)|1)
+#define BGP_med			((32<<1)|1)
+#define BGP_message		((33<<1)|1)
+#define BGP_new_state		((34<<1)|1)
+#define BGP_old_state		((35<<1)|1)
+#define BGP_origin		((36<<1)|1)
+#define BGP_originator		((37<<1)|1)
+#define BGP_path		((38<<1)|1)
+#define BGP_path16		((39<<1)|1)
+#define BGP_path32		((40<<1)|1)
+#define BGP_prefix		((41<<1)|1)
+#define BGP_prefixv4		((42<<1)|1)
+#define BGP_prefixv6		((43<<1)|1)
+#define BGP_safi		((44<<1)|1)
+#define BGP_src_addr		((45<<1)|1)
+#define BGP_src_addrv4		((46<<1)|1)
+#define BGP_src_addrv6		((47<<1)|1)
+#define BGP_src_as		((48<<1)|1)
+#define BGP_src_as16		((49<<1)|1)
+#define BGP_src_as32		((50<<1)|1)
+#define BGP_stamp		((51<<1)|1)
+#define BGP_time		((52<<1)|1)
+#define BGP_type		((53<<1)|1)
+#define BGP_weight		((54<<1)|1)
+#define BGP_unknown		((55<<1)|1)
 
-#define BGP_LAST		54
+#define BGP_LAST		55
 
 #define BGP_INDEX(x)		(((x)>>1)-1)
 
@@ -130,15 +131,16 @@
 #define BGP_SET_dpa_addrv6	(1<<7)
 #define BGP_SET_dst_addrv4	(1<<8)
 #define BGP_SET_dst_addrv6	(1<<9)
-#define BGP_SET_hopv4		(1<<10)
-#define BGP_SET_hopv6		(1<<11)
-#define BGP_SET_path16		(1<<12)
-#define BGP_SET_path32		(1<<13)
-#define BGP_SET_prefixv4	(1<<14)
-#define BGP_SET_prefixv6	(1L<<15)
-#define BGP_SET_src_addrv4	(1L<<16)
-#define BGP_SET_src_addrv6	(1L<<17)
-#define BGP_SET_unknown		(1L<<18)
+#define BGP_SET_extended	(1<<10)
+#define BGP_SET_hopv4		(1<<11)
+#define BGP_SET_hopv6		(1<<12)
+#define BGP_SET_path16		(1<<13)
+#define BGP_SET_path32		(1<<14)
+#define BGP_SET_prefixv4	(1L<<15)
+#define BGP_SET_prefixv6	(1L<<16)
+#define BGP_SET_src_addrv4	(1L<<17)
+#define BGP_SET_src_addrv6	(1L<<18)
+#define BGP_SET_unknown		(1L<<19)
 
 /*
  * BGP_type
@@ -162,6 +164,7 @@
 
 #define BGPCLUSTER(r)		((Bgpnum_t*)((r)->data+(r)->cluster.offset))
 #define BGPCOMMUNITY(r)		((Bgpasn_t*)((r)->data+(r)->community.offset))
+#define BGPEXTENDED(r)		((Bgpasn_t*)((r)->data+(r)->extended.offset))
 #define BGPPATH(r)		((Bgpasn_t*)((r)->data+(r)->path.offset))
 #define BGPPATH32(r)		((Bgpasn_t*)((r)->data+(r)->path32.offset))
 
@@ -228,6 +231,7 @@ struct Bgproute_s
 	Bgpvec_t	path;		/* as path			*/
 	Bgpvec_t	cluster;	/* clusters			*/
 	Bgpvec_t	community;	/* communities			*/
+	Bgpvec_t	extended;	/* extended communities		*/
 	Bgpvec_t	path32;		/* as32 path			*/
 	Bgpvec_t	unknown;	/* unknown attributes		*/
 
@@ -256,9 +260,9 @@ struct Bgproute_s
 	unsigned char	agg_addr32v6[16];/* aggregator as32 addr	*/
 	unsigned char	prefixv6[17];	/* prefix			*/
 
-	char		pad[7];		/* pad to 8 byte boundary	*/
+	char		pad[15];	/* pad to 8 byte boundary	*/
 
-	char		data[768];	/* vector data (round to 1K)	*/
+	char		data[752];	/* vector data (round to 1K)	*/
 };
 
 #endif

@@ -1,4 +1,5 @@
-07-03-19 src/var.c: use nv_setref() to initialize references
+08-08-08  src/list.c,src/tcleval.c: add temporary sh_eval(p,0x8000) hack
+07-03-19  src/var.c: use nv_setref() to initialize references
 06-09-19  src/shcompat.c: sysconf() => astconf()
 04-07-19  tcl/tclIOUtil.c: treat { O_RDONLY O_WRONLY O_RDWR } as values
 03-06-13  include/tclInt.h: disable #undef sprintf that masked its prototype

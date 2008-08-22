@@ -1,3 +1,5 @@
+08-08-08 state.c: do not use low res virtual st.st_mtime
+08-08-08 Makerules.mk: always include explicit :: files in manifest
 08-06-06 Makerules.mk: drop -G from _BLD_DEBUG trigger -- doh
 08-05-22 Makerules.mk: $(CC.ARFLAGS) also needs $(CCLDFLAGS)
 08-05-20 tests/test.def: add SET local -- nfs can't keep up

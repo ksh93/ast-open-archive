@@ -996,14 +996,15 @@ For the latest information vist the
 <TD align=left><A href="#tests changes">tests</A></TD>
 </TR><TR>
 <TD align=left><A href="#text changes">text</A></TD>
+<TD align=left><A href="#time_t changes">time_t</A></TD>
 <TD align=left><A href="#validate changes">validate</A></TD>
 <TD align=left><A href="#ie changes">ie</A></TD>
 <TD align=left><A href="#mailx changes">mailx</A></TD>
 <TD align=left><A href="#ncsl changes">ncsl</A></TD>
 <TD align=left><A href="#pack changes">pack</A></TD>
 <TD align=left><A href="#pzip changes">pzip</A></TD>
-<TD align=left><A href="#re changes">re</A></TD>
 </TR><TR>
+<TD align=left><A href="#re changes">re</A></TD>
 <TD align=left><A href="#sort changes">sort</A></TD>
 <TD align=left><A href="#std changes">std</A></TD>
 <TD align=left><A href="#tksh changes">tksh</A></TD>
@@ -1011,8 +1012,8 @@ For the latest information vist the
 <TD align=left><A href="#warp changes">warp</A></TD>
 <TD align=left><A href="#vczip changes">vczip</A></TD>
 <TD align=left><A href="#libast changes">libast</A></TD>
-<TD align=left><A href="#libardir changes">libardir</A></TD>
 </TR><TR>
+<TD align=left><A href="#libardir changes">libardir</A></TD>
 <TD align=left><A href="#libcmd changes">libcmd</A></TD>
 <TD align=left><A href="#libdll changes">libdll</A></TD>
 <TD align=left><A href="#libexpr changes">libexpr</A></TD>
@@ -1020,8 +1021,8 @@ For the latest information vist the
 <TD align=left><A href="#libsum changes">libsum</A></TD>
 <TD align=left><A href="#libuu changes">libuu</A></TD>
 <TD align=left><A href="#libvdelta changes">libvdelta</A></TD>
-<TD align=left><A href="#libbz changes">libbz</A></TD>
 </TR><TR>
+<TD align=left><A href="#libbz changes">libbz</A></TD>
 <TD align=left><A href="#libz changes">libz</A></TD>
 <TD align=left><A href="#libcoshell changes">libcoshell</A></TD>
 <TD align=left><A href="#libcs changes">libcs</A></TD>
@@ -1029,8 +1030,8 @@ For the latest information vist the
 <TD align=left><A href="#libcodex changes">libcodex</A></TD>
 <TD align=left><A href="#libdss changes">libdss</A></TD>
 <TD align=left><A href="#libpz changes">libpz</A></TD>
-<TD align=left><A href="#libtksh changes">libtksh</A></TD>
 </TR><TR>
+<TD align=left><A href="#libtksh changes">libtksh</A></TD>
 <TD align=left><A href="#libvcodex changes">libvcodex</A></TD>
 <TD align=left><A href="#libgraph changes">libgraph</A></TD>
 </TR></TABLE>
@@ -1045,7 +1046,16 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-08-08-01  --- Release ksh93t  ---
+08-08-19  --- Release ksh93t  ---
+08-08-19  The ALRM signal no longer cause the sleep builtin to terminate.
+08-08-13  When used in an arithmetic expression, the .sh.version variable  
+	  now produces a number that will be increasing for each release.
+08-08-11  A bug in which type instanciation with a compound assignment in
+	  a dot script in which the type is defined has been fixed. 
+08-08-07  The -m option has been added to typeset to move or rename a
+	  variable.  Not documented yet.
+08-08-06  A bug in read when used in a loop when a prompt was specified
+	  when reading from a terminal has been fixed.
 08-08-01  A bug with the pipefail option in which a nested pipeline could
 	  cause an asynchronous command to block has been fixed.
 08-08-01  A for loop optimizer bug that treates .sh.lineno as an invariant
@@ -3742,6 +3752,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-08-08 state.c: do not use low res virtual st.st_mtime
+08-08-08 Makerules.mk: always include explicit :: files in manifest
 08-06-06 Makerules.mk: drop -G from _BLD_DEBUG trigger -- doh
 08-05-22 Makerules.mk: $(CC.ARFLAGS) also needs $(CCLDFLAGS)
 08-05-20 tests/test.def: add SET local -- nfs can't keep up
@@ -5229,6 +5241,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="att changes">att changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-08-11 dss.tst: %K.%6N for 18 digit long double limitation
 07-11-14 dshield.dss: add
 07-02-14 mrd-mail.dss: add
 
@@ -5237,6 +5250,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-08-11 bgp.c,bgp-mrt.c: add extended community support
 08-07-16 bgp-mrt.c: fix MP_UNREACH_NLRI parse bug
 08-06-24 bgp-mrt.c: handle ipv6 extensions
 08-01-15 bgp.c,bgp-cisco.c: add { BGP_rib_failure BGP_stale }
@@ -5337,6 +5351,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-08-11 bgp.h,ip_t.c: add extended community type support
 08-07-31 ptvopen.c: fix ptvinsert() interval bug
 08-07-25 ip_t.c: add { %(prefix:C)s %(addr:C)s } for 0x%02x comma-separated value
 08-06-11 add { fv ptv } for ipv6
@@ -5435,6 +5450,14 @@ All recorded changes follow.
 
 02-12-17 propagate -ldss changes
 02-11-01 a rudimentary alternative to the flat method
+
+</PRE>
+<P>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="time_t changes">time_t changes</A></H3></FONT></FONT></CENTER>
+<PRE>
+
+08-08-22 fix time_t =&gt; Time_t typo
+08-08-11 update timestamp_t logic to tmx*()
 
 </PRE>
 <P>
@@ -6343,6 +6366,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-08-20 misc/fts.c: fix st_nlink stat() optimization logic
+08-08-19 sfio/sfpkrd.c: workaround macosx recv(PEEK) data consumption on non-socket
+08-08-19 strn?tol?d: handle long double with smaller exponent range than double
+08-08-18 sfio/sfcvt.c: eliminate excessive multiplies and integral overprecision
+08-08-11 tm/tmxfmt.c: handle %10N and %010N
+08-08-06 include/shcmd.h: add 'int invariant;' for builtin invarinat arg count
 08-08-05 features/ndbm: favor sleepycat ndbm compatibility
 08-07-21 include/glob.h,misc/glob.c: GLOB_STARSTAR only forces lstat on chdir
 08-07-17 sfio: sync with kpv
@@ -9282,7 +9311,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libtksh changes">libtksh changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-07-03-19 src/var.c: use nv_setref() to initialize references
+08-08-08  src/list.c,src/tcleval.c: add temporary sh_eval(p,0x8000) hack
+07-03-19  src/var.c: use nv_setref() to initialize references
 06-09-19  src/shcompat.c: sysconf() =&gt; astconf()
 04-07-19  tcl/tclIOUtil.c: treat { O_RDONLY O_WRONLY O_RDWR } as values
 03-06-13  include/tclInt.h: disable #undef sprintf that masked its prototype
@@ -9428,7 +9458,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>August 05, 2008</TD>
+<TD align=right>August 23, 2008</TD>
 </TR>
 </TABLE>
 <P>

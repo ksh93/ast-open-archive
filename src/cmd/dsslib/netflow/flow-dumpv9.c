@@ -43,7 +43,7 @@ dumpv9ident(Dssfile_t* file, void* buf, size_t n, Dssdisc_t* disc)
 {
 	register unsigned char*		b = buf;
 
-	return n >= 20 && BE2(b) == 9 && (n = BE2(b)) >= 1 && n <= 31;
+	return n >= 20 && BE2(b) == 9 && (n = BE2(b)) >= 1 && n <= 255;
 }
 
 /*
@@ -80,7 +80,6 @@ dumpv9fread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* d
 	register Netflow_template_t*	tp;
 	register Netflow_template_t*	bp;
 	register Netflow_field_t*	fp;
-	Netflow_template_t*		np;
 	int				n;
 	int				m;
 	int				k;
@@ -296,6 +295,8 @@ dumpv9fread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* d
 static int
 dumpv9fwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 {
+	if (disc->errorf)
+		(*disc->errorf)(NiL, disc, 2, "%s: record write not implemented", file->format->name);
 	return -1;
 }
 

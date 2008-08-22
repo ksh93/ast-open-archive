@@ -423,7 +423,7 @@ Tcl_TclEval(interp, cmd)
  			TkshSetListMode(oldMode);
 			dprintf(("Tcl_Eval (ksh): %s\n", cmd));
 			if ((tclcommand = sfopen((Sfio_t *) 0, cmd, "s")))
-				sh_eval(tclcommand,0);	/* closed in sh_eval */
+				sh_eval(tclcommand,0x8000);	/* closed in sh_eval */
 			iPtr->interpType = INTERP_TCL;
  			/* TkshSetListMode(oldMode); */
 			ckfree(cmd);

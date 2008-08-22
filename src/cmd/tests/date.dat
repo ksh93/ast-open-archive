@@ -393,10 +393,6 @@ thursday				NULL	Thu May  1 01:02:03 EDT 2008
 friday					NULL	Fri May  2 01:02:03 EDT 2008
 saturday				NULL	Sat May  3 01:02:03 EDT 2008
 
-this month				NULL	Thu May  1 00:00:00 EDT 2008
-last month				NULL	Tue Apr  1 00:00:00 EDT 2008
-next month				NULL	Sun Jun  1 00:00:00 EDT 2008
-
 this month 1st monday			NULL	Mon May  5 00:00:00 EDT 2008
 this month first monday			NULL	Mon May  5 00:00:00 EDT 2008
 1st monday may 2008			NULL	Mon May  5 00:00:00 EDT 2008
@@ -453,6 +449,12 @@ next month fourth monday		NULL	Mon Jun 23 00:00:00 EDT 2008
 next month 4th monday			NULL	Mon Jun 23 00:00:00 EDT 2008
 next month final monday			NULL	Mon Jun 30 00:00:00 EDT 2008
 next month nth monday			NULL	Mon Jun 30 00:00:00 EDT 2008
+
+SET					NOW	2008-08-01+01:02:03
+
+this month				NULL	Fri Aug  1 00:00:00 EDT 2008
+last month				NULL	Tue Jul  1 00:00:00 EDT 2008
+next month				NULL	Mon Sep  1 00:00:00 EDT 2008
 
 # format tests
 

@@ -26,7 +26,7 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2008-07-25 $\0\n";
+static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2008-08-11 $\0\n";
 
 #include <dsslib.h>
 #include <bgp.h>
@@ -37,10 +37,10 @@ static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2008-07
 
 #define AS16PATH_T	(&types[3])
 #define AS32PATH_T	(&types[4])
-#define IPV4ADDR_T	(&types[8])
-#define IPV6ADDR_T	(&types[9])
-#define IPV4PREFIX_T	(&types[11])
-#define IPV6PREFIX_T	(&types[12])
+#define IPV4ADDR_T	(&types[9])
+#define IPV6ADDR_T	(&types[10])
+#define IPV4PREFIX_T	(&types[12])
+#define IPV6PREFIX_T	(&types[13])
 
 /* XXX: some compilers choke on static foo bar[]; */
 
@@ -428,6 +428,36 @@ community_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxd
 }
 
 static ssize_t
+extended_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+{
+	Cxformat_t*	formats[2];
+
+	formats[0] = 0;
+	formats[1] = format;
+	return itl1external(cx, type, 0, 8, 0, details, formats, value, buf, size, disc);
+}
+
+static ssize_t
+extended_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+{
+	return itl1internal(cx, &ret->value, 0, 8, 0, buf, size, vm, disc);
+}
+
+static void*
+extended_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc_t* disc)
+{
+	if (!cxisstring(pat))
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: match requires %s pattern", sub->name, cx->state->type_string->name, sub->name);
+		return 0;
+	}
+	iredisc.version = IRE_VERSION;
+	iredisc.errorf = disc->errorf;
+	return irecomp(val->string.data, 1, 0, 8, 0, &iredisc);
+}
+
+static ssize_t
 prefixv4_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
 	char*	s;
@@ -626,6 +656,16 @@ static Cxmatch_t	match_community =
 	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. Pairs are separated by :. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. If a : tuple separator is omitted then :.* is assumed. For example, '[!1 100]' matches all lists that contain neither 1 nor 100 as the first pair element, and '^[!1: :100]-701:999$' matches all lists that don't start with 1 as the first pair element or 100 as the second pair element and end with 701:999.",
 	CXH,
 	community_match_comp,
+	match_list_exec,
+	match_list_free
+};
+
+static Cxmatch_t	match_extended =
+{
+	"extended-re",
+	"Matches on this type treat a string pattern as an ire(3) integer list regular expression for tuples with 8 integer elements in the range 0..255. Each number in the list is a distinct token. Elements are separated by :. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. If a : tuple separator is omitted then :.* is assumed. For example, '[!1 100]' matches all lists that contain neither 1 nor 100 as the first tuple element, and '^[!1: :100]-:201:199$' matches all lists that don't start with 1 as the first tuple element or 100 as the last tuple element and end with :201:199.",
+	CXH,
+	extended_match_comp,
 	match_list_exec,
 	match_list_free
 };
@@ -903,6 +943,7 @@ Cxtype_t	types[] =
 { "aspath_t", 0, CXH, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, { 0 }, &match_aspath, 0, &aspath_generic[0] },
 { "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
 { "community_t", "A sequence of unsigned 16 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
+{ "extended_t", "A sequence of unsigned 64 bit integer tuples.", CXH, (Cxtype_t*)"buffer", 0, extended_external, extended_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted elements, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_extended },
 { "ipv4addr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, addrv4_external, addrv4_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefixv4 },
 { "ipv6addr_t",	"An RFC 2373 ipv6 address. The details string \"C\" lists the prefix as 16 0x%02x comma-separated values.", CXH, (Cxtype_t*)"buffer", 0, addrv6_external, addrv6_internal, 0, 0, { 0 }, &match_prefixv6 },
 { "ipaddr_t",	0, CXH, (Cxtype_t*)"number", 0, addr_external, addr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefix, 0, &addr_generic[0] },

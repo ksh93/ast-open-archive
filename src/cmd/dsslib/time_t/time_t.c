@@ -25,19 +25,18 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss time type library (AT&T Research) 2008-06-11 $\0\n";
+static const char id[] = "\n@(#)$Id: dss time type library (AT&T Research) 2008-08-22 $\0\n";
 
 #include <dsslib.h>
-#include <tm.h>
+#include <tmx.h>
 
-#define NS			1e9
-#define SS			4.294967296e9
+#define NS			1000000000
 
 typedef struct Precise_s
 {
-	Cxnumber_t		seconds;
 	const char*		format;
 	size_t			size;
+	int			shift;
 } Precise_t;
 
 #if _typ_int64_t
@@ -88,9 +87,9 @@ ns_init(void* data, Cxdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return 0;
 	}
-	precise->seconds = NS;
-	precise->format = ".%09lu";
+	precise->format = "%K.%9N";
 	precise->size = 40;
+	precise->shift = 0;
 	return precise;
 }
 
@@ -105,24 +104,54 @@ stamp_init(void* data, Cxdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return 0;
 	}
-	precise->seconds = SS;
-	precise->format = ".%010lu";
-	precise->size = 41;
+	precise->format = "%K.%N";
+	precise->size = 40;
+	precise->shift = 32;
 	return precise;
+}
+
+static Time_t
+n2s(Time_t t, int s)
+{
+	Time_t		m;
+
+	m = t % NS;
+	t /= NS;
+	t <<= s;
+	m <<= s;
+	m /= NS;
+	return t + m;
+}
+
+static Time_t
+s2n(Time_t t, int s)
+{
+	Time_t		m;
+
+	m = 1;
+	m <<= s;
+	m--;
+	m &= t;
+	t >>= s;
+	t *= NS;
+	m *= NS;
+	m >>= s;
+	return t + m;
 }
 
 static ssize_t
 precise_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
 	char*		s;
-	time_t		t;
+	Time_t		t;
 	Precise_t*	precise = (Precise_t*)type->data;
 
 	if (!size)
 		return precise->size;
-	t = value->number / precise->seconds;
-	s = tmfmt(buf, size, CXDETAILS(details, format, type, "%K"), &t);
-	s += sfsprintf(s, size - (s - buf), precise->format, (unsigned long)(value->number - ((Cxnumber_t)t * precise->seconds)));
+	t = value->number;
+	if (precise->shift)
+		t = s2n(t, precise->shift);
+	s = tmxfmt(buf, size, CXDETAILS(details, format, type, precise->format), t);
 	if (s == (buf + size - 1))
 		return 2 * size;
 	return s - buf;
@@ -134,18 +163,19 @@ precise_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 	char*		e;
 	char*		f;
 	Precise_t*	precise = (Precise_t*)type->data;
+	Time_t		t;
 
 	if (CXDETAILS(details, format, type, 0))
 	{
-		ret->value.number = tmscan(buf, &e, details, &f, NiL, 0);
+		t = tmxscan(buf, &e, details, &f, NiL, 0);
 		if (*f || e == (char*)buf)
-			ret->value.number = tmdate(buf, &e, NiL);
+			t = tmxdate(buf, &e, NiL);
 	}
 	else
-		ret->value.number = tmdate(buf, &e, NiL);
-	ret->value.number *= precise->seconds;
-	if (*e == '.')
-		ret->value.number += strtoul(e + 1, &e, 10);
+		t = tmxdate(buf, &e, NiL);
+	if (precise->shift)
+		t = n2s(t, precise->shift);
+	ret->value.number = t;
 	return e - (char*)buf;
 }
 
@@ -345,7 +375,7 @@ CXV("ns",    "number",   TIME_T_ns,    "Residual nanoseconds [0-999999999].")
 
 typedef struct Tm_state_s
 {
-	time_t		t;
+	Time_t		t;
 	Tm_t		tm;
 } Tm_state_t;
 
@@ -360,7 +390,7 @@ tm_init(void* data, Cxdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return 0;
 	}
-	state->tm = *tmmake(&state->t);
+	state->tm = *tmxmake(state->t);
 	return state;
 }
 
@@ -368,20 +398,26 @@ static int
 tm_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
 	Tm_state_t*	state = (Tm_state_t*)pc->data.variable->member->data;
-	Cxnumber_t	ns;
-	time_t		t;
+	Time_t		t;
+	int		shift;
 
+	t = r->value.number;
 	if (r->type && r->type->data)
-		ns = ((Precise_t*)r->type->data)->seconds;
+	{
+		if (shift = ((Precise_t*)r->type->data)->shift)
+			t = s2n(t, shift);
+	}
 	else if (b && b->type && b->type->data)
-		ns = ((Precise_t*)b->type->data)->seconds;
+	{
+		if (shift = ((Precise_t*)b->type->data)->shift)
+			t = s2n(t, shift);
+	}
 	else
-		ns = 0;
-	t = ns ? (r->value.number / ns) : r->value.number;
+		t *= NS;
 	if (state->t != t)
 	{
 		state->t = t;
-		state->tm = *tmmake(&t);
+		state->tm = *tmxmake(t);
 	}
 	switch (pc->data.variable->index)
 	{
@@ -413,10 +449,7 @@ tm_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.number = state->tm.tm_isdst;
 		break;
 	case TIME_T_ns:
-		if (ns)
-			r->value.number -= ((Cxnumber_t)t * ns);
-		else
-			r->value.number = 0;
+		r->value.number = state->tm.tm_nsec;
 		break;
 	default:
 		return -1;
@@ -428,22 +461,30 @@ static int
 tm_set(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
 	Tm_state_t*	state = (Tm_state_t*)pc->data.variable->member->data;
-	Cxnumber_t	ns;
-	Cxinteger_t	n;
-	time_t		t;
+	Time_t		t;
 	int		i;
+	int		shift;
 
+	t = r->value.number;
 	if (r->type && r->type->data)
-		ns = ((Precise_t*)r->type->data)->seconds;
+	{
+		if (shift = ((Precise_t*)r->type->data)->shift)
+			t = s2n(t, shift);
+	}
 	else if (b && b->type && b->type->data)
-		ns = ((Precise_t*)b->type->data)->seconds;
+	{
+		if (shift = ((Precise_t*)b->type->data)->shift)
+			t = s2n(t, shift);
+	}
 	else
-		ns = 0;
-	t = ns ? (r->value.number / ns) : r->value.number;
+	{
+		shift = -1;
+		t *= NS;
+	}
 	if (state->t != t)
 	{
 		state->t = t;
-		state->tm = *tmmake(&t);
+		state->tm = *tmxmake(t);
 	}
 	switch (pc->data.variable->index)
 	{
@@ -484,20 +525,17 @@ tm_set(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		state->tm.tm_isdst = a->value.number;
 		break;
 	case TIME_T_ns:
-		if (ns)
-		{
-			n = r->value.number;
-			n = (n / ns) * ns;
-			n += a->value.number;
-			r->value.number = n;
-		}
-		return 0;
+		state->tm.tm_nsec = a->value.number;
+		return -1;
 	default:
 		return -1;
 	}
-	r->value.number = state->t = tmtime(&state->tm, TM_LOCALZONE);
-	if (ns)
-		r->value.number *= ns;
+	state->t = t = tmxtime(&state->tm, TM_LOCALZONE);
+	if (shift < 0)
+		t /= NS;
+	else if (shift)
+		t = n2s(t, shift);
+	r->value.number = t;
 	return 0;
 }
 
@@ -515,8 +553,8 @@ static Cxtype_t types[] =
 	{ "tm_wday_t",	"Weekday name represented as a number [0-6], starting at Sunday.", CXH, (Cxtype_t*)"number", 0, tm_wday_external, tm_wday_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
 	{ "tm_t",	"Time parts.", CXH, (Cxtype_t*)"number", tm_init, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4 }, 0, &tm_member	},
 	{ "elapsed_t",	"Elapsed time in milliseconds.", CXH, (Cxtype_t*)"number", 0, elapsed_external, elapsed_internal, 0, 0, { 0, 0, CX_INTEGER, 4 }	},
-	{ "ns_t",	"64 bit nanoseconds since the epoch.", CXH, (Cxtype_t*)"tm_t", ns_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 8 } },
-	{ "stamp_t",	"64 bit 1/2**32 seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", stamp_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 8 } },
+	{ "ns_t",	"64 bit nanoseconds since the epoch.", CXH, (Cxtype_t*)"tm_t", ns_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K.%9N", CX_UNSIGNED|CX_INTEGER, 8 } },
+	{ "stamp_t",	"64 bit 1/2**32 seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", stamp_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K.%N", CX_UNSIGNED|CX_INTEGER, 8 } },
 	{ "time_t",	"32 bit seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", 0, time_external, time_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 4 } },
 	{ 0, 0 }
 };

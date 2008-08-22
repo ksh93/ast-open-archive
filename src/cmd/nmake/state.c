@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2006 AT&T Corp.                  *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -996,7 +996,8 @@ statetime(register Rule_t* r, int sync)
 		zerostate = 1;
 	else if (r->status == FAILED)
 	{
-		tmxsetmtime(&st, 0);
+		r->time = 0;
+		tmxsetmtime(&st, r->time);
 		if ((state.test & 0x00040000) && (s = staterule(RULE, r, NiL, 0)))
 		{
 			r->time = s->time;
@@ -1158,10 +1159,10 @@ statetime(register Rule_t* r, int sync)
 		}
 		state.savestate = 1;
 	}
-	if (!skip && (s->time != tmxgetmtime(&st) || zerostate && s->time))
+	if (!skip && (s->time != ((r->property & P_virtual) ? r->time : tmxgetmtime(&st)) || zerostate && s->time))
 	{
 		s->dynamic &= ~D_lowres;
-		s->time = zerostate ? 0 : tmxgetmtime(&st);
+		s->time = zerostate ? 0 : (r->property & P_virtual) ? r->time : tmxgetmtime(&st);
 		s->event = CURTIME;
 		state.savestate = 1;
 	}

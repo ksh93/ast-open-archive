@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-06-06 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-08-08 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -3518,7 +3518,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			.UNION. : .SPECIAL $(T) $(?$(X:B:S):N!=[-+]l*:T=F:P=S:T!=G)
 		end
 	else
-		.UNION. : .SPECIAL $(.FILES.:T=F:T!=G)
+		.UNION. : .SPECIAL $(.FILES.:V:T=F) $(.FILES.:T=F:T!=G)
 		$(*.UNION.:N!=[-+]l*) : .SPECIAL -ARCHIVE -COMMAND -OBJECT
 		.UNION. : .SPECIAL $(...:T!=XS:N!=[-+]l*:T=F:A=.REGULAR:P=S:T!=G)
 		.UNION. : .SPECIAL $(...:T=XSFA:N!=[-+]l*:T=F:A=.REGULAR:P=S:T!=G)

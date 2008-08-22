@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -32,6 +32,12 @@
 #define ITLINT		uint16_t
 #define ITLINTERNAL	itl2internal
 #define ITLEXTERNAL	itl2external
+
+#include "itlie.h"
+
+#define ITLINT		uint8_t
+#define ITLINTERNAL	itl1internal
+#define ITLEXTERNAL	itl1external
 
 #include "itlie.h"
 

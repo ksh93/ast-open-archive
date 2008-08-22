@@ -1077,7 +1077,7 @@ TEST 01 'basics'
 		<DESCRIPTION>Variable width data heap.</>
 		<TYPE>void</>
 		<PHYSICAL>
-			<WIDTH>65856</>
+			<WIDTH>692</>
 		</>
 	</>
 </>'

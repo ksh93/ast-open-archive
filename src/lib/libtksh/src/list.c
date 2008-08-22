@@ -118,7 +118,7 @@ int Tcl_SplitList(Tcl_Interp *interp, char *list, int *argcPtr, char ***argvPtr)
 
 		if ((str = sfopen((Sfio_t *) 0, command, "s")))
 		{
-			sh_eval(str, 0);
+			sh_eval(str, 0x8000);
 			sfclose(str);
 			result = Tksh_OkOrErr();
 		}

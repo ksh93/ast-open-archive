@@ -117,7 +117,7 @@ main(int argc, char** argv)
 
 	if (argc <= 1)
 	{
-		printf("%u.%u-%u.%u-%u.%u\n", FLT_DIG, FLT_MAX_EXP, DBL_DIG, DBL_MAX_EXP, LDBL_DIG, LDBL_MAX_EXP);
+		printf("%u.%u.%u-%u.%u.%u-%u.%u.%u\n", FLT_DIG, -(FLT_MIN_10_EXP), FLT_MAX_10_EXP, DBL_DIG, -(DBL_MIN_10_EXP), DBL_MAX_10_EXP, LDBL_DIG, -(LDBL_MIN_10_EXP), LDBL_MAX_10_EXP);
 		return 0;
 	}
 	while (s = *++argv)

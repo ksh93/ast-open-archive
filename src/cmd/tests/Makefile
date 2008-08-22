@@ -44,7 +44,8 @@ sfio :TEST: testsfio sftest.h +last \
 	sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c \
 	sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c \
 	sfio/ttmpfile.c sfio/tungetc.c sfio/twc.c sfio/twchar.c sfio/twhole.c \
-	sfio/twrrd.c
+	sfio/twrrd.c sfio/tbadargs.c sfio/tfmt.c sfio/tmprdwr.c sfio/tresize.c \
+	sfio/tscanf1.c
 		set +x; $(*:O=1) $(TESTSFIOFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
 test.sf : testsfio sftest.h +last $$(*.ARGS:D=sfio:B:S=.c) .CLEARARGS
@@ -62,11 +63,12 @@ vmalloc :TEST: testvmalloc vmtest.h +last \
 test.vm : testvmalloc vmtest.h +last $$(*.ARGS:D=vmalloc:B:S=.c) .CLEARARGS
 	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
-:: RELEASE testdate.sh y2k.dat \
-	strtof-6.128-15.1024-15.1024.rt strtof-6.128-15.1024-15.1024.tst \
-	strtof-6.128-15.1024-18.16384.rt strtof-6.128-15.1024-18.16384.tst \
-	strtof-6.128-15.1024-31.1024.rt strtof-6.128-15.1024-31.1024.tst \
-	strtof-6.128-15.1024-33.16384.rt strtof-6.128-15.1024-33.16384.tst
+:: RELEASE NOTES testdate.sh y2k.dat \
+	strtof-6.37.38-15.307.308-15.307.308.rt   strtof-6.37.38-15.307.308-15.307.308.tst \
+	strtof-6.37.38-15.307.308-18.4931.4932.rt strtof-6.37.38-15.307.308-18.4931.4932.tst \
+	strtof-6.37.38-15.307.308-31.291.308.rt   strtof-6.37.38-15.307.308-31.291.308.tst \
+	strtof-6.37.38-15.307.308-31.307.308.rt   strtof-6.37.38-15.307.308-31.307.308.tst \
+	strtof-6.37.38-15.307.308-33.4931.4932.rt strtof-6.37.38-15.307.308-33.4931.4932.tst
 
 install :
 	: only tests in this directory : nothing to install :

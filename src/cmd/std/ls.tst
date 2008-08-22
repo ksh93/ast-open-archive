@@ -202,17 +202,17 @@ TEST 02 'large sizes'
 		OUTPUT - $'    0 f       0 fff       0 fffff       0 fffffff       1 fffffffff
     0 ff      0 ffff      0 ffffff      0 ffffffff      1 ffffffffff'
 
-	EXEC --testsize=32 -sk f*
-		OUTPUT - $'8388608 f
-12582912 ff
-20971520 fff
-37748736 ffff
-71303168 fffff
-138412032 ffffff
-272629760 fffffff
-541065216 ffffffff
-1077936128 fffffffff
-2151677952 ffffffffff'
+	EXEC --testsize=24 -sk f*
+		OUTPUT - $'32768 f
+49152 ff
+81920 fff
+147456 ffff
+278528 fffff
+540672 ffffff
+1064960 fffffff
+2113536 ffffffff
+4210688 fffffffff
+8404992 ffffffffff'
 
 	EXEC --format="%(size)22u %(name)s" f*
 		OUTPUT - $'                     2 f
@@ -226,28 +226,28 @@ TEST 02 'large sizes'
                    257 fffffffff
                    513 ffffffffff'
 
-	EXEC --testsize=32 --format="%(blocks)18u %(size)22u %(name)s" f*
-		OUTPUT - $'          16777216             8589934592 f
-          25165824            12884901888 ff
-          41943040            21474836480 fff
-          75497472            38654705664 ffff
-         142606336            73014444032 fffff
-         276824064           141733920768 ffffff
-         545259520           279172874240 fffffff
-        1082130432           554050781184 ffffffff
-        2155872256          1103806595072 fffffffff
-        4303355904          2203318222848 ffffffffff'
+	EXEC --testsize=24 --format="%(blocks)18u %(size)22u %(name)s" f*
+		OUTPUT - $'             65536               33554432 f
+             98304               50331648 ff
+            163840               83886080 fff
+            294912              150994944 ffff
+            557056              285212672 fffff
+           1081344              553648128 ffffff
+           2129920             1090519040 fffffff
+           4227072             2164260864 ffffffff
+           8421376             4311744512 fffffffff
+          16809984             8606711808 ffffffffff'
 
-	EXPORT	LC_NUMERIC=en
+	EXPORT	LC_NUMERIC=debug
 
-	EXEC --testsize=32 --format="%(blocks)'18u %(size)'22u %(name)s" f*
-		OUTPUT - $'        16,777,216          8,589,934,592 f
-        25,165,824         12,884,901,888 ff
-        41,943,040         21,474,836,480 fff
-        75,497,472         38,654,705,664 ffff
-       142,606,336         73,014,444,032 fffff
-       276,824,064        141,733,920,768 ffffff
-       545,259,520        279,172,874,240 fffffff
-     1,082,130,432        554,050,781,184 ffffffff
-     2,155,872,256      1,103,806,595,072 fffffffff
-     4,303,355,904      2,203,318,222,848 ffffffffff'
+	EXEC --testsize=24 --format="%(blocks)'18u %(size)'22u %(name)s" f*
+		OUTPUT - $'            65.536             33.554.432 f
+            98.304             50.331.648 ff
+           163.840             83.886.080 fff
+           294.912            150.994.944 ffff
+           557.056            285.212.672 fffff
+         1.081.344            553.648.128 ffffff
+         2.129.920          1.090.519.040 fffffff
+         4.227.072          2.164.260.864 ffffffff
+         8.421.376          4.311.744.512 fffffffff
+        16.809.984          8.606.711.808 ffffffffff'

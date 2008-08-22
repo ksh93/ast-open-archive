@@ -1,3 +1,4 @@
+08-08-11 bgp.h,ip_t.c: add extended community type support
 08-07-31 ptvopen.c: fix ptvinsert() interval bug
 08-07-25 ip_t.c: add { %(prefix:C)s %(addr:C)s } for 0x%02x comma-separated value
 08-06-11 add { fv ptv } for ipv6
