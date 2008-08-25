@@ -554,6 +554,7 @@ TEST 09 'prereq error'
 		INPUT Makefile $'target : file1 file2 file3 file4
 	: COMPILE $(>)
 	grep -q error $(*) && exit 1
+	sleep 1
 	touch $(<)'
 		INPUT file1 $'ok'
 		INPUT file2 $'ok'
@@ -561,49 +562,30 @@ TEST 09 'prereq error'
 		INPUT file4 $'ok'
 		ERROR - $'+ : COMPILE file1 file2 file3 file4
 + grep -q error file1 file2 file3 file4
++ sleep 1
 + touch target'
 
 	EXEC
 		ERROR -
 
-	if	[[ -f file2 && $(date -m -f %N file2) == +(0) ]]
-	then
 
-		EXEC
-			INPUT file2 $'error'	# simulate compilation error
-			INPUT file3 $'good'	# simulate good patch
-			ERROR - $'+ : COMPILE file1 file2 file3 file4
+	EXEC	--regress=sync
+		INPUT file2 $'error'	# simulate compilation error
+		INPUT file3 $'good'	# simulate good patch
+		ERROR - $'+ : COMPILE file2 file3
 + grep -q error file1 file2 file3 file4
 + exit 1
 make: *** exit code 1 making target'
-			EXIT 1
+		EXIT 1
 
-		EXEC
-			INPUT file2 $'better'	# simulate good repatch
-			ERROR - $'+ : COMPILE file1 file2 file3 file4
+	EXEC	--regress=sync
+		INPUT file2 $'better'	# simulate good repatch
+		ERROR - $'+ : COMPILE file2 file3
 + grep -q error file1 file2 file3 file4
++ sleep 1
 + touch target'
-			EXIT 0
+		EXIT 0
 
-	else
-
-		EXEC
-			INPUT file2 $'error'	# simulate compilation error
-			INPUT file3 $'good'	# simulate good patch
-			ERROR - $'+ : COMPILE file2 file3
-+ grep -q error file1 file2 file3 file4
-+ exit 1
-make: *** exit code 1 making target'
-			EXIT 1
-
-		EXEC
-			INPUT file2 $'better'	# simulate good repatch
-			ERROR - $'+ : COMPILE file2 file3
-+ grep -q error file1 file2 file3 file4
-+ touch target'
-			EXIT 0
-
-	fi
 
 	EXEC
 		ERROR -

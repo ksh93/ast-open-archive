@@ -200,7 +200,7 @@ $(ETCDIR) :INSTALLDIR: a.c b.c c.c'
 
 	CD	../dev
 
-	EXEC	install
+	EXEC	--regress=sync install
 		ERROR - $'+ mkdir -p etc'
 
 	EXEC	install
@@ -359,7 +359,7 @@ int main() { return PWD != 0; }'
 
 	CD	../top
 
-	EXEC	target
+	EXEC	--regress=sync target
 		ERROR -
 
 	EXEC	target

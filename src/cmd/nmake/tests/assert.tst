@@ -341,7 +341,7 @@ a b c :JOINT: i
 		INPUT i
 		ERROR - $'+ touch a b c'
 
-	EXEC
+	EXEC	--regress=sync
 		ERROR -
 
 	DO	touch b
@@ -540,7 +540,7 @@ ug gu :LINK: gg'
 + fi
 + ln bin/gg bin/gu'
 
-	EXEC	install
+	EXEC	--regress=sync install
 		INPUT Makefile $'INSTALLROOT = .
 .COMMAND.o : .USE
 	touch $(<)
@@ -557,12 +557,11 @@ aaa zzz :LINK: cmd'
 + ln bin/cmd bin/aaa
 + ln bin/cmd bin/zzz'
 
-	EXEC	install
+	EXEC	--regress=sync install
 		ERROR -
 
-	DO	touch aaa
-
-	EXEC	install
+	EXEC	--regress=sync install
+		INPUT aaa
 		ERROR - $'+ touch cmd
 + cp aaa aaa.old
 + rm -f aaa
@@ -717,7 +716,7 @@ making ColorSM.h'
 + cc -O -I. -c traffic.c
 + cc -o traffic color.o traffic.o'
 
-	EXEC
+	EXEC	--regress=sync
 		OUTPUT -
 		ERROR -
 

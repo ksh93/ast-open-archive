@@ -165,7 +165,7 @@ main(){return g();}'
 + cc -O -c g.c
 + cc -O -o cmd a.o g.o'
 
-	EXEC
+	EXEC	--regress=sync
 		ERROR -
 
 	DO	touch g.g
@@ -202,7 +202,7 @@ a :: a.ch z.ch'
 + cc -O -c z.c
 + cc -O -o a a.o z.o'
 
-	EXEC
+	EXEC	--regress=sync
 		ERROR -
 
 	DO	touch z.sz
@@ -704,7 +704,7 @@ ll.c : .PASS.AFTER.ll.c .FAIL.AFTER.ll.c
 + cc -O -c ll.c
 + cc -O -o cmd yy.o ll.o'
 
-	EXEC	DISABLE_YY= DISABLE_LL=
+	EXEC	--regress=sync DISABLE_YY= DISABLE_LL=
 		ERROR -
 
 	EXEC	DISABLE_YY=false DISABLE_LL=
@@ -717,7 +717,7 @@ make: *** exit code 1 making yy.c
 + cc -O -c yy.c
 + cc -O -o cmd yy.o ll.o'
 
-	EXEC	DISABLE_YY=false DISABLE_LL=
+	EXEC	--regress=sync DISABLE_YY=false DISABLE_LL=
 		ERROR -
 
 	EXEC	DISABLE_YY= DISABLE_LL=false
@@ -735,7 +735,7 @@ make: *** exit code 1 making ll.c
 + cc -O -c ll.c
 + cc -O -o cmd yy.o ll.o'
 
-	EXEC	DISABLE_YY= DISABLE_LL=false
+	EXEC	--regress=sync DISABLE_YY= DISABLE_LL=false
 		ERROR -
 
 	EXEC	DISABLE_YY=false DISABLE_LL=false
@@ -748,7 +748,7 @@ make: *** exit code 1 making yy.c
 + cc -O -c yy.c
 + cc -O -o cmd yy.o ll.o'
 
-	EXEC	DISABLE_YY=false DISABLE_LL=false
+	EXEC	--regress=sync DISABLE_YY=false DISABLE_LL=false
 		ERROR -
 
 	EXEC	DISABLE_YY= DISABLE_LL=

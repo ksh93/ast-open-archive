@@ -34,13 +34,13 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make codex
 make libkshcodex.a archive
 make codex.o
-make ../../codex/codex.c
+make ${INSTALLROOT}/src/cmd/codex/codex.c
 make ${PACKAGE_ast_INCLUDE}/option.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
@@ -113,10 +113,10 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/codex.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../../codex/codex.c
-meta codex.o %.c>%.o ../../codex/codex.c codex
-prev ../../codex/codex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -Dmain=b_codex -D_PACKAGE_ast -D_BLD_codex -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshcodex]"\" -c ../../codex/codex.c
+done ${INSTALLROOT}/src/cmd/codex/codex.c
+meta codex.o %.c>%.o ${PACKAGEROOT}/src/cmd/codex/codex.c codex
+prev ${INSTALLROOT}/src/cmd/codex/codex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -Dmain=b_codex -D_PACKAGE_ast -D_BLD_codex -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshcodex]"\" -c ${INSTALLROOT}/src/cmd/codex/codex.c
 done codex.o generated
 exec - ${AR} cr libkshcodex.a codex.o
 exec - (ranlib libkshcodex.a) >/dev/null 2>&1 || true
@@ -126,7 +126,7 @@ done install virtual
 make test
 make test.codex
 make codex.tst
-meta codex.tst %.rt>%.tst codex.rt codex
+meta codex.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/kshlib/codex/codex.rt codex
 make codex.rt
 done codex.rt
 exec - if	[[ "1" || "codex.rt" -nt "codex.tst" ]]

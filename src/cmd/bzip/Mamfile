@@ -135,7 +135,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/bzlib.h
 done bzip2.c
-meta bzip2.o %.c>%.o bzip2.c bzip2
+meta bzip2.o %.c>%.o ${PACKAGEROOT}/src/cmd/bzip/bzip2.c bzip2
 prev bzip2.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c bzip2.c
 done bzip2.o generated

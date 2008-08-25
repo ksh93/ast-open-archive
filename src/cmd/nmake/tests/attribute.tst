@@ -269,11 +269,11 @@ int h()
 + cc -O -I. -c h.c
 + cc -O -o h m.o h.o'
 
-	EXEC
+	EXEC	--regress=sync
 		INPUT h.h $'#define YODA 1'
 		ERROR -
 
-	EXEC
+	EXEC	--regress=sync
 		INPUT h.h $'#define GERMAN 1'
 		ERROR - $'+ cc -O -I. -c h.c
 + cc -O -o h m.o h.o'
@@ -369,7 +369,7 @@ all : .MAKE .VIRTUAL .FORCE
 (aaa) = 1
 (zzz) = 2'
 
-	EXEC
+	EXEC	--regress=sync
 
 	CD	../v0
 
@@ -410,7 +410,7 @@ t.i : .PASS.AFTER.t.i .FAIL.AFTER.t.i'
 	EXEC	GEN=true
 		ERROR -
 
-	EXEC	GEN=false
+	EXEC	--regress=sync GEN=false
 		OUTPUT t.i
 		ERROR - '+ false
 make: *** exit code 1 making t.i
@@ -463,16 +463,18 @@ set jobs=2
 all : a b c
 x : .SEMAPHORE
 fix : .AFTER .FORCE .REPEAT
-	silent sleep 2
 	: $(<) : $(<<) :
+	silent sleep 1
 a b : x fix
+	silent sleep 1
 	: $(<) : $(<<) :
 c :
-	: $(<) : $(<<) :'
-		ERROR - $'+ : a : all :
-+ : c : all :
-+ : b : all :
+	: $(<) : $(<<) :
+	silent sleep 1'
+		ERROR - $'+ : c : all :
++ : a : all :
 + : fix : a :
++ : b : all :
 + : fix : b :'
 
 TEST 18 'pattern association'

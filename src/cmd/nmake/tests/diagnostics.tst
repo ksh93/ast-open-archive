@@ -759,7 +759,7 @@ OPTIONS
 
 TEST 14 'convoluted include + global makefiles'
 
-	EXEC
+	EXEC	--regress=sync
 		INPUT Makefile $'include "foo/foo.mk"
 all :
 	: $(<) : $(~) :
@@ -810,7 +810,7 @@ make: warning: Makefile.mo: recompiling'
 		OUTPUT -
 		ERROR - $'+ : all : global FOO BAR :'
 
-	EXEC	--noexec --include=gbl --global=global.mk
+	EXEC	--regress=sync --noexec --include=gbl --global=global.mk
 		OUTPUT - $'+ : all : global FOO BAR :'
 		ERROR -
 
@@ -824,7 +824,7 @@ make: warning: Makefile.mo: recompiling'
 		OUTPUT -
 		ERROR - $'+ : all : GLOBAL FOO BAR :'
 
-	EXEC	--noexec
+	EXEC	--regress=sync --noexec
 		OUTPUT - $'+ : all : FOO BAR :'
 		ERROR - $'make: warning: Makefile.mo: global file global.mk was specified last time
 make: warning: Makefile.mo: recompiling'

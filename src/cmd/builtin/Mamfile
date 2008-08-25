@@ -37,8 +37,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make .INIT
 make ${PACKAGE_ast_INCLUDE}/cmdlist.h
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -136,7 +136,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h
 done dlls.c
-meta dlls.o %.c>%.o dlls.c dlls
+meta dlls.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/dlls.c dlls
 prev dlls.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_dlls"
 setv LICENSE -DLICENSE="since=2002,author=gsf"
@@ -153,7 +153,7 @@ make look.c
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done look.c
-meta look.o %.c>%.o look.c look
+meta look.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/look.c look
 prev look.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_look"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DCMD_STANDALONE=b_look -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c look.c
@@ -177,7 +177,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/mime.h
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done mime.c
-meta mime.o %.c>%.o mime.c mime
+meta mime.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/mime.c mime
 prev mime.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_mime"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_mime -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c mime.c
@@ -189,7 +189,7 @@ make pty
 make pty.o
 make pty.c
 make FEATURE/pty implicit
-meta FEATURE/pty features/%>FEATURE/% features/pty pty
+meta FEATURE/pty features/%>FEATURE/% ${PACKAGEROOT}/src/cmd/builtin/features/pty pty
 make features/pty
 done features/pty
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libcmd}  : run features/pty
@@ -201,7 +201,7 @@ done ${PACKAGE_ast_INCLUDE}/proc.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done pty.c
-meta pty.o %.c>%.o pty.c pty
+meta pty.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/pty.c pty
 prev pty.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_pty"
 setv LICENSE -DLICENSE="since=2001,author=dgk"
@@ -216,7 +216,7 @@ make nl.c
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done nl.c
-meta nl.o %.c>%.o nl.c nl
+meta nl.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/nl.c nl
 prev nl.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_nl"
 setv LICENSE -DLICENSE="since=2003,author=dgk"
@@ -230,7 +230,7 @@ make asa.o
 make asa.c
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done asa.c
-meta asa.o %.c>%.o asa.c asa
+meta asa.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/asa.c asa
 prev asa.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_asa"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DCMD_STANDALONE=b_asa -D_PACKAGE_ast -c asa.c
@@ -262,7 +262,7 @@ make ${PACKAGE_ast_INCLUDE}/sig.h implicit
 done ${PACKAGE_ast_INCLUDE}/sig.h
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done od.c
-meta od.o %.c>%.o od.c od
+meta od.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/od.c od
 prev od.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_od"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_od -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c od.c
@@ -287,7 +287,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done pr.c
-meta pr.o %.c>%.o pr.c pr
+meta pr.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/pr.c pr
 prev pr.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_pr"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_pr -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c pr.c
@@ -300,7 +300,7 @@ make strings.o
 make strings.c
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done strings.c
-meta strings.o %.c>%.o strings.c strings
+meta strings.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/strings.c strings
 prev strings.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_strings"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DCMD_STANDALONE=b_strings -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c strings.c
@@ -315,7 +315,7 @@ prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done tr.c
-meta tr.o %.c>%.o tr.c tr
+meta tr.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/tr.c tr
 prev tr.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_tr"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_tr -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c tr.c
@@ -334,7 +334,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/uu.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done uudecode.c
-meta uudecode.o %.c>%.o uudecode.c uudecode
+meta uudecode.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/uudecode.c uudecode
 prev uudecode.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_uudecode"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c uudecode.c
@@ -351,7 +351,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/uu.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done uuencode.c
-meta uuencode.o %.c>%.o uuencode.c uuencode
+meta uuencode.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/uuencode.c uuencode
 prev uuencode.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_uuencode"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c uuencode.c
@@ -364,7 +364,7 @@ make what.o
 make what.c
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done what.c
-meta what.o %.c>%.o what.c what
+meta what.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/what.c what
 prev what.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_what"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DCMD_STANDALONE=b_what -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c what.c
@@ -376,7 +376,7 @@ make who
 make who.o
 make who.c
 make FEATURE/utmp implicit
-meta FEATURE/utmp features/%>FEATURE/% features/utmp utmp
+meta FEATURE/utmp features/%>FEATURE/% ${PACKAGEROOT}/src/cmd/builtin/features/utmp utmp
 make features/utmp
 done features/utmp
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libcmd}  : run features/utmp
@@ -384,7 +384,7 @@ done FEATURE/utmp generated
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done who.c
-meta who.o %.c>%.o who.c who
+meta who.o %.c>%.o ${PACKAGEROOT}/src/cmd/builtin/who.c who
 prev who.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_who"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DCMD_STANDALONE=b_who -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c who.c
@@ -499,7 +499,7 @@ exec - regress  asa.tst asa
 done test.asa virtual
 make test.chmod
 make chmod.tst
-meta chmod.tst %.rt>%.tst chmod.rt chmod
+meta chmod.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/builtin/chmod.rt chmod
 make chmod.rt
 done chmod.rt
 exec - if	[[ "1" || "chmod.rt" -nt "chmod.tst" ]]
@@ -545,7 +545,7 @@ exec - regress  fmt.tst
 done test.fmt virtual
 make test.head
 make head.tst
-meta head.tst %.rt>%.tst head.rt head
+meta head.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/builtin/head.rt head
 make head.rt
 done head.rt
 exec - if	[[ "1" || "head.rt" -nt "head.tst" ]]
@@ -572,7 +572,7 @@ exec - regress  look.tst look
 done test.look virtual
 make test.mkdir
 make mkdir.tst
-meta mkdir.tst %.rt>%.tst mkdir.rt mkdir
+meta mkdir.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/builtin/mkdir.rt mkdir
 make mkdir.rt
 done mkdir.rt
 exec - if	[[ "1" || "mkdir.rt" -nt "mkdir.tst" ]]
@@ -616,7 +616,7 @@ exec - regress  tr.tst tr
 done test.tr virtual
 make test.uniq
 make uniq.tst
-meta uniq.tst %.rt>%.tst uniq.rt uniq
+meta uniq.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/builtin/uniq.rt uniq
 make uniq.rt
 done uniq.rt
 exec - if	[[ "1" || "uniq.rt" -nt "uniq.tst" ]]
@@ -633,7 +633,7 @@ exec - regress  uuencode.tst uuencode
 done test.uuencode virtual
 make test.wc
 make wc.tst
-meta wc.tst %.rt>%.tst wc.rt wc
+meta wc.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/builtin/wc.rt wc
 make wc.rt
 done wc.rt
 exec - if	[[ "1" || "wc.rt" -nt "wc.tst" ]]

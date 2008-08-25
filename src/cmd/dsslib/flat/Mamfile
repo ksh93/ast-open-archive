@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make flat
 make libdssflat.a archive
@@ -187,7 +187,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done flat.c
-meta flat.o %.c>%.o flat.c flat
+meta flat.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/flat/flat.c flat
 prev flat.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssflat]"\" -c flat.c
 done flat.o generated
@@ -195,7 +195,7 @@ make lib.o
 make lib.c
 prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
-meta lib.o %.c>%.o lib.c lib
+meta lib.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/flat/lib.c lib
 prev lib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c lib.c
 done lib.o generated

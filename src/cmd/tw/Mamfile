@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make tw
 make tw.o
@@ -170,7 +170,7 @@ done ${PACKAGE_ast_INCLUDE}/expr.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done tw.h
 done tw.c
-meta tw.o %.c>%.o tw.c tw
+meta tw.o %.c>%.o ${PACKAGEROOT}/src/cmd/tw/tw.c tw
 prev tw.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?tw]"\" -c tw.c
 done tw.o generated
@@ -196,7 +196,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tm.h
 prev tw.h implicit
 done expr.c
-meta expr.o %.c>%.o expr.c expr
+meta expr.o %.c>%.o ${PACKAGEROOT}/src/cmd/tw/expr.c expr
 prev expr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c expr.c
 done expr.o generated
@@ -205,7 +205,7 @@ make ftwlocal.c
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ftwlocal.h implicit
 done ftwlocal.c
-meta ftwlocal.o %.c>%.o ftwlocal.c ftwlocal
+meta ftwlocal.o %.c>%.o ${PACKAGEROOT}/src/cmd/tw/ftwlocal.c ftwlocal
 prev ftwlocal.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ftwlocal.c
 done ftwlocal.o generated
@@ -246,7 +246,7 @@ done ${PACKAGE_ast_INCLUDE}/modex.h
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done find.c
-meta find.o %.c>%.o find.c find
+meta find.o %.c>%.o ${PACKAGEROOT}/src/cmd/tw/find.c find
 prev find.c
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?tw]"\" -c find.c
@@ -261,7 +261,7 @@ prev ${PACKAGE_ast_INCLUDE}/cmdarg.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done xargs.c
-meta xargs.o %.c>%.o xargs.c xargs
+meta xargs.o %.c>%.o ${PACKAGEROOT}/src/cmd/tw/xargs.c xargs
 prev xargs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?tw]"\" -c xargs.c
 done xargs.o generated
@@ -270,7 +270,7 @@ done xargs generated
 make locate
 make locate.sh
 done locate.sh
-meta locate %.sh>% locate.sh locate
+meta locate %.sh>% ${PACKAGEROOT}/src/cmd/tw/locate.sh locate
 prev locate.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -307,7 +307,7 @@ done locate generated
 make updatedb
 make updatedb.sh
 done updatedb.sh
-meta updatedb %.sh>% updatedb.sh updatedb
+meta updatedb %.sh>% ${PACKAGEROOT}/src/cmd/tw/updatedb.sh updatedb
 prev updatedb.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)

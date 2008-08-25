@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make pack
 make pack.o
@@ -116,7 +116,7 @@ make huffman.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done huffman.h
 done pack.c
-meta pack.o %.c>%.o pack.c pack
+meta pack.o %.c>%.o ${PACKAGEROOT}/src/cmd/pack/pack.c pack
 prev pack.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pack]"\" -c pack.c
 done pack.o generated
@@ -154,7 +154,7 @@ make huffinit.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev huffman.h implicit
 done huffinit.c
-meta huffinit.o %.c>%.o huffinit.c huffinit
+meta huffinit.o %.c>%.o ${PACKAGEROOT}/src/cmd/pack/huffinit.c huffinit
 prev huffinit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffinit.c
 done huffinit.o generated
@@ -163,7 +163,7 @@ make huffgethdr.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev huffman.h implicit
 done huffgethdr.c
-meta huffgethdr.o %.c>%.o huffgethdr.c huffgethdr
+meta huffgethdr.o %.c>%.o ${PACKAGEROOT}/src/cmd/pack/huffgethdr.c huffgethdr
 prev huffgethdr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffgethdr.c
 done huffgethdr.o generated
@@ -171,7 +171,7 @@ make huffputhdr.o
 make huffputhdr.c
 prev huffman.h implicit
 done huffputhdr.c
-meta huffputhdr.o %.c>%.o huffputhdr.c huffputhdr
+meta huffputhdr.o %.c>%.o ${PACKAGEROOT}/src/cmd/pack/huffputhdr.c huffputhdr
 prev huffputhdr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffputhdr.c
 done huffputhdr.o generated
@@ -179,7 +179,7 @@ make huffencode.o
 make huffencode.c
 prev huffman.h implicit
 done huffencode.c
-meta huffencode.o %.c>%.o huffencode.c huffencode
+meta huffencode.o %.c>%.o ${PACKAGEROOT}/src/cmd/pack/huffencode.c huffencode
 prev huffencode.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffencode.c
 done huffencode.o generated
@@ -187,7 +187,7 @@ make huffdecode.o
 make huffdecode.c
 prev huffman.h implicit
 done huffdecode.c
-meta huffdecode.o %.c>%.o huffdecode.c huffdecode
+meta huffdecode.o %.c>%.o ${PACKAGEROOT}/src/cmd/pack/huffdecode.c huffdecode
 prev huffdecode.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffdecode.c
 done huffdecode.o generated
@@ -211,7 +211,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev huffman.h implicit
 done unpack.c
-meta unpack.o %.c>%.o unpack.c unpack
+meta unpack.o %.c>%.o ${PACKAGEROOT}/src/cmd/pack/unpack.c unpack
 prev unpack.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pack]"\" -c unpack.c
 done unpack.o generated
