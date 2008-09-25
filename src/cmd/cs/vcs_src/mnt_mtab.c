@@ -99,6 +99,7 @@ int im_restart(argc, argv)
 		return (1);
 	}
 	(void) hashwalk(istate.mtab, 0, do_call, 0);
+	return(0);
 }
 
 int do_call(mpoint, value, dump)

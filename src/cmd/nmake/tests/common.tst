@@ -9,42 +9,37 @@ TEST 01 'install with --compare and --clobber'
 
 	EXEC	--regress=sync install
 		INPUT Makefile $'t :: t.sh'
-		INPUT t.sh
+		INPUT t.sh aaa
 		ERROR - $'+ cp t.sh t
 + chmod u+w,+x t
 + mkdir -p bin
 + ignore cp t bin/t'
 
-	DO	touch t.sh
-
 	EXEC	--regress=sync install
+		INPUT t.sh aaa
 		ERROR - $'+ cp t.sh t'
 
-	DO	touch t.sh
-
 	EXEC	--regress=sync --nocompare install
+		INPUT t.sh aaa
 		ERROR - $'+ cp t.sh t
 + mv -f bin/t bin/t.old
 + ignore cp t bin/t'
 
-	DO	touch t.sh
-
 	EXEC	--regress=sync install compare=0 # obsolete compatibility
+		INPUT t.sh aaa
 		ERROR - $'make: warning: compare=0: obsolete: use --nocompare
 + cp t.sh t
 + mv -f bin/t bin/t.old
 + ignore cp t bin/t'
 
-	DO	touch t.sh
-
 	EXEC	--regress=sync --nocompare --clobber install
+		INPUT t.sh aaa
 		ERROR - $'+ cp t.sh t
 + rm -f bin/t
 + ignore cp t bin/t'
 
-	DO	touch t.sh
-
 	EXEC	--regress=sync install compare=0 clobber=1 # obsolete compatibility
+		INPUT t.sh aaa
 		ERROR - $'make: warning: clobber=1 compare=0: obsolete: use --clobber --nocompare
 + cp t.sh t
 + rm -f bin/t

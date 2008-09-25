@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make odelta
 make libodelta.a archive
@@ -133,7 +133,7 @@ make update.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done update.h
 done delta.c
-meta delta.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/delta.c delta
+meta delta.o %.c>%.o delta.c delta
 prev delta.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c delta.c
 done delta.o generated
@@ -141,7 +141,7 @@ make mtchstring.o
 make mtchstring.c
 prev update.h implicit
 done mtchstring.c
-meta mtchstring.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/mtchstring.c mtchstring
+meta mtchstring.o %.c>%.o mtchstring.c mtchstring
 prev mtchstring.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c mtchstring.c
 done mtchstring.o generated
@@ -149,7 +149,7 @@ make suftree.o
 make suftree.c
 prev suftree.h implicit
 done suftree.c
-meta suftree.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/suftree.c suftree
+meta suftree.o %.c>%.o suftree.c suftree
 prev suftree.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c suftree.c
 done suftree.o generated
@@ -157,7 +157,7 @@ make update.o
 make update.c
 prev update.h implicit
 done update.c
-meta update.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/update.c update
+meta update.o %.c>%.o update.c update
 prev update.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c update.c
 done update.o generated

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -72,7 +72,7 @@ ps_init(Pss_t* pss)
 		return -1;
 	}
 	state->now = (unsigned long)time(NiL) + 60;
-	if ((s = getenv("_PSS_ps")) && *s == 'd')
+	if ((s = getenv("_AST_PSS_ps")) && *s == 'd')
 		state->debug = 1;
 	fields = 0;
 	for (po = pso; po->field; po++)

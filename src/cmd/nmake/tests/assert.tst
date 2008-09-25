@@ -561,22 +561,31 @@ aaa zzz :LINK: cmd'
 		ERROR -
 
 	EXEC	--regress=sync install
-		INPUT aaa
+		INPUT aaa zzz
 		ERROR - $'+ touch cmd
 + cp aaa aaa.old
 + rm -f aaa
 + ln cmd aaa
 + cp zzz zzz.old
 + rm -f zzz
-+ ln cmd zzz'
++ ln cmd zzz
++ mv -f bin/cmd bin/cmd.old
++ ignore cp cmd bin/cmd
++ cp bin/aaa bin/aaa.old
++ rm -f bin/aaa
++ ln bin/cmd bin/aaa
++ cp bin/zzz bin/zzz.old
++ rm -f bin/zzz
++ ln bin/cmd bin/zzz'
 
-	EXEC	install
+	EXEC	--regress=sync install
 		ERROR -
 
-	DO	touch bin/aaa
-
-	EXEC	install
-		ERROR - $'+ cp bin/aaa bin/aaa.old
+	EXEC	--regress=sync install
+		INPUT bin/aaa aaa
+		ERROR - $'+ mv -f bin/cmd bin/cmd.old
++ ignore cp cmd bin/cmd
++ cp bin/aaa bin/aaa.old
 + rm -f bin/aaa
 + ln bin/cmd bin/aaa
 + cp bin/zzz bin/zzz.old

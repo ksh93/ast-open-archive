@@ -514,10 +514,11 @@ badlock(char* file, int view, Time_t date)
 	 * probably a bad lock if too old
 	 */
 
-	if ((d = (CURSECS - tmxsec(date))) > 24 * 60 * 60)
+	d = state.regress ? 0 : (CURSECS - tmxsec(date));
+	if (d > 24 * 60 * 60)
 		error(1, "%s is probably an invalid lock file", file);
 	else if (d > 0)
-		error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(state.regress ? 1 : d, 1));
+		error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(d, 1));
 	else
 		error(1, "another make is running on %s in %s", state.makefile, state.view[view].path);
 	error(3, "use -%c to override", OPT(OPT_ignorelock));

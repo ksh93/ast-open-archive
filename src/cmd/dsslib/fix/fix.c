@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -199,7 +199,10 @@ fix_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 				field->max = arg.value.number;
 		}
 		else if (field->width < arg.value.buffer.size)
+		{
+			error(-1, "AHA fix_act %s.width %d  arg.size %d", field->variable->name, field->width, arg.value.buffer.size);
 			field->width = arg.value.buffer.size;
+		}
 	}
 	return 0;
 }
@@ -243,6 +246,7 @@ fix_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 				w = 8;
 			else if (w < (1<<15))
 				for (x = w, w = 1; w < x; w <<= 1);
+			error(-1, "AHA fix_end %s.width %d w %d", field->variable->name, field->width, w);
 			if (field->representation == FIELD_string)
 				field->width = w;
 			else

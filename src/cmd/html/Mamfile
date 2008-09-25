@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make html2rtf
 make html2rtf.o
@@ -116,7 +116,7 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done html2rtf.h
 done html2rtf.c
-meta html2rtf.o %.c>%.o ${PACKAGEROOT}/src/cmd/html/html2rtf.c html2rtf
+meta html2rtf.o %.c>%.o html2rtf.c html2rtf
 prev html2rtf.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c html2rtf.c
 done html2rtf.o generated
@@ -129,7 +129,7 @@ make html2db.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done html2db.c
-meta html2db.o %.c>%.o ${PACKAGEROOT}/src/cmd/html/html2db.c html2db
+meta html2db.o %.c>%.o html2db.c html2db
 prev html2db.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c html2db.c
 done html2db.o generated
@@ -141,7 +141,7 @@ make bb2tok.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done bb2tok.c
-meta bb2tok.o %.c>%.o ${PACKAGEROOT}/src/cmd/html/bb2tok.c bb2tok
+meta bb2tok.o %.c>%.o bb2tok.c bb2tok
 prev bb2tok.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c bb2tok.c
 done bb2tok.o generated
@@ -186,7 +186,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/cdt.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done htmlrefs.c
-meta htmlrefs.o %.c>%.o ${PACKAGEROOT}/src/cmd/html/htmlrefs.c htmlrefs
+meta htmlrefs.o %.c>%.o htmlrefs.c htmlrefs
 prev htmlrefs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c htmlrefs.c
 done htmlrefs.o generated
@@ -195,7 +195,7 @@ done htmlrefs generated
 make mm2html
 make mm2html.sh
 done mm2html.sh
-meta mm2html %.sh>% ${PACKAGEROOT}/src/cmd/html/mm2html.sh mm2html
+meta mm2html %.sh>% mm2html.sh mm2html
 prev mm2html.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -232,7 +232,7 @@ done mm2html generated
 make mm2bb
 make mm2bb.sh
 done mm2bb.sh
-meta mm2bb %.sh>% ${PACKAGEROOT}/src/cmd/html/mm2bb.sh mm2bb
+meta mm2bb %.sh>% mm2bb.sh mm2bb
 prev mm2bb.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -291,7 +291,7 @@ done ${PACKAGE_ast_INCLUDE}/ccode.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done troff2html.h
 done troff2html.c
-meta troff2html.o %.c>%.o ${PACKAGEROOT}/src/cmd/html/troff2html.c troff2html
+meta troff2html.o %.c>%.o troff2html.c troff2html
 prev troff2html.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?html]"\" -c troff2html.c
 done troff2html.o generated
@@ -300,7 +300,7 @@ done troff2html generated
 make download
 make download.sh
 done download.sh
-meta download %.sh>% ${PACKAGEROOT}/src/cmd/html/download.sh download
+meta download %.sh>% download.sh download
 prev download.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)

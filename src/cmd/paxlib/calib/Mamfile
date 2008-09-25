@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make calib
 make libpaxcalib.a archive
@@ -152,7 +152,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/paxlib.h
 done calib.c
-meta calib.o %.c>%.o ${PACKAGEROOT}/src/cmd/paxlib/calib/calib.c calib
+meta calib.o %.c>%.o calib.c calib
 prev calib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c calib.c
 done calib.o generated

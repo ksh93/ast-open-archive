@@ -50,6 +50,63 @@ NoN(pss_kvm)
 #define extern_proc		proc
 #endif
 
+#ifndef SIDL
+#ifdef	LSIDL
+#define SIDL	LSIDL
+#else
+#define SIDL	1
+#endif
+#endif
+#ifndef SRUN
+#ifdef	LSRUN
+#define SRUN	LSRUN
+#else
+#define SRUN	2
+#endif
+#endif
+#ifndef SSLEEP
+#ifdef	LSSLEEP
+#define SSLEEP	LSSLEEP
+#else
+#define SSLEEP	3
+#endif
+#endif
+#ifndef SSTOP
+#ifdef	LSSTOP
+#define SSTOP	LSSTOP
+#else
+#define SSTOP	4
+#endif
+#endif
+#ifndef SZOMB
+#ifdef	LSZOMB
+#define SZOMB	LSZOMB
+#else
+#define SZOMB	5
+#endif
+#endif
+#ifndef SDEAD
+#ifdef	LSDEAD
+#define SDEAD	LSDEAD
+#else
+#define SDEAD	6
+#endif
+#endif
+#ifndef SONPROC
+#ifdef	LSONPROC
+#define SONPROC	LSONPROC
+#else
+#define SONPROC	7
+#endif
+#endif
+#ifndef SSUSPENDED
+#ifdef	LSSUSPENDED
+#define SSUSPENDED	LSSUSPENDED
+#else
+#define SSUSPENDED	8
+#endif
+#endif
+
 typedef struct State_s
 {
 	kvm_t*			kd;
@@ -172,14 +229,16 @@ kvm_full(register Pss_t* pss, register Pssent_t* pe)
 			pe->command = s;
 		}
 	}
-#if 0
+#if _mem_p_addr_extern_proc
 	pe->addr = state->pr->p_addr;
 #endif
+#if _mem_p_wchan_extern_proc
 	pe->wchan = state->pr->p_wchan;
+#endif
 	pe->flags = state->pr->p_flag;
 	pe->nice = state->pr->p_nice;
 	pe->ppid = state->px->e_ppid;
-#if PSS_pri
+#if PSS_pri && _mem_p_usrpri_extern_proc
 	pe->pri = state->pr->p_usrpri;
 #endif
 #ifdef FWIDTH

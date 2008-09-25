@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make dbm
 make libkshdbm.a archive
@@ -135,7 +135,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done dbm.c
-meta dbm.o %.c>%.o ${PACKAGEROOT}/src/cmd/kshlib/dbm/dbm.c dbm
+meta dbm.o %.c>%.o dbm.c dbm
 prev dbm.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm"\" -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshdbm]"\" -D_PACKAGE_ast -c dbm.c
 done dbm.o generated
@@ -147,7 +147,7 @@ done install virtual
 make test
 make test.dbm
 make dbm.tst
-meta dbm.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/kshlib/dbm/dbm.rt dbm
+meta dbm.tst %.rt>%.tst dbm.rt dbm
 make dbm.rt
 done dbm.rt
 exec - if	[[ "1" || "dbm.rt" -nt "dbm.tst" ]]

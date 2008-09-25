@@ -4,6 +4,8 @@ TITLE + sync
 
 unset SORTIN SORTOUT SORTOF01 SORTOF02 SORTOF03
 
+export LC_ALL=C
+
 VIEW data
 
 TEST 01 'basics'

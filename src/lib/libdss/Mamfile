@@ -9,7 +9,7 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
-setv CCFLAGS ${mam_cc_DEBUG}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make dss
 make libdss.a archive
@@ -211,9 +211,9 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done dsslib.h dontcare
 done dsshdr.h
 done dssopen.c
-meta dssopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/dssopen.c dssopen
+meta dssopen.o %.c>%.o dssopen.c dssopen
 prev dssopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libdss]"\" -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_dss -D_BLD_cx -D_BLD_tag -c dssopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libdss]"\" -D_PACKAGE_ast -D_BLD_dss -D_BLD_cx -D_BLD_tag -c dssopen.c
 done dssopen.o generated
 make dssfile.o
 make dssfile.c
@@ -227,9 +227,9 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ls.h
 prev dsshdr.h implicit
 done dssfile.c
-meta dssfile.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/dssfile.c dssfile
+meta dssfile.o %.c>%.o dssfile.c dssfile
 prev dssfile.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_dss -D_BLD_cx -D_BLD_tag -c dssfile.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_dss -D_BLD_cx -D_BLD_tag -c dssfile.c
 done dssfile.o generated
 make dssprintf.o
 make dssprintf.c
@@ -238,17 +238,17 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_float.h
 prev dsshdr.h implicit
 done dssprintf.c
-meta dssprintf.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/dssprintf.c dssprintf
+meta dssprintf.o %.c>%.o dssprintf.c dssprintf
 prev dssprintf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -D_BLD_tag -c dssprintf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_cx -D_BLD_tag -c dssprintf.c
 done dssprintf.o generated
 make dssmisc.o
 make dssmisc.c
 prev dsshdr.h implicit
 done dssmisc.c
-meta dssmisc.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/dssmisc.c dssmisc
+meta dssmisc.o %.c>%.o dssmisc.c dssmisc
 prev dssmisc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -D_BLD_tag -c dssmisc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_cx -D_BLD_tag -c dssmisc.c
 done dssmisc.o generated
 make dssmagic.o
 make dssmagic.c
@@ -258,25 +258,25 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/magicid.h
 prev dsslib.h implicit
 done dssmagic.c
-meta dssmagic.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/dssmagic.c dssmagic
+meta dssmagic.o %.c>%.o dssmagic.c dssmagic
 prev dssmagic.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -D_BLD_tag -c dssmagic.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_cx -D_BLD_tag -c dssmagic.c
 done dssmagic.o generated
 make dssopt.o
 make dssopt.c
 prev dsshdr.h implicit
 done dssopt.c
-meta dssopt.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/dssopt.c dssopt
+meta dssopt.o %.c>%.o dssopt.c dssopt
 prev dssopt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -D_BLD_tag -c dssopt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_cx -D_BLD_tag -c dssopt.c
 done dssopt.o generated
 make dsstags.o
 make dsstags.c
 prev dsslib.h implicit
 done dsstags.c
-meta dsstags.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/dsstags.c dsstags
+meta dsstags.o %.c>%.o dsstags.c dsstags
 prev dsstags.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -D_BLD_tag -c dsstags.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_dss -D_PACKAGE_ast -D_BLD_cx -D_BLD_tag -c dsstags.c
 done dsstags.o generated
 make tag.o
 make tag.c
@@ -290,51 +290,51 @@ done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev tag.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done tag.c
-meta tag.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/tag.c tag
+meta tag.o %.c>%.o tag.c tag
 prev tag.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_tag -c tag.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tag -c tag.c
 done tag.o generated
 make cxopen.o
 make cxopen.c
 prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev cxlib.h implicit
 done cxopen.c
-meta cxopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/cxopen.c cxopen
+meta cxopen.o %.c>%.o cxopen.c cxopen
 prev cxopen.c
-exec - ${CC} -g -D_BLD_DLL -fPIC -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -c cxopen.c
+exec - ${CC} -g -D_BLD_DLL -fPIC -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxopen.c
 done cxopen.o generated
 make cxcomp.o
 make cxcomp.c
 prev cxlib.h implicit
 done cxcomp.c
-meta cxcomp.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/cxcomp.c cxcomp
+meta cxcomp.o %.c>%.o cxcomp.c cxcomp
 prev cxcomp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -c cxcomp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxcomp.c
 done cxcomp.o generated
 make cxeval.o
 make cxeval.c
 prev cxlib.h implicit
 done cxeval.c
-meta cxeval.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/cxeval.c cxeval
+meta cxeval.o %.c>%.o cxeval.c cxeval
 prev cxeval.c
-exec - ${CC} -g -D_BLD_DLL -fPIC -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -c cxeval.c
+exec - ${CC} -g -D_BLD_DLL -fPIC -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxeval.c
 done cxeval.o generated
 make cxmap.o
 make cxmap.c
 prev cxlib.h implicit
 done cxmap.c
-meta cxmap.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/cxmap.c cxmap
+meta cxmap.o %.c>%.o cxmap.c cxmap
 prev cxmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -c cxmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxmap.c
 done cxmap.o generated
 make cxattr.o
 make cxattr.c
 prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev cxlib.h implicit
 done cxattr.c
-meta cxattr.o %.c>%.o ${PACKAGEROOT}/src/lib/libdss/cxattr.c cxattr
+meta cxattr.o %.c>%.o cxattr.c cxattr
 prev cxattr.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_cx -c cxattr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cx -c cxattr.c
 done cxattr.o generated
 exec - ${AR} cr libdss.a dssopen.o dssfile.o dssprintf.o dssmisc.o dssmagic.o dssopt.o dsstags.o tag.o cxopen.o cxcomp.o cxeval.o cxmap.o cxattr.o
 exec - (ranlib libdss.a) >/dev/null 2>&1 || true

@@ -38,6 +38,10 @@ case $# in
 0)	set $SORT ;;
 esac
 
+# Some intermediate file tests require ~100 fds,
+# and some systems have low ~64 fds defaults.
+(ulimit -n 128) >/dev/null 2>&1 && ulimit -n 128
+
 # Other tests may be needed for files too big to fit in memory;
 # see TEST=15 below
 

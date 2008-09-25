@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2008-06-20 $\n]"
+"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2008-08-28 $\n]"
 USAGE_LICENSE
 "[+NAME?sortsum - sort uniq summary discipline]"
 "[+DESCRIPTION?The \bsortsum\b \bsort\b(1) discipline applies "
@@ -56,6 +56,7 @@ USAGE_LICENSE
         "[+set (s)?set all field field bytes to the first character of "
             "\aarg\a, which may be a C-style escape sequence]"
     "}"
+"[r:regress?Massage output for regression testing.]"
 "[d:debug?List the field operations on the standard error.]"
 "[+EXAMPLES]"
     "{"
@@ -107,6 +108,7 @@ struct Summary_s
 	int		op;
 	int		set;
 	int		fixed;
+	int		width;
 	Sflong_t	count;
 	Sfdouble_t	value;
 };
@@ -126,6 +128,7 @@ typedef struct State_s
 	Recfmt_t	fmt;
 	int		tab;
 	int		alt;
+	int		regress;
 	Buffer_t	tmp;
 	Buffer_t	buf[2];
 } State_t;
@@ -202,7 +205,8 @@ record(register State_t* state, register Rsobj_t* r, int op)
 		else
 			a = z = s;
 		w = z - a;
-		sum->format.width = RECTYPE(state->fmt) == REC_fixed ? w : (!(sum->format.flags & CX_FLOAT) || sum->end.index || w >= 8) ? 0 : 8;
+		if (!sum->width)
+			sum->format.width = RECTYPE(state->fmt) == REC_fixed ? w : (!(sum->format.flags & CX_FLOAT) || sum->end.index || w >= 8) ? 0 : 8;
 		if (map = sum->map)
 		{
 			ASSURE(state, &state->tmp, w + 2);
@@ -215,6 +219,12 @@ record(register State_t* state, register Rsobj_t* r, int op)
 			x = a;
 		if (sum->op == 'v' || (*sum->type->internalf)(cx, sum->type, NiL, &sum->format, &v, (char*)x, w, cx->rm, cx->disc) < 0)
 			v.value.number = 0;
+		else if (state->regress && (sum->format.flags & CX_FLOAT))
+		{
+			n = v.value.number * 1000.0;
+			n /= 10;
+			v.value.number = n;
+		}
 		if (op < 0)
 		{
 			sum->value = v.value.number;
@@ -569,6 +579,7 @@ rs_disc(Rskey_t* key, const char* options)
 			{
 				s = t;
 				sum->type = type;
+				sum->width = sum->format.width;
 				tok++;
 				break;
 			}
@@ -599,6 +610,9 @@ rs_disc(Rskey_t* key, const char* options)
 						state->sum = sum;
 					sum->next = cur;
 				}
+				continue;
+			case 'r':
+				state->regress = 1;
 				continue;
 			case '?':
 				error(ERROR_USAGE|4, "%s", opt_info.arg);

@@ -1,4 +1,4 @@
-: (?%...) nested matched pair regex tests 2005-05-28
+: (?%...) nested matched pair regex tests 2008-09-04
 
 EA	(?%()		-(-)-			EPAREN
 EA	(?%()")		-(-)-			EPAREN
@@ -68,9 +68,9 @@ EA	(?%T;)			NULL		NOMATCH
 EA	(?%D;)			NULL		NOMATCH
 EA	(?%S;)			NULL		NOMATCH
 
-EA	(?%T;OT)		NULL		(0,1)
-EA	(?%D;OT)		NULL		(0,1)
-EA	(?%S;OT)		NULL		(0,1)
+EA	(?%T;OT)		NULL		NOMATCH
+EA	(?%D;OT)		NULL		NOMATCH
+EA	(?%S;OT)		NULL		NOMATCH
 
 EA	(?%T;)			-		NOMATCH
 EA	(?%D;)			-		NOMATCH
@@ -261,9 +261,9 @@ K	%(T;)			NULL		NOMATCH
 K	%(D;)			NULL		NOMATCH
 K	%(S;)			NULL		NOMATCH
 
-K	%(T;OT)			NULL		(0,1)(0,1)
-K	%(D;OT)			NULL		(0,1)(0,1)
-K	%(S;OT)			NULL		(0,1)(0,1)
+K	%(T;OT)			NULL		NOMATCH
+K	%(D;OT)			NULL		NOMATCH
+K	%(S;OT)			NULL		NOMATCH
 
 K	%(T;)			-		NOMATCH
 K	%(D;)			-		NOMATCH

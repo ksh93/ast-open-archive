@@ -92,16 +92,56 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-08-08-25  --- Release ksh93t  ---
+08-09-24  --- Release ksh93t  ---
+08-09-24  $(...) has been fixed to properly set the exit status in $?.
+08-09-23  $(<...) with IFS=$'\n\n' has been fixed to retain all but the last
+	  of multiple trailing newlines.
+08-09-23  The -p option to typeset when used with other attributes, restricts
+	  the output to variables with the specified attributes.
+08-09-22  A bug that sometimes lost the exit status of a job has been fixed.
+08-09-21  A bug that retained trailing command substitution newlines in
+	  cases where the command caused the shell to fork has been fixed.
+08-09-19  type, whence -v, and command -v were fixed to comply with POSIX
+	  by writing 'not found' diagnostics to the standard error.
+08-09-18  test and [...] were fixed to comply with POSIX in the case
+	  of test '(' binop ')' where binop is a valid binary test operator.
+08-09-16  If a method discipline named create is specified when defining a
+	  type, this function will be called when an instance is created.
+08-09-15  The variable _ is now set as a reference to the compound variable
+	  when defining a compound variable or a type.
+08-09-10  The shell now prints an error message when the type name specified
+	  for an indexed array subscript is not an enumeration type.
+08-09-10  A bug in which a subshell that spawned a background process could
+	  loose output that was produced after the foreground completed
+	  has been fixed.
+08-09-10  A timing bug on some systems that could cause coprocesses started by a
+	  subshell to not clean up and prevent other coprocesses has been fixed.
+08-09-09  The typeset -m option is now able to rename array elements from
+	  the same array.
+08-09-09  The exit status of 2 from the DEBUG trap causes the next command
+	  to be skipped.  An exit value of 255 from a DEBUG trap called from
+	  a function causes the function to return. 
+08-09-08  A bug in which a coprocess created in a subshell that did not
+	  complete when the subshell terminated could prevent a coprocess
+	  from being created in the parent shell has been fixed.
+08-09-05  An assignment of the form name1=name2 where name1 and name2
+	  are both compound variables causes name1 to get a copy of name2.
+	  name1+=name2 causes name2 sub-variables to be appended to name1.
+08-09-05  A bug in which unsetting a compound variable did not unset all
+	  the sub-variables has been fixed.
+08-09-01  A bug in the subshell cleanup code that could cause SIGSEGV has
+	  been fixed.
+06-08-26  The SHLVL variable which is an environment variable used by bash
+          and zsh that gets incremented when the shell starts.
 08-08-25  For an indexed array, a negative subscript now refers to offsets
 	  from the end so that -1 refers to the last element.
-08-08-24  An alignment error for shorts on 64 bit architectures has be fixed.
+08-08-24  An alignment error for shorts on 64 bit architectures has been fixed.
 08-08-22  If oldvar is a compound variable, typeset -C newvar=oldvar creates 
 	  newvar as a copy of oldvar.
 08-08-19  The ALRM signal no longer cause the sleep builtin to terminate.
 08-08-13  When used in an arithmetic expression, the .sh.version variable  
 	  now produces a number that will be increasing for each release.
-08-08-11  A bug in which type instanciation with a compound assignment in
+08-08-11  A bug in which type instantiation with a compound assignment in
 	  a dot script in which the type is defined has been fixed. 
 08-08-07  The -m option has been added to typeset to move or rename a
 	  variable.  Not documented yet.
@@ -113,10 +153,6 @@ All recorded changes follow.
 	  has been fixed.
 08-07-30  A bug in which expanding compound variable that had a get discipline
 	  from with a here document could cause a syntax error has been fixed.
-08-07-29  When the right hand side of an assignment is of the form, $name
-	  or ${name}, and name is a compound variable or a type defined by
-	  a compound variable, the assignment causes the left hand side to
-	  be a copy of the right hand side equivalent to eval "left=$name".
 08-07-18  A bug in which a nameref caused a local variable to be created
 	  rather than binding to an existing variable in the global scope
 	  has been fixed.
@@ -2767,6 +2803,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+08-09-24 Makerules.mk: add --recurse=only
+08-09-10 Makerules.mk: add :NOPROTECT:, fix CC.DIALECT=VERSION shared lib bind
 08-08-08 state.c: do not use low res virtual st.st_mtime
 08-08-08 Makerules.mk: always include explicit :: files in manifest
 08-06-06 Makerules.mk: drop -G from _BLD_DEBUG trigger -- doh
@@ -4238,6 +4276,8 @@ All recorded changes follow.
 
 :::::::: bgp ::::::::
 
+08-08-28 bgp-mrt.c: add afi=1/safi=128 nlri
+08-08-28 bgp.c: add { afi label rd_admin rd_number rd_type }
 08-08-11 bgp.c,bgp-mrt.c: add extended community support
 08-07-16 bgp-mrt.c: fix MP_UNREACH_NLRI parse bug
 08-06-24 bgp-mrt.c: handle ipv6 extensions
@@ -4283,6 +4323,7 @@ All recorded changes follow.
 
 :::::::: flat ::::::::
 
+08-08-30 flat.c: work around macos cc struct copy bug
 07-06-05 flat.c: <COUNT>*</> => <COUNT>0</> => 0 or more
 07-01-17 flat.c: don't sfsetbuf() on an active stream!
 06-10-11 flat.c: add sfstruse() error checks
@@ -4405,6 +4446,11 @@ All recorded changes follow.
 
 02-12-17 propagate -ldss changes
 02-11-01 a rudimentary alternative to the flat method
+
+:::::::: time_t ::::::::
+
+08-08-22 fix time_t => Time_t typo
+08-08-11 update timestamp_t logic to tmx*()
 
 :::::::: validate ::::::::
 
@@ -4635,6 +4681,7 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+08-09-04 nested.dat,noop.dat: nested match beyond end of subject fix
 08-07-29 testglob.c: add workspace symlinks
 08-07-29 testglob.dat: add ** symlink => dir tests
 08-05-14 *.dat: update tests for UTF-8 vs. ISO-8859-1
@@ -4859,6 +4906,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+08-09-10 features/procfs,pss-kvm.c: netbsd 4.0 kvm tweaks
 08-01-31 features/procfs,pss-kvm.c: freebsd6 kvm tweaks -- stop already
 08-01-26 df.c: belay some of that delay (automounts foiled it)
 07-11-19 df.c: delay stat()/statfs() until necessary
@@ -5271,6 +5319,10 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+08-09-10 misc/magic.c: handle old vcodex() indices
+08-09-10 sfio/sfvprintf.c: drop SF_WCWIDTH, use %Lc or %Ls instead
+08-09-05 Makefile: ibm.risc joins the :NOOPTIMIZE: crowd
+08-09-04 regex/regnexec.c: fix nested delimiter match beyond end of subject
 08-08-20 misc/fts.c: fix st_nlink stat() optimization logic
 08-08-19 sfio/sfpkrd.c: workaround macosx recv(PEEK) data consumption on non-socket
 08-08-19 strn?tol?d: handle long double with smaller exponent range than double
@@ -6799,6 +6851,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+08-09-08 stty.c: #ifdef guard TAB[012] -- freebsd: damn the posix, full speed ahead
 08-06-17 shcmd.h: move to libast
 08-04-24 uniq.c: add optget() 'n' option for -1 => -f1
 08-04-24 getconf.c: clarify diffs between "name - value" and "name = value"
@@ -8274,6 +8327,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+08-09-10 vcsfio.c: handle old binary method header
 08-07-23 vcodex.h: add __EXPORT__/__IMPORT__ extern attributes
 08-06-04 sync with kpv
 06-07-26 vcgetmeth.c,vcextract.c: handle CC_NATIVE!=CC_ASCII

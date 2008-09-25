@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make netflow
 make libdssnetflow.a archive
@@ -156,7 +156,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h dontcare
 done flowlib.h
 done netflow.c
-meta netflow.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/netflow/netflow.c netflow
+meta netflow.o %.c>%.o netflow.c netflow
 prev netflow.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c netflow.c
 done netflow.o generated
@@ -165,7 +165,7 @@ make flow-dump.c
 prev ${PACKAGE_ast_INCLUDE}/swap.h implicit
 prev flowlib.h implicit
 done flow-dump.c
-meta flow-dump.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/netflow/flow-dump.c flow-dump
+meta flow-dump.o %.c>%.o flow-dump.c flow-dump
 prev flow-dump.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-dump.c
 done flow-dump.o generated
@@ -173,7 +173,7 @@ make flow-dumpv9.o
 make flow-dumpv9.c
 prev flowlib.h implicit
 done flow-dumpv9.c
-meta flow-dumpv9.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/netflow/flow-dumpv9.c flow-dumpv9
+meta flow-dumpv9.o %.c>%.o flow-dumpv9.c flow-dumpv9
 prev flow-dumpv9.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-dumpv9.c
 done flow-dumpv9.o generated
@@ -186,7 +186,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/magicid.h
 prev flowlib.h implicit
 done flow-fixed.c
-meta flow-fixed.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/netflow/flow-fixed.c flow-fixed
+meta flow-fixed.o %.c>%.o flow-fixed.c flow-fixed
 prev flow-fixed.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-fixed.c
 done flow-fixed.o generated
@@ -194,7 +194,7 @@ make flow-flat.o
 make flow-flat.c
 prev flowlib.h implicit
 done flow-flat.c
-meta flow-flat.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/netflow/flow-flat.c flow-flat
+meta flow-flat.o %.c>%.o flow-flat.c flow-flat
 prev flow-flat.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-flat.c
 done flow-flat.o generated
@@ -203,7 +203,7 @@ make flow-tool.c
 prev ${PACKAGE_ast_INCLUDE}/swap.h implicit
 prev flowlib.h implicit
 done flow-tool.c
-meta flow-tool.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/netflow/flow-tool.c flow-tool
+meta flow-tool.o %.c>%.o flow-tool.c flow-tool
 prev flow-tool.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c flow-tool.c
 done flow-tool.o generated

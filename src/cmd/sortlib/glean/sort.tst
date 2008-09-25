@@ -4,6 +4,8 @@
 
 UNIT sort
 
+export LC_ALL=C
+
 TEST 01 basics
 
 	EXEC	-t, -k1,1 -k2,2n '-lglean,count,min="3,3n",min="4,4",max="3,3n",max="4,4r"'

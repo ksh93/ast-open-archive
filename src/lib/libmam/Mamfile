@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make mam
 make libmam.a archive
@@ -151,7 +151,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done mam.h dontcare
 done mamlib.h
 done mam.c
-meta mam.o %.c>%.o ${PACKAGEROOT}/src/lib/libmam/mam.c mam
+meta mam.o %.c>%.o mam.c mam
 prev mam.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c mam.c
 done mam.o generated

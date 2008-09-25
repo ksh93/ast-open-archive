@@ -184,7 +184,7 @@ svc_read(void* handle, int fd)
 			err = ENOSYS;
 			break;
 		case MSG_read:
-			if (msg.argv[2].number < 0)
+			if ((long)msg.argv[2].number < 0)
 				err = EINVAL;
 			else if ((n = con->size - con->offset) > 0)
 			{

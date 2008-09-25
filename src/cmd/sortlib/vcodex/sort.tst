@@ -2,6 +2,8 @@
 
 TITLE + vcodex
 
+export LC_ALL=C
+
 KEEP "*.dat" "*.qz"
 
 function DATA

@@ -66,6 +66,118 @@ typedef struct _sfdc_s
 	ssize_t		cdsz;
 } Sfdc_t;
 
+#ifndef SKIPVCDX /* deal with the ancient VCDX header that uses method numbers */
+
+#ifndef elementsof
+#define elementsof(x)	(sizeof(x)/sizeof(x[0]))
+#endif
+
+typedef struct _map_s /* to map an old method number to a transform */
+{	const char*	name;	/* new method name	*/
+	int		mtid;	/* old method number	*/
+	Vcmethod_t*	meth;	/* corresponding method	*/
+} Map_t;
+
+typedef struct _meth_s /* keep method data for reverse construction */
+{	Vcmethod_t*	meth;
+	ssize_t		size;
+	Vcchar_t*	data;
+} Meth_t;
+
+static Map_t		Map[] =
+{	{ "delta",	0	},
+	{ "huffman",	1	},
+	{ "huffgroup",	2	},
+	{ "arith",	3	},
+	{ "bwt",	4	},
+	{ "rle",	5	},
+	{ "mtf",	6	},
+	{ "transpose",	7	},
+	{ "table",	8	},
+	{ "huffpart",	9	},
+	{ "map",	50	},
+	{ "ama",	100	},
+	{ "ss7",	101	},
+};
+
+#if __STD_C
+static ssize_t hdrvcdx(Vcchar_t** datap, ssize_t dtsz, Vcchar_t* code, ssize_t cdsz)
+#else
+static ssize_t hdrvcdx(datap, dtsz, code, cdsz)
+Vcchar_t**	datap;	/* old header data	*/
+ssize_t		dtsz;
+Vcchar_t*	code;	/* space for new code	*/
+ssize_t		cdsz;
+#endif
+{
+	ssize_t		k, n, id, sz;
+	Vcchar_t	*dt, buf[1024];
+	Vcio_t		io;
+	Meth_t		meth[2*elementsof(Map)]; /* should not exceed this */
+
+	/* parse old header into list of transforms */
+	vcioinit(&io, *datap, dtsz);
+	for(n = 0; n < elementsof(meth) && vciomore(&io) > 0; ++n)
+	{	id = vciogetc(&io);
+		for(k = 0; k < elementsof(Map); ++k)
+			if(Map[k].mtid == id)
+				break;
+		if(k >= elementsof(Map)) /* not matching any transform */
+			return dtsz; /* must be new header format */
+
+		if(!Map[k].meth && !(Map[k].meth = vcgetmeth((char*)Map[k].name, 1)))
+		{	Map[k].mtid = -1;
+			return dtsz;
+		}
+		meth[n].meth = Map[k].meth;
+
+		if(vciomore(&io) <= 0 || /* no or bad argument code */
+		   (sz = (ssize_t)vciogetu(&io)) < 0 || sz > vciomore(&io) )
+			return dtsz; /* must be new header format */
+
+		meth[n].size = sz;
+		meth[n].data = vcionext(&io);
+		vcioskip(&io, sz);
+	}
+
+	if(vciomore(&io) > 0) /* too many transforms */
+		return dtsz; /* must be new header */
+
+	/* construct new header in reverse order */
+	vcioinit(&io, code, cdsz);
+	for(n -= 1; n >= 0; --n)
+	{	/* get and write out the method id string */
+		if(!(dt = (unsigned char*)vcgetident(meth[n].meth, (char*)buf, sizeof(buf))) )
+			return -1; /* error, no id string for method? */
+		if((sz = strlen((char*)dt)+1) > vciomore(&io)) /* too long */
+			return dtsz; /* must be new header format */
+		vcioputs(&io, dt, sz);
+
+		sz = meth[n].size; dt = meth[n].data;
+		if((sz + vcsizeu(sz)) > vciomore(&io))
+			return dtsz;
+
+		if(sz == 0)
+			vcioputu(&io, 0);
+		else if(meth[n].meth == Vcrle || meth[n].meth == Vcmtf)
+		{	if(*dt == 0) /* coding rle.0 or mtf.0 */
+			{	vcstrcode("0", (char*)buf, sizeof(buf));
+				vcioputu(&io, 1);
+				vcioputc(&io, buf[0]);
+			}
+			else	vcioputu(&io, 0);
+		}
+		else /* let us pray for the right coding! */
+		{	vcioputu(&io, sz);
+			vcioputs(&io, dt, sz);
+		}
+	}
+
+	*datap = code; /* set to return new code string */
+	return vciosize(&io);
+}
+#endif /* SKIPVCDX */
+
 /* dealing with RFC3284 Vcdiff header */
 #if __STD_C
 static ssize_t hdrvcdiff(Vcio_t* iodt, int indi, Vcchar_t* code, ssize_t cdsz)
@@ -384,6 +496,10 @@ int		identify;
 				continue;
 			code = vcionext(&io);
 			vcioskip(&io, cdsz);
+
+#ifndef SKIPVCDX /* deal with old headers that use method numbers instead of names */
+			cdsz = hdrvcdx(&code, cdsz, cdbuf, sizeof(cdbuf));
+#endif
 		}
 
 		/* successfully read the header data */

@@ -1,3 +1,5 @@
+08-09-24 Makerules.mk: add --recurse=only
+08-09-10 Makerules.mk: add :NOPROTECT:, fix CC.DIALECT=VERSION shared lib bind
 08-08-08 state.c: do not use low res virtual st.st_mtime
 08-08-08 Makerules.mk: always include explicit :: files in manifest
 08-06-06 Makerules.mk: drop -G from _BLD_DEBUG trigger -- doh

@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ed
 make ed.o
@@ -122,7 +122,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/error.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ed.c
-meta ed.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/ed.c ed
+meta ed.o %.c>%.o ed.c ed
 prev ed.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?re]"\" -c ed.c
 done ed.o generated
@@ -149,7 +149,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done grep.c
-meta grep.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/grep.c grep
+meta grep.o %.c>%.o grep.c grep
 prev grep.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?re]"\" -c grep.c
@@ -181,7 +181,7 @@ prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sed.h
 done sed0.c
-meta sed0.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/sed0.c sed0
+meta sed0.o %.c>%.o sed0.c sed0
 prev sed0.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?re]"\" -D_PACKAGE_ast -c sed0.c
@@ -190,7 +190,7 @@ make sed1.o
 make sed1.c
 prev sed.h implicit
 done sed1.c
-meta sed1.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/sed1.c sed1
+meta sed1.o %.c>%.o sed1.c sed1
 prev sed1.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sed1.c
@@ -199,7 +199,7 @@ make sed2.o
 make sed2.c
 prev sed.h implicit
 done sed2.c
-meta sed2.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/sed2.c sed2
+meta sed2.o %.c>%.o sed2.c sed2
 prev sed2.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sed2.c
@@ -208,7 +208,7 @@ make sed3.o
 make sed3.c
 prev sed.h implicit
 done sed3.c
-meta sed3.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/sed3.c sed3
+meta sed3.o %.c>%.o sed3.c sed3
 prev sed3.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sed3.c
@@ -290,7 +290,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_stdio.h
 done ${PACKAGE_ast_INCLUDE}/stdio.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done testglob.c
-meta testglob.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/testglob.c testglob
+meta testglob.o %.c>%.o testglob.c testglob
 prev testglob.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testglob.c
 done testglob.o generated
@@ -310,7 +310,7 @@ make testfmt.c
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done testfmt.c
-meta testfmt.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/testfmt.c testfmt
+meta testfmt.o %.c>%.o testfmt.c testfmt
 prev testfmt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testfmt.c
 done testfmt.o generated
@@ -332,7 +332,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/fnmatch.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done testfnmatch.c
-meta testfnmatch.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/testfnmatch.c testfnmatch
+meta testfnmatch.o %.c>%.o testfnmatch.c testfnmatch
 prev testfnmatch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testfnmatch.c
 done testfnmatch.o generated
@@ -356,7 +356,7 @@ make testmatch.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done testmatch.c
-meta testmatch.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/testmatch.c testmatch
+meta testmatch.o %.c>%.o testmatch.c testmatch
 prev testmatch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testmatch.c
 done testmatch.o generated
@@ -380,7 +380,7 @@ prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done testregex.c
-meta testregex.o %.c>%.o ${PACKAGEROOT}/src/cmd/re/testregex.c testregex
+meta testregex.o %.c>%.o testregex.c testregex
 prev testregex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testregex.c
 done testregex.o generated

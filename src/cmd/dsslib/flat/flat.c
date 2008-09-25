@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2008-06-11 $\n]"
+"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2008-08-30 $\n]"
 USAGE_LICENSE
 "[+NAME?flat - dss flat method schema description]"
 "[+DESCRIPTION?The \bdss\b flat method schema is an XML file.]"
@@ -1477,7 +1477,16 @@ static Dssformat_t flat_format =
 static int
 op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
+#if __APPLE__
+	Cxoperand_t*	x;
+
+	x = (*(((Record_t*)DSSDATA(data))->getf))((Record_t*)DSSDATA(data), pc->data.variable->index);
+	r->type = x->type;
+	r->refs = x->refs;
+	r->value.number = x->value.number;
+#else
 	*r = *(*(((Record_t*)DSSDATA(data))->getf))((Record_t*)DSSDATA(data), pc->data.variable->index);
+#endif
 	return 0;
 }
 

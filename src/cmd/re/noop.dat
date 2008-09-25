@@ -1,4 +1,4 @@
-NOTE	augmented shell inline flags : 2008-02-14
+NOTE	augmented shell inline flags : 2008-09-04
 
 K	~(N)/dev/null	/dev/null	(0,9)
 K	~(N)/dev/null*	/dev/null	(0,9)
@@ -182,9 +182,9 @@ K	~(N)+([[:alnum:]])*([[:space:]])(%(()))	call(a+b,x/(c/d),(0));	(0,21)(0,4)(4,4
 K	~(N)%(T;)			NULL		NOMATCH
 K	~(N)%(D;)			NULL		NOMATCH
 K	~(N)%(S;)			NULL		NOMATCH
-K	~(N)%(T;OT)			NULL		(0,1)(0,1)
-K	~(N)%(D;OT)			NULL		(0,1)(0,1)
-K	~(N)%(S;OT)			NULL		(0,1)(0,1)
+K	~(N)%(T;OT)			NULL		NOMATCH
+K	~(N)%(D;OT)			NULL		NOMATCH
+K	~(N)%(S;OT)			NULL		NOMATCH
 K	~(N)%(T;)			-		NOMATCH
 K	~(N)%(D;)			-		NOMATCH
 K	~(N)%(S;)			-		NOMATCH

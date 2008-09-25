@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make probe
 make probe.o
@@ -129,7 +129,7 @@ done ${PACKAGE_ast_INCLUDE}/error.h
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done probe.c
-meta probe.o %.c>%.o ${PACKAGEROOT}/src/cmd/probe/probe.c probe
+meta probe.o %.c>%.o probe.c probe
 prev probe.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?probe]"\" -c probe.c
 done probe.o generated

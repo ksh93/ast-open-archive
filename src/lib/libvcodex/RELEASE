@@ -1,3 +1,4 @@
+08-09-10 vcsfio.c: handle old binary method header
 08-07-23 vcodex.h: add __EXPORT__/__IMPORT__ extern attributes
 08-06-04 sync with kpv
 06-07-26 vcgetmeth.c,vcextract.c: handle CC_NATIVE!=CC_ASCII

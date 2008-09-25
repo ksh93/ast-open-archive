@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make rar
 make libpaxrar.a archive
@@ -146,7 +146,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/paxlib.h
 done rar.c
-meta rar.o %.c>%.o ${PACKAGEROOT}/src/cmd/paxlib/rar/rar.c rar
+meta rar.o %.c>%.o rar.c rar
 prev rar.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c rar.c
 done rar.o generated

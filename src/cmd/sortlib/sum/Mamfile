@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make sum
 make libsortsum.a archive
@@ -143,7 +143,7 @@ done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sortsum.c
-meta sortsum.o %.c>%.o ${PACKAGEROOT}/src/cmd/sortlib/sum/sortsum.c sortsum
+meta sortsum.o %.c>%.o sortsum.c sortsum
 prev sortsum.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortsum]"\" -c sortsum.c
 done sortsum.o generated

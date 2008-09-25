@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-08-08 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-09-24 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -54,7 +54,7 @@ set option=';official-output;s;-;The \bdiff\b(1) log file name for the \bofficia
 set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b$$(CC.INCLUDE.LOCAL)\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
 set option=';preserve;sv;-;Move existing \binstall\b action targets matching \apattern\a to the \bETXTBSY\b subdirectory of the install target.;pattern:!*'
 set option=';profile;b;-;Compile and link with \bprof\b(1) instrumentation options enabled.'
-set option=';recurse;sa;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+combine?Combine all recursive makefiles into one rooted at the current directory. \b::\b, \b:PACKAGE:\b, \b.SOURCE\b*, and \bLDLIBRARIES\b are intercepted to adjust relative directory and library references. Complex makefile hierarchies may not be amenable to combination.][+implicit?All makefiles in all subdirectories are treated as if they contained \b:MAKE:\b.][+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently and a \b+\b prerequisite separates leaf directories from intermediate directories.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
+set option=';recurse;sa;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+combine?Combine all recursive makefiles into one rooted at the current directory. \b::\b, \b:PACKAGE:\b, \b.SOURCE\b*, and \bLDLIBRARIES\b are intercepted to adjust relative directory and library references. Complex makefile hierarchies may not be amenable to combination.][+implicit?All makefiles in all subdirectories are treated as if they contained \b:MAKE:\b.][+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently and a \b+\b prerequisite separates leaf directories from intermediate directories.][+only?Disable component closure and operate on explicit prerequisites only.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
 set option=';recurse-enter;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon entering a recursive \b:MAKE:\b directory.;text'
 set option=';recurse-leave;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon leaving a recursive \b:MAKE:\b directory. If \b--recurse-leave\b is not specified then no message is printed upon leaving \b:MAKE:\b directories.;text'
 set option=';select;s;-;A catenation of edit operators that selects terminal source files.;edit-ops'
@@ -732,7 +732,7 @@ end
 			end
 			return $(T)
 		else
-			local H I J L P Q S
+			local H I J L P Q S Z
 			L := $(%)
 			V :=
 			if P = "$(PACKAGE_$(B)_VERSION)"
@@ -763,20 +763,25 @@ end
 							return $(T)
 						end
 					elif "$(J)" || ! "$(CC.PREFIX.SHARED)"
-						if "$(CC.SUFFIX.SHARED)"
-							S = |$(CC.SUFFIX.SHARED)
-							if "$(CC.SUFFIX.SHARED)" != "$(CC.SUFFIX.OBJECT)"
-								H = -
-								if "$(CC.DIALECT:N=VERSION)"
-									S := $(S)$$(V)*
+						if ! S
+							if "$(CC.SUFFIX.STATIC)"
+								S = |$(CC.SUFFIX.STATIC)
+							end
+							if "$(CC.SUFFIX.SHARED)"
+								S := $(S:V)|$(CC.SUFFIX.SHARED)
+								if "$(CC.SUFFIX.SHARED)" != "$(CC.SUFFIX.OBJECT)"
+									H = -
+									if "$(CC.DIALECT:N=VERSION)"
+										Z = 1
+									end
 								end
 							end
 						end
-						if "$(CC.SUFFIX.STATIC)"
-							S := $(S:V)|$(CC.SUFFIX.STATIC)
-						end
 						while 1
 							T := $(*.SOURCE.%.ARCHIVE:L>$(L:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)))
+							if ! T && Z
+								T := $(*.SOURCE.%.ARCHIVE:L>$(L:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)$(V)*))
+							end
 							if T
 								if ! "$(CC.SUFFIX.SHARED)" || T != "*$(CC.SUFFIX.SHARED)"
 									if T == "*$(CC.SUFFIX.ARCHIVE)"
@@ -1341,6 +1346,13 @@ DAGGERFLAGS =
 		CCFLAGS := $(CC.DEBUG) $(CCFLAGS:VP:N!=-g|$(CC.DEBUG)|$\(CC.DEBUG\))
 	end
 
+.NOPROTECT.c : .MAKE .LOCAL
+	if "$(-mam)"
+		CCFLAGS := ${mam_cc_FLAGS} ${CCFLAGS.FORCE} ${mam_cc_NOPROTECT}
+	else
+		CCFLAGS += $(CC.NOPROTECT)
+	end
+
 .READONLY. : .FUNCTION
 	local ( .ROSRC. .ROOBJ. ... RO ) $(%)
 	if RO == "-S.idat"
@@ -1471,6 +1483,9 @@ end
 	end
 	if D == "."
 		D := $(D:W=R=$(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE))
+	end
+	if "$(-recurse)" == "*only*"
+		D := $(D:N=?(*/)($(.RECURSE.ARGS.:/ /|/G)))
 	end
 	if "$(-recurse)" == "*list*"
 		print $(D:/ /$("\n")/G)
@@ -2589,6 +2604,20 @@ end
 				$(T:B:S=$(CC.SUFFIX.OBJECT)) : .SPECIAL .NOOPTIMIZE$(T:S)
 			else
 				error 1 :NOOPTIMIZE: ignored for suffix $(T:S)
+			end
+		end
+	end
+
+":NOPROTECT:" : .MAKE .OPERATOR .PROBE.INIT
+	local T P
+	.P. : .CLEAR $(<)
+	P := $(*.P.:/ /|/G)
+	if ! "$(P)" || "$(-mam:N=static*)" || CC.HOSTTYPE == "$(P)"
+		for T $(>)
+			if "$(@.NOPROTECT$(T:S):V)"
+				$(T:B:S=$(CC.SUFFIX.OBJECT)) : .SPECIAL .NOPROTECT$(T:S)
+			else
+				error 1 :NOPROTECT: ignored for suffix $(T:S)
 			end
 		end
 	end

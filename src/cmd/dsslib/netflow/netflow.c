@@ -331,10 +331,10 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.number = rp->icmp_type;
 		break;
 	case NETFLOW_if_desc:
-		r->value.string.data = (char*)rp->if_desc;
+		r->value.string.size = strlen(r->value.string.data = (char*)rp->if_desc);
 		break;
 	case NETFLOW_if_name:
-		r->value.string.data = (char*)rp->if_name;
+		r->value.string.size = strlen(r->value.string.data = (char*)rp->if_name);
 		break;
 	case NETFLOW_in_bytes:
 		r->value.number = rp->in_bytes;
@@ -477,7 +477,7 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.number = rp->sampler_mode;
 		break;
 	case NETFLOW_sampler_name:
-		r->value.string.data = (char*)rp->sampler_name;
+		r->value.string.size = strlen(r->value.string.data = (char*)rp->sampler_name);
 		break;
 	case NETFLOW_src_addr:
 		if (rp->set & NETFLOW_SET_src_addrv6)
@@ -743,9 +743,9 @@ static const Netflow_template_t	template =
 		NUMBER(mpls_label_10, 0),
 		NUMBER(in_dst_mac, 0),
 		NUMBER(out_src_mac, 0),
-		NUMBER(if_name, 0),
-		NUMBER(if_desc, 0),
-		NUMBER(sampler_name, 0),
+		BUFFER(if_name, 0),
+		BUFFER(if_desc, 0),
+		BUFFER(sampler_name, 0),
 		NUMBER(in_permanent_bytes, 0),
 		NUMBER(in_permanent_packets, 0),
 		BUFFER(vendor_87, 0),

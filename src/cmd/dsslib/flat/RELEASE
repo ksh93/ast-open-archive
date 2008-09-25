@@ -1,3 +1,4 @@
+08-08-30 flat.c: work around macos cc struct copy bug
 07-06-05 flat.c: <COUNT>*</> => <COUNT>0</> => 0 or more
 07-01-17 flat.c: don't sfsetbuf() on an active stream!
 06-10-11 flat.c: add sfstruse() error checks

@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make cpp
 make cpp.o
@@ -122,7 +122,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/pp.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cpp.c
-meta cpp.o %.c>%.o ${PACKAGEROOT}/src/cmd/cpp/cpp.c cpp
+meta cpp.o %.c>%.o cpp.c cpp
 prev cpp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cpp.c
 done cpp.o generated
