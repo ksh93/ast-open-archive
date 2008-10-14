@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -101,7 +101,7 @@ USAGE_LICENSE
 "			[+proprietary?Internal or non-disclosure use only.]"
 "			[+special?Nonstandard license text and notices.]"
 "		}"
-"		[+corporation?They own it all, e.g., \bAT&T\b.]"
+"		[+corporation?Within the parent, e.g., \bAT&T\b.]"
 "		[+company?Within the corporation, e.g., \bResearch\b.]"
 "		[+location?Company location.]"
 "		[+organization?Within the company, e.g., \bNetwork Services"
@@ -109,6 +109,7 @@ USAGE_LICENSE
 "		[+notice?\btype=special\b notice text with embedded newlines"
 "			or additional notice text listed by \btype=verbose\b.]"
 "		[+package?The generic software package name, e.g., \bast\b.]"
+"		[+parent?They own it all, e.g., \bAT&T\b.]"
 "		[+since?The year the software was first released.]"
 "		[+url?The URL of the detailed license text, e.g.,"
 "		\bhttp://www.research.att.com/sw/license/open-ast.html\b.]"
