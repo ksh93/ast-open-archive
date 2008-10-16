@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-09-24 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-10-16 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1341,7 +1341,7 @@ DAGGERFLAGS =
 .NOOPTIMIZE.c .CC.NOOPTIMIZE /* drop .CC.* in 2004 */ : .MAKE .LOCAL
 	CCFLAGS := $(.MAM.CC.FLAGS|CCFLAGS:VP:N!=-O*|$(CC.OPTIMIZE)|$\(CC.OPTIMIZE\))
 	if "$(-mam)"
-		CCFLAGS := ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}
+		CCFLAGS := ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} $(<:A=.NOPROTECT.c:+${mam_cc_NOPROTECT})
 	elif "$(-debug-symbols)"
 		CCFLAGS := $(CC.DEBUG) $(CCFLAGS:VP:N!=-g|$(CC.DEBUG)|$\(CC.DEBUG\))
 	end

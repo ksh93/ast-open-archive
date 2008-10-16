@@ -3820,6 +3820,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-10-16 Makerules.mk: fix :NOOPTIMIZE: to cooperate with :NOPROTECT:
 08-09-24 Makerules.mk: add --recurse=only
 08-09-10 Makerules.mk: add :NOPROTECT:, fix CC.DIALECT=VERSION shared lib bind
 08-08-08 state.c: do not use low res virtual st.st_mtime
@@ -5149,6 +5150,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-10-15 rm.rt: add to test rm -f x x
 08-02-14 look.c: fix operand parse / diagnostic bugs
 08-01-30 expr.tst: add substr * 1 * tests
 07-09-21 cksum.tst: drop sha1, add -r compatibility
@@ -7979,6 +7981,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-10-15 rm.c: handle 'rm -f x x' =&gt; exit 0
 08-09-08 stty.c: #ifdef guard TAB&#0091;012&#0093; -- freebsd: damn the posix, full speed ahead
 08-06-17 shcmd.h: move to libast
 08-04-24 uniq.c: add optget() 'n' option for -1 =&gt; -f1
@@ -9539,7 +9542,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>October 14, 2008</TD>
+<TD align=right>October 16, 2008</TD>
 </TR>
 </TABLE>
 <P>

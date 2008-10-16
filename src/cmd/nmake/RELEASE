@@ -1,3 +1,4 @@
+08-10-16 Makerules.mk: fix :NOOPTIMIZE: to cooperate with :NOPROTECT:
 08-09-24 Makerules.mk: add --recurse=only
 08-09-10 Makerules.mk: add :NOPROTECT:, fix CC.DIALECT=VERSION shared lib bind
 08-08-08 state.c: do not use low res virtual st.st_mtime

@@ -603,6 +603,17 @@ make paste.tst
 done paste.tst
 exec - regress  paste.tst
 done test.paste virtual
+make test.rm
+make rm.tst
+meta rm.tst %.rt>%.tst rm.rt rm
+make rm.rt
+done rm.rt
+exec - if	[[ "1" || "rm.rt" -nt "rm.tst" ]]
+exec - then	mktest --style=regress rm.rt > rm.tst
+exec - fi
+done rm.tst generated
+exec - regress  rm.tst
+done test.rm virtual
 make test.tail
 make tail.tst
 done tail.tst

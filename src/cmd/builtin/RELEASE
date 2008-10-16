@@ -1,3 +1,4 @@
+08-10-15 rm.rt: add to test rm -f x x
 08-02-14 look.c: fix operand parse / diagnostic bugs
 08-01-30 expr.tst: add substr * 1 * tests
 07-09-21 cksum.tst: drop sha1, add -r compatibility
