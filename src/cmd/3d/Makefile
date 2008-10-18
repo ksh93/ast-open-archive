@@ -94,6 +94,8 @@ NAME3D = lib_3d.h std_3d.h vcs_3d.h
 
 -ldll :lib:
 
+terminal FEATURE/eaccess FEATURE/hack
+
 3d :TEST: 3d.tst
 	$(BINDIR)/3d $(SHELL) $(REGRESS) $(REGRESSFLAGS) $(*)
 

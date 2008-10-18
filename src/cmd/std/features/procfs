@@ -288,8 +288,8 @@ tst	run{
 	#define PR_CTIME(p)	((p)->pr_time.tv_sec)
 	#define PR_START(p)	((p)->pr_start.tv_sec)
 !
-		else
-			if	test -d /proc/pinfo
+		elif	test -d /proc/pinfo -o -e /proc/$$
+		then	if	test -d /proc/pinfo
 			then	dir=/proc/pinfo
 			else	dir=/proc
 			fi

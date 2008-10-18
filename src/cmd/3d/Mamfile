@@ -326,13 +326,8 @@ make ../../lib/libast/comp/gross_sgi.h implicit
 make locale_attr.h implicit
 done locale_attr.h dontcare virtual
 done ../../lib/libast/comp/gross_sgi.h dontcare
-make FEATURE/hack implicit
-meta FEATURE/hack features/%>FEATURE/% ../../lib/libast/features/hack hack
-make ../../lib/libast/features/hack
-done ../../lib/libast/features/hack
-prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run ../../lib/libast/features/hack
-done FEATURE/hack generated
+make ../../lib/libast/FEATURE/hack implicit
+done ../../lib/libast/FEATURE/hack
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/gross.c
@@ -414,13 +409,8 @@ make ../../lib/libast/path/pathcat.c implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/path/pathcat.c dontcare
 make ../../lib/libast/comp/eaccess.c implicit
-make FEATURE/eaccess implicit
-meta FEATURE/eaccess features/%>FEATURE/% ../../lib/libast/features/eaccess eaccess
-make ../../lib/libast/features/eaccess
-done ../../lib/libast/features/eaccess
-prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run ../../lib/libast/features/eaccess
-done FEATURE/eaccess dontcare generated
+make ../../lib/libast/FEATURE/eaccess implicit
+done ../../lib/libast/FEATURE/eaccess dontcare
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/eaccess.c dontcare
@@ -507,7 +497,7 @@ prev 3d.h implicit
 done ast.c
 meta ast.o %.c>%.o ast.c ast
 prev ast.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -D_PACKAGE_ast -DFS -DDEBUG -D_BLD_3d -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -D_PACKAGE_ast -DFS -DDEBUG -D_BLD_3d -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
 done ast.o generated
 make cs.o
 make cs.c
