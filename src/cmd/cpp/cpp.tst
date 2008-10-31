@@ -4667,3 +4667,81 @@ unsigned int l = 1234L;
 unsigned int m = 1234L;'
 
 	EXEC -I-D -D:compatibility
+
+TEST 37 'a convoluted one from msvc 2008 express <sal.h> -- is all that maintained by hand?'
+
+	EXEC -I-D
+		INPUT - $'#define a(x) b(c(x))
+#define b(x) x
+#define c(x) =#x
+a(X)'
+		OUTPUT - $'# 1 ""
+
+
+
+="X"'
+
+TEST 38 'multiple include'
+
+	EXEC -I-D
+		INPUT - $'#pragma pp:map "/#pragma once/" ",#pragma once,#pragma pp:nomultiple,"
+int b;
+#include "m.h"
+#include "n.h"
+#include "o.h"
+#include "m.h"
+#include "n.h"
+#include "o.h"
+#include "m.h"
+int e;'
+		INPUT m.h $'extern int m;'
+		INPUT n.h $'#pragma pp:nomultiple
+int n;'
+		INPUT o.h $'#pragma once
+int o;'
+		OUTPUT - $'# 1 ""
+
+int b;
+# 1 "m.h"
+extern int m;
+# 4 ""
+
+# 1 "n.h"
+
+int n;
+# 5 ""
+
+# 1 "o.h"
+int o;
+# 6 ""
+
+# 1 "m.h"
+extern int m;
+# 7 ""
+
+# 1 "m.h"
+extern int m;
+# 10 ""
+int e;'
+
+	EXEC -I-D -D:noallmultiple
+		OUTPUT - $'# 1 ""
+
+int b;
+# 1 "m.h"
+extern int m;
+# 4 ""
+
+# 1 "n.h"
+
+int n;
+# 5 ""
+
+# 1 "o.h"
+int o;
+# 6 ""
+
+
+
+
+int e;'

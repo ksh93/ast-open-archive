@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1986-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1986-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1468,11 +1468,12 @@ ppcontrol(void)
 			{
 			case T_STRING:
 				s = error_info.file;
-				if (*(p = pp.token)) pathcanon(p, 0);
+				if (*(p = pp.token))
+					pathcanon(p, 0);
 				fp = ppsetfile(p);
 				error_info.file = fp->name;
 				if (error_info.line == 1)
-					ppmultiple(fp, INC_TEST);
+					ppmultiple(fp, INC_IGNORE);
 				switch (c = pplex())
 				{
 				case '\n':
@@ -1953,8 +1954,8 @@ ppcontrol(void)
 				break;
 			case X_MULTIPLE:
 				n = 1;
-				if (pp.in->type == IN_FILE)
-					ppmultiple(ppsetfile(error_info.file), i0 ? INC_CLEAR : INC_TEST);
+				if (pp.in->type == IN_FILE || pp.in->type == IN_RESCAN)
+					ppmultiple(ppsetfile(error_info.file), i0 ? INC_CLEAR : INC_IGNORE);
 				break;
 			case X_NATIVE:
 				setoption(NATIVE, i0);

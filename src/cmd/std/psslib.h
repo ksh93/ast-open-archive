@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -39,6 +39,7 @@
 	Dtdisc_t	ttybynamedisc;	/* tty by name disc		*/ \
 	Dtdisc_t	ttybydevdisc;	/* tty by dev disc		*/ \
 	void*		data;		/* private data			*/ \
+	int		hz;		/* current CLK_TCK		*/ \
 	int		ttyscan;	/* -1:bad 0:init 2:scanned	*/ \
 	char		buf[1024];	/* work and return value buffer	*/
 

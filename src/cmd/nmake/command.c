@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -857,6 +857,25 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 				return 0;
 		}
 	after:
+#if __GNUC__ == 3 && ( sparc || _sparc || __sparc ) && !_HUH_2008_10_25 /* gcc code generation bug -- first hit on solaris -- not sure if for all gcc 3.* */
+#ifndef __GNUC_MINOR__
+#define __GNUC_MINOR__ 0
+#endif
+#ifndef __GNUC_PATCHLEVEL__
+#define __GNUC_PATCHLEVEL__ 1
+#endif
+		if (!jobs.firstjob)
+		{
+			static int	warned = 0;
+
+			if (!warned)
+			{
+				warned = 1;
+				error(state.mam.regress || state.regress ? -1 : 1, "command.c:%d: gcc %d.%d.%d code generation bug workaround -- pass this on to the vendor", __LINE__, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+			}
+			return !clear;
+		}
+#endif
 		push(job);
 		n = makeafter(job->target, (job->flags & CO_ERRORS) ? P_failure : P_after);
 		pop(job);
@@ -1019,7 +1038,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 							if (!warned)
 							{
 								warned = 1;
-								error(state.mam.regress || state.regress ? -1 : 1, "gcc %d.%d.%d code generation bug workaround -- pass this on to the vendor", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+								error(state.mam.regress || state.regress ? -1 : 1, "command.c:%d: gcc %d.%d.%d code generation bug workaround -- pass this on to the vendor", __LINE__, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 							}
 							break;
 						}

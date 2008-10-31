@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1986-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1986-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -82,7 +82,7 @@ ppmultiple(register struct ppfile* fp, register struct ppsymbol* test)
 	{
 		if (status != INC_CLEAR)
 		{
-			if (status != INC_TEST && status->macro || !(pp.mode & ALLMULTIPLE) && !(pp.state & STRICT))
+			if (status == INC_TEST || status->macro)
 			{
 				if ((pp.mode & (ALLMULTIPLE|LOADING)) == LOADING)
 					fp->guard = INC_IGNORE;
@@ -96,6 +96,8 @@ ppmultiple(register struct ppfile* fp, register struct ppsymbol* test)
 		}
 		if ((pp.mode & (ALLMULTIPLE|LOADING)) == LOADING)
 			test = INC_IGNORE;
+		else
+			return 1;
 	}
 	fp->guard = test;
 	return 1;

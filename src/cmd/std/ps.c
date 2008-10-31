@@ -27,14 +27,14 @@
  * fall back to /bin/ps if no support -- and you better match their args!
  */
 
-#define FIELDS_default	"pid,tty,time,command"
-#define FIELDS_c	"pid,class,pri,tty,time,command"
-#define FIELDS_f	"user,pid,ppid,start,tty,time,args"
-#define FIELDS_j	"pid,pgrp,sid,tty,time,command"
-#define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
+#define FIELDS_default	"pid,tty,time,comm"
+#define FIELDS_c	"pid,class,pri,tty,time,comm"
+#define FIELDS_f	"user,pid,ppid,start,tty,time,cmd"
+#define FIELDS_j	"pid,pgrp,sid,tty,time,comm"
+#define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2008-01-31 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2008-10-28 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -50,7 +50,7 @@ USAGE_LICENSE
 "	Implied by \b--children\b, \b--parents\b, and \b--tree\b.]"
 "[c:class?Equivalent to \b--fields=" FIELDS_c "\b.]"
 "[C:children?Display the process tree hierarchy, including the children"
-"	of all selected processes, in the \bCOMMAND\b field list.]"
+"	of all selected processes, in the \bCMD\b field list.]"
 "[d:no-session?List all processes except session leaders.]"
 "[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
@@ -94,13 +94,13 @@ USAGE_LICENSE
 "	widths are listed under \b--format\b.]:[key[+width]][=label]]...]"
 "[p:pids?List processes in the \apid\a list.]:[pid...]"
 "[P:parents?Display the process tree hierarchy, including the parents"
-"	of all selected processes, in the \bCOMMAND\b field list.]"
+"	of all selected processes, in the \bCMD\b field list.]"
 "[r|R:recursive?Recursively list the children of all selected processes.]"
 "[s:sessions?List processes with session leaders in the \asid\a list.]:[sid...]"
 "[t:terminals|ttys?List processes with controlling terminals in the \atty\a"
 "	list.]:[tty...]"
 "[T:tree|forest?Display the process tree hierarchy, including the parents and"
-"	children of all selected processes, in the \bCOMMAND\b field list.]"
+"	children of all selected processes, in the \bCMD\b field list.]"
 "[u|U:users?List processes with real user id names or numbers in the \auser\a"
 "	list.]:[user...]"
 "[v:verbose?List verbose error messages for inaccessible processes.]"
@@ -135,9 +135,9 @@ USAGE_LICENSE
 #define KEY_alias		0
 
 #define KEY_addr		1
-#define KEY_args		2
-#define KEY_class		3
-#define KEY_command		4
+#define KEY_class		2
+#define KEY_cmd			3
+#define KEY_comm		4
 #define KEY_cpu			5
 #define KEY_etime		6
 #define KEY_flags		7
@@ -249,16 +249,6 @@ static Key_t	keys[] =
 		8
 	},
 	{
-		"args",
-		"COMMAND",
-		"Command path with arguments.",
-		PSS_args,
-		KEY_args,
-		-32, 0,
-		0,0,0,
-		KEY_command
-	},
-	{
 		"class",
 		"CLS",
 		"Scheduling class.",
@@ -267,14 +257,24 @@ static Key_t	keys[] =
 		3,
 	},
 	{
-		"command",
+		"cmd",
+		"CMD",
+		"Command path with arguments.",
+		PSS_args,
+		KEY_cmd,
+		-32, 0,
+		0,0,0,
+		KEY_comm
+	},
+	{
+		"comm",
 		"COMMAND",
 		"Command file base name.",
 		PSS_command,
-		KEY_command,
+		KEY_comm,
 		-16, 0,
 		0,0,0,
-		KEY_args
+		KEY_cmd
 	},
 	{
 		"cpu",
@@ -495,7 +495,8 @@ static Key_t	keys[] =
 
 	/* aliases after this point */
 
-	{ "comm",	0,	0,	0,	KEY_command		},
+	{ "args",	0,	0,	0,	KEY_cmd			},
+	{ "command",	0,	0,	0,	KEY_cmd			},
 	{ "f",		0,	0,	0,	KEY_flags		},
 	{ "jid",	0,	0,	0,	KEY_job			},
 	{ "ntpid",	0,	0,	0,	KEY_npid		},
@@ -647,10 +648,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				goto zombie;
 			s = pp->ps->sched;
 			break;
-		case KEY_args:
+		case KEY_cmd:
 			s = pp->ps->args;
 			goto branch;
-		case KEY_command:
+		case KEY_comm:
 			s = pp->ps->command;
 		branch:
 			if (!s)
@@ -851,10 +852,10 @@ ps(Ps_t* pp)
 				goto zombie;
 			s = pr->sched;
 			goto string;
-		case KEY_args:
+		case KEY_cmd:
 			s = pr->args;
 			goto branch;
-		case KEY_command:
+		case KEY_comm:
 			s = pr->command;
 		branch:
 			if (!s)
@@ -1142,7 +1143,7 @@ head(void)
 		kp = state.lastfield;
 		if (kp->width < 0)
 			kp->width = 0;
-		if (kp->index == KEY_args)
+		if (kp->index == KEY_cmd)
 			kp->prec = 80;
 		if (n && state.heading)
 		{

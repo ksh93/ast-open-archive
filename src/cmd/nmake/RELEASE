@@ -1,3 +1,5 @@
+08-10-24 Makerules.mk: fix install --link=* to handle directories
+08-10-24 command.c: work around another gcc code generation bug -- ouch
 08-10-16 Makerules.mk: fix :NOOPTIMIZE: to cooperate with :NOPROTECT:
 08-09-24 Makerules.mk: add --recurse=only
 08-09-10 Makerules.mk: add :NOPROTECT:, fix CC.DIALECT=VERSION shared lib bind

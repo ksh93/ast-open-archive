@@ -467,8 +467,8 @@ PSS_refcount refcount refs ref jobc
 PSS_rss rss
 PSS_size size vsize vsz
 PSS_wchan nwchan wchan
-PSS_command ucomm command comm
-PSS_args args command
+PSS_command comm ucomm command
+PSS_args cmd command args
 !
 	echo 0, 0
 fi

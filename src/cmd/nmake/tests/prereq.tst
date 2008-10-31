@@ -622,7 +622,9 @@ foo $(VERSION) :LIBRARY: foo.c'
 + then	mkdir -p lib 		    		   
 + fi
 + if	silent test \'\' != "libfoo.a"
-+ then	if	silent test -d "libfoo.a"
++ then	if	silent test \'\' != ""
++ 	then	: lib/libfoo.a linked to libfoo.a
++ 	elif	silent test -d "libfoo.a"
 + 	then	cp -pr libfoo.a lib
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
@@ -638,7 +640,9 @@ foo $(VERSION) :LIBRARY: foo.c'
 + then	mkdir -p lib/lib 		    		   
 + fi
 + if	silent test \'\' != "foo.req"
-+ then	if	silent test -d "foo.req"
++ then	if	silent test \'\' != ""
++ 	then	: lib/lib/foo linked to foo.req
++ 	elif	silent test -d "foo.req"
 + 	then	cp -pr foo.req lib/lib
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
@@ -675,7 +679,9 @@ foo $(VERSION) :LIBRARY: foo.c'
 + then	mkdir -p lib 		    		   
 + fi
 + if	silent test \'\' != "libfoo.a"
-+ then	if	silent test -d "libfoo.a"
++ then	if	silent test \'\' != ""
++ 	then	: lib/libfoo.a linked to libfoo.a
++ 	elif	silent test -d "libfoo.a"
 + 	then	cp -pr libfoo.a lib
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
@@ -691,7 +697,9 @@ foo $(VERSION) :LIBRARY: foo.c'
 + then	mkdir -p lib/lib 		    		   
 + fi
 + if	silent test \'\' != "foo.req"
-+ then	if	silent test -d "foo.req"
++ then	if	silent test \'\' != ""
++ 	then	: lib/lib/foo linked to foo.req
++ 	elif	silent test -d "foo.req"
 + 	then	cp -pr foo.req lib/lib
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
@@ -728,7 +736,9 @@ foo $(VERSION) :LIBRARY: foo.c'
 + then	mkdir -p lib 		    		   
 + fi
 + if	silent test \'\' != "libfoo.a"
-+ then	if	silent test -d "libfoo.a"
++ then	if	silent test \'\' != ""
++ 	then	: lib/libfoo.a linked to libfoo.a
++ 	elif	silent test -d "libfoo.a"
 + 	then	cp -pr libfoo.a lib
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
@@ -744,7 +754,9 @@ foo $(VERSION) :LIBRARY: foo.c'
 + then	mkdir -p lib/lib 		    		   
 + fi
 + if	silent test \'\' != "foo.req"
-+ then	if	silent test -d "foo.req"
++ then	if	silent test \'\' != ""
++ 	then	: lib/lib/foo linked to foo.req
++ 	elif	silent test -d "foo.req"
 + 	then	cp -pr foo.req lib/lib
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{

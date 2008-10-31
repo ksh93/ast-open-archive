@@ -161,7 +161,9 @@ TEST 07 ':INSTALLDIR:'
 + esac
 + silent test -w test -a -x test || chmod u+w,+x test
 + if	silent test \'\' != "test"
-+ then	if	silent test -d "test"
++ then	if	silent test \'\' != ""
++ 	then	: fun/test linked to test
++ 	elif	silent test -d "test"
 + 	then	cp -pr test fun
 + 	else	silent cmp -s test fun/test ||
 + 		{
@@ -518,7 +520,9 @@ ug gu :LINK: gg'
 + then	mkdir -p bin 		    		   
 + fi
 + if	silent test \'\' != "gg"
-+ then	if	silent test -d "gg"
++ then	if	silent test \'\' != ""
++ 	then	: bin/gg linked to gg
++ 	elif	silent test -d "gg"
 + 	then	cp -pr gg bin
 + 	else	silent cmp -s gg bin/gg ||
 + 		{
@@ -907,7 +911,9 @@ TEST 27 ':MAKE: + install + file name clash'
 + then	mkdir -p bin 		    		   
 + fi
 + if	silent test \'\' != "t.exe"
-+ then	if	silent test -d "t.exe"
++ then	if	silent test \'\' != ""
++ 	then	: bin/t.exe linked to t.exe
++ 	elif	silent test -d "t.exe"
 + 	then	cp -pr t.exe bin
 + 	else	silent cmp -s t.exe bin/t.exe ||
 + 		{
@@ -952,7 +958,9 @@ $$(BINDIR) :INSTALLDIR: mode=0644 $(FILES)'
 + then	mkdir -p bin 		    		   
 + fi
 + if	silent test \'\' != "a"
-+ then	if	silent test -d "a"
++ then	if	silent test \'\' != ""
++ 	then	: bin/a linked to a
++ 	elif	silent test -d "a"
 + 	then	cp -pr a bin
 + 	else	silent cmp -s a bin/a ||
 + 		{
@@ -1008,7 +1016,9 @@ t :: t.c .TBIN'
 + then	mkdir -p tbin 		    		   
 + fi
 + if	silent test \'\' != "t"
-+ then	if	silent test -d "t"
++ then	if	silent test \'\' != ""
++ 	then	: tbin/t linked to t
++ 	elif	silent test -d "t"
 + 	then	cp -pr t tbin
 + 	else	silent cmp -s t tbin/t ||
 + 		{
@@ -1032,7 +1042,9 @@ t :: t.c .TBIN'
 + then	mkdir -p tbin 		    		   
 + fi
 + if	silent test \'\' != "t.o"
-+ then	if	silent test -d "t.o"
++ then	if	silent test \'\' != ""
++ 	then	: tbin/t.o linked to t.o
++ 	elif	silent test -d "t.o"
 + 	then	cp -pr t.o tbin
 + 	else	silent cmp -s t.o tbin/t.o ||
 + 		{
@@ -1044,7 +1056,9 @@ t :: t.c .TBIN'
 + 	fi
 + fi
 + if	silent test \'\' != "t"
-+ then	if	silent test -d "t"
++ then	if	silent test \'\' != ""
++ 	then	: tbin/t linked to t
++ 	elif	silent test -d "t"
 + 	then	cp -pr t tbin
 + 	else	silent cmp -s t tbin/t ||
 + 		{

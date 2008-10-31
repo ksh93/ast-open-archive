@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-10-16 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-10-24 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1301,9 +1301,11 @@ DAGGERFLAGS =
 
 .DO.INSTALL : .USE $$(<:N=*$$(CC.SUFFIX.ARCHIVE):?.ARCOPY??)
 	if	$(SILENT) test '' != "$(*:O=1)"
-	then	if	$(SILENT) test -d "$(*:O=1)"
-		then	$(CPR) $(CPRFLAGS) $(*:O=1) $(<:D)
-		else	$(*:O=1:P=I=$(<):?: $(<) linked to $(*:O=1) ||?$$(-compare:+$$$(SILENT) $$$(CMP) $$$(CMPFLAGS) $$$(*:O=1) $$$(<) ||)?)
+	then	if	$(SILENT) test '' != "$(*:O=1:P=I=$(<))"
+		then	: $(<) linked to $(*:O=1)
+		elif	$(SILENT) test -d "$(*:O=1)"
+		then	$(-link:+$$(<:B:$$(<:A=.COMMAND:Y@@S@):N=$$(-link):+$$$(LN) $$$(_feature_:N=ln|ln-s:O=2:Y%-s $$$(*:O=1:D=$$$(<:D:P=R=$$$(*:O=1:D)):B:S)%$$$(*:O=1)%) $$$(<) || ))$(CPR) $(CPRFLAGS) $(*:O=1) $(<:D)
+		else	$(-compare:+$$(SILENT) $$(CMP) $$(CMPFLAGS) $$(*:O=1) $$(<) ||)
 			{
 			if	$(SILENT) test -f "$(<)"
 			then	$(.DO.INSTALL.OLD. $(<))

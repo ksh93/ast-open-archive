@@ -229,8 +229,10 @@ procfs_part(register Pss_t* pss, register Pssent_t* pe)
 					}
 				sfclose(fp);
 			}
+			if (!(pss->hz = (int)strtol(astconf("CLK_TCK", NiL, NiL), NiL, 0)))
+				pss->hz = PR_HZ;
 		}
-		pr->pr_start = pss->boot + pr->pr_start / PR_HZ;
+		pr->pr_start = pss->boot + pr->pr_start / pss->hz;
 #endif
 	}
 #else

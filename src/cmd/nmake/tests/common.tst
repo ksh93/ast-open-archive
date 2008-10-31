@@ -188,7 +188,9 @@ aha :LIBRARY: aha.c'
 + then	mkdir -p root/lib 		    		   
 + fi
 + if	silent test \'\' != "libtst.a"
-+ then	if	silent test -d "libtst.a"
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/libtst.a linked to libtst.a
++ 	elif	silent test -d "libtst.a"
 + 	then	cp -pr libtst.a root/lib
 + 	else	silent cmp -s libtst.a root/lib/libtst.a ||
 + 		{
@@ -204,7 +206,9 @@ aha :LIBRARY: aha.c'
 + then	mkdir -p root/lib/lib 		    		   
 + fi
 + if	silent test \'\' != "tst.req"
-+ then	if	silent test -d "tst.req"
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/lib/tst linked to tst.req
++ 	elif	silent test -d "tst.req"
 + 	then	cp -pr tst.req root/lib/lib
 + 	else	silent cmp -s tst.req root/lib/lib/tst ||
 + 		{
@@ -216,7 +220,9 @@ aha :LIBRARY: aha.c'
 + 	fi
 + fi
 + if	silent test \'\' != "libaha.a"
-+ then	if	silent test -d "libaha.a"
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/libaha.a linked to libaha.a
++ 	elif	silent test -d "libaha.a"
 + 	then	cp -pr libaha.a root/lib
 + 	else	silent cmp -s libaha.a root/lib/libaha.a ||
 + 		{
@@ -229,7 +235,9 @@ aha :LIBRARY: aha.c'
 + fi
 + ignore ranlib root/lib/libaha.a
 + if	silent test \'\' != "aha.req"
-+ then	if	silent test -d "aha.req"
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/lib/aha linked to aha.req
++ 	elif	silent test -d "aha.req"
 + 	then	cp -pr aha.req root/lib/lib
 + 	else	silent cmp -s aha.req root/lib/lib/aha ||
 + 		{
@@ -256,8 +264,10 @@ aha :LIBRARY: aha.c'
 + then	mkdir -p root/lib 		    		   
 + fi
 + if	silent test \'\' != "libtst.a"
-+ then	if	silent test -d "libtst.a"
-+ 	then	cp -pr libtst.a root/lib
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/libtst.a linked to libtst.a
++ 	elif	silent test -d "libtst.a"
++ 	then	ln -s ../../libtst.a root/lib/libtst.a || cp -pr libtst.a root/lib
 + 	else	silent cmp -s libtst.a root/lib/libtst.a ||
 + 		{
 + 		if	silent test -f "root/lib/libtst.a"
@@ -272,8 +282,10 @@ aha :LIBRARY: aha.c'
 + then	mkdir -p root/lib/lib 		    		   
 + fi
 + if	silent test \'\' != "tst.req"
-+ then	if	silent test -d "tst.req"
-+ 	then	cp -pr tst.req root/lib/lib
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/lib/tst linked to tst.req
++ 	elif	silent test -d "tst.req"
++ 	then	ln -s ../../../tst.req root/lib/lib/tst || cp -pr tst.req root/lib/lib
 + 	else	silent cmp -s tst.req root/lib/lib/tst ||
 + 		{
 + 		if	silent test -f "root/lib/lib/tst"
@@ -284,8 +296,10 @@ aha :LIBRARY: aha.c'
 + 	fi
 + fi
 + if	silent test \'\' != "libaha.a"
-+ then	if	silent test -d "libaha.a"
-+ 	then	cp -pr libaha.a root/lib
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/libaha.a linked to libaha.a
++ 	elif	silent test -d "libaha.a"
++ 	then	ln -s ../../libaha.a root/lib/libaha.a || cp -pr libaha.a root/lib
 + 	else	silent cmp -s libaha.a root/lib/libaha.a ||
 + 		{
 + 		if	silent test -f "root/lib/libaha.a"
@@ -297,8 +311,10 @@ aha :LIBRARY: aha.c'
 + fi
 + ignore ranlib root/lib/libaha.a
 + if	silent test \'\' != "aha.req"
-+ then	if	silent test -d "aha.req"
-+ 	then	cp -pr aha.req root/lib/lib
++ then	if	silent test \'\' != ""
++ 	then	: root/lib/lib/aha linked to aha.req
++ 	elif	silent test -d "aha.req"
++ 	then	ln -s ../../../aha.req root/lib/lib/aha || cp -pr aha.req root/lib/lib
 + 	else	silent cmp -s aha.req root/lib/lib/aha ||
 + 		{
 + 		if	silent test -f "root/lib/lib/aha"
@@ -472,7 +488,9 @@ t4 :LIBRARY: c.c'
 + then	mkdir -p ../bin 		    		   
 + fi
 + if	silent test \'\' != "t1"
-+ then	if	silent test -d "t1"
++ then	if	silent test \'\' != ""
++ 	then	: ../bin/t1 linked to t1
++ 	elif	silent test -d "t1"
 + 	then	cp -pr t1 ../bin
 + 	else	silent cmp -s t1 ../bin/t1 ||
 + 		{
@@ -484,7 +502,9 @@ t4 :LIBRARY: c.c'
 + 	fi
 + fi
 + if	silent test \'\' != "t2"
-+ then	if	silent test -d "t2"
++ then	if	silent test \'\' != ""
++ 	then	: ../bin/t2 linked to t2
++ 	elif	silent test -d "t2"
 + 	then	cp -pr t2 ../bin
 + 	else	silent cmp -s t2 ../bin/t2 ||
 + 		{
@@ -499,7 +519,9 @@ t4 :LIBRARY: c.c'
 + then	mkdir -p ../lib 		    		   
 + fi
 + if	silent test \'\' != "t3.a"
-+ then	if	silent test -d "t3.a"
++ then	if	silent test \'\' != ""
++ 	then	: ../lib/t3.a linked to t3.a
++ 	elif	silent test -d "t3.a"
 + 	then	cp -pr t3.a ../lib
 + 	else	silent cmp -s t3.a ../lib/t3.a ||
 + 		{
@@ -512,7 +534,9 @@ t4 :LIBRARY: c.c'
 + fi
 + ignore ranlib ../lib/t3.a
 + if	silent test \'\' != "libt4.a"
-+ then	if	silent test -d "libt4.a"
++ then	if	silent test \'\' != ""
++ 	then	: ../lib/libt4.a linked to libt4.a
++ 	elif	silent test -d "libt4.a"
 + 	then	cp -pr libt4.a ../lib
 + 	else	silent cmp -s libt4.a ../lib/libt4.a ||
 + 		{
@@ -528,7 +552,9 @@ t4 :LIBRARY: c.c'
 + then	mkdir -p ../lib/lib 		    		   
 + fi
 + if	silent test \'\' != "t4.req"
-+ then	if	silent test -d "t4.req"
++ then	if	silent test \'\' != ""
++ 	then	: ../lib/lib/t4 linked to t4.req
++ 	elif	silent test -d "t4.req"
 + 	then	cp -pr t4.req ../lib/lib
 + 	else	silent cmp -s t4.req ../lib/lib/t4 ||
 + 		{
@@ -696,7 +722,9 @@ t :LIBRARY: a.c'
 + then	mkdir -p include 		    		   
 + fi
 + if	silent test \'\' != "t.h"
-+ then	if	silent test -d "t.h"
++ then	if	silent test \'\' != ""
++ 	then	: include/t.h linked to t.h
++ 	elif	silent test -d "t.h"
 + 	then	cp -pr t.h include
 + 	else	silent cmp -s t.h include/t.h ||
 + 		{
@@ -711,7 +739,9 @@ t :LIBRARY: a.c'
 + then	mkdir -p bin 		    		   
 + fi
 + if	silent test \'\' != "t"
-+ then	if	silent test -d "t"
++ then	if	silent test \'\' != ""
++ 	then	: bin/t linked to t
++ 	elif	silent test -d "t"
 + 	then	cp -pr t bin
 + 	else	silent cmp -s t bin/t ||
 + 		{
@@ -723,7 +753,9 @@ t :LIBRARY: a.c'
 + 	fi
 + fi
 + if	silent test \'\' != "t2"
-+ then	if	silent test -d "t2"
++ then	if	silent test \'\' != ""
++ 	then	: bin/t2 linked to t2
++ 	elif	silent test -d "t2"
 + 	then	cp -pr t2 bin
 + 	else	silent cmp -s t2 bin/t2 ||
 + 		{
@@ -738,7 +770,9 @@ t :LIBRARY: a.c'
 + then	mkdir -p lib 		    		   
 + fi
 + if	silent test \'\' != "libt.a"
-+ then	if	silent test -d "libt.a"
++ then	if	silent test \'\' != ""
++ 	then	: lib/libt.a linked to libt.a
++ 	elif	silent test -d "libt.a"
 + 	then	cp -pr libt.a lib
 + 	else	silent cmp -s libt.a lib/libt.a ||
 + 		{
@@ -754,7 +788,9 @@ t :LIBRARY: a.c'
 + then	mkdir -p lib/lib 		    		   
 + fi
 + if	silent test \'\' != "t.req"
-+ then	if	silent test -d "t.req"
++ then	if	silent test \'\' != ""
++ 	then	: lib/lib/t linked to t.req
++ 	elif	silent test -d "t.req"
 + 	then	cp -pr t.req lib/lib
 + 	else	silent cmp -s t.req lib/lib/t ||
 + 		{
@@ -779,7 +815,9 @@ t :LIBRARY: a.c'
 + then	mkdir -p include 		    		   
 + fi
 + if	silent test \'\' != "t.h"
-+ then	if	silent test -d "t.h"
++ then	if	silent test \'\' != ""
++ 	then	: include/t.h linked to t.h
++ 	elif	silent test -d "t.h"
 + 	then	cp -pr t.h include
 + 	else	silent cmp -s t.h include/t.h ||
 + 		{
@@ -794,8 +832,10 @@ t :LIBRARY: a.c'
 + then	mkdir -p bin 		    		   
 + fi
 + if	silent test \'\' != "t"
-+ then	if	silent test -d "t"
-+ 	then	cp -pr t bin
++ then	if	silent test \'\' != ""
++ 	then	: bin/t linked to t
++ 	elif	silent test -d "t"
++ 	then	ln -s ../t bin/t || cp -pr t bin
 + 	else	silent cmp -s t bin/t ||
 + 		{
 + 		if	silent test -f "bin/t"
@@ -806,7 +846,9 @@ t :LIBRARY: a.c'
 + 	fi
 + fi
 + if	silent test \'\' != "t2"
-+ then	if	silent test -d "t2"
++ then	if	silent test \'\' != ""
++ 	then	: bin/t2 linked to t2
++ 	elif	silent test -d "t2"
 + 	then	cp -pr t2 bin
 + 	else	silent cmp -s t2 bin/t2 ||
 + 		{
@@ -821,7 +863,9 @@ t :LIBRARY: a.c'
 + then	mkdir -p lib 		    		   
 + fi
 + if	silent test \'\' != "libt.a"
-+ then	if	silent test -d "libt.a"
++ then	if	silent test \'\' != ""
++ 	then	: lib/libt.a linked to libt.a
++ 	elif	silent test -d "libt.a"
 + 	then	cp -pr libt.a lib
 + 	else	silent cmp -s libt.a lib/libt.a ||
 + 		{
@@ -837,8 +881,10 @@ t :LIBRARY: a.c'
 + then	mkdir -p lib/lib 		    		   
 + fi
 + if	silent test \'\' != "t.req"
-+ then	if	silent test -d "t.req"
-+ 	then	cp -pr t.req lib/lib
++ then	if	silent test \'\' != ""
++ 	then	: lib/lib/t linked to t.req
++ 	elif	silent test -d "t.req"
++ 	then	ln -s ../../t.req lib/lib/t || cp -pr t.req lib/lib
 + 	else	silent cmp -s t.req lib/lib/t ||
 + 		{
 + 		if	silent test -f "lib/lib/t"
@@ -921,7 +967,9 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + then	mkdir -p etc 		    		   
 + fi
 + if	silent test \'\' != "NSTMTC.fld"
-+ then	if	silent test -d "NSTMTC.fld"
++ then	if	silent test \'\' != ""
++ 	then	: etc/NSTMTC.fld linked to NSTMTC.fld
++ 	elif	silent test -d "NSTMTC.fld"
 + 	then	cp -pr NSTMTC.fld etc
 + 	else	silent cmp -s NSTMTC.fld etc/NSTMTC.fld ||
 + 		{
@@ -933,7 +981,9 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	fi
 + fi
 + if	silent test \'\' != "NSTMTC.fld"
-+ then	if	silent test -d "NSTMTC.fld"
++ then	if	silent test \'\' != ""
++ 	then	: etc/EIT5E.fld linked to NSTMTC.fld
++ 	elif	silent test -d "NSTMTC.fld"
 + 	then	cp -pr NSTMTC.fld etc
 + 	else	silent cmp -s NSTMTC.fld etc/EIT5E.fld ||
 + 		{
@@ -945,7 +995,9 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	fi
 + fi
 + if	silent test \'\' != "NSTMTC.fld"
-+ then	if	silent test -d "NSTMTC.fld"
++ then	if	silent test \'\' != ""
++ 	then	: etc/EIT4EP.fld linked to NSTMTC.fld
++ 	elif	silent test -d "NSTMTC.fld"
 + 	then	cp -pr NSTMTC.fld etc
 + 	else	silent cmp -s NSTMTC.fld etc/EIT4EP.fld ||
 + 		{
@@ -957,7 +1009,9 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	fi
 + fi
 + if	silent test \'\' != "NSTMTC.fld"
-+ then	if	silent test -d "NSTMTC.fld"
++ then	if	silent test \'\' != ""
++ 	then	: etc/NSTUI.fld linked to NSTMTC.fld
++ 	elif	silent test -d "NSTMTC.fld"
 + 	then	cp -pr NSTMTC.fld etc
 + 	else	silent cmp -s NSTMTC.fld etc/NSTUI.fld ||
 + 		{
@@ -980,7 +1034,9 @@ TEST 19 'synthesized rule name clashes'
 + fi
 + : > file
 + if	silent test \'\' != "file"
-+ then	if	silent test -d "file"
++ then	if	silent test \'\' != ""
++ 	then	: ../../install/file linked to file
++ 	elif	silent test -d "file"
 + 	then	cp -pr file ../../install
 + 	else	silent cmp -s file ../../install/file ||
 + 		{

@@ -224,7 +224,7 @@ ps_part(register Pss_t* pss, register Pssent_t* pe)
 				break;
 			case PSS_args:
 				pe->args = e = s;
-				break;
+				return 1;
 			case PSS_sched:
 				pe->sched = e = s;
 				break;

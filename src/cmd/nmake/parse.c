@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2007 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1905,6 +1905,160 @@ static const Namval_t	nametypes[] =
 	"variable",	NAME_variable,
 };
 
+#if DEBUG
+
+static void
+fds(int details)
+{
+	char*		m;
+	char*		s;
+	char*		x;
+	int		i;
+	int		flags;
+	int		open_max;
+	struct stat	st;
+
+	if ((open_max = (int)strtol(astconf("OPEN_MAX", NiL, NiL), NiL, 0)) <= 0)
+		open_max = OPEN_MAX;
+	for (i = 0; i <= open_max; i++)
+	{
+		if (fstat(i, &st))
+		{
+			/* not open */
+			continue;
+		}
+		if (!details)
+		{
+			sfprintf(sfstdout, "%d\n", i);
+			continue;
+		}
+		if ((flags = fcntl(i, F_GETFL, (char*)0)) == -1)
+			m = "--";
+		else
+			switch (flags & (O_RDONLY|O_WRONLY|O_RDWR))
+			{
+			case O_RDONLY:
+				m = "r-";
+				break;
+			case O_WRONLY:
+				m = "-w";
+				break;
+			case O_RDWR:
+				m = "rw";
+				break;
+			default:
+				m = "??";
+				break;
+			}
+		x = (fcntl(i, F_GETFD, (char*)0) > 0) ? "x" : "-";
+		if (isatty(i) && (s = ttyname(i)))
+		{
+			sfprintf(sfstdout, "%02d %s%s %s %s\n", i, m, x, fmtmode(st.st_mode, 0), s);
+			continue;
+		}
+#if defined(S_IFSOCK) && 0
+		addrlen = sizeof(addr);
+		memset(&addr, 0, addrlen);
+		if (!getsockname(i, (struct sockaddr*)&addr, (void*)&addrlen))
+		{
+			type = 0;
+			prot = 0;
+#ifdef SO_TYPE
+			len = sizeof(type);
+			if (getsockopt(i, SOL_SOCKET, SO_TYPE, (void*)&type, (void*)&len))
+				type = -1;
+#endif
+#ifdef SO_PROTOTYPE
+			len = sizeof(prot);
+			if (getsockopt(i, SOL_SOCKET, SO_PROTOTYPE, (void*)&prot, (void*)&len))
+				prot = -1;
+#endif
+			if (!st.st_mode)
+				st.st_mode = S_IFSOCK|S_IRUSR|S_IWUSR;
+			s = 0;
+			switch (type)
+			{
+			case SOCK_DGRAM:
+				switch (addr.sin_family)
+				{
+				case AF_INET:
+#ifdef AF_INET6
+				case AF_INET6:
+#endif
+					s = "udp";
+					break;
+				}
+				break;
+			case SOCK_STREAM:
+				switch (addr.sin_family)
+				{
+				case AF_INET:
+#ifdef AF_INET6
+				case AF_INET6:
+#endif
+#ifdef IPPROTO_SCTP
+					if (prot == IPPROTO_SCTP)
+						s = "sctp";
+					else
+#endif
+						s = "tcp";
+					break;
+				}
+				break;
+#ifdef SOCK_RAW
+			case SOCK_RAW:
+				s = "raw";
+				break;
+#endif
+#ifdef SOCK_RDM
+			case SOCK_RDM:
+				s = "rdm";
+				break;
+#endif
+#ifdef SOCK_SEQPACKET
+			case SOCK_SEQPACKET:
+				s = "seqpacket";
+				break;
+#endif
+			}
+			if (!s)
+			{
+				for (type = 0; family[type].name && family[type].value != addr.sin_family; type++);
+				if (!(s = (char*)family[type].name))
+					sfsprintf(s = num, sizeof(num), "family.%d", addr.sin_family);
+			}
+			port = 0;
+#ifdef INET6_ADDRSTRLEN
+			if (a = (char*)inet_ntop(addr.sin_family, &addr.sin_addr, nam, sizeof(nam)))
+				port = ntohs(addr.sin_port);
+			else
+#endif
+			if (addr.sin_family == AF_INET)
+			{
+				a = inet_ntoa(addr.sin_addr);
+				port = ntohs(addr.sin_port);
+			}
+			else
+			{
+				a = fam;
+				e = (b = (unsigned char*)&addr) + addrlen;
+				while (b < e && a < &fam[sizeof(fam)-1])
+					a += sfsprintf(a, &fam[sizeof(fam)] - a - 1, ".%d", *b++);
+				a = a == fam ? "0" : fam + 1;
+			}
+			if (port)
+				sfprintf(sfstdout, "%02d %s%s %s /dev/%s/%s/%d\n", i, m, x, fmtmode(st.st_mode, 0), s, a, port);
+			else
+				sfprintf(sfstdout, "%02d %s%s %s /dev/%s/%s\n", i, m, x, fmtmode(st.st_mode, 0), s, a);
+			continue;
+		}
+#endif
+		sfprintf(sfstdout, "%02d %s%s %s /dev/inode/%u/%u\n", i, m, x, fmtmode(st.st_mode, 0), st.st_dev, st.st_ino);
+	}
+}
+
+#endif
+
 /*
  * parse a basic assertion statement
  */
@@ -1975,6 +2129,15 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 			{
 				c = 0;
 				hashdump(NiL, HASH_BUCKET);
+			}
+			else if (streq(s, "fds"))
+			{
+#if DEBUG
+				fds(1);
+				c = 0;
+#else
+				error(2, "%s: implemented in DEBUG==1 version", s);
+#endif
 			}
 			else if (streq(s, "hash"))
 			{
