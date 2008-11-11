@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1990-2005 AT&T Corp.                  #
+#          Copyright (c) 1990-2008 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -32,7 +32,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2004-09-28 $
+@(#)$Id: sear (AT&T Labs Research) 2008-11-15 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -159,7 +159,7 @@ cc="$cc $dyn"
 tmp=/tmp/sear$$
 obj=${src##*/}
 obj=${obj%.*}.o
-trap 'rm -f $obj $tmp.*' 0 1 2 3
+trap 'rm -f "$obj" $tmp.*' 0 1 2 3
 res=$tmp.res
 typeset -H host_ico=$ico host_rc=$tmp.rc host_res=$tmp.res
 print -r "sear ICON \"${host_ico//\\/\\\\}\"" > $tmp.rc
@@ -168,12 +168,22 @@ then	exit 1
 fi
 export nativepp=-1
 if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
-	! $cc -o "$out" "$obj" "$res"
+	! ${cc/-Bstatic/} --mt-output="$out.manifest" --mt-name="${out%.*}" --mt-administrator -o "$out" "$obj" "$res"
 then	exit 1
+fi
+if	[[ -f "$out.manifest" ]]
+then	ed - "$out.manifest" <<-'!'
+	/<dependency>/,/<\/dependency>/d
+	w
+	q
+	!
+	if	! $cc --mt-input="$out.manifest" -o "$out" "$obj" "$res"
+	then	exit 1
+	fi
 fi
 size=$(wc -c < "$out")
 if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
-	! $cc -o "$out" "$obj" "$res"
+	! $cc --mt-input="$out.manifest" --mt-delete -o "$out" "$obj" "$res"
 then	exit 1
 fi
 pax -x tgz -w "$@" >> "$out"

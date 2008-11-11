@@ -69,4 +69,4 @@
  * mailx version stamp
  */
 
-#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2008-02-12 $\n"
+#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2008-11-04 $\n"

@@ -1,3 +1,4 @@
+08-11-15 sear.sh: add manifest logic
 06-12-04 proto.c: add utime() prototype
 06-06-28 proto.tst: add more externalize tests
 06-05-09 proto.c: add --externalize, -x

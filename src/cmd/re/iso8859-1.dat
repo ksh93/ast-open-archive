@@ -1,6 +1,66 @@
-: regex iso8859-1 tests 2008-05-14
+: regex iso8859-1 tests 2008-11-04
 
 {C	es_ES.ISO-8859-1
+
+SK	[![.-.]]		A		(0,1)
+SK	[![.-.]]		Z		(0,1)
+SK	[![.-.]]		.		(0,1)
+SK	[![.-.]]		-		NOMATCH
+
+SK	[![.-.][:upper:]]	A		NOMATCH
+SK	[![.-.][:upper:]]	Z		NOMATCH
+SK	[![.-.][:upper:]]	.		(0,1)
+SK	[![.-.][:upper:]]	-		NOMATCH
+
+SK	[![.-.]A-Z]		A		NOMATCH
+SK	[![.-.]A-Z]		Z		NOMATCH
+SK	[![.-.]A-Z]		.		(0,1)
+SK	[![.-.]A-Z]		-		NOMATCH
+
+SK	[!-]			A		(0,1)
+SK	[!-]			Z		(0,1)
+SK	[!-]			.		(0,1)
+SK	[!-]			-		NOMATCH
+
+SK	[!-[:upper:]]		A		NOMATCH
+SK	[!-[:upper:]]		Z		NOMATCH
+SK	[!-[:upper:]]		.		(0,1)
+SK	[!-[:upper:]]		-		NOMATCH
+
+SK	[!-A-Z]			A		NOMATCH
+SK	[!-A-Z]			Z		NOMATCH
+SK	[!-A-Z]			.		(0,1)
+SK	[!-A-Z]			-		NOMATCH
+
+BESK	[^[.-.]]		A		(0,1)
+BESK	[^[.-.]]		Z		(0,1)
+BESK	[^[.-.]]		.		(0,1)
+BESK	[^[.-.]]		-		NOMATCH
+
+BESK	[^[.-.][:upper:]]	A		NOMATCH
+BESK	[^[.-.][:upper:]]	Z		NOMATCH
+BESK	[^[.-.][:upper:]]	.		(0,1)
+BESK	[^[.-.][:upper:]]	-		NOMATCH
+
+BESK	[^[.-.]A-Z]		A		NOMATCH
+BESK	[^[.-.]A-Z]		Z		NOMATCH
+BESK	[^[.-.]A-Z]		.		(0,1)
+BESK	[^[.-.]A-Z]		-		NOMATCH
+
+BESK	[^-]			A		(0,1)
+BESK	[^-]			Z		(0,1)
+BESK	[^-]			.		(0,1)
+BESK	[^-]			-		NOMATCH
+
+BESK	[^-[:upper:]]		A		NOMATCH
+BESK	[^-[:upper:]]		Z		NOMATCH
+BESK	[^-[:upper:]]		.		(0,1)
+BESK	[^-[:upper:]]		-		NOMATCH
+
+BESK	[^-A-Z]			A		NOMATCH
+BESK	[^-A-Z]			Z		NOMATCH
+BESK	[^-A-Z]			.		(0,1)
+BESK	[^-A-Z]			-		NOMATCH
 
 {S$	[[:lower:]]	\xE0		(0,1)	locale does not support ISO-8859-1 8 bit chars
 

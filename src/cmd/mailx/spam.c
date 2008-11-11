@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2008 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -197,7 +197,7 @@ addrmatch(const char* a, const char* b)
 				note(0, "spam: addr check `%s'  `%s'", ap, bp);
 			if (host = *bp == '@' && (tp = strchr(ap, '@')))
 				ap = tp + 1;
-				bp++;
+			bp++;
 			for (;;)
 			{
 				if (!strcasecmp(ap, bp))
@@ -370,6 +370,8 @@ usermatch(const char* a, const char* b, int to)
 	register char*	be;
 	register char*	td;
 
+	if (!*a || !*b)
+		return 0;
 	ap = (char*)a;
 	while (*ap)
 	{

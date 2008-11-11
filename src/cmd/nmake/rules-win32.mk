@@ -26,7 +26,7 @@ SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 %.res : %.rc (RC) (RCFLAGS)
 	$(CPP) $(.INCLUDE. rc:/^/-I/) $(>) > $(%).ri
 	$(RC) $(RCFLAGS) -I$(>:D:P=N) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(%).ri >/dev/null 2>&1 ||
-	$(RC) $(RCFLAGS) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(>)
+	$(RC) $(RCFLAGS) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(>:P=N)
 	$(RM) $(RMFLAGS) $(%).ri
 
 %.def : %.sym

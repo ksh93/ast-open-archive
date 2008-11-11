@@ -1145,7 +1145,6 @@ main(int argc, char** argv)
 	int		nsub;
 	int		i;
 	int		j;
-	int		k;
 	int		expected;
 	int		got;
 	int		locale;

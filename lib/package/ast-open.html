@@ -1046,6 +1046,19 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-11  --- Release ksh93t+  ---
+08-11-11  A bug in which a field that was unset in a type definition and later
+	  set for an instance could appear twice when displaying the variable
+	  has been fixed.
+08-11-11  A bug in which running a simple command &amp; inside a function would
+	  not return the correct process id has been fixed.
+08=11-10  A bug in which the exit status of a command could be lost if the pid
+	  was that of the most recent command substitution that had completed
+	  has been fixed.
+08-11-10  The maximum depth for subshells has been increased from 256 to 65536.
+08-11-06  A bug which could cause a core dump when the _ reference variable was
+          used as an embedded type with a compound assignment has been fixed.
+
 08-10-31  --- Release ksh93t  ---
 08-10-31  Variable scoping/initialization bugs that could dump core were fixed.
 08-10-24  The lexer now accepts all RE characters for patterns prefixed
@@ -3350,6 +3363,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-15 sear.sh: add manifest logic
 06-12-04 proto.c: add utime() prototype
 06-06-28 proto.tst: add more externalize tests
 06-05-09 proto.c: add --externalize, -x
@@ -3826,6 +3840,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-11 rules-win32.mk: rc requires native path to .rc file
 08-10-24 Makerules.mk: fix install --link=* to handle directories
 08-10-24 command.c: work around another gcc code generation bug -- ouch
 08-10-16 Makerules.mk: fix :NOOPTIMIZE: to cooperate with :NOPROTECT:
@@ -5330,6 +5345,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-13 bgp-mrt.c: handle undocumented BGP4MP &lt;16,20&gt; records
+08-11-12 bgp-mrt.c: forgot to set rp-&gt;afi!
 08-08-28 bgp-mrt.c: add afi=1/safi=128 nlri
 08-08-28 bgp.c: add { afi label rd_admin rd_number rd_type }
 08-08-11 bgp.c,bgp-mrt.c: add extended community support
@@ -5575,6 +5592,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mailx changes">mailx changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-04 spam.c: fix 0-terminated overrun in usermatch() -- wow
 08-02-12 local.c: favor fcntl() lock over flock() for N(otan)FS
 08-01-15 cmd3.c: add `if f?path' so old Mail doesn't carp
 07-02-06 cmd2.c: "S name" =&gt; .../From/name
@@ -5792,6 +5810,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-04 iso8859-1.dat: add &#0091;!-...&#0093; and &#0091;^-...&#0093; locale tests
 08-09-04 nested.dat,noop.dat: nested match beyond end of subject fix
 08-07-29 testglob.c: add workspace symlinks
 08-07-29 testglob.dat: add ** symlink =&gt; dir tests
@@ -6452,6 +6471,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-04 regex/regcomp.c: fix locale &#0091;!-...&#0093; and &#0091;^-...&#0093; re-initialization
+08-11-04 stdio: add flockfile.c ftrylockfile.c funlockfile.c
 08-10-24 port/astconf.c: handle multiple/trailing '/' in universe initialization
 08-09-10 misc/magic.c: handle old vcodex() indices
 08-09-10 sfio/sfvprintf.c: drop SF_WCWIDTH, use %Lc or %Ls instead
@@ -7991,6 +8012,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+08-11-10 stty.c: check for -t grouping so -tostop != -t -ostop
 08-10-15 rm.c: handle 'rm -f x x' =&gt; exit 0
 08-09-08 stty.c: #ifdef guard TAB&#0091;012&#0093; -- freebsd: damn the posix, full speed ahead
 08-06-17 shcmd.h: move to libast
@@ -9555,7 +9577,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>October 31, 2008</TD>
+<TD align=right>November 15, 2008</TD>
 </TR>
 </TABLE>
 <P>
