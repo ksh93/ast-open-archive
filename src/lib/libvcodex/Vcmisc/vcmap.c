@@ -270,8 +270,9 @@ Void_t**	out;
 		if(disc && disc->data)
 			map = disc->data;
 
-	if((vc->flags&VC_DECODE) && vcrecode(vc, &dt, &sz, 0) <= 0)
-		return -1;
+	if(vc->flags&VC_DECODE)
+		if(vcrecode(vc, &dt, &sz, 0, 0) < 0)
+			return -1;
 
 	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
 		return -1;
@@ -286,7 +287,7 @@ Void_t**	out;
 
 	if(vc->flags&VC_ENCODE)
 	{	dt = output;
-		if(vcrecode(vc, &output, &sz, 0) <= 0 )
+		if(vcrecode(vc, &output, &sz, 0, 0) < 0 )
 			return -1;
 		if(dt != output)
 			vcbuffer(vc, dt, -1, -1);

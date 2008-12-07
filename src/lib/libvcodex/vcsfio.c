@@ -686,7 +686,7 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 				   (pos = (Sfoff_t)vciogetu(&io)) < 0 ||
 				   !(wm = vcwapply(sfdc->vcw, TYPECAST(Void_t*, ctrl), d, pos)) )
 				{	VCSFERROR(sfdc, "Error in obtaining source window data while decoding");
-					DEBUG_BREAK;
+					BREAK;
 				}
 				sfdc->vcdc.data = wm->wdata;
 				sfdc->vcdc.size = wm->wsize;
@@ -699,7 +699,7 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 			}
 			else if(ctrl != 0 && ctrl != VC_RAW)
 			{	VCSFERROR(sfdc, "Data stream appeared to be corrupted");
-				DEBUG_BREAK;
+				BREAK;
 			}
 
 			if(sfdc->vcw)
@@ -708,7 +708,7 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 			/* size of coded data */
 			if((d = vciogetu(&io)) <= 0)
 			{	VCSFERROR(sfdc, "Error in getting size of coded data");
-				DEBUG_BREAK;
+				BREAK;
 			}
 
 			/* make sure all the data is available */
@@ -733,7 +733,7 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 			{	vcbuffer(sfdc->vc, NIL(Vcchar_t*), -1, -1);
 				if((m = vcapply(sfdc->vc, sfdc->code, d, &text)) <= 0)
 				{	VCSFERROR(sfdc, "Failure in decoding data");
-					DEBUG_BREAK;
+					BREAK;
 				}
 			}
 
@@ -765,10 +765,6 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 
 	if(!(sfdc->flags & VC_ENCODE) )
 		return VCSFERROR(sfdc, "Handle was not created to encode data");
-
-#ifdef DEBUG
-	vctellbuf(sfdc->vc, 0); /* print buffers in use */
-#endif
 
 	for(sz = 0, dt = (Vcchar_t*)buf; sz < n; sz += w, dt += w)
 	{	if(buf == (Void_t*)sfdc->data)

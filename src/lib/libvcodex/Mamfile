@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-10-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-12-08
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -48,7 +48,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in vcodex graph dll ast
+exec - for i in vcodex vgraph dll ast
 exec - do	case $i in
 exec - 	"vcodex"|vcodex)
 exec - 		;;
@@ -144,139 +144,70 @@ done io.h dontcare virtual
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make vcodex.h implicit
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
+make vcsfio.h implicit
+prev vcodex.h implicit
+done vcsfio.h dontcare
+make Vcwindow/vcwindow.h implicit
+done Vcwindow/vcwindow.h dontcare
+make vcmethods.h implicit
+prev vcopen.c
+make vcclose.c
+prev vchdr.h implicit
+done vcclose.c
+make vcio.c
+make Vchuff/vchuff.h implicit
+done Vchuff/vchuff.h
+prev vchdr.h implicit
+done vcio.c
+make vcdisc.c
+prev vchdr.h implicit
+done vcdisc.c
+make vcextract.c
+prev vchdr.h implicit
+done vcextract.c
+make vcrecode.c
+prev vchdr.h implicit
+done vcrecode.c
+make vccontext.c
+prev vchdr.h implicit
+done vccontext.c
+make vclog.c
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done vcodex.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done vchdr.h
-done vcopen.c
-meta vcopen.o %.c>%.o vcopen.c vcopen
-prev vcopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcopen.c
-done vcopen.o generated
-make vcclose.o
-make vcclose.c
-prev vchdr.h implicit
-done vcclose.c
-meta vcclose.o %.c>%.o vcclose.c vcclose
-prev vcclose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcclose.c
-done vcclose.o generated
-make vcio.o
-make vcio.c
-prev vchdr.h implicit
-done vcio.c
-meta vcio.o %.c>%.o vcio.c vcio
-prev vcio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcio.c
-done vcio.o generated
-make vcdisc.o
-make vcdisc.c
-prev vchdr.h implicit
-done vcdisc.c
-meta vcdisc.o %.c>%.o vcdisc.c vcdisc
-prev vcdisc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcdisc.c
-done vcdisc.o generated
-make vcextract.o
-make vcextract.c
-prev vchdr.h implicit
-done vcextract.c
-meta vcextract.o %.c>%.o vcextract.c vcextract
-prev vcextract.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcextract.c
-done vcextract.o generated
-make vcrecode.o
-make vcrecode.c
-prev vchdr.h implicit
-done vcrecode.c
-meta vcrecode.o %.c>%.o vcrecode.c vcrecode
-prev vcrecode.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcrecode.c
-done vcrecode.o generated
-make vccontext.o
-make vccontext.c
-prev vchdr.h implicit
-done vccontext.c
-meta vccontext.o %.c>%.o vccontext.c vccontext
-prev vccontext.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vccontext.c
-done vccontext.o generated
-make vclog.o
-make vclog.c
-prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
-prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev vchdr.h implicit
 done vclog.c
-meta vclog.o %.c>%.o vclog.c vclog
-prev vclog.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vclog.c
-done vclog.o generated
-make vcsfxsort.o
 make vcsfxsort.c
-make ${PACKAGE_ast_INCLUDE}/graph.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-done ${PACKAGE_ast_INCLUDE}/graph.h
+make ${PACKAGE_ast_INCLUDE}/vgraph.h implicit
+make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
+done ${PACKAGE_ast_INCLUDE}/vgraph.h
 prev vchdr.h implicit
 done vcsfxsort.c
-meta vcsfxsort.o %.c>%.o vcsfxsort.c vcsfxsort
-prev vcsfxsort.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcsfxsort.c
-done vcsfxsort.o generated
-make vcperiod.o
 make vcperiod.c
 prev vchdr.h implicit
 done vcperiod.c
-meta vcperiod.o %.c>%.o vcperiod.c vcperiod
-prev vcperiod.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcperiod.c
-done vcperiod.o generated
-make vclzparse.o
 make vclzparse.c
 prev vchdr.h implicit
 done vclzparse.c
-meta vclzparse.o %.c>%.o vclzparse.c vclzparse
-prev vclzparse.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vclzparse.c
-done vclzparse.o generated
-make vcbuffer.o
 make vcbuffer.c
 prev vchdr.h implicit
 done vcbuffer.c
-meta vcbuffer.o %.c>%.o vcbuffer.c vcbuffer
-prev vcbuffer.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcbuffer.c
-done vcbuffer.o generated
-make vcbcktsort.o
 make vcbcktsort.c
 prev vchdr.h implicit
 done vcbcktsort.c
-meta vcbcktsort.o %.c>%.o vcbcktsort.c vcbcktsort
-prev vcbcktsort.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcbcktsort.c
-done vcbcktsort.o generated
-make vcqsort.o
 make vcqsort.c
 prev vchdr.h implicit
 done vcqsort.c
-meta vcqsort.o %.c>%.o vcqsort.c vcqsort
-prev vcqsort.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcqsort.c
-done vcqsort.o generated
-make vcmethod.o
 make vcmethod.c
+prev vcmethods.h implicit
 make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
@@ -287,62 +218,13 @@ make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h dontcare
 prev vchdr.h implicit
 done vcmethod.c
-meta vcmethod.o %.c>%.o vcmethod.c vcmethod
-prev vcmethod.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcmethod.c
-done vcmethod.o generated
-make vcsfio.o
 make vcsfio.c
 prev vchdr.h implicit
 done vcsfio.c
-meta vcsfio.o %.c>%.o vcsfio.c vcsfio
-prev vcsfio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcsfio.c
-done vcsfio.o generated
-make vcalias.o
 make vcalias.c
 prev vchdr.h implicit
 done vcalias.c
-meta vcalias.o %.c>%.o vcalias.c vcalias
-prev vcalias.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcalias.c
-done vcalias.o generated
-make vcdcache.o
-make Vcdelta/vcdcache.c
-make Vcdelta/vcdhdr.h implicit
-prev vchdr.h implicit
-done Vcdelta/vcdhdr.h
-done Vcdelta/vcdcache.c
-meta vcdcache.o %.c>%.o Vcdelta/vcdcache.c vcdcache
-prev Vcdelta/vcdcache.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcdelta/vcdcache.c
-done vcdcache.o generated
-make vcdelta.o
-make Vcdelta/vcdelta.c
-prev Vcdelta/vcdhdr.h implicit
-done Vcdelta/vcdelta.c
-meta vcdelta.o %.c>%.o Vcdelta/vcdelta.c vcdelta
-prev Vcdelta/vcdelta.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcdelta/vcdelta.c
-done vcdelta.o generated
-make vcdtable.o
-make Vcdelta/vcdtable.c
-prev Vcdelta/vcdhdr.h implicit
-done Vcdelta/vcdtable.c
-meta vcdtable.o %.c>%.o Vcdelta/vcdtable.c vcdtable
-prev Vcdelta/vcdtable.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcdelta/vcdtable.c
-done vcdtable.o generated
-make vcdtblinit.o
-make Vcdelta/vcdtblinit.c
-prev Vcdelta/vcdhdr.h implicit
-done Vcdelta/vcdtblinit.c
-meta vcdtblinit.o %.c>%.o Vcdelta/vcdtblinit.c vcdtblinit
-prev Vcdelta/vcdtblinit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcdelta/vcdtblinit.c
-done vcdtblinit.o generated
-make vchamming.o
-make Vcdelta/vchamming.c
+make Vcmisc/vctranspose.c
 make vclib.h implicit
 prev vchdr.h
 exec - sed -e 's/HDR/LIB/g' vchdr.h > vclib.h
@@ -352,218 +234,382 @@ prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev vcodex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vclib.h generated
+done Vcmisc/vctranspose.c
+make Vcdelta/vcdcache.c
+make Vcdelta/vcdhdr.h implicit
+make Vcdelta/vcdelta.h implicit
+done Vcdelta/vcdelta.h dontcare
+prev vchdr.h implicit
+done Vcdelta/vcdhdr.h
+done Vcdelta/vcdcache.c
+make Vcdelta/vcdelta.c
+prev Vcdelta/vcdhdr.h implicit
+done Vcdelta/vcdelta.c
+make Vcdelta/vcdtable.c
+prev Vcdelta/vcdhdr.h implicit
+done Vcdelta/vcdtable.c
+make Vcdelta/vcdtblinit.c
+prev Vcdelta/vcdhdr.h implicit
+done Vcdelta/vcdtblinit.c
+make Vcdelta/vchamming.c
+prev Vcdelta/vcdhdr.h implicit
 done Vcdelta/vchamming.c
-meta vchamming.o %.c>%.o Vcdelta/vchamming.c vchamming
-prev Vcdelta/vchamming.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcdelta/vchamming.c
-done vchamming.o generated
-make vchbits.o
 make Vchuff/vchbits.c
 make Vchuff/vchhdr.h implicit
+prev Vchuff/vchuff.h implicit
 prev vchdr.h implicit
 done Vchuff/vchhdr.h
 done Vchuff/vchbits.c
-meta vchbits.o %.c>%.o Vchuff/vchbits.c vchbits
-prev Vchuff/vchbits.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vchuff/vchbits.c
-done vchbits.o generated
-make vchcode.o
 make Vchuff/vchcode.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchcode.c
-meta vchcode.o %.c>%.o Vchuff/vchcode.c vchcode
-prev Vchuff/vchcode.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vchuff/vchcode.c
-done vchcode.o generated
-make vchsize.o
 make Vchuff/vchsize.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchsize.c
-meta vchsize.o %.c>%.o Vchuff/vchsize.c vchsize
-prev Vchuff/vchsize.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vchuff/vchsize.c
-done vchsize.o generated
-make vchtrie.o
 make Vchuff/vchtrie.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchtrie.c
-meta vchtrie.o %.c>%.o Vchuff/vchtrie.c vchtrie
-prev Vchuff/vchtrie.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vchuff/vchtrie.c
-done vchtrie.o generated
-make vchuffgroup.o
 make Vchuff/vchuffgroup.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchuffgroup.c
-meta vchuffgroup.o %.c>%.o Vchuff/vchuffgroup.c vchuffgroup
-prev Vchuff/vchuffgroup.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchuffgroup.c
-done vchuffgroup.o generated
-make vchuffman.o
 make Vchuff/vchuffman.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchuffman.c
-meta vchuffman.o %.c>%.o Vchuff/vchuffman.c vchuffman
-prev Vchuff/vchuffman.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchuffman.c
-done vchuffman.o generated
-make vchuffpart.o
 make Vchuff/vchuffpart.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchuffpart.c
-meta vchuffpart.o %.c>%.o Vchuff/vchuffpart.c vchuffpart
-prev Vchuff/vchuffpart.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchuffpart.c
-done vchuffpart.o generated
-make vcbwt.o
 make Vcmisc/vcbwt.c
 prev vclib.h implicit
 done Vcmisc/vcbwt.c
-meta vcbwt.o %.c>%.o Vcmisc/vcbwt.c vcbwt
-prev Vcmisc/vcbwt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcbwt.c
-done vcbwt.o generated
-make vcmap.o
 make Vcmisc/vcmap.c
 prev vclib.h implicit
 done Vcmisc/vcmap.c
-meta vcmap.o %.c>%.o Vcmisc/vcmap.c vcmap
-prev Vcmisc/vcmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmap.c
-done vcmap.o generated
-make vcmtf.o
 make Vcmisc/vcmtf.c
 prev vclib.h implicit
 done Vcmisc/vcmtf.c
-meta vcmtf.o %.c>%.o Vcmisc/vcmtf.c vcmtf
-prev Vcmisc/vcmtf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmtf.c
-done vcmtf.o generated
-make vcrle.o
 make Vcmisc/vcrle.c
 prev vclib.h implicit
 done Vcmisc/vcrle.c
-meta vcrle.o %.c>%.o Vcmisc/vcrle.c vcrle
-prev Vcmisc/vcrle.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
-done vcrle.o generated
-make vcrdparse.o
-make vcrdparse.c
-prev vclib.h implicit
-done vcrdparse.c
-meta vcrdparse.o %.c>%.o vcrdparse.c vcrdparse
-prev vcrdparse.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcrdparse.c
-done vcrdparse.o generated
-make vcrdplan.o
-make vcrdplan.c
-prev ${PACKAGE_ast_INCLUDE}/graph.h implicit
-prev vclib.h implicit
-done vcrdplan.c
-meta vcrdplan.o %.c>%.o vcrdplan.c vcrdplan
-prev vcrdplan.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcrdplan.c
-done vcrdplan.o generated
-make vcrdsepar.o
-make vcrdsepar.c
-prev vclib.h implicit
-done vcrdsepar.c
-meta vcrdsepar.o %.c>%.o vcrdsepar.c vcrdsepar
-prev vcrdsepar.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcrdsepar.c
-done vcrdsepar.o generated
-make vcrdvector.o
-make vcrdvector.c
-prev vclib.h implicit
-done vcrdvector.c
-meta vcrdvector.o %.c>%.o vcrdvector.c vcrdvector
-prev vcrdvector.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c vcrdvector.c
-done vcrdvector.o generated
-make vctranspose.o
-make Vcmisc/vctranspose.c
-prev vclib.h implicit
-done Vcmisc/vctranspose.c
-meta vctranspose.o %.c>%.o Vcmisc/vctranspose.c vctranspose
-prev Vcmisc/vctranspose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
-done vctranspose.o generated
-make vcwclose.o
 make Vcwindow/vcwclose.c
 make Vcwindow/vcwhdr.h implicit
 prev vchdr.h implicit
 done Vcwindow/vcwhdr.h
 done Vcwindow/vcwclose.c
-meta vcwclose.o %.c>%.o Vcwindow/vcwclose.c vcwclose
-prev Vcwindow/vcwclose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcwindow/vcwclose.c
-done vcwclose.o generated
-make vcwdecode.o
 make Vcwindow/vcwdecode.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwdecode.c
-meta vcwdecode.o %.c>%.o Vcwindow/vcwdecode.c vcwdecode
-prev Vcwindow/vcwdecode.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcwindow/vcwdecode.c
-done vcwdecode.o generated
-make vcwfile.o
 make Vcwindow/vcwfile.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwfile.c
-meta vcwfile.o %.c>%.o Vcwindow/vcwfile.c vcwfile
-prev Vcwindow/vcwfile.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcwindow/vcwfile.c
-done vcwfile.o generated
-make vcwmethod.o
 make Vcwindow/vcwmethod.c
-prev vchdr.h implicit
+prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwmethod.c
-meta vcwmethod.o %.c>%.o Vcwindow/vcwmethod.c vcwmethod
-prev Vcwindow/vcwmethod.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcwindow/vcwmethod.c
-done vcwmethod.o generated
-make vcwmirror.o
 make Vcwindow/vcwmirror.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwmirror.c
-meta vcwmirror.o %.c>%.o Vcwindow/vcwmirror.c vcwmirror
-prev Vcwindow/vcwmirror.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcwindow/vcwmirror.c
-done vcwmirror.o generated
-make vcwngram.o
 make Vcwindow/vcwngram.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwngram.c
-meta vcwngram.o %.c>%.o Vcwindow/vcwngram.c vcwngram
-prev Vcwindow/vcwngram.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcwindow/vcwngram.c
-done vcwngram.o generated
-make vcwopen.o
 make Vcwindow/vcwopen.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwopen.c
-meta vcwopen.o %.c>%.o Vcwindow/vcwopen.c vcwopen
-prev Vcwindow/vcwopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -c Vcwindow/vcwopen.c
-done vcwopen.o generated
-make vcwprefix.o
 make Vcwindow/vcwprefix.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwprefix.c
+make Vcwindow/vcwvote.c
+prev Vcwindow/vcwhdr.h implicit
+done Vcwindow/vcwvote.c
+exec - set -- $( sed -e '/\<VCLIB(/!d' -e 's/.*\<VCLIB(\(.*\)).*/\1/' vcopen.c vcclose.c vcio.c vcdisc.c vcextract.c vcrecode.c vccontext.c vclog.c vcsfxsort.c vcperiod.c vclzparse.c vcbuffer.c vcbcktsort.c vcqsort.c vcmethod.c vcsfio.c vcalias.c Vcmisc/vctranspose.c Vcdelta/vcdcache.c Vcdelta/vcdelta.c Vcdelta/vcdtable.c Vcdelta/vcdtblinit.c Vcdelta/vchamming.c Vchuff/vchbits.c Vchuff/vchcode.c Vchuff/vchsize.c Vchuff/vchtrie.c Vchuff/vchuffgroup.c Vchuff/vchuffman.c Vchuff/vchuffpart.c Vcmisc/vcbwt.c Vcmisc/vcmap.c Vcmisc/vcmtf.c Vcmisc/vcrle.c Vcwindow/vcwclose.c Vcwindow/vcwdecode.c Vcwindow/vcwfile.c Vcwindow/vcwmethod.c Vcwindow/vcwmirror.c Vcwindow/vcwngram.c Vcwindow/vcwopen.c Vcwindow/vcwprefix.c Vcwindow/vcwvote.c )
+exec - {
+exec - print "/*"
+exec - print " * list of default public -lvcodex methods"
+exec - print " * proprietary methods available as plugins with separate license"
+exec - print " *"
+exec - print " * this file may be included multiple times in one source"
+exec - print " */"
+exec - print
+exec - print "#ifndef	VCMETHOD"
+exec - print "#define VCMETHOD(m)	extern Vcmethod_t* m;"
+exec - print "#endif"
+exec - print
+exec - for m
+exec - do	print "VCMETHOD($m)"
+exec - done
+exec - print
+exec - print "#undef	VCMETHOD"
+exec - } > 1.${COTEMP}.h
+exec - if	cmp 2>/dev/null -s 1.${COTEMP}.h vcmethods.h
+exec - then	rm -f 1.${COTEMP}.h
+exec - else	mv 1.${COTEMP}.h vcmethods.h
+exec - fi
+done vcmethods.h dontcare generated
+prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done vcodex.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done vchdr.h dontcare
+done vcopen.c
+meta vcopen.o %.c>%.o vcopen.c vcopen
+prev vcopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcopen.c
+done vcopen.o generated
+make vcclose.o
+prev vcclose.c
+meta vcclose.o %.c>%.o vcclose.c vcclose
+prev vcclose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcclose.c
+done vcclose.o generated
+make vcio.o
+prev vcio.c
+meta vcio.o %.c>%.o vcio.c vcio
+prev vcio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c vcio.c
+done vcio.o generated
+make vcdisc.o
+prev vcdisc.c
+meta vcdisc.o %.c>%.o vcdisc.c vcdisc
+prev vcdisc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcdisc.c
+done vcdisc.o generated
+make vcextract.o
+prev vcextract.c
+meta vcextract.o %.c>%.o vcextract.c vcextract
+prev vcextract.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcextract.c
+done vcextract.o generated
+make vcrecode.o
+prev vcrecode.c
+meta vcrecode.o %.c>%.o vcrecode.c vcrecode
+prev vcrecode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcrecode.c
+done vcrecode.o generated
+make vccontext.o
+prev vccontext.c
+meta vccontext.o %.c>%.o vccontext.c vccontext
+prev vccontext.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vccontext.c
+done vccontext.o generated
+make vclog.o
+prev vclog.c
+meta vclog.o %.c>%.o vclog.c vclog
+prev vclog.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vclog.c
+done vclog.o generated
+make vcsfxsort.o
+prev vcsfxsort.c
+meta vcsfxsort.o %.c>%.o vcsfxsort.c vcsfxsort
+prev vcsfxsort.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfxsort.c
+done vcsfxsort.o generated
+make vcperiod.o
+prev vcperiod.c
+meta vcperiod.o %.c>%.o vcperiod.c vcperiod
+prev vcperiod.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcperiod.c
+done vcperiod.o generated
+make vclzparse.o
+prev vclzparse.c
+meta vclzparse.o %.c>%.o vclzparse.c vclzparse
+prev vclzparse.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vclzparse.c
+done vclzparse.o generated
+make vcbuffer.o
+prev vcbuffer.c
+meta vcbuffer.o %.c>%.o vcbuffer.c vcbuffer
+prev vcbuffer.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcbuffer.c
+done vcbuffer.o generated
+make vcbcktsort.o
+prev vcbcktsort.c
+meta vcbcktsort.o %.c>%.o vcbcktsort.c vcbcktsort
+prev vcbcktsort.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcbcktsort.c
+done vcbcktsort.o generated
+make vcqsort.o
+prev vcqsort.c
+meta vcqsort.o %.c>%.o vcqsort.c vcqsort
+prev vcqsort.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcqsort.c
+done vcqsort.o generated
+make vcmethod.o
+prev vcmethod.c
+meta vcmethod.o %.c>%.o vcmethod.c vcmethod
+prev vcmethod.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcmethod.c
+done vcmethod.o generated
+make vcsfio.o
+prev vcsfio.c
+meta vcsfio.o %.c>%.o vcsfio.c vcsfio
+prev vcsfio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfio.c
+done vcsfio.o generated
+make vcalias.o
+prev vcalias.c
+meta vcalias.o %.c>%.o vcalias.c vcalias
+prev vcalias.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcalias.c
+done vcalias.o generated
+make vctranspose.o
+prev Vcmisc/vctranspose.c
+meta vctranspose.o %.c>%.o Vcmisc/vctranspose.c vctranspose
+prev Vcmisc/vctranspose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
+done vctranspose.o generated
+make vcdcache.o
+prev Vcdelta/vcdcache.c
+meta vcdcache.o %.c>%.o Vcdelta/vcdcache.c vcdcache
+prev Vcdelta/vcdcache.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdcache.c
+done vcdcache.o generated
+make vcdelta.o
+prev Vcdelta/vcdelta.c
+meta vcdelta.o %.c>%.o Vcdelta/vcdelta.c vcdelta
+prev Vcdelta/vcdelta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdelta.c
+done vcdelta.o generated
+make vcdtable.o
+prev Vcdelta/vcdtable.c
+meta vcdtable.o %.c>%.o Vcdelta/vcdtable.c vcdtable
+prev Vcdelta/vcdtable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdtable.c
+done vcdtable.o generated
+make vcdtblinit.o
+prev Vcdelta/vcdtblinit.c
+meta vcdtblinit.o %.c>%.o Vcdelta/vcdtblinit.c vcdtblinit
+prev Vcdelta/vcdtblinit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdtblinit.c
+done vcdtblinit.o generated
+make vchamming.o
+prev Vcdelta/vchamming.c
+meta vchamming.o %.c>%.o Vcdelta/vchamming.c vchamming
+prev Vcdelta/vchamming.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vchamming.c
+done vchamming.o generated
+make vchbits.o
+prev Vchuff/vchbits.c
+meta vchbits.o %.c>%.o Vchuff/vchbits.c vchbits
+prev Vchuff/vchbits.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchbits.c
+done vchbits.o generated
+make vchcode.o
+prev Vchuff/vchcode.c
+meta vchcode.o %.c>%.o Vchuff/vchcode.c vchcode
+prev Vchuff/vchcode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchcode.c
+done vchcode.o generated
+make vchsize.o
+prev Vchuff/vchsize.c
+meta vchsize.o %.c>%.o Vchuff/vchsize.c vchsize
+prev Vchuff/vchsize.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchsize.c
+done vchsize.o generated
+make vchtrie.o
+prev Vchuff/vchtrie.c
+meta vchtrie.o %.c>%.o Vchuff/vchtrie.c vchtrie
+prev Vchuff/vchtrie.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchtrie.c
+done vchtrie.o generated
+make vchuffgroup.o
+prev Vchuff/vchuffgroup.c
+meta vchuffgroup.o %.c>%.o Vchuff/vchuffgroup.c vchuffgroup
+prev Vchuff/vchuffgroup.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffgroup.c
+done vchuffgroup.o generated
+make vchuffman.o
+prev Vchuff/vchuffman.c
+meta vchuffman.o %.c>%.o Vchuff/vchuffman.c vchuffman
+prev Vchuff/vchuffman.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffman.c
+done vchuffman.o generated
+make vchuffpart.o
+prev Vchuff/vchuffpart.c
+meta vchuffpart.o %.c>%.o Vchuff/vchuffpart.c vchuffpart
+prev Vchuff/vchuffpart.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffpart.c
+done vchuffpart.o generated
+make vcbwt.o
+prev Vcmisc/vcbwt.c
+meta vcbwt.o %.c>%.o Vcmisc/vcbwt.c vcbwt
+prev Vcmisc/vcbwt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcbwt.c
+done vcbwt.o generated
+make vcmap.o
+prev Vcmisc/vcmap.c
+meta vcmap.o %.c>%.o Vcmisc/vcmap.c vcmap
+prev Vcmisc/vcmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmap.c
+done vcmap.o generated
+make vcmtf.o
+prev Vcmisc/vcmtf.c
+meta vcmtf.o %.c>%.o Vcmisc/vcmtf.c vcmtf
+prev Vcmisc/vcmtf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmtf.c
+done vcmtf.o generated
+make vcrle.o
+prev Vcmisc/vcrle.c
+meta vcrle.o %.c>%.o Vcmisc/vcrle.c vcrle
+prev Vcmisc/vcrle.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
+done vcrle.o generated
+make vcwclose.o
+prev Vcwindow/vcwclose.c
+meta vcwclose.o %.c>%.o Vcwindow/vcwclose.c vcwclose
+prev Vcwindow/vcwclose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwclose.c
+done vcwclose.o generated
+make vcwdecode.o
+prev Vcwindow/vcwdecode.c
+meta vcwdecode.o %.c>%.o Vcwindow/vcwdecode.c vcwdecode
+prev Vcwindow/vcwdecode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwdecode.c
+done vcwdecode.o generated
+make vcwfile.o
+prev Vcwindow/vcwfile.c
+meta vcwfile.o %.c>%.o Vcwindow/vcwfile.c vcwfile
+prev Vcwindow/vcwfile.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwfile.c
+done vcwfile.o generated
+make vcwmethod.o
+prev Vcwindow/vcwmethod.c
+meta vcwmethod.o %.c>%.o Vcwindow/vcwmethod.c vcwmethod
+prev Vcwindow/vcwmethod.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwmethod.c
+done vcwmethod.o generated
+make vcwmirror.o
+prev Vcwindow/vcwmirror.c
+meta vcwmirror.o %.c>%.o Vcwindow/vcwmirror.c vcwmirror
+prev Vcwindow/vcwmirror.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwmirror.c
+done vcwmirror.o generated
+make vcwngram.o
+prev Vcwindow/vcwngram.c
+meta vcwngram.o %.c>%.o Vcwindow/vcwngram.c vcwngram
+prev Vcwindow/vcwngram.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwngram.c
+done vcwngram.o generated
+make vcwopen.o
+prev Vcwindow/vcwopen.c
+meta vcwopen.o %.c>%.o Vcwindow/vcwopen.c vcwopen
+prev Vcwindow/vcwopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwopen.c
+done vcwopen.o generated
+make vcwprefix.o
+prev Vcwindow/vcwprefix.c
 meta vcwprefix.o %.c>%.o Vcwindow/vcwprefix.c vcwprefix
 prev Vcwindow/vcwprefix.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwprefix.c
 done vcwprefix.o generated
 make vcwvote.o
-make Vcwindow/vcwvote.c
-prev Vcwindow/vcwhdr.h implicit
-done Vcwindow/vcwvote.c
+prev Vcwindow/vcwvote.c
 meta vcwvote.o %.c>%.o Vcwindow/vcwvote.c vcwvote
 prev Vcwindow/vcwvote.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwvote.c
 done vcwvote.o generated
-exec - ${AR} cr libvcodex.a vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcsfio.o vcalias.o vcdcache.o vcdelta.o vcdtable.o vcdtblinit.o vchamming.o vchbits.o vchcode.o vchsize.o vchtrie.o vchuffgroup.o vchuffman.o vchuffpart.o vcbwt.o
-exec - ${AR} cr libvcodex.a vcmap.o vcmtf.o vcrle.o vcrdparse.o vcrdplan.o vcrdsepar.o vcrdvector.o vctranspose.o vcwclose.o vcwdecode.o vcwfile.o vcwmethod.o vcwmirror.o vcwngram.o vcwopen.o vcwprefix.o vcwvote.o
+exec - ${AR} cr libvcodex.a vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcsfio.o vcalias.o vctranspose.o vcdcache.o vcdelta.o vcdtable.o vcdtblinit.o vchamming.o vchbits.o vchcode.o vchsize.o vchtrie.o vchuffgroup.o vchuffman.o vchuffpart.o
+exec - ${AR} cr libvcodex.a vcbwt.o vcmap.o vcmtf.o vcrle.o vcwclose.o vcwdecode.o vcwfile.o vcwmethod.o vcwmirror.o vcwngram.o vcwopen.o vcwprefix.o vcwvote.o
 exec - (ranlib libvcodex.a) >/dev/null 2>&1 || true
 done libvcodex.a generated
 done vcodex virtual
@@ -614,6 +660,22 @@ exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcodex.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vcodex.h generated
+make ${PACKAGE_ast_INCLUDE}/vcsfio.h
+prev vcsfio.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcsfio.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcsfio.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcsfio.h
+exec - fi
+done ${PACKAGE_ast_INCLUDE}/vcsfio.h generated
+make ${PACKAGE_ast_INCLUDE}/vcwindow.h
+prev Vcwindow/vcwindow.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  Vcwindow/vcwindow.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcwindow.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcwindow.h
+exec - fi
+done ${PACKAGE_ast_INCLUDE}/vcwindow.h generated
 make ${PACKAGE_ast_INCLUDE}/vclib.h
 prev vclib.h
 exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vclib.h  > 1.${COTEMP}.x
@@ -622,6 +684,14 @@ exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vclib.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vclib.h generated
+make ${PACKAGE_ast_INCLUDE}/vcmethods.h
+prev vcmethods.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcmethods.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcmethods.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcmethods.h
+exec - fi
+done ${PACKAGE_ast_INCLUDE}/vcmethods.h generated
 done install virtual
 make test
 done test dontcare virtual

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1998-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -35,7 +35,7 @@ static const char id[] = "\n@(#)$Id: warp (AT&T Research) 1998-04-01 $\0\n";
 #endif
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer times utime _utime __utime utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
+__STDPP__directive pragma pp:hide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer time times utime _utime __utime utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
 __STDPP__directive pragma pp:hide execlp _execlp __execlp execve _execve __execve execvp _execvp __execvp execvpe _execvpe __execvpe
 #else
 #define alarm		______alarm
@@ -59,6 +59,7 @@ __STDPP__directive pragma pp:hide execlp _execlp __execlp execve _execve __execv
 #define setitimer	______setitimer
 #define _setitimer	_______setitimer
 #define __setitimer	________setitimer
+#define time		______time
 #define times		______times
 #define utime		______utime
 #define _utime		_______utime
@@ -119,7 +120,7 @@ struct timespec
 #endif
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer times utime _utime __utime utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
+__STDPP__directive pragma pp:nohide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer time times utime _utime __utime utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
 __STDPP__directive pragma pp:nohide execlp _execlp __execlp execve _execve __execve execvp _execvp __execvp execvpe _execvpe __execvpe
 #else
 #undef	alarm
@@ -143,6 +144,7 @@ __STDPP__directive pragma pp:nohide execlp _execlp __execlp execve _execve __exe
 #undef	setitimer
 #undef	_setitimer
 #undef	__setitimer
+#undef	time
 #undef	times
 #undef	utime
 #undef	_utime

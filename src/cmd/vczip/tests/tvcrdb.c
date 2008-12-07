@@ -18,6 +18,7 @@
 *                                                                      *
 ***********************************************************************/
 #include	"vctest.h"
+#include	<vcrdb.h>
 
 /* Test the suite of functions for dealing with relational data
 **

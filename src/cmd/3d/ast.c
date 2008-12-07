@@ -24,10 +24,12 @@
 #define NoN(x)
 
 #include "3d.h"
+#include "ast.h"
 
 static char	conf[] = "";
 
 #define astconf(a,b,c)	conf
+#define ctermid		___ctermid
 
 #include "state.c"
 

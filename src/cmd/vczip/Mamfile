@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-10-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-12-08
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -43,6 +43,13 @@ make vczip.c
 make vchdr.h implicit
 done vchdr.h dontcare virtual
 make ${PACKAGE_ast_INCLUDE}/vcodex.h implicit
+make ${PACKAGE_ast_INCLUDE}/vcsfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/vcodex.h implicit
+done ${PACKAGE_ast_INCLUDE}/vcsfio.h dontcare
+make ${PACKAGE_ast_INCLUDE}/vcwindow.h implicit
+done ${PACKAGE_ast_INCLUDE}/vcwindow.h dontcare
+make ${PACKAGE_ast_INCLUDE}/vcmethods.h implicit
+done ${PACKAGE_ast_INCLUDE}/vcmethods.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
@@ -216,6 +223,22 @@ make tests/tvcqsort.c
 prev tests/vctest.h implicit
 done tests/tvcqsort.c
 make tests/tvcrdb.c
+make ${PACKAGE_ast_INCLUDE}/vcrdb.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+make ${PACKAGE_ast_INCLUDE}/vclib.h implicit
+make ${PACKAGE_ast_INCLUDE}/debug.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/debug.h dontcare
+make io.h implicit
+done io.h dontcare virtual
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/vcodex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done ${PACKAGE_ast_INCLUDE}/vclib.h dontcare
+done ${PACKAGE_ast_INCLUDE}/vcrdb.h
 prev tests/vctest.h implicit
 done tests/tvcrdb.c
 make tests/tvcrle.c

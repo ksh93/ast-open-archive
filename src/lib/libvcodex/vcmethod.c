@@ -29,74 +29,36 @@
 #include <ccode.h>
 #endif
 
+/* reconstitute declarations for the default public methods */
+
+_BEGIN_EXTERNS_
+
+#ifdef __STDC__
+#define VCMETHOD(m)		extern Vcmethod_t _##m;
+#else
+#define VCMETHOD(m)		extern Vcmethod_t _/**/m;
+#endif
+#include <vcmethods.h>
+
+_END_EXTERNS_
+
+/* reconstitute the list of pointers to the default public methods */
+
+static Vcmethod_t*		_Vcmethods[] =
+{
+#ifdef __STDC__
+#define VCMETHOD(m)		&_##m,
+#else
+#define VCMETHOD(m)		&_/**/m,
+#endif
+#include <vcmethods.h>
+};
+
 typedef struct _vcmtlist_s	Vcmtlist_t;
 struct _vcmtlist_s
 {	Vcmtlist_t*	next;	/* link list		*/
 	Vcmethod_t**	list;	/* list of methods 	*/
 	int		size;	/* list size		*/
-};
-
-/* List of currently supported data transforms */
-_BEGIN_EXTERNS_
-extern Vcmethod_t	_Vcdelta;
-extern Vcmethod_t	_Vchamming;
-
-extern Vcmethod_t	_Vchuffman;
-extern Vcmethod_t	_Vchuffgroup;
-extern Vcmethod_t	_Vchuffpart;
-
-extern Vcmethod_t	_Vcbwt;
-extern Vcmethod_t	_Vcmtf;
-extern Vcmethod_t	_Vcrle;
-
-extern Vcmethod_t	_Vcmap;
-extern Vcmethod_t	_Vctranspose;
-
-#if VCPROPRIETARY
-extern Vcmethod_t	_Vctable;
-extern Vcmethod_t	_Vcrtable;
-extern Vcmethod_t	_Vcrdb;
-
-extern Vcmethod_t	_Vcsieve;
-
-extern Vcmethod_t	_Vcama;
-extern Vcmethod_t	_Vcss7;
-extern Vcmethod_t	_Vcbdw;
-extern Vcmethod_t	_Vcamadiff;
-
-extern Vcmethod_t	_Vcnetflow;
-#endif
-_END_EXTERNS_
-
-static Vcmethod_t*	_Vcmethods[] =
-{	&_Vcdelta,
-	&_Vchamming,
-#if VCPROPRIETARY
-	&_Vcsieve,
-#endif
-
-	&_Vchuffman,
-	&_Vchuffgroup,
-	&_Vchuffpart,
-
-	&_Vcbwt,
-	&_Vcmtf,
-	&_Vcrle,
-
-	&_Vcmap,
-	&_Vctranspose,
-#if VCPROPRIETARY
-	&_Vctable,
-	&_Vcrtable,
-	&_Vcrdb,
-
-	&_Vcama,
-	&_Vcss7,
-	&_Vcbdw,
-	&_Vcamadiff,
-
-	&_Vcnetflow,
-#endif
 };
 
 static Vcmtlist_t*	_Vcmtlist;
@@ -123,7 +85,7 @@ ssize_t		size;	/* number of them	*/
 	if(!list || size < 0)
 		return 0;
 
-	if(!(mtl = (Vcmtlist_t*)malloc(sizeof(Vcmtlist_t) + size ? 0 : sizeof(Vcmethod_t**))) )
+	if(!(mtl = (Vcmtlist_t*)malloc(sizeof(Vcmtlist_t) + (size ? 0 : sizeof(Vcmethod_t**)))) )
 		return -1;
 
 	if(_Vcmtlist)
@@ -194,6 +156,7 @@ static int vcmtinit()
 	{	while (dle = dllsread(dls))
 			if (dll = dlopen(dle->path, RTLD_LAZY))
 				plugin(dll, dle->path);
+			else	errorf("dll", NiL, 1, "%s: dlopen failed: %s", dle->path, dlerror());
 		dllsclose(dls);
 	}
 #endif
@@ -543,9 +506,11 @@ sszie_t		n;	/* size of buffer		*/
 	if(!meth) /* bad invocation */
 		return NIL(char*);
 
+#ifdef VC_GETIDENT
 	if(meth->eventf && /* ask the method for its identification string */
 	   (*meth->eventf)(NIL(Vcodex_t*), VC_GETIDENT, (Void_t*)(&ident)) < 0 )
 		return NIL(char*);
+#endif
 
 	if(!ident && meth->name) /* construct ID from name */
 		ident = vcstrcode(meth->name, buf, n);

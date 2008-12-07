@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-10-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-12-08
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -42,6 +42,13 @@ make libsortvcodex.a archive
 make vcodex.o
 make vcodex.c
 make ${PACKAGE_ast_INCLUDE}/vcodex.h implicit
+make ${PACKAGE_ast_INCLUDE}/vcsfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/vcodex.h implicit
+done ${PACKAGE_ast_INCLUDE}/vcsfio.h dontcare
+make ${PACKAGE_ast_INCLUDE}/vcwindow.h implicit
+done ${PACKAGE_ast_INCLUDE}/vcwindow.h dontcare
+make ${PACKAGE_ast_INCLUDE}/vcmethods.h implicit
+done ${PACKAGE_ast_INCLUDE}/vcmethods.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
@@ -100,7 +107,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/vcodex.h
+done ${PACKAGE_ast_INCLUDE}/vcodex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/recsort.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/recsort.h

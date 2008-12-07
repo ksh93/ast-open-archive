@@ -48,7 +48,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2008-10-31 $\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2008-12-07 $\0\n";
 
 #include "pplib.h"
 
@@ -176,4 +176,4 @@ struct ppglobals pp =
 	/* the rest are implicitly initialized */
 };
 
-char	ppctype[UCHAR_MAX];
+char	ppctype[UCHAR_MAX+1];

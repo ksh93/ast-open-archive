@@ -1,3 +1,5 @@
+08-12-07 pp.h,ppdata.c: fix ancient pptype and ppctype[] off by one
+08-11-15 ppsearch.c: '\\' => '/' in first step; msvc complains about '\\' in #line!!
 08-10-31 ppsearch.c: relax pp:nomultiple pedantry
 08-10-30 pplex.c: handle =#x S_CHRB|SPLICE bug
 08-05-11 ppproto.c: fix proto test 10 regression

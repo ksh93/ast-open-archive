@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-10-24 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-12-08 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -506,8 +506,8 @@ end
 (AR) (ARFLAGS) (AS) (ASFLAGS) (CPP) (CC) (CCFLAGS) (CCLD) \
 	(CCLDFLAGS) (COATTRIBUTES) (COBOL) (COBOLDIALECT) (COBOLFLAGS) \
 	(F77) (F77FLAGS) (IFFE) (IFFEFLAGS) (LD) (LDFLAGS) (LDLIBRARIES) \
-	(LDSHARED) (LEX) (LEXFLAGS) (M4) (M4FLAGS) (SHELLMAGIC) (YACC) \
-	(YACCFLAGS) : .PARAMETER
+	(LDSHARED) (LEX) (LEXFLAGS) (M4) (M4FLAGS) (PERLMAGIC) (SHELLMAGIC) \
+	(YACC) (YACCFLAGS) : .PARAMETER
 
 /*
  * mark actions that operate on built objects
@@ -591,18 +591,30 @@ end
 
 .LIB.TYPE. : .FUNCTION
 	local P T
-	if ! .NO.LIB.TYPE && "$(-lib-type)" && "$(.PACKAGE.$(%).type)" != "-"
-		for P $(.PACKAGE.$(%).type) $(CC.LIB.TYPE)
-			/* libX-P.a or libX_P.a or libP/libX.a */
-			T := $(CC.PREFIX.ARCHIVE)$(%)$(P)$(CC.SUFFIX.ARCHIVE)
-			if ! "$(T:A=.TARGET)" && ! "$(T:T=F)"
-				T := $(CC.PREFIX.ARCHIVE)$(%)(P:/-/_/)$(CC.SUFFIX.ARCHIVE)
+	if "$(%)" == "*/*"
+		if CC.PREFIX.DYNAMIC || CC.SUFFIX.DYNAMIC
+			T := $(%:D)/$(CC.PREFIX.DYNAMIC)$(%:B)$(CC.SUFFIX.DYNAMIC)
+		else
+			T := $(%:D)/$(CC.PREFIX.SHARED)$(%:B)$(CC.SUFFIX.SHARED)
+		end
+		if T = "$(*.SOURCE.%.ARCHIVE:X=$(T):T=F:O=1)"
+			return $(T)
+		end
+	end
+	if ! .NO.LIB.TYPE
+		if "$(-lib-type)" && "$(.PACKAGE.$(%).type)" != "-"
+			for P $(.PACKAGE.$(%).type) $(CC.LIB.TYPE)
+				/* libX-P.a or libX_P.a or libP/libX.a */
+				T := $(CC.PREFIX.ARCHIVE)$(%)$(P)$(CC.SUFFIX.ARCHIVE)
 				if ! "$(T:A=.TARGET)" && ! "$(T:T=F)"
-					T := lib$(P:/-//)/$(CC.PREFIX.ARCHIVE)$(%)$(CC.SUFFIX.ARCHIVE)
+					T := $(CC.PREFIX.ARCHIVE)$(%)(P:/-/_/)$(CC.SUFFIX.ARCHIVE)
+					if ! "$(T:A=.TARGET)" && ! "$(T:T=F)"
+						T := lib$(P:/-//)/$(CC.PREFIX.ARCHIVE)$(%)$(CC.SUFFIX.ARCHIVE)
+					end
 				end
-			end
-			if "$(T:A=.TARGET)" || "$(T:T=F)"
-				return $(T)
+				if "$(T:A=.TARGET)" || "$(T:T=F)"
+					return $(T)
+				end
 			end
 		end
 	end
@@ -1089,6 +1101,33 @@ end
 		;;
 	*)	cat - $(>) > $(<) <<'!'
 	$(SHELLMAGIC)
+	$(&:T=E)
+	!
+		;;
+	esac
+	$(SILENT) test -w $(<) -a -x $(<) || $(CHMOD) u+w,+x $(<)
+
+PERLMAGIC = $("#")!/usr/bin/perl
+
+% : %.pl (PERLMAGIC)
+	case '$(PERLMAGIC)' in
+	"")	case $(&:T=E:@O!) in
+		0)	$(CP) $(>) $(<)
+			;;
+		*)	{
+			i=`(read x; echo $x) < $(>)`
+			case $i in
+			'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
+			esac
+			cat - $(>) <<'!'
+	$(&:T=E)
+	!
+			} > $(<)
+			;;
+		esac
+		;;
+	*)	cat - $(>) > $(<) <<'!'
+	$(PERLMAGIC)
 	$(&:T=E)
 	!
 		;;
@@ -2347,7 +2386,7 @@ end
 					end
 				else
 					L := $(L:T=F)
-					if L == "-l*|*/libm.a" /* XXX: probe!!! */
+					if L == "-l*|*$(CC.SUFFIX.DYNAMIC|CC.SUFFIX.SHARED|"..")|*/libm.a" /* XXX: probe!!! */
 						S += $(L)
 						if CC.SUFFIX.STATIC
 							if A = "$(L:P=B:/\(.*\)\$(CC.SUFFIX.SHARED)\([0-9.]*\)$/\1$(CC.SUFFIX.STATIC)\2/)"
@@ -3906,7 +3945,7 @@ PACKAGES : .SPECIAL .FUNCTION
 					K.$(K) := 1
 				end
 			elif ! K && ! "$(.PACKAGE.$(P).dontcare)"
-				if ! "$(PKGDIRS:X=package/$(P).lic package/$(P).pkg:T=F)"
+				if ! "$(PKGDIRS:X=package/$(P).lic package/$(P).pkg:T=F)" && ! "$(.PACKAGE.$(P).library)"
 					error 3 $(P): package not found
 				end
 				.PACKAGE.$(P).dontcare := 1

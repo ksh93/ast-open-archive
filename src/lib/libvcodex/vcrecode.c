@@ -20,38 +20,43 @@
 #include	"vchdr.h"
 
 /* Recode a chunk of data using a secondary coder.
-** This is like calling vcapply() on the data but it must make
-** sure that all data is consumed and the recoding is error-free.
 **
-** Written by Kiem-Phong Vo (08/04/2006)
+** Written by Kiem-Phong Vo 
 */
 
 #if __STD_
-ssize_t vcrecode(Vcodex_t* vc, Vcchar_t** dtp, ssize_t* dtz, ssize_t head)
+int vcrecode(Vcodex_t* vc, Vcchar_t** dtp, ssize_t* dtz, ssize_t head, int type)
 #else 
-ssize_t vcrecode(vc, dtp, dtz, head)
+int vcrecode(vc, dtp, dtz, head, type)
 Vcodex_t*	vc;	/* coding handle	*/
 Vcchar_t**	dtp;	/* input/output data	*/
 ssize_t*	dtz;	/* input/output size	*/
 ssize_t		head;	/* extra header		*/
+int		type;	/* = 0: undone is bad	*/
 #endif
 {
 	ssize_t		sz;
 	Vcchar_t	*dt;
 
-	if(!vc->coder)
-		return *dtz;
+	if(!vc->coder) /* nothing to do */
+		return 0;
 
+	/* ask follow-on coders to leave head room */
 	vc->coder->head += vc->head + head;
 	sz = vcapply(vc->coder, *dtp, *dtz, &dt);
-	if(vcundone(vc->coder) > 0) /* at this step, all data must be processed */
-		sz = -1;
 	vc->coder->head -= vc->head + head;
 
-	if(sz >= 0)
-	{	*dtp = dt;
-		*dtz = sz;
+	if(sz < 0) /* secondary coder failed */
+		return -1;
+
+	if(type == 0) /* no undone data allowed */
+	{	if(vcundone(vc->coder) > 0)
+			return -1;
+	}
+	else /* undone data ok and reflected upward */
+	{	vc->undone = vc->coder->undone;
 	}
 
-	return sz;
+	*dtp = dt; *dtz = sz;
+	return 0;
 }

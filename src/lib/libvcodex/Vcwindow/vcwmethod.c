@@ -17,7 +17,7 @@
 *                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
-#include	"vchdr.h"
+#include	"vcwhdr.h"
 
 /*	Return a windowing method by its string name.
 **

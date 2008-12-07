@@ -1,7 +1,7 @@
 #ifndef _GRHDR_H
 #define _GRHDR_H	1
 
-#include	<graph.h>
+#include	<vgraph.h>
 #include	<stdlib.h>
 
 #include	"kpvdebug.h"

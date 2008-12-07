@@ -137,7 +137,7 @@ Void_t**	out;	/* return encoded data 	*/
 
 	dt = output;
 	s = vciosize(&io); /**/DEBUG_PRINT(2,"cmpsz=%d\n",s);
-	if(vcrecode(vc, &output, &s, 0) <= 0 )
+	if(vcrecode(vc, &output, &s, 0, 0) < 0 )
 		return -1;
 	if(dt != output)
 		vcbuffer(vc, dt, -1, -1);
@@ -168,7 +168,7 @@ Void_t**	out;	/* return decoded data	*/
 		return 0;
 
 	data = (Vcchar_t*)orig; sz = (ssize_t)dtsz;
-	if(vcrecode(vc, &data, &sz, 0) <= 0 )
+	if(vcrecode(vc, &data, &sz, 0, 0) < 0 )
 		return -1;
 	dtsz = sz;
 

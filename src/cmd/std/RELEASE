@@ -1,3 +1,5 @@
+08-12-08 ls.c: at least one space before link count for -l
+08-12-07 ls.c: use %[_][EO]K for [space pad] [full|long] iso
 08-10-28 pss-procfs.c: use hz = getconf("CLK_TCK")
 08-09-10 features/procfs,pss-kvm.c: netbsd 4.0 kvm tweaks
 08-01-31 features/procfs,pss-kvm.c: freebsd6 kvm tweaks -- stop already

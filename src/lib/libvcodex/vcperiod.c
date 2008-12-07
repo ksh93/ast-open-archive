@@ -52,7 +52,7 @@ ssize_t	dtsz;
 	{	if(sfx->inv[i] == 0)
 			continue;
 		k = sfx->idx[sfx->inv[i]-1];
-		while(dt[i+p] == dt[k+p])
+		while((i+p) < sz && (k+p) < sz && dt[i+p] == dt[k+p])
 			p += 1;
 		lcp[sfx->inv[i]] = p;
 		if(p > 0)

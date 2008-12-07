@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-10-28
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-12-08
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -37,9 +37,9 @@ setv YACCFLAGS -d
 make ${PACKAGEROOT}/lib/package/ast.lic
 done ${PACKAGEROOT}/lib/package/ast.lic
 make install
-make graph
-make libgraph.a archive
-make graph.req
+make vgraph
+make libvgraph.a archive
+make vgraph.req
 exec - set -
 exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -c 1.${COTEMP}.c &&
@@ -48,9 +48,9 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in graph ast
+exec - for i in vgraph ast
 exec - do	case $i in
-exec - 	"graph"|graph)
+exec - 	"vgraph"|vgraph)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
 exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -L${INSTALLROOT}/lib ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
@@ -64,9 +64,9 @@ exec - 		;;
 exec - 	esac
 exec - 	echo " -l$i"
 exec - done
-exec - } > graph.req
+exec - } > vgraph.req
 exec - rm -f 1.${COTEMP}.*
-done graph.req generated
+done vgraph.req generated
 make graph.o
 make graph.c
 make grhdr.h implicit
@@ -81,7 +81,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
 done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
-make graph.h implicit
+make vgraph.h implicit
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -118,12 +118,12 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-done graph.h dontcare
+done vgraph.h dontcare
 done grhdr.h
 done graph.c
 meta graph.o %.c>%.o graph.c graph
 prev graph.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c graph.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c graph.c
 done graph.o generated
 make grbranching.o
 make grbranching.c
@@ -138,7 +138,7 @@ prev grhdr.h implicit
 done grbranching.c
 meta grbranching.o %.c>%.o grbranching.c grbranching
 prev grbranching.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c grbranching.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grbranching.c
 done grbranching.o generated
 make grfold.o
 make grfold.c
@@ -146,7 +146,7 @@ prev grhdr.h implicit
 done grfold.c
 meta grfold.o %.c>%.o grfold.c grfold
 prev grfold.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c grfold.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grfold.c
 done grfold.o generated
 make grsearch.o
 make grsearch.c
@@ -154,44 +154,44 @@ prev grhdr.h implicit
 done grsearch.c
 meta grsearch.o %.c>%.o grsearch.c grsearch
 prev grsearch.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c grsearch.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grsearch.c
 done grsearch.o generated
-exec - ${AR} cr libgraph.a graph.o grbranching.o grfold.o grsearch.o
-exec - (ranlib libgraph.a) >/dev/null 2>&1 || true
-done libgraph.a generated
-done graph virtual
-prev libgraph.a archive
+exec - ${AR} cr libvgraph.a graph.o grbranching.o grfold.o grsearch.o
+exec - (ranlib libvgraph.a) >/dev/null 2>&1 || true
+done libvgraph.a generated
+done vgraph virtual
+prev libvgraph.a archive
 make ${INSTALLROOT}/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib
 exec - then	mkdir -p ${INSTALLROOT}/lib
 exec - fi
 done ${INSTALLROOT}/lib generated
-make ${INSTALLROOT}/lib/libgraph.a archive
+make ${INSTALLROOT}/lib/libvgraph.a archive
 prev ${INSTALLROOT}/lib
-prev libgraph.a archive
-exec - test '' = 'libgraph.a' || ${STDCMP} 2>/dev/null -s libgraph.a ${INSTALLROOT}/lib/libgraph.a || { ${STDMV} ${INSTALLROOT}/lib/libgraph.a ${INSTALLROOT}/lib/libgraph.a.old 2>/dev/null || true; ${STDCP} libgraph.a ${INSTALLROOT}/lib/libgraph.a  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/libgraph.a) >/dev/null 2>&1 || true
-done ${INSTALLROOT}/lib/libgraph.a generated
+prev libvgraph.a archive
+exec - test '' = 'libvgraph.a' || ${STDCMP} 2>/dev/null -s libvgraph.a ${INSTALLROOT}/lib/libvgraph.a || { ${STDMV} ${INSTALLROOT}/lib/libvgraph.a ${INSTALLROOT}/lib/libvgraph.a.old 2>/dev/null || true; ${STDCP} libvgraph.a ${INSTALLROOT}/lib/libvgraph.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libvgraph.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libvgraph.a generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
 exec - then	mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
 done ${INSTALLROOT}/lib/lib generated
-make ${INSTALLROOT}/lib/lib/graph
+make ${INSTALLROOT}/lib/lib/vgraph
 prev ${INSTALLROOT}/lib/lib
-prev graph.req
-exec - test '' = 'graph.req' || ${STDCMP} 2>/dev/null -s graph.req ${INSTALLROOT}/lib/lib/graph || { ${STDMV} ${INSTALLROOT}/lib/lib/graph ${INSTALLROOT}/lib/lib/graph.old 2>/dev/null || true; ${STDCP} graph.req ${INSTALLROOT}/lib/lib/graph  		    		    ;}
-done ${INSTALLROOT}/lib/lib/graph generated
+prev vgraph.req
+exec - test '' = 'vgraph.req' || ${STDCMP} 2>/dev/null -s vgraph.req ${INSTALLROOT}/lib/lib/vgraph || { ${STDMV} ${INSTALLROOT}/lib/lib/vgraph ${INSTALLROOT}/lib/lib/vgraph.old 2>/dev/null || true; ${STDCP} vgraph.req ${INSTALLROOT}/lib/lib/vgraph  		    		    ;}
+done ${INSTALLROOT}/lib/lib/vgraph generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
 exec - then	mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
-make ${PACKAGE_ast_INCLUDE}/graph.h
+make ${PACKAGE_ast_INCLUDE}/vgraph.h
 prev ${PACKAGE_ast_INCLUDE}
-prev graph.h
-exec - test '' = 'graph.h' || ${STDCMP} 2>/dev/null -s graph.h ${PACKAGE_ast_INCLUDE}/graph.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/graph.h ${PACKAGE_ast_INCLUDE}/graph.h.old 2>/dev/null || true; ${STDCP} graph.h ${PACKAGE_ast_INCLUDE}/graph.h  		    		    ;}
-done ${PACKAGE_ast_INCLUDE}/graph.h generated
+prev vgraph.h
+exec - test '' = 'vgraph.h' || ${STDCMP} 2>/dev/null -s vgraph.h ${PACKAGE_ast_INCLUDE}/vgraph.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/vgraph.h ${PACKAGE_ast_INCLUDE}/vgraph.h.old 2>/dev/null || true; ${STDCP} vgraph.h ${PACKAGE_ast_INCLUDE}/vgraph.h  		    		    ;}
+done ${PACKAGE_ast_INCLUDE}/vgraph.h generated
 done install virtual
 make test
 done test dontcare virtual

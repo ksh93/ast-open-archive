@@ -24,10 +24,6 @@
 #include	<ast.h>
 #endif
 
-#ifndef VCTABLE	/* include table transforms by default */
-#define VCTABLE		1
-#endif
-
 #define _VCODEX_PRIVATE \
 	Vcbuffer_t*	list;	/* allocated buffers	*/ \
 	unsigned int	busy;	/* total buffer size 	*/ \
@@ -53,10 +49,6 @@
 #include	<stdarg.h>
 #else
 #include	<varargs.h>
-#endif
-
-#ifndef USAGE_LICENSE
-#define USAGE_LICENSE		""
 #endif
 
 #if !_PACKAGE_ast && _WIN32 /* to do binary I/O on Windows */

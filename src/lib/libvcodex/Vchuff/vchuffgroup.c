@@ -507,7 +507,7 @@ Void_t**	out;	/* to return output buffer 	*/
 
 	dt = output;
 	n = vciosize(&io); /**/ DEBUG_ASSERT(n <= n_output);
-	if(vcrecode(vc, &output, &n, 0) < 0 )
+	if(vcrecode(vc, &output, &n, 0, 0) < 0 )
 		return -1;
 	if(dt != output)
 		vcbuffer(vc, dt, -1, -1);
@@ -543,7 +543,7 @@ Void_t**	out;	/* to return output buffer 	*/
 		return 0;
 
 	data = (Vcchar_t*)orig; sz = (ssize_t)dtsz;
-	if(vcrecode(vc, &data, &sz, 0) <= 0 )
+	if(vcrecode(vc, &data, &sz, 0, 0) < 0 )
 		return -1;
 	dtsz = sz;
 
@@ -696,15 +696,6 @@ Void_t*		params;
 		}
 		return 0;
 	}
-	else if(type == VC_TELLBUFFER)
-	{	if((grp = vcgetmtdata(vc, Group_t*)) )
-		{	if(grp->mtf && vctellbuf(grp->mtf, (Vcbuffer_f)params) < 0 )
-				return -1;
-			if(grp->huf && vctellbuf(grp->huf, (Vcbuffer_f)params) < 0 )
-				return -1;
-		}
-		return 0;
-	}
 	else	return 0;
 }
 
@@ -714,7 +705,7 @@ Vcmethod_t	_Vchuffgroup =
 	grpevent,
 	"huffgroup", "Huffman encoding by groups.",
 	"[-version?huffgroup (AT&T Research) 2003-01-01]" USAGE_LICENSE,
-	NIL(Vcmtarg_t*),
+	0,
 	1024*1024,
 	0
 };

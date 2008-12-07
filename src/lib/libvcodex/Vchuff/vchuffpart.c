@@ -205,7 +205,7 @@ Void_t**	out;	/* to return output buffer 	*/
 
 	dt = output;
 	n = vciosize(&io); /* compressed data size */
-	if(vcrecode(vc, &output, &n, 0) < 0)
+	if(vcrecode(vc, &output, &n, 0, 0) < 0)
 		return -1;
 	if(dt != output) /* free unused buffers */
 		vcbuffer(vc, dt, -1, -1);
@@ -236,7 +236,7 @@ Void_t**	out;	/* to return output buffer 	*/
 		return 0;
 
 	data = (Vcchar_t*)orig; sz = (ssize_t)size;
-	if(vcrecode(vc, &data, &sz, 0) <= 0 )
+	if(vcrecode(vc, &data, &sz, 0, 0) < 0 )
 		return -1;
 	size = sz;
 
@@ -319,12 +319,6 @@ Void_t*		params;
 	else if(type == VC_FREEBUFFER)
 	{	if((pt = vcgetmtdata(vc, Part_t*)) && pt->vch)
 			vcbuffer(pt->vch, NIL(Vcchar_t*), -1, -1);
-		return 0;
-	}
-	else if(type == VC_TELLBUFFER)
-	{	if((pt = vcgetmtdata(vc, Part_t*)) && pt->vch &&
-		   vctellbuf(pt->vch, (Vcbuffer_f)params) < 0 )
-			return -1;
 		return 0;
 	}
 	else	return 0;

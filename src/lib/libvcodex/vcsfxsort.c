@@ -18,7 +18,7 @@
 *                                                                      *
 ***********************************************************************/
 #include	"vchdr.h"
-#include	"graph.h"
+#include	"vgraph.h"
 
 /* Algorithm to compute the suffix array of a string.
 ** Sadakane-Larson magic numbering is used to speed up sort.

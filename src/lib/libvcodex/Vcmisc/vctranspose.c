@@ -69,7 +69,7 @@ Vcchar_t*	flip;
 	Transflip_t	*fl;
 
 	if(data[dtsz-1] != rsep)
-		return -1;
+		RETURN(-1);
 
 	/* count number of rows */
 	for(nrows = 0, z = 0; z < dtsz; ++z)
@@ -78,7 +78,7 @@ Vcchar_t*	flip;
 
 	/* allocate space for row data */
 	if(!(fl = (Transflip_t*)calloc(nrows, sizeof(Transflip_t))) )
-		return -1;
+		RETURN(-1);
 	
 	/* compute record starts and record sizes */
 	for(p = r = z = 0; z < dtsz; ++z)
@@ -125,7 +125,7 @@ Vcchar_t*	flip;
 	Transflip_t	*fl;
 
 	if(data[dtsz-1] != rsep)
-		return -1;
+		RETURN(-1);
 
 	/* count number of rows */
 	for(nrows = 0, z = 0; z < dtsz; ++z)
@@ -134,7 +134,7 @@ Vcchar_t*	flip;
 
 	/* allocate space for row data */
 	if(!(fl = (Transflip_t*)calloc(nrows, sizeof(Transflip_t))) )
-		return -1;
+		RETURN(-1);
 	for(r = 0; r < nrows; ++r)
 		fl[r].open = r;
 
@@ -258,7 +258,7 @@ Void_t**	out;
 	size = nrows*ncols;
 	hd = vcsizeu(size) + (trans->type == TR_PLAIN ? 0 : vcsizeu(ncols));
 	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), 2*(size + vcsizeu(size)), hd)) )
-		return -1;
+		RETURN(-1);
 
 	chr = output + vcsizeu(size);
 	run = chr + size + vcsizeu(size);
@@ -321,7 +321,7 @@ Void_t**	out;
 	if(vc->coder->coder) /* note that vc->coder is Vcrle */
 	{	sz = 2*(size + vcsizeu(size));
 		if((sz = _vcrle2coder(vc->coder,hd,chr,c,run,r,&output,sz)) < 0)
-			return -1;
+			RETURN(-1);
 	}
 	else
 	{	vcioinit(&io, output, 2*(size+hd));
@@ -339,7 +339,7 @@ Void_t**	out;
 	vcioputu(&io, size);
 
 	if(!(output = vcbuffer(vc, output, sz+hd, -1)) )
-		return -1;
+		RETURN(-1);
 	if(out)
 		*out = output;
 	return sz+hd;
@@ -368,10 +368,10 @@ Void_t**	out;
 		return 0;
 
 	if(!(trans = vcgetmtdata(vc, Transpose_t*)) )
-		return -1;
+		RETURN(-1);
 
 	if(!(ctxt = vcgetcontext(vc, Transctxt_t*)) )
-		return -1;
+		RETURN(-1);
 
 	if((rsep = ctxt->rsep) < 0 && trans->ctxt->rsep >= 0 )
 		rsep = trans->ctxt->rsep;
@@ -403,17 +403,17 @@ Void_t**	out;
 
 	z = 2*sizeof(ssize_t); /* for coding ncols or rsep */
 	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, z)) )
-		return -1;
+		RETURN(-1);
 
 	if(rsep >= 0)
 	{	if((nrows = transflip((Vcchar_t*)data, sz, rsep, output)) < 0)
-			return -1;
+			RETURN(-1);
 	}
 	else	transfixed((Vcchar_t*)data, nrows, ncols, output);
 
 	dt = output;	
-	if(vcrecode(vc, &output, &sz, z) < 0 )
-		return -1;
+	if(vcrecode(vc, &output, &sz, z, 0) < 0 )
+		RETURN(-1);
 	if(dt != output)
 		vcbuffer(vc, dt, -1, -1);
 
@@ -456,16 +456,16 @@ Void_t**	out;
 		return 0;
 
 	if(!(trans = vcgetmtdata(vc, Transpose_t*)) )
-		return -1;
+		RETURN(-1);
 
 	if(!(ctxt = vcgetcontext(vc, Transctxt_t*)) )
-		return -1;
+		RETURN(-1);
 
 	vcioinit(&io, data, size);
 	rsep = -1; ncols = nrows = 0;
 	if(trans->type != TR_PLAIN)
 	{	if((ncols = vciogetu(&io)) < 0)
-			return -1;
+			RETURN(-1);
 		if(ncols == 0)
 			rsep = vciogetc(&io);
 	}
@@ -478,27 +478,27 @@ Void_t**	out;
 	}
 
 	if(rsep < 0 && ncols <= 0)
-		return -1;
+		RETURN(-1);
 
 	/* data to be untransposed */
 	dt = vcionext(&io);
 	z = vciomore(&io);
-	if(vcrecode(vc, &dt, &z, 0) < 0)
-		return -1;
+	if(vcrecode(vc, &dt, &z, 0, 0) < 0)
+		RETURN(-1);
 
 	if(rsep < 0) /* fixed-length data */
 	{	nrows = z/ncols;
 		if(ncols*nrows != z)
-			return -1;
+			RETURN(-1);
 	}
 
 	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), z, 0)) )
-		return -1;
+		RETURN(-1);
 
 	if(rsep < 0)
 		transfixed(dt, ncols, z/ncols, output);
 	else if(unflip(dt, z, rsep, output) < 0)
-		return -1;
+		RETURN(-1);
 
 	if(out)
 		*out = output;
@@ -521,10 +521,10 @@ Void_t*		params;
 
 	if(type == VC_OPENING)
 	{	if(!(trans = (Transpose_t*)calloc(1,sizeof(Transpose_t))) )
-			return -1;
+			RETURN(-1);
 		if(!(trans->ctxt = (Transctxt_t*)vcinitcontext(vc, NIL(Vccontext_t*))) )
 		{	free(trans);
-			return -1;
+			RETURN(-1);
 		}
 		vcsetmtdata(vc, trans);
 		goto vc_setarg;
@@ -539,7 +539,7 @@ Void_t*		params;
 	else if(type == VC_SETMTARG)
 	{ vc_setarg:	
 		if(!(ctxt = vcgetcontext(vc, Transctxt_t*)) )
-			return -1;
+			RETURN(-1);
 		for(data = (char*)params; data && *data; )
 		{	data = vcgetmtarg(data, val, sizeof(val), _Transargs, &arg);
 			switch(TYPECAST(int,arg->data) )
@@ -565,7 +565,7 @@ Void_t*		params;
 	{	if(!params)
 			return 0;
 		if(!(ctxt = (Transctxt_t*)calloc(1,sizeof(Transctxt_t))) )
-			return -1;
+			RETURN(-1);
 		ctxt->ncols = 0;
 		ctxt->rsep = -1;
 		*((Transctxt_t**)params) = ctxt;

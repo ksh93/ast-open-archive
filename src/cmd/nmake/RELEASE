@@ -1,4 +1,8 @@
+08-12-08 Makerules.mk: -lfoo/bar => bar plugin for foo
+08-12-08 expand.c: handle -lfoo/bar prereqs
+08-11-11 Makerules.mk: add %.pl => % for perl scripts
 08-11-11 rules-win32.mk: rc requires native path to .rc file
+08-11-04 bind.c: handle non-3d VPATH for absolute dirs in .SOURCE*
 08-10-24 Makerules.mk: fix install --link=* to handle directories
 08-10-24 command.c: work around another gcc code generation bug -- ouch
 08-10-16 Makerules.mk: fix :NOOPTIMIZE: to cooperate with :NOPROTECT:

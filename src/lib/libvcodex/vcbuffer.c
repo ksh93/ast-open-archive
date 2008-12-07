@@ -35,6 +35,10 @@ ssize_t		head;	/* head room in front of buffer 	*/
 #endif
 {
 	Vcbuffer_t	*b, *n;
+	/**/DEBUG_DECLARE(static ssize_t, Busy=0);
+#ifdef VMFL
+	/**/DEBUG_DECLARE(Vmstat_t, statb); DEBUG_ASSERT(vmstat(Vmregion, &statb) >= 0);
+#endif
 
 	if(!vc)
 		return NIL(Vcchar_t*);
@@ -53,7 +57,12 @@ ssize_t		head;	/* head room in front of buffer 	*/
 			else	vc->list = b->next;
 
 			if(size < 0 ) /* just free the buffer */
-			{	vc->busy -= b->size;
+			{	/**/DEBUG_SET(Busy, Busy - b->size);
+				/**/DEBUG_PRINT(2,"free: file=%s ", b->file);
+				/**/DEBUG_PRINT(2,"line=%d ",b->line);
+				/**/DEBUG_PRINT(2,"size=%d\n",b->size);
+
+				vc->busy -= b->size;
 				vc->nbuf -= 1;
 				free(b);
 				return NIL(Vcchar_t*);
@@ -68,7 +77,13 @@ ssize_t		head;	/* head room in front of buffer 	*/
 			size += (head = trunc - (Vcchar_t*)b->buf);
 			if(size < 3*b->size/4 )
 			{	if(!(n = (Vcbuffer_t*)realloc(b, sizeof(Vcbuffer_t)+size)) )
-					return NIL(Vcchar_t*);
+					RETURN(NIL(Vcchar_t*));
+				/**/DEBUG_SET(Busy, Busy - b->size + size);
+				/**/DEBUG_PRINT(2,"realloc: file=%s ", b->file);
+				/**/DEBUG_PRINT(2,"line=%d ",b->line);
+				/**/DEBUG_PRINT(2,"oldsize=%d ",b->size);
+				/**/DEBUG_PRINT(2,"newsize=%d\n",size);
+
 				vc->busy -= n->size - size; /* n->size is old b->size */
 				n->size = size;
 				if(n != b)
@@ -84,11 +99,16 @@ ssize_t		head;	/* head room in front of buffer 	*/
 	}
 	else if(size < 0) /* free all buffers */
 	{	for(; vc; vc = vc->coder)
-		{	if(vc->meth->eventf)
+		{	if(vc->meth->eventf) /* tell vc to free its internal buffers */
 				(*vc->meth->eventf)(vc, VC_FREEBUFFER, 0);
 
 			for(b = vc->list; b; b = n)
 			{	n = b->next;
+
+				/**/DEBUG_SET(Busy, Busy - b->size);
+				/**/DEBUG_PRINT(2,"free: file=%s ", b->file);
+				/**/DEBUG_PRINT(2,"line=%d ",b->line);
+				/**/DEBUG_PRINT(2,"size=%d\n",b->size);
 				free(b);
 			}
 
@@ -102,71 +122,19 @@ ssize_t		head;	/* head room in front of buffer 	*/
 	else
 	{	head = (head <= 0 ? 0 : head) + vc->head; /* required head room */
 		if(!(b = (Vcbuffer_t*)malloc(sizeof(Vcbuffer_t)+head+size)) )
-			return NIL(Vcchar_t*);
+			RETURN(NIL(Vcchar_t*));
 		b->size = head+size;
 		b->next = vc->list;
 		b->file = vc->file; vc->file = NIL(char*);
 		b->line = vc->line; vc->line = 0;
+		/**/DEBUG_SET(Busy, Busy + b->size);
+		/**/DEBUG_PRINT(2,"alloc: file=%s ", b->file);
+		/**/DEBUG_PRINT(2,"line=%d ",b->line);
+		/**/DEBUG_PRINT(2,"size=%d\n",b->size);
+
 		vc->list = b;
 		vc->busy += b->size;
 		vc->nbuf += 1;
 		return (Vcchar_t*)(&b->buf[head]);
 	}
-}
-
-/* default vctellbuf() prints buffer data */
-#if __STD_C
-static int printbuf(Vcodex_t* vc, Vcbuffer_t* list, Vcmethod_t* meth)
-#else
-static int printbuf(vc, list, meth)
-Vcodex_t*	vc;
-Vcbuffer_t*	list;	/* list of buffers	*/
-Vcmethod_t*	meth;	/* meth being executed	*/
-#endif
-{
-	char	buf[1024], *b, *endb;
-	ssize_t	n;
-
-	for(; list; list = list->next)
-	{	b = buf; endb = buf+sizeof(buf) - 16;
-
-		n = vcitoa(TYPECAST(Vcint_t,list), b, endb-b); b += n; *b++ = ':'; 
-
-		n = vcitoa(TYPECAST(Vcint_t,list->size), b, endb-b); b += n; *b++ = ':'; 
-
-		n = (n = strlen(meth->name)) < (endb-b) ? n : endb-b;
-		memcpy(b, meth->name, n); b += n; *b++ = ':';
-
-		n = (n = strlen(list->file)) < (endb-b) ? n : endb-b;
-		memcpy(b, list->file, n); b += n; *b++ = ':';
-
-		n = vcitoa(TYPECAST(Vcint_t,list->line), b, endb-b); b += n; *b++ = '\n'; 
-
-		if(write(2, buf, b-buf) < 0 )
-			return -1;
-	}
-
-	return 0;
-}
-
-/* This is mostly for debugging. bufferf is called on each list of buffers per handle */
-#if __STD_C
-int vctellbuf(Vcodex_t* vc, Vcbuffer_f bufferf)
-#else
-int vctellbuf(vc, bufferf)
-Vcodex_t	*vc;
-Vcbuffer_f	bufferf;
-#endif
-{
-	if(!bufferf)
-		bufferf = printbuf;
-
-	for(; vc; vc = vc->coder)
-	{	if(vc->list && (*bufferf)(vc, vc->list, vc->meth) < 0)
-			return -1;
-		if(vc->meth->eventf && (*vc->meth->eventf)(vc, VC_TELLBUFFER, (Void_t*)bufferf) < 0 )
-			return -1;
-	}
-
-	return 0;
 }

@@ -144,14 +144,14 @@ Void_t**	out;
 		return 0;
 
 	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
-		return -1;
+		RETURN(-1);
 
 	if((*mtff)((Vcchar_t*)data, ((Vcchar_t*)data)+sz, output, 1) != sz)
-		return -1;
+		RETURN(-1);
 
 	dt = output;
-	if(vcrecode(vc, &output, &sz, 0) < 0)
-		return -1;
+	if(vcrecode(vc, &output, &sz, 0, 0) < 0)
+		RETURN(-1);
 	if(dt != output)
 		vcbuffer(vc, dt, -1, -1);
 
@@ -178,14 +178,14 @@ Void_t**	out;
 		return 0;
 
 	dt = (Vcchar_t*)data; sz = size;
-	if(vcrecode(vc, &dt, &sz, 0) < 0 )
-		return -1;
+	if(vcrecode(vc, &dt, &sz, 0, 0) < 0 )
+		RETURN(-1);
 
 	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
-		return -1;
+		RETURN(-1);
 
 	if((*mtff)(dt, dt+sz, output, 0) != sz)
-		return -1;
+		RETURN(-1);
 
 	if(dt != (Vcchar_t*)data)
 		vcbuffer(vc, dt, -1, -1);
@@ -216,9 +216,9 @@ Vcchar_t**	datap;	/* basis string for persistence	*/
 
 	n = strlen(arg->name);
 	if(!(ident = (char*)vcbuffer(vc, NIL(Vcchar_t*), sizeof(int)*n+1, 0)) )
-		return -1;
+		RETURN(-1);
 	if(!(ident = vcstrcode(arg->name, ident, sizeof(int)*n+1)) )
-		return -1; 
+		RETURN(-1); 
 	if(datap)
 		*datap = (Void_t*)ident;
 	return n;
@@ -272,16 +272,16 @@ Void_t*		params;
 	}
 	else if(type == VC_EXTRACT)
 	{	if(!(mtcd = (Vcmtcode_t*)params) )
-			return -1;
+			RETURN(-1);
 		if((mtcd->size = mtfextract(vc, &mtcd->data)) < 0 )
-			return -1;
+			RETURN(-1);
 		return 1;
 	}
 	else if(type == VC_RESTORE)
 	{	if(!(mtcd = (Vcmtcode_t*)params) )
-			return -1;
+			RETURN(-1);
 		if(!(mtcd->coder = mtfrestore(mtcd->data, mtcd->size)) )
-			return -1;
+			RETURN(-1);
 		return 1;
 	}
 

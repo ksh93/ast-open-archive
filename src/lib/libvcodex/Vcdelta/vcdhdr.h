@@ -21,6 +21,7 @@
 #define _VCDHDR_H	1
 
 #include	"vchdr.h"
+#include	"vcdelta.h"
 
 #define COPYMIN		(4)	/* min size for a COPY 		*/
 

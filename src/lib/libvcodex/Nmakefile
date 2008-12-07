@@ -4,14 +4,15 @@ CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 LICENSE = since=2003,author=kpv
 
-.SOURCE : Vcdelta Vchuff Vcmisc Vctable Vcwindow
+.SOURCE .SOURCE.h : Vcdelta Vchuff Vcmisc Vctable Vcwindow
 
-vcodex 1.1 :LIBRARY: vcodex.3 \
+vcodex 2.0 :LIBRARY: vcodex.3 \
 	vchdr.h \
 	/* common */ \
 	vcopen.c vcclose.c vcio.c vcdisc.c vcextract.c vcrecode.c \
 	vccontext.c vclog.c vcsfxsort.c vcperiod.c vclzparse.c \
 	vcbuffer.c vcbcktsort.c vcqsort.c vcmethod.c vcsfio.c vcalias.c \
+	vctranspose.c \
 	/* sfio */ \
 	vcsfio.c \
 	/* Vcdelta */ \
@@ -21,19 +22,42 @@ vcodex 1.1 :LIBRARY: vcodex.3 \
         vchuffgroup.c vchuffman.c vchuffpart.c \
 	/* Vcmisc */ \
 	vcbwt.c vcmap.c vcmtf.c vcrle.c \
-	/* Vcrdb */ \
-	vcrdparse.c vcrdplan.c vcrdsepar.c vcrdvector.c \
-	/* Vctable */ \
-	vctranspose.c \
 	/* Vcwindow */ \
         vcwhdr.h vcwclose.c vcwdecode.c vcwfile.c vcwmethod.c \
         vcwmirror.c vcwngram.c vcwopen.c vcwprefix.c vcwvote.c \
-	-lgraph -ldll
+	-lvgraph -ldll
 
 vclib.h : vchdr.h
 	$(SED) -e 's/HDR/LIB/g' $(*) > $(<)
 
-$(INCLUDEDIR) :INSTALLPROTO: vcodex.h vclib.h
+src = $(*$(*$(*vcodex)):N=*.c:T=F)
+
+vcmethods.h : (src) $$(-mam:+$$(src))
+	set -- $( $(SED) -e '/\<VCLIB(/!d' -e 's/.*\<VCLIB(\(.*\)).*/\1/' $($(~:O=1)) )
+	{
+	print "/*"
+	print " * list of default public -lvcodex methods"
+	print " * proprietary methods available as plugins with separate license"
+	print " *"
+	print " * this file may be included multiple times in one source"
+	print " */"
+	print
+	print "#ifndef	VCMETHOD"
+	print "#define VCMETHOD(m)	extern Vcmethod_t* m;"
+	print "#endif"
+	print
+	for m
+	do	print "VCMETHOD($m)"
+	done
+	print
+	print "#undef	VCMETHOD"
+	} > 1.$(tmp).h
+	if	$(CMP) $(CMPFLAGS) 1.$(tmp).h $(<)
+	then	$(RM) $(RMFLAGS) 1.$(tmp).h
+	else	$(MV) 1.$(tmp).h $(<)
+	fi
+
+$(INCLUDEDIR) :INSTALLPROTO: vcodex.h vcsfio.h vcwindow.h vclib.h vcmethods.h
 
 :: RELEASE Makefile Vcdelta/Makefile Vchuff/Makefile \
-	Vcmisc/Makefile Vctable/Makefile Vcwindow/Makefile
+	Vcmisc/Makefile Vcwindow/Makefile

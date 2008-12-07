@@ -17,7 +17,7 @@
 *                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
-#include	<vclib.h>
+#include	"vcdhdr.h"
 
 /*	Transforming data by byte-wise differencing
 **
@@ -70,7 +70,7 @@ Void_t**	out;
 	}
 
 	dt = output;
-	if(vcrecode(vc, &output, &tarsz, 0) < 0 )
+	if(vcrecode(vc, &output, &tarsz, 0, 0) < 0 )
 		return -1;
 	if(dt != output)
 		vcbuffer(vc, dt, -1, -1);
@@ -105,7 +105,7 @@ Void_t**	out;
 		return tarsz;
 	if(tarsz > 0 && !(tardt = (Vcchar_t*)data) )
 		return -1;
-	if(vcrecode(vc, &tardt, &tarsz, 0) < 0 )
+	if(vcrecode(vc, &tardt, &tarsz, 0, 0) < 0 )
 		return -1;
 
 	/* source data to diff against */

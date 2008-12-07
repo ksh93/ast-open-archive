@@ -44,15 +44,15 @@ struct _rle_s
 	Vcchar_t*	abuf;	/* auxiliary buffer	*/
 	ssize_t		asiz;
 
-	Vcchar_t	onec;	/* 1st letter for rle2	*/
-	Vcchar_t	twoc;	/* 2nd letter for rle2	*/
+	Vcchar_t	run1;	/* run-heads of rle2()	*/
+	Vcchar_t	run2;
 };
 
 /* arguments to select type of run length coder */
 static Vcmtarg_t _Rleargs[] =
 {	{ "0", "Run-length-encoding: 0-sequences only.", (Void_t*)rle0 },
 	{ "1", "Run-length-encoding: 0&1-sequences only.", (Void_t*)rle1 },
-	{ "2", "Run-length-encoding: only 2 letters in data.", (Void_t*)rle2 },
+	{ "2", "Run-length-encoding: Alphabet has only two letters.", (Void_t*)rle2 },
 	{  0 , "General run-length-encoding.", (Void_t*)rleg }
 };
 
@@ -128,9 +128,7 @@ int	encoding;
 	return (rle->osiz = o - rle->obuf);
 }
 
-/* Encoding 0&1-run's only. Useful for sequences undergone entropy reduction
-   transforms such as Burrows-Wheele + MTF or the column prediction method.
-*/
+/* Like rle0() but including 1-run's as well as 0-runs */
 #if __STD_C
 static ssize_t rle1(Rle_t* rle, int encoding)
 #else
@@ -225,7 +223,7 @@ int	encoding;
 	return (rle->osiz = o - rle->obuf);
 }
 
-/* rl-encoding data consisting of runs of two or less letters */
+/* Encoding a sequence with at most two distinct letters */
 #if __STD_C
 static ssize_t rle2(Rle_t* rle, int encoding)
 #else
@@ -236,60 +234,46 @@ int	encoding;
 {
 	Vcchar_t	*dt, *enddt;
 	ssize_t		sz, n, k, c, c1, c2;
-	Vcio_t		io1, io2;
+	Vcio_t		io;
 
 	if(encoding)
-	{	dt = rle->ibuf; sz = rle->isiz;
-		vcioinit(&io1, rle->obuf, rle->osiz);
-		vcioinit(&io2, rle->abuf, rle->asiz);
+	{	dt = rle->ibuf; sz = rle->isiz; /**/DEBUG_ASSERT(sz >= 1);
+		vcioinit(&io, rle->obuf, rle->osiz);
 
-		/* compute the letters of the two runs */
-		for(c1 = dt[0], k = 1; k < sz; ++k)
-			if(dt[k] != c1)
+		for(c1 = dt[0], n = 1; n < sz; ++n)
+			if(dt[n] != c1)
 				break;
-		c2 = k < sz ? dt[k] : c1;
-
-		for(c = c1, n = k-1; k < sz; ++k)
-		{	if(dt[k] == c)
-				n += 1;
-			else /* end of current run, output */
-			{	if(c == c1)
-				{	if((c = dt[k]) != c2)
-						return -1;
-					vcioputu(&io1, n);
+		if(n == sz)
+			c2 = c1; /* just a single run */
+		else
+		{	c2 = dt[n];
+			for(c = c1, k = n; k < sz; ++k)
+			{	if(dt[k] == c) /* current run continues */
+					n += 1;
+				else /* end of current run */
+				{	if((c = dt[k]) != c1 && c != c2)
+						RETURN(-1);
+					vcioputu(&io, n-1);
+					n = 1;
 				}
-				else
-				{	if((c = dt[k]) != c1)
-						return -1;
-					vcioputu(&io2, n);
-				}
-				n = 0;
 			}
 		}
-		if(c == c1)
-			vcioputu(&io1, n);
-		else	vcioputu(&io2, n);
+		vcioputu(&io, n-1); /* output length of last run */
 
-		rle->onec = c1;
-		rle->twoc = c2;
-		return (rle->osiz = vciosize(&io1)) + (rle->asiz = vciosize(&io2));
+		rle->run1 = c1; rle->run2 = c2;
+		return rle->osiz = vciosize(&io);
 	}
 	else
 	{	dt = rle->obuf; enddt = rle->endo;
-		c1 = rle->onec; vcioinit(&io1, rle->ibuf, rle->isiz);
-		c2 = rle->twoc; vcioinit(&io2, rle->abuf, rle->asiz);
-		for(;;)
-		{	if(vciomore(&io1) <= 0)
-				break;
-			for(n = vciogetu(&io1); n >= 0 && dt < enddt; --n)
-				*dt++ = c1;
-			if(vciomore(&io2) <= 0)
-				break;
-			for(n = vciogetu(&io2); n >= 0 && dt < enddt; --n)
-				*dt++ = c2;
+		c1 = rle->run1; c2 = rle->run2;
+		vcioinit(&io, rle->ibuf, rle->isiz);
+		for(c = c1; vciomore(&io) > 0;)
+		{	for(n = vciogetu(&io); n >= 0 && dt < enddt; --n, ++dt)
+				*dt = c;
+			c = c == c1 ? c2 : c1; /* alternate run letters */
 		}
-		if(vciomore(&io1) > 0 || vciomore(&io2) > 0 || n >= 0)
-			return -1;
+		if(vciomore(&io) != 0)
+			RETURN(-1);
 
 		return (rle->osiz = dt - rle->obuf);
 	}
@@ -380,48 +364,60 @@ size_t		size;
 Void_t**	out;
 #endif
 {
-	Vcchar_t	*output, *space;
-	ssize_t		hd, sz, outsz;
+	Vcchar_t	*dt, *output, *space;
+	ssize_t		k, hd, sz, outsz;
 	Vcio_t		io;
 	Rle_t		*rle = vcgetmtdata(vc, Rle_t*);
 
 	if(size == 0)
 		return 0;
 
-	hd = vcsizeu(size);
-	outsz = 2*vcsizeu(size) + 2*size + 128;
-	if(!(output = space = vcbuffer(vc, NIL(Vcchar_t*), outsz, hd)) )
-		return -1;
-
-	rle->ibuf = (Vcchar_t*)data; /* input data to encode */
+	/* input data to encode */
+	rle->ibuf = (Vcchar_t*)data;
 	rle->isiz = (ssize_t)size;
 
-	if(rle->rlef == rle2 || rle->rlef == rleg)
-	{	rle->obuf = output + vcsizeu(size) + (rle->rlef == rle2 ? 2 : 0);
+	/* size of header in transformed data */
+	hd = vcsizeu(size);
+	if(rle->rlef == rle2)
+		hd += 2; /* for the two run bytes */
+
+	/* allocate buffers for transformed data */
+	if(rle->rlef == rleg) /* size for data + size/2 for lengths */
+		outsz = 2*vcsizeu(size) + size + size/2;
+	else if(rle->rlef == rle2)
+		outsz = size; /* binary coding never exceeds size */
+	else if(size < 64*1024*1024) /* if get here: rle0/1 coding */
+		outsz = 2*size; /* small, just overallocate */
+	else /* count the extra RL_ESC's that might be needed */
+	{	for(dt = rle->ibuf, sz = 0, k = 0; k < size; ++k)
+			if(dt[k] >= RL_ONE)
+				sz += 1;
+		outsz = size + sz;
+	}
+	if(!(output = space = vcbuffer(vc, NIL(Vcchar_t*), outsz+128, hd)) )
+		RETURN(-1);
+
+	if(rle->rlef == rleg)
+	{	rle->obuf = output + vcsizeu(size);
 		rle->endo = rle->obuf + (rle->osiz = size);
 		rle->abuf = rle->endo + vcsizeu(size);
-		rle->asiz = size;
+		rle->asiz = size/2;
 
 		if((sz = (*rle->rlef)(rle, 1)) < 0 )
-			return -1;
+			RETURN(-1);
 
 		if(vc->coder) /* run continuator on the two parts */
-		{	if(vcrecode(vc, &rle->obuf, &rle->osiz, 0) < 0)
-				return -1;
-			if(vcrecode(vc, &rle->abuf, &rle->asiz, 0) < 0)
-				return -1;
+		{	if(vcrecode(vc, &rle->obuf, &rle->osiz, 0, 0) < 0)
+				RETURN(-1);
+			if(vcrecode(vc, &rle->abuf, &rle->asiz, 0, 0) < 0)
+				RETURN(-1);
 		}
 
 		sz = vcsizeu(rle->osiz) + rle->osiz + vcsizeu(rle->asiz) + rle->asiz;
-		if((sz += rle->rlef == rle2 ? 2 : 0) > outsz)
+		if(sz > outsz)
 			output = vcbuffer(vc, NIL(Vcchar_t*), sz, hd);
 
 		vcioinit(&io, output, sz);
-
-		if(rle->rlef == rle2) /* put out the run bytes */
-		{	vcioputc(&io, rle->onec);
-			vcioputc(&io, rle->twoc);
-		}
 
 		vcioputu(&io, rle->osiz);
 		if(rle->obuf != vcionext(&io))
@@ -440,10 +436,10 @@ Void_t**	out;
 		rle->endo = rle->obuf + outsz;
 
 		if((sz = (*rle->rlef)(rle, 1)) < 0 )
-			return -1;
+			RETURN(-1);
 
-		if(vcrecode(vc, &output, &sz, hd) < 0 )
-			return -1;
+		if(vcrecode(vc, &output, &sz, hd, 0) < 0 )
+			RETURN(-1);
 	}
 
 	if(space != output) /* free space if unused */
@@ -453,8 +449,13 @@ Void_t**	out;
 	vcioinit(&io, output, hd);
 	vcioputu(&io, size);
 
+	if(rle->rlef == rle2)
+	{	vcioputc(&io, rle->run1);
+		vcioputc(&io, rle->run2);
+	}
+
 	if(!(output = vcbuffer(vc, output, sz, -1)) ) /* truncate buffer to size */
-		return -1;
+		RETURN(-1);
 	if(out)
 		*out = output;
 	return sz;
@@ -478,57 +479,61 @@ Void_t**	out;
 	if(size == 0)
 		return 0;
 
+	rle->ibuf = rle->abuf = NIL(Vcchar_t*);
+	rle->isiz = rle->asiz = 0;
+
 	vcioinit(&io, data, size);
 	if((sz = vciogetu(&io)) <= 0 )
-		return -1;
+		RETURN(-1);
+
+	if(rle->rlef == rle2) /* get the two run bytes */
+	{	if(vciomore(&io) < 2)
+			RETURN(-1);
+		rle->run1 = vciogetc(&io);
+		rle->run2 = vciogetc(&io);
+	}
 
 	if(!(output = vcbuffer(vc, (Vcchar_t*)0, sz, 0)) )
-		return -1;
+		RETURN(-1);
 	rle->obuf = output;
 	rle->endo = rle->obuf + sz;
 
-	if(rle->rlef == rle2 || rle->rlef == rleg)
-	{	if(rle->rlef == rle2)
-		{	if(vciomore(&io) < 2)
-				return -1;
-			rle->onec = vciogetc(&io);
-			rle->twoc = vciogetc(&io);
-		}
-
-		if(vciomore(&io) <= 0 || (rle->isiz = vciogetu(&io)) < 0)
-			return -1;
+	if(rle->rlef == rleg)
+	{	if(vciomore(&io) <= 0 || (rle->isiz = vciogetu(&io)) < 0)
+			RETURN(-1);
 		if(vciomore(&io) < rle->isiz)
-			return -1;
+			RETURN(-1);
 		rle->ibuf = vcionext(&io);
 		vcioskip(&io, rle->isiz);
 
 		if(vciomore(&io) <= 0 || (rle->asiz = vciogetu(&io)) < 0)
-			return -1;
+			RETURN(-1);
 		if(vciomore(&io) < rle->asiz)
-			return -1;
+			RETURN(-1);
 		rle->abuf = vcionext(&io);
 
 		/* decode data by secondary encoders */
-		if(vcrecode(vc, &rle->ibuf, &rle->isiz, 0) < 0)
-			return -1;
-		if(vcrecode(vc, &rle->abuf, &rle->asiz, 0) < 0)
-			return -1;
+		if(vcrecode(vc, &rle->ibuf, &rle->isiz, 0, 0) < 0)
+			RETURN(-1);
+		if(vcrecode(vc, &rle->abuf, &rle->asiz, 0, 0) < 0)
+			RETURN(-1);
 	}
 	else
 	{	if(vciomore(&io) <= 0 || (rle->isiz = vciomore(&io)) < 0 )
-			return -1;
-		if(vciomore(&io) < rle->isiz)
-			return -1;
+			RETURN(-1);
 		rle->ibuf = vcionext(&io);
-		if(vcrecode(vc, &rle->ibuf, &rle->isiz, 0) < 0)
-			return -1;
+		if(vcrecode(vc, &rle->ibuf, &rle->isiz, 0, 0) < 0)
+			RETURN(-1);
 	}
 
 	if((*rle->rlef)(rle, 0) != sz) /* decode run data */
-		return -1;
+		RETURN(-1);
 
+	/* free temporary data */
 	if(rle->ibuf && (rle->ibuf < (Vcchar_t*)data || rle->ibuf >= (Vcchar_t*)data+size) )
 		vcbuffer(vc, rle->ibuf, -1, -1);
+	if(rle->abuf && (rle->abuf < (Vcchar_t*)data || rle->abuf >= (Vcchar_t*)data+size) )
+		vcbuffer(vc, rle->abuf, -1, -1);
 
 	if(out)
 		*out = output;
@@ -556,9 +561,9 @@ Vcchar_t**	datap;	/* basis string for persistence	*/
 
 	n = strlen(arg->name);
 	if(!(ident = (char*)vcbuffer(vc, NIL(Vcchar_t*), sizeof(int)*n+1, 0)) )
-		return -1;
+		RETURN(-1);
 	if(!(ident = vcstrcode(arg->name, ident, sizeof(int)*n+1)) )
-		return -1;
+		RETURN(-1);
 	if(datap)
 		*datap = (Void_t*)ident;
 	return n;
@@ -610,7 +615,7 @@ Void_t*		params;
 					break;
 
 		if(!(rle = (Rle_t*)calloc(1,sizeof(Rle_t))) )
-			return -1;
+			RETURN(-1);
 		rle->rlef = (Rle_f)arg->data;
 
 		vcsetmtdata(vc, rle);
@@ -623,16 +628,16 @@ Void_t*		params;
 	}
 	else if(type == VC_EXTRACT)
 	{	if(!(mtcd = (Vcmtcode_t*)params) )
-			return -1;
+			RETURN(-1);
 		if((mtcd->size = rleextract(vc, &mtcd->data)) < 0 )
-			return -1;
+			RETURN(-1);
 		return 1;
 	}
 	else if(type == VC_RESTORE)
 	{	if(!(mtcd = (Vcmtcode_t*)params) )
-			return -1;
+			RETURN(-1);
 		if(!(mtcd->coder = rlerestore(mtcd->data, mtcd->size)) )
-			return -1;
+			RETURN(-1);
 		return 1;
 	}
 

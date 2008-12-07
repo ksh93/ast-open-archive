@@ -18,6 +18,7 @@
 *                                                                      *
 ***********************************************************************/
 #include	"vchdr.h"
+#include	"vchuff.h"
 
 /*	Functions to read/write integers in various portable formats.
 **	Some of these are stolen from the Sfio library and modified 
@@ -860,12 +861,114 @@ ssize_t z;	/* size of 'a'			*/
 		type = c < 256 ? -1 : 1;
 	}
 
-	if(type > 0 ) /* already ASCII */
-		return s;
-	else /* do translation */
-	{	for(c = 0; c < z; ++c)
-			if((a[c] = (char)_ascii[s[c]]) == 0 )
-				break;
-		return c < z ? a : NIL(char*);
+	for(c = 0; c < z; ++c)
+		if((a[c] = (char)_ascii[s[c]]) == 0 )
+			break;
+	return c < z ? a : NIL(char*);
+}
+
+/* decode a list of integers from a null-terminated string */
+#if __STD_C
+ssize_t vcstr2list(char* str, int comma, ssize_t** listp)
+#else
+ssize_t vcstr2list(str, comma, listp)
+char*		str;	/* string to be parsed	*/
+int		comma;	/* value separator	*/
+ssize_t**	listp;	/* to return list	*/
+#endif
+{
+	ssize_t	n, k, *list;
+
+	for(n = 0, k = 0;; )
+	{	while(str[k] == ' ' || str[k] == '\t' || str[k] == comma)
+			k += 1;
+		if(!isdigit(str[k]) )
+			break;
+
+		while(isdigit(str[k]) )
+			k += 1;
+		n += 1; /* a well-defined value */
+	}
+
+	if(n == 0)
+		return n;
+
+	if(!(list = (ssize_t*)malloc(n*sizeof(ssize_t))) )
+		return -1;
+
+	for(n = 0, k = 0;; )
+	{	while(str[k] == ' ' || str[k] == '\t' || str[k] == comma)
+			k += 1;
+		if(!isdigit(str[k]) )
+			break;
+
+		list[n] = 0;
+		while(isdigit(str[k]) )
+		{	list[n] = list[n]*10 + (str[k] - '0');
+			k += 1;
+		}
+		n += 1; /* a well-defined value */
+	}
+
+	*listp = list;
+	return n;
+}
+
+
+/* transform data from/to bit-representation to/from hex-representation */
+ssize_t vchexcode(Vcchar_t* byte, ssize_t bytez, Vcchar_t* hex, ssize_t hexz, int type)
+{
+	int		b, h, l, r;
+	Vcchar_t	*dig;
+	static Vcchar_t	Upper[16], Lower[16], Rev[256], Didinit = 0;
+
+	if(!Didinit) /* initialize conversion tables */
+	{	memcpy(Upper, (Vcchar_t*)("0123456789ABCDEF"), 16);
+		memcpy(Lower, (Vcchar_t*)("0123456789abcdef"), 16);
+		for(b = 0; b < 256; ++b)
+			Rev[b] = (Vcchar_t)(~0);
+		for(b = 0; b < 16; ++b)
+		{	Rev[Upper[b]] = b; /* upper-case */
+			Rev[Lower[b]] = b; /* lower-case */
+		}
+		Didinit = 1;
+	}
+
+	if(!byte || !hex)
+		return -1;
+
+	if(type >= 0) /* byte to hex */
+	{	if(hexz < 2*bytez)
+			return -1;
+
+		/* 0 for lower-case, anything else upper-case */
+		dig = type == 0 ? Lower : Upper;
+
+		for(h = 0, b = 0; b < bytez; b += 1, h += 2)
+		{	if(h >= hexz-1)
+				return -1;
+			hex[h]   = dig[(byte[b]>>4) & 0xf];
+			hex[h+1] = dig[(byte[b]>>0) & 0xf];
+		}
+
+		if(h < hexz)
+			hex[h] = 0;
+		return h;
+	}
+	else /* hex to byte, allow mixed case */
+	{	if(hexz%2 != 0 || bytez < hexz/2)
+			return -1;
+		for(b = 0, h = 0; h < hexz; h += 2, b += 1)
+		{	if(b >= bytez ||
+			   (l = Rev[hex[h+0]]) == (Vcchar_t)(~0) ||
+			   (r = Rev[hex[h+1]]) == (Vcchar_t)(~0) )
+				return -1;
+
+			byte[b] = (Vcchar_t)((l<<4) | r);
+		}
+
+		if(b < bytez)
+			byte[b] = 0;
+		return b;
 	}
 }

@@ -356,7 +356,7 @@ Void_t**	out;
 
 	/* make sure we have enough data for decoding */
 	if((d+i+a) != vciomore(&data) )
-		DEBUG_RETURN(-1);
+		RETURN(-1);
 
 	/* data, instructions and COPY addresses */
 	rd = vcionext(&data);
@@ -367,15 +367,15 @@ Void_t**	out;
 	if(vc->coder)
 	{	if(ctrl&VCD_DATACOMPRESS)
 		{	if((d = vcapply(vc->coder, rd, d, &rd)) < 0 )
-				DEBUG_RETURN(-1);
+				RETURN(-1);
 		}
 		if(ctrl&VCD_INSTCOMPRESS)
 		{	if((i = vcapply(vc->coder, ri, i, &ri)) < 0 )
-				DEBUG_RETURN(-1);
+				RETURN(-1);
 		}
 		if(ctrl&VCD_ADDRCOMPRESS)
 		{	if((a = vcapply(vc->coder, ra, a, &ra)) < 0 )
-				DEBUG_RETURN(-1);
+				RETURN(-1);
 		}
 	}
 
@@ -389,7 +389,7 @@ Void_t**	out;
 
 	/* buffer to reconstruct data */
 	if(!(tar = vcbuffer(vc, NIL(Vcchar_t*), ntar, 0)) )
-		DEBUG_RETURN(-1);
+		RETURN(-1);
 	etar = tar + ntar;
 	nsrc = disc ? disc->size : 0;
 	src  = disc ? (Vcchar_t*)disc->data : NIL(Vcchar_t*);
@@ -401,7 +401,7 @@ Void_t**	out;
 
 		/* get the pair of instructions */
 		if(vciomore(&inst) <= 0)
-			DEBUG_RETURN(-1);
+			RETURN(-1);
 		cd = code + vciogetc(&inst);
 
 		for(i = 0; i < 2; ++i)
@@ -411,12 +411,12 @@ Void_t**	out;
 
 			if((sz = in->size) == 0)
 			{	if(vciomore(&inst) <= 0)
-					DEBUG_RETURN(-1);
+					RETURN(-1);
 				sz = vciogetu(&inst);
 			}
 
 			if(t+sz > etar)
-				DEBUG_RETURN(-1);
+				RETURN(-1);
 
 			if(in->type == VCD_BYTE)
 			{	d = in->mode;
@@ -425,16 +425,16 @@ Void_t**	out;
 			}
 			else if(in->type == VCD_COPY)
 			{	if(vciomore(&addr) <= 0)
-					DEBUG_RETURN(-1);
+					RETURN(-1);
 				d = vcdkagetaddr(ka,&addr,(t-tar)+nsrc,in->mode);
 				if(d < nsrc)
 				{	if(d+sz > nsrc)
-						DEBUG_RETURN(-1);
+						RETURN(-1);
 					s = src+d;
 				}
 				else
 				{	if((d -= nsrc) >= (t-tar) || (d+sz) > ntar)
-						DEBUG_RETURN(-1);
+						RETURN(-1);
 					s = tar+d;
 				}
 				for(; sz > 0; --sz)
@@ -442,18 +442,18 @@ Void_t**	out;
 			}
 			else if(in->type == VCD_ADD)
 			{	if(vciomore(&data) < sz)
-					DEBUG_RETURN(-1);
+					RETURN(-1);
 				vciogets(&data, t, sz);
 				t += sz;
 			}
 			else if(in->type == VCD_RUN)
 			{	if(vciomore(&data) <= 0)
-					DEBUG_RETURN(-1);
+					RETURN(-1);
 				d = vciogetc(&data);
 				for(; sz > 0; --sz)
 					*t++ = (Vcchar_t)d;
 			}
-			else	DEBUG_RETURN(-1);
+			else	RETURN(-1);
 		}
 	}
 

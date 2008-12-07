@@ -45,7 +45,7 @@ Void_t**	out;
 
 	/* compute suffix array */
 	if(!(sfx = vcsfxsort(data,size)) )
-		return -1;
+		RETURN(-1);
 
 	/* compute the location of the sentinel */
 	for(endidx = (idx = sfx->idx)+size; idx < endidx; ++idx)
@@ -69,7 +69,7 @@ Void_t**	out;
 
 	/* filter data thru the continuation coder */
 	dt = output;
-	if(vcrecode(vc, &output, &sz, hd) < 0 )
+	if(vcrecode(vc, &output, &sz, hd, 0) < 0 )
 		goto done;
 	if(dt != output) /* got a new buffer, free old one */
 		vcbuffer(vc, dt, -1, -1);
@@ -82,7 +82,7 @@ Void_t**	out;
 
 	/* truncate buffer to size */
 	if(!(output = vcbuffer(vc, output, rv, -1)) )
-		return -1;
+		RETURN(-1);
 	if(out)
 		*out = output;
 done:	free(sfx);
@@ -110,26 +110,26 @@ Void_t**	out;
 	vcioinit(&io, data, size);
 
 	if((sp = vciogetu(&io)) < 0) /* index of 0th position */
-		return -1;
+		RETURN(-1);
 
 	/* retrieve transformed data */
 	sz = vciomore(&io);
 	dt = vcionext(&io);
 
 	/* invert continuation coder if there was one */
-	if(vcrecode(vc, &dt, &sz, 0) <= 0 )
-		return -1;
+	if(vcrecode(vc, &dt, &sz, 0, 0) < 0 )
+		RETURN(-1);
 	sz -= 1; /* actual data size */
 
 	if(sp >= sz) /* corrupted data */
-		return -1;
+		RETURN(-1);
 
 	/* get space to decode */
 	if(!(output = vcbuffer(vc, NIL(Vcchar_t*), sz, 0)) )
-		return -1;
+		RETURN(-1);
 
 	if(!(offset = (ssize_t*)malloc((sz+1)*sizeof(ssize_t))) )
-		return -1;
+		RETURN(-1);
 
 	/* base and offset vector for bytes */
 	for(n = 0; n < 256; ++n)

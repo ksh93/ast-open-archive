@@ -1677,6 +1677,45 @@ unbind(const char* s, char* v, void* h)
 }
 
 /*
+ * append views of absolute path s to source list z
+ */
+
+static List_t*
+absolute(List_t* z, char* s, Sfio_t* tmp)
+{
+	int	i;
+	int	j;
+	int	n;
+	Rule_t*	x;
+	char*	t;
+
+	if (state.questionable & 0x00000004)
+		return z;
+	for (i = 0; i < state.maxview; i++)
+	{
+		if (!strncmp(s, state.view[i].root, n = state.view[i].rootlen) && (!*(s + n) || *(s + n) == '/'))
+		{
+			s += n;
+			j = i;
+			while (++j <= state.maxview)
+			{
+				sfprintf(tmp, "%s%s", state.view[j].root, s);
+				t = sfstruse(tmp);
+				if (!(x = getrule(t)))
+					x = makerule(t);
+				if (!(x->mark & M_directory))
+				{
+					x->mark |= M_directory;
+					z = z->next = cons(x, NiL);
+				}
+			}
+			break;
+		}
+	}
+	return z;
+}
+
+/*
  * fix up .SOURCE prereqs after user assertion
  */
 
@@ -1760,6 +1799,8 @@ source(register Rule_t* r)
 						x->mark |= M_directory;
 						z = z->next = cons(x, NiL);
 					}
+					if (*(t = unbound(x)) == '/')
+						z = absolute(z, t, tmp);
 				}
 				else if (!p->rule->view)
 				{
@@ -1825,7 +1866,10 @@ source(register Rule_t* r)
 					for (p = q; p; p = p->next)
 					{
 						if (*(t = unbound(p->rule)) == '/')
+						{
+							z = absolute(z, t, tmp);
 							break;
+						}
 						if (!p->rule->view)
 						{
 							if (*t == '.' && !*(t + 1))
@@ -1878,6 +1922,8 @@ source(register Rule_t* r)
 						x->mark |= M_directory;
 						z = z->next = cons(x, NiL);
 					}
+					if (*(s = unbound(x)) == '/')
+						z = absolute(z, s, tmp);
 				}
 			} while (q = p);
 		}

@@ -607,8 +607,14 @@ ppsearch(char* file, int type, int flags)
 
 	pp.include = 0;
 	fd = -1;
-	dospath = 0;
 	chop = 0;
+	if (s = strchr(file, '\\'))
+	{
+		do *s++ = '/'; while (s = strchr(s, '\\'));
+		dospath = 1;
+	}
+	else
+		dospath = 0;
  again:
 	pathcanon(file, 0);
 	if (chop)
@@ -759,15 +765,6 @@ ppsearch(char* file, int type, int flags)
 
 		switch (dospath)
 		{
-		case 0:
-			if (s = strchr(file, '\\'))
-			{
-				do *s++ = '/'; while (s = strchr(s, '\\'));
-				pathcanon(file, 0);
-				dospath = 1;
-				goto again;
-			}
-			/*FALLTHROUGH*/
 		case 1:
 			if (ppisid(file[0]) && file[1] == ':' && file[2] == '/')
 			{

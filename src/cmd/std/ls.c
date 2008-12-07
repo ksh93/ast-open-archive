@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,12 +26,12 @@
  */
 
 #define TIME_ISO	"%Q/%m-%d+%H:%M/%Y-%m-%d /"
-#define TIME_LONG_ISO	"%K"
-#define TIME_FULL_ISO	"%K.%N%z"
+#define TIME_LONG_ISO	"%_K"
+#define TIME_FULL_ISO	"%_EK"
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2007-08-03 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2008-12-08 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -1697,7 +1697,7 @@ main(int argc, register char** argv)
 			sfputr(fmt, "%5(blocks)u ", -1);
 		if (state.lsflags & LS_LONG)
 		{
-			sfputr(fmt, "%(mode)s%3(nlink)u", -1);
+			sfputr(fmt, "%(mode)s %3(nlink)u", -1);
 			if (!(state.lsflags & LS_NOUSER))
 				sfprintf(fmt, " %%-8(uid)%c", (state.lsflags & LS_NUMBER) ? 'd' : 's');
 			if (!(state.lsflags & LS_NOGROUP))

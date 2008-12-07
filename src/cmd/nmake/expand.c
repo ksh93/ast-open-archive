@@ -1458,6 +1458,8 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	char*		t;
 	char*		u;
 	char*		b;
+	char*		a;
+	char*		z;
 	char*		tok;
 	char*		lib;
 	Rule_t*		r;
@@ -1474,6 +1476,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	int		i;
 	int		j;
 	int		k;
+	int		m;
 	int		p;
 	int		var;
 
@@ -1494,10 +1497,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 		d = *v++;
 		if ((d->mark & M_MUST) && (sp = rsfopen(bind(r)->name)))
 		{
-			if (s = strrchr(d->name, '/'))
-				s++;
-			else
-				s = d->name;
+			z = 0;
 			while (s = sfgetr(sp, '\n', 1))
 			{
 				j = p = 0;
@@ -1507,8 +1507,9 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 					var = 0;
 					lib = 0;
 					for (k = 1; (i = *s) == ' ' || i == '\t' || i == '\r' || i == '"' || i == '\''; s++);
+					m = *s != '-' && *s != '+' || *(s + 1) != 'l';
 					for (t = s; (i = *s) && i != ' ' && i != '\t' && i != '\r' && i != '"' && i != '\'' && i != '\\' && i != ':'; s++)
-						if (i == '/')
+						if (i == '/' && m)
 							t = s + 1;
 						else if (i == '.' && *(s + 1) != 'c' && *(s + 1) != 'C' && *(s + 1) != 'h' && *(s + 1) != 'H' && t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
 							*s = 0;
@@ -1522,11 +1523,27 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 						k = 0;
 					else if ((t[0] == '-' || t[0] == '+') && t[1] == 'l')
 					{
-						for (u = t += 2; istype(*u, C_ID1|C_ID2); u++);
+						a = 0;
+						for (u = t += 2; istype(*u, C_ID1|C_ID2) || *u == '/' && (a = u); u++);
 						*u = 0;
 						if (!*t)
 							continue;
-						sfprintf(internal.nam, "lib%s", t);
+						if (a)
+						{
+							if (!z)
+								for (m = 0, z = d->name + strlen(d->name); z > d->name; z--)
+									if (*z == '/' && ++m == 2)
+									{
+										z++;
+										break;
+									}
+							if (z > d->name)
+								sfprintf(internal.nam, "%-.*s%-.*slib/%s", z - d->name, d->name, a - t, t, a + 1);
+							else
+								sfprintf(internal.nam, "%s", a + 1);
+						}
+						else
+							sfprintf(internal.nam, "lib%s", t);
 						lib = t = sfstruse(internal.nam);
 					}
 					else if (p)

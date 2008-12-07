@@ -19,7 +19,7 @@
 ***********************************************************************/
 #include	"vchdr.h"
 
-static char*	Version = "\r\n@(#)vcodex (AT&T Shannon Laboratory - Kiem-Phong Vo) 2008-05-01\0\r\n";
+static char*	Version = "\r\n@(#)$Id: vcodex (AT&T Shannon Laboratory - Kiem-Phong Vo) 2008-11-04 $\r\n";
 
 /*	Open a handle for data coding
 **

@@ -1,3 +1,4 @@
+08-12-04 fs.c: change open(/dev/fd/NN,...) try open(2) first, then dup(2)
 08-06-20 ast_3d.h,ast.c: add libast/misc/setenviron.c
 07-03-26 Makefile: drop -L* from IFFEREFS -- handled by .IFFE.REF.
 07-03-21 lib_3d.h,error.c: handle error_info => *_error_data_

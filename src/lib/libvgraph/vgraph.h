@@ -108,6 +108,11 @@ struct _gralgo_s
 #define _Grgraph(oo)	((Grgraph_t*)(oo))
 
 _BEGIN_EXTERNS_
+
+#if _BLD_vgraph && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern Graph_t*		gropen _ARG_((Grdisc_t*, int));
 extern int		grclose _ARG_((Graph_t*));
 extern int		grrestore _ARG_((Graph_t*));
@@ -119,6 +124,9 @@ extern Grnode_t*	grfold _ARG_((Grnode_t*, Grnode_t*));
 extern Grnode_t*	_grfind _ARG_((Grnode_t*));
 
 extern Grdata_t*	_grdata _ARG_((Grdata_t**, Gralgo_t*, int));
+
+#undef	extern
+
 _END_EXTERNS_
 
 /* return the representative node for a collapsed set of nodes */
@@ -144,9 +152,27 @@ _END_EXTERNS_
 *	Functions germane to the algorithm to compute an optimum branching.
 ******************************************************************************/
 _BEGIN_EXTERNS_
+
+#if _BLD_vgraph && defined(__EXPORT__)
+#define extern		extern __EXPORT__
+#endif
+#if !_BLD_vgraph && defined(__IMPORT__)
+#define extern		extern __IMPORT__
+#endif
+
 extern Gralgo_t*	Grbranching;
+
+#undef	extern
+
+#if _BLD_vgraph && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 extern ssize_t		grbranching _ARG_((Graph_t*));
 extern ssize_t		grbrweight _ARG_((Gredge_t*, ssize_t));
+
+#undef	extern
+
 _END_EXTERNS_
 
 #endif /*_GRAPH_H*/
