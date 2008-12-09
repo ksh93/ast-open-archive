@@ -251,9 +251,10 @@ Vcodex_t*	vc;
 char*		name;	/* name of the parameter to set	*/
 Void_t*		val;	/* data to set the parameter	*/
 int		type;	/* different coding types:	*/
-			/*   0: 'char' in C-style	*/
-			/*   1: 'int' in decimal	*/
-			/*   *: null-terminated string 	*/
+			/*   0: null-terminated string 	*/
+			/*   1: 'char' in C-style	*/
+			/*   >0: 'int' in decimal	*/
+			/*   <0: no value		*/
 #endif
 {
 	Vcchar_t	data[1024], *v;
@@ -273,9 +274,20 @@ int		type;	/* different coding types:	*/
 	if(name[k] || k > MAXNAME)
 		return -1;
 
-	data[k++] = '=';
-	if(type == 0) /* char, code in C-style */
-	{	type = (unsigned char)TYPECAST(int,val);
+	if(type == 0) /* string */
+	{	if((v = (Vcchar_t*)val) != NIL(Vcchar_t*) )
+		{	data[k++] = '=';
+			while(k < sizeof(data)-1)
+			{	if(*v == 0)
+					break;
+				data[k++] = *v++;
+			}
+		}
+	}
+	else if(type == 1) /* char, code in C-style octals */
+	{	data[k++] = '=';
+
+		type = (unsigned char)TYPECAST(int,val);
 		data[k++] = '\\';
 		if(type >= 64)
 		{	data[k++] = '0' + type/64; type %= 64;
@@ -292,8 +304,10 @@ int		type;	/* different coding types:	*/
 		do_0:	data[k++] = '0' + type;
 		}
 	}
-	else if(type == 1) /* int, code in base 10 */
-	{	if((type = TYPECAST(int,val)) < 0)
+	else if(type > 0) /* int, code in base 10 */
+	{	data[k++] = '=';
+
+		if((type = TYPECAST(int,val)) < 0)
 			type = -type;
 		for(v = data + sizeof(data); ; )
 		{	*--v = '0' + type%10; type /= 10;
@@ -306,14 +320,7 @@ int		type;	/* different coding types:	*/
 		while(v < &data[sizeof(data)] )
 			data[k++] = *v++;
 	}
-	else /* string */
-	{	v = (unsigned char*)val;
-		while(k < sizeof(data)-1)
-		{	if(*v == 0)
-				break;
-			data[k++] = *v++;
-		}
-	}
+
 	data[k] = 0;
 
 	return (*vc->meth->eventf)(vc, VC_SETMTARG, (Void_t*)data);

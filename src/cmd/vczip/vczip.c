@@ -30,7 +30,7 @@
 #define VCZIPRC		".vcziprc"
 
 static const char usage[] =
-"[-?\n@(#)$Id: vczip (AT&T Research) 2008-06-06 $\n]"
+"[-?\n@(#)$Id: vczip (AT&T Research) 2008-11-04 $\n]"
 USAGE_LICENSE
 "[+NAME?vczip - vcodex method encode/decode filter]"
 "[+DESCRIPTION?\bvczip\b is a filter that decodes the standard input "

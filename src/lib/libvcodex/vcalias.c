@@ -50,19 +50,20 @@ struct _vcalias_s
 
 static char	*Dfltalias[] =
 {	"b = bwt,mtf,rle.0,huffgroup",
-	"delta = delta,huffgroup",
+	"delta = sieve.delta,bwt,mtf,rle.0,huffgroup",
 	"dna = sieve.reverse.map=ATGCatgc,huffgroup",
-	"flatrdb = rdb,bwt,mtf,rle.0,huffgroup",
 	"fixedrdb = rdb.full,table,mtf,rle.0,huffgroup",
-	"q = transpose,rle,huffman",
-	"t = table,mtf,rle.0,huffgroup",
-	"rt = rtable,mtf,rle.0,huffgroup",
-	"qv = ama,transpose,rle,huffman",
-	"tv = ama,table,mtf,rle.0,huffgroup",
-	"tnl = ama.nl,table,mtf,rle.0,huffgroup",
-	"tss7 = ss7,table,mtf,rle.0,huffpart",
-	"tbdw = bdw,ama,table,mtf,rle.0,huffgroup",
+	"flatrdb = rdb,bwt,mtf,rle.0,huffgroup",
 	"netflow = netflow,mtf,rle.0,huffgroup",
+	"q = transpose,rle,huffman",
+	"qv = ama,transpose,rle,huffman",
+	"rt = rtable,mtf,rle.0,huffgroup",
+	"t = table,mtf,rle.0,huffgroup",
+	"tbdw = bdw,ama,table,mtf,rle.0,huffgroup",
+	"tnl = ama.nl,table,mtf,rle.0,huffgroup",
+	"tnls = ama.nls,rtable,mtf,rle.0,huffgroup",
+	"tss7 = ss7,table,mtf,rle.0,huffpart",
+	"tv = ama,table,mtf,rle.0,huffgroup",
 	0
 };
 

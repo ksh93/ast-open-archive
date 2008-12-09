@@ -1,3 +1,4 @@
+08-11-04 vczip.c: change date to official kpv release
 08-06-06 sync with kpv; add ast plugins and optget() usage
 05-09-25 vczip.c: fix empty input test for pipes
 05-06-16 vczip.c: snarf from kpv
