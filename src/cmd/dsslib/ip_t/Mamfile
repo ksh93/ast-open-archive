@@ -137,6 +137,9 @@ prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ptv.h
 prev pt.h implicit
+make fv.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done fv.h
 make itl.h implicit
 make ${PACKAGE_ast_INCLUDE}/cx.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
@@ -375,9 +378,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -
 done ptrebit.o generated
 make fv.o
 make fv.c
-make fv.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done fv.h
+prev fv.h implicit
 done fv.c
 meta fv.o %.c>%.o fv.c fv
 prev fv.c

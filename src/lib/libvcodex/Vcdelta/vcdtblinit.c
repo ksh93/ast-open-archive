@@ -127,7 +127,11 @@ Vcdindex_t*	idx;
 	/**/DEBUG_ASSERT(i == 256);
 }
 
+#if __STD_C
+void _vcdtblinit(void)
+#else
 void _vcdtblinit()
+#endif
 {
 	if(!_Vcdtbl)
 	{	vcdtblmake(&_Vcdtable, &_Vcdsize, &_Vcdindex);

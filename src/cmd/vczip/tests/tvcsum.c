@@ -18,31 +18,39 @@
 *                                                                      *
 ***********************************************************************/
 #include	"vctest.h"
+#include	"vccrypto.h"
 
-#define NCOLS	1600
-#define NROWS	2000
+/* hold test strings */
+typedef struct _pair_s
+{	Vcchar_t*	str;
+	Vcchar_t*	sum;
+} Pair_t;
+
+static Pair_t	Md5[] =
+{	{ "0123456789", "781E5E245D69B566979B86E28D23F2C7" },
+	{ "abcdefghij", "A925576942E94B2EF57A066101B48876" },
+	{ 0, 0 }
+};
 
 main()
 {
-	int		i, j;
-	Vcchar_t	matrix[NROWS][NCOLS], trans[NCOLS][NROWS], *tr;
-	Vcodex_t	*vc;
+	ssize_t		k, n, h;
+	Vcchar_t	*sum, hex[1024];
+	Vcx_t		xx;
 
-	for(i = 0; i < NROWS; ++i)
-	for(j = 0; j < NCOLS; ++j)
-	{	matrix[i][j] = 'a' + (i+j)%26;
-		trans[j][i] = 'a' + (i+j)%26;
+	if(vcxinit(&xx, Vcxmd5sum, 0, 0) < 0)
+		terror("Initializing md5 handle");
+	for(k = 0; Md5[k].str; ++k)
+	{	if((n = vcxencode(&xx, Md5[k].str, strlen(Md5[k].str), &sum)) < 0 )
+			terror("Encoding data");
+		if(n != 16)
+			terror("Bad md5 digest length");
+		if((h = vchexcode(sum, n, hex, sizeof(hex), 1)) != 32)
+			terror("Bad md5 hex coding length");
+		if(strcmp(Md5[k].sum, hex) != 0)
+			terror("Bad md5 digest");
 	}
-
-	if(!(vc = vcopen(0, Vctranspose, "0", 0, VC_ENCODE)) )
-		terror("Cannot open Vctranspose handle");
-
-	vcsetmtarg(vc, "columns", (Void_t*)1600, 2);
-	if((i = vcapply(vc, matrix, sizeof(matrix), &tr)) != sizeof(matrix) )
-		terror("Vctranspose failed");
-
-	if(memcmp(&trans[0][0], tr, sizeof(trans)) != 0)
-		terror("Bad data");
+	vcxstop(&xx);
 
 	exit(0);
 }

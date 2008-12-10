@@ -115,6 +115,8 @@ extern ssize_t		vcdkagetaddr _ARG_((Vcdcache_t*, Vcio_t*, ssize_t, ssize_t));
 
 extern Vcdtable_t*	vcdbmtable();
 extern int		vcdbmputinst _ARG_((Vclzparse_t*, ssize_t, ssize_t, ssize_t, ssize_t, int));
+
+extern void		_vcdtblinit _ARG_((void));
 _END_EXTERNS_
 
 #endif /*_VDELHDR_H*/

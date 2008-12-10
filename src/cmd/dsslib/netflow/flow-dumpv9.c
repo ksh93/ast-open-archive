@@ -105,11 +105,7 @@ dumpv9fread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* d
 				if (!(pp->data = (unsigned char*)sfreserve(file->io, NETFLOW_PACKET, 0)))
 				{
 					if (sfvalue(file->io))
-					{
-						if (disc->errorf)
-							(*disc->errorf)(NiL, disc, 2, "%slast packet incomplete", cxlocation(file->dss->cx, record));
-						return -1;
-					}
+						goto incomplete;
 					return 0;
 				}
 				if ((rp->version = BE2(pp->data)) != 9)

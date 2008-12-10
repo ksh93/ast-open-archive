@@ -28,7 +28,7 @@
 #define VCSF_BUFMIN	(64*1024)	/* surely affordable!	*/
 #define VCSF_WSIZE	(4*1024*1024)	/* dflt encoding window	*/
 #define VCSF_SLACK	(16*sizeof(size_t)) /* for extra coding	*/
-#define VCSFDTSZ(sz)	((sz) + ((sz)/2 >= 1024 ? (sz)/2 : 1024) )
+#define VCSFDTSZ(sz)	((((sz) / 1024) + 2) * 1024)
 
 #define VCSFERROR(dc,m)	((dc)->sfdt->errorf ? ((*(dc)->sfdt->errorf)(m), -1) : -1 )
 
@@ -315,12 +315,10 @@ Sfdisc_t*	disc;
 	{	memcpy(sfdc->base, sfdc->code, sz);
 		sfdc->endb = (sfdc->code = sfdc->base) + sz;
 	}
-
 	for(; sz < sfdc->bssz; sz += n, sfdc->endb += n)
-	{	if(!disc)
+	{	if(!disc) /* plain read if no discipline set yet */
 			n = sfread(f, sfdc->endb, sfdc->bssz-sz);
-		else
-			n = sfrd(f, sfdc->endb, sfdc->bssz-sz, disc);
+		else	n = sfrd(f, sfdc->endb, sfdc->bssz-sz, disc);
 		if(n <= 0)
 			break;
 	}
@@ -423,7 +421,7 @@ size_t		dtsz;
 }
 
 #if __STD_C
-static ssize_t getheader(Sfdc_t* sfdc, Sfio_t* f, int init, int identify )
+static ssize_t getheader(Sfdc_t* sfdc, Sfio_t* f, int init, int identify)
 #else
 static ssize_t getheader(sfdc, f, init, identify)
 Sfdc_t*		sfdc;

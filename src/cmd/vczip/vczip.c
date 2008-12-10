@@ -83,6 +83,7 @@ USAGE_LICENSE
 "[d:vcdiff|ietf?Encode as defined in IETF RFC3284.]"
 "[p:plain?Do not encode transformation information in the data. This means "
     "the transform must be explicitly supplied to decode.]"
+"[D:debug?Debug: print the pid and sleep(10); then continue processing.]"
 "[M:move?Use sfmove() for io.]"
 
 "\n"
@@ -234,6 +235,10 @@ main(int argc, char** argv)
 		case 'd':
 			type = VCSF_VCDIFF;
 			continue;
+		case 'D':
+			error(1, "pid %d", getpid());
+			sleep(10);
+			continue;
 		case 'f':
 			if ((from = ccmapid(opt_info.arg)) < 0)
 				error(2, "%s: unknown codeset", opt_info.arg);
@@ -287,14 +292,6 @@ main(int argc, char** argv)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	if((map = ccmap(from, to)) && !(vcm = vcopen(0, Vcmap, map, 0, VC_ENCODE)) )
 		error(3, "cannot open codeset conversion handle");
-	if(sfsize(sfstdin) == 0) /* a potentially empty data stream */
-	{	Void_t *data;
-
-		/* see if this is just a pipe showing up initially empty */
-		if(!(data = sfreserve(sfstdin, -1, SF_LOCKR)) || sfvalue(sfstdin) == 0 )
-			return 0; /* empty data transforms to empty output */
-		else	sfread(sfstdin, data, 0); /* reset stream for normal transformation */
-	}
 
 	/* turn off share mode to avoid peeking on unseekable devices */
 	sfset(sfstdin, SF_SHARE, 0);
@@ -303,6 +300,15 @@ main(int argc, char** argv)
 	/* use binary mode for file I/O */
 	sfopen(sfstdin, NiL, "rb");
 	sfopen(sfstdout, NiL, "wb");
+
+	if(sfsize(sfstdin) == 0) /* a potentially empty data stream */
+	{	Void_t *data;
+
+		/* see if this is just a pipe showing up initially empty */
+		if(!(data = sfreserve(sfstdin, -1, SF_LOCKR)) || sfvalue(sfstdin) == 0 )
+			return 0; /* empty data transforms to empty output */
+		else	sfread(sfstdin, data, 0); /* reset stream for normal transformation */
+	}
 
 	/* open stream for data processing */
 	sfdt.type   = type;

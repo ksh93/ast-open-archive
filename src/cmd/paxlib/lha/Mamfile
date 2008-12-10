@@ -111,6 +111,7 @@ make ${PACKAGE_ast_INCLUDE}/swap.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/swap.h
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 make ${PACKAGE_ast_INCLUDE}/codex.h implicit
 make codexlib.h implicit
 done codexlib.h dontcare virtual

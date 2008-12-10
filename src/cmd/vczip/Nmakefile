@@ -11,9 +11,9 @@ vcunzip :LINK: vczip
 :TEST: vczip
 
 vcodex :TEST: testvcodex vctest.h terror.h +lvcodex +last \
-	tio.c tvcbwt.c tvcbwzip.c tvcdelta.c tvchuff.c \
-	tvchuffgroup.c tvcmtf.c tvcqsort.c tvcrdb.c \
-	tvcrle.c tvcrtable.c tvctable.c tvctranspose.c
+	tio.c tvcbwt.c tvcbwzip.c tvccrypt.c tvcdelta.c \
+	tvchuff.c tvchuffgroup.c tvcmtf.c tvcqsort.c tvcrdb.c \
+	tvcrle.c tvcsum.c tvcrtable.c tvctable.c tvctranspose.c
 		set +x; $(*:O=1) $(TESTVCODEXFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
-:: RELEASE Makefile tvctable.c
+:: RELEASE Makefile

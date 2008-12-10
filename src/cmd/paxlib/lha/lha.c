@@ -6,6 +6,7 @@
 
 #include <paxlib.h>
 #include <codex.h>
+#include <ctype.h>
 #include <swap.h>
 #include <tm.h>
 

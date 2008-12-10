@@ -207,6 +207,12 @@ done tests/tvcbwt.c
 make tests/tvcbwzip.c
 prev tests/vctest.h implicit
 done tests/tvcbwzip.c
+make tests/tvccrypt.c
+make ${PACKAGE_ast_INCLUDE}/vccrypto.h implicit
+prev ${PACKAGE_ast_INCLUDE}/vcodex.h implicit
+done ${PACKAGE_ast_INCLUDE}/vccrypto.h
+prev tests/vctest.h implicit
+done tests/tvccrypt.c
 make tests/tvcdelta.c
 prev tests/vctest.h implicit
 done tests/tvcdelta.c
@@ -244,6 +250,10 @@ done tests/tvcrdb.c
 make tests/tvcrle.c
 prev tests/vctest.h implicit
 done tests/tvcrle.c
+make tests/tvcsum.c
+prev ${PACKAGE_ast_INCLUDE}/vccrypto.h implicit
+prev tests/vctest.h implicit
+done tests/tvcsum.c
 make tests/tvcrtable.c
 prev tests/vctest.h implicit
 done tests/tvcrtable.c
@@ -254,6 +264,6 @@ make tests/tvctranspose.c
 prev tests/vctest.h implicit
 done tests/tvctranspose.c
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
-exec - 	set +x; tests/testvcodex  tests/vctest.h tests/terror.h ${mam_libvcodex} ${mam_libast} tests/tio.c tests/tvcbwt.c tests/tvcbwzip.c tests/tvcdelta.c tests/tvchuff.c tests/tvchuffgroup.c tests/tvcmtf.c tests/tvcqsort.c tests/tvcrdb.c tests/tvcrle.c tests/tvcrtable.c tests/tvctable.c tests/tvctranspose.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Itests -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
+exec - 	set +x; tests/testvcodex  tests/vctest.h tests/terror.h ${mam_libvcodex} ${mam_libast} tests/tio.c tests/tvcbwt.c tests/tvcbwzip.c tests/tvccrypt.c tests/tvcdelta.c tests/tvchuff.c tests/tvchuffgroup.c tests/tvcmtf.c tests/tvcqsort.c tests/tvcrdb.c tests/tvcrle.c tests/tvcsum.c tests/tvcrtable.c tests/tvctable.c tests/tvctranspose.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Itests -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
 done test.vcodex virtual
 done test dontcare virtual

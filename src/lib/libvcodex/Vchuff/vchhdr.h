@@ -117,4 +117,8 @@ do {	Vchobj_t* oo = (Vchobj_t*)(o); Vcchar_t* ff = (Vcchar_t*)(f); \
 	for(; nn > 0; nn -= VCH_SW) GRPsize(v, sz, oo, ff, nn >= VCH_SW ? VCH_SW : nn); \
 } while(0)
 
+_BEGIN_EXTERNS_
+extern int	vchcopy(Vcodex_t*, ssize_t*, ssize_t*, ssize_t);
+_END_EXTERNS_
+
 #endif

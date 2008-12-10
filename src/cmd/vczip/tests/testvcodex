@@ -79,7 +79,18 @@ do	(( tests = tests + 1 ))
 		}
 	}
 	prev=$file
-	"$@" $inc -o t.exe $file $lib >&9 2>&1
+	# XXX compensate for nmake -lvcodex/foo => plugin #
+	lcl= plugins=
+	case $file in
+	*crypt*)plugins="$plugins crypt" ;;
+	*rdb*)	plugins="$plugins rdb" ;;
+	*sum*)	plugins="$plugins sum" ;;
+	esac
+	for p in $plugins
+	do	set -A plugin $INSTALLROOT/lib/vcodex/*$p*
+		[[ -f ${plugin[1]} ]] && lcl="$lcl ${plugin[1]}"
+	done
+	"$@" $inc -o t.exe $file $lcl $lib >&9 2>&1
 	code=$?
 	rm -f ${test}.[oO]*
 	case $code in

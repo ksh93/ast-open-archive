@@ -32,6 +32,7 @@ USAGE_LICENSE
 ;
 
 #include <dsslib.h>
+#include <tm.h>
 
 #define FIELD_string	0
 #define FIELD_number	1

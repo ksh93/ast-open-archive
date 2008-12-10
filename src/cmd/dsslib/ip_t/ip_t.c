@@ -32,6 +32,7 @@ static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2008-08
 #include <bgp.h>
 #include <ire.h>
 #include <itl.h>
+#include <fv.h>
 #include <pt.h>
 #include <ptv.h>
 
