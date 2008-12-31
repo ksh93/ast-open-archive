@@ -163,6 +163,35 @@ final day feb 1999			NULL	Sun Feb 28 00:00:00 EST 1999
 final day feb 1996			NULL	Thu Feb 29 00:00:00 EST 1996
 
 #
+# work days
+#
+
+first workday jan 2009			NULL	Thu Jan  1 00:00:00 EST 2009
+last work day jan 2009			NULL	Fri Jan 30 00:00:00 EST 2009
+first workday feb 2009			NULL	Mon Feb  2 00:00:00 EST 2009
+last work day feb 2009			NULL	Fri Feb 27 00:00:00 EST 2009
+first workday mar 2009			NULL	Mon Mar  2 00:00:00 EST 2009
+last work day mar 2009			NULL	Tue Mar 31 00:00:00 EDT 2009
+first workday apr 2009			NULL	Wed Apr  1 00:00:00 EDT 2009
+last work day apr 2009			NULL	Thu Apr 30 00:00:00 EDT 2009
+first workday may 2009			NULL	Fri May  1 00:00:00 EDT 2009
+last work day may 2009			NULL	Fri May 29 00:00:00 EDT 2009
+first workday jun 2009			NULL	Mon Jun  1 00:00:00 EDT 2009
+last work day jun 2009			NULL	Tue Jun 30 00:00:00 EDT 2009
+first workday jul 2009			NULL	Wed Jul  1 00:00:00 EDT 2009
+last work day jul 2009			NULL	Fri Jul 31 00:00:00 EDT 2009
+first workday aug 2009			NULL	Mon Aug  3 00:00:00 EDT 2009
+last work day aug 2009			NULL	Mon Aug 31 00:00:00 EDT 2009
+first workday sep 2009			NULL	Tue Sep  1 00:00:00 EDT 2009
+last work day sep 2009			NULL	Wed Sep 30 00:00:00 EDT 2009
+first workday oct 2009			NULL	Thu Oct  1 00:00:00 EDT 2009
+last work day oct 2009			NULL	Fri Oct 30 00:00:00 EDT 2009
+first workday nov 2009			NULL	Mon Nov  2 00:00:00 EST 2009
+last work day nov 2009			NULL	Mon Nov 30 00:00:00 EST 2009
+first workday dec 2009			NULL	Tue Dec  1 00:00:00 EST 2009
+last work day dec 2009			NULL	Thu Dec 31 00:00:00 EST 2009
+
+#
 # a few leap year tests
 #
 
@@ -648,7 +677,7 @@ NIL	%_I		 3
 NIL	%_j		265
 NIL	%_J		264
 NIL	%_k		Mon Sep 22 15:09:47 EDT 1986
-NIL	%_K		1986-09-22+15:09:47
+NIL	%_K		1986-09-22 15:09:47
 NIL	%_l		Sep 22  1986
 NIL	%_L		Mon Sep 22 15:09:47 EDT 1986
 NIL	%_m		 9

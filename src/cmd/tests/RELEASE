@@ -1,3 +1,5 @@
+08-12-30 date.dat: add TM_WORK tests
+08-12-19 date.dat,datey2k.dat: update for %_K
 08-06-24 date.dat: update for tmxfmt() %z fix
 08-05-22 testdate.sh: add date.dat supplement test case generator
 08-05-20 strtof*.rt: reorganize strtof tests for easy(ier) change
