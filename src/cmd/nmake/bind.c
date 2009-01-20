@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1870,7 +1870,7 @@ source(register Rule_t* r)
 							z = absolute(z, t, tmp);
 							break;
 						}
-						if (!p->rule->view)
+						if (!p->rule->view || (p->rule->property & P_target) && !strchr(t, '/'))
 						{
 							if (*t == '.' && !*(t + 1))
 							{

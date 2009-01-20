@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Research) 2005-07-17 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Research) 2009-01-20 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -456,6 +456,7 @@ main(int argc, char** argv)
 	Sflong_t		m;
 	Sflong_t		n;
 	Sflong_t		r;
+	Sflong_t		partial;
 	struct stat		st;
 	Sfdisc_t		disc;
 
@@ -788,10 +789,12 @@ main(int argc, char** argv)
 			f &= ~NOERROR;
 		if (!(r = state.count.value.number))
 			r = -1;
+		partial = 0;
 		while (state.in.complete != r)
 		{
 			b = sfreserve(state.in.fp, SF_UNBOUND, 0);
 			m = sfvalue(state.in.fp);
+			error(-2, "AHA#%d complete=%llu r=%lld m=%lld c=%lld", __LINE__, state.in.complete, r, m, c);
 			if (!b)
 			{
 				if (!m)
@@ -801,6 +804,7 @@ main(int argc, char** argv)
 			}
 			while (state.in.complete != r)
 			{
+				error(-1, "AHA#%d complete=%lld r=%lld m=%lld c=%lld", __LINE__, state.in.complete, r, m, c);
 				s = b;
 				if (m >= c)
 				{
@@ -812,10 +816,11 @@ main(int argc, char** argv)
 					n = m;
 					if (state.in.special)
 						state.in.partial++;
-					else if ((state.in.remains += n) >= c)
+					if ((state.in.remains += n) >= c)
 					{
 						state.in.remains -= c;
 						state.in.complete++;
+						partial++;
 					}
 					if (f & SYNC)
 					{
@@ -869,6 +874,11 @@ main(int argc, char** argv)
 					break;
 				b += n;
 			}
+		}
+		if (state.in.partial)
+		{
+			state.in.complete -= partial;
+			state.in.remains = 0;
 		}
 		if (sfsync(state.out.fp))
 			error(ERROR_SYSTEM|3, "%s: write error", state.ofn.value.string);

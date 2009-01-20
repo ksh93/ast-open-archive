@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -338,12 +338,13 @@ Option_t		options[] =
 	The first character is the expression delimiter.\
 	There may be more than one edit expression;\
 	each is applied in order from left to right.",
-	",old,new,[glpsu]]",
+	",old,new,[glpsu]][i]]",
 	"[+g?All \aold\a patterns.]\
 	[+l?Convert \anew\a to lower case.]\
 	[+p?Print the edit result on the standard error.]\
 	[+s?Stop edits on path if this edit succeeds.]\
-	[+u?Convert \anew\a to upper case.]",
+	[+u?Convert \anew\a to upper case.]\
+	[+i?Append member index to pathname in \b.%04d format\b.]",
 },
 {
 	"entry",
@@ -427,7 +428,8 @@ Option_t		options[] =
 	OPT_format,
 	"The archive format. Formats are automatically detected on read. A\
 	basic, compress and delta format may be combined, separated by \b:\b.\
-	The supported formats are:",
+	Each format may be followed by =\bdetails\b; details are format\
+	specific. The supported formats are:",
 	"format:=" FMT_DEFAULT,
 	"\fformats\f",
 },

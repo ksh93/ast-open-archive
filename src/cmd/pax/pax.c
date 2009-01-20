@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2008-05-01 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2009-01-18 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -205,6 +205,17 @@ substitute(Map_t** lastmap, register char* s)
 		}
 		if (c)
 			regfatal(&mp->re, 3, c);
+		for (;;)
+		{
+			switch (*s++)
+			{
+			case 'i':
+				mp->flags |= MAP_INDEX;
+				continue;
+			}
+			s--;
+			break;
+		}
 		if (*s && !isspace(*s))
 			error(1, "invalid character after substitution: %s", s);
 		if (*lastmap)
@@ -362,6 +373,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 	char*		e;
 	char*		s;
 	char*		v;
+	char*		o;
 	Filter_t*	xp;
 	Format_t*	fp;
 	Option_t*	op;
@@ -696,7 +708,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 				if (s = strdup(v))
 					do
 					{
-						for (e = s;;)
+						for (e = s, o = 0;;)
 						{
 							switch (*e++)
 							{
@@ -714,6 +726,13 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 									break;
 								s = e;
 								continue;
+							case '=':
+								if (!o)
+								{
+									*(e - 1) = 0;
+									o = e;
+								}
+								continue;
 							default:
 								continue;
 							}
@@ -723,6 +742,8 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 							s = "gzip";
 						else if (s[0] == 'b' && s[1] == 'z')
 							s = "bzip";
+						else if (s[0] == 'v' && (s[1] == 'c' || s[1] == 'z'))
+							s = "vczip";
 						if (!(fp = getformat(s, 0)))
 						{
 							if (!pathpath(tmp1, "lib/pax", opt.arg0, PATH_EXECUTE) || sfsprintf(tmp2, sizeof(tmp2) - 1, "%s/%s.fmt", tmp1, s) <= 0 || !(sp = sfopen(NiL, tmp2, "r")))
@@ -736,6 +757,8 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 							sfclose(sp);
 						}
 						else
+						{
+							fp->details = o;
 							switch (fp->flags & (ARCHIVE|COMPRESS|DELTA))
 							{
 							case ARCHIVE:
@@ -748,6 +771,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 								initdelta(ap, fp);
 								break;
 							}
+						}
 					} while (s = e);
 			}
 			ap->expected = ap->format;
@@ -1621,11 +1645,15 @@ main(int argc, char** argv)
 		{
 			Proc_t*		proc;
 			List_t*		p;
-			char*		cmd[3];
+			char*		cmd[4];
 
 			cmd[0] = ap->compress->name;
-			cmd[1] = ((Compress_format_t*)ap->compress->data)->variant;
-			cmd[2] = 0;
+			i = 1;
+			if (cmd[i] = ((Compress_format_t*)ap->compress->data)->variant)
+				i++;
+			if (cmd[i] = ap->compress->details)
+				i++;
+			cmd[i] = 0;
 			if (!(proc = procopen(*cmd, cmd, NiL, NiL, PROC_WRITE)))
 				error(3, "%s: cannot execute %s filter", ap->name, ap->compress->name);
 			n = proc->wfd;

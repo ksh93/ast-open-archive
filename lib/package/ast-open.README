@@ -92,7 +92,34 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-08-12-24  --- Release ksh93t+  ---
+09-01-20  --- Release ksh93t+  ---
+09-01-20  A bug in which the exit status specified in an exit trap was
+	  not used when a process terminated with a signal has been fixed.
+09-01-19  A bug in which a signal whose default action is to terminate
+	  a process could be ingored when the process is running a sub-shell
+	  has been fixed.
+09-01-19  A bug in which sending SIGWINCH to a process that reads from a pipe
+	  could cause a memory fault has been fixed.
+09-01-16  The -R unary operator was added to [[...]] and test to check whether
+	  a variable is a  name reference.
+09-01-16  The -v unary operator was added to [[...]] and test to check whether
+	  a variable is set.
+09-01-14  The unset built-in was modified to return 0 exit status when
+	  unsetting a variable that was unset to conform with the POSIX
+	  standard.
+09-01-14  The unset built-in was modified to continue to unset variables
+	  after encountering a variable that it could not unset to
+	  conform to the POSIX standard.
+09-01-14  The paramter expansion ${x+value} no longer expands the value of
+	  the variable x when determining whether x is set or not.
+09-01-13  A bug in which background jobs and pipelines that were not waited
+	  for could, in rare instantes, cause the shell to go into an infinite
+	  loop or fail has been fixed.
+09-01-06  A bug in indexed arrays of compound variables in which referencing
+	  non-existant sub-variable in an arithmetic expression could cause
+	  the sub-variable to be created has been fixed.
+09-01-05  A bug in which the \ character did not escape extened regular
+	  expression pattern characters has been fixed.
 08-12-24  A bug in which killing the last element of a pipe did not cause
 	  a write to the pipe to generate a SIGPIPE has been fixed.
 08-12-19  A bug which could cause command substitution to hang when the
@@ -2042,6 +2069,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+08-12-31 pax.c,pax-vczip.c: add vczip compression format
 08-05-08 pax.tst: handle systems with privileged chmod +t / mkfifo
 08-05-01 pax-tar.c: handle sfsprintf() '\0'
 07-12-11 delta2patch.sh: dro pax -v, add pax --nosummary
@@ -2444,6 +2472,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+09-01-15 sear.sh: update for msvcrt.dll link
 08-11-15 sear.sh: add manifest logic
 06-12-04 proto.c: add utime() prototype
 06-06-28 proto.tst: add more externalize tests
@@ -2813,6 +2842,8 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+09-01-06 cpp.tst: add macdor definition overwrite test
+09-01-05 cpp.tst: add another multiple include guard test
 08-10-31 cpp.tst: add #x and pp:nomultiple tests
 06-05-09 cpp.tst: add pp:externalize tests
 	 cpp.tst: add compatibility ul numeric qualifier tests
@@ -2897,6 +2928,9 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+09-01-09 Makerules.mk: fix .TGZ to handle large manifests
+09-01-09 Makerules.mk: :: foo.man[=N] installs in man/manN/foo.N (default 1)
+09-01-06 bind.c: fix 2d .SOURCE* cross product virtual+dir bug
 08-12-08 Makerules.mk: -lfoo/bar => bar plugin for foo
 08-12-08 expand.c: handle -lfoo/bar prereqs
 08-11-11 Makerules.mk: add %.pl => % for perl scripts
@@ -4222,6 +4256,8 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+09-01-12 tr.tst: add tests for trailing '-' in source and/or destination sets
+09-01-03 mkfifo.rt: add
 08-10-15 rm.rt: add to test rm -f x x
 08-02-14 look.c: fix operand parse / diagnostic bugs
 08-01-30 expr.tst: add substr * 1 * tests
@@ -5013,6 +5049,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+09-01-20 dd.c: fix state.in.special counting logic
 08-12-08 ls.c: at least one space before link count for -l
 08-12-07 ls.c: use %[_][EO]K for [space pad] [full|long] iso
 08-10-28 pss-procfs.c: use hz = getconf("CLK_TCK")
@@ -5422,6 +5459,7 @@ All recorded changes follow.
 
 :::::::: vczip ::::::::
 
+09-01-18 vczip.c: fix bug that forgot to assign src file path
 08-11-04 vczip.c: change date to official kpv -lvcodex release
 08-06-06 sync with kpv; add ast plugins and optget() usage
 05-09-25 vczip.c: fix empty input test for pipes
@@ -5431,6 +5469,14 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-01-14 misc/fts_open.c: delay top list reorder until first fts_read()
+09-01-14 include/ls.h: LS_W_INUMBER => 9 to accomodate large st_ino
+09-01-14 misc/optget.c: expand STYLE_usage input text
+09-01-09 features/uwin,stdio/_stdfun.c: iffe for _p__iob and __p__iob
+09-01-09 misc/magic.tab: add ISO filesystem image entries
+09-01-07 string/strtoi.c: strtol() etc. do not consume [lLuU] suffix -- thanks jkf
+09-01-07 sfio/sfstrtof.h: strtod() etc. do not consume [fFlL] suffix -- thanks jkf
+09-01-05 string/strlcat.c: fix logic to match docs (not that easy)
 08-12-30 tm/tmxdate.c,include/tm.h: add TM_WORK { "workday" "working" "work" }
 08-12-28 sfio/sfcvt.c: fix 'a' format rounding
 08-12-21 tm/tmdata.c: add 2008-12-31+23:59:60-0000 leap second event
@@ -6978,6 +7024,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+09-01-05 cmp.c: fix EOF diagnostic to conform to posix
+09-01-03 mkfifo.c: fix --mode=mode logic
 08-12-07 date.c: add %[_][EO]K for [space pad] [full|long] iso docs
 08-11-10 stty.c: check for -t grouping so -tostop != -t -ostop
 08-10-15 rm.c: handle 'rm -f x x' => exit 0
@@ -7613,6 +7661,8 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+09-01-06 ppcall.c: fix macro definition overwrite bug -- I know
+09-01-05 ppcontrol.c: fix multiple include guard for #include outside guard
 08-12-07 pp.h,ppdata.c: fix ancient pptype and ppctype[] off by one
 08-11-15 ppsearch.c: '\\' => '/' in first step; msvc complains about '\\' in #line!!
 08-10-31 ppsearch.c: relax pp:nomultiple pedantry

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -58,7 +58,8 @@ extern Format_t			PAX_DEBUG_FORMAT;
 #define pax_pds_next		(&pax_compress_format)
 #define pax_compress_next	(&pax_gzip_format)
 #define pax_gzip_next		(&pax_bzip_format)
-#define pax_bzip_next		(&pax_delta_format)
+#define pax_bzip_next		(&pax_vczip_format)
+#define pax_vczip_next		(&pax_delta_format)
 #define pax_delta_next		(&pax_delta_88_format)
 #define pax_delta_88_next	(&pax_ignore_format)
 #define pax_ignore_next		(&pax_patch_format)
@@ -86,6 +87,7 @@ extern Format_t			pax_slt_format;
 extern Format_t			pax_tar_format;
 extern Format_t			pax_tnef_format;
 extern Format_t			pax_ustar_format;
+extern Format_t			pax_vczip_format;
 extern Format_t			pax_vdb_format;
 extern Format_t			pax_vmsbackup_format;
 

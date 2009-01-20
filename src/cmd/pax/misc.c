@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -369,7 +369,7 @@ undos(File_t* f)
  */
 
 char*
-map(register char* name)
+map(Archive_t* ap, register char* name)
 {
 	register Map_t*	mp;
 	char*		to;
@@ -390,9 +390,11 @@ map(register char* name)
 			if (n = regsubexec(&mp->re, from, elementsof(match), match))
 				regfatal(&mp->re, 3, n);
 			n = strlen(mp->re.re_sub->re_buf) + 1;
-			if (!(to = fmtbuf(n)))
+			if (!(to = fmtbuf(n + ((mp->flags & MAP_INDEX) ? 10 : 0))))
 				nospace();
 			memcpy(to, mp->re.re_sub->re_buf, n);
+			if (mp->flags & MAP_INDEX)
+				sfsprintf(to + n - 1, 10, ".%04d", ap->entry);
 			if (mp->re.re_sub->re_flags & REG_SUB_PRINT)
 				sfprintf(sfstderr, "%s >> %s\n", from, to);
 			if (mp->re.re_sub->re_flags & REG_SUB_STOP)

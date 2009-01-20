@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -30,7 +30,7 @@
 #define VCZIPRC		".vcziprc"
 
 static const char usage[] =
-"[-?\n@(#)$Id: vczip (AT&T Research) 2008-11-04 $\n]"
+"[-?\n@(#)$Id: vczip (AT&T Research) 2008-01-18 $\n]"
 USAGE_LICENSE
 "[+NAME?vczip - vcodex method encode/decode filter]"
 "[+DESCRIPTION?\bvczip\b is a filter that decodes the standard input "
@@ -287,8 +287,7 @@ main(int argc, char** argv)
 		break;
 	}
 	argv += opt_info.index;
-	argc -= opt_info.index;
-	if (error_info.errors || argc > 3)
+	if (error_info.errors || argv[0] && argv[1])
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	if((map = ccmap(from, to)) && !(vcm = vcopen(0, Vcmap, map, 0, VC_ENCODE)) )
 		error(3, "cannot open codeset conversion handle");
@@ -313,7 +312,7 @@ main(int argc, char** argv)
 	/* open stream for data processing */
 	sfdt.type   = type;
 	sfdt.trans  = trans;
-	sfdt.source = argc == 2 ? argv[1] : 0;
+	sfdt.source = argv[0];
 	sfdt.window = window;
 	sfdt.errorf = vcsferror;
 	sfio = vcsfio(action == VC_ENCODE ? sfstdout : sfstdin, &sfdt, action);

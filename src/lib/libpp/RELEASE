@@ -1,3 +1,5 @@
+09-01-06 ppcall.c: fix macro definition overwrite bug -- I know
+09-01-05 ppcontrol.c: fix multiple include guard for #include outside guard
 08-12-07 pp.h,ppdata.c: fix ancient pptype and ppctype[] off by one
 08-11-15 ppsearch.c: '\\' => '/' in first step; msvc complains about '\\' in #line!!
 08-10-31 ppsearch.c: relax pp:nomultiple pedantry

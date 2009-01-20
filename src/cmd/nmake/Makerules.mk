@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2008-12-08 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-01-09 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1486,6 +1486,8 @@ if "$(_release_:N=V)"
 	/^#[ 	]*endif/p
 end
 
+RECURSEROOT = .
+
 .RECURSE : .MAKE .VIRTUAL .FORCE .NULL
 
 .NORECURSE : .MAKE .VIRTUAL .FORCE .NULL
@@ -1509,6 +1511,17 @@ end
 		V := .RECURSE $(V)
 	end
 	return $(V)
+
+.RECURSE.OPTIONS. : .FUNCTION
+	local L O R
+	O = ..
+	R = --include=..
+	for L $(.RWD.:C,/, ,G)
+		O := $(O)/..
+		R += --include=$(O)
+	end
+	R := RECURSEROOT=$(O)	/* += for --include -- not sure about that */
+	return $(R)
 
 .RECURSE.INIT. : .FUNCTION
 	local D N P
@@ -1559,7 +1572,7 @@ end
 	if	$(*.VIEW:O=2:N=...:+2d) test -d $(<) $(-virtual:+|| $(MKDIR) $(<))
 	then	$(-silent:~echo $(-recurse-enter) $(.RWD.:+$(<:N!=/*:+$(.RWD.)/))$(<)$$(":") >&2)
 		cd $(<)
-		$(MAKE) $(-) --errorid=$(<:Q) $(=:V:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:C%$%/%)$(<) $(.RECURSE.ARGS.)
+		$(MAKE) $(-) --errorid=$(<:Q) $(=:V:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:C%$%/%)$(<) $(.RECURSE.OPTIONS.) $(.RECURSE.ARGS.)
 		$(-recurse-leave:+$(-silent:~echo $(-recurse-leave) $(.RWD.:+$(<:N!=/*:+$$(.RWD.)/))$(<)$$$(":") >&2))
 	else	echo $(<): warning: cannot recurse on virtual directory >&2
 	fi
@@ -1758,6 +1771,15 @@ end
 					end
 				end
 				let T1 = T1 + 1
+			end
+			for T2 $(>:V:N=*.man?(=*))
+				if T2 == "*.man=*"
+					T1 := $(T2:V:/.*man=//)
+					T2 := $(T2:V:/=.*//)
+				else
+					T1 = 1
+				end
+				$$(MANDIR)$(T1)/$(T2:V:D:B:S=.$(T1)) :INSTALL: $(T2:V)
 			end
 		end
 	end
@@ -4789,7 +4811,8 @@ end
 .TGZ : .COMMON.SAVE $$(*.RECURSE:@?.TGZ.RECURSE?.TGZ.LOCAL)
 
 .TGZ.LOCAL : .COMMON.SAVE
-	$(PAX) -d -w -f $(-archive-output)$(-?archive-output:~.tgz) -x tar:gzip $(PAXFLAGS) $(.MANIFEST.)
+	{ $(SILENT) print -r '$(.MANIFEST.:@/ /$("\n")/G)'; } |
+	$(PAX) -d -w -f $(-archive-output)$(-?archive-output:~.tgz) -x tar:gzip $(PAXFLAGS)
 
 .TGZ.RECURSE : .COMMON.SAVE
 	$(MAKE) --noexec --file=$(MAKEFILE) $(-) recurse list.manifest |
@@ -4968,6 +4991,9 @@ include - "rules-$(_hosttype_).mk"
 
 if _hosttype_ != "$(_hosttype_:B)"
 include - "rules-$(_hosttype_:B).mk"
+	if "$(_hosttype_:B)" != "$(_hosttype_:B:/\([0-9][0-9]*\)[^0-9][^0-9]*[0-9]*$/\1/)"
+	include - "rules-$(_hosttype_:B:/\([0-9][0-9]*\)[^0-9][^0-9]*[0-9]*$/\1/).mk"
+	end
 end
 
 /*

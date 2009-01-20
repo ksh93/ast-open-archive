@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -669,13 +669,13 @@ getheader(register Archive_t* ap, register File_t* f)
 		}
 	}
 	f->path = stash(&ap->path.name, f->name, 0);
-	f->name = map(f->name);
+	f->name = map(ap, f->name);
 	f->namesize = strlen(f->name) + 1;
 	if (f->linkpath)
 	{
 		pathcanon(f->linkpath, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
-			f->linkpath = map(f->linkpath);
+			f->linkpath = map(ap, f->linkpath);
 		f->linkpathsize = strlen(f->linkpath) + 1;
 	}
 	else

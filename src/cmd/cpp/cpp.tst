@@ -4745,3 +4745,48 @@ int o;
 
 
 int e;'
+
+	EXEC -I-D
+		INPUT - $'#include "h1.h"
+#include "h1.h"'
+		INPUT h1.h $'#include "h2.h"
+#ifndef _H1_H
+#define _H1_H
+int h1_once;
+#endif'
+		INPUT h2.h $'extern int h2_multiple;
+#define _H2_H'
+		OUTPUT - $'# 1 ""
+
+# 1 "h1.h"
+
+# 1 "h2.h"
+extern int h2_multiple;
+# 2 "h1.h"
+
+
+int h1_once;
+# 2 ""
+
+# 1 "h1.h"
+
+# 1 "h2.h"
+extern int h2_multiple;
+# 2 "h1.h"
+
+# 3 ""'
+
+TEST 39 'macro definition overwrite -- I know'
+
+	EXEC -I-D
+		INPUT - $'#define FOO(x)	BAR x
+#define BAR(x)
+FOO(ONE)
+FOO(TWO)
+FOO(TEN)'
+		OUTPUT - $'# 1 ""
+
+
+BAR ONE
+BAR TWO
+BAR TEN'

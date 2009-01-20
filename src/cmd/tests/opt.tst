@@ -481,8 +481,8 @@ IMPLEMENTATION
 		EXIT 0
 	EXEC	sum "$usage" -m L A
 		OUTPUT - $'return=m option=-m name=-m arg=(null) num=0\nargument=1 value="L"\nargument=2 value="A"'
-	EXEC	sum "$usage" -m 0L A
-		OUTPUT - $'return=m option=-m name=-m arg=0L num=0\nargument=1 value="A"'
+	EXEC	sum "$usage" -m 0 A
+		OUTPUT - $'return=m option=-m name=-m arg=0 num=0\nargument=1 value="A"'
 
 TEST 05 'should at least generate its own man page'
 	usage=$'[-?@(#)getopts (AT&T Research) 1999-02-02\n]
@@ -4296,6 +4296,36 @@ id=xlate catalog=libast text="Usage"'
 "again|back"
 "\\ftwo\\f"'
 		EXIT 2
+	EXEC -+ xlate "$usage" --usage
+		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
+id=xlate catalog=libast text="nroff"
+id=xlate catalog=libast text="options"
+id=xlate catalog=libast text="posix"
+id=xlate catalog=libast text="short"
+id=xlate catalog=libast text="usage"
+id=xlate catalog=libast text="about"
+id=xlate catalog=libast text="api"
+id=xlate catalog=libast text="help"
+id=xlate catalog=libast text="html"
+id=xlate catalog=libast text="keys"
+id=xlate catalog=libast text="long"
+id=xlate catalog=libast text="man"
+id=xlate catalog=libast text="nroff"
+id=xlate catalog=libast text="options"
+id=xlate catalog=libast text="posix"
+id=xlate catalog=libast text="short"
+id=xlate catalog=libast text="usage"
+return=? option=- name=--usage num=0
+id=xlate catalog=libast text="Usage"'
+		ERROR - $'[-?\\n@(#)xlate 1.0\\n][-author?Col. Hyde][a:algorithm?<* one info ok *>]:[method]{[+?<* three info ok *>]}[b:again|back?<* two info ok *>]'
 
 TEST 99 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'

@@ -1,3 +1,4 @@
+09-01-15 sear.sh: update for msvcrt.dll link
 08-11-15 sear.sh: add manifest logic
 06-12-04 proto.c: add utime() prototype
 06-06-28 proto.tst: add more externalize tests

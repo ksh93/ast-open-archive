@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -767,7 +767,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	name = stash(&ap->path.name, name, ftw->pathlen);
 	pathcanon(name, 0);
 	f->path = stash(&ap->path.path, name, ftw->pathlen);
-	f->name = map(name);
+	f->name = map(ap, name);
 	if (state.files && state.operation == (IN|OUT) && dirprefix(state.destination, name))
 		return 0;
 	f->namesize = strlen(f->name) + 1;
@@ -791,7 +791,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 		f->linktype = SOFTLINK;
 		pathcanon(f->linkpath, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
-			f->linkpath = map(f->linkpath);
+			f->linkpath = map(ap, f->linkpath);
 		if (streq(f->path, f->linkpath))
 		{
 			error(2, "%s: symbolic link loops to self", f->path);
@@ -916,7 +916,7 @@ addlink(register Archive_t* ap, register File_t* f)
 	{
 		if (f->linktype == NOLINK)
 			return 1;
-		f->linkpath = map(f->linkpath);
+		f->linkpath = map(ap, f->linkpath);
 		goto linked;
 	}
 	else if (f->st->st_nlink <= 1)

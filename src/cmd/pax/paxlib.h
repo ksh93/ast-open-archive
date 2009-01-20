@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -149,6 +149,7 @@ struct Paxformat_s			/* format info			*/
 	int		(*validate)(Pax_t*, Paxarchive_t*, Paxfile_t*);
 	int		(*event)(Pax_t*, Paxarchive_t*, Paxfile_t*, void*, unsigned long);
 	unsigned long	events;
+	char*		details;	/* instance details		*/
 };
 
 struct Paxarchive_s			/* archive info			*/

@@ -11,8 +11,8 @@ pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	pax-ar.c pax-bzip.c pax-compress.c \
 	pax-cpio.c pax-delta.c pax-delta_88.c pax-flash.c \
 	pax-gzip.c pax-ignore.c pax-mime.c pax-patch.c pax-pds.c \
-	pax-rpm.c pax-slt.c pax-tar.c pax-tnef.c pax-vdb.c \
-	pax-saveset.c $(PAX.DEBUG.FORMAT) \
+	pax-rpm.c pax-saveset.c pax-slt.c pax-tar.c pax-tnef.c \
+	pax-vczip.c pax-vdb.c $(PAX.DEBUG.FORMAT) \
 	-lardir -lodelta -lvdelta -lcodex -lsum -ldll
 
 "win32*" :NOOPTIMIZE: delta.c

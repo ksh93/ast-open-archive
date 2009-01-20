@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -208,6 +208,8 @@ typedef struct Tarheader_s Tarheader_t;
 #define MAXID		BLOCKSIZE	/* max ident buffer size	*/
 #define RESETABLE	(-1)		/* default option can be reset	*/
 
+#define MAP_INDEX	0x01		/* append .%d index on match	*/
+
 typedef int (*Link_f)(const char*, const char*);
 typedef int (*Stat_f)(const char*, struct stat*);
 
@@ -336,6 +338,7 @@ struct Map_s				/* file name map list		*/
 {
 	Map_t*		next;		/* next in list			*/
 	regex_t		re;		/* compiled match re		*/
+	int		flags;		/* MAP_* flags			*/
 };
 
 typedef struct Post_s			/* post processing restoration	*/
@@ -689,7 +692,7 @@ extern char**		initmatch(char**);
 extern void		interactive(void);
 extern void		listentry(File_t*);
 extern int		listprintf(Sfio_t*, Archive_t*, File_t*, const char*);
-extern char*		map(char*);
+extern char*		map(Archive_t*, char*);
 extern int		match(char*);
 extern void		newio(Archive_t*, int, int);
 extern Format_t*	nextformat(Format_t*);

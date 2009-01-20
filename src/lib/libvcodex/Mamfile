@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2008-12-08
+info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2009-01-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -456,7 +456,7 @@ make vctranspose.o
 prev Vcmisc/vctranspose.c
 meta vctranspose.o %.c>%.o Vcmisc/vctranspose.c vctranspose
 prev Vcmisc/vctranspose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
 done vctranspose.o generated
 make vcdcache.o
 prev Vcdelta/vcdcache.c
@@ -468,7 +468,7 @@ make vcdelta.o
 prev Vcdelta/vcdelta.c
 meta vcdelta.o %.c>%.o Vcdelta/vcdelta.c vcdelta
 prev Vcdelta/vcdelta.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdelta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdelta.c
 done vcdelta.o generated
 make vcdtable.o
 prev Vcdelta/vcdtable.c
@@ -486,7 +486,7 @@ make vchamming.o
 prev Vcdelta/vchamming.c
 meta vchamming.o %.c>%.o Vcdelta/vchamming.c vchamming
 prev Vcdelta/vchamming.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vchamming.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vchamming.c
 done vchamming.o generated
 make vchbits.o
 prev Vchuff/vchbits.c
@@ -516,43 +516,43 @@ make vchuffgroup.o
 prev Vchuff/vchuffgroup.c
 meta vchuffgroup.o %.c>%.o Vchuff/vchuffgroup.c vchuffgroup
 prev Vchuff/vchuffgroup.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffgroup.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffgroup.c
 done vchuffgroup.o generated
 make vchuffman.o
 prev Vchuff/vchuffman.c
 meta vchuffman.o %.c>%.o Vchuff/vchuffman.c vchuffman
 prev Vchuff/vchuffman.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffman.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffman.c
 done vchuffman.o generated
 make vchuffpart.o
 prev Vchuff/vchuffpart.c
 meta vchuffpart.o %.c>%.o Vchuff/vchuffpart.c vchuffpart
 prev Vchuff/vchuffpart.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffpart.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffpart.c
 done vchuffpart.o generated
 make vcbwt.o
 prev Vcmisc/vcbwt.c
 meta vcbwt.o %.c>%.o Vcmisc/vcbwt.c vcbwt
 prev Vcmisc/vcbwt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcbwt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcbwt.c
 done vcbwt.o generated
 make vcmap.o
 prev Vcmisc/vcmap.c
 meta vcmap.o %.c>%.o Vcmisc/vcmap.c vcmap
 prev Vcmisc/vcmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmap.c
 done vcmap.o generated
 make vcmtf.o
 prev Vcmisc/vcmtf.c
 meta vcmtf.o %.c>%.o Vcmisc/vcmtf.c vcmtf
 prev Vcmisc/vcmtf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmtf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmtf.c
 done vcmtf.o generated
 make vcrle.o
 prev Vcmisc/vcrle.c
 meta vcrle.o %.c>%.o Vcmisc/vcrle.c vcrle
 prev Vcmisc/vcrle.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
 done vcrle.o generated
 make vcwclose.o
 prev Vcwindow/vcwclose.c
@@ -600,13 +600,13 @@ make vcwprefix.o
 prev Vcwindow/vcwprefix.c
 meta vcwprefix.o %.c>%.o Vcwindow/vcwprefix.c vcwprefix
 prev Vcwindow/vcwprefix.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwprefix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwprefix.c
 done vcwprefix.o generated
 make vcwvote.o
 prev Vcwindow/vcwvote.c
 meta vcwvote.o %.c>%.o Vcwindow/vcwvote.c vcwvote
 prev Vcwindow/vcwvote.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2008 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwvote.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwvote.c
 done vcwvote.o generated
 exec - ${AR} cr libvcodex.a vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcsfio.o vcalias.o vctranspose.o vcdcache.o vcdelta.o vcdtable.o vcdtblinit.o vchamming.o vchbits.o vchcode.o vchsize.o vchtrie.o vchuffgroup.o vchuffman.o vchuffpart.o
 exec - ${AR} cr libvcodex.a vcbwt.o vcmap.o vcmtf.o vcrle.o vcwclose.o vcwdecode.o vcwfile.o vcwmethod.o vcwmirror.o vcwngram.o vcwopen.o vcwprefix.o vcwvote.o
