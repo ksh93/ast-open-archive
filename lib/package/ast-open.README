@@ -92,11 +92,34 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-01-20  --- Release ksh93t+  ---
+09-02-02  --- Release ksh93t+  ---
+09-02-02  A bug in restricted mode in which the value of ENV could be
+	  changed from within a function has been fixed.
+09-02-02  A bug in which an erroneous message indicating that a process
+	  terminated with a coredump has been fixed.
+09-02-02  The exit status when exit was called without an argument from
+	  a signal handler was incorrect and has been fixed.
+09-02-02  A bug in which a function autoloaded in a subshell could cause
+	  a core dump when the subshell completed has been fixed.
+09-02-02  A bug in which 2>&1 inside a command substitution wasn't working
+	  correctly has been fixed.
+09-02-02  A bug in the call stack of arithmetic function with 2 args
+	  returning int has been fixed.
+09-01-30  A bug in which 'eval print \$0' inside a function was giving the
+	  wrong value for $0 has been fixed.
+09-01-28  A bug in which a command substitution could return an exit status
+	  of 127 when the pipefail option is enabled has been fixed.
+09-01-26  ksh93 now generates an error message if you attempt to create
+	  a global name reference to a local variable.
+09-01-26  The [[ -v var ]] operator was modified to test for array elements.
+09-01-23  The redirection operator <>; was added.  It is similar to <>
+	  except that if the command it is applied to succeeds, the file
+	  is truncated to the offset at the command completion.
+09-01-23  The default file descriptor for <> was changed to 1.
 09-01-20  A bug in which the exit status specified in an exit trap was
 	  not used when a process terminated with a signal has been fixed.
 09-01-19  A bug in which a signal whose default action is to terminate
-	  a process could be ingored when the process is running a sub-shell
+	  a process could be ignored when the process is running a sub-shell
 	  has been fixed.
 09-01-19  A bug in which sending SIGWINCH to a process that reads from a pipe
 	  could cause a memory fault has been fixed.
@@ -110,15 +133,15 @@ All recorded changes follow.
 09-01-14  The unset built-in was modified to continue to unset variables
 	  after encountering a variable that it could not unset to
 	  conform to the POSIX standard.
-09-01-14  The paramter expansion ${x+value} no longer expands the value of
+09-01-14  The parameter expansion ${x+value} no longer expands the value of
 	  the variable x when determining whether x is set or not.
 09-01-13  A bug in which background jobs and pipelines that were not waited
-	  for could, in rare instantes, cause the shell to go into an infinite
+	  for could, in rare instances, cause the shell to go into an infinite
 	  loop or fail has been fixed.
 09-01-06  A bug in indexed arrays of compound variables in which referencing
-	  non-existant sub-variable in an arithmetic expression could cause
+	  non-existent sub-variable in an arithmetic expression could cause
 	  the sub-variable to be created has been fixed.
-09-01-05  A bug in which the \ character did not escape extened regular
+09-01-05  A bug in which the \ character did not escape extended regular
 	  expression pattern characters has been fixed.
 08-12-24  A bug in which killing the last element of a pipe did not cause
 	  a write to the pipe to generate a SIGPIPE has been fixed.
@@ -138,7 +161,7 @@ All recorded changes follow.
 	  has been fixed.
 08-12-09  Command completion was changed to use \ to quote special characters
 	  instead of quoting the argument in single quotes.
-08-12-07  A bug in typeset -m which occured when the target node was an
+08-12-07  A bug in typeset -m which occurred when the target node was an
 	  associative array element has been fixed.
 08-12-07  A timing bug on some systems (for example darwin), that could
 	  cause the last process of a pipeline entered interactively to fail
@@ -184,7 +207,7 @@ All recorded changes follow.
 08-10-18  A bug in array scoping that could dump core has been fixed.
 08-10-10  read -n and -N fixed to count characters in multibyte locales.
 08-10-10  A bug that mishandled _.array[] type references has been fixed.
-08-10-09  ${.sh.version} now contains a catenation of the following (after
+08-10-09  ${.sh.version} now contains a concatenation of the following (after
 	  'Version') denoting compile time features:
 		A	SHOPT_AUDIT
 		B	SHOPT_BASH
@@ -293,7 +316,7 @@ All recorded changes follow.
 	  jobs completed has been fixed.
 08-06-23  KSH_VERSION added as a name reference to .sh.version.
 08-06-20  type now outputs 'special builtin' for special builtins.
-08-06-19  A couple of bugs in multi-dimensional arrays have been fxied.
+08-06-19  A couple of bugs in multi-dimensional arrays have been fixed.
 08-06-19  A bug in which a syntax error in a dot script could generated
 	  a syntax error in the next subsequent command has been fixed.
 08-06-17  Reduced the maximum function call depth to 2048 to avoid exceptions
@@ -1043,7 +1066,7 @@ All recorded changes follow.
 	  used inside ${...} has been fixed.
 03-07-15  An error in which expanding an indexed array inside a compound
 	  variable could cause a core dump has been fixed.
-03-07-15  A bug in which under on rare occassions a job completion interrupt
+03-07-15  A bug in which on rare occasions a job completion interrupt
 	  could cause to core dump has been fixed.
 03-06-26  A bug in which process substitution embedded within command
 	  substitution would generate a syntax error has been fixed.
@@ -2516,6 +2539,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+09-02-02 sfio/tprintf.c: fix sfaprints() test
 08-12-30 date.dat: add TM_WORK tests
 08-12-19 date.dat,datey2k.dat: update for %_K
 08-06-24 date.dat: update for tmxfmt() %z fix
@@ -2928,6 +2952,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+09-02-02 Makerules.mk: reset :PACKAGE: pkg:noinstall for each pkg
 09-01-09 Makerules.mk: fix .TGZ to handle large manifests
 09-01-09 Makerules.mk: :: foo.man[=N] installs in man/manN/foo.N (default 1)
 09-01-06 bind.c: fix 2d .SOURCE* cross product virtual+dir bug
@@ -4256,6 +4281,11 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+09-02-14 join.tst: add a VSC test
+09-02-14 tail.tst: add some VSC tests
+09-02-02 mktemp: add
+09-02-02 tail.tst: update for -b[blocks], +cl, -cl
+09-01-30 pty.c: add <ast_time.h> (for fd_set!! on mvs.390)
 09-01-12 tr.tst: add tests for trailing '-' in source and/or destination sets
 09-01-03 mkfifo.rt: add
 08-10-15 rm.rt: add to test rm -f x x
@@ -4590,6 +4620,7 @@ All recorded changes follow.
 
 :::::::: time_t ::::::::
 
+09-01-30 handle TMX_FLOAT (mvs.390)
 08-08-22 fix time_t => Time_t typo
 08-08-11 update timestamp_t logic to tmx*()
 
@@ -4823,6 +4854,7 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+09-02-02 repetition.dat,haskell.dat: add tests by Chris Kuklewicz www.haskell.org
 08-11-04 iso8859-1.dat: add [!-...] and [^-...] locale tests
 08-09-04 nested.dat,noop.dat: nested match beyond end of subject fix
 08-07-29 testglob.c: add workspace symlinks
@@ -5049,6 +5081,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+09-01-30 mount.c: hide mount prototype too (for mvs.390)
 09-01-20 dd.c: fix state.in.special counting logic
 08-12-08 ls.c: at least one space before link count for -l
 08-12-07 ls.c: use %[_][EO]K for [space pad] [full|long] iso
@@ -5459,6 +5492,7 @@ All recorded changes follow.
 
 :::::::: vczip ::::::::
 
+09-02-02 vczip.c: -u is now a flag (no optional arg)
 09-01-18 vczip.c: fix bug that forgot to assign src file path
 08-11-04 vczip.c: change date to official kpv -lvcodex release
 08-06-06 sync with kpv; add ast plugins and optget() usage
@@ -5469,6 +5503,12 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-02-02 misc/opthdr.h,optget.c: fix flags mixup, handle old '-' as option
+09-02-02 sfio/sfprints.c: fix sfvaprints() return value to not count trailing '\0'
+09-02-02 misc/cmdarg.c: handle !defined(ARG_MAX)
+09-02-02 port/astconf.c: fix UNIVERSE overwrite of null[] value!
+09-01-31 features/sys: drop header sys/localedef.h
+09-01-28 include/fs3d.h,misc/fs3d.c: mount() => fs3d_mount() for diff std prototypes
 09-01-14 misc/fts_open.c: delay top list reorder until first fts_read()
 09-01-14 include/ls.h: LS_W_INUMBER => 9 to accomodate large st_ino
 09-01-14 misc/optget.c: expand STYLE_usage input text
@@ -7024,6 +7064,13 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+09-02-14 tail.c: fix VSC failures
+09-02-14 join.c: fix VSC failure
+09-02-02 uniq.c: document -number == -fnumber, +number == -snumber
+09-02-02 tail.c: fix usage[] for negative offsets, add sun -b
+09-02-02 mktemp.c: add
+09-02-02 features/utsname: UWIN _UNAME_os_DEFAULT => UWIN
+09-01-31 dirname.c: add experimental { -f -r -x } for pathpath(3)
 09-01-05 cmp.c: fix EOF diagnostic to conform to posix
 09-01-03 mkfifo.c: fix --mode=mode logic
 08-12-07 date.c: add %[_][EO]K for [space pad] [full|long] iso docs
@@ -7326,6 +7373,7 @@ All recorded changes follow.
 
 :::::::: libexpr ::::::::
 
+09-02-02 exgram.h: drop function ref in call() to avoid eval in exeval()
 06-10-11 add exstash() and exnospace() for sfstruse()/vmstrdup() errs
 05-10-25 exeval.c: fix I2F unsigned cast
 05-04-20 exeval.c: fix sscanf() runtime argument check logic
@@ -7661,6 +7709,9 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+09-02-02 pp.probe,probe.win32: check for compiler supplied __FUNCTION__
+09-02-02 ppop.c: include pp_default.h/probe at end of builtin script
+09-01-20 probe.win32: elide #pragma comment.*linker.*manifest
 09-01-06 ppcall.c: fix macro definition overwrite bug -- I know
 09-01-05 ppcontrol.c: fix multiple include guard for #include outside guard
 08-12-07 pp.h,ppdata.c: fix ancient pptype and ppctype[] off by one
@@ -8512,6 +8563,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+09-02-02 vcsfxsort.c: fix suffix sort stack overflow bug
 08-12-07 sync with kpv 2008-11-04
 08-09-10 vcsfio.c: handle old binary method header
 08-07-23 vcodex.h: add __EXPORT__/__IMPORT__ extern attributes

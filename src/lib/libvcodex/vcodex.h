@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -435,7 +435,7 @@ typedef Vcuint32_t		Vchash_t;	/* 32-bit hash value	*/
 */
 #if defined(__FILE__) && defined(__LINE__)
 #define vcbuffer(vv,bb,zz,hh) \
-	(!(vv) ? NIL(Vcchar_t*) : \
+	(!(vv) ? ((Vcchar_t*)0) : \
 		((vv)->file = __FILE__, (vv)->line = __LINE__, \
 		  _vcbuffer((vv),(bb),(zz),(hh)) ) )
 #else

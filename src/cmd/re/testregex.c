@@ -13,6 +13,8 @@
  *
  * PLEASE: publish your tests so everyone can benefit
  *
+ * The following license covers testregex.c and all associated test data.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of THIS SOFTWARE FILE (the "Software"), to deal in the Software
  * without restriction, including without limitation the rights to use,

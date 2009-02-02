@@ -7,6 +7,8 @@
  * %include suffix .yacc
  */
 
+":yacc:" : .MAKE .OPERATOR
+
 .SOURCE.%.yacc : $$(*.SOURCE.%.LCL.INCLUDE)
 
 .SCAN.yy : .SCAN

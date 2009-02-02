@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-01-09 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-02-02 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -3058,7 +3058,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	return $(X:/\([A-Za-z_.][A-Za-z0-9_.]*\)/"$$(.PACKAGE.\1.found)"=="1"/G:@/"  *"/" \&\& "/G:E)
 
 ":PACKAGE:" : .MAKE .OPERATOR
-	local A H I T N O P Q V version insert=0 install=1 library=-l options=1 private
+	local A H I T N O P Q V version insert=0 install=1 this_install library=-l options=1 private
 	if "$(<)"
 		/* a separate include handles package definitions */
 		eval
@@ -3202,6 +3202,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			end
 			I = pkg-$(P).mk
 			V := $(version)
+			this_install := $(install)
 			while 1
 				if H = "$(I:T=F)"
 					.PACKAGE.$(P).rules := $(H)
@@ -3319,7 +3320,7 @@ PACKAGES : .SPECIAL .FUNCTION
 				elif N == "version"
 					PACKAGE_$(P)_VERSION := $(V)
 				elif N == "install"
-					$(N) := $(V)
+					this_$(N) := $(V)
 				elif N == "insert"
 					I := 1
 				elif N == "attributes"
@@ -3335,7 +3336,7 @@ PACKAGES : .SPECIAL .FUNCTION
 				eval
 				_PACKAGE_$(P) $(.INITIALIZED.:?=?==?) 1
 				end
-				if install && ! .PACKAGE.install
+				if this_install && ! .PACKAGE.install
 					if "$(INCLUDEDIR:V)" == "\$\(INSTALLROOT\)/include"
 						.PACKAGE.install = 1
 						.PACKAGE.$(P).dontcare := 1

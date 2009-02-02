@@ -194,6 +194,8 @@ make features/pty
 done features/pty
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libcmd}  : run features/pty
 done FEATURE/pty generated
+make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_time.h
 make ${PACKAGE_ast_INCLUDE}/proc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -275,8 +277,7 @@ make pr.o
 make pr.c
 make ${PACKAGE_ast_INCLUDE}/tm.h implicit
 make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/times.h dontcare
@@ -592,6 +593,10 @@ exec - fi
 done mkfifo.tst generated
 exec - regress  mkfifo.tst
 done test.mkfifo virtual
+make test.mktemp
+make mktemp.tst
+done mktemp.tst virtual
+done test.mktemp virtual
 make test.mv
 make mv.tst
 done mv.tst
@@ -626,9 +631,20 @@ done rm.tst generated
 exec - regress  rm.tst
 done test.rm virtual
 make test.tail
+make tail
+make tail.o
+make tail.c
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
+done tail.c
+meta tail.o %.c>%.o tail.c tail
+prev tail.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tail.c
+done tail.o virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tail tail.o ${mam_libast} ${mam_libcmd}
+done tail generated
 make tail.tst
 done tail.tst
-exec - regress  tail.tst
+exec - regress  tail.tst tail
 done test.tail virtual
 make test.tr
 prev tr

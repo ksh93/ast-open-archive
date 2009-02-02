@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -107,8 +107,9 @@ USAGE_LICENSE
 ;
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide umount unmount
+__STDPP__directive pragma pp:hide mount umount unmount
 #else
+#define mount		______mount
 #define umount		______umount
 #define unmount		______unmount
 #endif
@@ -122,7 +123,6 @@ __STDPP__directive pragma pp:hide umount unmount
 #include <ast_fs.h>
 
 #if _sys_mount
-#define mount		______mount
 #if __bsdi__ || __bsdi || bsdi
 #include <sys/param.h>
 #endif
@@ -130,12 +130,12 @@ __STDPP__directive pragma pp:hide umount unmount
 #define NGROUPS	NGROUPS_MAX
 #endif
 #include <sys/mount.h>
-#undef	mount
 #endif
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide umount unmount
+__STDPP__directive pragma pp:nohide mount umount unmount
 #else
+#undef	mount
 #undef	umount
 #undef	unmount
 #endif

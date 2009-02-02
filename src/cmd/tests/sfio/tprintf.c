@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -623,8 +623,8 @@ MAIN()
 		terror("long double NaN Inf 0.0 error: %s", buf1);
 
 	/* test the sfaprints() function */
-	if(sfaprints(&s, "%d", 123) != 4 || strcmp(s, "123") != 0)
-		terror("sfaprints() failed");
+	if((i = sfaprints(&s, "%d", 123)) != 3 || strcmp(s, "123") != 0)
+		terror("sfaprints() failed -- expected \"123\" [3], got \"%s\" [%d]", s, i);
 	free(s);
 
 	/* test 64-bit linux %g */

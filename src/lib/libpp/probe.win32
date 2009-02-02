@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Research) 2007-08-11
+# @(#)probe.win32 (AT&T Research) 2009-02-02
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -111,7 +111,9 @@ fi
 
 stdinclude=
 for inc in $include
-do	if	[[ ${inc%/*} -ef /platformsdk ]]
+do	if	[[ ${inc%/*} -ef /msdev/platformsdk ]]
+	then	inc=/msdev/platformsdk/${inc##*/}
+	elif	[[ ${inc%/*} -ef /platformsdk ]]
 	then	inc=/platformsdk/${inc##*/}
 	fi
 	for dup in $stdinclude
@@ -176,6 +178,15 @@ then	version=${version[MINGW]} VERSION=__MINGW32__
 	pragmas='#pragma pp:map "/#include_next>/" ",[^\<]*\<,#include <.../,"
 #pragma pp:lineid
 #pragma pp:linetype 2'
+fi
+
+undef_predef=
+echo "char* fun() { return (char*)__FUNCTION__; }
+int main() { return !fun(); }" > easy.c
+rm -f easy.exe
+if	$cc -o easy.exe easy.c && test -x easy.exe
+then	undef_predef="$undef_predef
+#undef	__FUNCTION__"
 fi
 
 dialect=ansi
@@ -376,6 +387,7 @@ $specific
 #define #preroot()
 #define #universe(att)
 #define #dialect(${dialect})
+$undef_predef
 
 $reserved
 
@@ -392,6 +404,7 @@ $pragexpand
 #pragma pp:map "/#pragma lint:/" ",#pragma lint:(.*),##/*\1*/,u"
 #pragma pp:map "/#(pragma )?sccs>/"
 #pragma pp:map "/#pragma once/" ",#pragma once,#pragma pp:nomultiple,"
+#pragma pp:map "/#pragma comment.*linker.*manifest/"
 !
 	exit 0
 fi

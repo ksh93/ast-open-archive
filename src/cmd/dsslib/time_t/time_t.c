@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -25,12 +25,16 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss time type library (AT&T Research) 2008-08-22 $\0\n";
+static const char id[] = "\n@(#)$Id: dss time type library (AT&T Research) 2009-01-30 $\0\n";
 
 #include <dsslib.h>
 #include <tmx.h>
 
 #define NS			1000000000
+
+#if TMX_FLOAT
+#define SS			4294967296.0
+#endif
 
 typedef struct Precise_s
 {
@@ -38,12 +42,6 @@ typedef struct Precise_s
 	size_t			size;
 	int			shift;
 } Precise_t;
-
-#if _typ_int64_t
-typedef uint64_t Nstime_t;
-#else
-typedef double Nstime_t;
-#endif
 
 static ssize_t
 time_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
@@ -115,10 +113,19 @@ n2s(Time_t t, int s)
 {
 	Time_t		m;
 
+#if TMX_FLOAT
+	m = t;
+	t /= NS;
+	t = (Tmxsec_t)t;
+	m -= t * NS;
+	t *= SS;
+	m *= SS;
+#else
 	m = t % NS;
 	t /= NS;
 	t <<= s;
 	m <<= s;
+#endif
 	m /= NS;
 	return t + m;
 }
@@ -128,6 +135,15 @@ s2n(Time_t t, int s)
 {
 	Time_t		m;
 
+#if TMX_FLOAT
+	m = t / SS;
+	m = (Tmxnsec_t)m;
+	m *= NS;
+	m = t - m;
+	m /= SS;
+	t /= SS;
+	t *= NS;
+#else
 	m = 1;
 	m <<= s;
 	m--;
@@ -136,6 +152,7 @@ s2n(Time_t t, int s)
 	t *= NS;
 	m *= NS;
 	m >>= s;
+#endif
 	return t + m;
 }
 

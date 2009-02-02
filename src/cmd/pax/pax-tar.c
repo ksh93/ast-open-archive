@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -560,7 +560,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	{
 		if (!streq(tar->header.magic, TMAGIC))
 		{
-			if (strneq(tar->header.magic, TMAGIC, TMAGLEN - 1) && streq(tar->header.magic + TMAGLEN, "  "))
+			if (strneq(tar->header.magic, TMAGIC, TMAGLEN - 1) && streq((char*)tar->header.magic + TMAGLEN, "  "))
 				/* old gnu tar */;
 			else if (ap->entry > 1)
 				goto nope;
@@ -573,7 +573,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			ap->format = tp;
 		}
 	}
-	*(tar->header.name + TARSIZEOF(name)) = 0;
+	*((char*)tar->header.name + TARSIZEOF(name)) = 0;
 	if (ap->format->variant != OLD && *tar->header.prefix)
 	{
 		f->name = paxstash(pax, &ap->stash.head, NiL, TARSIZEOF(prefix) + TARSIZEOF(name) + 2);
@@ -581,7 +581,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	}
 	else
 		f->name = tar->header.name;
-	*(tar->header.linkname + TARSIZEOF(name)) = 0;
+	*((char*)tar->header.linkname + TARSIZEOF(name)) = 0;
 	f->linktype = NOLINK;
 	f->linkpath = 0;
 	f->st->st_nlink = 1;

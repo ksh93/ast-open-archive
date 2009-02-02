@@ -1,3 +1,4 @@
+09-02-02 Makerules.mk: reset :PACKAGE: pkg:noinstall for each pkg
 09-01-09 Makerules.mk: fix .TGZ to handle large manifests
 09-01-09 Makerules.mk: :: foo.man[=N] installs in man/manN/foo.N (default 1)
 09-01-06 bind.c: fix 2d .SOURCE* cross product virtual+dir bug

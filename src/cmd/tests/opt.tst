@@ -3,6 +3,14 @@
 export LC_ALL=C LC_MESSAGES=C
 
 TEST 01 'compatibility'
+	EXEC	net 'a-' -a b
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+argument=1 value="b"'
+	EXEC	net 'a-:' -a b
+	EXEC	net 'a-:' -a --help b
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=- option=-- name=-- arg=help num=1
+argument=1 value="b"'
 	EXEC	cmd $'a file ...' -?
 		OUTPUT - $'return=? option=-? name=-? num=0'
 		ERROR - $'Usage: cmd [-a] file ...'

@@ -25,12 +25,12 @@
 #if _PACKAGE_ast
 
 #define UNZIP		((char*)0)
-#define DFLTZIP		"sieve.delta,bwt,mtf,rle.0,huffgroup"
+#define DFLTZIP		"delta,huffgroup"
 #define ALIASES		"lib/vcodex/aliases"
 #define VCZIPRC		".vcziprc"
 
 static const char usage[] =
-"[-?\n@(#)$Id: vczip (AT&T Research) 2008-01-18 $\n]"
+"[-?\n@(#)$Id: vczip (AT&T Research) 2009-02-02 $\n]"
 USAGE_LICENSE
 "[+NAME?vczip - vcodex method encode/decode filter]"
 "[+DESCRIPTION?\bvczip\b is a filter that decodes the standard input "
@@ -60,9 +60,7 @@ USAGE_LICENSE
     "{\fmethods\f}"
 "[o:output?Output data is written to \afile\a instead of the standard "
     "output.]:[file]"
-"[u:undo|decode?Decode data. If method is specified then that transformation "
-    "is applied; otherwise the inverse of the encoding transofrmation is "
-    "applied.]:?[method[.arg]][,method[.arg]]...]]]"
+"[u:undo|decode?Decode data.]"
 "[v:verbose?List the compresses size on the standard error.]"
 "[w:window?Set the data partition window size to \awindow\a. "
     "\amethod\a specifies an optional window matching "
@@ -269,7 +267,7 @@ main(int argc, char** argv)
 			continue;
 		case 'u':
 			action = VC_DECODE;
-			trans = opt_info.arg ? opt_info.arg : UNZIP;
+			trans = UNZIP;
 			continue;
 		case 'w':
 			window = opt_info.arg;

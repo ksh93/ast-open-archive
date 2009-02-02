@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -44,10 +44,12 @@ static unsigned int	_rand = 0xdeadbeef; /* gotta be a dirt cheap RNG :-) */
 #define MEDIAN(x,y,z)	((x) <= (y) ? ((y) <= (z) ? (y) : (z) >= (x) ? (z) : (x)) : \
 				      ((y) >= (z) ? (y) : (z) <= (x) ? (z) : (x)) )
 
-#define INSERTSORT	64 /* insertion sort any set <= this */
+#define INSERTSORT	64	/* insertion sort any set <= this	*/
+#define MAXHEADER	1024	/* max hdr to limit sfxqsort recursion 	*/
 
 #ifdef DEBUG
 static Vcsfxint_t	Pn, Pz, Pc, Qn, Qz, In, Iz, Cn, Cz;
+static int		Ql, Qm, Qr; /* qsort recursion depths */
 extern char*		getenv(const char*);
 
 static int chktodo(Vcsfx_t* sfx, Vcsfxint_t lo, Vcsfxint_t hi)
@@ -71,7 +73,7 @@ static int intcmp(void* one, void* two, void* disc)
 
 static int chkdata(Vcsfx_t* sfx, Vcsfxint_t lo, Vcsfxint_t hi)
 {	Vcsfxint_t	i, endi, k;
-	Vcsfxint_t	*idx = sfx->idx, *inv = sfx->inv;
+	Vcsfxint_t	*idx = sfx->idx, *inv = sfx->inv, nstr = sfx->nstr;
 	Vcsfxint_t	*ary;
 
 	if(lo > hi || !chktodo(sfx,lo,hi))
@@ -260,15 +262,19 @@ q_sort:	if((sz = max-min+1) <= INSERTSORT) /* insertion sort */
 	if(ln == 1) /* process the segment <pi */
 		inv[*min] = min-idx;
 	else if(ln > 1) /* recurse to sort */
-	{	sfxqsort(sfx, min, le-1, hdr, 0);
+	{	/**/DEBUG_INCREASE(Ql);
+		sfxqsort(sfx, min, le-1, hdr, 0);
+		/**/DEBUG_DECREASE(Ql);
 		/**/DEBUG_ASSERT(chkdata(sfx,min-idx,(le-1)-idx));
 	}
 
 	if(mn == 1) /* process the segment =pi */
 		inv[*le] = le-idx;
 	else if(mn > 1)
-	{	if(mn <= 1024 || (period == 0 && rn > 1) )
-		{	sfxqsort(sfx, le, re, hdr+2, 0);
+	{	if(hdr <= MAXHEADER || (period == 0 && rn > 1) )
+		{	/**/DEBUG_INCREASE(Qm);
+			sfxqsort(sfx, le, re, hdr+2, 0);
+			/**/DEBUG_DECREASE(Qm);
 			mn = 0; /* completely sorted */
 		}
 		else if((pi = re-idx) != inv[*le]) /* reset ranks */
@@ -280,7 +286,9 @@ q_sort:	if((sz = max-min+1) <= INSERTSORT) /* insertion sort */
 	if(rn == 1) /* process the segment >pi */
 		inv[*max] = max-idx;
 	else if(rn > 1)
-	{	sfxqsort(sfx, re+1, max, hdr, 0);
+	{	/**/DEBUG_INCREASE(Qr);
+		sfxqsort(sfx, re+1, max, hdr, 0);
+		/**/DEBUG_DECREASE(Qr);
 		/**/DEBUG_ASSERT(chkdata(sfx,min-idx,(le-1)-idx));
 	}
 
