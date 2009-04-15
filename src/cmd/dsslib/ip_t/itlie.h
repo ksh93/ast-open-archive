@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -88,7 +88,7 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int dots, int tuple, int group, const char
 				sfprintf(sp, "}");
 				t = sep;
 			}
-			else if (g == (j + 1) && ap[i] == (ITLINT)(~0))
+			else if (g == (j + 1) && ap[i] == (ITLINT)(~0) && i < (j - 1))
 			{
 				i++;
 				if (ap[i])
@@ -130,8 +130,10 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int dots, int tuple, int group, const char
 						n = (n - '0') * 8;
 					dotted:
 						v = ap[i];
-						b = sizeof(ITLINT) * 8;
 						m = (1 << n) - 1;
+						b = sizeof(ITLINT) * 8;
+						if ((b / n) == 2 && !((v >> n) & m))
+							b = n;
 						while ((b -= n) >= 0)
 							sfprintf(sp, "%u%s", (v >> b) & m, b ? "." : "");
 						break;

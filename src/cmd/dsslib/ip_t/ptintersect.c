@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2000-2006 AT&T Corp.                  *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -44,7 +44,7 @@ ptintersect(Pt_t* a, Pt_t* b)
 			bp = (Ptprefix_t*)dtnext(b->dict, bp);
 		else
 		{
-			if (ptinsert(t, (ap->min > bp->min) ? ap->min : bp->min, (ap->max < bp->max) ? ap->max : bp->max))
+			if (!ptinsert(t, (ap->min > bp->min) ? ap->min : bp->min, (ap->max < bp->max) ? ap->max : bp->max))
 				break;
 			if (ap->max < bp->max)
 				ap = (Ptprefix_t*)dtnext(a->dict, ap);

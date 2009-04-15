@@ -974,11 +974,11 @@ ppop(int op, ...)
 				sfprintf(sp, "#%s \"%s\"\n", dirname(INCLUDE), pp.ppdefault);
 			sfprintf(sp,
 "\
-#%s __STDC__\n\
+#%s !defined(__STDC__) && (!#option(compatibility) || #option(transition))\n\
 #%s __STDC__ #(STDC)\n\
 #%s\n\
 "
-				, dirname(IFNDEF)
+				, dirname(IF)
 				, dirname(DEFINE)
 				, dirname(ENDIF)
 				);

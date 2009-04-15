@@ -22,7 +22,7 @@ cdt :TEST: testcdt dttest.h +last \
 test.dt : testcdt dttest.h +last $$(*.ARGS:D=cdt:B:S=.c) .CLEARARGS
 	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
-date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat week.dat
+date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat week.dat zone.dat
 	for i in $(*:N=*.dat)
 	do	DATEMSK=$(*:N=*.msk:/ /:/G) TZ=EST5EDT $(*:O=1) $(TESTDATEFLAGS) < $i
 	done

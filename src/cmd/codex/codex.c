@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -22,7 +22,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: codex (AT&T Research) 2008-05-08 $\n]"
+"[-?\n@(#)$Id: codex (AT&T Research) 2009-04-15 $\n]"
 USAGE_LICENSE
 "[+NAME?codex - encode/decode filter]"
 "[+DESCRIPTION?\bcodex\b decodes the standard input and/or encodes the"
@@ -81,6 +81,8 @@ USAGE_LICENSE
 
 "[d:decode?Apply the \amethod\a operand to the standard input only.]"
 "[e:encode?Apply the \amethod\a operand to the standard output only.]"
+"[f:passfile?Like \b--passphrase\b, except the passphrase is the first"
+"	line (sans newline) from \afile\a.]:[file]"
 "[i:identify?Identify and write the standard input encoding name on the"
 "	standard output and exit.]"
 "[n:null?Write to the \bcodenull\b(3) stream instead of the standard output.]"
@@ -200,6 +202,8 @@ main(int argc, register char** argv)
 	void*			buf;
 	Sfio_t*			ip;
 	Sfio_t*			op;
+	Sfio_t*			pp;
+	char*			s;
 	Codexnum_t		flags;
 	Optdisc_t		optdisc;
 	char			ident[CODEX_IDENT];
@@ -221,6 +225,17 @@ main(int argc, register char** argv)
 			continue;
 		case 'e':
 			ip = 0;
+			continue;
+		case 'f':
+			if (!(pp = sfopen(NiL, opt_info.arg, "r")))
+				error(ERROR_SYSTEM|3, "%s: cannot read", opt_info.arg);
+			else if (!(s = sfgetr(pp, '\n', 1)))
+			{
+				sfclose(pp);
+				error(ERROR_SYSTEM|3, "%s: read error", opt_info.arg);
+			}
+			codexdisc.passphrase = strcpy(fmtbuf(sfvalue(pp)), s);
+			sfclose(pp);
 			continue;
 		case 'i':
 			if (!(buf = sfreserve(ip, CODEX_IDENT, SF_LOCKR)) && !(buf = sfreserve(ip, sfvalue(ip), SF_LOCKR)))

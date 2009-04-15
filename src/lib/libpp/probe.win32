@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Research) 2009-02-02
+# @(#)probe.win32 (AT&T Research) 2009-03-19
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -213,7 +213,7 @@ then	hosttype=$(package)
 	esac
 	for inc in $stdinclude
 	do	standard="$standard
-#pragma pp:standard \"$inc\""
+#pragma pp:include \"$inc\""
 	done
 	: the payoff
 	set -- $cc

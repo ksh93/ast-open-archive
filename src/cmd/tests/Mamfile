@@ -303,8 +303,10 @@ make datey2k.dat
 done datey2k.dat
 make week.dat
 done week.dat
+make zone.dat
+done zone.dat
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
-exec - for i in date.dat datey1k.dat datey2k.dat week.dat
+exec - for i in date.dat datey1k.dat datey2k.dat week.dat zone.dat
 exec - do	DATEMSK=date.msk TZ=EST5EDT date  < $i
 exec - done
 done test.date virtual
@@ -386,6 +388,7 @@ make sfio/tmtsafe.c
 make ../../lib/libast/sfio/vthread.h implicit
 make windows.h implicit
 done windows.h dontcare virtual
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ../../lib/libast/ast_common.h implicit
 done ../../lib/libast/sfio/vthread.h dontcare
 prev sfio/sftest.h implicit

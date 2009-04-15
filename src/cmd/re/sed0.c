@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -63,7 +63,7 @@ void	copyscript(Text*, unsigned char*);
 int	initinput(int, char **);
 Sfio_t*	aopen(char*, int);
 
-#define ustrncmp(a,b,c) (unsigned char*)strncmp((char*)(a), (char*)(b), c)
+#define ustrncmp(a,b,c) strncmp((char*)(a), (char*)(b), c)
 
 int reflags;		/* regcomp() flags */
 int recno;		/* current record number */

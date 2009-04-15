@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -33,7 +33,7 @@ ptvunion(Ptv_t* a, Ptv_t* b)
 	if (!(a = ptvcopy(a)))
 		return 0;
 	for (bp = (Ptvprefix_t*)dtfirst(b->dict); bp; bp = (Ptvprefix_t*)dtnext(b->dict, bp))
-		if (ptvinsert(a, bp->min, bp->max))
+		if (!ptvinsert(a, bp->min, bp->max))
 			break;
 	return a;
 }

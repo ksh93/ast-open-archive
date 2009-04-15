@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -33,7 +33,8 @@
 
 #define BGP_VERSION		20080811L	/* interface version	*/
 
-#define BGP_SET			0xffff		/* as path set marker	*/
+#define BGP_SET16		0xffff		/* as16 path set marker	*/
+#define BGP_SET32		0xffffffff	/* as32 path set marker	*/
 
 /*
  * attributes (even, 1 bit set)

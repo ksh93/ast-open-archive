@@ -192,9 +192,8 @@ done dss virtual
 done install virtual
 make test
 make test.dss
-prev dss
 make dss.tst
 done dss.tst
-exec - regress  dss.tst dss
+exec - regress  dss.tst
 done test.dss virtual
 done test dontcare virtual

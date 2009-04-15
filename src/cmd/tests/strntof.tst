@@ -1,6 +1,6 @@
 # regression tests for the ast floating point strnto*() routines
 
-case $($UNIT) in 33)
+case $($MAIN) in 33)
 
 TEST 01 'min/max'
 

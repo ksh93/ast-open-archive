@@ -9,7 +9,7 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
-setv CCFLAGS ${mam_cc_DEBUG}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
@@ -202,7 +202,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done ip_t.c
 meta ip_t.o %.c>%.o ip_t.c ip_t
 prev ip_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ip_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ip_t.c
 done ip_t.o generated
 make lib.o
 make lib.c
@@ -210,7 +210,7 @@ prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
 meta lib.o %.c>%.o lib.c lib
 prev lib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c lib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated
 make ire.o
 make ire.c
@@ -223,7 +223,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ire.c
 meta ire.o %.c>%.o ire.c ire
 prev ire.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c ire.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ire.c
 done ire.o generated
 make itl.o
 make itl.c
@@ -234,7 +234,7 @@ prev itl.h implicit
 done itl.c
 meta itl.o %.c>%.o itl.c itl
 prev itl.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_DEBUG -c itl.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c itl.c
 done itl.o generated
 make ptaddresses.o
 make ptaddresses.c
@@ -246,7 +246,7 @@ done ptlib.h
 done ptaddresses.c
 meta ptaddresses.o %.c>%.o ptaddresses.c ptaddresses
 prev ptaddresses.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptaddresses.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptaddresses.c
 done ptaddresses.o generated
 make ptcopy.o
 make ptcopy.c
@@ -254,7 +254,7 @@ prev ptlib.h implicit
 done ptcopy.c
 meta ptcopy.o %.c>%.o ptcopy.c ptcopy
 prev ptcopy.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptcopy.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptcopy.c
 done ptcopy.o generated
 make ptcover.o
 make ptcover.c
@@ -262,7 +262,7 @@ prev ptlib.h implicit
 done ptcover.c
 meta ptcover.o %.c>%.o ptcover.c ptcover
 prev ptcover.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptcover.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptcover.c
 done ptcover.o generated
 make ptdifference.o
 make ptdifference.c
@@ -270,7 +270,7 @@ prev ptlib.h implicit
 done ptdifference.c
 meta ptdifference.o %.c>%.o ptdifference.c ptdifference
 prev ptdifference.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptdifference.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptdifference.c
 done ptdifference.o generated
 make ptequal.o
 make ptequal.c
@@ -278,7 +278,7 @@ prev ptlib.h implicit
 done ptequal.c
 meta ptequal.o %.c>%.o ptequal.c ptequal
 prev ptequal.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptequal.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptequal.c
 done ptequal.o generated
 make ptintersect.o
 make ptintersect.c
@@ -286,7 +286,7 @@ prev ptlib.h implicit
 done ptintersect.c
 meta ptintersect.o %.c>%.o ptintersect.c ptintersect
 prev ptintersect.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptintersect.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptintersect.c
 done ptintersect.o generated
 make ptinvert.o
 make ptinvert.c
@@ -294,7 +294,7 @@ prev ptlib.h implicit
 done ptinvert.c
 meta ptinvert.o %.c>%.o ptinvert.c ptinvert
 prev ptinvert.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptinvert.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptinvert.c
 done ptinvert.o generated
 make ptmatch.o
 make ptmatch.c
@@ -302,7 +302,7 @@ prev ptlib.h implicit
 done ptmatch.c
 meta ptmatch.o %.c>%.o ptmatch.c ptmatch
 prev ptmatch.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptmatch.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptmatch.c
 done ptmatch.o generated
 make ptopen.o
 make ptopen.c
@@ -310,7 +310,7 @@ prev ptlib.h implicit
 done ptopen.c
 meta ptopen.o %.c>%.o ptopen.c ptopen
 prev ptopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptopen.c
 done ptopen.o generated
 make ptprint.o
 make ptprint.c
@@ -318,7 +318,7 @@ prev ptlib.h implicit
 done ptprint.c
 meta ptprint.o %.c>%.o ptprint.c ptprint
 prev ptprint.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptprint.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptprint.c
 done ptprint.o generated
 make ptranges.o
 make ptranges.c
@@ -326,7 +326,7 @@ prev ptlib.h implicit
 done ptranges.c
 meta ptranges.o %.c>%.o ptranges.c ptranges
 prev ptranges.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptranges.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptranges.c
 done ptranges.o generated
 make ptsize.o
 make ptsize.c
@@ -334,7 +334,7 @@ prev ptlib.h implicit
 done ptsize.c
 meta ptsize.o %.c>%.o ptsize.c ptsize
 prev ptsize.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptsize.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptsize.c
 done ptsize.o generated
 make ptstats.o
 make ptstats.c
@@ -342,7 +342,7 @@ prev ptlib.h implicit
 done ptstats.c
 meta ptstats.o %.c>%.o ptstats.c ptstats
 prev ptstats.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptstats.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptstats.c
 done ptstats.o generated
 make ptsubset.o
 make ptsubset.c
@@ -350,7 +350,7 @@ prev ptlib.h implicit
 done ptsubset.c
 meta ptsubset.o %.c>%.o ptsubset.c ptsubset
 prev ptsubset.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptsubset.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptsubset.c
 done ptsubset.o generated
 make ptunion.o
 make ptunion.c
@@ -358,7 +358,7 @@ prev ptlib.h implicit
 done ptunion.c
 meta ptunion.o %.c>%.o ptunion.c ptunion
 prev ptunion.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptunion.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptunion.c
 done ptunion.o generated
 make ptdump.o
 make ptdump.c
@@ -366,7 +366,7 @@ prev ptlib.h implicit
 done ptdump.c
 meta ptdump.o %.c>%.o ptdump.c ptdump
 prev ptdump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptdump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptdump.c
 done ptdump.o generated
 make ptrebit.o
 make ptrebit.c
@@ -374,7 +374,7 @@ prev ptlib.h implicit
 done ptrebit.c
 meta ptrebit.o %.c>%.o ptrebit.c ptrebit
 prev ptrebit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptrebit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptrebit.c
 done ptrebit.o generated
 make fv.o
 make fv.c
@@ -382,7 +382,7 @@ prev fv.h implicit
 done fv.c
 meta fv.o %.c>%.o fv.c fv
 prev fv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_DEBUG -D_BLD_pt -D_PACKAGE_ast -c fv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c fv.c
 done fv.o generated
 make ptvaddresses.o
 make ptvaddresses.c
@@ -396,7 +396,7 @@ done ptvlib.h
 done ptvaddresses.c
 meta ptvaddresses.o %.c>%.o ptvaddresses.c ptvaddresses
 prev ptvaddresses.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvaddresses.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvaddresses.c
 done ptvaddresses.o generated
 make ptvcopy.o
 make ptvcopy.c
@@ -404,7 +404,7 @@ prev ptvlib.h implicit
 done ptvcopy.c
 meta ptvcopy.o %.c>%.o ptvcopy.c ptvcopy
 prev ptvcopy.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvcopy.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvcopy.c
 done ptvcopy.o generated
 make ptvcover.o
 make ptvcover.c
@@ -412,7 +412,7 @@ prev ptvlib.h implicit
 done ptvcover.c
 meta ptvcover.o %.c>%.o ptvcover.c ptvcover
 prev ptvcover.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvcover.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvcover.c
 done ptvcover.o generated
 make ptvdifference.o
 make ptvdifference.c
@@ -420,7 +420,7 @@ prev ptvlib.h implicit
 done ptvdifference.c
 meta ptvdifference.o %.c>%.o ptvdifference.c ptvdifference
 prev ptvdifference.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvdifference.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvdifference.c
 done ptvdifference.o generated
 make ptvdump.o
 make ptvdump.c
@@ -428,7 +428,7 @@ prev ptvlib.h implicit
 done ptvdump.c
 meta ptvdump.o %.c>%.o ptvdump.c ptvdump
 prev ptvdump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvdump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvdump.c
 done ptvdump.o generated
 make ptvequal.o
 make ptvequal.c
@@ -436,7 +436,7 @@ prev ptvlib.h implicit
 done ptvequal.c
 meta ptvequal.o %.c>%.o ptvequal.c ptvequal
 prev ptvequal.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvequal.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvequal.c
 done ptvequal.o generated
 make ptvintersect.o
 make ptvintersect.c
@@ -444,7 +444,7 @@ prev ptvlib.h implicit
 done ptvintersect.c
 meta ptvintersect.o %.c>%.o ptvintersect.c ptvintersect
 prev ptvintersect.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvintersect.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvintersect.c
 done ptvintersect.o generated
 make ptvinvert.o
 make ptvinvert.c
@@ -452,7 +452,7 @@ prev ptvlib.h implicit
 done ptvinvert.c
 meta ptvinvert.o %.c>%.o ptvinvert.c ptvinvert
 prev ptvinvert.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvinvert.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvinvert.c
 done ptvinvert.o generated
 make ptvmatch.o
 make ptvmatch.c
@@ -460,7 +460,7 @@ prev ptvlib.h implicit
 done ptvmatch.c
 meta ptvmatch.o %.c>%.o ptvmatch.c ptvmatch
 prev ptvmatch.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvmatch.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvmatch.c
 done ptvmatch.o generated
 make ptvmin.o
 make ptvmin.c
@@ -468,7 +468,7 @@ prev ptvlib.h implicit
 done ptvmin.c
 meta ptvmin.o %.c>%.o ptvmin.c ptvmin
 prev ptvmin.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvmin.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvmin.c
 done ptvmin.o generated
 make ptvmax.o
 make ptvmax.c
@@ -476,7 +476,7 @@ prev ptvlib.h implicit
 done ptvmax.c
 meta ptvmax.o %.c>%.o ptvmax.c ptvmax
 prev ptvmax.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvmax.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvmax.c
 done ptvmax.o generated
 make ptvopen.o
 make ptvopen.c
@@ -484,7 +484,7 @@ prev ptvlib.h implicit
 done ptvopen.c
 meta ptvopen.o %.c>%.o ptvopen.c ptvopen
 prev ptvopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvopen.c
 done ptvopen.o generated
 make ptvprint.o
 make ptvprint.c
@@ -492,7 +492,7 @@ prev ptvlib.h implicit
 done ptvprint.c
 meta ptvprint.o %.c>%.o ptvprint.c ptvprint
 prev ptvprint.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvprint.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvprint.c
 done ptvprint.o generated
 make ptvranges.o
 make ptvranges.c
@@ -500,7 +500,7 @@ prev ptvlib.h implicit
 done ptvranges.c
 meta ptvranges.o %.c>%.o ptvranges.c ptvranges
 prev ptvranges.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvranges.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvranges.c
 done ptvranges.o generated
 make ptvrebit.o
 make ptvrebit.c
@@ -508,7 +508,7 @@ prev ptvlib.h implicit
 done ptvrebit.c
 meta ptvrebit.o %.c>%.o ptvrebit.c ptvrebit
 prev ptvrebit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvrebit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvrebit.c
 done ptvrebit.o generated
 make ptvsize.o
 make ptvsize.c
@@ -516,7 +516,7 @@ prev ptvlib.h implicit
 done ptvsize.c
 meta ptvsize.o %.c>%.o ptvsize.c ptvsize
 prev ptvsize.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvsize.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvsize.c
 done ptvsize.o generated
 make ptvstats.o
 make ptvstats.c
@@ -524,7 +524,7 @@ prev ptvlib.h implicit
 done ptvstats.c
 meta ptvstats.o %.c>%.o ptvstats.c ptvstats
 prev ptvstats.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvstats.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvstats.c
 done ptvstats.o generated
 make ptvsubset.o
 make ptvsubset.c
@@ -532,7 +532,7 @@ prev ptvlib.h implicit
 done ptvsubset.c
 meta ptvsubset.o %.c>%.o ptvsubset.c ptvsubset
 prev ptvsubset.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvsubset.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvsubset.c
 done ptvsubset.o generated
 make ptvunion.o
 make ptvunion.c
@@ -540,7 +540,7 @@ prev ptvlib.h implicit
 done ptvunion.c
 meta ptvunion.o %.c>%.o ptvunion.c ptvunion
 prev ptvunion.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ptvunion.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvunion.c
 done ptvunion.o generated
 exec - ${AR} cr libdssip_t.a ip_t.o lib.o ire.o itl.o ptaddresses.o ptcopy.o ptcover.o ptdifference.o ptequal.o ptintersect.o ptinvert.o ptmatch.o ptopen.o ptprint.o ptranges.o ptsize.o ptstats.o ptsubset.o ptunion.o ptdump.o ptrebit.o fv.o ptvaddresses.o ptvcopy.o ptvcover.o ptvdifference.o ptvdump.o ptvequal.o ptvintersect.o ptvinvert.o
 exec - ${AR} cr libdssip_t.a ptvmatch.o ptvmin.o ptvmax.o ptvopen.o ptvprint.o ptvranges.o ptvrebit.o ptvsize.o ptvstats.o ptvsubset.o ptvunion.o

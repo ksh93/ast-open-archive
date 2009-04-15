@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -118,92 +118,23 @@ inumcmp(const char* a, const char* b)
 }
 
 /*
- * directory prefix strcmp(3) -- longest first!
+ * inverted strpcmp(3)
  */
 
 static int
-pfxcmp(register const char* a, register const char* b)
+istrpcmp(const char* a, const char* b)
 {
-	while (*a == *b)
-	{
-		if (!*a++)
-			return 0;
-		b++;
-	}
-	if (*a == 0 && *b == '/')
-		return 1;
-	if (*a == '/' && *b == 0)
-		return -1;
-	return (a < b) ? -1 : 1;
+	return strpcmp(b, a);
 }
 
 /*
- * inverted pfxcmp(3)
+ * inverted strvcmp(3)
  */
 
 static int
-ipfxcmp(const char* a, const char* b)
+istrvcmp(const char* a, const char* b)
 {
-	return pfxcmp(b, a);
-}
-
-/*
- * version strcmp(3) -- latest first!
- */
-
-static int
-vercmp(register const char* a, register const char* b)
-{
-	register unsigned long	na;
-	register unsigned long	nb;
-
-	for (;;)
-	{
-		if (isdigit(*a) && isdigit(*b))
-		{
-			na = nb = 0;
-			while (isdigit(*a))
-				na = na * 10 + *a++ - '0';
-			while (isdigit(*b))
-				nb = nb * 10 + *b++ - '0';
-			if (na < nb)
-				return 1;
-			if (na > nb)
-				return -1;
-		}
-		else if (*a != *b)
-			break;
-		else if (!*a)
-			return 0;
-		else
-		{
-			a++;
-			b++;
-		}
-	}
-	if (*a == 0)
-		return -1;
-	if (*b == 0)
-		return 1;
-	if (*a == '.')
-		return -1;
-	if (*b == '.')
-		return 1;
-	if (*a == '-')
-		return -1;
-	if (*b == '-')
-		return 1;
-	return *a < *b ? -1 : 1;
-}
-
-/*
- * inverted vercmp(3)
- */
-
-static int
-ivercmp(const char* a, const char* b)
-{
-	return vercmp(b, a);
+	return strvcmp(b, a);
 }
 
 static Cmp_f		sort_cmp[] =
@@ -214,10 +145,10 @@ static Cmp_f		sort_cmp[] =
 	istrcoll,
 	numcmp,
 	inumcmp,
-	pfxcmp,
-	ipfxcmp,
-	vercmp,
-	ivercmp,
+	strpcmp,
+	istrpcmp,
+	istrvcmp,
+	strvcmp,
 };
 
 /*

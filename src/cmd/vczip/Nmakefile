@@ -2,8 +2,6 @@
 
 LICENSE = since=2003,author=kpv
 
-.SOURCE : tests
-
 vczip :: vcodex.1 vczip.c -lvcodex
 
 vcunzip :LINK: vczip

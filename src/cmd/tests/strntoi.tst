@@ -1,6 +1,6 @@
 # regression tests for the ast integral strnto*() routines
 
-if	(( $($UNIT) == 64 ))
+if	(( $($MAIN) == 64 ))
 then
 
 TEST 01 'base 10'

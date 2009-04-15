@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *
@@ -176,6 +176,7 @@ sfgzwrite(Sfio_t* fp, const Void_t* buf, size_t size, Sfdisc_t* dp)
  *	<0	error
  */
 
+#undef	PRIVATE
 #define PRIVATE	0
 
 int

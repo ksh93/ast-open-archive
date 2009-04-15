@@ -73,7 +73,7 @@ static int intcmp(void* one, void* two, void* disc)
 
 static int chkdata(Vcsfx_t* sfx, Vcsfxint_t lo, Vcsfxint_t hi)
 {	Vcsfxint_t	i, endi, k;
-	Vcsfxint_t	*idx = sfx->idx, *inv = sfx->inv, nstr = sfx->nstr;
+	Vcsfxint_t	*idx = sfx->idx, *inv = sfx->inv;
 	Vcsfxint_t	*ary;
 
 	if(lo > hi || !chktodo(sfx,lo,hi))
@@ -104,12 +104,8 @@ static int cmpsfx(Vcsfx_t* sfx, Vcsfxint_t p, Vcsfxint_t s)
 	for(n = p < s ? p : s, k = 0; k < n; ++k)
 	{	if((v = ps[k] - ss[k]) == 0)
 			continue;
-		if(v > 0) printf("cmpsfx: ps=%d > ss=%d at k=%d\n",
-				ps-sfx->str, ss-sfx->str, k);
 		return v > 0 ? 1 : -1;
 	}
-	if(p < s) printf("cmpsfx: ps=%d > ss=%d because np=%d < ns=%d\n",
-			ps-sfx->str, ss-sfx->str, p, s);
 	return p < s ? 1 : -1;
 }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -56,8 +56,10 @@ static char	*Dfltalias[] =
 	"tnl = ama.nl,table,mtf,rle.0,huffgroup",
 	"tbdw = bdw,ama,table,mtf,rle.0,huffgroup",
 	"t = table,mtf,rle.0,huffgroup",
+	"rte = strip.nl.head=1.tail=1,rdb.pad.plain.whole,table,mtf,rle.0,huffgroup",
 	"rt = rtable,mtf,rle.0,huffgroup",
 	"qv = ama,transpose,rle,huffman",
+	"qnl = ama.nl,transpose,rle,huffman",
 	"q = transpose,rle,huffman",
 	"netflow = netflow,mtf,rle.0,huffgroup",
 	"flatrdb = rdb,bwt,mtf,rle.0,huffgroup",

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *              This software is part of the bzip package               *
-*                       Copyright (c) 1996-2005                        *
+*                       Copyright (c) 1996-2009                        *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *
@@ -1385,23 +1385,26 @@ const char * BZ_API(bzlibVersion)(void)
 #if defined(_WIN32) && !_WINIX || defined(OS2) || defined(MSDOS)
 #   include <fcntl.h>
 #   include <io.h>
-#   define SET_BINARY_MODE(file) setmode(fileno(file),O_BINARY)
+#   ifdef _MSC_VER
+#      define SET_BINARY_MODE(file) _setmode(_fileno(file),O_BINARY)
+#   else
+#      define SET_BINARY_MODE(file) setmode(fileno(file),O_BINARY)
+#   endif
 #else
 #   define SET_BINARY_MODE(file)
 #endif
 static
-BZFILE * bzopen_or_bzdopen
-               ( const char *path,   /* no use when bzdopen */
-                 int fd,             /* no use when bzdopen */
-                 const char *mode,
-                 int open_mode)      /* bzopen: 0, bzdopen:1 */
+BZFILE * bzopen_internal
+               ( const char *path,   /* if !=0 */
+		 FILE *fp,	     /* if !=0 && path==0 */
+                 int fd,             /* if path==0 && fp==0 */
+                 const char *mode)
 {
    int    bzerr;
    char   unused[BZ_MAX_UNUSED];
    char   mode2[10];
    int    blockSize100k = 9;
    int    writing       = 0;
-   FILE   *fp           = NULL;
    BZFILE *bzfp         = NULL;
    int    verbosity     = 0;
    int    workFactor    = 30;
@@ -1436,15 +1439,15 @@ BZFILE * bzopen_or_bzdopen
    strcpy(mode2, writing ? "w" : "r" );
    strcat(mode2,"b");   /* binary mode */
 
-   if(open_mode==0){
-      if(path==NULL || strcmp(path,"")==0){
+   if(path) {
+      if(path[0]==0){
         fp = (writing ? stdout : stdin);
 	noClose = 1;
         SET_BINARY_MODE(fp);
       }else{
         fp = fopen(path,mode2);
       }
-   }else{
+   }else if (fp==0) {
 #ifdef BZ_STRICT_ANSI
       fp = NULL;
 #else
@@ -1477,7 +1480,16 @@ BZFILE * BZ_API(bzopen)
                ( const char *path,
                  const char *mode )
 {
-   return bzopen_or_bzdopen(path,-1,mode,/*bzopen*/0);
+   return bzopen_internal(path,NULL,-1,mode);
+}
+
+
+/*---------------------------------------------------*/
+BZFILE * BZ_API(bzfopen)
+               ( FILE *fp,
+                 const char *mode )
+{
+   return bzopen_internal(NULL,fp,-1,mode);
 }
 
 
@@ -1486,7 +1498,7 @@ BZFILE * BZ_API(bzdopen)
                ( int fd,
                  const char *mode )
 {
-   return bzopen_or_bzdopen(NULL,fd,mode,/*bzdopen*/1);
+   return bzopen_internal(NULL,NULL,fd,mode);
 }
 
 

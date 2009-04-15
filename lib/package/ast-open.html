@@ -1046,7 +1046,37 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-02-02  --- Release ksh93t+  ---
+09-04-22  --- Release ksh93t+  ---
+09-04-15  A bug that caused ${...;} to hang for large files has ben fixed.
+09-04-08  A change was made in the -n option which printed out an incorrect
+	  warning with &lt;&gt;.
+09-04-07  The emacs edit command M-_ and M_. and the vi command _ was fixed
+	  to handle the case there there is no history file.
+09-04-05  A bug in handling new-lines with read -n has been fixed.
+09-04-05  The ENV variable defaults the the file named by $HOME/.kshrc rather
+	  then to the string $HOME/.kshrc.
+09-03-31  A bug in which a nested command substitution with redirections could
+	  leave a file descriptor open has been fixed.
+09-03-24  ksh now only uses the value of the _ variable on startup if it can
+	  verify that it was set by the invoking process rather than being
+	  inherited by some other ancestor.
+09-03-24  When ksh is invoked without -p and ruid!=euid, and the shell is
+	  compiled without SHOPT_P_UID or ruid&lt;SHOPT_P_UID, the shell now
+	  enables the -p option.  The previous version instead set the
+	  euid to the ruid as it does for set +p.
+09-03-24  When SHOPT_P_UID is defined at compile time and the shell is started
+	  without -p and ruid!=euid and ruid&gt;=SHOPT_P_UID then euid is set
+	  to ruid. A bug that did the wrong test (ruid&lt;SHOPT_P_UID) was fixed.
+09-03-17  The sleep(1) builtin now accept and ISO 8601 PnYnMnDTnHnMnS
+	  duration or date(1) compatible date/time operand.
+09-03-10  If a variable that was left or right justified or zero-filled was
+	  changed with a typeset statement that was left or right justified
+	  or zero-filled, then the original justification no longer affects
+	  the result.
+09-03-10  A bug in the handling of traps when the last command in a script
+	  is a subshell grouping command has been fixed.
+09-03-03  A bug in which an expansion of the form ${!prefix@} could generate
+	  an exception after the return from a function has been fixed.
 09-02-02  A bug in restricted mode in which the value of ENV could be
 	  changed from within a function has been fixed.
 09-02-02  A bug in which an erroneous message indicating that a process
@@ -3458,6 +3488,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-03-02 Makefile: eliminate master src paths from ../INIT/proto.c
 09-01-15 sear.sh: update for msvcrt.dll link
 08-11-15 sear.sh: add manifest logic
 06-12-04 proto.c: add utime() prototype
@@ -3844,7 +3875,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="cpp changes">cpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-01-06 cpp.tst: add macdor definition overwrite test
+09-01-06 cpp.tst: add macro definition overwrite test
 09-01-05 cpp.tst: add another multiple include guard test
 08-10-31 cpp.tst: add #x and pp:nomultiple tests
 06-05-09 cpp.tst: add pp:externalize tests
@@ -3942,6 +3973,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-03-24 Makerules.mk: --option&#0091;=value&#0093; compatibility with option&#0091;=value&#0093; until 2011
+09-03-02 Makerules.mk: ues $(-recurse:/:/ /G:N=&#0091;0-9&#0093;*:O=N) for recursion limit
 09-02-02 Makerules.mk: reset :PACKAGE: pkg:noinstall for each pkg
 09-01-09 Makerules.mk: fix .TGZ to handle large manifests
 09-01-09 Makerules.mk: :: foo.man&#0091;=N&#0093; installs in man/manN/foo.N (default 1)
@@ -5283,6 +5316,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-03-31 features/pty,Makefile: add pty.h and -lutil refs for linux -- great, another util library
 09-02-14 join.tst: add a VSC test
 09-02-14 tail.tst: add some VSC tests
 09-02-02 mktemp: add
@@ -5404,6 +5438,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="codex changes">codex changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-04-15 codex.c: add --passfile=file
 08-05-08 codex.c: Codexdisc_t can't be on main()'s stack due to SF_ATEXIT
 06-08-23 codex.tst: add uu boundary and text tests
 04-01-11 doc update
@@ -5462,6 +5497,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-03-19 bgp-mrt.c: fix DUMP_V2 ipv6 =&gt; as32
+09-03-11 bgp-mrt.c: handle TABLE_DUMP_V2 &lt;13&gt; records
 08-11-13 bgp-mrt.c: handle undocumented BGP4MP &lt;16,20&gt; records
 08-11-12 bgp-mrt.c: forgot to set rp-&gt;afi!
 08-08-28 bgp-mrt.c: add afi=1/safi=128 nlri
@@ -5568,6 +5605,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-03-19 ip_t.c,itlie.h: elide leading 0.* for 2-tuple external conversion
+09-03-15 pt&#0091;v&#0093;.h,pt&#0091;v&#0093;open.c: add Pt&#0091;v&#0093;prefix_t.data, pt&#0091;v&#0093;insert() returns new prefix
+09-03-15 itlie.h: handle as set marker in last element
 08-08-11 bgp.h,ip_t.c: add extended community type support
 08-07-31 ptvopen.c: fix ptvinsert() interval bug
 08-07-25 ip_t.c: add { %(prefix:C)s %(addr:C)s } for 0x%02x comma-separated value
@@ -6161,6 +6201,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-04-15 ls.c: add --sort=version
 09-01-30 mount.c: hide mount prototype too (for mvs.390)
 09-01-20 dd.c: fix state.in.special counting logic
 08-12-08 ls.c: at least one space before link count for -l
@@ -6598,6 +6639,15 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-04-22 include/regex.h,regex/regcomp.c: add REG_REGEXP &lt;regexp.h&gt; compatibility
+09-04-15 tm/tmxdate.c: handle "4th thursday in november"
+09-03-31 string/strvcmp.c,string/strnvcmp.c: add version strcmp(3)
+09-03-31 string/strpcmp.c,string/strnpcmp.c: add path prefix strcmp(3)
+09-03-29 misc/optget.c: clean up num = number casts
+09-03-04 tm/tmxmake.c: add tmxtm() with zone override
+09-03-03 tm/tmxfmt.c: add %(...)&lt;c&gt;, specifically %(...)z for output zone
+09-02-22 tm/tmxdate.c: add iso P... durations
+09-02-02 path/pathprog.c: add
 09-02-02 misc/opthdr.h,optget.c: fix flags mixup, handle old '-' as option
 09-02-02 sfio/sfprints.c: fix sfvaprints() return value to not count trailing '&nbsp;'
 09-02-02 misc/cmdarg.c: handle !defined(ARG_MAX)
@@ -8165,6 +8215,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-03-31 cat.c: handle --no* options
+09-03-15 tail.c: fix --timeout termination logic
+09-03-03 tee.c: clean up sfio disciplines on error
+09-03-03 cat.c: fix -v|-e|-n|-B interaction bugs
 09-02-14 tail.c: fix VSC failures
 09-02-14 join.c: fix VSC failure
 09-02-02 uniq.c: document -number == -fnumber, +number == -snumber
@@ -8433,6 +8487,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdll changes">libdll changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-04-15 dllopen.c: add, use dllopen() internally to wrap dlopen()
 08-05-12 dllscan.c: LIBSUFFIX==.dylib =&gt; default plugin version match 0.0
 06-10-11 dllscan.c: check sfstruse() return values -- doh
 06-01-25 dllplug.c: add errorf() library message for dlopen() error
@@ -8654,6 +8709,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libbz changes">libbz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-04-15 bzlib.c: add bzfopen()
 03-05-13 sfdcbzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
 02-02-14 blocksort.c: drop -O for msvc
 02-01-24 bzhdr.h: rename from bzlib_private.h for 14 char fs
@@ -9712,6 +9768,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libvcodex changes">libvcodex changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-03-12 vcstrip.c: add
+09-03-10 vcalias.c: add qnl
+09-02-24 vcalias.c: add rte
+09-02-24 vcsfio.c: ignore VC_EOF+ at end of header data
 09-02-02 vcsfxsort.c: fix suffix sort stack overflow bug
 08-12-07 sync with kpv 2008-11-04
 08-09-10 vcsfio.c: handle old binary method header
@@ -9752,7 +9812,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>February 19, 2009</TD>
+<TD align=right>April 23, 2009</TD>
 </TR>
 </TABLE>
 <P>

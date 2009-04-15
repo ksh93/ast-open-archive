@@ -244,7 +244,7 @@ x := \$(MAKE_TREE temp.mk package[$i]=EXPORT)"
 
 	EXEC
 		INPUT test.mk $'all :
-	silent print $(~tree) | fmt -w72
+	silent echo $(~tree) | fmt -w72
 tree : .VIRTUAL
 .semaphore.do_tree : .SEMAPHORE
 Xdo_tree : .USE .semaphore.do_tree

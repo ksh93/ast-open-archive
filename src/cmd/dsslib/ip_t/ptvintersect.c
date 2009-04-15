@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -44,7 +44,7 @@ ptvintersect(Ptv_t* a, Ptv_t* b)
 			bp = (Ptvprefix_t*)dtnext(b->dict, bp);
 		else
 		{
-			if (ptvinsert(t, fvcmp(a->size, ap->min, bp->min) > 0 ? ap->min : bp->min, fvcmp(a->size, ap->max, bp->max) < 0 ? ap->max : bp->max))
+			if (!ptvinsert(t, fvcmp(a->size, ap->min, bp->min) > 0 ? ap->min : bp->min, fvcmp(a->size, ap->max, bp->max) < 0 ? ap->max : bp->max))
 				break;
 			if (fvcmp(a->size, ap->max, bp->max) < 0)
 				ap = (Ptvprefix_t*)dtnext(a->dict, ap);

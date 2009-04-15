@@ -224,17 +224,6 @@ done vcsfio.c
 make vcalias.c
 prev vchdr.h implicit
 done vcalias.c
-make Vcmisc/vctranspose.c
-make vclib.h implicit
-prev vchdr.h
-exec - sed -e 's/HDR/LIB/g' vchdr.h > vclib.h
-prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
-prev io.h implicit
-prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-prev vcodex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done vclib.h generated
-done Vcmisc/vctranspose.c
 make Vcdelta/vcdcache.c
 make Vcdelta/vcdhdr.h implicit
 make Vcdelta/vcdelta.h implicit
@@ -279,7 +268,15 @@ make Vchuff/vchuffpart.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchuffpart.c
 make Vcmisc/vcbwt.c
-prev vclib.h implicit
+make vclib.h implicit
+prev vchdr.h
+exec - sed -e 's/HDR/LIB/g' vchdr.h > vclib.h
+prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
+prev io.h implicit
+prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+prev vcodex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done vclib.h generated
 done Vcmisc/vcbwt.c
 make Vcmisc/vcmap.c
 prev vclib.h implicit
@@ -290,6 +287,12 @@ done Vcmisc/vcmtf.c
 make Vcmisc/vcrle.c
 prev vclib.h implicit
 done Vcmisc/vcrle.c
+make Vcmisc/vcstrip.c
+prev vchdr.h implicit
+done Vcmisc/vcstrip.c
+make Vcmisc/vctranspose.c
+prev vclib.h implicit
+done Vcmisc/vctranspose.c
 make Vcwindow/vcwclose.c
 make Vcwindow/vcwhdr.h implicit
 prev vchdr.h implicit
@@ -319,11 +322,11 @@ done Vcwindow/vcwprefix.c
 make Vcwindow/vcwvote.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwvote.c
-exec - set -- $( sed -e '/\<VCLIB(/!d' -e 's/.*\<VCLIB(\(.*\)).*/\1/' vcopen.c vcclose.c vcio.c vcdisc.c vcextract.c vcrecode.c vccontext.c vclog.c vcsfxsort.c vcperiod.c vclzparse.c vcbuffer.c vcbcktsort.c vcqsort.c vcmethod.c vcsfio.c vcalias.c Vcmisc/vctranspose.c Vcdelta/vcdcache.c Vcdelta/vcdelta.c Vcdelta/vcdtable.c Vcdelta/vcdtblinit.c Vcdelta/vchamming.c Vchuff/vchbits.c Vchuff/vchcode.c Vchuff/vchsize.c Vchuff/vchtrie.c Vchuff/vchuffgroup.c Vchuff/vchuffman.c Vchuff/vchuffpart.c Vcmisc/vcbwt.c Vcmisc/vcmap.c Vcmisc/vcmtf.c Vcmisc/vcrle.c Vcwindow/vcwclose.c Vcwindow/vcwdecode.c Vcwindow/vcwfile.c Vcwindow/vcwmethod.c Vcwindow/vcwmirror.c Vcwindow/vcwngram.c Vcwindow/vcwopen.c Vcwindow/vcwprefix.c Vcwindow/vcwvote.c )
+exec - set -- $( sed -e '/\<VCLIB(/!d' -e 's/.*\<VCLIB(\(.*\)).*/\1/' vcopen.c vcclose.c vcio.c vcdisc.c vcextract.c vcrecode.c vccontext.c vclog.c vcsfxsort.c vcperiod.c vclzparse.c vcbuffer.c vcbcktsort.c vcqsort.c vcmethod.c vcsfio.c vcalias.c Vcdelta/vcdcache.c Vcdelta/vcdelta.c Vcdelta/vcdtable.c Vcdelta/vcdtblinit.c Vcdelta/vchamming.c Vchuff/vchbits.c Vchuff/vchcode.c Vchuff/vchsize.c Vchuff/vchtrie.c Vchuff/vchuffgroup.c Vchuff/vchuffman.c Vchuff/vchuffpart.c Vcmisc/vcbwt.c Vcmisc/vcmap.c Vcmisc/vcmtf.c Vcmisc/vcrle.c Vcmisc/vcstrip.c Vcmisc/vctranspose.c Vcwindow/vcwclose.c Vcwindow/vcwdecode.c Vcwindow/vcwfile.c Vcwindow/vcwmethod.c Vcwindow/vcwmirror.c Vcwindow/vcwngram.c Vcwindow/vcwopen.c Vcwindow/vcwprefix.c Vcwindow/vcwvote.c )
 exec - {
 exec - print "/*"
 exec - print " * list of default public -lvcodex methods"
-exec - print " * proprietary methods available as plugins with separate license"
+exec - print " * proprietary methods are available as plugins under separate license(s)"
 exec - print " *"
 exec - print " * this file may be included multiple times in one source"
 exec - print " */"
@@ -452,12 +455,6 @@ meta vcalias.o %.c>%.o vcalias.c vcalias
 prev vcalias.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcalias.c
 done vcalias.o generated
-make vctranspose.o
-prev Vcmisc/vctranspose.c
-meta vctranspose.o %.c>%.o Vcmisc/vctranspose.c vctranspose
-prev Vcmisc/vctranspose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
-done vctranspose.o generated
 make vcdcache.o
 prev Vcdelta/vcdcache.c
 meta vcdcache.o %.c>%.o Vcdelta/vcdcache.c vcdcache
@@ -554,6 +551,18 @@ meta vcrle.o %.c>%.o Vcmisc/vcrle.c vcrle
 prev Vcmisc/vcrle.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
 done vcrle.o generated
+make vcstrip.o
+prev Vcmisc/vcstrip.c
+meta vcstrip.o %.c>%.o Vcmisc/vcstrip.c vcstrip
+prev Vcmisc/vcstrip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcstrip.c
+done vcstrip.o generated
+make vctranspose.o
+prev Vcmisc/vctranspose.c
+meta vctranspose.o %.c>%.o Vcmisc/vctranspose.c vctranspose
+prev Vcmisc/vctranspose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
+done vctranspose.o generated
 make vcwclose.o
 prev Vcwindow/vcwclose.c
 meta vcwclose.o %.c>%.o Vcwindow/vcwclose.c vcwclose
@@ -608,8 +617,8 @@ meta vcwvote.o %.c>%.o Vcwindow/vcwvote.c vcwvote
 prev Vcwindow/vcwvote.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwvote.c
 done vcwvote.o generated
-exec - ${AR} cr libvcodex.a vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcsfio.o vcalias.o vctranspose.o vcdcache.o vcdelta.o vcdtable.o vcdtblinit.o vchamming.o vchbits.o vchcode.o vchsize.o vchtrie.o vchuffgroup.o vchuffman.o vchuffpart.o
-exec - ${AR} cr libvcodex.a vcbwt.o vcmap.o vcmtf.o vcrle.o vcwclose.o vcwdecode.o vcwfile.o vcwmethod.o vcwmirror.o vcwngram.o vcwopen.o vcwprefix.o vcwvote.o
+exec - ${AR} cr libvcodex.a vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcsfio.o vcalias.o vcdcache.o vcdelta.o vcdtable.o vcdtblinit.o vchamming.o vchbits.o vchcode.o vchsize.o vchtrie.o vchuffgroup.o vchuffman.o vchuffpart.o vcbwt.o
+exec - ${AR} cr libvcodex.a vcmap.o vcmtf.o vcrle.o vcstrip.o vctranspose.o vcwclose.o vcwdecode.o vcwfile.o vcwmethod.o vcwmirror.o vcwngram.o vcwopen.o vcwprefix.o vcwvote.o
 exec - (ranlib libvcodex.a) >/dev/null 2>&1 || true
 done libvcodex.a generated
 done vcodex virtual

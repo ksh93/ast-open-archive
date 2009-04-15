@@ -137,6 +137,7 @@ local gzFile gz_open (path, mode, fp, buf, len)
     s->crc = crc32(0L, Z_NULL, 0);
 #if _PACKAGE_ast
     s->fatal = 0;
+    s->noclose = 0;
     s->nocrc = 0;
     s->verified = 0;
 #endif

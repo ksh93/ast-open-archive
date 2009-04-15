@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *              This software is part of the bzip package               *
-*                       Copyright (c) 1996-2005                        *
+*                       Copyright (c) 1996-2009                        *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *
@@ -197,10 +197,15 @@ typedef
 
 #include <stdio.h>
 
-#if _BLD_bz && defined(__EXPORT__)
+#if _BLD_bz
 
-#define BZ_API(func)	func
-#define BZ_EXTERN	__EXPORT__
+#if defined(__EXPORT__)
+#   define BZ_API(func)	func
+#   define BZ_EXTERN __EXPORT__
+#else
+#   define BZ_API(func) func
+#   define BZ_EXTERN extern
+#endif
 
 #else
 
@@ -364,6 +369,11 @@ BZ_EXTERN BZFILE * BZ_API(bzopen) (
       const char *mode
    );
 
+BZ_EXTERN BZFILE * BZ_API(bzfopen) (
+      FILE       *fp,
+      const char *mode
+   );
+         
 BZ_EXTERN BZFILE * BZ_API(bzdopen) (
       int        fd,
       const char *mode

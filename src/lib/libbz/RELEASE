@@ -1,3 +1,4 @@
+09-04-15 bzlib.c: add bzfopen()
 03-05-13 sfdcbzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
 02-02-14 blocksort.c: drop -O for msvc
 02-01-24 bzhdr.h: rename from bzlib_private.h for 14 char fs

@@ -1,3 +1,4 @@
+09-22-22 date.dat: add iso duration tests
 09-02-02 sfio/tprintf.c: fix sfaprints() test
 08-12-30 date.dat: add TM_WORK tests
 08-12-19 date.dat,datey2k.dat: update for %_K

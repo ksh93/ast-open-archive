@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2008-12-08 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2009-04-15 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -175,6 +175,7 @@ USAGE_LICENSE
 "	[f:name?File name.]"
 "	[n:none?Don't sort.]"
 "	[s:size|blocks?File size.]"
+"	[v:version?File name version.]"
 "}"
 "[Y:layout?Listing layout \akey\a:]:[key]{"
 "	[a:across|horizontal?Multi-column across the page.]"
@@ -237,7 +238,6 @@ USAGE_LICENSE
 #define LS_MARKDIR	(LS_USER<<9)	/* marks dirs with /		*/
 #define LS_MOST		(LS_USER<<10)	/* list all but . and ..	*/
 #define LS_NOBACKUP	(LS_USER<<11)	/* omit *~ names		*/
-#define LS_NOSORT	(LS_USER<<12)	/* don't sort			*/
 #define LS_NOSTAT	(LS_USER<<13)	/* leaf FTW_NS ok		*/
 #define LS_PRINTABLE	(LS_USER<<14)	/* ? for non-printable chars	*/
 #define LS_QUOTE	(LS_USER<<15)	/* "..." file names		*/
@@ -297,6 +297,8 @@ USAGE_LICENSE
 #endif
 #define PRINTABLE(s)	((state.lsflags&LS_PRINTABLE)?printable(s):(s))
 
+typedef int (*Order_f)(Ftw_t*, Ftw_t*);
+
 typedef struct				/* dir/total counts		*/
 {
 	Sfulong_t	blocks;		/* number of blocks		*/
@@ -325,7 +327,6 @@ typedef struct				/* program state		*/
 	char		flags[64];	/* command line option flags	*/
 	long		ftwflags;	/* FTW_* flags			*/
 	long		lsflags;	/* LS_* flags			*/
-	long		sortflags;	/* sort LS_* flags		*/
 	long		timeflags;	/* time LS_* flags		*/
 	long		blocksize;	/* file block size		*/
 	unsigned long	directories;	/* directory count		*/
@@ -345,6 +346,7 @@ typedef struct				/* program state		*/
 	Hash_table_t*	keys;		/* sfkeyprintf() keys		*/
 	Sfio_t*		tmp;		/* tmp string stream		*/
 	Ftw_t*		top;		/* top directory -- no label	*/
+	Order_f		order;		/* sort comparison function	*/
 } State_t;
 
 static char	DEF_header[] =
@@ -1020,20 +1022,116 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 }
 
 /*
+ * order() helpers
+ */
+
+static int
+order_none(register Ftw_t* f1, register Ftw_t* f2)
+{
+	return 0;
+}
+
+static int
+order_blocks(register Ftw_t* f1, register Ftw_t* f2)
+{
+	if (f1->statb.st_size < f2->statb.st_size)
+		return 1;
+	if (f1->statb.st_size > f2->statb.st_size)
+		return -1;
+	return 0;
+}
+
+static int
+order_atime(register Ftw_t* f1, register Ftw_t* f2)
+{
+	Time_t		t1;
+	Time_t		t2;
+
+	t1 = tmxgetatime(&f1->statb);
+	t2 = tmxgetatime(&f2->statb);
+	if (t1 < t2)
+		return 1;
+	if (t1 > t2)
+		return -1;
+	return 0;
+}
+
+static int
+order_ctime(register Ftw_t* f1, register Ftw_t* f2)
+{
+	Time_t		t1;
+	Time_t		t2;
+
+	t1 = tmxgetctime(&f1->statb);
+	t2 = tmxgetctime(&f2->statb);
+	if (t1 < t2)
+		return 1;
+	if (t1 > t2)
+		return -1;
+	return 0;
+}
+
+static int
+order_mtime(register Ftw_t* f1, register Ftw_t* f2)
+{
+	Time_t		t1;
+	Time_t		t2;
+
+	t1 = tmxgetmtime(&f1->statb);
+	t2 = tmxgetmtime(&f2->statb);
+	if (t1 < t2)
+		return 1;
+	if (t1 > t2)
+		return -1;
+	return 0;
+}
+
+static int
+order_extension(register Ftw_t* f1, register Ftw_t* f2)
+{
+	register int	n;
+	char*		x1;
+	char*		x2;
+
+	x1 = strrchr(f1->name, '.');
+	x2 = strrchr(f2->name, '.');
+	if (x1)
+	{
+		if (x2)
+			n = strcoll(x1, x2);
+		else
+			n = 1;
+	}
+	else if (x2)
+		n = -1;
+	else
+		n = 0;
+	if (!n)
+		n = strcoll(f1->name, f2->name);
+	return n;
+}
+
+static int
+order_version(Ftw_t* f1, Ftw_t* f2)
+{
+	return strvcmp(f1->name, f2->name);
+}
+
+static int
+order_name(Ftw_t* f1, Ftw_t* f2)
+{
+	return strcoll(f1->name, f2->name);
+}
+
+/*
  * order child entries
  */
 
 static int
 order(register Ftw_t* f1, register Ftw_t* f2)
 {
-	register int	n;
-	char*		x1;
-	char*		x2;
-	Time_t		t1;
-	Time_t		t2;
+	int	n;
 
-	if (state.sortflags & LS_NOSORT)
-		return 0;
 	if (!(state.lsflags & LS_DIRECTORY) && (state.ftwflags & FTW_MULTIPLE) && f1->level == 0)
 	{
 		if (f1->info == FTW_D)
@@ -1044,62 +1142,8 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 		else if (f2->info == FTW_D)
 			return -1;
 	}
-	if (state.sortflags & LS_BLOCKS)
-	{
-		if (f1->statb.st_size < f2->statb.st_size)
-			n = 1;
-		else if (f1->statb.st_size > f2->statb.st_size)
-			n = -1;
-		else
-			n = 0;
-	}
-	else if (state.sortflags & LS_TIME)
-	{
-		if (state.sortflags & LS_ATIME)
-		{
-			t1 = tmxgetatime(&f1->statb);
-			t2 = tmxgetatime(&f2->statb);
-		}
-		else if (state.sortflags & LS_CTIME)
-		{
-			t1 = tmxgetctime(&f1->statb);
-			t2 = tmxgetctime(&f2->statb);
-		}
-		else
-		{
-			t1 = tmxgetmtime(&f1->statb);
-			t2 = tmxgetmtime(&f2->statb);
-		}
-		if (t1 < t2)
-			n = 1;
-		else if (t1 > t2)
-			n = -1;
-		else
-			n = 0;
-	}
-	else if (state.sortflags & LS_EXTENSION)
-	{
-		x1 = strrchr(f1->name, '.');
-		x2 = strrchr(f2->name, '.');
-		if (x1)
-		{
-			if (x2)
-				n = strcoll(x1, x2);
-			else
-				n = 1;
-		}
-		else if (x2)
-			n = -1;
-		else
-			n = 0;
-		if (!n)
-			n = strcoll(f1->name, f2->name);
-	}
-	else
-		n = strcoll(f1->name, f2->name);
-	if (state.reverse)
-		n = -n;
-	return n;
+	n = (*state.order)(f1, f2);
+	return state.reverse ? -n : n;
 }
 
 /*
@@ -1248,7 +1292,7 @@ ls(register Ftw_t* ftw)
 	return 0;
 }
 
-#define set(f)	(opt_info.num?(state.lsflags|=(f)):(state.lsflags&=~(f)))
+#define set(f)	(opt_info.num?(state.lsflags|=(f)):((state.lsflags&=~(f)),0))
 #define clr(f)	(opt_info.num?(state.lsflags&=~(f)):(state.lsflags|=(f)))
 
 int
@@ -1313,6 +1357,8 @@ main(int argc, register char** argv)
 		case 'c':
 			state.lsflags &= ~LS_ATIME;
 			state.lsflags |= LS_CTIME;
+			if (!state.order)
+				state.order = order_ctime;
 			break;
 		case 'd':
 			set(LS_DIRECTORY);
@@ -1325,7 +1371,7 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_ALL;
 			state.lsflags &= ~(LS_BLOCKS|LS_LONG|LS_TIME);
 			state.reverse = 0;
-			state.sortflags = LS_NOSORT;
+			state.order = order_none;
 			break;
 		case 'g':
 		case 'O':
@@ -1372,11 +1418,14 @@ main(int argc, register char** argv)
 			set(LS_BLOCKS);
 			break;
 		case 't':
-			set(LS_TIME);
+			if (set(LS_TIME) && !state.order)
+				state.order = order_mtime;
 			break;
 		case 'u':
 			state.lsflags &= ~LS_CTIME;
 			state.lsflags |= LS_ATIME;
+			if (!state.order)
+				state.order = order_atime;
 			break;
 		case 'w':
 			state.width = strtol(opt_info.arg, &e, 0); 
@@ -1393,33 +1442,36 @@ main(int argc, register char** argv)
 			break;
 		case 'y':
 			if (!opt_info.arg)
-				state.sortflags = LS_NOSORT;
+				state.order = order_none;
 			else
 				switch (opt_info.num)
 				{
 				case 'a':
-					state.sortflags = LS_TIME|LS_ATIME;
+					state.order = order_atime;
 					break;
 				case 'c':
-					state.sortflags = LS_TIME|LS_CTIME;
+					state.order = order_ctime;
 					break;
 				case 'f':
-					state.sortflags = 0;
+					state.order = 0;
 					break;
 				case 'm':
-					state.sortflags = LS_TIME;
+					state.order = order_mtime;
 					break;
 				case 'n':
-					state.sortflags = LS_NOSORT;
+					state.order = order_none;
 					break;
 				case 's':
-					state.sortflags = LS_BLOCKS;
+					state.order = order_blocks;
 					break;
 				case 't':
-					state.sortflags = LS_TIME;
+					state.order = order_mtime;
+					break;
+				case 'v':
+					state.order = order_version;
 					break;
 				case 'x':
-					state.sortflags = LS_EXTENSION;
+					state.order = order_extension;
 					break;
 				}
 			break;
@@ -1551,13 +1603,13 @@ main(int argc, register char** argv)
 			set(LS_RECURSIVE);
 			break;
 		case 'S':
-			state.sortflags |= LS_BLOCKS;
+			state.order = order_blocks;
 			break;
 		case 'T':
 			/* ignored */
 			break;
 		case 'U':
-			state.sortflags = LS_NOSORT;
+			state.order = order_none;
 			break;
 		case 'V':
 			switch (opt_info.num)
@@ -1658,8 +1710,8 @@ main(int argc, register char** argv)
 		state.ftwflags |= FTW_SEEDOTDIR; /* keep configure happy */
 	if (state.lsflags & LS_DIRECTORY)
 		state.lsflags &= ~LS_RECURSIVE;
-	if (!state.sortflags)
-		state.sortflags = state.lsflags & ~LS_BLOCKS;
+	if (!state.order)
+		state.order = order_name;
 	if (!state.timeflags)
 		state.timeflags = state.lsflags;
 	if (state.lsflags & (LS_COLUMNS|LS_COMMAS))

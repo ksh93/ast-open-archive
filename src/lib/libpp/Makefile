@@ -85,7 +85,7 @@ probe.ini : (CC.HOSTTYPE) probe.win32
 	g/^printf.*T_TOKCAT/d
 	g/^printf.*T_TOKEN/d
 	0a
-	#include <stdio.h>
+	$("#")include <stdio.h>
 	int
 	main(argc, argv)
 	int	argc;

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-02-02 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-03-02 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -87,7 +87,7 @@ set virtual:=1
 
 .OPTION.COMPATIBILITY : .MAKE .VIRTUAL .FORCE
 	local N O
-	if .MAKEVERSION. < 20090101
+	if .MAKEVERSION. < 20110101
 		O =
 		N =
 		if ! "$(-?clobber)" && "$("clobber":T=QV)"
@@ -4245,7 +4245,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	 * check make recursion limits
 	 */
 
-	T1 := $(-recurse:/[^0-9]//G)
+	T1 := $(-recurse:/:/ /G:N=[0-9]*:O=N)
 	if T1 > 0
 		T2 =
 		while T1 > 0

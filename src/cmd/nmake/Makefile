@@ -49,8 +49,6 @@ ppcc :: ppcc.sh
 
 convert :: convert.c
 
-.SOURCE : tests
-
 :TEST: -- assert assign attribute automatic baserules common diagnostics \
 	edit immediate implicit internal interrupt metarule option panic \
 	prereq quoting recurse scan shell state statement syntax view

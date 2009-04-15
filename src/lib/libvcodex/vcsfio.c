@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -691,6 +691,8 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 			}
 			else if(ctrl == VC_EOF) /* a new decoding context */
 			{	sfdc->code = vcionext(&io);
+				if(vciomore(&io) > 0 && *sfdc->code == VC_EOF)
+					continue; /* skip a sequence of VC_EOF's */
 				if(getheader(sfdc, f, 0, 0) < 0 )
 					break;
 				else	continue;
@@ -840,9 +842,9 @@ Sfdisc_t*	disc;
 
 /* on close, remove the discipline */
 #if __STD_C
-static vcsfdcexcept(Sfio_t* f, int type, Void_t* data, Sfdisc_t* disc)
+static int vcsfdcexcept(Sfio_t* f, int type, Void_t* data, Sfdisc_t* disc)
 #else
-static vcsfdcexcept(f,type,data,disc)
+static int vcsfdcexcept(f,type,data,disc)
 Sfio_t*		f;
 int		type;
 Void_t*		data;

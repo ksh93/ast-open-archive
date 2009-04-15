@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,7 @@
 #include <ast.h>
 #include <cdt.h>
 
-#define PT_VERSION		20020329L
+#define PT_VERSION		20090315L
 
 #define PTBITS			32
 #define PTSHIFT			1
@@ -50,9 +50,12 @@ struct Ptprefix_s
 {
 	Ptaddr_t		min;
 	Ptaddr_t		max;
-#ifdef _PTPREFIX_PRIVATE_
-	_PTPREFIX_PRIVATE_
-#endif
+	union
+	{
+	long			number;
+	void*			pointer;
+	}			data;
+	Dtlink_t		link;
 };
 
 struct Ptdisc_s				/* user discipline		*/
@@ -79,7 +82,7 @@ struct Pt_s
 
 extern Pt_t*		ptopen(Ptdisc_t*);
 extern int		ptclose(Pt_t*);
-extern int		ptinsert(Pt_t*, Ptaddr_t, Ptaddr_t);
+extern Ptprefix_t*	ptinsert(Pt_t*, Ptaddr_t, Ptaddr_t);
 extern int		ptdelete(Pt_t*, Ptaddr_t, Ptaddr_t);
 
 extern Ptprefix_t*	ptmatch(Pt_t*, Ptaddr_t);

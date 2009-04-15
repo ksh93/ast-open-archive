@@ -622,7 +622,7 @@ exec - g/^printf.*T_KEYWORD/d
 exec - g/^printf.*T_TOKCAT/d
 exec - g/^printf.*T_TOKEN/d
 exec - 0a
-exec -
+exec - #include <stdio.h>
 exec - int
 exec - main(argc, argv)
 exec - int	argc;
@@ -664,7 +664,7 @@ exec - g/^printf.*T_KEYWORD/d
 exec - g/^printf.*T_TOKCAT/d
 exec - g/^printf.*T_TOKEN/d
 exec - 0a
-exec -
+exec - #include <stdio.h>
 exec - int
 exec - main(argc, argv)
 exec - int	argc;

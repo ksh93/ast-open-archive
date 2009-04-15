@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -130,7 +130,7 @@ ptvclose(Ptv_t* a)
  * 0 returned on success
  */
 
-int
+Ptvprefix_t*
 ptvinsert(Ptv_t* tab, Ptvaddr_t min, Ptvaddr_t max)
 {
 	register Ptvprefix_t*	xp;
@@ -154,7 +154,7 @@ ptvinsert(Ptv_t* tab, Ptvaddr_t min, Ptvaddr_t max)
 	if (xp)
 	{
 		if (fvcmp(tab->size, key.min, xp->min) >= 0 && fvcmp(tab->size, key.max, xp->max) <= 0)
-			return 0;
+			return xp;
 		if (fvcmp(tab->size, xp->min, tab->r[2]) >= 0)
 			fvsub(tab->size, tab->r[3], xp->min, tab->r[2]);
 		else
@@ -177,8 +177,7 @@ ptvinsert(Ptv_t* tab, Ptvaddr_t min, Ptvaddr_t max)
 				key.max = max;
 		}
 	}
-	dtinsert(tab->dict, &key);
-	return 0;
+	return (Ptvprefix_t*)dtinsert(tab->dict, &key);
 }
 
 /*

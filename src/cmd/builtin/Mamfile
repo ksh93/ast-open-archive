@@ -209,8 +209,9 @@ setv CMD_STANDALONE -DCMD_STANDALONE="b_pty"
 setv LICENSE -DLICENSE="since=2001,author=dgk"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_pty -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2001-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c pty.c
 done pty.o generated
+bind -lutil dontcare
 setv CMD_STANDALONE -DCMD_STANDALONE="b_pty"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pty pty.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pty pty.o ${mam_libutil} ${mam_libast} ${mam_libcmd}
 done pty generated
 make nl
 make nl.o
@@ -498,6 +499,17 @@ make asa.tst
 done asa.tst
 exec - regress  asa.tst asa
 done test.asa virtual
+make test.cat
+make cat.tst
+meta cat.tst %.rt>%.tst cat.rt cat
+make cat.rt
+done cat.rt
+exec - if	[[ "1" || "cat.rt" -nt "cat.tst" ]]
+exec - then	mktest --style=regress cat.rt > cat.tst
+exec - fi
+done cat.tst generated
+exec - regress  cat.tst
+done test.cat virtual
 make test.chmod
 make chmod.tst
 meta chmod.tst %.rt>%.tst chmod.rt chmod
@@ -593,10 +605,6 @@ exec - fi
 done mkfifo.tst generated
 exec - regress  mkfifo.tst
 done test.mkfifo virtual
-make test.mktemp
-make mktemp.tst
-done mktemp.tst virtual
-done test.mktemp virtual
 make test.mv
 make mv.tst
 done mv.tst
@@ -631,20 +639,9 @@ done rm.tst generated
 exec - regress  rm.tst
 done test.rm virtual
 make test.tail
-make tail
-make tail.o
-make tail.c
-prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
-done tail.c
-meta tail.o %.c>%.o tail.c tail
-prev tail.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tail.c
-done tail.o virtual
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tail tail.o ${mam_libast} ${mam_libcmd}
-done tail generated
 make tail.tst
 done tail.tst
-exec - regress  tail.tst tail
+exec - regress  tail.tst
 done test.tail virtual
 make test.tr
 prev tr

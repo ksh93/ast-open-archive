@@ -43,7 +43,9 @@ if ! "$(-mam)"
 		-e '/\/\*NODELAY_CONTROL\*\//s/^/#undef	DELAY_CONTROL /' \
 		$(*)
 		} > c.$(tmp).c
-		$(CPP) $(CPPFLAGS) -I$(INSTALLROOT)/include/ast -DPROTO_STANDALONE -D-F$(*) -D-L -I-D -E c.$(tmp).c | $(PROTO) $(PROTOFLAGS:N!=-s) -f > $(<)
+		$(CPP) $(CPPFLAGS) -I$(INSTALLROOT)/include/ast -DPROTO_STANDALONE -D-F$(*) -D-L -I-D -E c.$(tmp).c |
+		$(SED) -e 's%".*/src/cmd/proto/%"%' -e 's%".*/src/cmd/%"../%' -e 's%".*/src/lib/%"../../lib/%' |
+		$(PROTO) $(PROTOFLAGS:N!=-s) -f > $(<)
 		$(RM) -f c.$(tmp).c
 	fi
 

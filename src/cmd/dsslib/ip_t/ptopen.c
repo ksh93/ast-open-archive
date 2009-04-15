@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -54,6 +54,7 @@ makef(Dt_t* dt, register Ptprefix_t* a, Dtdisc_t* disc)
 	{
 		b->min = a->min;
 		b->max = a->max;
+		b->data.pointer = 0;
 	}
 	return b;
 }
@@ -107,10 +108,10 @@ ptclose(Pt_t* a)
 
 /*
  * insert prefix range min..max into tab
- * 0 returned on success
+ * prefix pointer returned on success
  */
 
-int
+Ptprefix_t*
 ptinsert(Pt_t* tab, Ptaddr_t min, Ptaddr_t max)
 {
 	register Ptprefix_t*	xp;
@@ -127,7 +128,7 @@ ptinsert(Pt_t* tab, Ptaddr_t min, Ptaddr_t max)
 	if (xp)
 	{
 		if (key.min >= xp->min && key.max <= xp->max)
-			return 0;
+			return xp;
 		if (key.max >= (xp->min ? (xp->min - 1) : 0))
 		{
 			if (key.min > xp->min)
@@ -143,8 +144,7 @@ ptinsert(Pt_t* tab, Ptaddr_t min, Ptaddr_t max)
 				key.max = max;
 		}
 	}
-	dtinsert(tab->dict, &key);
-	return 0;
+	return (Ptprefix_t*)dtinsert(tab->dict, &key);
 }
 
 /*

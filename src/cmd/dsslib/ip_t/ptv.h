@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -32,7 +32,7 @@
 #include <cdt.h>
 #include <pt.h>
 
-#define PTV_VERSION		20080611L
+#define PTV_VERSION		20090315L
 
 #define PTV_REGISTERS		6
 
@@ -48,9 +48,12 @@ struct Ptvprefix_s
 {
 	unsigned char*		min;
 	unsigned char*		max;
-#ifdef _PTVPREFIX_PRIVATE_
-	_PTVPREFIX_PRIVATE_
-#endif
+	union
+	{
+	long			number;
+	void*			pointer;
+	}			data;
+	Dtlink_t		link;
 };
 
 struct Ptv_s
@@ -76,7 +79,7 @@ extern unsigned char*	ptvmax(int, unsigned char*, const unsigned char*, int);
 
 extern Ptv_t*		ptvopen(Ptvdisc_t*, int);
 extern int		ptvclose(Ptv_t*);
-extern int		ptvinsert(Ptv_t*, unsigned char*, unsigned char*);
+extern Ptvprefix_t*	ptvinsert(Ptv_t*, unsigned char*, unsigned char*);
 extern int		ptvdelete(Ptv_t*, unsigned char*, unsigned char*);
 
 extern Ptvprefix_t*	ptvmatch(Ptv_t*, unsigned char*);

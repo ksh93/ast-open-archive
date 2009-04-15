@@ -1,6 +1,6 @@
 # regression tests for the ast integral strto*() and strnto*() routines
 
-case $($UNIT) in 64/64)
+case $($MAIN) in 64/64)
 
 TEST 01 'base 10'
 

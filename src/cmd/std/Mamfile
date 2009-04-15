@@ -268,6 +268,10 @@ make features/locales
 done features/locales
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/locales
 done FEATURE/locales generated
+make ${PACKAGE_ast_INCLUDE}/proc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/proc.h
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/tm.h implicit
 make ${PACKAGE_ast_INCLUDE}/times.h implicit
@@ -493,10 +497,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_
 done pss-ps.o generated
 make pss-info.o
 make pss-info.c
-make ${PACKAGE_ast_INCLUDE}/proc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/proc.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/proc.h implicit
 make info.h implicit
 done info.h dontcare virtual
 prev psslib.h implicit
@@ -755,10 +756,9 @@ done ${INSTALLROOT}/bin/expand generated
 done install virtual
 make test
 make test.csplit
-prev csplit
 make csplit.tst
 done csplit.tst
-exec - regress  csplit.tst csplit
+exec - regress  csplit.tst
 done test.csplit virtual
 make test.dd
 prev dd

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -40,7 +40,7 @@ ptvinvert(Ptv_t* a)
 			if (fvcmp(a->size, a->r[0], ap->min) < 0)
 			{
 				fvsub(a->size, a->r[2], ap->min, a->r[1]);
-				if (ptvinsert(t, a->r[0], a->r[2]))
+				if (!ptvinsert(t, a->r[0], a->r[2]))
 					break;
 			}
 			fvadd(a->size, a->r[0], ap->max, a->r[1]);

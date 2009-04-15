@@ -1,3 +1,4 @@
+09-03-02 Makefile: eliminate master src paths from ../INIT/proto.c
 09-01-15 sear.sh: update for msvcrt.dll link
 08-11-15 sear.sh: add manifest logic
 06-12-04 proto.c: add utime() prototype

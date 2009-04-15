@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -236,7 +236,10 @@ as32_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 	int		n;
 
 	as = value->number;
-	n = sfsprintf(buf, size, "%lu.%lu", (as >> 16) & 0xffff, as & 0xffff);
+	if (n = (as >> 16) & 0xffff)
+		n = sfsprintf(buf, size, "%u.%lu", n, as & 0xffff);
+	else
+		n = sfsprintf(buf, size, "%lu", as & 0xffff);
 	if (n >= size)
 		return n + 1;
 	return n;
@@ -690,7 +693,7 @@ ptload(int str, Cxvalue_t* val, Ptdisc_t* ptdisc, Cxdisc_t* disc)
 	{
 		addr = PREFIX_ADDR(val->number);
 		bits = PREFIX_BITS(val->number);
-		if (ptinsert(pt, PTMIN(addr, bits), PTMAX(addr, bits)))
+		if (!ptinsert(pt, PTMIN(addr, bits), PTMAX(addr, bits)))
 		{
 			ptclose(pt);
 			return 0;
@@ -700,7 +703,7 @@ ptload(int str, Cxvalue_t* val, Ptdisc_t* ptdisc, Cxdisc_t* disc)
 	{
 		while (!strtoip4(s, &t, &addr, &bits))
 		{
-			if (ptinsert(pt, PTMIN(addr, bits), PTMAX(addr, bits)))
+			if (!ptinsert(pt, PTMIN(addr, bits), PTMAX(addr, bits)))
 			{
 				ptclose(pt);
 				return 0;
@@ -713,7 +716,7 @@ ptload(int str, Cxvalue_t* val, Ptdisc_t* ptdisc, Cxdisc_t* disc)
 		if (ip = dssfopen(dss, s + 1, NiL, DSS_FILE_READ, NiL))
 		{
 			while (rp = (Bgproute_t*)dssfread(ip))
-				if (ptinsert(pt, PTMIN(rp->addr, rp->bits), PTMAX(rp->addr, rp->bits)))
+				if (!ptinsert(pt, PTMIN(rp->addr, rp->bits), PTMAX(rp->addr, rp->bits)))
 				{
 					dssfclose(ip);
 					ptclose(pt);
@@ -750,7 +753,7 @@ ptvload(int str, Cxvalue_t* val, Ptdisc_t* ptdisc, Cxdisc_t* disc)
 	if (!str)
 	{
 		pp = (unsigned char*)val->buffer.data;
-		if (ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], pp, pp[IP6BITS]), ptvmax(ptv->size, ptv->r[1], pp, pp[IP6BITS])))
+		if (!ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], pp, pp[IP6BITS]), ptvmax(ptv->size, ptv->r[1], pp, pp[IP6BITS])))
 		{
 			ptvclose(ptv);
 			return 0;
@@ -760,7 +763,7 @@ ptvload(int str, Cxvalue_t* val, Ptdisc_t* ptdisc, Cxdisc_t* disc)
 	{
 		while (!strtoip6(s, &t, prefix, prefix + IP6BITS))
 		{
-			if (ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], prefix, prefix[IP6BITS]), ptvmax(ptv->size, ptv->r[1], prefix, prefix[IP6BITS])))
+			if (!ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], prefix, prefix[IP6BITS]), ptvmax(ptv->size, ptv->r[1], prefix, prefix[IP6BITS])))
 			{
 				ptvclose(ptv);
 				return 0;
@@ -773,7 +776,7 @@ ptvload(int str, Cxvalue_t* val, Ptdisc_t* ptdisc, Cxdisc_t* disc)
 		if (ip = dssfopen(dss, s + 1, NiL, DSS_FILE_READ, NiL))
 		{
 			while (rp = (Bgproute_t*)dssfread(ip))
-				if (ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], rp->prefixv6, rp->prefixv6[IP6BITS]), ptvmax(ptv->size, ptv->r[1], rp->prefixv6, rp->prefixv6[IP6BITS])))
+				if (!ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], rp->prefixv6, rp->prefixv6[IP6BITS]), ptvmax(ptv->size, ptv->r[1], rp->prefixv6, rp->prefixv6[IP6BITS])))
 				{
 					dssfclose(ip);
 					ptvclose(ptv);
