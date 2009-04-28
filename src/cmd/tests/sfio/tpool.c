@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -41,15 +41,15 @@ MAIN()
 	int	i, n, on;
 	char	*s, *os, *s1, *s2, *s3;
 	char	poolbuf[1024];
-	Sfio_t	*f1, *f2, *f3, *f4;
+	Sfio_t	*f, *f1, *f2, *f3, *f4;
 
 	if(!(f1 = sfopen((Sfio_t*)0,tstfile(0),"w+")) ||
 	   !(f2 = sfopen((Sfio_t*)0,tstfile(1),"w"))  ||
 	   !(f3 = sfopen((Sfio_t*)0,tstfile(2),"w")))
-		terror("Opening files\n");
+		terror("Opening files");
 
 	if(!(f4 = sfopen((Sfio_t*)0,tstfile(0),"r+")) )
-		terror("Opening file to read\n");
+		terror("Opening file to read");
 	sfungetc(f1,'a');
 	sfungetc(f4,'b');
 	sfpool(f1,f4,0);
@@ -59,28 +59,28 @@ MAIN()
 	sfsetbuf(f2,poolbuf,sizeof(poolbuf));
 	sfsetbuf(f3,poolbuf,sizeof(poolbuf));
 	if(!sfpool(f2,f3,0) )
-		terror("Setting pool\n");
+		terror("Setting pool");
 
 	os = "1234567890\n";
 	on = strlen(os);
 	for(i = 0; i < 100; ++i)
 		if(sfputr(f1,os,-1) < 0)
-			terror("Writing data\n");
+			terror("Writing data");
 	sfseek(f1,(Sfoff_t)0,0);
 	for(i = 0; i < 100; ++i)
 	{	if(!(s = sfgetr(f1,'\n',0)) || (n = sfvalue(f1)) != on)
-			terror("Reading data\n");
+			terror("Reading data");
 		if(sfwrite(f2,s,n) != n)
-			terror("Writing1\n");
+			terror("Writing1");
 		if(sfwrite(f3,s,n) != n)
-			terror("Writing2\n");
+			terror("Writing2");
 	}
 
 	/* see if data matches */
 	if(!(f1 = sfopen(f1, tstfile(0), "r")) ||
 	   !(f2 = sfopen(f2, tstfile(1), "r")) ||
 	   !(f3 = sfopen(f3, tstfile(2), "r")) )
-		terror("sfopen for file comparison\n");
+		terror("sfopen for file comparison");
 
 	if(sfsize(f1) != sfsize(f2) || sfsize(f2) != sfsize(f3))
 		terror("Files don't match sizes");
@@ -103,72 +103,77 @@ MAIN()
 	sfset(sfstdout,SF_LINE,0);
 	sfset(sfstderr,SF_LINE,0);
 	if(sfpool(sfstdout,sfstderr,0) != sfstderr )
-		terror("sfpool1\n");
+		terror("sfpool1");
 	sfputc(sfstdout,'1');
 	sfputc(sfstderr,'2');
 	sfputc(sfstdout,'3');
 	sfputc(sfstderr,'4');
 	sfsync(sfstderr);
 	if(strcmp(Serial,"1234") != 0)
-		terror("Pool not serializing output\n");
+		terror("Pool not serializing output");
 	sfdisc(sfstdout,NIL(Sfdisc_t*));
 	sfdisc(sfstderr,NIL(Sfdisc_t*));
 
 	sfclose(sfstdout);
 	if(!(f1 = sfopen((Sfio_t*)0,tstfile(0),"r")))
-		terror("sfopen\n");
+		terror("sfopen");
 	if(!sfpool(f1,sfstderr,0) )
-		terror("sfpool2\n");
+		terror("sfpool2");
 
 	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) ||
 	   !(f2 = sfopen(NIL(Sfio_t*), tstfile(1), "w+")) ||
 	   !(f3 = sfopen(NIL(Sfio_t*), tstfile(2), "w+")) )
-		terror("sfopen3\n");
+		terror("sfopen3");
 	if(sfpool(f1,f2,SF_SHARE) != f2)
-		terror("sfpool3 f1\n");
+		terror("sfpool3 f1");
 	if(sfpool(f3,f2,SF_SHARE) != f2 )
-		terror("sfpool3 f3\n");
+		terror("sfpool3 f3");
 	if(sfputc(f3,'x') < 0)
-		terror("sfputc to f3\n");
+		terror("sfputc to f3");
 	if(sfputc(f2,'y') < 0)
-		terror("sfputc to f2\n");
+		terror("sfputc to f2");
 	if(sfputc(f1,'z') < 0)
-		terror("sfputc to f1\n");
+		terror("sfputc to f1");
 	if(sfseek(f1,(Sfoff_t)0,0) != 0)
-		terror("sfseek failed on f1\n");
+		terror("sfseek failed on f1");
 	if(!(s = sfreserve(f1,3,SF_LOCKR)) || sfvalue(f1) != 3)
-		terror("sfreserve failed on f1\n");
+		terror("sfreserve failed on f1");
 	if(memcmp(s,"xyz",3) != 0)
-		terror("Wrong data\n");
+		terror("Wrong data");
 
 	if((os = sfreserve(f2,SF_UNBOUND,0)) )
-		terror("sfreserve should have failed on f2\n");
+		terror("sfreserve should have failed on f2");
 
 	if(sfpool(NIL(Sfio_t*),f2,0) != f1)
-		terror("Didn't get right pool head for f2\n");
+		terror("Didn't get right pool head for f2");
 
 	if(sfread(f1,s,3) != 3)
-		terror("Wrong read on f1\n");
+		terror("Wrong read on f1");
 
-	if(!sfpool(f3,NIL(Sfio_t*),0) )
-		terror("sfpool to delete f3\n");
+	if(!(f = sfpool(f3,NIL(Sfio_t*),0)) )
+		terror("sfpool to delete f3");
+	if(f != f1 && f != f2)
+		terror("sfpool delete did not return a stream from old pool");
+
+	if(sfpool(f1,NIL(Sfio_t*),0) != f2 )
+		terror("sfpool delete did not return a stream from pool");
 
 	if(sfpool(f1,NIL(Sfio_t*),0) != f1 )
-		terror("sfpool to delete f1\n");
+		terror("sfpool delete of a lone stream did not return self");
 
 	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) ||
 	   !(f2 = sfopen(NIL(Sfio_t*), tstfile(1), "w")) )
-		terror("sfopen4\n");
+		terror("sfopen4");
 	sfputc(f1,'a');
 	sfputc(f1,'b');
 	sfputc(f1,'c');
 	sfset(f1,SF_WRITE,0);	/* off write mode */
 	if(sfpool(f1,f2,SF_SHARE) )
-		terror("sfpool should fail pooling read+write streams\n");
+		terror("sfpool should fail pooling read+write streams");
 	if(sfseek(f1,(Sfoff_t)0,0) != (Sfoff_t)0)
-		terror("sfseek failed\n");
+		terror("sfseek failed");
 	if(!(s = sfreserve(f1,3,SF_LOCKR)) || memcmp(s,"abc",3) != 0)
-		terror("Can't get data from f1\n");
+		terror("Can't get data from f1");
 
 	TSTEXIT(0);
 }

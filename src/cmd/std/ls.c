@@ -122,7 +122,7 @@ USAGE_LICENSE
 "[F:classify?Append a character for typing each entry. Turns on \b--physical\b.]"
 "[g:group?\b--long\b with no owner info.]"
 "[G?\b--long\b with no group info.]"
-"[h:scale|binary-scale|human-readable?Scale sizes to powers of 1024 { Kb Mb Gb Tb Pb Xb }.]"
+"[h:scale|binary-scale|human-readable?Scale sizes to powers of 1024 { Ki Mi Gi Ti Pi Xi }.]"
 "[i:inode?List the file serial number.]"
 "[I:ignore?Do not list implied entries matching shell \apattern\a.]:[pattern]"
 "[k:kilobytes?Use 1024 blocks instead of 512.]"

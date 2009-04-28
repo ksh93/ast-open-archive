@@ -1047,6 +1047,7 @@ All recorded changes follow.
 <PRE>
 
 09-04-22  --- Release ksh93t+  ---
+09-04-22  Default alias compound='typeset -C' added.
 09-04-15  A bug that caused ${...;} to hang for large files has ben fixed.
 09-04-08  A change was made in the -n option which printed out an incorrect
 	  warning with &lt;&gt;.
@@ -3539,6 +3540,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-04-27 sfio/tpool.c: update to match libast/sfio/sfpool.c patch
+09-02-22 date.dat: add iso duration tests
 09-02-02 sfio/tprintf.c: fix sfaprints() test
 08-12-30 date.dat: add TM_WORK tests
 08-12-19 date.dat,datey2k.dat: update for %_K
@@ -6639,6 +6642,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-04-27 sfio/sfpool.c: fix bug that did not return pool on delete
 09-04-22 include/regex.h,regex/regcomp.c: add REG_REGEXP &lt;regexp.h&gt; compatibility
 09-04-15 tm/tmxdate.c: handle "4th thursday in november"
 09-03-31 string/strvcmp.c,string/strnvcmp.c: add version strcmp(3)
@@ -9812,7 +9816,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>April 23, 2009</TD>
+<TD align=right>April 30, 2009</TD>
 </TR>
 </TABLE>
 <P>
