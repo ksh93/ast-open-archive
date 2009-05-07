@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1051,6 +1051,8 @@ scanmatch(List_t* p, register Action_t* a, Rule_t* r, char* b, char* s, int ifle
 
 	static char	label[] = "X-scan-action";
 
+	if (strchr(s, ' '))
+		return p;
 	if (state.test & 0x00100000)
 		error(2, "scanmatch: %s %c", s, a->type);
 	if (a->script || a->map)

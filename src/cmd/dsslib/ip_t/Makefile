@@ -27,6 +27,6 @@ bgpsize :: bgpsize.c
 PAXFILTER = ;*.[ch];$(PROTO) $(PROTOFLAGS) -c "" -p
 
 ptvsa.tgz : $$("ptvsa.manifest":T=F:T=I:/[[:space:]][[:space:]]*/ /G)
-	$(PAX) $(PAXFLAGS) -wvf $(<) -x $(<:/.*\.//) -s ',.*/,,' -A $(PAXFILTER:@Q) $(*)
+	$(PAX) $(PAXFLAGS) -wf $(<) -x $(<:/.*\.//) -s ',.*/,,' -A $(PAXFILTER:@Q) $(*)
 
 :: RELEASE README-ptvsa ptvsa.manifest ptvsa.omk

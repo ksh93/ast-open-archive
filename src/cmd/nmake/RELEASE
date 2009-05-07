@@ -1,5 +1,6 @@
+09-05-05 scan.c: reject implicit prereq names containing space
 09-03-24 Makerules.mk: --option[=value] compatibility with option[=value] until 2011
-09-03-02 Makerules.mk: ues $(-recurse:/:/ /G:N=[0-9]*:O=N) for recursion limit
+09-03-02 Makerules.mk: use $(-recurse:/:/ /G:N=[0-9]*:O=N) for recursion limit
 09-02-02 Makerules.mk: reset :PACKAGE: pkg:noinstall for each pkg
 09-01-09 Makerules.mk: fix .TGZ to handle large manifests
 09-01-09 Makerules.mk: :: foo.man[=N] installs in man/manN/foo.N (default 1)
