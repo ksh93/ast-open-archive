@@ -17,7 +17,7 @@
 #                 Glenn Fowler <gsf@research.att.com>                  #
 #                                                                      #
 ########################################################################
-: mm2bb - convert mm/man subset to bb markups
+: mm2twiki - convert mm/man subset to twiki markups
 
 # it keeps going and going ...
 #
@@ -28,24 +28,23 @@
 # .xx link="HOT-TEXT"		link goto request
 # .xx ref="URL\tMIME-TYPE"	head link hint
 
-command=mm2bb
-version='mm2bb (AT&T Research) 2007-12-11' # NOTE: repeated in USAGE
+command=mm2twiki
+version='mm2twiki (AT&T Research) 2009-05-08' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2bb (AT&T Research) 2007-12-11 $
+@(#)$Id: mm2twiki (at&t research) 2009-05-08 $
 ]
 '$USAGE_LICENSE$'
-[+NAME?mm2bb - convert mm/man subset to bb markups]
-[+DESCRIPTION?\bmm2bb\b is a \bsed\b(1)/\bksh\b(1) script (yes!) that
-	converts input \bmm\b(1) or \bman\b(1) documents to a \bbb\b markups
+[+NAME?mm2twiki - convert mm/man subset to twiki markups]
+[+DESCRIPTION?\bmm2twiki\b is a \bsed\b(1)/\bksh\b(1) script (yes!) that
+	converts input \bmm\b(1) or \bman\b(1) documents to a \btwiki\b markups
 	document on the standard output. If \afile\a is omitted then the
 	standard input is read.  \adir\a operands and directory components
 	of \afile\a operands are added to the included file search list.
-	The default \bbb\b markup style is [\aop\a]]\adata\a[/\aop\a]].]
-[t:texish?\b\\foo\b{\adata\a} \bbb\b markup style]
+	The default \btwiki\b markup style is [\aop\a]]\adata\a[/\aop\a]].]
 
 [ file ... ]
 
@@ -59,7 +58,7 @@ esac
 
 set -o noglob
 
-integer count row n s ndirs=0 nfiles=0 tex=0
+integer count row n s ndirs=0 nfiles=0
 integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4
 integer labels=0 reference=1 ce=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
@@ -112,8 +111,6 @@ vg_ps=20
 
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
-	t)	tex=1
-		;;
 	*)	OPTIND=0
 		getopts $ARGV0 "$USAGE" OPT '-?'
 		exit 2
@@ -139,21 +136,13 @@ ds[Rf]="[$reference]"
 ds[Rg]='&#174;'
 ds[CM]='&#169;'
 ds[RM]='&#174;'
-if	(( tex ))
-then
-	ds[SM]='\-1{\b{SM}}'
-	ds[TM]='\-1{\b{TM}}'
-	tt='font{courier new\,courier,'
-	dd='{'
-else
-	size_small=9
-	size_normal=12
-	size_big=18
-	ds[SM]="[size=$size_small][b]SM[/b][/size]"
-	ds[TM]="[size=$size_small][b]TM[/b][/size]"
-	tt=code
-	dd=
-fi
+size_small=9
+size_normal=12
+size_big=18
+ds[SM]="[size=$size_small][b]SM[/b][/size]"
+ds[TM]="[size=$size_small][b]TM[/b][/size]"
+tt=code
+dd=
 
 map[.Cs]=.EX
 map[.Ce]=.EE
@@ -197,15 +186,15 @@ function getfiles
 	-e 's%\\u\([^\\]*\)\\d%\1%g' \
 	-e 's%\\v\(.\)-\([^\\]*\)\1\(.*\)\\v\1+*\2\1%\3%g' \
 	-e 's%\\v\(.\)+*\([^\\]*\)\1\(.*\)\\v\1-\2\1%\3%g' \
-	-e 's%\\h'\''0\*\\w"\([abcdefghijklmnopqrstuvwxyz]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
-	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
-	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\([abcdefghijklmnopqrstuvwxyz]*:[^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
-	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
-	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\2[/url]%g' \
-	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%[url=\1]\1[/url]%g' \
+	-e 's%\\h'\''0\*\\w"\([abcdefghijklmnopqrstuvwxyz]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[[\1][\2]]%g' \
+	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[[\1][\2]]%g' \
+	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[[\1][\2]]%g' \
+	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%[[\1][\1]]%g' \
+	-e 's%\\h'\''0\*1'\''\([abcdefghijklmnopqrstuvwxyz]*:[^'\'']*\)\\h'\''0'\''%[[\1][\1]]%g' \
+	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%[[\1][\1]]%g' \
+	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%[[\1][\1]]%g' \
+	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%[[\1][\2]]%g' \
+	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%[[\1][\1]]%g' \
 	-e 's%\\s+\(.\)\([^\\]*\)\\s-\1%[size='$size_big']\2[/size]%g' \
 	-e 's%\\s+\(.\)\([^\\]*\)\\s0%[size='$size_big']\2[/size]%g' \
 	-e 's%\\s-\(.\)\([^\\]*\)\\s+\1%[size='$size_small']\2[/size]%g' \
@@ -214,28 +203,28 @@ function getfiles
 	-e 's%\\f[PR]%\\fZ%g' \
 	-e 's%\\f\(.\)\([^\\]*\)%<\1>\2</\1>%g' \
 	-e 's%&lt;\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][-._abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]*@[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.]*\)&gt;%[size='$size_small']\&lt;[url=mailto:\1]\1[/url]\&gt;[/size]%g' \
-	-e 's%\[[ABCDEFGHIJKLMNOPQRSTUVWXYZ][ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]*[0123456789][0123456789][abcdefghijklmnopqrstuvwxyz]*]%[b]&[/b]%g' \
+	-e 's%\[[ABCDEFGHIJKLMNOPQRSTUVWXYZ][ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]*[0123456789][0123456789][abcdefghijklmnopqrstuvwxyz]*]%*&*%g' \
 	-e 's%</*Z>%%g' \
 	-e 's%<[146789]>%%g' \
 	-e 's%</[146789]>%%g' \
-	-e 's%<2>%[i]%g' \
-	-e 's%</2>%[/i]%g' \
-	-e 's%<3>%[b]%g' \
-	-e 's%</3>%[/b]%g' \
-	-e 's%<5>%[code]%g' \
-	-e 's%</5>%[/code]%g' \
-	-e 's%<B>%[b]%g' \
-	-e 's%</B>%[/b]%g' \
-	-e 's%<I>%[i]%g' \
-	-e 's%</I>%[/i]%g' \
-	-e 's%<L>%[code]%g' \
-	-e 's%</L>%[/code]%g' \
-	-e 's%<X>%[code]%g' \
-	-e 's%</X>%[/code]%g' \
-	-e 's%<CW>%[code]%g' \
-	-e 's%</CW>%[/code]%g' \
-	-e 's%<i>\([^<]*\)</i>(\([0123456789]\))%[url=../man\2/\1.html][i]\1[/i][/url]\2%g' \
-	-e 's%<b>\([^<]*\)</b>(\([0123456789]\))%[url=../man\2/\1.html][b]\1[/b][/url]\2%g' \
+	-e 's%<2>%_%g' \
+	-e 's%</2>%_ %g' \
+	-e 's%<3>%*%g' \
+	-e 's%</3>%* %g' \
+	-e 's%<5>%=%g' \
+	-e 's%</5>%= %g' \
+	-e 's%<B>%*%g' \
+	-e 's%</B>%* %g' \
+	-e 's%<I>%_%g' \
+	-e 's%</I>%_ %g' \
+	-e 's%<L>%=%g' \
+	-e 's%</L>%= %g' \
+	-e 's%<X>%=%g' \
+	-e 's%</X>%= %g' \
+	-e 's%<CW>%=%g' \
+	-e 's%</CW>%= %g' \
+	-e 's%<i>\([^<]*\)</i>(\([0123456789]\))%[[../man\2/\1.html][\1]]\2%g' \
+	-e 's%<b>\([^<]*\)</b>(\([0123456789]\))%[[../man\2/\1.html][\1]]\2%g' \
 	-e 's%\\s+\(.\)\(.*\)\\s-\1%[size='$size_big']\2[/size]%g' \
 	-e 's%\\s-\(.\)\(.*\)\\s+\1%[size='$size_small']\2[/size]%g' \
 	-e 's%\\e%\&#0092;%g' \
@@ -259,7 +248,7 @@ function space
 function flush
 {
 	if	[[ $fill ]]
-	then	print -r -- "${fill#?}"
+	then	print -r -- "${fill#?}" | fmt -w80
 		fill=
 		spaced=0
 	fi
@@ -553,10 +542,7 @@ function getline
 						label)	if	(( labels >= 0 ))
 							then	nam=name
 								label[labels++]=$txt
-								if	(( tex ))
-								then	puttext '\newurl{'$url,$txt'}'
-								else	puttext "[url=$url]$txt[/url]"
-								fi
+								puttext "[[$url][$txt]]"
 							fi
 							;;
 						link*)	tar=
@@ -572,10 +558,7 @@ function getline
 								;;
 							esac
 							nam=href
-							if	(( tex ))
-							then	data="${data}\\newurl{$pfx$url,$txt}"
-							else	data="${data}[url=$pfx$url]$txt[/url]"
-							fi
+							data="${data}[[$pfx$url][$txt]]"
 							;;
 						esac
 						;;
@@ -606,28 +589,15 @@ function getline
 						x=${2#'('*')'}
 						y=${2%$x}
 						n=$y
-						if	(( tex ))
-						then
-							case $op in
-							.B*)	font1='\b{' ;;
-							.L*)	font1='\'$tt ;;
-							*)	font1='\i{' ;;
-							esac
-							case $macros in
-							man)	set -A text -- "\\newurl{../man$n/$1.html,$font1$1}}$y$x" ;;
-							*)	set -A text -- "\\newurl{${html.man:=../man}/man$n/$1.html,$font1$1}$y$x" ;;
-							esac
-						else
-							case $op in
-							.B*)	font1=b ;;
-							.L*)	font1=$tt ;;
-							*)	font1=i ;;
-							esac
-							case $macros in
-							man)	set -A text -- "[url=../man$n/$1.html][$font1]$1[/$font1][/url]$y$x" ;;
-							*)	set -A text -- "[url=${html.man:=../man}/man$n/$1.html][$font1]$1[/$font1][/url]$y$x" ;;
-							esac
-						fi
+						case $op in
+						.B*)	font1=b ;;
+						.L*)	font1=$tt ;;
+						*)	font1=i ;;
+						esac
+						case $macros in
+						man)	set -A text -- "[[../man$n/$1.html][$1]]$y$x" ;;
+						*)	set -A text -- "[[${html.man:=../man}/man$n/$1.html][$1]]$y$x" ;;
+						esac
 						break
 						;;
 					esac
@@ -652,10 +622,7 @@ function getline
 				case $font in
 				"")	data=
 					;;
-				?*)	if	(( tex ))
-					then	data="}"
-					else	data="[/$font]"
-					fi
+				?*)	data="$font"
 					font=
 					;;
 				esac
@@ -668,15 +635,15 @@ function getline
 					;;
 				esac
 				case $font1 in
-				B)	font1=b$dd ;;
-				I)	font1=i$dd ;;
-				[LMX])	font1=$tt ;;
+				B)	font1=* ;;
+				I)	font1=_ ;;
+				[LMX])	font1== ;;
 				R)	font1= ;;
 				esac
 				case $font2 in
-				B)	font2=b$dd ;;
-				I)	font2=i$dd ;;
-				[LMX])	font2=$tt ;;
+				B)	font2=* ;;
+				I)	font2=_ ;;
+				[LMX])	font2== ;;
 				R)	font2= ;;
 				esac
 				font=$font2
@@ -688,58 +655,30 @@ function getline
 					$font2)	font=$font1 ;;
 					*)	font=$font2 ;;
 					esac
-					if	(( tex ))
-					then
-						case $1 in
-						"")	;;
-						*'\-'[1-9]*|*'\'[1-9]*)
-							case $font in
-							"")	data="$data$1" ;;
-							*)	data="$data\\$font$1}" ;;
-							esac
-							;;
-						*)	case "$1 $2" in
-							*'\\-'[1-9]*|*'\'[1-9]*)
-								case $font in
-								"")	data="$data$1 $2" ;;
-								*)	data="$data\\$font$1 $2}" ;;
-								esac
-								shift
-								;;
-							*)	case $font in
-								"")	data="$data$1" ;;
-								*)	data="$data\\$font$1}" ;;
-								esac
-								;;
-							esac
-							;;
+					case $1 in
+					"")	;;
+					*"[size"*)
+						case $font in
+						"")	data="$data$1" ;;
+						*)	data="$data$font$1$font " ;;
 						esac
-					else
-						case $1 in
-						"")	;;
+						;;
+					*)	case "$1 $2" in
 						*"[size"*)
 							case $font in
-							"")	data="$data$1" ;;
-							*)	data="$data[$font]$1[/$font]" ;;
+							"")	data="$data$1 $2" ;;
+							*)	data="$data$font$1 $2$font " ;;
 							esac
+							shift
 							;;
-						*)	case "$1 $2" in
-							*"[size"*)
-								case $font in
-								"")	data="$data$1 $2" ;;
-								*)	data="$data[$font]$1 $2[/$font]" ;;
-								esac
-								shift
-								;;
-							*)	case $font in
-								"")	data="$data$1" ;;
-								*)	data="$data[$font]$1[/$font]" ;;
-								esac
-								;;
+						*)	case $font in
+							"")	data="$data$1" ;;
+							*)	data="$data$font$1$font " ;;
 							esac
 							;;
 						esac
-					fi
+						;;
+					esac
 					shift
 				done
 				font=
@@ -758,10 +697,7 @@ function getline
 				case $# in
 				0)	getline ;;
 				esac
-				if	(( tex ))
-				then	set -A text -- "\\-1{\\b{""$@""}}"
-				else	set -A text -- "[size=$size_small][b]""$@""[/b][/size]"
-				fi
+				set -A text -- "[size=$size_small]*""$@""*[/size]"
 				;;
 			.SG)	continue
 				;;
@@ -770,10 +706,7 @@ function getline
 				case $# in
 				0)	getline ;;
 				esac
-				if	(( tex ))
-				then	set -A text -- "\\-1{""$@""}"
-				else	set -A text -- "[size=$size_small]""$@""[/size]"
-				fi
+				set -A text -- "[size=$size_small]""$@""[/size]"
 				;;
 			*)	x=${map[${text[0]}]}
 				case $x in
@@ -792,7 +725,7 @@ function getline
 
 function heading
 {
-	typeset op=$1 i o options beg end
+	typeset op=$1 i o options beg
 	integer count
 
 	shift
@@ -811,16 +744,12 @@ function heading
 	case $* in
 	"")	putop
 		;;
-	*)	if	(( count == 1 ))
-		then	if	(( tex ))
-			then	beg="$beg\\red{\\1{"
-				end="}}$end"
-			else	beg="$beg[color=red][size=$size_big]"
-				end="[/size][/color]$end"
-			fi
-		fi
-		space
-		putop "$beg $* $end"
+	*)	space
+		beg=---+
+		while (( count-- ))
+		do	beg=$beg+
+		done
+		putop "$beg$*"
 		space
 		;;
 	esac
@@ -855,18 +784,12 @@ function tbl_attributes
 		;;
 	esac
 	case $i in
-	*[bB]*)	if	(( tex ))
-		then	b="$b\\b{" e="}$e"
-		else	b="$b[b]" e="[/b]$e"
-		fi
+	*[bB]*)	b="$b*" e="*$e"
 		;;
 	esac
 	case X$i in
 	*[!0-9.][iI]*)
-		if	(( tex ))
-		then	b="$b\\i{" e="}$e"
-		else	b="$b[i]" e="[/i]$e"
-		fi
+		b="$b_" e="_$e"
 		;;
 	esac
 }
@@ -906,12 +829,9 @@ do	getline || {
 			;;
 		.AL|.[IR]S|.VL)
 			case $macros:$op in
-			mm:.RS)	if	(( tex ))
-				then	Rf="\\+{[$reference]}"
-					references="$references$nl\\list{[$reference]}"
-				else	Rf="\\u[$reference]\\d"
-					references="$references$nl[list][$reference][/list]"
-				fi
+			mm:.RS)	
+				Rf="\\u[$reference]\\d"
+				references="$references$nl[list][$reference][/list]"
 				while	getline
 				do	case $1 in
 					.RF)	break ;;
@@ -934,25 +854,16 @@ do	getline || {
 					list[lists]=OL
 					;;
 				esac
-				if	(( tex ))
-				then	putopn '\olist{'
-				else	putop '[list]'
-				fi
+				putop '[list]'
 				;;
-			.[IR]S)	if	(( tex ))
-				then	putopn '\list{'
-				else	putop '[list]'
-				fi
+			.[IR]S)	putop '[list]'
 				;;
 			.VL)	case $1 in
 				?*)	type[++lists]=.al
 					list[lists]=DL
 					;;
 				esac
-				if	(( tex ))
-				then	putopn '\list{'
-				else	putop '[list]'
-				fi
+				putop '[list]'
 				;;
 			esac
 			;;
@@ -989,12 +900,8 @@ do	getline || {
 			(( pp = lists ))
 			end=
 			case ${mm.title} in
-			?*)	if	(( tex ))
-				then	beg="$beg\\1{\\blue{"
-					end="}}$end"
-				else	beg="$beg[size=$size_big][color=blue]"
-					end="[/color][/size]$end"
-				fi
+			?*)	beg="$beg[size=$size_big][color=blue]"
+				end="[/color][/size]$end"
 				space
 				putop "$beg ${mm.title} $end"
 				space
@@ -1019,10 +926,7 @@ do	getline || {
 				case $mm_AU in
 				?*)	putop "${mm_AU#?}"
 					case $mm_AF_cur in
-					?*)	if	(( tex ))
-						then	mm_AF="${mm_AF_cur}[/i]"
-						else	mm_AF="${mm_AF_cur}[/i]"
-						fi
+					?*)	mm_AF="${mm_AF_cur}[/i]"
 						;;
 					esac
 					case $mm_AF in
@@ -1077,10 +981,7 @@ do	getline || {
 					esac
 					;;
 				esac
-				if	(( tex ))
-				then	mm_AF="${mm_AF_cur}}"
-				else	mm_AF="${mm_AF_cur}[/i]"
-				fi
+				mm_AF="${mm_AF_cur}[/i]"
 				mm_AF_cur=""
 				;;
 			esac
@@ -1097,10 +998,7 @@ do	getline || {
 			esac
 			type[++lists]=.AL
 			list[lists]=UL
-			if	(( tex ))
-			then	putopn '\list{'
-			else	putop "[list]"
-			fi
+			putop "[list]"
 			;;
 		.BP)	unset parm
 			while	[[ $1 == *=* ]]
@@ -1163,19 +1061,13 @@ do	getline || {
 		.DE|.fi)
 			if ((nf))
 			then	nf=0
-				if	(( tex ))
-				then	putop "}</PRE>"
-				else	putop "[/code]"
-				fi
+				putop "</verbatim>"
 			fi
 			;;
 		.DF|.DS|.nf)
 			if ((!nf))
 			then	nf=1
-				if	(( tex ))
-				then	putop "<PRE>\\$tt"
-				else	putop "[code]"
-				fi
+				putop "<verbatim>"
 			fi
 			;;
 		.DT)	case $macros in
@@ -1185,25 +1077,16 @@ do	getline || {
 			;;
 		.EE)if ((nf))
 			then	nf=0
-				if	(( tex ))
-				then	putop "}</PRE>"
-				else	putop "[/code]"
-				fi
+				putop "</verbatim>"
 			fi
 			if [[ $fg ]]
-			then	if	(( tex ))
-				then	putop "\\blue{$fg}"
-				else	putop "[color=blue]$fg[/color]"
-				fi
+			then	putop "[color=blue]$fg[/color]"
 			fi
 			indent=${indent#$inch}
 			;;
 		.EX)if ((!nf))
 			then	nf=1
-				if	(( tex ))
-				then	putop "<PRE>\\$tt"
-				else	putop "[code]"
-				fi
+				putop "<verbatim>"
 			fi
 			indent=$inch$indent
 			case $# in
@@ -1213,10 +1096,7 @@ do	getline || {
 			;;
 		.FE)	putop " ] "
 			;;
-		.FG)	if	(( tex ))
-			then	putop "\\blue{Figure $figure: $*}"
-			else	putop "[color=blue]Figure $figure: $*[/color]"
-			fi
+		.FG)	putop "[color=blue]Figure $figure: $*[/color]"
 			(( figure++ ))
 			;;
 		.FS)	putop " [ "
@@ -1264,10 +1144,7 @@ do	getline || {
 				esac
 				case $op in
 				.IP|.LP|.TF)
-					if	(( tex ))
-					then	set -- "<PRE>\\$tt$*}</PRE>"
-					else	set -- "[code]$*[/code]"
-					fi
+					set -- "=$*="
 					;;
 				.TP)	getline
 					;;
@@ -1278,20 +1155,13 @@ do	getline || {
 			then	if	[[ ${list[lists]} == DL ]] && (( ! $# ))
 				then	getline
 				fi
-				if	(( tex ))
-				then	case $* in
-					'')			putopn ;;
-					'\b{'*)			putopn "$* " ;;
-					*)			putopn "\\b{$*} " ;;
-					esac
-				else	case $* in
-					'['*']'[[:alpnum:]]*)	putopn "[*]$* " ;;
-					'['*)			putopn "[*]$*: " ;;
-					'')			putopn "[*] " ;;
-					[[:alpnum:]]*)		putopn "[*][b]$*[/b] " ;;
-					*)			putopn "[*][b]$*[/b]: " ;;
-					esac
-				fi
+				case $* in
+				'['*']'[[:alpnum:]]*)	putopn "[*]$* " ;;
+				'['*)			putopn "[*]$*: " ;;
+				'')			putopn "[*] " ;;
+				[[:alpnum:]]*)		putopn "[*][b]$*[/b] " ;;
+				*)			putopn "[*][b]$*[/b]: " ;;
+				esac
 			else	warning "$op: no current list"
 			fi
 			;;
@@ -1299,17 +1169,11 @@ do	getline || {
 			;;
 		.LE|.[IR]E)
 			if	[[ $op == ".LE" ]]
-			then	if	(( tex ))
-				then	putopt '}'
-				else	putop '[/list]'
-				fi
+			then	putop '[/list]'
 			fi
 			case ${type[@]} in
 			*.[Aa][Ll]*)
-				if	(( tex ))
-				then	flush
-				else	space
-				fi
+				space
 				while	(( lists > 0 ))
 				do	case ${type[lists--]} in
 					.AL)	break ;;
@@ -1319,11 +1183,9 @@ do	getline || {
 			*)	warning "$op: no current list type"
 				;;
 			esac
-			if	(( !tex ))
-			then	case $op:$pd in
-				.[IR]E:?*)	putop ;;
-				esac
-			fi
+			case $op:$pd in
+			.[IR]E:?*)	putop ;;
+			esac
 			;;
 		.LX)	: ignore $op
 			;;
@@ -1333,18 +1195,12 @@ do	getline || {
 			;;
 		.NL)	type[++lists]=.AL
 			list[lists]=OL
-			if	(( tex ))
-			then	putopn '\olist{'
-			else	putop '[list]'
-			fi
+			putop '[list]'
 			;;
 		.OK)	mm.keywords="$*"
 			;;
 		.OP)	: .OP opt arg arg-append arg-prepend
-			if	(( tex ))
-			then	x="$4\\b{&#45;$1}\\i{$2}"
-			else	x="$4[b]&#45;$1[/b][i]$2[/i]"
-			fi
+			x="$4[b]&#45;$1[/b][i]$2[/i]"
 			case $3 in
 			'[]')	x="[ $x ]" ;;
 			?*)	x="$x$3" ;;
@@ -1363,10 +1219,7 @@ do	getline || {
 			*)	pm="${pm}PROPRIETARY" ;;
 			esac
 			case $pm in
-			?*)	if	(( tex ))
-				then	pm="\\blue{${pm}}"
-				else	pm="[color=blue]${pm}[/color]"
-				fi
+			?*)	pm="[color=blue]${pm}[/color]"
 			esac
 			;;
 		.PU)	: ignore $op
@@ -1475,20 +1328,14 @@ do	getline || {
 			I)	font=i$dd
 				;;
 			*)	case $font in
-				?*)	if	(( tex ))
-					then	puttext "}"
-					else	puttext "[/$font]"
-					fi
+				?*)	puttext "$font"
 					font=
 					;;
 				esac
 				;;
 			esac
 			if	[[ $font ]]
-			then	if	(( tex ))
-				then	puttext "\\$font"
-				else	puttext "[$font]"
-				fi
+			then	puttext "$font"
 			fi
 			;;
 		.fp)	: ignore $op
@@ -1522,15 +1369,10 @@ do	getline || {
 		.ns)	: ignore $op
 			;;
 		.ps)	case $1 in
-			-*)	if	(( tex ))
-				then	putop "\\-{"
-				else	putop "[size=$size_small]"
-				fi
+			-*)	putop "[size=$size_small]"
 				;;
-			+*)	if	(( tex ))
-				then	putop "\\+{"
-				else	putop "[size=$size_big]"
-				fi
+			+*)	putop "[size=$size_big]"
+				;;
 			esac
 			;;
 		.sh)	case $HTMLPATH in
@@ -1573,10 +1415,7 @@ do	getline || {
 	""|[\ \	]*)
 		case $macros in
 		man)	leading=1
-			if	(( tex ))
-			then	prefix="<PRE>\\$tt"
-			else	prefix="[code]"
-			fi
+			prefix="<verbatim>"
 			blank=
 			while	:
 			do	case $1 in
@@ -1599,10 +1438,7 @@ do	getline || {
 				getline || break
 			done
 			case $prefix in
-			"")	if	(( tex ))
-				then	putop "}</PRE>"
-				else	putop "[/code]"
-				fi
+			"")	putop "</verbatim>"
 				;;
 			esac
 			;;

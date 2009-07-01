@@ -1,3 +1,4 @@
+09-06-22 sync with kpv, add vcgetfname(), vcwalkfname()
 09-03-12 vcstrip.c: add
 09-03-10 vcalias.c: add qnl
 09-02-24 vcalias.c: add rte

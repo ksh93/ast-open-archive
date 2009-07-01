@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2009 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -220,7 +220,7 @@ filefd(int fd, char* mode)
  */
 
 FILE*
-filetemp(char* buf, int type, int fd)
+filetemp(char* buf, int size, int type, int fd)
 {
 	register char*	s;
 	register char*	b;
@@ -231,8 +231,9 @@ filetemp(char* buf, int type, int fd)
 		if (fd <= 0)
 			return 0;
 		b = state.path.path;
+		size = sizeof(state.path.path);
 	}
-	e = b + PATHSIZE;
+	e = b + size - 1;
 	s = strncopy(b, state.tmp.dir, e - b);
 	s = strncopy(s, "Mail", e - s);
 	if (s < e)
@@ -240,16 +241,18 @@ filetemp(char* buf, int type, int fd)
 	strncopy(s, "XXXXXX", e - s);
 	if (fd) {
 		fd = mkstemp(b);
-		if (!buf)
+		if (!buf && *b)
 			remove(b);
 		if (fd < 0 || !(fp = filefd(fd, "r+"))) {
 			if (fd >= 0)
 				close(fd);
-			note(FATAL|SYSTEM|ERROR|IDENTIFY, "%s", b);
+			note(FATAL|SYSTEM|ERROR|IDENTIFY, "\"%s\": temporary file error", b);
 		}
 	}
 	else
-		mktemp(buf);
+		mktemp(b);
+	if (!*b)
+		note(FATAL|SYSTEM|ERROR|IDENTIFY, "\"%s\": temporary file error", b);
 	return fp;
 }
 

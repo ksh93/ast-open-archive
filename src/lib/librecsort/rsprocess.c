@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -95,7 +95,7 @@ ssize_t	s_data;		/* data size		*/
 
 	if(defkeyf) /* max expansion for key */
 	{	if(key <= 0)
-			key = 4;
+			key = mbcoll() ? 64 : 4;
 	}
 	else if(dsamelen) /* embedded key with fixed length */
 	{	datalen = d;

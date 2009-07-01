@@ -101,8 +101,8 @@ features used by the component makefiles of the
 .xx link="/sw/download/	ast-open"
 source package.
 Although slightly out of sync with the AT&T release, the
-.xx link="http://www.alcatel-lucent.com/	Alcatel-Lucent (search for nmake -- who mourns for Bell Labs?)"
-site provides a more complete treatment of the details
+.xx link="http://www.bell-labs.com/project/nmake/	Alcatel-Lucent nmake site"
+(who mourns for Bell Labs?) provides a more complete treatment of the details
 (the tech writer remained with Lucent after the '95 split.)
 The following assumes familiarity with the UNIX or GNU
 .B make

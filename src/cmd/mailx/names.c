@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2009 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -352,7 +352,7 @@ mapuser(Dt_t* dt, void* object, void* context)
 		}
 	}
 	if (!dictsearch(&state.aliases, np->name, LOOKUP))
-		dictsearch(&wm->next, (char*)np, INSERT|IGNORECASE|STACK|OBJECT);
+		dictsearch(&wm->next, (char*)np, INSERT|IGNORECASE|STACK|OBJECT|COPY);
 	return 0;
 }
 

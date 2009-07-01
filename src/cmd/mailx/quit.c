@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2009 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -92,11 +92,11 @@ tempinit(void)
 		strcpy(cp, state.tmp.dir);
 		state.tmp.dir = cp;
 	}
-	filetemp(state.tmp.edit, 'E', 0);
-	filetemp(state.tmp.mail, 'M', 0);
-	filetemp(state.tmp.mesg, 'G', 0);
-	filetemp(state.tmp.more, 'X', 0);
-	filetemp(state.tmp.quit, 'Q', 0);
+	filetemp(state.tmp.edit, sizeof(state.tmp.edit), 'E', 0);
+	filetemp(state.tmp.mail, sizeof(state.tmp.mail), 'M', 0);
+	filetemp(state.tmp.mesg, sizeof(state.tmp.mesg), 'G', 0);
+	filetemp(state.tmp.more, sizeof(state.tmp.more), 'X', 0);
+	filetemp(state.tmp.quit, sizeof(state.tmp.quit), 'Q', 0);
 }
 
 /*
@@ -192,7 +192,7 @@ edstop(void)
 		ibuf = 0;
 		if (stat(state.path.mail, &st) >= 0 && st.st_size > state.mailsize) {
 			temp = state.path.path;
-			filetemp(temp, 'B', 0);
+			filetemp(temp, sizeof(state.path.path), 'B', 0);
 			if (!(obuf = fileopen(temp, "Ew"))) {
 				relsesigs();
 				reset(0);

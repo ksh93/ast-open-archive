@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1996-2008 AT&T Intellectual Property          #
+#          Copyright (c) 1996-2009 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -41,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2007-12-11' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2009-06-30' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2007-12-11 $
+@(#)$Id: mm2html (AT&T Research) 2009-06-30 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -116,7 +116,7 @@ set -o noglob
 
 integer count row n s ndirs=0 nfiles=0
 integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4
-integer labels=0 reference=1 ident=0 ce=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
+integer labels=0 mark=4 reference=1 ident=0 ce=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
@@ -189,6 +189,15 @@ primary=".BL|.LI|.IX"
 ss="verdana,arial,helvetica,geneva,sans-serif"
 top=
 vg_ps=20
+
+function setmacros
+{
+	case $1 in
+	man)	mark=6 ;;
+	*)	mark=4 ;;
+	esac
+	macros=$1
+}
 
 function options
 {
@@ -617,8 +626,12 @@ function getline
 					esac
 					nam=${1%%=*}
 					case $nam in
-					no?*)	nam=${nam#no} val=0 ;;
-					*)	val=${1#*=} ;;
+					no?*)	nam=${nam#no}
+						val=0
+						;;
+					*)	val=${1#*=}
+						[[ $val ]] || val=1
+						;;
 					esac
 					shift
 					case $nam in
@@ -1037,7 +1050,7 @@ function heading
 		done
 		(( count += head ))
 		print -nr -- "$beg<H$count$options>"
-		if	(( labels >= 0 && count < 4 ))
+		if	(( labels >= 0 && count < mark ))
 		then	print -nr -- "<A name=\"$*\">$*</A>"
 			label[labels++]=$*
 		else	print -nr "$*"
@@ -1267,7 +1280,7 @@ do	getline || {
 					print -r -- "<CENTER>"
 				fi
 				;;
-			.S[HS])	macros=man
+			.S[HS])	setmacros man
 				while	(( lists > 0 ))
 				do	print -r -- "</${list[lists]}>"
 					case ${type[lists--]} in
@@ -1519,7 +1532,7 @@ do	getline || {
 			;;
 		.LX)	: ignore $op
 			;;
-		.MT)	macros=mm
+		.MT)	setmacros mm
 			;;
 		.ND|.Dt)ds[Dt]=$*
 			;;
@@ -1550,7 +1563,7 @@ do	getline || {
 			esac
 			case $pm in
 			?*)	case $op in
-				.pM)	pm="<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR><TD><FONT font face=\"${ss}\"><B>${pm}</B></FONT></TD></TR></TABLE>" ;;
+				.pM)	pm="<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR><TD><FONT face=\"${ss}\"><B>${pm}</B></FONT></TD></TR></TABLE>" ;;
 				*)	pm="<HR><CENTER><$H>${pm}</$H></CENTER>" ;;
 				esac
 				;;
@@ -1565,8 +1578,8 @@ do	getline || {
 		.TH|.TL): .TL junk junk
 			: .TH item section foot_center foot_left head_center
 			case $macros:$op in
-			:.TH)	macros=man ;;
-			:.TL)	macros=mm ;;
+			:.TH)	setmacros man ;;
+			:.TL)	setmacros mm ;;
 			esac
 			case ${html.title} in
 			?*)	title=${html.title}
@@ -2260,7 +2273,7 @@ case $frame in
 ?*)	if	[[ $framelink == '' && ${html.labels} != '' ]] && (( labels > 1 ))
 	then
 		exec > $frame-temp.html || exit
-		print -r -- "<B><FONT font face=\"${ss}\">"
+		print -r -- "<B><FONT size=-1 face=\"${ss}\">"
 		print -r -- "<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR>"
 		for ((n = 0; n < labels; n++))
 		do	print -r -- "<TD><A href=\"#${label[n]}\">${label[n]}</A></TD>"
@@ -2297,12 +2310,15 @@ q
 	;;
 *)	if	[[ ${html.labels} != '' ]] && (( labels > 1 ))
 	then
+		if	[[ ${html.labels} != +([0-9]) || ${html.labels} == [01] ]]
+		then	html.labels=7
+		fi
 		print -r -- "<!--LABELS-->"
-		print -r -- "<B><FONT font face=\"${ss}\">"
-		print -r -- "<TABLE border=0 bordercolor=white cellpadding=0 cellspacing=0 width=90% align=center><TR>"
+		print -r -- "<B><FONT size=-1 face=\"${ss}\">"
+		print -r -- "<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey width=90%><TR>"
 		for ((n = 0; n < labels; n++))
-		do	print -r -- "<TD align=left><A href=\"#${label[n]}\">${label[n]}</A></TD>"
-			if (( (n + 1) < labels && (n & 7) == 7 ))
+		do	print -r -- "<TD align=center valign=center><A href=\"#${label[n]}\">${label[n]}</A></TD>"
+			if (( (n + 1) < labels && !( (n + 1) % ${html.labels} ) ))
 			then	print -r -- "</TR><TR>"
 			fi
 		done

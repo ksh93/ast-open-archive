@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2009 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -703,6 +703,7 @@ dictsearch(Dt_t** dp, const char* name, register int op)
 	register Dt_t*		dt;
 	register struct dict*	dict;
 	register struct name*	np;
+	register struct name*	xp;
 	struct name*		object;
 
 	if (!(dt = *dp)) {
@@ -732,12 +733,13 @@ dictsearch(Dt_t** dp, const char* name, register int op)
 	if (!(np = (struct name*)dtmatch(dt, name))) {
 		if (!(op & (CREATE|INSERT)))
 			return 0;
-		if (!(np = object)) {
-			if (!(np = (op & STACK) ? (struct name*)salloc(sizeof(struct name) + strlen(name) + 1) : newof(0, struct name, 1, strlen(name) + 1)))
+		if (!(np = object) || (op & COPY)) {
+			if (!(xp = (op & STACK) ? (struct name*)salloc(sizeof(struct name) + strlen(name) + 1) : newof(0, struct name, 1, strlen(name) + 1)))
 				note(PANIC, "Out of space");
-			strcpy(np->name, name);
-			np->value = 0;
-			np->flags = 0;
+			strcpy(xp->name, name);
+			xp->value = np ? np->value : 0;
+			xp->flags = np ? np->flags : 0;
+			np = xp;
 		}
 		np = (struct name*)dtinsert(dt, np);
 	}

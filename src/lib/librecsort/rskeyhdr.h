@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2007 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -58,7 +58,7 @@
 struct Field_s;
 struct _rskey_s;
 
-typedef int (*Coder_t)(struct _rskey_s*, struct Field_s*, unsigned char*, unsigned char*, int);
+typedef int (*Coder_t)(struct _rskey_s*, struct Field_s*, unsigned char*, int, unsigned char*, unsigned char*);
 
 typedef struct				/* field position		*/
 {

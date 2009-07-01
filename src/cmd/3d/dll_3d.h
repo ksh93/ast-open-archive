@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,6 +24,8 @@
 #include "lib_3d.h"
 
 #include <dlldefs.h>
+
+#define dllopen		dlopen
 
 #ifdef _DLL_RLD_SYM_TYPE
 #define _dll_next	_3d_dllnext

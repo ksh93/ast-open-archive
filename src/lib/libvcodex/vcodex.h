@@ -266,6 +266,8 @@ extern int		vcwalkmeth _ARG_((Vcwalk_f, Void_t*));
 extern void		vcaddalias _ARG_((char**));
 extern char*		vcgetalias _ARG_((char*, char*, ssize_t));
 extern int		vcwalkalias _ARG_((Vcwalk_f, Void_t*));
+extern char*		vcgetfname _ARG_((char*, char*, ssize_t));
+extern int		vcwalkfname _ARG_((Vcwalk_f, Void_t*));
 
 extern char*		vcgetident _ARG_((Vcmethod_t*, char*, ssize_t));
 extern char*		vcgetmtarg _ARG_((char*, char*, ssize_t, Vcmtarg_t*, Vcmtarg_t**));

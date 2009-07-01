@@ -141,15 +141,87 @@ TEST 04 'standard input'
 	EXEC	-c +287
 	EXEC	+287c
 
+TEST 05 'r combinations'
+
+	EXEC	-r tst.dat
+		INPUT tst.dat $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4\n3\n2\n1'
+
+	EXEC	-1r tst.dat
+		OUTPUT - $'10'
+
+	EXEC	-2r tst.dat
+		OUTPUT - $'10\n9'
+
+	EXEC	-3r tst.dat
+		OUTPUT - $'10\n9\n8'
+
+	EXEC	-4r tst.dat
+		OUTPUT - $'10\n9\n8\n7'
+
+	EXEC	-5r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6'
+
+	EXEC	-6r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5'
+
+	EXEC	-7r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4'
+
+	EXEC	-8r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4\n3'
+
+	EXEC	-9r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4\n3\n2'
+
+	EXEC	-10r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4\n3\n2\n1'
+
+	EXEC	-11r tst.dat
+
+	EXEC	+r tst.dat
+
+	EXEC	+1r tst.dat
+
+	EXEC	+2r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4\n3\n2'
+
+	EXEC	+3r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4\n3'
+
+	EXEC	+4r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5\n4'
+
+	EXEC	+5r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6\n5'
+
+	EXEC	+6r tst.dat
+		OUTPUT - $'10\n9\n8\n7\n6'
+
+	EXEC	+7r tst.dat
+		OUTPUT - $'10\n9\n8\n7'
+
+	EXEC	+8r tst.dat
+		OUTPUT - $'10\n9\n8'
+
+	EXEC	+9r tst.dat
+		OUTPUT - $'10\n9'
+
+	EXEC	+10r tst.dat
+		OUTPUT - $'10'
+
+	EXEC	+11r tst.dat
+		OUTPUT -
+
 # the remainder converted from the gnu tail Test.pm
 
-TEST 05	chars
+TEST 10	chars
 
 	EXEC	+2c
 		INPUT -n - $'abcd'
 		OUTPUT -n - $'bcd'
 
-TEST 06	obs-c
+TEST 11	obs-c
 
 	EXEC	+8c
 		INPUT -n - $'abcd'
@@ -171,7 +243,7 @@ TEST 06	obs-c
 		INPUT - $'x'
 		OUTPUT - $'x'
 
-TEST 07	obs-l
+TEST 12	obs-l
 
 	EXEC	-1l
 		INPUT - $'x\ny'
@@ -189,7 +261,7 @@ TEST 07	obs-l
 		INPUT - $'x'
 		OUTPUT - $'x'
 
-TEST 08	obs
+TEST 13	obs
 
 	EXEC	-1
 		INPUT - $'x\ny'
@@ -217,7 +289,7 @@ TEST 08	obs
 	EXEC	-c
 		OUTPUT -n - $'yyyyyyyyyz'
 
-TEST 09	obsx
+TEST 14	obsx
 
 	EXEC	+l
 		INPUT -n - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
@@ -231,13 +303,13 @@ TEST 09	obsx
 
 	EXEC	-cl
 
-TEST 10	empty
+TEST 15	empty
 
 	EXEC	-
 
 	EXEC	-c
 
-TEST 11 err
+TEST 16 err
 
 	EXEC	+2cz
 		ERROR - $'tail: z: invalid suffix
@@ -252,7 +324,7 @@ Usage: tail [-bfhlLqrsv] [-n lines] [-c[chars]] [-t timeout] [file ...]'
 		ERROR - $'tail: -c: 99999999999999999999: invalid numeric argument -- out of range
 Usage: tail [-bfhlLqrsv] [-n lines] [-c[chars]] [-t timeout] [file ...]'
 
-TEST 12	minus
+TEST 17	minus
 
 	EXEC	-
 		INPUT - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
@@ -260,7 +332,7 @@ TEST 12	minus
 
 	EXEC	-n 10
 
-TEST 13	n
+TEST 18	n
 
 	EXEC	-n -10
 		INPUT - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
@@ -290,7 +362,7 @@ TEST 13	n
 		INPUT - $'y\ny\ny\ny\ny'
 		OUTPUT - 
 
-TEST 14 VSC#4,5,14,15,1001,1003
+TEST 19 VSC#4,5,14,15,1001,1003
 
 	EXEC	- more
 		INPUT more $'111\n222\n333\n444\n555\n666\n777\n888\n999\naaa\nbbb\nccc'
@@ -349,7 +421,7 @@ TEST 14 VSC#4,5,14,15,1001,1003
 
 	EXEC	-1b big
 
-TEST 15 VSC#20
+TEST 20 VSC#20
 
 	EXEC	-t1s -s -f -c -7 more
 		INPUT more $'111\n222\n333\n444\n555\n666\n777\n888\n999\naaa\nbbb\nccc'
@@ -392,7 +464,7 @@ TEST 15 VSC#20
 
 	EXEC	+12l more
 
-TEST 16 xpg4
+TEST 21 xpg4
 
 	EXEC	-t1s -s -f1 more
 		INPUT more $'111\n222\n333\n444\n555\n666\n777\n888\n999\naaa\nbbb\nccc'

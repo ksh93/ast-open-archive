@@ -1,8 +1,8 @@
 :PACKAGE: ast
 
-LICENSE = since=2003,author=kpv
+LICENSE = since=2003,author=kpv+gsf
 
-vczip :: vcodex.1 vczip.c -lvcodex
+vczip :: vcodex.1 vczip.c -lvcodex -lcodex
 
 vcunzip :LINK: vczip
 

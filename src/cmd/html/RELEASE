@@ -1,7 +1,9 @@
+09-06-30 mm2html.sh: increase heading level for -o html.labels
+09-05-08 mm2twiki.sh: add for mm => twiki markups
 07-12-11 mm2bb.sh: fix bb list and fill logic, add long name \n[CC...]
 07-12-11 mm2html.sh: add long name \n[CC...]
-07-08-11 mm2bb.sh: --texish for tex style bb code
-07-04-20 mm2bb.sh: add for mm => bb code
+07-08-11 mm2bb.sh: --texish for tex style bb markups
+07-04-20 mm2bb.sh: add for mm => bb markups
 07-02-09 mm2html.sh: expand \*(.. rather than escape to \\(*..
 06-10-31 mm2html: fix tager=_top omission bug
 06-10-11 add sfstruse() error checks

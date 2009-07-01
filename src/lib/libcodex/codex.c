@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -108,6 +108,12 @@ codex_except(Sfio_t* sp, int op, void* data, Sfdisc_t* disc)
 					r = (*code->meth->closef)(code);
 				else if (code->data)
 					free(code->data);
+				if (code->op)
+				{
+					sfswap(code->op, code->sp);
+					sfclose(code->op);
+					code->op = 0;
+				}
 				free(code);
 			}
 		}
@@ -558,6 +564,12 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 		s = arg[1];
 		if ((*meth->openf)(code, arg, deen))
 		{
+			if (code->op)
+			{
+				sfswap(code->op, code->sp);
+				sfclose(code->op);
+				code->op = 0;
+			}
 			free(code);
 			code = 0;
 		}
@@ -673,6 +685,12 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 				free(code->data);
 			if (code->dp)
 				sfclose(code->dp);
+			if (code->op)
+			{
+				sfswap(code->op, code->sp);
+				sfclose(code->op);
+				code->op = 0;
+			}
 			free(code);
 		}
 	}

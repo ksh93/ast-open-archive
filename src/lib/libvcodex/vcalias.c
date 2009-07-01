@@ -19,6 +19,8 @@
 ***********************************************************************/
 #include	"vchdr.h"
 
+#include	<fnmatch.h>
+
 /*	Collection of functions to translate command line arguments,
 **	aliases, etc. to list of transforms and arguments suitable for
 **	data tranformation by vcsfio().
@@ -71,17 +73,18 @@ static char	*Dfltalias[] =
 };
 
 static Vcalias_t	*Alias;
+static Vcalias_t	*Fname;
 
 /* create aliases, text lines of the form 'name = value' */
+/* create file name extension mappings, text lines of the form 'pattern : value' */
 #if __STD_C
-static Vcalias_t* zipalias(Vcalias_t* alias, char* s)
+static void zipalias(char* s)
 #else
-static Vcalias_t* zipalias(alias, s)
-Vcalias_t*	alias;	/* curren alias list	*/
+static Vcalias_t* zipalias(s)
 char*		s;	/* spec of new aliases	*/
 #endif
 {
-	Vcalias_t	*al;
+	Vcalias_t	*al, **list;
 	ssize_t		a, v, w, n;
 
 	for(n = s ? strlen(s) : 0; n > 0; )
@@ -100,7 +103,11 @@ char*		s;	/* spec of new aliases	*/
 		for(v = a; v < n; ++v)
 			if(!isblank(s[v]) )
 				break;
-		if(s[v] != '=') /* syntax is name = value */
+		if(s[v] == '=')
+			list = &Alias;
+		else if(s[v] == ':')
+			list = &Fname;
+		else
 			goto skip_line;
 
 		/* get the value */
@@ -120,16 +127,14 @@ char*		s;	/* spec of new aliases	*/
 		al->value = al->name + a+1;
 		memcpy(al->name, s, a); al->name[a] = 0;
 		memcpy(al->value, s+v, w-v); al->value[w-v] = 0;
-		al->next = alias;
-		alias = al;
+		al->next = *list;
+		*list = al;
 
 	skip_line:
 		for(; n > 0; --n, ++s)
 			if(*s == '\n')
 				break;
 	}
-
-	return alias;
 }
 
 /* initialize a list of aliases */
@@ -143,14 +148,13 @@ char**	dflt;	/* list of default aliases */
 	ssize_t		z;
 	Sfio_t		*sf;
 	char		*sp, file[PATH_MAX];
-	Vcalias_t	*alias = Alias;
 
-	if(!alias)
+	if(!Alias)
 	{
 #if _PACKAGE_ast /* AST alias convention */
 		if(pathpath(file, ALIASES, "",  PATH_REGULAR) && (sf = sfopen(0, file, "")) )
 		{	while((sp = sfgetr(sf, '\n', 1)) )
-				alias = zipalias(alias, sp);
+				zipalias(sp);
 			sfclose(sf);
 		}
 #endif
@@ -163,20 +167,18 @@ char**	dflt;	/* list of default aliases */
 
 			if((sf = sfopen(0, file, "")) )
 			{	while((sp = sfgetr(sf, '\n', 1)) )
-					alias = zipalias(alias, sp);
+					zipalias(sp);
 				sfclose(sf);
 			}
 		}
 		for(z = 0; sp = Dfltalias[z]; ++z)
-			alias = zipalias(alias, sp);
+			zipalias(sp);
 	}
 
 	/* other default aliases */
 	if(dflt)
 		for(z = 0; (sp = dflt[z]); ++z)
-			alias = zipalias(alias, sp);
-
-	Alias = alias;
+			zipalias(sp);
 }
 
 /* map an alias. Arguments are passed onto the first method of the aliased spec */
@@ -242,6 +244,53 @@ ssize_t		mtsz;	/* buffer size		*/
 	return meth;
 }
 
+/* match a file name */
+#if __STD_C
+char* vcgetfname(char* name, char* meth, ssize_t mtsz)
+#else
+char* vcgetfname(name, meth, mtsz)
+char*		name;	/* file name to match	*/
+char*		meth;	/* buffer for methods	*/
+ssize_t		mtsz;	/* buffer size		*/
+#endif
+{
+	Vcalias_t	*al;
+
+	if(!Alias)
+		vcaddalias(NIL(char**));
+
+	for(al = Fname; al; al = al->next)
+		if(fnmatch(al->name, name, FNM_PATHNAME) == 0 )
+		{
+			if(!meth || mtsz <= strlen(al->value))
+				break;
+			strcpy(meth, al->value);
+			return meth;
+		}
+
+	return NIL(char*);
+}
+
+/* walk an alias list */
+#if __STD_C
+static int vcwalklist(Vcalias_t* al, Vcwalk_f walkf, Void_t* disc)
+#else
+static int vcwalklist(al, walkf, disc)
+Vcalias_t*	al;
+Vcwalk_f	walkf;
+Void_t*		disc;
+#endif
+{
+	int		rv;
+
+	if(!walkf)
+		return -1;
+	for(; al; al = al->next)
+		if((rv = (*walkf)((Void_t*)0, al->name, al->value, disc)) < 0 )
+			return rv;
+	return 0;
+}
+
 /* walk the list of aliases */
 #if __STD_C
 int vcwalkalias(Vcwalk_f walkf, Void_t* disc)
@@ -251,15 +300,21 @@ Vcwalk_f	walkf;
 Void_t*		disc;
 #endif
 {
-	Vcalias_t	*al;
-	int		rv;
-
 	if(!Alias)
 		vcaddalias(NIL(char**));
-	if(!walkf)
-		return -1;
-	for(al = Alias; al; al = al->next)
-		if((rv = (*walkf)((Void_t*)0, al->name, al->value, disc)) < 0 )
-			return rv;
-	return 0;
+	return vcwalklist(Alias, walkf, disc);
+}
+
+/* walk the list of fnames */
+#if __STD_C
+int vcwalkfname(Vcwalk_f walkf, Void_t* disc)
+#else
+int vcwalkfname(walkf, disc)
+Vcwalk_f	walkf;
+Void_t*		disc;
+#endif
+{
+	if(!Alias)
+		vcaddalias(NIL(char**));
+	return vcwalklist(Fname, walkf, disc);
 }

@@ -222,6 +222,10 @@ make vcsfio.c
 prev vchdr.h implicit
 done vcsfio.c
 make vcalias.c
+make ${PACKAGE_ast_INCLUDE}/fnmatch.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/fnmatch.h
 prev vchdr.h implicit
 done vcalias.c
 make Vcdelta/vcdcache.c

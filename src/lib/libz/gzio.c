@@ -86,7 +86,7 @@ typedef struct gz_stream {
 
 
 local gzFile gz_open      OF((const char *path, const char *mode, FILE* fp, void* buf, unsigned len));
-local int do_flush        OF((gzFile file, int flush));
+local int    do_flush     OF((gzFile file, int flush));
 local int    get_byte     OF((gz_stream *s));
 local void   check_header OF((gz_stream *s));
 local int    destroy      OF((gz_stream *s));
@@ -234,11 +234,11 @@ fprintf(stderr, "AHA gz_open inbuf=< %02x %02x > len=%d offset=%d:%d\n", s->inbu
          * necessary.
          */
     } else {
-#if _PACKAGE_ast
+#if _PACKAGE_ast && 0
 	sfsetbuf(s->file, (void*)s->file, SF_UNBOUND);
 #endif
         check_header(s); /* skip the .gz header */
-        s->start = ftell(s->file) - s->stream.avail_in;
+        s->start = s->stream.next_in - s->inbuf;
     }
 
     return (gzFile)s;
@@ -413,7 +413,8 @@ local void check_header(s)
     }
 
     /* Discard time, xflags and OS code: */
-    for (len = 0; len < 6; len++) (void)get_byte(s);
+    for (len = 0; len < 6; len++)
+       (void)get_byte(s);
 
     if ((flags & EXTRA_FIELD) != 0) { /* skip the extra field */
         len  =  (uInt)get_byte(s);

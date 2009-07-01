@@ -1,3 +1,4 @@
+09-05-24 tail.tst: add r combinations
 09-03-31 features/pty,Makefile: add pty.h and -lutil refs for linux -- great, another util library
 09-02-14 join.tst: add a VSC test
 09-02-14 tail.tst: add some VSC tests

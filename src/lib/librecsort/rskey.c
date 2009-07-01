@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -86,14 +86,15 @@ datasize(void)
 
 static int
 #if __STD_C
-key_n_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+key_n_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
 #else
-key_n_code(kp, f, dp, cp, len)
+key_n_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
 Field_t*	f;
 unsigned char*	dp;
-unsigned char*	cp;
 int		len;
+unsigned char*	cp;
+unsigned char*	zp;
 #endif
 {
 	unsigned char*	dig = cp + 1;	/* byte for next digit */
@@ -180,15 +181,16 @@ int		len;
 			if (f->flag != 'g')
 				goto out;
 			inv = 1;
-			if (xp < ep) switch(trans[*++xp])
-			{
-			case '-':
-				inv = -1;
-				/*FALLTHROUGH*/
-			case '+':
-				xp++;
-				break;
-			}
+			if (xp < ep)
+				switch(trans[*++xp])
+				{
+				case '-':
+					inv = -1;
+					/*FALLTHROUGH*/
+				case '+':
+					xp++;
+					break;
+				}
 			if (xp >= ep || trans[*xp] > '9' || trans[*xp] < '0')
 				goto out;
 			for (n = 0; xp < ep; xp++)
@@ -219,8 +221,10 @@ int		len;
 		nib = 0;
 	}
  retzero:
-	if (neg) sigdig = 2048 - sigdig;
-	else sigdig = 2048 + sigdig;
+	if (neg)
+		sigdig = 2048 - sigdig;
+	else
+		sigdig = 2048 + sigdig;
 	cp[0] = sigdig >> 4;
 	cp[1] |= sigdig << 4;
 	putdig(-1);
@@ -233,14 +237,15 @@ int		len;
 
 static int
 #if __STD_C
-key_p_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+key_p_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
 #else
-key_p_code(kp, f, dp, cp, len)
+key_p_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
 Field_t*	f;
 unsigned char*	dp;
-unsigned char*	cp;
 int		len;
+unsigned char*	cp;
+unsigned char*	zp;
 #endif
 {
 	unsigned char*	dig = cp + 1;	/* byte for next digit */
@@ -282,8 +287,10 @@ int		len;
 		*dig = 0;
 		nib = 0;
 	}
-	if (neg) sigdig = 2048 - sigdig;
-	else sigdig = 2048 + sigdig;
+	if (neg)
+		sigdig = 2048 - sigdig;
+	else
+		sigdig = 2048 + sigdig;
 	cp[0] = sigdig >> 4;
 	cp[1] |= sigdig << 4;
 	putdig(-1);
@@ -296,14 +303,15 @@ int		len;
 
 static int
 #if __STD_C
-key_z_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+key_z_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
 #else
-key_z_code(kp, f, dp, cp, len)
+key_z_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
 Field_t*	f;
 unsigned char*	dp;
-unsigned char*	cp;
 int		len;
+unsigned char*	cp;
+unsigned char*	zp;
 #endif
 {
 	unsigned char*	dig = cp + 1;	/* byte for next digit */
@@ -346,8 +354,10 @@ int		len;
 		*dig = 0;
 		nib = 0;
 	}
-	if (neg) sigdig = 2048 - sigdig;
-	else sigdig = 2048 + sigdig;
+	if (neg)
+		sigdig = 2048 - sigdig;
+	else
+		sigdig = 2048 + sigdig;
 	cp[0] = sigdig >> 4;
 	cp[1] |= sigdig << 4;
 	putdig(-1);
@@ -360,14 +370,15 @@ int		len;
 
 static int
 #if __STD_C
-key_j_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+key_j_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
 #else
-key_j_code(kp, f, dp, cp, len)
+key_j_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
 Field_t*	f;
 unsigned char*	dp;
-unsigned char*	cp;
 int		len;
+unsigned char*	cp;
+unsigned char*	zp;
 #endif
 {
 	unsigned char*	xp = cp;
@@ -392,14 +403,15 @@ int		len;
 
 static int
 #if __STD_C
-key_t_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+key_t_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
 #else
-key_t_code(kp, f, dp, cp, len)
+key_t_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
 Field_t*	f;
 unsigned char*	dp;
-unsigned char*	cp;
 int		len;
+unsigned char*	cp;
+unsigned char*	zp;
 #endif
 {
 	unsigned char*	xp = cp;
@@ -423,7 +435,7 @@ int		len;
 				if (!(kp->xfrmbuf = vmnewof(Vmheap, kp->xfrmbuf, unsigned char, n, 0)))
 				{
 					if (kp->keydisc->errorf)
-						(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: multibyte field overflow", dp);
+						(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: multibyte field overflow -- falling back to native collation", dp);
 					goto native;
 				}
 			}
@@ -433,13 +445,15 @@ int		len;
 					*bp++ = trans[c];
 			*bp++ = 0;
 			m = kp->xfrmsiz - (bp - kp->xfrmbuf);
-			if ((n = mbxfrm(bp, kp->xfrmbuf, m)) <= m)
+			if ((n = mbxfrm(bp, kp->xfrmbuf, m)) < m)
 			{
 				dp = bp;
 				break;
 			}
 			n += n - m + (bp - kp->xfrmbuf);
 		}
+		bp = dp;
+		m = 0;
 		while (--n >= 0)
 		{
 			c = *dp++;
@@ -449,15 +463,31 @@ int		len;
 				 * anti-ambiguity
 				 */
 
-				*xp++ = 1 ^ reverse;
+				if (xp < zp)
+					*xp++ = 1 ^ reverse;
+				else
+					m++;
 				c++;
 			}
 			else if (c >= 254)
 			{
-				*xp++ = 255 ^ reverse;
+				if (xp < zp)
+					*xp++ = 255 ^ reverse;
+				else
+					m++;
 				c--;
 			}
-			*xp++ = c ^ reverse;
+			if (xp < zp)
+				*xp++ = c ^ reverse;
+			else
+				m++;
+		}
+		if (m)
+		{
+			if (kp->keydisc->errorf)
+				(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "key coder collation overflow (%d/%I*u) -- falling back to native collation", m, sizeof(zp - cp), zp - cp);
+			dp = bp;
+			goto native;
 		}
 	}
 	else
@@ -503,14 +533,15 @@ static const char*	month[] =
 
 static int
 #if __STD_C
-key_m_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+key_m_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
 #else
-key_m_code(kp, f, dp, cp, len)
+key_m_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
 Field_t*	f;
 unsigned char*	dp;
-unsigned char*	cp;
 int		len;
+unsigned char*	cp;
+unsigned char*	zp;
 #endif
 {
 	register int	c;
@@ -564,6 +595,7 @@ Rsdisc_t*	disc;
 	Field_t*	fp;
 	unsigned char*	ep;
 	unsigned char*	op = key;
+	unsigned char*	zp = key + keylen;
 	unsigned char*	xp = dat + datlen;
 	int		t;
 	int		np;
@@ -605,7 +637,8 @@ Rsdisc_t*	disc;
 			if (cp > xp)
 				cp = xp;
 		}
-		else cp = xp;
+		else
+			cp = xp;
 		t = fp->end.field;
 		if (t < np)
 		{
@@ -616,7 +649,8 @@ Rsdisc_t*	disc;
 				else
 				{
 					ep = pp[t + 1];
-					if (kp->tab) ep--;
+					if (kp->tab)
+						ep--;
 				}
 			}
 			else
@@ -632,8 +666,9 @@ Rsdisc_t*	disc;
 			else if (ep < cp)
 				ep = cp;
 		}
-		else ep = xp;
-		op += (*fp->coder)(kp, fp, cp, op, ep - cp);
+		else
+			ep = xp;
+		op += (*fp->coder)(kp, fp, cp, ep - cp, op, zp);
 	}
 	return op - key;
 }
@@ -1132,9 +1167,12 @@ register Rskey_t*	kp;
 			fp->coder = key_t_code;
 			fp->flag = 't';
 		}
-		else n = 1;
-		if(!fp->keep) fp->keep = kp->state->all;
-		else n = 1;
+		else
+			n = 1;
+		if(!fp->keep)
+			fp->keep = kp->state->all;
+		else
+			n = 1;
 		if (!n && !fp->trans && !fp->bflag && !fp->eflag && !fp->rflag)
 		{
 			fp->coder = kp->field.global.coder;
@@ -1207,7 +1245,7 @@ register Rskey_t*	kp;
 	{
 		kp->field.maxfield += 2;
 		kp->disc->defkeyf = code;
-		kp->disc->key = (mbcoll() ? 5 : 2) * kp->field.maxfield;
+		kp->disc->key = (mbcoll() ? 32 : 2) * kp->field.maxfield;
 		if (!(kp->field.positions = vmnewof(Vmheap, 0, unsigned char*, kp->field.maxfield, 0)))
 		{
 			if (kp->keydisc->errorf)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2008 The Regents of the University of California an*
+*Copyright (c) 1978-2009 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -497,12 +497,13 @@ struct linematch {
  */
 
 #define LOOKUP		0
-#define CREATE		(1<<0)
-#define DELETE		(1<<1)
-#define IGNORECASE	(1<<2)
-#define INSERT		(1<<3)
-#define OBJECT		(1<<4)
-#define STACK		(1<<5)
+#define COPY		(1<<0)
+#define CREATE		(1<<1)
+#define DELETE		(1<<2)
+#define IGNORECASE	(1<<3)
+#define INSERT		(1<<4)
+#define OBJECT		(1<<5)
+#define STACK		(1<<6)
 
 /*
  * ignore flags
@@ -744,11 +745,11 @@ typedef struct {
 	}		part;
 
 	struct {
-	char	edit[L_tmpnam];
-	char	mail[L_tmpnam];
-	char	mesg[L_tmpnam];
-	char	more[L_tmpnam];
-	char	quit[L_tmpnam];
+	char	edit[256];
+	char	mail[256];
+	char	mesg[256];
+	char	more[256];
+	char	quit[256];
 	char*	dir;
 	}	tmp;
 
@@ -915,7 +916,7 @@ extern int		filelock(const char*, FILE*, int);
 extern FILE*		fileopen(char*, char*);
 extern off_t		filesize(FILE*);
 extern FILE*		filestd(char*, char*);
-extern FILE*		filetemp(char*, int, int);
+extern FILE*		filetemp(char*, int, int, int);
 extern int		filetrunc(FILE*);
 extern int		first(int, int);
 extern int		folder(char**);

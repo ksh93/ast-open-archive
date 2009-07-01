@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -31,7 +31,7 @@
 #include <ast.h>
 #include <error.h>
 
-#define CODEX_VERSION	20040104L
+#define CODEX_VERSION	20090626L
 
 #define CODEX_DECODE	0x0001		/* decode supported		*/
 #define CODEX_ENCODE	0x0002		/* encode supported		*/
@@ -79,6 +79,7 @@ struct Codex_s				/* coder public state		*/
 	Codexnum_t	index;		/* per-process index		*/
 	int		serial;		/* codex() serial number	*/
 	void*		data;		/* coder private state		*/
+	Sfio_t*		op;		/* original stream		*/
 };
 
 struct Codexdata_s			/* codexdata() info		*/

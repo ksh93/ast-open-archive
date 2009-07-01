@@ -18,6 +18,8 @@ mm2html :: mm2html.1 mm2html.sh
 
 mm2bb :: mm2bb.sh
 
+mm2twiki :: mm2twiki.sh
+
 troff2html :: troff2html.1 troff2html.h troff2html.c
 
 "win32*" :NOOPTIMIZE: troff2html.c

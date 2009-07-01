@@ -378,6 +378,13 @@ BZ_EXTERN BZFILE * BZ_API(bzdopen) (
       int        fd,
       const char *mode
    );
+
+BZ_EXTERN BZFILE * BZ_API(bzbopen) (
+      int          fd,
+      const char*  mode,
+      const void*  buf,
+      unsigned int len
+   );
          
 BZ_EXTERN int BZ_API(bzread) (
       BZFILE* b, 
@@ -386,9 +393,9 @@ BZ_EXTERN int BZ_API(bzread) (
    );
 
 BZ_EXTERN int BZ_API(bzwrite) (
-      BZFILE* b, 
-      void*   buf, 
-      int     len 
+      BZFILE*     b, 
+      const void* buf, 
+      int         len 
    );
 
 BZ_EXTERN int BZ_API(bzflush) (

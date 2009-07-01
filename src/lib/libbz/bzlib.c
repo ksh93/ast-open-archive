@@ -1398,7 +1398,9 @@ BZFILE * bzopen_internal
                ( const char *path,   /* if !=0 */
 		 FILE *fp,	     /* if !=0 && path==0 */
                  int fd,             /* if path==0 && fp==0 */
-                 const char *mode)
+                 const char *mode,
+		 const void* buf,
+		 unsigned int len)
 {
    int    bzerr;
    char   unused[BZ_MAX_UNUSED];
@@ -1480,7 +1482,7 @@ BZFILE * BZ_API(bzopen)
                ( const char *path,
                  const char *mode )
 {
-   return bzopen_internal(path,NULL,-1,mode);
+   return bzopen_internal(path,NULL,-1,mode,NULL,0);
 }
 
 
@@ -1489,7 +1491,7 @@ BZFILE * BZ_API(bzfopen)
                ( FILE *fp,
                  const char *mode )
 {
-   return bzopen_internal(NULL,fp,-1,mode);
+   return bzopen_internal(NULL,fp,-1,mode,NULL,0);
 }
 
 
@@ -1498,9 +1500,18 @@ BZFILE * BZ_API(bzdopen)
                ( int fd,
                  const char *mode )
 {
-   return bzopen_internal(NULL,NULL,fd,mode);
+   return bzopen_internal(NULL,NULL,fd,mode,NULL,0);
 }
 
+/*---------------------------------------------------*/
+BZFILE * BZ_API(bzbopen)
+               ( int          fd,
+                 const char*  mode,
+		 const void*  buf,
+		 unsigned int len )
+{
+   return bzopen_internal(NULL,NULL,fd,mode,buf,len);
+}
 
 /*---------------------------------------------------*/
 int BZ_API(bzread) (BZFILE* b, void* buf, int len )
@@ -1517,11 +1528,11 @@ int BZ_API(bzread) (BZFILE* b, void* buf, int len )
 
 
 /*---------------------------------------------------*/
-int BZ_API(bzwrite) (BZFILE* b, void* buf, int len )
+int BZ_API(bzwrite) (BZFILE* b, const void* buf, int len )
 {
    int bzerr;
 
-   bzWrite(&bzerr,b,buf,len);
+   bzWrite(&bzerr,b,(void*)buf,len);
    if(bzerr == BZ_OK){
       return len;
    }else{

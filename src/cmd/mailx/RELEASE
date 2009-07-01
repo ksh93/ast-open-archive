@@ -1,3 +1,5 @@
+09-06-09 names.c,vars.c: fix alias expansion cross-dictionary bug
+09-05-15 proc.c,quit.c: add buffer checks to filetemp()
 08-11-04 spam.c: fix 0-terminated overrun in usermatch() -- wow
 08-02-12 local.c: favor fcntl() lock over flock() for N(otan)FS
 08-01-15 cmd3.c: add `if f?path' so old Mail doesn't carp
