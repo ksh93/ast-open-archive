@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -106,7 +106,7 @@ USAGE_LICENSE
         "[+dss -x bgp {count} cisco.dat?Count the number of \bbgp\b "
             "records in \bcisco.dat\b.]"
         "[+dss -x bgp '(type==\"A\")??{write table > a}::{write cisco > "
-            "o}' mrt.dat?Write the announce records from \bmrt.dat\b to the "
+            "b}' mrt.dat?Write the announce records from \bmrt.dat\b to the "
             "file \ba\b in the \btable\b format and all other records to the "
             "file \bb\b in the \bcisco\b format.]"
         "[+dss -x foo-txt '{flat foo-bin}|{compress}' foo.txt > foo.bin?Convert "

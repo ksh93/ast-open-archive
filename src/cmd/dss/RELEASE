@@ -1,3 +1,4 @@
+09-07-02 dss.c: fix EXAMPLES typo
 08-07-17 dss.c: tweak self-docs
 06-10-11 add sfstruse() error checks
 03-02-06 dss.c: convert main loop to dssrun()

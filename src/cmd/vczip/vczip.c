@@ -26,13 +26,14 @@
 #if _PACKAGE_ast
 
 #define UNZIP		((char*)0)
+#define DISABLED	((char*)disabled)
 #define DFLTZIP		"delta,huffgroup"
 #define ALIASES		"lib/vcodex/aliases"
 #define VCZIPRC		".vcziprc"
 #define VCZIP		"vczip"
 
 static const char usage[] =
-"[-?\n@(#)$Id: vczip (AT&T Research) 2009-06-30 $\n]"
+"[-?\n@(#)$Id: vczip (AT&T Research) 2009-07-04 $\n]"
 USAGE_LICENSE
 "[+NAME?vczip - vcodex method encode/decode filter]"
 "[+DESCRIPTION?\bvczip\b is a filter that decodes the standard input "
@@ -48,7 +49,6 @@ USAGE_LICENSE
     "order. Each alias is a \aname=value\a pair where \avalue\a is a "
     "\b--method\b option value, described below. Method names are searched "
     "before alias names.]"
-"[d:vcdiff|ietf?Encode as defined in IETF RFC3284.]"
 "[i:input?Input data is read from \afile\a instead of the standard "
     "input.]:[file]"
 "[m:method|encode?Set the transformation method from the \b,\b (or \b^\b) "
@@ -71,9 +71,9 @@ USAGE_LICENSE
     "printed.]"
 "[t:transform?Apply the \bcodex\b(3) data transform around the "
     "\bvcodex\b(3) transform. A codex transform is a catenation of the "
-    "following methods, each method prefixed by \b<\b for decode or \b>\b "
-    "for encode. Method arguments, if any, must be prefixed by \b-\b. The "
-    "method are:]:[[<>]]method[-arg...]]...]"
+    "following methods, each method prefixed by \b<\b to decode the input or "
+    "\b>\b to encode the output. Method arguments, if any, must be prefixed "
+    "by \b-\b. The method are:]:[[<>]]method[-arg...]]...]"
     "{\fcodex\f}"
 "[u:undo|decode?Decode data.]"
 "[v:verbose?List the compresses size on the standard error.]"
@@ -81,8 +81,12 @@ USAGE_LICENSE
     "\amethod\a specifies an optional window matching "
     "method. The window methods are:]:[window[,method]]]"
     "{\fwindows\f}"
-"[D:debug?Debug: print the pid and sleep(10); then continue processing.]"
+"[d:vcdiff|ietf?Encode as defined in IETF RFC3284. Obsolete -- use "
+    "--method=ietf.]"
+"[D:debug?Set the debug trace level to \alevel\a. Higher levels produce "
+    "more output.]:[level]"
 "[M:move?Use sfmove() for io.]"
+"[P:pause?Debug: print the pid and sleep(10); then continue processing.]"
 
 "\n"
 "\n[ source ] < input > output\n"
@@ -102,6 +106,8 @@ USAGE_LICENSE
 #include	<ctype.h>
 #include	<vcodex.h>
 #include	<codex.h>
+
+static const char	disabled[] = "disabled";
 
 static int
 optmethod(Void_t* obj, char* name, char* desc, Void_t* handle)
@@ -258,6 +264,12 @@ apply(int action, const char* vt, Vcsfdata_t* vcodexdisc, const char* ct, Codexd
 	 * set up the sfio output stream
 	 */
 
+	if (!action)
+	{
+		sfprintf(sfstdout, "%s: ", input);
+		output = "/dev/null";
+		codexdisc->identify = sfstdout;
+	}
 	if (!output || !*output || streq(output, "-") || streq(output, "/dev/stdout") || streq(output, "/dev/fd/1"))
 	{
 		output = "/dev/stdout";
@@ -277,69 +289,70 @@ apply(int action, const char* vt, Vcsfdata_t* vcodexdisc, const char* ct, Codexd
 	 * check codex sfio discipline
 	 */
 
-	if (action)
-	{	
-		if ((!ct || *ct || !vt) && codex(ip, op, ct, action == VC_DECODE ? CODEX_DECODE : CODEX_ENCODE, codexdisc, NiL) < 0)
+	error(-1, "AHA action=%s input=%s source=%s output=%s vt=%s ct=%s", action == VC_ENCODE ? "encode" : "decode", input, source, output, vt, ct);
+	if (ct != DISABLED)
+	{
+		if ((n = codex(ip, op, ct, action == VC_ENCODE ? CODEX_ENCODE : CODEX_DECODE, codexdisc, NiL)) < 0)
 			error(3, "%s: cannot push codex io stream discipline", input);
+		if (!action && n > 0)
+			sfprintf(sfstdout, ",");
 	}
-	else
-		ct = 0;
 
 	/*
 	 * check vcodex sfio discipline
 	 */
 
-	if (vt)
+	if (vt != DISABLED)
 	{	
 		vcodexdisc->trans  = (char*)vt;
 		vcodexdisc->source = (char*)source;
 		if (!vcsfio(action == VC_ENCODE ? op : ip, vcodexdisc, action))
 			error(3, "%s: cannot push vcodex io stream discipline", input);
 		else if (!action)
-		{	
-			sfprintf(sfstdout, "%s: %s\n", input, vcodexdisc->trans);
-			return;
-		}
+			sfprintf(sfstdout, "%s", vcodexdisc->trans);
 	}
-	else if (!action)
-		return;
 
 	/*
 	 * copy from ip to op
 	 */
 
-	if (buf)
-		for (;;)
-		{	
-			if ((n = sfread(ip, buf, bufsize)) <= 0)
-			{
-				if (n < 0)
-					error(ERROR_SYSTEM|2, "%s: read error", input);
-				break;
-			}
-			if (donez >= 0) /* verbose mode */
-			{	
-				if (donez >= lastz + 64 * (bufsize > 1024*1024 ? bufsize : 1024*1024)) 
-				{	
-					sfprintf(sfstderr, "done %10I*d %s\n", sizeof(donez), donez, output);
-					lastz = donez;
-				}
-				donez += n;
-			}
-			if ((n = sfwrite(op, buf, n)) < 0)
-			{
-				error(ERROR_SYSTEM|2, "%s: write error", output);
-				break;
-			}
-		}
-	else
+	if (action)
 	{
-		sfmove(ip, op, SF_UNBOUND, -1);
-		if (!sfeof(ip))
-			error(ERROR_SYSTEM|2, "%s: read error", input);
-		else if (sfsync(op) || sferror(op))
-			error(ERROR_SYSTEM|2, "%s: write error", output);
+		if (buf)
+			for (;;)
+			{	
+				if ((n = sfread(ip, buf, bufsize)) <= 0)
+				{
+					if (n < 0)
+						error(ERROR_SYSTEM|2, "%s: read error", input);
+					break;
+				}
+				if (donez >= 0) /* verbose mode */
+				{	
+					if (donez >= lastz + 64 * (bufsize > 1024*1024 ? bufsize : 1024*1024)) 
+					{	
+						sfprintf(sfstderr, "done %10I*d %s\n", sizeof(donez), donez, output);
+						lastz = donez;
+					}
+					donez += n;
+				}
+				if ((n = sfwrite(op, buf, n)) < 0)
+				{
+					error(ERROR_SYSTEM|2, "%s: write error", output);
+					break;
+				}
+			}
+		else
+		{
+			sfmove(ip, op, SF_UNBOUND, -1);
+			if (!sfeof(ip))
+				error(ERROR_SYSTEM|2, "%s: read error", input);
+			else if (sfsync(op) || sferror(op))
+				error(ERROR_SYSTEM|2, "%s: write error", output);
+		}
 	}
+	else
+		sfprintf(sfstdout, "\n");
 	if (ip != sfstdin)
 		sfclose(ip);
 	if (op != sfstdout)
@@ -381,7 +394,7 @@ main(int argc, char** argv)
 	vczip = streq(name, VCZIP);
 	if (!vczip && codexmeth(name))
 	{	
-		vt = 0;
+		vt = DISABLED;
 		sfprintf(cs, "%c%s", action == VC_DECODE ? '<' : '>', name);
 	}
 	else if (action == VC_DECODE)
@@ -399,10 +412,6 @@ main(int argc, char** argv)
 		case 'd':
 			vcodexdisc.type = VCSF_VCDIFF;
 			continue;
-		case 'D':
-			error(1, "pid %d", getpid());
-			sleep(10);
-			continue;
 		case 'i':
 			if (sfopen(sfstdin, opt_info.arg, "r") != sfstdin)
 				error(ERROR_SYSTEM|3, "%s: cannot read", opt_info.arg);
@@ -411,12 +420,9 @@ main(int argc, char** argv)
 			if (streq(opt_info.arg, "ietf") || streq(opt_info.arg, "vcdiff"))
 				vcodexdisc.type = VCSF_VCDIFF;
 			else if (streq(opt_info.arg, "-"))
-				vt = 0;
+				vt = DISABLED;
 			else
 				vt = opt_info.arg;
-			continue;
-		case 'M':
-			move = 1;
 			continue;
 		case 'o':
 			if (sfopen(sfstdout, opt_info.arg, "w") != sfstdout)
@@ -444,6 +450,16 @@ main(int argc, char** argv)
 		case 'w':
 			vcodexdisc.window = opt_info.arg;
 			continue;
+		case 'D':
+			error_info.trace = -(int)opt_info.num;
+			continue;
+		case 'M':
+			move = 1;
+			continue;
+		case 'P':
+			error(1, "pid %d", getpid());
+			sleep(10);
+			continue;
 		case ':':
 			error(2, "%s", opt_info.arg);
 			continue;
@@ -459,12 +475,14 @@ main(int argc, char** argv)
 	buf = 0;
 	if (!move)
 		for (bufsize = 1024*1024; bufsize > 0; bufsize /= 2)
-			if ((buf = malloc(bufsize)))
+			if (buf = malloc(bufsize))
 				break;
 	if (!(ct = sfstruse(cs)))
 		error(ERROR_SYSTEM|3, "out of space");
-	if (streq(ct+1, "-") || !*ct && !vczip)
-		ct = 0;
+	if (streq(ct+1, "-"))
+		ct = DISABLED;
+	else if (!*(ct+1))
+		ct = UNZIP;
 	apply(action, vt, &vcodexdisc, ct, &codexdisc, NiL, *argv, NiL, buf, bufsize, donez, lastz);
 	return error_info.errors != 0;
 }

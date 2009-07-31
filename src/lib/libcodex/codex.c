@@ -735,7 +735,11 @@ decodex(Sfio_t* ip, Codexnum_t flags, Codexdisc_t* disc)
 			return -1;
 		}
 		if (i)
+		{
 			serial = i;
+			if (disc->version >= 20090704L && disc->identify)
+				sfprintf(disc->identify, "<%s", meth->name);
+		}
 	}
 	return serial;
 }

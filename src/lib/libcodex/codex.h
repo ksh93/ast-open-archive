@@ -31,7 +31,7 @@
 #include <ast.h>
 #include <error.h>
 
-#define CODEX_VERSION	20090626L
+#define CODEX_VERSION	20090704L
 
 #define CODEX_DECODE	0x0001		/* decode supported		*/
 #define CODEX_ENCODE	0x0002		/* encode supported		*/
@@ -95,6 +95,7 @@ struct Codexdisc_s			/* coder discipline		*/
 	Error_f		errorf;		/* error message function	*/
 	ssize_t		(*passf)(void*, size_t, Codexdisc_t*, Codexmeth_t*);
 	const char*	passphrase;	/* passphrase			*/
+	Sfio_t*		identify;	/* decode method string if != 0	*/
 };
 
 struct Codexmeth_s			/* coder method			*/
@@ -157,7 +158,6 @@ extern Codexmeth_t*	codex_lib(const char*);
 extern int		codex(Sfio_t*, Sfio_t*, const char*, Codexnum_t, Codexdisc_t*, Codexmeth_t*);
 extern int		codexpop(Sfio_t*, Sfio_t*, int);
 extern int		codexcmp(const char*, const char*);
-extern Codex_t*		codexcopy(void);
 extern int		codexdata(Sfio_t*, Codexdata_t*);
 extern ssize_t		codexgetpass(const char*, void*, size_t);
 extern Codexmeth_t*	codexid(const void*, size_t, char*, size_t);

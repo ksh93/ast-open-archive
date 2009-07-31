@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2009-04-15 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2009-07-02 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -1304,6 +1304,7 @@ main(int argc, register char** argv)
 	Key_t*		kp;
 	Sfio_t*		fmt;
 	long		lsflags;
+	int		logical = 1;
 	int		dump = 0;
 
 	static char	fmt_color[] = "%(mode:case:d*:\\E[01;34m%(name)s\\E[0m:l*:\\E[01;36m%(name)s\\E[0m:*x*:\\E[01;32m%(name)s\\E[0m:*:%(name)s)s";
@@ -1556,6 +1557,7 @@ main(int argc, register char** argv)
 			break;
 		case 'H':
 			state.ftwflags |= FTW_META|FTW_PHYSICAL;
+			logical = 0;
 			break;
 		case 'I':
 			state.ignore = opt_info.arg;
@@ -1588,6 +1590,7 @@ main(int argc, register char** argv)
 			break;
 		case 'L':
 			state.ftwflags &= ~(FTW_META|FTW_PHYSICAL|FTW_SEEDOTDIR);
+			logical = 0;
 			break;
 		case 'N':
 			clr(LS_PRINTABLE);
@@ -1595,12 +1598,14 @@ main(int argc, register char** argv)
 		case 'P':
 			state.ftwflags &= ~FTW_META;
 			state.ftwflags |= FTW_PHYSICAL;
+			logical = 0;
 			break;
 		case 'Q':
 			set(LS_PRINTABLE|LS_QUOTE);
 			break;
 		case 'R':
 			set(LS_RECURSIVE);
+			logical = 0;
 			break;
 		case 'S':
 			state.order = order_blocks;
@@ -1706,6 +1711,8 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
+	if (logical)
+		state.ftwflags &= ~(FTW_META|FTW_PHYSICAL);
 	if (state.lsflags == (lsflags|LS_TIME))
 		state.ftwflags |= FTW_SEEDOTDIR; /* keep configure happy */
 	if (state.lsflags & LS_DIRECTORY)

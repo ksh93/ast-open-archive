@@ -1,3 +1,5 @@
+09-07-01 mm2html.sh: --frame=foo for man generates side content frame
+09-07-01 mm2html.sh: add redirection hackery to insert html.labels
 09-06-30 mm2html.sh: increase heading level for -o html.labels
 09-05-08 mm2twiki.sh: add for mm => twiki markups
 07-12-11 mm2bb.sh: fix bb list and fill logic, add long name \n[CC...]

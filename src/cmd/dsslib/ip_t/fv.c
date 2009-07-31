@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -447,4 +447,60 @@ fvcpy(int n, unsigned char* r, const unsigned char* a)
 {
 	memcpy(r, a, n);
 	return 0;
+}
+
+/*
+ * return the minimum prefix of a limited to m bits
+ */
+
+unsigned char*
+fvplo(int z, int m, unsigned char* r, const unsigned char* a)
+{
+	int		i;
+	int		n;
+
+	if (m)
+	{
+		fvcpy(z, r, a);
+		m = z * 8 - m;
+		n = m / 8;
+		m -= n * 8;
+		if (!m)
+			n++;
+		for (i = 1; i < n; i++)
+			r[z - i] = 0;
+		if (m)
+			r[z - n] &= ~((1<<m) - 1);
+	}
+	else
+		fvset(z, r, 0);
+	return r;
+}
+
+/*
+ * return the maximum prefix of a limited to m bits
+ */
+
+unsigned char*
+fvphi(int z, int m, unsigned char* r, const unsigned char* a)
+{
+	int		i;
+	int		n;
+
+	if (m)
+	{
+		fvcpy(z, r, a);
+		m = z * 8 - m;
+		n = m / 8;
+		m -= n * 8;
+		if (!m)
+			n++;
+		for (i = 1; i < n; i++)
+			r[z - i] = 0xFF;
+		if (m)
+			r[z - n] |= ((1<<m) - 1);
+	}
+	else
+		fvset(z, r, 0xFF);
+	return r;
 }

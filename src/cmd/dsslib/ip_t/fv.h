@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -51,6 +51,9 @@ extern int		fvadd(int, unsigned char*, const unsigned char*, const unsigned char
 extern int		fvsub(int, unsigned char*, const unsigned char*, const unsigned char*);
 extern int		fvmpy(int, unsigned char*, const unsigned char*, const unsigned char*);
 extern int		fvdiv(int, unsigned char*, unsigned char*, const unsigned char*, const unsigned char*);
+
+extern unsigned char*	fvplo(int, int, unsigned char*, const unsigned char*);
+extern unsigned char*	fvphi(int, int, unsigned char*, const unsigned char*);
 
 extern char*		fmtfv(int, const unsigned char*, int, int, int);
 extern int		strfv(int, unsigned char*, const char*, char**, int, int);

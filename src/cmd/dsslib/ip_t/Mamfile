@@ -384,6 +384,55 @@ meta fv.o %.c>%.o fv.c fv
 prev fv.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c fv.c
 done fv.o generated
+make ivopen.o
+make ivopen.c
+make ivlib.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+make ivmethods.h implicit
+done ivmethods.h dontcare
+make iv.h implicit
+prev fv.h implicit
+done iv.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done ivlib.h
+done ivopen.c
+meta ivopen.o %.c>%.o ivopen.c ivopen
+prev ivopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_ip_t -D_BLD_pt -c ivopen.c
+done ivopen.o generated
+make ivclose.o
+make ivclose.c
+prev ivlib.h implicit
+done ivclose.c
+meta ivclose.o %.c>%.o ivclose.c ivclose
+prev ivclose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_ip_t -D_BLD_pt -c ivclose.c
+done ivclose.o generated
+make ivmeth.o
+make ivmeth.c
+prev ivmethods.h implicit
+prev ivlib.h implicit
+done ivmeth.c
+meta ivmeth.o %.c>%.o ivmeth.c ivmeth
+prev ivmeth.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_ip_t -D_BLD_pt -c ivmeth.c
+done ivmeth.o generated
+make iv-flat.o
+make iv-flat.c
+prev ivlib.h implicit
+done iv-flat.c
+meta iv-flat.o %.c>%.o iv-flat.c iv-flat
+prev iv-flat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_ip_t -D_BLD_pt -c iv-flat.c
+done iv-flat.o generated
+make iv-nested.o
+make iv-nested.c
+prev ivlib.h implicit
+done iv-nested.c
+meta iv-nested.o %.c>%.o iv-nested.c iv-nested
+prev iv-nested.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_ip_t -D_BLD_pt -c iv-nested.c
+done iv-nested.o generated
 make ptvaddresses.o
 make ptvaddresses.c
 make ptvlib.h implicit
@@ -542,8 +591,8 @@ meta ptvunion.o %.c>%.o ptvunion.c ptvunion
 prev ptvunion.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pt -D_PACKAGE_ast -c ptvunion.c
 done ptvunion.o generated
-exec - ${AR} cr libdssip_t.a ip_t.o lib.o ire.o itl.o ptaddresses.o ptcopy.o ptcover.o ptdifference.o ptequal.o ptintersect.o ptinvert.o ptmatch.o ptopen.o ptprint.o ptranges.o ptsize.o ptstats.o ptsubset.o ptunion.o ptdump.o ptrebit.o fv.o ptvaddresses.o ptvcopy.o ptvcover.o ptvdifference.o ptvdump.o ptvequal.o ptvintersect.o ptvinvert.o
-exec - ${AR} cr libdssip_t.a ptvmatch.o ptvmin.o ptvmax.o ptvopen.o ptvprint.o ptvranges.o ptvrebit.o ptvsize.o ptvstats.o ptvsubset.o ptvunion.o
+exec - ${AR} cr libdssip_t.a ip_t.o lib.o ire.o itl.o ptaddresses.o ptcopy.o ptcover.o ptdifference.o ptequal.o ptintersect.o ptinvert.o ptmatch.o ptopen.o ptprint.o ptranges.o ptsize.o ptstats.o ptsubset.o ptunion.o ptdump.o ptrebit.o fv.o ivopen.o ivclose.o ivmeth.o iv-flat.o iv-nested.o ptvaddresses.o ptvcopy.o ptvcover.o
+exec - ${AR} cr libdssip_t.a ptvdifference.o ptvdump.o ptvequal.o ptvintersect.o ptvinvert.o ptvmatch.o ptvmin.o ptvmax.o ptvopen.o ptvprint.o ptvranges.o ptvrebit.o ptvsize.o ptvstats.o ptvsubset.o ptvunion.o
 exec - (ranlib libdssip_t.a) >/dev/null 2>&1 || true
 done libdssip_t.a generated
 done ip_t virtual
@@ -559,6 +608,17 @@ prev libdssip_t.a archive
 exec - test '' = 'libdssip_t.a' || ${STDCMP} 2>/dev/null -s libdssip_t.a ${INSTALLROOT}/lib/libdssip_t.a || { ${STDMV} ${INSTALLROOT}/lib/libdssip_t.a ${INSTALLROOT}/lib/libdssip_t.a.old 2>/dev/null || true; ${STDCP} libdssip_t.a ${INSTALLROOT}/lib/libdssip_t.a  		    		    ;}
 exec - (ranlib ${INSTALLROOT}/lib/libdssip_t.a) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/libdssip_t.a generated
+make ${INSTALLROOT}/man/man3
+exec - if	silent test ! -d ${INSTALLROOT}/man/man3
+exec - then	mkdir -p ${INSTALLROOT}/man/man3
+exec - fi
+done ${INSTALLROOT}/man/man3 generated
+make ${INSTALLROOT}/man/man3/iv.3
+prev ${INSTALLROOT}/man/man3
+make iv.3
+done iv.3
+exec - test '' = 'iv.3' || ${STDCMP} 2>/dev/null -s iv.3 ${INSTALLROOT}/man/man3/iv.3 || { ${STDMV} ${INSTALLROOT}/man/man3/iv.3 ${INSTALLROOT}/man/man3/iv.3.old 2>/dev/null || true; ${STDCP} iv.3 ${INSTALLROOT}/man/man3/iv.3  		    		    ;}
+done ${INSTALLROOT}/man/man3/iv.3 generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
 exec - then	mkdir -p ${INSTALLROOT}/lib/lib
@@ -583,6 +643,30 @@ exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/bgp.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/bgp.h generated
+make ${PACKAGE_ast_INCLUDE}/fv.h
+prev fv.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  fv.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/fv.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/fv.h
+exec - fi
+done ${PACKAGE_ast_INCLUDE}/fv.h generated
+make ${PACKAGE_ast_INCLUDE}/iv.h
+prev iv.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  iv.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/iv.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/iv.h
+exec - fi
+done ${PACKAGE_ast_INCLUDE}/iv.h generated
+make ${PACKAGE_ast_INCLUDE}/ivmethods.h
+prev ivmethods.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  ivmethods.h  > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ivmethods.h 1.${COTEMP}.x
+exec - then	rm -f 1.${COTEMP}.x
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ivmethods.h
+exec - fi
+done ${PACKAGE_ast_INCLUDE}/ivmethods.h generated
 make ${PACKAGE_ast_INCLUDE}/pt.h
 prev pt.h
 exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  pt.h  > 1.${COTEMP}.x
@@ -599,14 +683,36 @@ exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ptv.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/ptv.h generated
-make ${PACKAGE_ast_INCLUDE}/fv.h
-prev fv.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  fv.h  > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/fv.h 1.${COTEMP}.x
-exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/fv.h
-exec - fi
-done ${PACKAGE_ast_INCLUDE}/fv.h generated
 done install virtual
 make test
+make test.iv
+make testiv
+make testiv.o
+make testiv.c
+prev ${PACKAGE_ast_INCLUDE}/option.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ip6.h implicit
+prev iv.h implicit
+done testiv.c
+meta testiv.o %.c>%.o testiv.c testiv
+prev testiv.c
+setv _BLD_ip_t -U_BLD_ip_t
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_pt -c testiv.c
+done testiv.o generated
+prev libdssip_t.a archive
+bind -ldssip_t
+bind -last
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testiv testiv.o ${mam_libdssip_t} ${mam_libast}
+done testiv generated
+make iv-prefix.dat
+done iv-prefix.dat
+make iv-addr.dat
+done iv-addr.dat
+make testiv.out
+done testiv.out
+exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
+exec - set +x
+exec - testiv iv-prefix.dat iv-addr.dat > testiv.tmp
+exec - cmp -s testiv.tmp testiv.out || echo iv test failed
+done test.iv virtual
 done test dontcare virtual

@@ -1,0 +1,34 @@
+ipv6 address longest prefix match using an interval dictionary
+use this until the lpm(1) retrie implementation handles ipv6 addresses
+
+	Glenn Fowler
+	Network Services Research
+	gsf@research.att.com
+
+This directory contains the standalone code for ipv6 address longest
+prefix match using an interval dictionary. The code is currently AT&T
+PROPRIETARY, so don't propagate this outside of AT&T.  ivsa requires
+the ast standalone astsa source package.  Read this package and astsa
+in the same directory and run this to build libivsa.a:
+
+	make -f ivsa.omk
+
+and this to build the test harness and test the library:
+
+	make -f ivsa.omk test
+
+You may have to do some /bin/make plumbing on *.omk to get it to work
+on your system.  If you already have the non-standalone libast installed
+then you should be able to compile and link just the standalone ivsa
+against it.
+
+The library interface is implemented in libivsa.a; include iv.h in your
+source and link your a.out with libivsa.a.  ivsa.omk (for old make) pulls
+in standalone headers and source.
+
+'testiv --man' lists the test harness man page on the standard error.
+See testiv.c for example api usage -- iv(3) documentation real soon now.
+
+ivsa is a subset of the { ast-base ast-dss } packages at
+
+	http://www.research.att.com/sw/download/

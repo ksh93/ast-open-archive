@@ -92,7 +92,7 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-06-30  --- Release ksh93t+  ---
+09-07-01  --- Release ksh93t+  ---
 09-06-22  The default width for typeset -X has been changed so that there
 	  should be no loss of precision when converting to a string.
 09-06-19  A bug in the printing of array elements for binary variables with
@@ -2479,6 +2479,8 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+09-07-01 mm2html.sh: --frame=foo for man generates side content frame
+09-07-01 mm2html.sh: add redirection hackery to insert html.labels
 09-06-30 mm2html.sh: increase heading level for -o html.labels
 09-05-08 mm2twiki.sh: add for mm => twiki markups
 07-12-11 mm2bb.sh: fix bb list and fill logic, add long name \n[CC...]
@@ -2619,6 +2621,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+09-07-22 ip6.rt: add trailing :0 tests
 09-04-27 sfio/tpool.c: update to match libast/sfio/sfpool.c patch
 09-02-22 date.dat: add iso duration tests
 09-02-02 sfio/tprintf.c: fix sfaprints() test
@@ -4496,6 +4499,7 @@ All recorded changes follow.
 
 :::::::: dss ::::::::
 
+09-07-02 dss.c: fix EXAMPLES typo
 08-07-17 dss.c: tweak self-docs
 06-10-11 add sfstruse() error checks
 03-02-06 dss.c: convert main loop to dssrun()
@@ -4630,6 +4634,7 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+09-07-28 fv.h,fv.c: add fvplo(), fvphi()
 09-03-19 ip_t.c,itlie.h: elide leading 0.* for 2-tuple external conversion
 09-03-15 pt[v].h,pt[v]open.c: add Pt[v]prefix_t.data, pt[v]insert() returns new prefix
 09-03-15 itlie.h: handle as set marker in last element
@@ -5178,6 +5183,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+09-07-02 ls.c: ftwflags() default only if not --recursive
 09-05-15 ps.c: fix format field alias logic
 09-04-15 ls.c: add --sort=version
 09-01-30 mount.c: hide mount prototype too (for mvs.390)
@@ -5591,6 +5597,7 @@ All recorded changes follow.
 
 :::::::: vczip ::::::::
 
+09-07-04 vczip.c: first attempt to unify vcodex(--method) and codex(--transform)
 09-02-02 vczip.c: -u is now a flag (no optional arg)
 09-01-18 vczip.c: fix bug that forgot to assign src file path
 08-11-04 vczip.c: change date to official kpv -lvcodex release
@@ -5602,7 +5609,9 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
-09-06-30 port/astconf.c: strict PATH_RESOLVE is "physical" (not "metaphysical")
+09-07-29 astlicense.c: fix first name=value logic error
+09-07-22 string/fmtip6.c: don't drop trailing 0 in 44::1:0:0
+09-06-30 port/astconf.c: standard PATH_RESOLVE is "physical" (not "metaphysical")
 09-06-19 vmalloc: sync with kpv
 09-06-19 include/shcmd.h: add sh_context(p) cast
 09-06-11 misc/magic.tab: differentiate pc 386 32/64 bit dll/exe/obj
@@ -7182,6 +7191,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+09-07-23 pathchk.c: add -P,--path and -a,--all
+09-07-02 chgrp.c,chmod.c,cksum.c: fts_flags() default only if not --recursive
 09-06-19 cmd.h,cmdinit.c: add ERROR_CALLBACK for ERROR_NOTIFY main() callback
 09-06-19 mktemp.c: --unsafe now checks and prints path but does create
 09-06-19 tee.c: add ERROR_CALLBACK for tee_cleanup() sfio discipline pop

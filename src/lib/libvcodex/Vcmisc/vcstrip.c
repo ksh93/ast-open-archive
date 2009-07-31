@@ -230,7 +230,7 @@ Vcmethod_t _Vcstrip =
 {	strip,
 	unstrip,
 	stripevent,
-	"strip", "Stripp head and tail data.",
+	"strip", "Strip head and tail data.",
 	"[-version?strip (AT&T Research) 2009-03-12]" USAGE_LICENSE,
 	_Stripargs,
 	1024*1024,

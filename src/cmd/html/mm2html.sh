@@ -41,69 +41,88 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2009-06-30' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2009-07-01' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2009-06-30 $
+@(#)$Id: mm2html (AT&T Research) 2009-07-01 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
 [+DESCRIPTION?\bmm2html\b is a \bsed\b(1)/\bksh\b(1) script (yes!) that
-	converts input \bmm\b(1) or \bman\b(1) documents to an \bhtml\b
-	document on the standard output. If \afile\a is omitted then the
-	standard input is read. \btroff2html\b(1) is similar but does a full
-	\btroff\b(1) parse. \adir\a operands and directory components of
-	\afile\a operands are added to the included file search list.]
-[f:frame?Generate framed HTML files in:]:[name]{
-	[+\aname\a\b.html?The main body.]
-	[+\aname\a\b-index.html?The frame index (if \b--index\b specified).]
-	[+\aname\a\b-temp.html?Temporary frame goto labels.]
-}
+    converts input \bmm\b(1) or \bman\b(1) documents to an \bhtml\b
+    document on the standard output. If \afile\a is omitted then the
+    standard input is read. \btroff2html\b(1) is similar but does a full
+    \btroff\b(1) parse. \adir\a operands and directory components of
+    \afile\a operands are added to the included file search list.]
+[f:frame?Generate framed HTML files in:]:[name]
+    {
+        [+man documents]
+            {
+                [+\aname\a\b.html?The parent frame page.]
+                [+\aname\a\b-toc.html?The table of contents (link)
+                    frame.]
+                [+\aname\a\b-man.html?The (also standalone) man page
+                    frame.]
+            }
+        [+other documents]
+            {
+                [+\aname\a\b.html?The main body.]
+                [+\aname\a\b-index.html?The frame index (if \b--index\b
+                    specified).]
+                [+\aname\a\b-temp.html?Temporary frame goto labels.]
+            }
+    }
 [g:global-index?Generate a standalone \bindex.html\b for framed HTML.]
-[h:html?Read html options from \afile\a. Unknown options
-	are silently ignored. See the \b.xx\b request below for a description
-	of the options. The file pathname may be followed by URL style
-	\aname=value\a pairs that are evaluated as if they came from
-	\afile.\a]:[file[??name=value;...]]]
-[l:license?Read license identification options from \afile\a. Unknown options
-	are silently ignored. See the \b.xx\b request below for a description
-	of the options. The file pathname may be followed by URL style
-	\aname=value\a pairs that are evaluated as if they came from
-	\afile\a.]:[file[??name=value;...]]]
-[o:option?Sets a space or \b,\b separated list of \b--license\b options. Option
-	values with embedded spaces must be quoted.]:[[no]]name=value]
+[h:html?Read html options from \afile\a. Unknown options are silently
+    ignored. See the \b.xx\b request below for a description of the
+    options. The file pathname may be followed by URL style \aname=value\a
+    pairs that are evaluated as if they came from
+    \afile.\a]:[file[??name=value;...]]]
+[l:license?Read license identification options from \afile\a. Unknown
+    options are silently ignored. See the \b.xx\b request below for a
+    description of the options. The file pathname may be followed by URL
+    style \aname=value\a pairs that are evaluated as if they came from
+    \afile\a.]:[file[??name=value;...]]]
+[o:option?Sets a space or \b,\b separated list of \b--license\b
+    options. Option values with embedded spaces must be
+    quoted.]:[[no]]name=value]
 [t:top?Open non-local urls in the top frame.]
-[x:index?Generate a standalone \aname\a\b-index.html\b for framed HTML where
-	\aname\a is specified by \b--frame\b.]
-
-[ [ dir | file ] ... ]
-
+[x:index?Generate a standalone \aname\a\b-index.html\b for framed HTML
+    where \aname\a is specified by \b--frame\b.]
+[ [ dir | file ]
+    ... ]
 [+EXTENSIONS?\b.xx\b \aname\a[=\avalue\a]] is a special \bmm2html\b
-	request that handles program tracing, \bhtml\b extensions and \atroff\a
-	macro package magic. Supported operations are:]{
-	[+author=text?Specifies the contact information for the document
-		HEAD section.]
-	[+background=URL?Specifies the document background URL.]
-	[+logo=URL?Specifies the logo/banner image URL that is centered
-		at the top of the document.]
-	[+mailto=address?Sets the email \aaddress\a to send comments and
-		suggestions.]
-	[+meta.name?Emits the \bhtml\b tag \b<META name=\b\aname\a
-		\bcontent=\b\acontent\a\b>\b.]
-	[+package=text?\atext\a is prepended to the \bhtml\b document title.]
-	[+title=text?Sets the document title.]
-}
-[+?Local URL links are generated for all top level headings. These can be
-	referenced by embedding the benign (albeit convoluted) \atroff\a
-	construct \\h'\'$'0*\\w\"label\"'\'$'text\\h'\'$'0'\'$', where
-	\alabel\a is the local link label and \atext\a is the hot link text.
-	If \alabel\a and \atext\a are the same then use
-	\\h'\'$'0*1'\'$'text\\h'\'$'0'\'$'.]
-[+?\bman\b(1) links are generated for bold or italic identifiers that are
-	immediately followed by a parenthesized number.]
+    request that handles program tracing, \bhtml\b extensions and \atroff\a
+    macro package magic. Supported operations are:]
+    {
+        [+author=text?Specifies the contact information for the
+            document HEAD section.]
+        [+background=URL?Specifies the document background URL.]
+        [+logo=URL?Specifies the logo/banner image URL that is centered
+            at the top of the document.]
+        [+mailto=address?Sets the email \aaddress\a to send comments
+            and suggestions.]
+        [+meta.name?Emits the \bhtml\b tag \b<META name=\b\aname\a
+            \bcontent=\b\acontent\a\b>\b.]
+        [+package=text?\atext\a is prepended to the \bhtml\b document
+            title.]
+        [+title=text?Sets the document title.]
+    }
+[+?Local URL links are generated for all top level headings. These can
+    be referenced by embedding the benign (albeit convoluted) \atroff\a
+    construct \\h'\'$'0*\\w\"label\"'\'$'text\\h'\'$'0'\'$', where
+    \alabel\a is the local link label and \atext\a is the hot link text. If
+    \alabel\a and \atext\a are the same then use
+    \\h'\'$'0*1'\'$'text\\h'\'$'0'\'$'.]
+[+?\bman\b(1) links are generated for bold or italic identifiers that
+    are immediately followed by a parenthesized number.]
+[+FILES]
+    {
+        [+$HOME/.2html?Default rendering info.]
+    }
 [+SEE ALSO?\btroff2html\b(1), \bhtml2rtf\b(1)]
 '
 	;;
@@ -114,14 +133,14 @@ esac
 
 set -o noglob
 
-integer count row n s ndirs=0 nfiles=0
+integer count row n s ndirs=0 nfiles=0 last_level=0
 integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4
 integer labels=0 mark=4 reference=1 ident=0 ce=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
 typeset -x -A ds map nr outline
-typeset cond dirs files fg frame label list prev text trailer type
+typeset cond dirs files fg frame label level list prev text trailer type
 typeset license html meta nl mm index authors vg header references ss
 typeset mm_AF mm_AF_cur mm_AF_old mm_AU
 
@@ -186,6 +205,8 @@ macros=
 pd='<P>'
 pm=
 primary=".BL|.LI|.IX"
+redirect_old=
+redirect_new=
 ss="verdana,arial,helvetica,geneva,sans-serif"
 top=
 vg_ps=20
@@ -238,6 +259,10 @@ function options
 		esac
 	done
 }
+
+if	[[ -f $HOME/.2html ]]
+then	. $HOME/.2html
+fi
 
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
@@ -682,6 +707,8 @@ function getline
 						case $nam in
 						label)	if	(( labels >= 0 ))
 							then	nam=name
+								txt=${txt%%*([-.,])}
+								level[label]=$last_level
 								label[labels++]=$txt
 								print -r -- "<A $nam=\"$url\">$txt</A>"
 							fi
@@ -720,7 +747,7 @@ function getline
 						;;
 					logo)	eval html.$nam.src='$'val
 						;;
-					ident|logo*|title|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
+					ident|labels|logo*|title|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
 						eval html.$nam='$'val
 						;;
 					text)	data="$data	$val"
@@ -900,6 +927,24 @@ function ident
 	print -r -- "<META name=\"generator\" content=\"$version\">${meta}"
 }
 
+indexed=
+
+function index
+{
+	if	[[ ! $indexed ]]
+	then	indexed=1
+		if	[[ ! $frame && ${html.labels} ]]
+		then	redirect_old=9 redirect_new=8
+			eval "exec $redirect_old>&1"
+			t=/tmp/m2hl$$
+			eval "exec 1>$t"
+			eval "exec $redirect_new<$t"
+			rm -f $t
+		else	print -r -- "<!--INDEX--><!--/INDEX-->"
+		fi
+	fi
+}
+
 function title
 {
 	ident
@@ -998,7 +1043,9 @@ $(cat $hit)
 			esac
 			;;
 		esac
-		print -r -- "<!--INDEX--><!--/INDEX-->"
+		if	[[ $macros != man ]]
+		then	index
+		fi
 		;;
 	esac
 	case $pm in
@@ -1011,7 +1058,7 @@ $(cat $hit)
 
 function heading
 {
-	typeset op=$1 i o options beg end
+	typeset op=$1 i o options beg end txt
 	integer count
 
 	shift
@@ -1050,10 +1097,15 @@ function heading
 		done
 		(( count += head ))
 		print -nr -- "$beg<H$count$options>"
+		txt=$*
+		txt=${txt%%*([-,.])}
+		txt=${txt//\&+([^\;])\;/}
 		if	(( labels >= 0 && count < mark ))
-		then	print -nr -- "<A name=\"$*\">$*</A>"
-			label[labels++]=$*
-		else	print -nr "$*"
+		then	print -nr -- "<A name=\"$txt\">$txt</A>"
+			last_level=$count
+			level[labels]=$count
+			label[labels++]=$txt
+		else	print -nr "$txt"
 		fi
 		print -r -- "</H$count>$end"
 		;;
@@ -1297,12 +1349,20 @@ do	getline || {
 					;;
 				esac
 				case $op in
-				.SH)	heading .H 2 "$@" ;;
-				*)	heading .H 3 "$@" ;;
+				.SH)	if	[[ $macros == man && $* == DESCRIPTION && ${html.labels} ]]
+					then	index
+					fi
+					heading .H 2 "$@"
+					;;
+				*)	heading .H 3 "$@"
+					;;
 				esac
 				type[++lists]=.XX
 				list[lists]=DL
-				print -r -- "<DL COMPACT><DT>"
+				case $op:$* in
+				.SH:NAME)	print -n -r -- "<DL COMPACT>$nl<DT>" ;;
+				*)		print -r -- "<DL COMPACT><DT>" ;;
+				esac
 				;;
 			*)	heading $op "$@"
 				;;
@@ -1628,7 +1688,9 @@ do	getline || {
 				*)	sec=$5
 					;;
 				esac
-				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$1($2)</TH><TH align=center><A href=\".\" TITLE=\"Index\">$sec</A></TH><TH align=right>$1($2)</TH></TR></TBODY></TABLE></H3>"
+				MAN="$1($2)"
+				print -r -- "<A name=\"$MAN\"></A>"
+				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$MAN</TH><TH align=center><A href=\".\" title=\"Index\" target=\"_top\">$sec</A></TH><TH align=right>$MAN</TH></TR></TBODY></TABLE></H3>"
 				print -r -- "<HR>"
 				;;
 			.TL)	getline || break
@@ -2271,22 +2333,63 @@ trailer="$trailer$nl</HTML>"
 print -r -- "$trailer"
 case $frame in
 ?*)	if	[[ $framelink == '' && ${html.labels} != '' ]] && (( labels > 1 ))
-	then
-		exec > $frame-temp.html || exit
-		print -r -- "<B><FONT size=-1 face=\"${ss}\">"
-		print -r -- "<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR>"
-		for ((n = 0; n < labels; n++))
-		do	print -r -- "<TD><A href=\"#${label[n]}\">${label[n]}</A></TD>"
-		done
-		print -r -- "</TR></TABLE>"
-		print -r -- "</FONT></B>"
-		exec > /dev/null || exit
-		ed $framebody <<!
+	then	if	[[ $macros == man ]]
+		then	mv $framebody $frame-man.html
+			{
+				ident
+				print -r -- "<TITLE>$file table of contents</TITLE>"
+				print -r -- "</HEAD>"
+				print -r -- "<BODY" ${html.BODY/'('@(*)')'/\1} ">"
+				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left><A target=\"man\" href=\"$frame-man.html#$MAN\">$MAN</A></TH><TH align=right><A href=\".\" target=_top title=\"Command Index.\">COMMANDS</A></TH></TR></TBODY></TABLE></H3>"
+				print -r -- "<HR>"
+				print -r -- "<UL>"
+				(( lev = level[0] ))
+				for ((n = 0; n < labels; n++))
+				do	while	(( lev < level[n] ))
+					do	(( lev++ ))
+						print -r -- "<UL>"
+					done
+					while	(( lev > level[n] ))
+					do	(( lev-- ))
+						print -r -- "</UL>"
+					done
+					print -r -- "<LI><A href=\"$frame-man.html#${label[n]}\" target=\"man\">${label[n]}</A>"
+				done
+				while	(( lev > level[0] ))
+				do	(( lev-- ))
+					print -r -- "</UL>"
+				done
+				print -r -- "</UL>"
+				print -r -- "</BODY>"
+				print -r -- "</HTML>"
+			} > $frame-toc.html
+			{
+				ident
+				print -r -- "<TITLE>$file frame sets</TITLE>$nl</HEAD>"
+				print -r -- "<BASE>"
+				print -r -- "</HEAD>"
+				print -r -- "<FRAMESET cols=\"20%,80%\">"
+				print -r -- "<FRAME src=\"$frame-toc.html\" name=\"toc\">"
+				print -r -- "<FRAME src=\"$frame-man.html\" name=\"man\">"
+				print -r -- "</FRAMESET>"
+				print -r -- "</HTML>"
+			} > $framebody
+		else	exec > $frame-temp.html || exit
+			print -r -- "<B><FONT size=-1 face=\"${ss}\">"
+			print -r -- "<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR>"
+			for ((n = 0; n < labels; n++))
+			do	print -r -- "<TD><A href=\"#${label[n]}\">${label[n]}</A></TD>"
+			done
+			print -r -- "</TR></TABLE>"
+			print -r -- "</FONT></B>"
+			exec > /dev/null || exit
+			ed $framebody <<!
 /<!--INDEX-->/r $frame-temp.html
 w
 q
 !
-		rm $frame-temp.html
+			rm $frame-temp.html
+		fi
 	fi
 	case $index in
 	?*)	case $index in
@@ -2308,7 +2411,10 @@ q
 		;;
 	esac
 	;;
-*)	if	[[ ${html.labels} != '' ]] && (( labels > 1 ))
+*)	if	[[ $redirect_old ]]
+	then	eval "exec 1>&$redirect_old $redirect_old>&-"
+	fi
+	if	[[ ${html.labels} != '' ]] && (( labels > 1 ))
 	then
 		if	[[ ${html.labels} != +([0-9]) || ${html.labels} == [01] ]]
 		then	html.labels=7
@@ -2325,6 +2431,9 @@ q
 		print -r -- "</TR></TABLE>"
 		print -r -- "</FONT></B>"
 		print -r -- "<!--/LABELS-->"
+	fi
+	if	[[ $redirect_new ]]
+	then	eval "cat <&$redirect_new"
 	fi
 	;;
 esac

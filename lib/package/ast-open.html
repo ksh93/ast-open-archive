@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Research) 2009-06-30">
+<META name="generator" content="mm2html (AT&T Research) 2009-07-01">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
@@ -10,7 +10,6 @@
 <BODY bgcolor=white link=slateblue vlink=teal >
 <TABLE border=0 align=center width=96%>
 <TBODY><TR><TD valign=top align=left>
-<!--INDEX--><!--/INDEX-->
 <P>
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ast-open package">ast-open package</A></H3></FONT></FONT></CENTER>
 The AT&amp;T Software Technology ast-open package from AT&amp;T Research
@@ -1047,7 +1046,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-06-30  --- Release ksh93t+  ---
+09-07-01  --- Release ksh93t+  ---
 09-06-22  The default width for typeset -X has been changed so that there
 	  should be no loss of precision when converting to a string.
 09-06-19  A bug in the printing of array elements for binary variables with
@@ -3440,6 +3439,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-07-01 mm2html.sh: --frame=foo for man generates side content frame
+09-07-01 mm2html.sh: add redirection hackery to insert html.labels
 09-06-30 mm2html.sh: increase heading level for -o html.labels
 09-05-08 mm2twiki.sh: add for mm =&gt; twiki markups
 07-12-11 mm2bb.sh: fix bb list and fill logic, add long name #0091;CC...&#0093;
@@ -3589,6 +3590,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-07-22 ip6.rt: add trailing :0 tests
 09-04-27 sfio/tpool.c: update to match libast/sfio/sfpool.c patch
 09-02-22 date.dat: add iso duration tests
 09-02-02 sfio/tprintf.c: fix sfaprints() test
@@ -5505,6 +5507,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="dss changes">dss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-07-02 dss.c: fix EXAMPLES typo
 08-07-17 dss.c: tweak self-docs
 06-10-11 add sfstruse() error checks
 03-02-06 dss.c: convert main loop to dssrun()
@@ -5660,6 +5663,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-07-28 fv.h,fv.c: add fvplo(), fvphi()
 09-03-19 ip_t.c,itlie.h: elide leading 0.* for 2-tuple external conversion
 09-03-15 pt&#0091;v&#0093;.h,pt&#0091;v&#0093;open.c: add Pt&#0091;v&#0093;prefix_t.data, pt&#0091;v&#0093;insert() returns new prefix
 09-03-15 itlie.h: handle as set marker in last element
@@ -6259,6 +6263,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-07-02 ls.c: ftwflags() default only if not --recursive
 09-05-15 ps.c: fix format field alias logic
 09-04-15 ls.c: add --sort=version
 09-01-30 mount.c: hide mount prototype too (for mvs.390)
@@ -6684,6 +6689,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="vczip changes">vczip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-07-04 vczip.c: first attempt to unify vcodex(--method) and codex(--transform)
 09-02-02 vczip.c: -u is now a flag (no optional arg)
 09-01-18 vczip.c: fix bug that forgot to assign src file path
 08-11-04 vczip.c: change date to official kpv -lvcodex release
@@ -6698,7 +6704,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-06-30 port/astconf.c: strict PATH_RESOLVE is "physical" (not "metaphysical")
+09-07-29 astlicense.c: fix first name=value logic error
+09-07-22 string/fmtip6.c: don't drop trailing 0 in 44::1:0:0
+09-06-30 port/astconf.c: standard PATH_RESOLVE is "physical" (not "metaphysical")
 09-06-19 vmalloc: sync with kpv
 09-06-19 include/shcmd.h: add sh_context(p) cast
 09-06-11 misc/magic.tab: differentiate pc 386 32/64 bit dll/exe/obj
@@ -8284,6 +8292,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-07-23 pathchk.c: add -P,--path and -a,--all
+09-07-02 chgrp.c,chmod.c,cksum.c: fts_flags() default only if not --recursive
 09-06-19 cmd.h,cmdinit.c: add ERROR_CALLBACK for ERROR_NOTIFY main() callback
 09-06-19 mktemp.c: --unsafe now checks and prints path but does create
 09-06-19 tee.c: add ERROR_CALLBACK for tee_cleanup() sfio discipline pop
@@ -9893,7 +9903,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>June 30, 2009</TD>
+<TD align=right>July 31, 2009</TD>
 </TR>
 </TABLE>
 <P>

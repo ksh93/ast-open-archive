@@ -1,3 +1,4 @@
+09-07-28 fv.h,fv.c: add fvplo(), fvphi()
 09-03-19 ip_t.c,itlie.h: elide leading 0.* for 2-tuple external conversion
 09-03-15 pt[v].h,pt[v]open.c: add Pt[v]prefix_t.data, pt[v]insert() returns new prefix
 09-03-15 itlie.h: handle as set marker in last element

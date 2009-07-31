@@ -24,11 +24,11 @@
 #include <ctype.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: testptv (AT&T Research) 2008-07-31 $\n]"
+"[-?\n@(#)$Id: testptv (AT&T Research) 2009-07-22 $\n]"
 USAGE_LICENSE
 "[+NAME?testptv - ptv ipv6 longest prefix match test harness]"
 "[+DESCRIPTION?\btestptv\b loads the ipv6 prefixes in \aprefix-file\a "
-    "and then does a longest prefix match for ipv6 address in each "
+    "and then does a longest prefix match for each ipv6 address in each "
     "\aaddress-file\a. If \aaddress-file\a is omitted or \b-\b then the "
     "standard input is read. Matched addresses are listed with the min and max "
     "rangepoints of the matching interval, one line per match. \b-\b is "
@@ -89,10 +89,15 @@ main(int argc, char** argv)
 	while (s = sfgetr(sp, '\n', 1))
 		if (strtoip6(s, 0, prefix, prefix + IP6BITS))
 			error(1, "%s: invalid prefix", s);
-		else if (!ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], prefix, prefix[IP6BITS]), ptvmax(ptv->size, ptv->r[1], prefix, prefix[IP6BITS])))
+		else
 		{
-			error(2, "%s: ptv insertion error", s);
-			break;
+			if (dump)
+				sfprintf(sfstderr, "insert  %s  %s\n", fmtip6(ptvmin(ptv->size, ptv->r[0], prefix, prefix[IP6BITS]), prefix[IP6BITS]), fmtip6(ptvmax(ptv->size, ptv->r[1], prefix, prefix[IP6BITS]), prefix[IP6BITS]));
+			if (!ptvinsert(ptv, ptvmin(ptv->size, ptv->r[0], prefix, prefix[IP6BITS]), ptvmax(ptv->size, ptv->r[1], prefix, prefix[IP6BITS])))
+			{
+				error(2, "%s: ptv insertion error", s);
+				break;
+			}
 		}
 	sfclose(sp);
 	if (dump)
