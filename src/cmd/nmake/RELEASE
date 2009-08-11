@@ -1,3 +1,4 @@
+09-07-31 Makerules.mk: add CC.AR.ARFLAGS
 09-05-05 scan.c: reject implicit prereq names containing space
 09-03-24 Makerules.mk: --option[=value] compatibility with option[=value] until 2011
 09-03-02 Makerules.mk: use $(-recurse:/:/ /G:N=[0-9]*:O=N) for recursion limit

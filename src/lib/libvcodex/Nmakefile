@@ -34,22 +34,22 @@ src = $(*$(*$(*vcodex)):N=*.c:T=F)
 vcmethods.h : (src) $$(-mam:+$$(src))
 	set -- $( $(SED) -e '/\<VCLIB(/!d' -e 's/.*\<VCLIB(\(.*\)).*/\1/' $($(~:O=1)) )
 	{
-	print "/*"
-	print " * list of default public -lvcodex methods"
-	print " * proprietary methods are available as plugins under separate license(s)"
-	print " *"
-	print " * this file may be included multiple times in one source"
-	print " */"
-	print
-	print "#ifndef	VCMETHOD"
-	print "#define VCMETHOD(m)	extern Vcmethod_t* m;"
-	print "#endif"
-	print
+	echo "/*"
+	echo " * list of default public -lvcodex methods"
+	echo " * proprietary methods are available as plugins under separate license(s)"
+	echo " *"
+	echo " * this file may be included multiple times in one source"
+	echo " */"
+	echo
+	echo "#ifndef	VCMETHOD"
+	echo "#define VCMETHOD(m)	extern Vcmethod_t* m;"
+	echo "#endif"
+	echo
 	for m
-	do	print "VCMETHOD($m)"
+	do	echo "VCMETHOD($m)"
 	done
-	print
-	print "#undef	VCMETHOD"
+	echo
+	echo "#undef	VCMETHOD"
 	} > 1.$(tmp).h
 	if	$(CMP) $(CMPFLAGS) 1.$(tmp).h $(<)
 	then	$(RM) $(RMFLAGS) 1.$(tmp).h

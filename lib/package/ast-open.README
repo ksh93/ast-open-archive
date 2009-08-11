@@ -3038,6 +3038,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+09-07-31 Makerules.mk: add CC.AR.ARFLAGS
 09-05-05 scan.c: reject implicit prereq names containing space
 09-03-24 Makerules.mk: --option[=value] compatibility with option[=value] until 2011
 09-03-02 Makerules.mk: use $(-recurse:/:/ /G:N=[0-9]*:O=N) for recursion limit
@@ -4370,6 +4371,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+09-08-01 join.tst: TEST 19 for empty field defref bug
 09-05-24 tail.tst: add r combinations
 09-03-31 features/pty,Makefile: add pty.h and -lutil refs for linux -- great, another util library
 09-02-14 join.tst: add a VSC test
@@ -5609,6 +5611,9 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-08-11 comp/setlocale.c: treat "en"/"en_US" AST_LC_MESSAGES as "C"/"POSIX"
+09-08-10 vmalloc/vmhdr.h: add user-defined _AST_PAGESIZE and computed VMHEAPINCR
+09-08-09 comp/conf.tab: add NPROCESSORS_MAX
 09-07-29 astlicense.c: fix first name=value logic error
 09-07-22 string/fmtip6.c: don't drop trailing 0 in 44::1:0:0
 09-06-30 port/astconf.c: standard PATH_RESOLVE is "physical" (not "metaphysical")
@@ -7191,6 +7196,9 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+09-08-11 wc.c: add setlocale(LC_CTYPE,"C") cleanup
+09-08-10 uniq.c: replace -c 1..9999 sfsprintf() with inline conversion
+09-08-01 join.c: fix empty field null pointer deref
 09-07-23 pathchk.c: add -P,--path and -a,--all
 09-07-02 chgrp.c,chmod.c,cksum.c: fts_flags() default only if not --recursive
 09-06-19 cmd.h,cmdinit.c: add ERROR_CALLBACK for ERROR_NOTIFY main() callback

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-03-02 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-07-31 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -4164,6 +4164,9 @@ PACKAGES : .SPECIAL .FUNCTION
 		.SHARED.o : .CLEAR .USE (LDSHARED)
 			$(LDSHARED) $(CC.SHARED) $(CCLDFLAGS) -o $(<) $(*$(**):N!=*$(CC.SUFFIX.ARCHIVE))
 		.ATTRIBUTE.%.a : -ARCHIVE
+	end
+	if "$(CC.AR.ARFLAGS)"
+		ARFLAGS &= $$(CC.AR.ARFLAGS)
 	end
 	IFFEFLAGS += -c '$$(IFFECC) $$(IFFECCFLAGS) $$(IFFELDFLAGS)' $$(-mam:N=(regress|static)*:??-S '$$(CC.STATIC)')
 	if "$(-cross)" || "$(CC.EXECTYPE)" && "$(CC.HOSTTYPE)" != "$(CC.EXECTYPE)"

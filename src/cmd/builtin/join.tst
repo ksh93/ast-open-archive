@@ -370,6 +370,11 @@ TEST 18 '-a -e -o'
 		INPUT f2 $'a x y\nb\nc\ne'
 		OUTPUT - $'a .\nb .\nc .\nd G\ne .'
 
+TEST 19 'empty field deref'
+	EXEC	-o 1.1 2.1 1.2 2.2 2.3 f1 f1
+		INPUT f1 $'U+0750'
+		OUTPUT - $'U+0750 U+0750   '
+
 TEST 20 'nuttin'
 	EXEC	f1 f2
 		INPUT f1 $' a 1\nb 2'

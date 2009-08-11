@@ -568,9 +568,20 @@ done head.tst generated
 exec - regress  head.tst
 done test.head virtual
 make test.join
+make join
+make join.o
+make join.c
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
+done join.c
+meta join.o %.c>%.o join.c join
+prev join.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c join.c
+done join.o virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o join join.o ${mam_libast} ${mam_libcmd}
+done join generated
 make join.tst
 done join.tst
-exec - regress  join.tst
+exec - regress  join.tst join
 done test.join virtual
 make test.ln
 make ln.tst

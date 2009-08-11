@@ -328,22 +328,22 @@ prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwvote.c
 exec - set -- $( sed -e '/\<VCLIB(/!d' -e 's/.*\<VCLIB(\(.*\)).*/\1/' vcopen.c vcclose.c vcio.c vcdisc.c vcextract.c vcrecode.c vccontext.c vclog.c vcsfxsort.c vcperiod.c vclzparse.c vcbuffer.c vcbcktsort.c vcqsort.c vcmethod.c vcsfio.c vcalias.c Vcdelta/vcdcache.c Vcdelta/vcdelta.c Vcdelta/vcdtable.c Vcdelta/vcdtblinit.c Vcdelta/vchamming.c Vchuff/vchbits.c Vchuff/vchcode.c Vchuff/vchsize.c Vchuff/vchtrie.c Vchuff/vchuffgroup.c Vchuff/vchuffman.c Vchuff/vchuffpart.c Vcmisc/vcbwt.c Vcmisc/vcmap.c Vcmisc/vcmtf.c Vcmisc/vcrle.c Vcmisc/vcstrip.c Vcmisc/vctranspose.c Vcwindow/vcwclose.c Vcwindow/vcwdecode.c Vcwindow/vcwfile.c Vcwindow/vcwmethod.c Vcwindow/vcwmirror.c Vcwindow/vcwngram.c Vcwindow/vcwopen.c Vcwindow/vcwprefix.c Vcwindow/vcwvote.c )
 exec - {
-exec - print "/*"
-exec - print " * list of default public -lvcodex methods"
-exec - print " * proprietary methods are available as plugins under separate license(s)"
-exec - print " *"
-exec - print " * this file may be included multiple times in one source"
-exec - print " */"
-exec - print
-exec - print "#ifndef	VCMETHOD"
-exec - print "#define VCMETHOD(m)	extern Vcmethod_t* m;"
-exec - print "#endif"
-exec - print
+exec - echo "/*"
+exec - echo " * list of default public -lvcodex methods"
+exec - echo " * proprietary methods are available as plugins under separate license(s)"
+exec - echo " *"
+exec - echo " * this file may be included multiple times in one source"
+exec - echo " */"
+exec - echo
+exec - echo "#ifndef	VCMETHOD"
+exec - echo "#define VCMETHOD(m)	extern Vcmethod_t* m;"
+exec - echo "#endif"
+exec - echo
 exec - for m
-exec - do	print "VCMETHOD($m)"
+exec - do	echo "VCMETHOD($m)"
 exec - done
-exec - print
-exec - print "#undef	VCMETHOD"
+exec - echo
+exec - echo "#undef	VCMETHOD"
 exec - } > 1.${COTEMP}.h
 exec - if	cmp 2>/dev/null -s 1.${COTEMP}.h vcmethods.h
 exec - then	rm -f 1.${COTEMP}.h
