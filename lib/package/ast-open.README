@@ -92,7 +92,17 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-07-01  --- Release ksh93t+  ---
+09-08-18  --- Release ksh93t+  ---
+09-08-18  A bug in which a discipline function for a type applied to an
+	  array instance when invoked in a function ignored the subscript
+	  has been fixed.
+09-08-18  A scoping error with variables in arithmetic expression with
+	  type variables when reference with a name reference has been fixed.
+09-08-10  Several memory leaks were fixed primarily related to subshells.
+09-08-06  A bug in which setting the trap on CHLD to ignore could cause
+	  a script to hang has been fixed. 
+09-07-08  A bug in the processing of name reference assignments when it
+	  contained pattern expansions with quoting has been fixed.
 09-06-22  The default width for typeset -X has been changed so that there
 	  should be no loss of precision when converting to a string.
 09-06-19  A bug in the printing of array elements for binary variables with
@@ -4371,6 +4381,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+09-08-18 testtail.sh: add fifo tests
 09-08-01 join.tst: TEST 19 for empty field defref bug
 09-05-24 tail.tst: add r combinations
 09-03-31 features/pty,Makefile: add pty.h and -lutil refs for linux -- great, another util library
@@ -5611,6 +5622,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-08-17 comp/setlocale.c: add AST_LC_utf8 and { utf8_mbtowc() utf8_mblen() }
 09-08-11 comp/setlocale.c: treat "en"/"en_US" AST_LC_MESSAGES as "C"/"POSIX"
 09-08-10 vmalloc/vmhdr.h: add user-defined _AST_PAGESIZE and computed VMHEAPINCR
 09-08-09 comp/conf.tab: add NPROCESSORS_MAX
@@ -7196,7 +7208,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
-09-08-11 wc.c: add setlocale(LC_CTYPE,"C") cleanup
+09-08-15 tail.c: fix fifo logic
+09-08-11 wc.c: add setlocale(LC_CTYPE,"C") cleanup, add utf8 optimzations
 09-08-10 uniq.c: replace -c 1..9999 sfsprintf() with inline conversion
 09-08-01 join.c: fix empty field null pointer deref
 09-07-23 pathchk.c: add -P,--path and -a,--all

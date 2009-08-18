@@ -88,3 +88,5 @@ dontcare -lutil
 
 :TEST: asa cat chmod chown cksum cp cut date expr fmt head join ln look \
 	mkdir mkfifo mv nl od paste rm tail tr uniq uuencode wc
+
+tail.script :TEST: testtail

@@ -576,7 +576,7 @@ done join.c
 meta join.o %.c>%.o join.c join
 prev join.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c join.c
-done join.o virtual
+done join.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o join join.o ${mam_libast} ${mam_libcmd}
 done join generated
 make join.tst
@@ -688,4 +688,44 @@ exec - fi
 done wc.tst generated
 exec - regress  wc.tst
 done test.wc virtual
+make test.tail.script
+make testtail
+meta testtail %.sh>% testtail.sh testtail
+make testtail.sh
+done testtail.sh
+exec - case static,port:$OPTIND:$RANDOM in
+exec - ?*:*:*|*::*|*:*:$RANDOM)
+exec - 	;;
+exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= $SHELL -n testtail.sh
+exec - 	fi
+exec - 	;;
+exec - esac
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 0 in
+exec - 	0)	${STDCP} testtail.sh testtail
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < testtail.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
+exec - 		esac
+exec - 		cat - testtail.sh <<'!'
+exec -
+exec - !
+exec - 		} > testtail
+exec - 		;;
+exec - 	esac
+exec - 	;;
+exec - *)	cat - testtail.sh > testtail <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec -
+exec - !
+exec - 	;;
+exec - esac
+exec - silent test -w testtail -a -x testtail || chmod u+w,+x testtail
+done testtail generated
+exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
+exec - testtail
+done test.tail.script virtual
 done test dontcare virtual

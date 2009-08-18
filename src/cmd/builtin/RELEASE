@@ -1,3 +1,4 @@
+09-08-18 testtail.sh: add fifo tests
 09-08-01 join.tst: TEST 19 for empty field defref bug
 09-05-24 tail.tst: add r combinations
 09-03-31 features/pty,Makefile: add pty.h and -lutil refs for linux -- great, another util library
