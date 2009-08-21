@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-07-31 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-08-20 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2086,7 +2086,7 @@ RECURSEROOT = .
  */
 
 ":LIBRARY:" : .MAKE .OPERATOR .PROBE.INIT
-	local A B L P R S T V X
+	local A B L N P R S T V X
 	P := $(.PACKAGE.plugin)
 	for T $(<:O>1)
 		if T == "+([-+.0-9])"
@@ -2100,6 +2100,8 @@ RECURSEROOT = .
 			.ALL : .$(B)
 		elif T == "plugin=*"
 			P := $(T:/plugin=//)
+		elif T == "shared=*"
+			N := $(T:/shared=//)
 		elif T == "static"
 			A = 1
 		end
@@ -2143,6 +2145,19 @@ RECURSEROOT = .
 		end
 		.CC.DLL.DIR.$(X) := $(LIBDIR)/$(P)
 		.INSTALL.$(X) := .
+	end
+	if CC.SHARED.NAME && N != "-"
+		if N == "-+([0-9])"
+			.PACKAGE.soname := $(N)
+			N =
+		end
+		if ! N
+			N := $(.DLL.NAME. $(B) $(V))
+		elif N == "+([-+.0-9])"
+			N := $(.DLL.NAME. $(B) $(N))
+		end
+		X := $(.DLL.NAME. $(B) $(V):B:C%\..*%%)
+		.CC.SHARED.NAME.$(X) := $(CC.SHARED.NAME)$(N)
 	end
 	if "$(>:G=%$(CC.SUFFIX.OBJECT):O=1)"
 		eval
@@ -2725,6 +2740,7 @@ RECURSEROOT = .
  *	:dynamic:	attempt dynamic library first
  *	:insert:	insert into package list
  *	:noregistry:	do not link dll against address registry
+ *	:soname:	link dll with $(CC.SHARED.NAME), =-1 for :B: edit
  */
 
 .PACKAGE. =
@@ -2734,6 +2750,7 @@ RECURSEROOT = .
 .PACKAGE.license =
 .PACKAGE.plugin =
 .PACKAGE.registry = 1
+.PACKAGE.soname =
 .PACKAGE.stdlib = $(*.SOURCE.a) $(CC.STDLIB) /usr/lib /lib
 .PACKAGE.strip =
 
@@ -3157,7 +3174,7 @@ PACKAGES : .SPECIAL .FUNCTION
 					end
 				elif N == "insert|install|version"
 					$(N) := $(V)
-				elif N == "registry"
+				elif N == "registry|soname"
 					.PACKAGE.$(N) := $(V)
 				elif N == "ignore"
 					if PACKAGE_IGNORE
@@ -3719,6 +3736,9 @@ PACKAGES : .SPECIAL .FUNCTION
 	.ATTRIBUTE.%$(CC.SUFFIX.OBJECT) : .OBJECT
 	if CC.SHARED.REGISTRY
 		CC.SHARED += $$(.CC.SHARED.REGISTRY.)
+	end
+	if CC.SHARED.NAME
+		CC.SHARED += $$(.CC.SHARED.NAME.)
 	end
 	if "$(-mam:N=static*,port*)"
 		.NO.LIB.TYPE = 1
@@ -4540,6 +4560,18 @@ test : .SPECIAL .DONTCARE .ONOBJECT $$("check":A=.TARGET:A!=.ARCHIVE|.COMMAND|.O
 
 .CC.LIB.DLL.undef : .FUNCTION
 	return `$(NM) $(NMFLAGS) $(%:O=1) | $(SED) $(NMEDIT) -e "s/^/-u /"` $(%)
+
+.CC.SHARED.NAME. : .FUNCTION
+	local R E
+	if ( R = "$(<<:B:C%\..*%%)" ) && ( E = "$(.PACKAGE.soname)" ) && "$(CC.DIALECT:N=DYNAMIC)" && ( "$(CCLDFLAGS:V:N=$(CC.DYNAMIC)|$\(CC.DYNAMIC\))" || ! "$(CCLDFLAGS:V:N=$(CC.STATIC)|$\(CC.STATIC\))" )
+		if R = "$(.CC.SHARED.NAME.$(R))"
+			while E < 0
+				let E = E + 1
+				R := $(R:B)
+			end
+			return $(R)
+		end
+	end
 
 .CC.SHARED.REGISTRY. : .FUNCTION
 	local R

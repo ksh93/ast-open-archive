@@ -25,7 +25,7 @@ typedef struct Method_s
 	Ivmeth_t**	meth;
 } Method_t;
 
-#define IVMETHOD(m)	extern Ivmeth_t ## Iv ## m;
+#define IVMETHOD(m)	extern Ivmeth_t* Iv ## m;
 
 #include "ivmethods.h"
 

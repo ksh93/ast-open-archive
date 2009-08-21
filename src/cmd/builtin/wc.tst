@@ -7,7 +7,7 @@ IGNORESPACE
 TEST 01 'empty input'
 
 	EXEC
-		INPUT -
+		INPUT -n -
 		OUTPUT - '       0       0       0'
 
 	EXEC	-c
@@ -38,7 +38,6 @@ TEST 03 'no newline'
 		OUTPUT - '       1'
 
 	EXEC	-L
-		OUTPUT - '       0'
 
 TEST 04 words
 
@@ -53,7 +52,7 @@ TEST 04 words
 		OUTPUT - '       2'
 
 	EXEC	-L
-		OUTPUT - '       4'
+		OUTPUT - '       3'
 
 TEST 05 'words with no newline'
 
@@ -68,7 +67,7 @@ TEST 05 'words with no newline'
 		OUTPUT - '       3'
 
 	EXEC	-L
-		OUTPUT - '       4'
+		OUTPUT - '       5'
 
 TEST 06 '-l counts newline bytes'
 
@@ -84,16 +83,16 @@ TEST 06 '-l counts newline bytes'
 		INPUT - $'x\ny'
 		OUTPUT - '       2'
 
-TEST 07 '-L checks only newline terminated lines'
+TEST 07 '-L does not count the newline'
 
 	EXEC	-L
 		INPUT - $'1\n12'
-		OUTPUT - '       3'
+		OUTPUT - '       2'
 
 	EXEC	-L
 		INPUT - $'1\n123\n1'
-		OUTPUT - '       4'
+		OUTPUT - '       3'
 
 	EXEC	-L
 		INPUT -n - $'\n123456'
-		OUTPUT - '       1'
+		OUTPUT - '       6'

@@ -53,7 +53,7 @@ EXEC -l
 EXEC -l <<<$'x y'
 EXEC -l <<<$'x\ny'
 
-TEST '-L checks only newline terminated lines'
+TEST '-L does not count the newline'
 
 EXEC -L <<<$'1\n12'
 EXEC -L <<<$'1\n123\n1'

@@ -474,3 +474,22 @@ TEST 21 xpg4
 		OUTPUT - $'333\n444\n555\n666\n777\n888\n999\naaa\nbbb\nccc'
 
 	EXEC	-t1s -s -f more
+
+SET nopipe-input
+
+TEST 30 'fifo by redirection'
+
+	JOB -f
+		FIFO INPUT - $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20'
+		OUTPUT - $'11\n12\n13\n14\n15\n16\n17\n18\n19\n20'
+	EXITED
+
+TEST 31 'fifo by path'
+
+	JOB -f fifo
+		FIFO INPUT fifo $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20'
+		OUTPUT - $'11\n12\n13\n14\n15\n16\n17\n18\n19\n20'
+	CONTINUE
+		INPUT fifo $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
+		OUTPUT - $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
+	CONTINUE

@@ -92,7 +92,17 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-08-18  --- Release ksh93t+  ---
+09-08-21  --- Release ksh93t+  ---
+09-08-21  A bug in the handling of the comma operator in arithmetic expressions
+	  that could cause a core dump on some systems has been fixed.
+09-08-20  A bug in which a compound variable containing an array of a type
+	  that doesn't have any elements now expands correctly.
+09-08-19  A bug which disabled function tracing inside a function after
+	  a call to another function has been fixed.
+09-08-19  A bug in which initializing a compound variable instance to another
+	  compound variable by name has been fixed.
+09-08-18  A bug in which compound variable instances could be lost after
+	  an instance that invoked a type method discipline has been fixed.
 09-08-18  A bug in which a discipline function for a type applied to an
 	  array instance when invoked in a function ignored the subscript
 	  has been fixed.
@@ -3048,6 +3058,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+09-08-20 Makerules.mk: add :LIBRARY: name=soname and CC.SHARED.NAME logic
+09-08-20 Makerules.mk: add :PACKAGE: --soname[=-n], -n to drop n suffixes in soname
 09-07-31 Makerules.mk: add CC.AR.ARFLAGS
 09-05-05 scan.c: reject implicit prereq names containing space
 09-03-24 Makerules.mk: --option[=value] compatibility with option[=value] until 2011
@@ -5622,6 +5634,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-08-18 include/ast_std.h,ast.h: add ast.mb_sync to sync mbchar() after error
 09-08-17 comp/setlocale.c: add AST_LC_utf8 and { utf8_mbtowc() utf8_mblen() }
 09-08-11 comp/setlocale.c: treat "en"/"en_US" AST_LC_MESSAGES as "C"/"POSIX"
 09-08-10 vmalloc/vmhdr.h: add user-defined _AST_PAGESIZE and computed VMHEAPINCR
@@ -7408,7 +7421,7 @@ All recorded changes follow.
 00-10-31 mkdir: handle races by checking EEXIST
 00-09-20 cp: copy argv to stack before modifying in place
 00-05-18 add setlocale(LC_ALL,"")
-00-04-30 join: drop wierd opt_info.argv reference
+00-04-30 join: drop weird opt_info.argv reference
 00-03-17 expr: add == operator -- duh
 	 cp,ln,mv: delay pathcanon() on destination to verify `cp a b/.'
 	 getconf: use astgetconf for proper message control

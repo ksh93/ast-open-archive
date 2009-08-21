@@ -1,3 +1,5 @@
+09-08-20 Makerules.mk: add :LIBRARY: name=soname and CC.SHARED.NAME logic
+09-08-20 Makerules.mk: add :PACKAGE: --soname[=-n], -n to drop n suffixes in soname
 09-07-31 Makerules.mk: add CC.AR.ARFLAGS
 09-05-05 scan.c: reject implicit prereq names containing space
 09-03-24 Makerules.mk: --option[=value] compatibility with option[=value] until 2011
