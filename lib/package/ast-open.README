@@ -92,7 +92,15 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-08-21  --- Release ksh93t+  ---
+09-08-26  --- Release ksh93t+  ---
+09-08-26  The .sh.file variable was not being set for a script that was run
+	  by name and didn't start with #! and this has been fixed.
+09-08-25  A bug in which a function called to deeply from command substitution
+	  did not display an error message has been fixed.
+09-08-24  When processing profiles, ksh93 now violates the POSIX standard and
+	  treats &> as a redirection operator similar to bash.
+09-08-23  A bug in the handling of the trap on SIGPIPE that could lead to am
+	  memory fault has been fixed.
 09-08-21  A bug in the handling of the comma operator in arithmetic expressions
 	  that could cause a core dump on some systems has been fixed.
 09-08-20  A bug in which a compound variable containing an array of a type
@@ -5634,6 +5642,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-08-24 sfio/sfreserve.c: fix SF_UNBOUND logic with pushed streams
 09-08-18 include/ast_std.h,ast.h: add ast.mb_sync to sync mbchar() after error
 09-08-17 comp/setlocale.c: add AST_LC_utf8 and { utf8_mbtowc() utf8_mblen() }
 09-08-11 comp/setlocale.c: treat "en"/"en_US" AST_LC_MESSAGES as "C"/"POSIX"
@@ -7221,6 +7230,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+09-08-25 tail.c: initialize Tail_t.fifo=0 !!
 09-08-15 tail.c: fix fifo logic
 09-08-11 wc.c: add setlocale(LC_CTYPE,"C") cleanup, add utf8 optimzations
 09-08-10 uniq.c: replace -c 1..9999 sfsprintf() with inline conversion
@@ -8743,6 +8753,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+09-08-19 vchufgroup.c: sync with kpv (new alg)
 09-06-22 sync with kpv, add vcgetfname(), vcwalkfname()
 09-03-12 vcstrip.c: add
 09-03-10 vcalias.c: add qnl

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -67,6 +67,7 @@ extern Vchtrie_t*	vchbldtrie _ARG_((ssize_t, ssize_t*, Vcbit_t*));
 extern Void_t		vchdeltrie _ARG_((Vchtrie_t*));
 extern ssize_t		vchgetcode _ARG_((ssize_t, ssize_t*, ssize_t, Vcchar_t*, size_t));
 extern ssize_t		vchputcode _ARG_((ssize_t, ssize_t*, ssize_t, Vcchar_t*, size_t));
+extern int		vchcopy _ARG_((Vcodex_t*, ssize_t*, ssize_t*, ssize_t));
 
 #undef	extern
 

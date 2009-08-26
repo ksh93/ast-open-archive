@@ -1,3 +1,4 @@
+09-08-19 vchufgroup.c: sync with kpv (new alg)
 09-06-22 sync with kpv, add vcgetfname(), vcwalkfname()
 09-03-12 vcstrip.c: add
 09-03-10 vcalias.c: add qnl

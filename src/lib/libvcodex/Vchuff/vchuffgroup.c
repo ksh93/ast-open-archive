@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,12 +24,10 @@
 **	Written by Binh Dao Vo and Kiem-Phong Vo
 */
 
-#define GRPMIN(sz)	(3)
-#define GRPMAX(sz)	(9)
-#define GRPPTSZ(sz)	(80)
-
-#define GRP_NTBL	(GRPMAX(1024*1024)+1)	/* maximum number of tables	*/
-#define GRP_ITER	3			/* default number of iterations	*/
+#define GRP_NTBL	32	/* max number of tables		*/
+#define GRP_IMAX	20	/* max initial number of tables	*/
+#define GRP_IMIN	4	/* min initial number of tables	*/
+#define GRP_ITER	3	/* desired number of iterations	*/
 
 #define GRP_HUGE	((ssize_t)((~((size_t)0)) >> 1) )
 
@@ -60,6 +58,7 @@ typedef struct _group_s
 
 	Obj_t*		obj;	/* objs and their frequencies	*/
 
+	ssize_t		hufsz;	/* size of single Huffman code 	*/
 	ssize_t		cmpsz;	/* current best compressed size	*/
 	ssize_t		ntbl;	/* number of coding tables	*/
 	Table_t		tbl[GRP_NTBL]; /* best coding tables	*/
@@ -236,6 +235,7 @@ int		niter;	/* # of iterations to run	*/
 	ssize_t		i, k, p, q, z, n, t, iter;
 	Vcchar_t	*dt, tmp[VCH_SIZE];
 	Table_t		tbl[GRP_NTBL];
+	int		map[GRP_NTBL];
 	ssize_t		freq[GRP_NTBL][VCH_SIZE], pfr[VCH_SIZE], psz[VCH_SIZE], *fr, *sz;
 	Vcchar_t	*part = grp->part, *work = grp->work;
 	ssize_t		npts = grp->npts, *ppos = grp->ppos, *sort = grp->sort;
@@ -298,7 +298,7 @@ int		niter;	/* # of iterations to run	*/
 		}
 	}
 
-	/**/DEBUG_PRINT(2,"\t#table aiming for=%d\n",ntbl);
+	/**/DEBUG_PRINT(2,"\tgrppart: #table aiming for=%d\n",ntbl);
 	for(iter = 1;; iter++)
 	{	/**/DEBUG_PRINT(2,"\t\titer=%d ", iter); DEBUG_PRINT(2,"cmpsz=%d ", (grp->cmpsz+7)/8);
 
@@ -337,24 +337,32 @@ int		niter;	/* # of iterations to run	*/
 			tbl[bestt].nblks += 1;
 		}
 
+		/* remove empty tables */
+		for(p = k = 0; k < ntbl; ++k)
+		{	map[k] = k; /* start as identity map */
+
+			if(tbl[k].nblks <= 0) /* empty table */
+				continue;
+
+			if(k > p) /* need to move this table */
+			{	memcpy(tbl+p, tbl+k, sizeof(Table_t));
+				memcpy(freq[p], freq[k], VCH_SIZE*sizeof(ssize_t));
+				map[k] = p; /* table at k was moved to p */
+			}
+			p += 1; /* move beyond known valid slot */
+		}
+		if(p < ntbl) /* tables were moved, reset part indexes */
+		{	for(i = 0; i < npts; ++i)
+			{	/**/DEBUG_ASSERT(work[i] < ntbl);
+				work[i] = map[work[i]];
+				/**/DEBUG_ASSERT(work[i] < p);
+			}
+			ntbl = p;
+		}
+
 		z = 0; /* recompute encoding cost given new grouping */
 		for(k = 0; k < ntbl; ++k)
-		{	if(tbl[k].nblks <= 0) /* empty table */
-			{	ntbl -= 1;
-				for(p = k; p < ntbl; ++p)
-				{	memcpy(tbl+p, tbl+p+1, sizeof(Table_t));
-					memcpy(freq[p], freq[p+1], VCH_SIZE*sizeof(ssize_t));
-				}
-				for(i = 0; i < npts; ++i)
-				{	/**/ DEBUG_ASSERT(work[i] != k);
-					if(work[i] > k)
-						work[i] -= 1;
-				}
-				k -= 1;
-				continue;
-			}
-
-			fr = freq[k]; sz = tbl[k].size;
+		{	fr = freq[k]; sz = tbl[k].size;
 			tbl[k].maxs = vchsize(VCH_SIZE, fr, sz, &tbl[k].runb);
 			if(tbl[k].maxs > 0)
 			{	DOTPRODUCT(p,fr,sz,VCH_SIZE); /* encoding size */
@@ -379,6 +387,12 @@ int		niter;	/* # of iterations to run	*/
 		}
 
 		/**/DEBUG_PRINT(2,"z=%d\n", (z+7)/8);
+		if(z > grp->hufsz)
+		{	/**/DEBUG_PRINT(2, "Stop iterating: z=%d > huffman size\n", z);
+			grp->ntbl = 0;
+			return;
+		}
+
 		if(z < (p = grp->cmpsz) )
 		{	grp->ntbl = ntbl;
 			grp->cmpsz = z;
@@ -394,6 +408,25 @@ int		niter;	/* # of iterations to run	*/
 	}
 }
 
+/* select a part size based on the data size. */
+static ssize_t grpptsz(size_t dtsz)
+{
+	ssize_t	ptsz, exp, lnz;
+
+	lnz = vclogi(dtsz); /* log_2 of data size */
+	if(lnz >= 16)
+	{	exp = (exp = (lnz-15)) > 8 ? 8 : exp;
+		ptsz = (1 << exp) * lnz; /* ptsz here is >= 32 */
+	}
+	else	ptsz = dtsz/(1<<10); /* ptsz here <= 64 */
+
+	ptsz = ptsz < 16 ? 16 : ptsz > 1024 ? 1024 : ptsz;
+	/**/DEBUG_PRINT(2,"grpptsz: dtsz=%d, ", dtsz);
+	/**/DEBUG_PRINT(2,"lnz=%d, ", lnz);
+	/**/DEBUG_PRINT(2,"ptsz=%d\n",ptsz);
+	return ptsz;
+}
+
 #if __STD_C
 static ssize_t grphuff(Vcodex_t* vc, const Void_t* data, size_t dtsz, Void_t** out)
 #else
@@ -404,8 +437,9 @@ size_t		dtsz;	/* data size			*/
 Void_t**	out;	/* to return output buffer 	*/
 #endif
 {
-	ssize_t		n, i, p, k, s, better;
-	ssize_t		*sz, npts, ntbl, ptsz, gmin, gmax;
+	ssize_t		n, i, p, k, s;
+	ssize_t		*sz, npts, ntbl, ptsz, itbl;
+	ssize_t		freq[VCH_SIZE], size[VCH_SIZE];
 	Vcchar_t	*part;
 	Table_t		*tbl;
 	Vcbit_t		b, *bt, bits[GRP_NTBL][VCH_SIZE];
@@ -417,41 +451,33 @@ Void_t**	out;	/* to return output buffer 	*/
 	if(dtsz == 0)
 		return 0;
 
+	/* get the size of doing Huffman alone */
+	CLRTABLE(freq,VCH_SIZE);
+	ADDFREQ(freq, Vchobj_t*, data, dtsz);
+	CLRTABLE(size,VCH_SIZE);
+	vchsize(VCH_SIZE, freq, size, 0);
+	DOTPRODUCT(grp->hufsz, freq, size, VCH_SIZE);
+	grp->hufsz += 256*8; /* plus est. header cost */
+
 	/* set desired part size and bounds for number of groups */
-	gmin = GRPMIN(dtsz);
-	gmax = GRPMAX(dtsz);
-	ptsz = GRPPTSZ(dtsz);
+	ptsz = grpptsz(dtsz);
 
 	/* initialize data structures for fast frequency calculations */
 	if(grpinit(grp, (Vcchar_t*)data, dtsz, ptsz) < 0)
 		return -1;
 
-	/* compute optimal number of tables */
-	grppart(grp, (gmin+gmax)/2, 1);
-	for(k = grp->ntbl+1, i = grp->ntbl-1; i >= gmin || k <= gmax; --i, ++k)
-	{	better = -1;
-		if(i >= gmin)
-		{	s = grp->cmpsz;
-			grppart(grp, i, 1);
-			if(grp->cmpsz < s)
-				better = i;
-		}
-		if(k <= gmax)
-		{	s = grp->cmpsz;
-			grppart(grp, k, 1);
-			if(grp->cmpsz < s)
-				better = k;
-		}
-		if(better < 0)
-			break;
-		else if(better == i)
-			k = gmax+1;
-		else	i = gmin-1;
-	}
-
 	/* now make the best grouping */
-	if(grp->ntbl > 1)
-		grppart(grp, grp->ntbl, GRP_ITER);
+	if((itbl = vclogi(grp->npts)) > GRP_IMAX)
+		itbl = GRP_IMAX;
+	else if(itbl < GRP_IMIN)
+		itbl = GRP_IMIN;
+	/**/DEBUG_PRINT(2,"grphuff: dtsz=%d, ", dtsz); DEBUG_PRINT(2,"ptsz=%d, ", ptsz);
+	/**/DEBUG_PRINT(2,"npts=%d, ", grp->npts); DEBUG_PRINT(2,"itbl=%d\n", itbl);
+	grppart(grp, itbl, GRP_ITER);
+	if(grp->ntbl == 0) /* single table, simplify */
+	{	grpinit(grp, (Vcchar_t*)data, dtsz, dtsz);
+		grppart(grp, 1, 1);
+	}
 
 	/* short-hands */
 	part = grp->part; npts = grp->npts; ptsz = grp->ptsz;
@@ -703,7 +729,7 @@ Vcmethod_t	_Vchuffgroup =
 {	grphuff,
 	grpunhuff,
 	grpevent,
-	"huffgroup", "Huffman encoding by groups.",
+	"huffgroup", "Huffman encoding by groups",
 	"[-version?huffgroup (AT&T Research) 2003-01-01]" USAGE_LICENSE,
 	0,
 	1024*1024,
