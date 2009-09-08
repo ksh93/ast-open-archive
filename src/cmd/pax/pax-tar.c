@@ -482,6 +482,49 @@ extend(Archive_t* ap, File_t* f, int type)
 }
 
 static int
+tar_getoctal(const char* f, const char* p, size_t n, int z, void* r)
+{
+	register unsigned char*	s = (unsigned char*)p;
+	register unsigned char*	e = s + n;
+	register uintmax_t	v = 0;
+
+	while (s < e && *s == ' ')
+		s++;
+	while (s < e && *s >= '0' && *s <= '7')
+		v = (v << 3) + (*s++ - '0');
+	if (s < e)
+	{
+		if (*s == 0x80 || *s == 0xff)
+		{
+			v = *s++ == 0x80 ? 0 : 0xff;
+			e = (unsigned char*)p + 8;
+			while (s < e)
+				v = (v << 8) + *s++;
+		}
+		else if (*s && *s != ' ')
+			return -1;
+	}
+	switch (z)
+	{
+	case 1:
+		*(unsigned char*)r = (unsigned char)v;
+		break;
+	case 2:
+		*(uint16_t*)r = (uint16_t)v;
+		break;
+	case 4:
+		*(uint32_t*)r = (uint32_t)v;
+		break;
+#ifdef _ast_int8_t
+	case 8:
+		*(uint64_t*)r = (uint64_t)v;
+		break;
+#endif
+	}
+	return 0;
+}
+
+static int
 tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 {
 	register Tar_t*	tar = (Tar_t*)ap->data;
@@ -493,6 +536,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	off_t		z;
 	long		num;
 	int		i;
+	int		m;
 
  again:
 	if (paxread(pax, ap, &tar->header, (off_t)0, (off_t)TAR_HEADER, 0) <= 0)
@@ -503,19 +547,15 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			goto nope;
 		return 0;
 	}
-	if (sfsscanf(tar->header.mode, "%7lo", &num) != 1)
+	if (tar_getoctal("mode", tar->header.mode, 7, sizeof(f->st->st_mode), &f->st->st_mode))
 		goto nope;
-	f->st->st_mode = num;
-	if (sfsscanf(tar->header.uid, "%7lo", &num) != 1)
+	if (tar_getoctal("uid", tar->header.uid, 7, sizeof(f->st->st_uid), &f->st->st_uid))
 		goto nope;
-	f->st->st_uid = num;
-	if (sfsscanf(tar->header.gid, "%7lo", &num) != 1)
+	if (tar_getoctal("gid", tar->header.gid, 7, sizeof(f->st->st_gid), &f->st->st_gid))
 		goto nope;
-	f->st->st_gid = num;
-	if (sfsscanf(tar->header.mtime, "%11lo", &num) != 1)
+	if (tar_getoctal("mtime", tar->header.mtime, 11, sizeof(f->st->st_mtime), &f->st->st_mtime))
 		goto nope;
-	f->st->st_mtime = num;
-	if (sfsscanf(tar->header.chksum, "%7lo", &num) != 1)
+	if (tar_getoctal("chksum", tar->header.chksum, 7, sizeof(num), &num))
 		goto nope;
 	if (!tar_checksum(ap, 1, num) && ap->entry == 1)
 	{
@@ -528,7 +568,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			{
 				memcpy(tmp, tar->header.chksum, TARSIZEOF(chksum));
 				swapmem(i, tmp, tmp, TARSIZEOF(chksum));
-				if (sfsscanf(tmp, "%7lo", &num) == 1 && tar_checksum(ap, 1, num))
+				if (!tar_getoctal("chksum", tar->header.chksum, 7, sizeof(num), &num) && tar_checksum(ap, 1, num))
 				{
 					ap->swapio = i;
 					paxunread(pax, ap, &tar->header, TAR_HEADER);
@@ -538,29 +578,13 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		}
 		goto nope;
 	}
-	if (sfsscanf(tar->header.size, "%11I*o", sizeof(z), &z) == 1)
-		f->st->st_size = z;
-	else if (((unsigned char*)tar->header.size)[0] != TAR_LARGENUM)
+	if (tar_getoctal("size", tar->header.size, 11, sizeof(f->st->st_size), &f->st->st_size))
 		goto nope;
-	else
-	{
-		/*
-		 * gnu tar largefile extension
-		 */
-
-		n = 0;
-		for (i = 1; i <= 11; i++)
-		{
-			n <<= 8;
-			n |= ((unsigned char*)tar->header.size)[i];
-		}
-		f->st->st_size = n;
-	}
 	if (ap->format->variant != OLD)
 	{
 		if (!streq(tar->header.magic, TMAGIC))
 		{
-			if (strneq(tar->header.magic, TMAGIC, TMAGLEN - 1) && streq((char*)tar->header.magic + TMAGLEN, "  "))
+			if (streq(tar->header.magic, TMAGIC "  "))
 				/* old gnu tar */;
 			else if (ap->entry > 1)
 				goto nope;
@@ -603,12 +627,11 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	case CHRTYPE:
 		f->st->st_mode |= X_IFCHR;
 	device:
-		if (sfsscanf(tar->header.devmajor, "%7lo", &num) != 1)
+		if (tar_getoctal("devmajor", tar->header.devmajor, 7, sizeof(i), &i))
 			goto nope;
-		i = num;
-		if (sfsscanf(tar->header.devminor, "%7lo", &num) != 1)
+		if (tar_getoctal("devminor", tar->header.devminor, 7, sizeof(m), &m))
 			goto nope;
-		IDEVICE(f->st, makedev(i, num));
+		IDEVICE(f->st, makedev(i, m));
 		break;
 	case BLKTYPE:
 		f->st->st_mode |= X_IFBLK;
@@ -917,7 +940,7 @@ tar_event(Pax_t* pax, Archive_t* ap, File_t* f, void* data, unsigned long event)
 		return 1;
 	case PAX_EVENT_SKIP_JUNK:
 		hdr = (Tarheader_t*)data;
-		if (!isdigit(hdr->chksum[0]) || !isdigit(hdr->chksum[1]) || !isdigit(hdr->chksum[2]) || !isdigit(hdr->chksum[3]) || !isdigit(hdr->chksum[4]) || !isdigit(hdr->chksum[5]) || !isdigit(hdr->chksum[6]) || sfsscanf(hdr->chksum, "%7lo", &sum) != 1 || !tar_checksum(ap, -1, sum))
+		if (!isdigit(hdr->chksum[0]) || !isdigit(hdr->chksum[1]) || !isdigit(hdr->chksum[2]) || !isdigit(hdr->chksum[3]) || !isdigit(hdr->chksum[4]) || !isdigit(hdr->chksum[5]) || !isdigit(hdr->chksum[6]) || tar_getoctal("chksum", hdr->chksum, 7, sizeof(sum), &sum) || !tar_checksum(ap, -1, sum))
 			return 1;
 		return 0;
 	}

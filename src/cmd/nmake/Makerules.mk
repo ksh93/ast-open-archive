@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-08-20 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-09-02 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -3782,7 +3782,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			return $(.REQUIRE.-l% $(%))
 		elif "$(%:N=+l*)"
 			return $(.REQUIRE.+l% $(%))
-		elif ! "$(%:A=.TARGET)"
+		elif ! "$(%:A=.TARGET)" && CC.PREFIX.ARCHIVE && "$(%:B:S:N=$(CC.PREFIX.ARCHIVE)*.$(CC.SUFFIX.ARCHIVE))"
 			return $(.REQUIRE.-l% -l$(%:B:S:/^$(CC.PREFIX.ARCHIVE)//:/$(CC.SUFFIX.ARCHIVE)$//:/$(CC.LIB.TYPE)$//))
 		end
 

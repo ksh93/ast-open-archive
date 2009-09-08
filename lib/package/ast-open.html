@@ -1046,7 +1046,25 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-08-26  --- Release ksh93t+  ---
+09-09-09  --- Release ksh93t+  ---
+09-09-09  A bug in the processing of line joining in here documents which
+	  occurred when a buffer began with &lt;escape&gt;&lt;new-line&gt; has been fixed.
+09-09-09  A leading ; with commands in a brace group or parenthesis group
+	  no longer causes an error.  It now is used for the "showme" option.
+09-09-09  A bug in which a subshell containing a background process could
+	  block until the background process completed has been fixed.
+09-09-04  A bug in handing ${var&#0091;sub&#0093;}, where var is a nameref has been fixed.
+09-09-03  A bug which caused an index array to have the wrong number of elements
+	  when it was converted from a compound variable by adding an another
+	  element has been fixed.
+09-09-03  Specifying export for a compound variable now generates an error.
+09-09-02  $"..." localizations strings are no longer recognized inside `...`.
+09-09-01  A bug in the for loop optimizer in the handling of type static
+	  variables has been fixed.
+09-09-01  An error message is not displayed when * and @ are used as subscripts.
+09-09-01  Several bugs in the processing for types that included an associative
+	  array of another type has been fixed.
+09-09-01  A bug in the tracing of &#0091;&#0091; a &lt; b &#0093;&#0093; and &#0091;&#0091; a &gt; b &#0093;&#0093; has been fixed.
 09-08-26  The .sh.file variable was not being set for a script that was run
 	  by name and didn't start with #! and this has been fixed.
 09-08-25  A bug in which a function called to deeply from command substitution
@@ -3154,6 +3172,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-09 ax-tar.c: handle gnu tar octal overflow extensions for all octal fields
 08-12-31 pax.c,pax-vczip.c: add vczip compression format
 08-05-08 pax.tst: handle systems with privileged chmod +t / mkfifo
 08-05-01 pax-tar.c: handle sfsprintf() '&nbsp;'
@@ -4056,6 +4075,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-01 Makerules.mk: handle { libfoo.a foolib.a foo.a } prereqs
 09-08-20 Makerules.mk: add :LIBRARY: name=soname and CC.SHARED.NAME logic
 09-08-20 Makerules.mk: add :PACKAGE: --soname&#0091;=-n&#0093;, -n to drop n suffixes in soname
 09-07-31 Makerules.mk: add CC.AR.ARFLAGS
@@ -6737,6 +6757,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-09 sfio/sfputr.c: add SIGPIPE hang fix
 09-08-24 sfio/sfreserve.c: fix SF_UNBOUND logic with pushed streams
 09-08-18 include/ast_std.h,ast.h: add ast.mb_sync to sync mbchar() after error
 09-08-17 comp/setlocale.c: add AST_LC_utf8 and { utf8_mbtowc() utf8_mblen() }
@@ -8331,6 +8352,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-09 fds.c: add --unit=fd
 09-08-25 tail.c: initialize Tail_t.fifo=0 !!
 09-08-15 tail.c: fix fifo logic
 09-08-11 wc.c: add setlocale(LC_CTYPE,"C") cleanup, add utf8 optimzations
@@ -9948,7 +9970,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>August 27, 2009</TD>
+<TD align=right>September 11, 2009</TD>
 </TR>
 </TABLE>
 <P>
