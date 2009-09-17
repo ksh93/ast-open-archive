@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -40,7 +40,7 @@ Sfdisc_t Disc = {readbuf, (Sfwrite_f)0, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0
 MAIN()
 {
 	Sfio_t	*f, *sf;
-	char	*ss, *s;
+	char	*ss, *s, *tmp;
 	int	n, i;
 	char	zero[SF_BUFSIZE*2];
 	char	buf[SF_BUFSIZE], little[512];
@@ -149,6 +149,32 @@ MAIN()
 	}
 	if(Bufcount != 10)
 		terror("Bad buffer filling count");
+	sfclose(f);
+
+	/* test buffer alignment for read streams - from a Daytona case */
+	tmp = tstfile(0); /* create a small file of data */
+	if(!(f = sfopen(NIL(Sfio_t*), tmp, "w")) )
+		terror("Opening to write");
+	for(i = 0; i < 500; ++i)
+		if(sfputr(f,"123456789",'\n') != 10)
+			terror("writing test data");
+	sfclose(f);
+
+	if(!(f = sfopen(NIL(Sfio_t*), tmp, "r")) )
+		terror("Opening to read");
+	sfsetbuf(f, buf, 512);
+	if(sfseek(f, (Sfoff_t)2741, SEEK_SET) != (Sfoff_t)2741)
+		terror("Bad seek");
+	if(!(s = sfreserve(f, 100, -1)) )
+		terror("Bad sfreserve");
+	if(sfseek(f, (Sfoff_t)0, SEEK_CUR) != (Sfoff_t)2841)
+		terror("Bad file position");
+	if(sfseek(f, (Sfoff_t)3224, SEEK_SET) != (Sfoff_t)3224)
+		terror("Bad seek");
+	if(!(s = sfreserve(f, 6, -1)) )
+		terror("Bad sfreserve");
+	if(strncmp(s, "56789\n", 6) != 0)
+		terror("Bad reserved data");
 
 	TSTEXIT(0);
 }

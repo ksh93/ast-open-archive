@@ -1,3 +1,4 @@
+09--9-17 mm2bb.sh: .sn now uses expand(1) instead of cat(1)
 09-07-01 mm2html.sh: --frame=foo for man generates side content frame
 09-07-01 mm2html.sh: add redirection hackery to insert html.labels
 09-06-30 mm2html.sh: increase heading level for -o html.labels

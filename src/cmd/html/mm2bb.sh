@@ -35,7 +35,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2bb (AT&T Research) 2007-12-11 $
+@(#)$Id: mm2bb (AT&T Research) 2009-09-17 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2bb - convert mm/man subset to bb markups]
@@ -1552,7 +1552,7 @@ do	getline || {
 			;;
 		.sn)	for d in "${dirs[@]}"
 			do	if	[[ -f "$d$1" ]]
-				then	cat "$d$1"
+				then	expand "$d$1"
 					continue 2
 				fi
 			done

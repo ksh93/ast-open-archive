@@ -92,7 +92,11 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-09-09  --- Release ksh93t+  ---
+09-09-17  --- Release ksh93t+  ---
+09-09-17  A bug in which unsetting SVLVL could cause a script invoked by
+	  name without #! to core dump has been fixed.
+09-09-16  A bug in which a pipeline in a here-document could hang when the
+	  pipefail option was on has been fixed. 
 09-09-09  A bug in the processing of line joining in here documents which
 	  occurred when a buffer began with <escape><new-line> has been fixed.
 09-09-09  A leading ; with commands in a brace group or parenthesis group
@@ -5662,6 +5666,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-09-17 include/sfio.h,sfio/sfwalk.c: add sfwalk()
 09-09-09 sfio/sfputr.c: add SIGPIPE hang fix
 09-08-24 sfio/sfreserve.c: fix SF_UNBOUND logic with pushed streams
 09-08-18 include/ast_std.h,ast.h: add ast.mb_sync to sync mbchar() after error
