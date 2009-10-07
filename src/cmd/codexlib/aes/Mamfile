@@ -1,0 +1,158 @@
+info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-10-09
+setv INSTALLROOT ../../..
+setv PACKAGEROOT ../../../../..
+setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
+setv ARFLAGS -cr
+setv AS as
+setv ASFLAGS
+setv CC cc
+setv mam_cc_FLAGS
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv COTEMP $$
+setv CPIO cpio
+setv CPIOFLAGS
+setv CPP "${CC} -E"
+setv F77 f77
+setv HOSTCC ${CC}
+setv IGNORE
+setv LD ld
+setv LDFLAGS
+setv LEX lex
+setv LEXFLAGS
+setv LPR lpr
+setv LPRFLAGS
+setv M4FLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
+setv PR pr
+setv PRFLAGS
+setv SHELL /bin/sh
+setv SILENT
+setv TAR tar
+setv YACC yacc
+setv YACCFLAGS -d
+make aes
+exec - set -
+exec - if	2d test -d aes || mkdir aes
+exec - then	echo  aes: >&2
+exec - 	cd aes
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=aes CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=aes RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo aes: warning: cannot recurse on virtual directory >&2
+exec - fi
+done aes generated
+make bzip
+exec - set -
+exec - if	2d test -d bzip || mkdir bzip
+exec - then	echo  bzip: >&2
+exec - 	cd bzip
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=bzip CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=bzip RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo bzip: warning: cannot recurse on virtual directory >&2
+exec - fi
+done bzip generated
+make compress
+exec - set -
+exec - if	2d test -d compress || mkdir compress
+exec - then	echo  compress: >&2
+exec - 	cd compress
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=compress CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=compress RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo compress: warning: cannot recurse on virtual directory >&2
+exec - fi
+done compress generated
+make crypt
+exec - set -
+exec - if	2d test -d crypt || mkdir crypt
+exec - then	echo  crypt: >&2
+exec - 	cd crypt
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=crypt CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=crypt RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo crypt: warning: cannot recurse on virtual directory >&2
+exec - fi
+done crypt generated
+make gzip
+exec - set -
+exec - if	2d test -d gzip || mkdir gzip
+exec - then	echo  gzip: >&2
+exec - 	cd gzip
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=gzip CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=gzip RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo gzip: warning: cannot recurse on virtual directory >&2
+exec - fi
+done gzip generated
+make lzd
+exec - set -
+exec - if	2d test -d lzd || mkdir lzd
+exec - then	echo  lzd: >&2
+exec - 	cd lzd
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzd CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=lzd RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo lzd: warning: cannot recurse on virtual directory >&2
+exec - fi
+done lzd generated
+make lzh
+exec - set -
+exec - if	2d test -d lzh || mkdir lzh
+exec - then	echo  lzh: >&2
+exec - 	cd lzh
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzh CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=lzh RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo lzh: warning: cannot recurse on virtual directory >&2
+exec - fi
+done lzh generated
+make lzx
+exec - set -
+exec - if	2d test -d lzx || mkdir lzx
+exec - then	echo  lzx: >&2
+exec - 	cd lzx
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzx CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=lzx RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo lzx: warning: cannot recurse on virtual directory >&2
+exec - fi
+done lzx generated
+make quantum
+exec - set -
+exec - if	2d test -d quantum || mkdir quantum
+exec - then	echo  quantum: >&2
+exec - 	cd quantum
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=quantum CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=quantum RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo quantum: warning: cannot recurse on virtual directory >&2
+exec - fi
+done quantum generated
+make rar
+exec - set -
+exec - if	2d test -d rar || mkdir rar
+exec - then	echo  rar: >&2
+exec - 	cd rar
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=rar CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=rar RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo rar: warning: cannot recurse on virtual directory >&2
+exec - fi
+done rar generated
+make sum
+exec - set -
+exec - if	2d test -d sum || mkdir sum
+exec - then	echo  sum: >&2
+exec - 	cd sum
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=sum CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=sum RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo sum: warning: cannot recurse on virtual directory >&2
+exec - fi
+done sum generated
+make zip
+exec - set -
+exec - if	2d test -d zip || mkdir zip
+exec - then	echo  zip: >&2
+exec - 	cd zip
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=zip CC=cc package.license.class='*.open|none.none' version=2009-10-07 'dontcare test' .RWD.=zip RECURSEROOT=.. .RECURSE .INSTALL test
+exec -
+exec - else	echo zip: warning: cannot recurse on virtual directory >&2
+exec - fi
+done zip generated
+make install
+done install virtual
+make test
+done test dontcare virtual

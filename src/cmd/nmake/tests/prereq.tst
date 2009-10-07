@@ -78,8 +78,8 @@ make .FIND.
 bind .FIND. 0.0
 done .FIND. virtual
 setv PACKAGEROOT $HOME
-setv AR ar
-setv ARFLAGS cr
+setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
+setv ARFLAGS -cr
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -206,8 +206,8 @@ make .FIND.
 bind .FIND. 0.3
 done .FIND. virtual
 setv PACKAGEROOT $HOME
-setv AR ar
-setv ARFLAGS cr
+setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
+setv ARFLAGS -cr
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -314,8 +314,8 @@ make .FIND.
 bind .FIND. 0.3
 done .FIND. virtual
 setv PACKAGEROOT $HOME
-setv AR ar
-setv ARFLAGS cr
+setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
+setv ARFLAGS -cr
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -614,7 +614,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 		INPUT foo.c
 		OUTPUT - $'+ echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
-+ ar cr libfoo.a foo.o
++ ar  cr libfoo.a foo.o
 + ignore ranlib libfoo.a
 + rm -f foo.o
 + cc  -shared  -o libfoo.so -all libfoo.a -notall 
@@ -671,7 +671,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 	EXEC	-n install VERSION=
 		OUTPUT - $'+ echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
-+ ar cr libfoo.a foo.o
++ ar  cr libfoo.a foo.o
 + ignore ranlib libfoo.a
 + rm -f foo.o
 + cc  -shared  -o libfoo.so.1.0 -all libfoo.a -notall 
@@ -728,7 +728,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 	EXEC	-n install VERSION=3.4.5
 		OUTPUT - $'+ echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
-+ ar cr libfoo.a foo.o
++ ar  cr libfoo.a foo.o
 + ignore ranlib libfoo.a
 + rm -f foo.o
 + cc  -shared  -o libfoo.so.3.4.5 -all libfoo.a -notall 

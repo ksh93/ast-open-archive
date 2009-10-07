@@ -2,7 +2,7 @@
  * make version stamp info
  */
 
-DATE =		2009-05-05
-VERSION =	5.3
+DATE =		2009-10-09
+VERSION =	5.4
 RELEASE =
 OWNER = 	AT&T Research

@@ -2,6 +2,8 @@
 
 KEEP "*.dat"
 
+TWD
+
 function DATA
 {
 	typeset f

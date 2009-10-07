@@ -261,7 +261,7 @@ int foo() { return 123; }'
 		OUTPUT - $'+ cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + echo "" -lfoo > foo.req
 + cc -D_BLD_DLL -D_BLD_PIC   -c lib.c
-+ ar cr libfoo.a lib.o
++ ar  cr libfoo.a lib.o
 + ignore ranlib libfoo.a
 + rm -f lib.o
 + cc     -o foo foo.o libfoo.a libbar.a
@@ -431,7 +431,7 @@ libtestlib.a :LINK: $(.LIB.NAME. test)'
 		INPUT lib.c $'lib(){}'
 		OUTPUT - $'+ echo "" -ltest > test.req
 + cc -O   -c lib.c
-+ ar cr libtest.a lib.o
++ ar  cr libtest.a lib.o
 + ignore ranlib libtest.a
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
@@ -445,7 +445,7 @@ libtestlib.a :LINK: $(.LIB.NAME. test)'
 libtest.a :: lib.c
 libtestlib.a :LINK: libtest.a'
 		OUTPUT - $'+ cc -O   -c lib.c
-+ ar cr libtest.a lib.o
++ ar  cr libtest.a lib.o
 + ignore ranlib libtest.a
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
@@ -459,7 +459,7 @@ libtestlib.a :LINK: libtest.a'
 testlib.a :: lib.c
 libtestlib.a :LINK: testlib.a'
 		OUTPUT - $'+ cc -O   -c lib.c
-+ ar cr testlib.a lib.o
++ ar  cr testlib.a lib.o
 + ignore ranlib testlib.a
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
@@ -822,7 +822,8 @@ b: warning: cannot recurse on virtual directory'
 
 	EXEC	--
 		ERROR - $'a:
-make [a]: a makefile must be specified when Nmakefile,nmakefile,Makefile,makefile omitted
+make [a]: warning: a makefile must be specified when Nmakefile,nmakefile,Makefile,makefile omitted
+make [a]: null: a main target must be specified
 make: *** exit code 1 making a'
 		EXIT 1
 
@@ -1176,7 +1177,7 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c a.c
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
-+ ar cr liblibraryC.a a.o b.o c.o
++ ar  cr liblibraryC.a a.o b.o c.o
 + ignore ranlib liblibraryC.a
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC.so.1.0 -all liblibraryC.a -notall 
@@ -1184,7 +1185,7 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 + CC -O -D_BLD_DLL -D_BLD_PIC   -c ../a.c
 + CC -O -D_BLD_DLL -D_BLD_PIC   -c ../b.c
 + CC -O -D_BLD_DLL -D_BLD_PIC   -c ../c.c
-+ ar cr liblibraryC++.a a.o b.o c.o
++ ar  cr liblibraryC++.a a.o b.o c.o
 + ignore ranlib liblibraryC++.a
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC++.so.1.0 -all liblibraryC++.a -notall 
@@ -1192,7 +1193,7 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 + cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../a.c
 + cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../b.c
 + cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../c.c
-+ ar cr liblibraryC2.a a.o b.o c.o
++ ar  cr liblibraryC2.a a.o b.o c.o
 + ignore ranlib liblibraryC2.a
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC2.so.1.0 -all liblibraryC2.a -notall '

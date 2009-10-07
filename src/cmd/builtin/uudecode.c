@@ -43,13 +43,7 @@ USAGE_LICENSE
 "[t:text?The input file is a text file that requires \\n => \\r\\n translation"
 "	on encoding.]"
 "[x:method?Specifies the encoding \amethod\a. Some encoding methods self"
-"	identify and for those \b--method\b is optional.]:[method]{"
-"	[+posix|uuencode]"
-"	[+ucb|bsd]"
-"	[+mime|base64]"
-"	[+quoted-printable|qp]"
-"	[+binhex|mac-binhex]"
-"}"
+"	identify and for those \b--method\b is optional.]:[method]{\fmethods\f}"
 "[m?Equivalent to \b--method=mime\b.]"
 "[q?Equivalent to \b--method=quoted-printable\b.]"
 "[u?Equivalent to \b--method=uuencode\b.]"
@@ -66,6 +60,21 @@ USAGE_LICENSE
 #include <error.h>
 #include <option.h>
 
+static int
+optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
+{
+	register Uumeth_t*	mp;
+
+	switch (*s)
+	{
+	case 'm':
+		for (mp = uumeth(NiL); mp->name; mp++)
+			sfprintf(sp, "[+%s|%s]", mp->name, mp->alias);
+		break;
+	}
+	return 0;
+}
+
 int
 main(int argc, register char** argv)
 {
@@ -77,9 +86,14 @@ main(int argc, register char** argv)
 	Sfio_t*		ip;
 	Sfio_t*		op;
 	char		buf[2];
+	Optdisc_t	optdisc;
 	Uudisc_t	disc;
 
 	error_info.id = "uudecode";
+	memset(&optdisc, 0, sizeof(optdisc));
+	optdisc.version = OPT_VERSION;
+	optdisc.infof = optinfo;
+	opt_info.disc = &optdisc;
 	memset(&disc, 0, sizeof(disc));
 	disc.version = UU_VERSION;
 	disc.flags = UU_HEADER;

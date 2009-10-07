@@ -1,10 +1,10 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2009-05-05
+info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-10-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGEROOT ../../../../..
-setv AR ar
-setv ARFLAGS cr
+setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
+setv ARFLAGS -cr
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -544,7 +544,7 @@ meta pptrace.o %.c>%.o pptrace.c pptrace
 prev pptrace.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pptrace.c
 done pptrace.o generated
-exec - ${AR} cr libpp.a ppargs.o ppbuiltin.o ppcall.o ppcomment.o ppcontext.o ppcontrol.o ppcpp.o ppdata.o pperror.o ppexpr.o ppfsm.o ppincref.o ppinput.o ppkey.o pplex.o ppline.o ppmacref.o ppmisc.o ppop.o pppragma.o ppprintf.o ppproto.o ppsearch.o pptrace.o
+exec - ${AR} -cr libpp.a ppargs.o ppbuiltin.o ppcall.o ppcomment.o ppcontext.o ppcontrol.o ppcpp.o ppdata.o pperror.o ppexpr.o ppfsm.o ppincref.o ppinput.o ppkey.o pplex.o ppline.o ppmacref.o ppmisc.o ppop.o pppragma.o ppprintf.o ppproto.o ppsearch.o pptrace.o
 exec - (ranlib libpp.a) >/dev/null 2>&1 || true
 done libpp.a generated
 done pp virtual

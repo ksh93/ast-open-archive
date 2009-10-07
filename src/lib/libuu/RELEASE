@@ -1,3 +1,4 @@
+09-09-24 uulib: add cat method for mail sevenbit|7bit encoding
 03-01-07 uulib: check UU_HEADER in bx_header()
 01-03-27 uulib: add UU_LOCAL for local path conversion
 00-03-06 uulib: !UU_HEADER decode checks for candidate encodings

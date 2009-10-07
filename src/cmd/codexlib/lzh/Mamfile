@@ -1,10 +1,10 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.3 2009-05-05
+info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-10-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGEROOT ../../../../../..
-setv AR ar
-setv ARFLAGS cr
+setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
+setv ARFLAGS -cr
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -116,7 +116,7 @@ meta lzh.o %.c>%.o lzh.c lzh
 prev lzh.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lzh.c
 done lzh.o generated
-exec - ${AR} cr libcodexlzh.a lzh.o
+exec - ${AR} -cr libcodexlzh.a lzh.o
 exec - (ranlib libcodexlzh.a) >/dev/null 2>&1 || true
 done libcodexlzh.a generated
 done lzh virtual

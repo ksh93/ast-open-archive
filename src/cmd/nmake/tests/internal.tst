@@ -105,7 +105,8 @@ export MAKEFILES
 		INPUT Makefile $'MAKEFILES = $(PWD:B).mk
 :MAKE: maintenance'
 		ERROR - $'maintenance:
-make [maintenance]: a makefile must be specified when Nmakefile,nmakefile,Makefile,makefile omitted
+make [maintenance]: warning: a makefile must be specified when Nmakefile,nmakefile,Makefile,makefile omitted
+make [maintenance]: null: a main target must be specified
 make: *** exit code 1 making maintenance'
 		EXIT 1
 

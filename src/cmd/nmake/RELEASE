@@ -1,3 +1,13 @@
+09-10-09 --- release 5.4 ---
+09-10-07 bind.c: makerule(path) == makerule(base) && !alias && terminal => drop path
+09-10-06 Makerules.mk: add '-' prefix to ARFLAGS for posix portability
+09-10-05 Makerules.mk: consult REQUIRE libs for CC.DLL targets
+09-09-28 Makerules.mk: retract: if -lfoo binds to CC.STDLIB dir then bind to -lfoo
+	 (it makes a difference for some cc!)
+09-09-22 Makerules.mk: CC='' or --cctype=- or --cctype=0 => no C probe
+09-09-22 Makerules.mk: if -lfoo binds to CC.STDLIB dir then bind to -lfoo
+09-09-22 main.c: missing default makefile diagnostic is warning if --errorid
+09-09-09 Makerules.mk: fix CC.AR.ARFLAGS logic
 09-09-01 Makerules.mk: handle { libfoo.a foolib.a foo.a } prereqs
 09-08-20 Makerules.mk: add :LIBRARY: name=soname and CC.SHARED.NAME logic
 09-08-20 Makerules.mk: add :PACKAGE: --soname[=-n], -n to drop n suffixes in soname

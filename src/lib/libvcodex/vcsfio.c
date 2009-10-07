@@ -997,7 +997,7 @@ int		type;	/* VC_ENCODE or VC_DECODE or 0	*/
 	/* local error processing function */
 #define errorsfio(s)	do { if(sfdt->errorf) (*sfdt->errorf)(s); goto error; } while(0)
 
-	if(!(sfdc = (Sfdc_t*)calloc(1,sizeof(Sfdc_t))) )
+	if(!(sfdc = (Sfdc_t*)calloc(1,sizeof(Sfdc_t) + (sfdt == &dflt ? sizeof(dflt) : 0))) )
 	{	if(!type)
 			sfdt->type = -1;
 		errorsfio("Out of memory for transformation structure");
@@ -1011,6 +1011,10 @@ int		type;	/* VC_ENCODE or VC_DECODE or 0	*/
 #endif
 
 	sfdc->sf   = sf; /* stream to do IO on */
+	if(sfdt == &dflt)
+	{	sfdt = (Vcsfdata_t*)(sfdc + 1);
+		*sfdt = dflt;
+	}
 	sfdc->sfdt = sfdt; /* init parameters */
 
 	wsize = getwindow(sfdt->window, &wmeth);

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*          Copyright (c) 1998-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1151,6 +1151,16 @@ bx_encode(register Uu_t* uu)
 	return 0;
 }
 
+/*
+ * cat input to output
+ */
+
+static int
+cat(register Uu_t* uu)
+{
+	return sfmove(uu->ip, uu->op, SF_UNBOUND, -1) >= 0 && sfeof(uu->ip) ? 0 : -1;
+}
+
 static Uudata_t	uu_posix =
 {
 	"end",
@@ -1213,6 +1223,10 @@ static const Uumeth_t	methods[] =
 {
 	"binhex",			"mac-binhex",	"",	  
 	bx_header,	bx_encode,	bx_decode,	(void*)&uu_bx
+},
+{
+	"sevenbit",			"7bit",		"",	  
+	0,		cat,		cat,		0
 },
 
 { 0 }

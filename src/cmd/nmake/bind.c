@@ -1425,8 +1425,16 @@ bindfile(register Rule_t* r, char* name, int flags)
 			}
 			if (!(r->dynamic & D_global))
 				r->preview = r->view;
-			if ((x = getrule(b)) && (x->dynamic & D_alias))
-				x = makerule(x->name);
+			if (x = getrule(b))
+			{
+				if (x->dynamic & D_alias)
+					x = makerule(x->name);
+				else if (x == r && (r->property & P_terminal))
+				{
+					putrule(b, 0);
+					x = 0;
+				}
+			}
 			if (!(state.questionable & 0x00001000) && aliased && !x && !streq(name, r->name))
 				x = makerule(name);
 			if (x && x != r)

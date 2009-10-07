@@ -1046,7 +1046,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-09-17  --- Release ksh93t+  ---
+09-10-07  --- Release ksh93t+  ---
+09-10-07  $PATH processing has been changed to delay dir stat() and .paths
+	  lookup until the directory is needed in the path search.
+09-09-28  Call the ast setlocale() intercept on unset too.
+09-09-24  A bug in which LANG=foo; LC_ALL=foo; unset LC_ALL; did not revert
+	  LC_CTYPE etc. to the LANG value has been fixed.
 09-09-17  A bug in which unsetting SVLVL could cause a script invoked by
 	  name without #! to core dump has been fixed.
 09-09-16  A bug in which a pipeline in a here-document could hang when the
@@ -4079,6 +4084,16 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-10-09 --- release 5.4 ---
+09-10-07 bind.c: makerule(path) == makerule(base) &amp;&amp; !alias &amp;&amp; terminal =&gt; drop path
+09-10-06 Makerules.mk: add '-' prefix to ARFLAGS for posix portability
+09-10-05 Makerules.mk: consult REQUIRE libs for CC.DLL targets
+09-09-28 Makerules.mk: retract: if -lfoo binds to CC.STDLIB dir then bind to -lfoo
+	 (it makes a difference for some cc!)
+09-09-22 Makerules.mk: CC='' or --cctype=- or --cctype=0 =&gt; no C probe
+09-09-22 Makerules.mk: if -lfoo binds to CC.STDLIB dir then bind to -lfoo
+09-09-22 main.c: missing default makefile diagnostic is warning if --errorid
+09-09-09 Makerules.mk: fix CC.AR.ARFLAGS logic
 09-09-01 Makerules.mk: handle { libfoo.a foolib.a foo.a } prereqs
 09-08-20 Makerules.mk: add :LIBRARY: name=soname and CC.SHARED.NAME logic
 09-08-20 Makerules.mk: add :PACKAGE: --soname&#0091;=-n&#0093;, -n to drop n suffixes in soname
@@ -5427,6 +5442,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-24 uuencode,uudecode: use uumeth(0) to generate usage method list
 09-08-18 testtail.sh: add fifo tests
 09-08-01 join.tst: TEST 19 for empty field defref bug
 09-05-24 tail.tst: add r combinations
@@ -5612,6 +5628,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-28 dss.tst: adjust for ip_t/fv.c fix
 09-03-19 bgp-mrt.c: fix DUMP_V2 ipv6 =&gt; as32
 09-03-11 bgp-mrt.c: handle TABLE_DUMP_V2 &lt;13&gt; records
 08-11-13 bgp-mrt.c: handle undocumented BGP4MP &lt;16,20&gt; records
@@ -5720,6 +5737,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-28 fv.c: fix off-by-one bug in fvplo() and fvphi()
+09-09-28 ptfmin.c,ptvmax.c: call fvplo() and fpvhi()
 09-07-28 fv.h,fv.c: add fvplo(), fvphi()
 09-03-19 ip_t.c,itlie.h: elide leading 0.* for 2-tuple external conversion
 09-03-15 pt&#0091;v&#0093;.h,pt&#0091;v&#0093;open.c: add Pt&#0091;v&#0093;prefix_t.data, pt&#0091;v&#0093;insert() returns new prefix
@@ -6746,6 +6765,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="vczip changes">vczip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-10-01 vczip.c: make discipline data static -- it may be accessed after main() returns
 09-07-04 vczip.c: first attempt to unify vcodex(--method) and codex(--transform)
 09-02-02 vczip.c: -u is now a flag (no optional arg)
 09-01-18 vczip.c: fix bug that forgot to assign src file path
@@ -6761,6 +6781,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-10-05 _sfopen.c: add but ignore 'F' flags for stdio compatibility
+09-09-28 fts.h,ftwalk.h,fts.c: promote { namelen pathlen level } to (s)size_t
+09-09-28 locales: add AST_LC_LANG for $LANG
+09-09-28 setlocale.c: fix logic for dynamic { LANG LC_ALL LC_* } changes
 09-09-17 include/sfio.h,sfio/sfwalk.c: add sfwalk()
 09-09-09 sfio/sfputr.c: add SIGPIPE hang fix
 09-08-24 sfio/sfreserve.c: fix SF_UNBOUND logic with pushed streams
@@ -8828,6 +8852,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libsum changes">libsum changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-28 sumlib.c: use simple (faster) method name match function
 08-06-05 sum-lmd.c: align context to largest int
 08-05-01 sumlib.c: add some -lmd verification checks
 08-02-11 sum-lmd.c,features/sum: add wrapper for solaris -lmd
@@ -8848,6 +8873,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libuu changes">libuu changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-09-24 uulib: add cat method for mail sevenbit|7bit encoding
 03-01-07 uulib: check UU_HEADER in bx_header()
 01-03-27 uulib: add UU_LOCAL for local path conversion
 00-03-06 uulib: !UU_HEADER decode checks for candidate encodings
@@ -9975,7 +10001,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>September 17, 2009</TD>
+<TD align=right>October 07, 2009</TD>
 </TR>
 </TABLE>
 <P>

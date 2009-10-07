@@ -308,8 +308,8 @@ z.x'
 		OUTPUT - $'info mam static 00000
 setv INSTALLROOT ../../../..
 setv PACKAGEROOT ../../../../../..
-setv AR ar
-setv ARFLAGS cr
+setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
+setv ARFLAGS -cr
 setv AS as
 setv ASFLAGS
 setv CC cc

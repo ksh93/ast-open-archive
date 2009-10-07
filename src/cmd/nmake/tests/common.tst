@@ -176,12 +176,12 @@ aha :LIBRARY: aha.c'
 		INPUT aha.req ' -laha'
 		OUTPUT - $'+ echo "" -ltst -laha > tst.req
 + cc -O   -c tst.c
-+ ar cr libtst.a tst.o
++ ar  cr libtst.a tst.o
 + ignore ranlib libtst.a
 + rm -f tst.o
 + echo "" -laha > aha.req
 + cc -O   -c aha.c
-+ ar cr libaha.a aha.o
++ ar  cr libaha.a aha.o
 + ignore ranlib libaha.a
 + rm -f aha.o
 + if	silent test ! -d root/lib
@@ -252,12 +252,12 @@ aha :LIBRARY: aha.c'
 	EXEC	-n --link="*" install
 		OUTPUT - $'+ echo "" -ltst -laha > tst.req
 + cc -O   -c tst.c
-+ ar cr libtst.a tst.o
++ ar  cr libtst.a tst.o
 + ignore ranlib libtst.a
 + rm -f tst.o
 + echo "" -laha > aha.req
 + cc -O   -c aha.c
-+ ar cr libaha.a aha.o
++ ar  cr libaha.a aha.o
 + ignore ranlib libaha.a
 + rm -f aha.o
 + if	silent test ! -d root/lib
@@ -346,7 +346,7 @@ lib :LIBRARY: lib.c'
 		OUTPUT - $'+ TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc -O   -c cmd.c
 + echo "" -llib > lib.req
 + TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc -O   -c lib.c
-+ ar cr liblib-tra.a lib.o
++ ar  cr liblib-tra.a lib.o
 + ignore ranlib liblib-tra.a
 + rm -f lib.o
 + TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc  -O   -o cmd cmd.o liblib-tra.a'
@@ -402,7 +402,7 @@ TEST 10 '--arclean=edit-op'
 		OUTPUT - $'+ echo "" -ltst > tst.req
 + cc -O   -c explicit.c
 + cc -O   -c implicit.c
-+ ar cr libtst.a explicit.o implicit.o
++ ar  cr libtst.a explicit.o implicit.o
 + ignore ranlib libtst.a
 + rm -f explicit.o implicit.o'
 
@@ -410,7 +410,7 @@ TEST 10 '--arclean=edit-op'
 		OUTPUT - $'+ echo "" -ltst > tst.req
 + cc -O   -c explicit.c
 + cc -O   -c implicit.c
-+ ar cr libtst.a explicit.o implicit.o
++ ar  cr libtst.a explicit.o implicit.o
 + ignore ranlib libtst.a
 + rm -f implicit.o'
 
@@ -459,12 +459,12 @@ t4 :LIBRARY: c.c'
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c a.c
 + cc  -O   -o t2 main.o a.o
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
-+ ar cr t3.a a.o b.o
++ ar  cr t3.a a.o b.o
 + ignore ranlib t3.a
 + rm -f a.o b.o
 + echo "" -lt4 > t4.req
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
-+ ar cr libt4.a c.o
++ ar  cr libt4.a c.o
 + ignore ranlib libt4.a
 + rm -f c.o
 + cc  -shared  -o libt4.so.1.0 -all libt4.a -notall '
@@ -475,12 +475,12 @@ t4 :LIBRARY: c.c'
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c a.c
 + cc  -O   -o t2 main.o a.o
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
-+ ar cr t3.a a.o b.o
++ ar  cr t3.a a.o b.o
 + ignore ranlib t3.a
 + rm -f a.o b.o
 + echo "" -lt4 > t4.req
 + cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
-+ ar cr libt4.a c.o
++ ar  cr libt4.a c.o
 + ignore ranlib libt4.a
 + rm -f c.o
 + cc  -shared  -o libt4.so.1.0 -all libt4.a -notall 
@@ -686,12 +686,12 @@ TEST 14 'cc-'
 		INPUT cc-g/
 		OUTPUT - $'+ echo "" -lt > t.req
 + cc -O   -c t.c
-+ ar cr libt.a t.o
++ ar  cr libt.a t.o
 + ignore ranlib libt.a
 + rm -f t.o
 + echo "" -lt > t.req
 + cc -g   -c ../t.c
-+ ar cr libt-g.a t.o
++ ar  cr libt-g.a t.o
 + ignore ranlib libt-g.a
 + rm -f t.o'
 		ERROR - $'cc-g:'
@@ -715,7 +715,7 @@ t :LIBRARY: a.c'
 + cc  -O   -o t2 main.o
 + echo "" -lt > t.req
 + cc -O   -c a.c
-+ ar cr libt.a a.o
++ ar  cr libt.a a.o
 + ignore ranlib libt.a
 + rm -f a.o
 + if	silent test ! -d include
@@ -808,7 +808,7 @@ t :LIBRARY: a.c'
 + cc  -O   -o t2 main.o
 + echo "" -lt > t.req
 + cc -O   -c a.c
-+ ar cr libt.a a.o
++ ar  cr libt.a a.o
 + ignore ranlib libt.a
 + rm -f a.o
 + if	silent test ! -d include

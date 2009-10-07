@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-09-02 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-10-09 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -38,7 +38,7 @@ set option=';ancestor;n;-;Set the ancestor search directory depth to \adepth\a. 
 set option=';ancestor-source;s;-;A list of \b.SOURCE\b\a.suffix\a \adirectory\a pairs added to the ancestor directory search.;.SOURCE.suffix directory...:=$(.ANCESTOR.LIST)'
 set option=';archive-clean;s;-;A catenation of edit operators that selects archive member files to be removed after being added to the archive.;edit-ops'
 set option=';archive-output;s;-;The output file name for archiving actions (\bpax\b, \bsave\b, \btgz\b, etc.) The default is based on the current directory and the VERSION variable.;file'
-set option=';cctype;s;-;Set the \bprobe\b(1) C compiler type identifier. The default value is based on the \bCC\b variable.;[type]'
+set option=';cctype;s;-;Set the \bprobe\b(1) C compiler type identifier. The default value is based on the \bCC\b variable. To disable the C probe use \b--cctype=-\b or set \bCC=""\b.;[type]'
 set option=';clean-ignore;s;-;Ignore \bclean\b action generated target files matching \apattern\a.;pattern'
 set option=';clobber;sv;-;Replace existing \binstall\b action targets matching \apattern\a instead of renaming to \atarget\a\b.old\b.;pattern:!*'
 set option=';compare;b;-;Ignore \binstall\b action targets whose contents have not changed. On by default.'
@@ -336,8 +336,8 @@ STDLN := $$(_feature_:N=ln:?$(.X.)?$$(STDCP)?)
  * action related symbols
  */
 
-AR = $(CC.AR)
-ARFLAGS = r
+AR = $(CC.AR) $(CC.AR.ARFLAGS)
+ARFLAGS = -r
 AS = as
 if "$(PATH:/:/ /G:X=awk:P=X)"
 AWK = awk
@@ -797,7 +797,12 @@ end
 							if T
 								if ! "$(CC.SUFFIX.SHARED)" || T != "*$(CC.SUFFIX.SHARED)"
 									if T == "*$(CC.SUFFIX.ARCHIVE)"
-										return $(T)
+										if "$(-stdlib-l)"
+											if "$(CC.STDLIB:N=$(T:T=F:D))"
+												H = -
+											end
+										end
+										return $(H) $(T)
 									end
 									if "$(CC.SUFFIX.STATIC)" && T == "*$(CC.SUFFIX.STATIC)"
 										H = -
@@ -2430,6 +2435,12 @@ RECURSEROOT = .
 								S += $(A)
 							end
 						end
+					else
+						P := lib/$(L:B:/$(CC.PREFIX.SHARED)//)
+						$(P) : .ARCHIVE
+						if "$(P:T=F)"
+							S += $(L)
+						end
 					end
 				end
 			else
@@ -3673,7 +3684,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		end
 	end
 	$(.PROBE.SPECIAL.) : -FUNCTIONAL
-	if "$(-base)"
+	if "$(-base)" || ! "$(CC)" || "$(-cctype)" == "[-0]"
 		set cctype:=0
 		.CC.PROBE. =
 	else
@@ -4184,9 +4195,6 @@ PACKAGES : .SPECIAL .FUNCTION
 		.SHARED.o : .CLEAR .USE (LDSHARED)
 			$(LDSHARED) $(CC.SHARED) $(CCLDFLAGS) -o $(<) $(*$(**):N!=*$(CC.SUFFIX.ARCHIVE))
 		.ATTRIBUTE.%.a : -ARCHIVE
-	end
-	if "$(CC.AR.ARFLAGS)"
-		ARFLAGS &= $$(CC.AR.ARFLAGS)
 	end
 	IFFEFLAGS += -c '$$(IFFECC) $$(IFFECCFLAGS) $$(IFFELDFLAGS)' $$(-mam:N=(regress|static)*:??-S '$$(CC.STATIC)')
 	if "$(-cross)" || "$(CC.EXECTYPE)" && "$(CC.HOSTTYPE)" != "$(CC.EXECTYPE)"
@@ -4911,10 +4919,10 @@ end
 	.MAM.PACKAGEROOT := $(".":P=R=$(PACKAGEROOT))
 	print -um setv PACKAGEROOT $(PACKAGEROOT)
 	PACKAGEROOT = ${PACKAGEROOT}
-	print -um setv AR ar
+	print -um setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
 	AR = ${AR}
-	print -um setv ARFLAGS cr
-	ARFLAGS = cr
+	print -um setv ARFLAGS -cr
+	ARFLAGS = -cr
 	print -um setv AS as
 	AS = ${AS}
 	print -um setv ASFLAGS

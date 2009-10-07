@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -95,6 +95,10 @@
  *   2003             (4.3)             .	AT&T Research
  *   2004             (4.4)             .	AT&T Research
  *   2005             (5.0)             .	AT&T Research
+ *   2006             (5.1)             .	AT&T Research
+ *   2007             (5.2)             .	AT&T Research
+ *   2008             (5.3)             .	AT&T Research
+ *   2009             (5.4)             .	AT&T Research
  *
  * command line arguments are of three types
  *
@@ -673,9 +677,9 @@ main(int argc, char** argv)
 			if (readfile("-", COMP_FILE, NiL))
 				optcheck(1);
 			if (*(s = sfstruse(imp)))
-				error(3, "a makefile must be specified when %s omitted", s);
+				error(state.errorid ? 1 : 3, "a makefile must be specified when %s omitted", s);
 			else
-				error(3, "a makefile must be specified");
+				error(state.errorid ? 1 : 3, "a makefile must be specified");
 		}
 		sfstrclose(imp);
 		if (exp)

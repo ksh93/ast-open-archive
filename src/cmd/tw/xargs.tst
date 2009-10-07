@@ -39,26 +39,26 @@ TEST 03 'arg limit'
 		INPUT - $'1\n2\n3\n4\n5'
 		OUTPUT - $'1 2\n3 4\n5'
 
-TEST 04 'size limit'
-	EXEC
-	size=(
-		$(COMMAND -s1 echo 1 </dev/null 2>&1 | sed 's/[^0-9]//g') 
-		$(COMMAND -s1 echo 1 2 </dev/null 2>&1 | sed 's/[^0-9]//g') 
-		$(COMMAND -s1 echo 1 2 3 </dev/null 2>&1 | sed 's/[^0-9]//g') 
-		$(COMMAND -s1 echo 1 2 3 4 </dev/null 2>&1 | sed 's/[^0-9]//g') 
-	)
-	EXEC -s${size[0]} echo
-		INPUT - $'1\n2\n3\n4'
-		OUTPUT - $'1\n2\n3\n4'
-	EXEC -s${size[1]} echo
-		INPUT - $'1\n2\n3\n4'
-		OUTPUT - $'1 2\n3 4'
-	EXEC -s${size[2]} echo
-		INPUT - $'1\n2\n3\n4'
-		OUTPUT - $'1 2 3\n4'
-	EXEC -s${size[3]} echo
-		INPUT - $'1\n2\n3\n4'
-		OUTPUT - $'1 2 3 4'
+#TBD#TEST 04 'size limit'
+#TBD#	EXEC
+#TBD#	size=(
+#TBD#		$($COMMAND -s1 echo 1 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+#TBD#		$($COMMAND -s1 echo 1 2 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+#TBD#		$($COMMAND -s1 echo 1 2 3 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+#TBD#		$($COMMAND -s1 echo 1 2 3 4 </dev/null 2>&1 | sed 's/[^0-9]//g') 
+#TBD#	)
+#TBD#	EXEC -s${size[0]} echo
+#TBD#		INPUT - $'1\n2\n3\n4'
+#TBD#		OUTPUT - $'1\n2\n3\n4'
+#TBD#	EXEC -s${size[1]} echo
+#TBD#		INPUT - $'1\n2\n3\n4'
+#TBD#		OUTPUT - $'1 2\n3 4'
+#TBD#	EXEC -s${size[2]} echo
+#TBD#		INPUT - $'1\n2\n3\n4'
+#TBD#		OUTPUT - $'1 2 3\n4'
+#TBD#	EXEC -s${size[3]} echo
+#TBD#		INPUT - $'1\n2\n3\n4'
+#TBD#		OUTPUT - $'1 2 3 4'
 
 TEST 05 'extensions'
 	EXEC -z echo test

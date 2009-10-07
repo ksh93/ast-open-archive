@@ -33,7 +33,7 @@
 #define VCZIP		"vczip"
 
 static const char usage[] =
-"[-?\n@(#)$Id: vczip (AT&T Research) 2009-07-04 $\n]"
+"[-?\n@(#)$Id: vczip (AT&T Research) 2009-10-01 $\n]"
 USAGE_LICENSE
 "[+NAME?vczip - vcodex method encode/decode filter]"
 "[+DESCRIPTION?\bvczip\b is a filter that decodes the standard input "
@@ -373,9 +373,12 @@ main(int argc, char** argv)
 	Sfio_t*		cs;			/* codex transform buf	*/
 	Sfoff_t		donez = -1, lastz = -1;	/* amount processed	*/
 	Optdisc_t	optdisc;		/* optget() dscipline	*/
-	Vcsfdata_t	vcodexdisc;		/* vcodex discipline	*/
-	Codexdisc_t	codexdisc;		/* codex discipline	*/
 	char		name[256];		/* method name buffer	*/
+
+	/* NOTE: disciplines may be accessed after main() returns */
+
+	static Vcsfdata_t	vcodexdisc;	/* vcodex discipline	*/
+	static Codexdisc_t	codexdisc;	/* codex discipline	*/
 
 	error_info.id = (ct = strrchr(argv[0], '/')) ? (ct + 1) : argv[0];
 	if (!(cs = sfstropen()))
