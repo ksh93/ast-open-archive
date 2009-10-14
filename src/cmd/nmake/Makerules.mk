@@ -1512,7 +1512,7 @@ RECURSEROOT = .
 			V += $(A)
 		end
 	end
-	if "$(~.ARGS:A=.ONOBJECT)"
+	if V && "$(~.ARGS:A=.ONOBJECT)"
 		V := .RECURSE $(V)
 	end
 	return $(V)
