@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: locale (AT&T Research) 2007-04-25 $\n]"
+"[-?\n@(#)$Id: locale (AT&T Research) 2009-10-21 $\n]"
 USAGE_LICENSE
 "[+NAME?locale - get locale-specific information]"
 "[+DESCRIPTION?\blocale\b writes information about the current locale to"
@@ -648,6 +648,11 @@ value(Sfio_t* sp, register const char* s, register unsigned int flags)
 	register int	u;
 
 	state.output = 1;
+	if ((flags & (LC_quote|LC_proper|LC_upper)) == LC_quote)
+	{
+		sfprintf(sp, "%s", fmtquote(s, "\"", "\"", strlen(s), FMT_ALWAYS));
+		return;
+	}
 	if (flags & LC_quote)
 		sfputc(sp, '"');
 	if (flags & LC_upper)

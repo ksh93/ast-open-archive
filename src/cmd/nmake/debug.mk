@@ -1,7 +1,7 @@
 /*
  * interactive debug support
  *
- * @(#)debug (AT&T Research) 2004-09-09
+ * @(#)debug (AT&T Research) 2009-10-14
  *
  * *.i from *.c
  */
@@ -24,6 +24,6 @@ for .S. $(.SUFFIX.c) $(.SUFFIX.C)
 		$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
 
 	%.s : %$(.S.) .ALWAYS $$(CCISCOPE)
-		$(CC) $(CCIFLAGS) -S $(>) > $(<)
+		$(CC) $(CCIFLAGS) -S $(>)
 
 end

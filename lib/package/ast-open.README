@@ -92,7 +92,9 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-10-12  --- Release ksh93t+  ---
+09-10-16  --- Release ksh93t+  ---
+09-10-16  A bug where notification to libast that the environment has changed
+          has been fixed.
 09-10-12  A bug in which a function loaded in a subshell could leave side
 	  effects in the parent shell has been fixed.
 09-10-12  A bug in converting a printf %d operand to a number when the operand
@@ -5265,6 +5267,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+09-10-21 locale.c: use fmtquote() to print key values
 09-07-02 ls.c: ftwflags() default only if not --recursive
 09-05-15 ps.c: fix format field alias logic
 09-04-15 ls.c: add --sort=version
