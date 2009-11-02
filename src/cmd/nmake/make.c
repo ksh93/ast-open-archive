@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -556,8 +556,13 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 					r0 = staterule(RULE, r1, NiL, 1);
 					if (!statetimeq(r1, r0) || !r0->event)
 					{
-						reason((1, "%s joint sibling %s is out of date", r->name, r1->name));
-						staterule(RULE, r, NiL, 1)->time = 0;
+						if ((r1->property & P_dontcare) && !r1->time)
+							r1->event = r0->event;
+						else
+						{
+							reason((1, "%s joint sibling %s is out of date", r->name, r1->name));
+							staterule(RULE, r, NiL, 1)->time = 0;
+						}
 					}
 				}
 				fp = newof(0, Frame_t, 1, 0);

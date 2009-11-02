@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -483,7 +483,7 @@ coda(void)
 
 typedef unsigned char* (*exef)(Text*, unsigned char *, Text*);
 
-static exef excom[128] = {
+static const exef excom[128] = {
 	vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,Ie,vv,vv,vv,vv,vv,
 	vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,
 	vv,vv,vv,Ie,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv,vv, /* # */

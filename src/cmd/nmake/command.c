@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1147,9 +1147,9 @@ block(int check)
 		{
 			if (n = !EXITED_TERM(cojob->status) || EXIT_CODE(cojob->status))
 			{
-				error(2, "*** %s code %d making %s%s", ERROR_translate(NiL, NiL, NiL, EXITED_TERM(cojob->status) ? "termination" : "exit"), EXIT_CODE(cojob->status), job->target->name, (job->flags & CO_IGNORE) ? ERROR_translate(NiL, NiL, NiL, " ignored") : null);
 				if ((job->target->dynamic & D_hasafter) && hasafter(job->target, P_failure))
 					n = 0;
+				error(n ? 2 : state.explain ? 0 : -1, "%s%s code %d making %s%s", n ? "*** " : null, ERROR_translate(NiL, NiL, NiL, EXITED_TERM(cojob->status) ? "termination" : "exit"), EXIT_CODE(cojob->status), job->target->name, (job->flags & CO_IGNORE) ? ERROR_translate(NiL, NiL, NiL, " ignored") : null);
 			}
 			if (!(job->flags & CO_IGNORE))
 			{

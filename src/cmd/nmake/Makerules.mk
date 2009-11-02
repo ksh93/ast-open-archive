@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-10-09 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-10-27 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1933,7 +1933,7 @@ RECURSEROOT = .
  */
 
 ":INSTALL:" : .MAKE .OPERATOR
-	local D O R S T
+	local D O R S T X
 	if ! "$(<:V)" && ! "$(>:V)" && ! "$(@:V)"
 		.NO.INSTALL. = 1
 	else
@@ -1982,7 +1982,12 @@ RECURSEROOT = .
 					$(@:V)
 				end
 			elif "$(R)"
-				$(<:V) : .SPECIAL .SCAN.IGNORE $(D) $$("$(R)":N!=$$(<)|$$(<:P=U):@?$(O) $(S) $(R) .DO.INSTALL??)
+				if "$(R:A=.DONTCARE)"
+					X = :T=F
+				else
+					X =
+				end
+				$(<:V) : .SPECIAL .SCAN.IGNORE $(D) $$("$(R)":N!=$$(<)|$$(<:P=U)$(X):@?$(O) $(S) $(R) .DO.INSTALL??)
 			else
 				$(<:V) : .SPECIAL .SCAN.IGNORE $(D) $$(<:B:S:N!=$$(<):@?$(O) $(S) $(R) $$(<:B:S) .DO.INSTALL??)
 			end
@@ -2460,7 +2465,7 @@ RECURSEROOT = .
 	$(LDSHARED) $(LDFLAGS) $(CC.SHARED) -o $(<) $(.CC.LIB.DLL.$(CC.LIB.DLL) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.:$(CC.SHARED:@??:T=F:N=*$(CC.SUFFIX.ARCHIVE)?)))) $(CC.DLL.LIBRARIES)
 
 .SHARED.DEF.dll.a .SHARED.DEF.lib .SHARED.DEF.x : .FUNCTION
-	local A B D I L S X Y Z W
+	local A B D G I L S W X Y Z
 	Y := $(%:O=2)
 	B := $(Y)$(%:O=3:/[^0-9]//G)$(dll.custom:?_$(dll.custom)??)
 	D := $(CC.PREFIX.DYNAMIC)$(B:B)$(CC.SUFFIX.DYNAMIC)
@@ -2480,6 +2485,7 @@ RECURSEROOT = .
 			W := $(Y:B:S=.so)
 			D := $(W)/$(D)
 			S := $(W)/$(S)
+			G := $(D:D:B:S=.pdb)
 			if "$(*.LIBRARY.STATIC.$(Y))"
 				Z += .LIBRARY.STATIC.$(Y)
 				.LIBRARY.STATIC.$(Y) : .VIRTUAL
@@ -2488,7 +2494,7 @@ RECURSEROOT = .
 				ARFLAGS := $(ARFLAGS)I
 			end
 		end
-		$(D) $(S) : .JOINT $(<:/DEF.//) $(*$(A):N=*@($(.LD.KEEP.:/ /|/G:/|$//))) $(A) $(Z)
+		$(D) $(S) $(G:+- $(G)) : .JOINT $(<:/DEF.//) $(*$(A):N=*@($(.LD.KEEP.:/ /|/G:/|$//))) $(A) $(Z)
 		.ALL : $(D) $(S)
 		if ! "$(.NO.INSTALL.)"
 			X := $(D:B:C%\..*%%)
@@ -2500,6 +2506,9 @@ RECURSEROOT = .
 			end
 			if ! "$(.INSTALL.$(S))" && ! "$(.INSTALL.$(X))"
 				$$(LIBDIR)/$(L) :INSTALL: $(S)
+				if G
+					$$(LIBDIR)/$(G:B:S) :INSTALL: $(G)
+				end
 			end
 		end
 	end

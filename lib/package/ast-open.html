@@ -1046,7 +1046,14 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-10-16  --- Release ksh93t+  ---
+09-11-02  --- Release ksh93t+  ---
+09-11-02  ``,2'' is now a valid numeric constant for locales with
+	  decimal_point=','.
+09-11-02  A bug where "return" in .profile did not restore the shell state
+	  has been fixed.
+09-10-31  A bug that corrupted saved exit status when pids wrapped around has
+	  been fixed.
+09-10-26  A bug in { LANG LC_ALL LC_category } ordering has been fixed in -last.
 09-10-16  A bug where notification to libast that the environment has changed
           has been fixed.
 09-10-12  A bug in which a function loaded in a subshell could leave side
@@ -4092,6 +4099,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-10-28 command.c: disable *** error status message for .FAILURE targets
+09-10-27 parse.c,make.c: a - b : .JOINT =&gt; b:.DONTCARE (b optionally generated)
+09-10-27 Makerules.mk: install .pdb if it exists in .lib dir
 09-10-09 --- release 5.4 ---
 09-10-07 bind.c: makerule(path) == makerule(base) &amp;&amp; !alias &amp;&amp; terminal =&gt; drop path
 09-10-06 Makerules.mk: add '-' prefix to ARFLAGS for posix portability
@@ -6114,6 +6124,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-10-31 sed: add a few gnu compatibility options
 09-02-02 repetition.dat,haskell.dat: add tests by Chris Kuklewicz www.haskell.org
 08-11-04 iso8859-1.dat: add &#0091;!-...&#0093; and &#0091;^-...&#0093; locale tests
 08-09-04 nested.dat,noop.dat: nested match beyond end of subject fix
@@ -6790,6 +6801,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-10-28 include/error.h: fix ERROR_translate() arg parens
+09-10-26 port/lcgen.c,comp/setlocale.c: handle LANG init after LC_* already defined
 09-10-05 _sfopen.c: add but ignore 'F' flags for stdio compatibility
 09-09-28 fts.h,ftwalk.h,fts.c: promote { namelen pathlen level } to (s)size_t
 09-09-28 locales: add AST_LC_LANG for $LANG
@@ -10010,7 +10023,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>October 21, 2009</TD>
+<TD align=right>November 03, 2009</TD>
 </TR>
 </TABLE>
 <P>

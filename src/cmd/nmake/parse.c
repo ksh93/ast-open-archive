@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -2074,6 +2074,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 	int			i;
 	int			n;
 	int			isactive;
+	Flags_t			jointproperty;
 	Rule_t*			x;
 	Rule_t*			joint;
 	Var_t*			v;
@@ -2407,6 +2408,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 	if (*act || (set.op & (A_null|A_target)) || (set.rule.property & (P_make|P_local)) == (P_make|P_local))
 		set.rule.property |= P_target;
 	joint = (set.rule.property & P_joint) ? internal.joint : 0;
+	jointproperty = 0;
 
 	/*
 	 * assert each target
@@ -2418,6 +2420,12 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 		r = makerule(name);
 		if (joint)
 		{
+			if (streq(r->name, "-"))
+			{
+				jointproperty |= P_dontcare;
+				name = getarg(&lhs, &set.op);
+				continue;
+			}
 			if (joint == internal.joint)
 			{
 				joint = catrule(internal.joint->name, ".", name, 1);
@@ -2426,6 +2434,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 			}
 			else
 				jointail = jointail->next = cons(r, NiL);
+			r->property |= jointproperty;
 		}
 		if ((set.op & (A_metarule|A_special)) == A_metarule)
 		{

@@ -22,7 +22,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Research) 2008-02-02 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Research) 2009-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"
@@ -40,118 +40,44 @@ USAGE_LICENSE
 "[n:quiet|silent?Suppress the default output in which each line, after it is"
 "	examined for editing, is written to standard output. Only lines"
 "	explicitly selected for output will be written.]"
-"[A:augmented?Enable augmented regular expressions; this includes negation"
+"[A|X:augmented?Enable augmented regular expressions; this includes negation"
 "	and conjunction.]"
-"[E:extended?Enable extended regular expressions, i.e., \begrep\b(1) style.]"
+"[E|r:extended|regexp-extended?Enable extended regular expressions, i.e.,"
+"	\begrep\b(1) style.]"
 "[O:lenient?Enable lenient regular expression interpretation."
 "	This is the default if \bgetconf CONFORMANCE\b is not \bstandard\b.]"
-"[S:strict?Enable strict regular expression interpretation. This is the"
+"[S:strict|posix?Enable strict regular expression interpretation. This is the"
 "	default if \bgetconf CONFORMANCE\b is \bstandard\b. You'd be"
 "	suprised what the lenient mode lets by.]"
 "[m?multi-digit-reference?Enable \a\\dd\a multi-digit backreferences.]"
 "[d?Ignored by this implementation.]"
+"[u:unbuffered?Unbuffered output.]"
 
 "\n"
 "\n[ file ... ]\n"
 "\n"
 
-"[+SEE ALSO?\bed\b(1), \bgrep\b(1), \bregex\b(3)]"
+"[+SEE ALSO?\bawk\b(1), \bed\b(1), \bgrep\b(1), \bregex\b(3)]"
 ;
 
-void	readscript(Text*, char*);
-void	copyscript(Text*, unsigned char*);
-int	initinput(int, char **);
-Sfio_t*	aopen(char*, int);
+#if 0
+static void	readscript(Text*, char*);
+static void	copyscript(Text*, unsigned char*);
+static int	initinput(int, char **);
+static Sfio_t*	aopen(char*, int);
+#endif
 
 #define ustrncmp(a,b,c) strncmp((char*)(a), (char*)(b), c)
 
-int reflags;		/* regcomp() flags */
-int recno;		/* current record number */
-int nflag;		/* nonprint option */
-int qflag;		/* command q executed */
-int sflag;		/* substitution has occurred */
-int bflag;		/* strip leading blanks from c,a,i <text> */
+int reflags = 0;	/* regcomp() flags */
+int recno = 0;		/* current record number */
+int nflag = 0;		/* nonprint option */
+int qflag = 0;		/* command q executed */
+int sflag = 0;		/* substitution has occurred */
+int bflag = 0;		/* strip leading blanks from c,a,i <text> */
+int uflag = 0;		/* unbuffered output */
 
 unsigned char*	map;	/* CC_NAT*IVE => CC_ASCII map */
-
-int
-main(int argc, char **argv)
-{
-	int c;
-	static Text script;
-	static Text data;
-	error_info.id = "sed";
-	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
-		reflags = REG_LENIENT;
-	map = ccmap(CC_NATIVE, CC_ASCII);
-	while (c = optget(argv, usage))
-		switch (c)
-		{
-		case 'A':
-			reflags |= REG_AUGMENTED;
-			break;
-		case 'E':
-			reflags |= REG_EXTENDED;
-			break;
-		case 'O':
-			reflags |= REG_LENIENT;
-			break;
-		case 'S':
-			reflags &= ~REG_LENIENT;
-			break;
-		case 'b':
-			bflag++;
-			break;
-		case 'e':
-			copyscript(&data, (unsigned char*)opt_info.arg);
-			break;
-		case 'f':
-			readscript(&data, opt_info.arg);
-			break;
-		case 'm':
-			reflags |= REG_MULTIREF;
-			break;
-		case 'n':
-			nflag++;
-			break;
-		case 'd':
-			break;
-		case '?':
-			error(ERROR_USAGE|4, "%s", opt_info.arg);
-			break;
-		case ':':
-			error(2, "%s", opt_info.arg);
-			break;
-		}
-	if (error_info.errors)
-		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	argv += opt_info.index;
-	argc -= opt_info.index;
-	if(data.s == 0) {
-		if(!*argv)
-			error(3, "no script");
-		copyscript(&data, (unsigned char*)*argv++);
-		argc--;
-	}
-	if(ustrncmp(data.s, "#n", 2) == 0)
-		nflag = 1;
-	copyscript(&data, (unsigned char*)"\n\n");  /* e.g. s/a/\ */
-	compile(&script, &data);
-#if DEBUG
-	printscript(&script);
-#endif
-
-	if (initinput(argc, argv))
-		for(;;) {
-			data.w = data.s;
-			if(!readline(&data))
-				break;
-			execute(&script, &data);
-		}
-	if(sfclose(sfstdout) < 0)
-		error(ERROR_SYSTEM|3, stdouterr);
-	return error_info.errors != 0;
-}
 
 void
 grow(Text *t, int n)
@@ -175,7 +101,18 @@ safescript(Text *t)
 		error(1, "script segment ends with \\");
 }
 
-void
+static Sfio_t *
+aopen(char *s, int level)
+{
+	Sfio_t *f = sfopen(NiL, s, "r");
+	if(f == 0)
+		error(ERROR_SYSTEM|level, "%s: cannot open", s);
+	if (uflag)
+		sfsetbuf(f, 0, 0);
+	return f;
+}
+
+static void
 readscript(Text *t, char *s)
 {
 	int n;
@@ -196,8 +133,8 @@ readscript(Text *t, char *s)
 	safescript(t);
 }
 
-void
-copyscript(Text *t, unsigned char *s)
+static void
+copyscript(Text *t, const unsigned char *s)
 {
 	do {
 		assure(t, 2);
@@ -273,7 +210,7 @@ ateof(void)
 	return input.iargc <= 0;
 }	
 
-int
+static int
 initinput(int argc, char **argv)
 {
 	input.iargc = argc;
@@ -290,15 +227,6 @@ initinput(int argc, char **argv)
 		error_info.file = *input.iargv;
 	}
 	return 1;
-}
-
-Sfio_t *
-aopen(char *s, int level)
-{
-	Sfio_t *f = sfopen(NiL, s, "r");
-	if(f == 0)
-		error(ERROR_SYSTEM|level, "%s: cannot open", s);
-	return f;
 }
 
 #if DEBUG & 1
@@ -324,3 +252,88 @@ execute(Text *x, Text *y)
 }
 
 #endif
+
+int
+main(int argc, char **argv)
+{
+	int c;
+	static Text script;
+	static Text data;
+	error_info.id = "sed";
+	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
+		reflags = REG_LENIENT;
+	map = ccmap(CC_NATIVE, CC_ASCII);
+	while (c = optget(argv, usage))
+		switch (c)
+		{
+		case 'A':
+		case 'X':
+			reflags |= REG_AUGMENTED;
+			break;
+		case 'E':
+		case 'r':
+			reflags |= REG_EXTENDED;
+			break;
+		case 'O':
+			reflags |= REG_LENIENT;
+			break;
+		case 'S':
+			reflags &= ~REG_LENIENT;
+			break;
+		case 'b':
+			bflag++;
+			break;
+		case 'e':
+			copyscript(&data, (unsigned char*)opt_info.arg);
+			break;
+		case 'f':
+			readscript(&data, opt_info.arg);
+			break;
+		case 'm':
+			reflags |= REG_MULTIREF;
+			break;
+		case 'n':
+			nflag++;
+			break;
+		case 'd':
+			break;
+		case 'u':
+			uflag++;
+			break;
+		case '?':
+			error(ERROR_USAGE|4, "%s", opt_info.arg);
+			break;
+		case ':':
+			error(2, "%s", opt_info.arg);
+			break;
+		}
+	if (error_info.errors)
+		error(ERROR_USAGE|4, "%s", optusage(NiL));
+	argv += opt_info.index;
+	argc -= opt_info.index;
+	if(data.s == 0) {
+		if(!*argv)
+			error(3, "no script");
+		copyscript(&data, (unsigned char*)*argv++);
+		argc--;
+	}
+	if(ustrncmp(data.s, "#n", 2) == 0)
+		nflag = 1;
+	copyscript(&data, (const unsigned char*)"\n\n");  /* e.g. s/a/\ */
+	compile(&script, &data);
+#if DEBUG
+	printscript(&script);
+#endif
+	if (uflag)
+		sfsetbuf(sfstdout, 0, 0);
+	if (initinput(argc, argv))
+		for(;;) {
+			data.w = data.s;
+			if(!readline(&data))
+				break;
+			execute(&script, &data);
+		}
+	if(sfclose(sfstdout) < 0)
+		error(ERROR_SYSTEM|3, stdouterr);
+	return error_info.errors != 0;
+}

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -58,14 +58,14 @@ extern void	coda(void);
 	
 	/* space management; assure room for n more chars in Text */
 #define assure(t, n) \
-	do if((t)->s==0 || (t)->w>=(t)->e-n-1) grow(t, n);while(0)
+	do if((t)->s==0 || (t)->w>=(t)->e-(n)-1) grow((t), (n));while(0)
 extern void	grow(Text*, int);
 
 	/* round character pointer up to word pointer.
 	   portable to the cray; simpler tricks are not */
 
-#define wordp(p) (word*)(p + sizeof(word) - 1 \
-			- (p+sizeof(word)-1 - (unsigned char*)0)%sizeof(word))
+#define wordp(p) (word*)((p) + sizeof(word) - 1 \
+			- ((p) + sizeof(word) - 1 - (unsigned char*)0)%sizeof(word))
 
 extern int	reflags;
 extern int	recno;

@@ -1,3 +1,6 @@
+09-10-28 command.c: disable *** error status message for .FAILURE targets
+09-10-27 parse.c,make.c: a - b : .JOINT => b:.DONTCARE (b optionally generated)
+09-10-27 Makerules.mk: install .pdb if it exists in .lib dir
 09-10-09 --- release 5.4 ---
 09-10-07 bind.c: makerule(path) == makerule(base) && !alias && terminal => drop path
 09-10-06 Makerules.mk: add '-' prefix to ARFLAGS for posix portability

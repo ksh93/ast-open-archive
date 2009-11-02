@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -41,11 +41,11 @@ unsigned char *succi(unsigned char*);
 extern void regdump(regex_t*);	/* secret entry into regex pkg */
 #endif
 
-int semicolon;
-int spaces;
-Text rebuf;
+static int semicolon;
+static int spaces;
+static Text rebuf;
 
-unsigned char adrs[UCHAR_MAX+1] = {	/* max no. of addrs, 3 is illegal */
+static const unsigned char adrs[UCHAR_MAX+1] = {	/* max no. of addrs, 3 is illegal */
 	0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, /* <nl> */
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 2, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,	/* !# */
@@ -580,7 +580,7 @@ execute(Text *script, Text *y)
 
 typedef void (*cmdf)(Text*, Text*);
 
-static cmdf docom[128] = {
+static const cmdf docom[128] = {
 	xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,Ic,xx,xx,xx,xx,xx, /* <nl> */
 	xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
 	xx,Ic,xx,Xc,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx, /* !# */
