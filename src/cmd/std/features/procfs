@@ -99,6 +99,7 @@ tst	run{
 	#define pr_size		pr_vsize
 	#define pr_sname	pr_state
 	#define pr_start	pr_starttime
+	#define pr_tgrp		pr_tpgid
 	#define pr_ttydev	pr_tty
 	
 	#define _PS_scan_format	"%ld %s %c %ld %ld %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu"

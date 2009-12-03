@@ -359,9 +359,35 @@ ye(Text *script, unsigned char *pc, Text *data)
 {
 	unsigned char *s = (unsigned char*)data->s;
 	unsigned char *w = (unsigned char*)data->w;
-	unsigned char *tbl = (unsigned char*)(instr(pc)+1);
-	for( ; s<w; s++)
-		*s = tbl[*s];
+	unsigned char **m = (unsigned char**)(instr(pc)+1);
+	unsigned char *b;
+	unsigned int c, x;
+	int i, n;
+	Sfio_t *f;
+	if(x = *m++ - (unsigned char*)0) {
+		if(!(f = sfstropen()))
+			error(ERROR_SYSTEM|3, "out of space");
+		while(s<w) {
+			b = s;
+			c = mbchar(s);
+			if(c < x && m[c]) {
+				n = m[c][0];
+				i = 0;
+				while(++i<=n)
+					sfputc(f, m[c][i]);
+			}
+			else
+				while(b<s)
+					sfputc(f, *b++);
+		}
+		x = sfstrtell(f);
+		assure(data, x);
+		memcpy(data->s, sfstrbase(f), x);
+		data->w = data->s + x;
+	}
+	else
+		for(b = (unsigned char*)m; s<w; s++)
+			*s = b[*s];
 	script = script;
 	return nexti(pc);
 }

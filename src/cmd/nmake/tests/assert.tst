@@ -124,12 +124,9 @@ TEST 07 ':INSTALLDIR:'
 	EXPORT INSTALLROOT=.
 
 	EXEC	-n install
-		INPUT Makefile $'$(FUNDIR) :INSTALLDIR: test'
+		INPUT Makefile $'$(FUNDIR) :INSTALLDIR: test\ntest :: test.sh'
 		INPUT test.sh
-		OUTPUT - $'+ if	silent test ! -d fun
-+ then	mkdir -p fun 		    		   
-+ fi
-+ case message:$OPTIND:$RANDOM in
+		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
@@ -160,6 +157,9 @@ TEST 07 ':INSTALLDIR:'
 + 	;;
 + esac
 + silent test -w test -a -x test || chmod u+w,+x test
++ if	silent test ! -d fun
++ then	mkdir -p fun 		    		   
++ fi
 + if	silent test \'\' != "test"
 + then	if	silent test \'\' != ""
 + 	then	: fun/test linked to test

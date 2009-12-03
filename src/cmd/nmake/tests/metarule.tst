@@ -709,7 +709,6 @@ ll.c : .PASS.AFTER.ll.c .FAIL.AFTER.ll.c
 
 	EXEC	DISABLE_YY=false DISABLE_LL=
 		ERROR - $'+ false
-make: *** exit code 1 making yy.c
 + : falling back to previous yy.c :
 + cp yy.yy.c yy.c
 + : falling back to previous yy.h :
@@ -729,7 +728,6 @@ make: *** exit code 1 making yy.c
 + cp yy.h yy.yy.h
 + cc -O -c yy.c
 + false
-make: *** exit code 1 making ll.c
 + : falling back to previous ll.c :
 + cp ll.ll.c ll.c
 + cc -O -c ll.c
@@ -740,7 +738,6 @@ make: *** exit code 1 making ll.c
 
 	EXEC	DISABLE_YY=false DISABLE_LL=false
 		ERROR - $'+ false
-make: *** exit code 1 making yy.c
 + : falling back to previous yy.c :
 + cp yy.yy.c yy.c
 + : falling back to previous yy.h :

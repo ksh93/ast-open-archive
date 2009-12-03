@@ -1,3 +1,4 @@
+09-11-20 sed: handle mb chars in y/from/to/
 09-10-31 sed: add a few gnu compatibility options
 09-02-02 repetition.dat,haskell.dat: add tests by Chris Kuklewicz www.haskell.org
 08-11-04 iso8859-1.dat: add [!-...] and [^-...] locale tests

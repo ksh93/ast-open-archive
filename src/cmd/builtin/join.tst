@@ -394,3 +394,21 @@ TEST 22 VSC#8
 		INPUT a.dat $'three:this:is:line:three:file2\ntwo:this:is:line:two:file2'
 		INPUT b.dat $'four:this:is:line:four:file3\nthree:this:is:line:three::file3'
 		OUTPUT - $'three:three:file2:bozo'
+
+TEST 23 'multibyte UTF-8'
+
+	EXPORT LC_CTYPE=de_DE.UTF-8
+
+	EXEC	-j1 1 -j2 2 -o 1.1 -t $'\342\202\254' a.dat b.dat
+		INPUT a.dat $'f1\342\202\254f2'
+		INPUT b.dat $'t2\342\202\254f1'
+		OUTPUT - 'f1'
+
+TEST 24 'multibyte euc'
+
+	EXPORT LC_CTYPE=ja_JP.eucJP
+
+	EXEC	-j1 1 -j2 2 -o 1.1 -t $'\xa1\xf7' a.dat b.dat
+		INPUT a.dat $'\x66\x31\xa1\xf7\x66\x32'
+		INPUT b.dat $'\x74\x32\xa1\xf7\x66\x31'
+		OUTPUT - 'f1'

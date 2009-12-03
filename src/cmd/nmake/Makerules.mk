@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-10-27 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-11-13 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -935,6 +935,7 @@ end
 				return $(%)
 			end
 		end
+		.REQUIRED.$(B) := 1
 		if "$(-mam:N=static*,port*)"
 			return ${mam_lib$(B)}
 		end
@@ -954,6 +955,7 @@ end
 	elif "$(-mam:N=static*,port*)"
 		return ${mam_lib$(B)}
 	end
+	.REQUIRED.$(B) := 1
 	T := $(T:T=I)
 	if "$(T:N=+l$(B))"
 		.PACKAGE.$(B).library := +l
@@ -2246,7 +2248,7 @@ RECURSEROOT = .
 	end
 
 .REQ. : .FUNCTION
-	local B I Q R
+	local B I Q R L
 	for I $(%)
 		if I == "[-+]l*"
 			B := $(I:/^[-+]l//)
@@ -2260,8 +2262,17 @@ RECURSEROOT = .
 			else
 				Q := $(.REQUIRE.-l% $(I))
 				if Q != "{ - }"
-					if "$(Q:T=F)"
-						R += $(I)
+					for L $(Q)
+						if "$(L:N=-l*)"
+							if "$(.REQUIRED.$(L:/-l//))"
+								R += $(I)
+								break
+							end
+						end
+						if "$(L:T=F)"
+							R += $(I)
+							break
+						end
 					end
 				end
 			end

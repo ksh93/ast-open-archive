@@ -15,8 +15,8 @@ E$	(?X)ab\\gdef	NULL	BADESC
 E	x{5,4}	NULL	BADBR
 E	z{1073741823}	NULL	BADBR
 E	[abcd	NULL	EBRACK
-E$	[\\B]	B	(0,1)
-E$x	[\\B]	B	(0,1)
+E$v	[\\B]	B	(0,1)
+E$xv	[\\B]	B	(0,1)
 E	[z-a]	NULL	ERANGE
 Eu	^*	NULL	(0,0)
 E	(abc	NULL	EPAREN
@@ -337,5 +337,5 @@ Ei	((?-i)[[:lower:]])[[:lower:]]	ab	(0,2)(0,1)
 Ei	SAME	aB	(0,2)(0,1)
 Ei	SAME	Ab	NOMATCH
 Ei	SAME	AB	NOMATCH
-E$	[\\200-\\410]	NULL	ERANGE
+E$v	[\\200-\\410]	NULL	ERANGE
 E	^(?(0)f|b)oo	NULL	ESUBREG

@@ -730,12 +730,16 @@ Exz	\U+	ABabcAB	(2,5)
 Exz	[a-\d]	!	NOMATCH
 E	[a-\d]	!	ERANGE
 E	[\d-a]	!	ERANGE
-Exz	[\d]+	ab012ab	(2,5)
-Exz	[\D]	!	(0,1)
+Exz	[\d]+	ab012ad	(6,7)
+Evxz	[\d]+	ab012ad	(2,5)
+Exz	[\D]	!D	(1,2)
+Evxz	[\D]	!D	(0,1)
 Exz	\D+	01abc01	(2,5)
 Exz	\s+	ab   ab	(2,5)
-Exz	[\s]+	ab   ab	(2,5)
-Exz	[\S]	!	(0,1)
+Exz	[\s]+	as   as	(1,2)
+Evxz	[\s]+	as   as	(2,5)
+Exz	[\S]	!S	(1,2)
+Evxz	[\S]	!S	(0,1)
 Exz	\S+	  abc  	(2,5)
 }
 # - match_default normal REG_EXTENDED REG_STARTEND

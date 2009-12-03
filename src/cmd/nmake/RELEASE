@@ -1,3 +1,4 @@
+09-11-13 Makerules.mk: fix .req logic for virtual -lfoo
 09-10-28 command.c: disable *** error status message for .FAILURE targets
 09-10-27 parse.c,make.c: a - b : .JOINT => b:.DONTCARE (b optionally generated)
 09-10-27 Makerules.mk: install .pdb if it exists in .lib dir

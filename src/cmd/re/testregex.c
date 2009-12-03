@@ -34,7 +34,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2008-05-15 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2009-11-11 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -70,15 +70,15 @@ static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2008-05-15 $\0\n"
 #define TEST_LRE		0x00000010
 #define TEST_SRE		0x00000020
 
-#define TEST_EXPAND		0x00000040
-#define TEST_LENIENT		0x00000080
+#define TEST_EXPAND		0x00000100
+#define TEST_LENIENT		0x00000200
 
-#define TEST_QUERY		0x00000100
-#define TEST_SUB		0x00000200
-#define TEST_UNSPECIFIED	0x00000400
-#define TEST_VERIFY		0x00000800
-#define TEST_AND		0x00001000
-#define TEST_OR			0x00002000
+#define TEST_QUERY		0x00000400
+#define TEST_SUB		0x00000800
+#define TEST_UNSPECIFIED	0x00001000
+#define TEST_VERIFY		0x00002000
+#define TEST_AND		0x00004000
+#define TEST_OR			0x00008000
 
 #define TEST_DELIMIT		0x00010000
 #define TEST_OK			0x00020000
@@ -118,7 +118,7 @@ compf(const regex_t* re, const char* xstr, size_t xlen, regdisc_t* disc)
 {
 	Disc_t*		dp = (Disc_t*)disc;
 
-	return (void*)++dp->ordinal;
+	return (void*)((char*)0 + ++dp->ordinal);
 }
 
 static int
@@ -126,7 +126,7 @@ execf(const regex_t* re, void* data, const char* xstr, size_t xlen, const char* 
 {
 	Disc_t*		dp = (Disc_t*)disc;
 
-	sfprintf(dp->sp, "{%-.*s}(%d:%d)", xlen, xstr, (int)data, slen);
+	sfprintf(dp->sp, "{%-.*s}(%lu:%d)", xlen, xstr, (char*)data - (char*)0, slen);
 	return atoi(xstr);
 }
 
@@ -199,8 +199,8 @@ T("  0 pointer.\n");
 T("\n");
 T("  Field 1: the regex(3) flags to apply, one character per REG_feature\n");
 T("  flag. The test is skipped if REG_feature is not supported by the\n");
-T("  implementation. If the first character is not [BEASKL] then the\n");
-T("  specification is a global control line. One or more of [BEASKL] may be\n");
+T("  implementation. If the first character is not [BEASKLP] then the\n");
+T("  specification is a global control line. One or more of [BEASKLP] may be\n");
 T("  specified; the test will be repeated for each mode.\n");
 T("\n");
 T("    B 	basic			BRE	(grep, ed, sed)\n");
@@ -231,6 +231,7 @@ T("    r	REG_RIGHT		implicit ...$\n");
 T("    s	REG_SHELL_ESCAPED	\\ not special\n");
 T("    t	REG_MUSTDELIM		all delimiters must be specified\n");
 T("    u	standard unspecified behavior -- errors not counted\n");
+T("    v	REG_CLASS_ESCAPE	\\ special inside [...]\n");
 T("    w	REG_NOSUB		no subexpression match array\n");
 T("    x	REG_LENIENT		let some errors slide\n");
 T("    y	REG_LEFT		regexec() implicit ^...\n");
@@ -329,6 +330,9 @@ static const char* unsupported[] =
 	"SHELL",
 #endif
 
+#ifndef REG_CLASS_ESCAPE
+	"CLASS_ESCAPE",
+#endif
 #ifndef REG_COMMENT
 	"COMMENT",
 #endif
@@ -410,6 +414,9 @@ static const char* unsupported[] =
 	0
 };
 
+#ifndef REG_CLASS_ESCAPE
+#define REG_CLASS_ESCAPE	NOTEST
+#endif
 #ifndef REG_COMMENT
 #define REG_COMMENT	NOTEST
 #endif
@@ -1481,7 +1488,13 @@ main(int argc, char** argv)
 						s = field[1];
 						if (!s || streq(s, "POSIX"))
 							s = "C";
-						if (!(ans = setlocale(LC_COLLATE, s)) || streq(ans, "C") || streq(ans, "POSIX") || !(ans = setlocale(LC_CTYPE, s)) || streq(ans, "C") || streq(ans, "POSIX"))
+						if ((ans = setlocale(LC_COLLATE, s)) && streq(ans, "POSIX"))
+							ans = "C";
+						if (!ans || !streq(ans, s) && streq(s, "C"))
+							ans = 0;
+						else if ((ans = setlocale(LC_CTYPE, s)) && streq(ans, "POSIX"))
+							ans = "C";
+						if (!ans || !streq(ans, s) && streq(s, "C"))
 							skip = note(level, s, skip, test);
 						else
 						{
@@ -1570,6 +1583,9 @@ main(int argc, char** argv)
 					continue;
 				case 'u':
 					test |= TEST_UNSPECIFIED;
+					continue;
+				case 'v':
+					cflags |= REG_CLASS_ESCAPE;
 					continue;
 				case 'w':
 					cflags |= REG_NOSUB;

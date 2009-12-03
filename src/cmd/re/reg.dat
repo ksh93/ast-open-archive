@@ -198,6 +198,9 @@ BE	a[--?]b		a?b		(0,3)
 BE	a[---]b		a-b		(0,3)
 BE	a[]b]c		a]c		(0,3)
 BE	a[]]b		a]b		(0,3)
+BE	a[[b]c		a[c		(0,3)
+BE	a[[b]c		abc		(0,3)
+
 B	a[\]]b		a]b		NOMATCH
 E	a[\]]b		a]b		NOMATCH
 B	a[\]]b		a\]b		(0,4)
@@ -207,23 +210,48 @@ E	a[\\]b		a\b		(0,3)
 E	a[\\]b		a\b		(0,3)
 B	a[\Z]b		a\b		(0,3)
 E	a[\Z]b		a\b		(0,3)
-BE	a[[b]c		a[c		(0,3)
-BE	a[[b]c		abc		(0,3)
+
+Bv	a[\]]b		a]b		NOMATCH
+Ev	a[\]]b		a]b		NOMATCH
+Bv	a[\]]b		a\]b		(0,4)
+Ev	a[\]]b		a\]b		(0,4)
+Bv	a[\\]b		a\b		(0,3)
+Ev	a[\\]b		a\b		(0,3)
+Ev	a[\\]b		a\b		(0,3)
+Bv	a[\Z]b		a\b		(0,3)
+Ev	a[\Z]b		a\b		(0,3)
+
 BE	a[[\b]c		a[c		(0,3)
-BE	a[[\b]c		abc		NOMATCH
+BE	a[[\b]c		abc		(0,3)
 BE	a[[\\b]c	abc		(0,3)
 BE	a[[\Z]c		aZc		(0,3)
-BE	a[[\b]c		a\c		NOMATCH
+BE	a[[\b]c		a\c		(0,3)
 BE	a[[\\b]c	a\c		(0,3)
 BE	a[[\b]*c	a[c		(0,3)
 BE	a[[\\b]*c	a[c		(0,3)
-BE	a[[\b]*c	a[bc		NOMATCH
+BE	a[[\b]*c	a[bc		(0,4)
 BE	a[[\\b]*c	a[bc		(0,4)
 BE	a[[\b]*c	a[c		(0,3)
 BE	a[[\\b]*c	a[c		(0,3)
-BE	a[[\b]*c	ab[c		NOMATCH
+BE	a[[\b]*c	ab[c		(0,4)
 BE	a[[\\b]*c	ab[c		(0,4)
 E$	a[\xfe-\a][\xff-	a\x02\xfb	ERANGE
+
+BEv	a[[\b]c		a[c		(0,3)
+BEv	a[[\b]c		abc		NOMATCH
+BEv	a[[\\b]c	abc		(0,3)
+BEv	a[[\Z]c		aZc		(0,3)
+BEv	a[[\b]c		a\c		NOMATCH
+BEv	a[[\\b]c	a\c		(0,3)
+BEv	a[[\b]*c	a[c		(0,3)
+BEv	a[[\\b]*c	a[c		(0,3)
+BEv	a[[\b]*c	a[bc		NOMATCH
+BEv	a[[\\b]*c	a[bc		(0,4)
+BEv	a[[\b]*c	a[c		(0,3)
+BEv	a[[\\b]*c	a[c		(0,3)
+BEv	a[[\b]*c	ab[c		NOMATCH
+BEv	a[[\\b]*c	ab[c		(0,4)
+E$v	a[\xfe-\a][\xff-	a\x02\xfb	ERANGE
 
 # anchors and newlines
 
@@ -317,9 +345,14 @@ E	a\wb		a-b		NOMATCH
 E	a\Wb		axb		NOMATCH
 E	a\Wb		a-b		(0,3)
 E	\y\w+z\y	adze-guz	BADESC
-E	a[\d]b		a1b		(0,3)
-E$	a[\\s]b		a b		(0,3)
-E	a[\w]b		axb		(0,3)
+
+E	a[\d]b		a1b		NOMATCH
+E$	a[\\s]b		a b		NOMATCH
+E	a[\w]b		axb		NOMATCH
+
+Ev	a[\d]b		a1b		(0,3)
+E$v	a[\\s]b		a b		(0,3)
+Ev	a[\w]b		axb		(0,3)
 
 # escapes
 

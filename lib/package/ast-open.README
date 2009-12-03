@@ -92,7 +92,26 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-11-02  --- Release ksh93t+  ---
+09-11-30  --- Release ksh93t+  ---
+09-11-30  A bug in which a trap could be inherited by the first element of
+	  a pipeline when the command had more than 63 arguments that did
+	  not contain any macro expansions has been fixed.
+09-11-19  When read from a terminal was called from with a while or foo loop,
+	  and an edit mode was on, a backspace or erase no longer will
+	  overwrite the prompt.
+09-11-17  Change .paths parse to handle BUILTIN_LIB=foo BUILTIN_LIB=foo-1.2.
+09-11-17  Inside a function, typeset foo.bar will bind foo to global variable
+	  foo if local variable foo does not exist, instead of creating a 
+	  local variable.
+09-11-17  "read -n1" from the terminal has been fixed to read exactly one character.
+09-11-11  Job control now works for subshell commands, (...).
+09-11-11  If set -e is on for an interractive shell errors in special builtins
+	  now cause the shell to exit.
+09-11-11  A bug in which an interrupt handler processed during the read builtin
+	  when IFS did not contain a new line has been fixed.
+09-11-09  A bug in which a variable that has been unset in a subshell and then
+	  exported from that subshell does not show up in the environment
+	  has been fixed.
 09-11-02  ``,2'' is now a valid numeric constant for locales with
 	  decimal_point=','.
 09-11-02  A bug where "return" in .profile did not restore the shell state
@@ -2692,6 +2711,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+09-11-13 vmalloc/trandom.c: fix test logic
 09-07-22 ip6.rt: add trailing :0 tests
 09-04-27 sfio/tpool.c: update to match libast/sfio/sfpool.c patch
 09-02-22 date.dat: add iso duration tests
@@ -3109,6 +3129,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+09-11-13 Makerules.mk: fix .req logic for virtual -lfoo
 09-10-28 command.c: disable *** error status message for .FAILURE targets
 09-10-27 parse.c,make.c: a - b : .JOINT => b:.DONTCARE (b optionally generated)
 09-10-27 Makerules.mk: install .pdb if it exists in .lib dir
@@ -5050,6 +5071,7 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+09-11-20 sed: handle mb chars in y/from/to/
 09-10-31 sed: add a few gnu compatibility options
 09-02-02 repetition.dat,haskell.dat: add tests by Chris Kuklewicz www.haskell.org
 08-11-04 iso8859-1.dat: add [!-...] and [^-...] locale tests
@@ -5278,6 +5300,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+09-11-11 features/procfs: handle linux /proc pr_tgrp == pr_tpgid
 09-10-21 locale.c: use fmtquote() to print key values
 09-07-02 ls.c: ftwflags() default only if not --recursive
 09-05-15 ps.c: fix format field alias logic
@@ -5706,6 +5729,10 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-11-21 misc/magic.tab: add gimp XCF
+09-11-20 vmalloc/vmtrace.c: add pid to assertion disgnostics
+09-11-11 regex.h,regcomp.c: add REG_CLASS_ESCAPE, \ inside [...] literal by default
+09-11-03 regex/regcache.c: change to variable length pattern strings
 09-10-28 include/error.h: fix ERROR_translate() arg parens
 09-10-26 port/lcgen.c,comp/setlocale.c: handle LANG init after LC_* already defined
 09-10-05 _sfopen.c: add but ignore 'F' flags for stdio compatibility
@@ -7302,6 +7329,13 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+09-11-30 cat.c,date.c,cksum.c: drop setlocale() call already done by optget()
+09-11-30 join.c: handle -t mb
+09-11-30 TODO cut.c: handle -d mb
+09-11-28 wclib.c: { -w -L } mb independent of -m
+09-11-28 paste.c: handle -d mb
+09-11-28 uniq.c: handle -s mb
+09-11-28 cksum.c: FTS_SEEDOTDIR by default
 09-09-09 fds.c: add --unit=fd
 09-08-25 tail.c: initialize Tail_t.fifo=0 !!
 09-08-15 tail.c: fix fifo logic
@@ -7587,6 +7621,7 @@ All recorded changes follow.
 
 :::::::: libdll ::::::::
 
+09-11-17 dllscan.c: handle name[-.]version in dlsopen()
 09-04-15 dllopen.c: add, use dllopen() internally to wrap dlopen()
 08-05-12 dllscan.c: LIBSUFFIX==.dylib => default plugin version match 0.0
 06-10-11 dllscan.c: check sfstruse() return values -- doh

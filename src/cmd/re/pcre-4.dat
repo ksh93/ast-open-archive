@@ -1,17 +1,17 @@
 : converted from the pcre testdata/testinput4 2008-05-14
 
-E$	[\\b]	\b	(0,1)
-E$	SAME	a	NOMATCH
+E$v	[\\b]	\b	(0,1)
+E$v	SAME	a	NOMATCH
 
 {C	es_ES.ISO-8859-1
 
 {E	\w	É	(0,1)	locale does not recognize ISO-8859-1 8 bit E-acute alpha
 
-E	^[\w]+	École	(0,5)
-E	^[\w]+	École	(0,5)
-E	^[\w]+	École	(0,5)
-E	^[\W]+	École	NOMATCH
-E	^[\W]+	École	NOMATCH
+Ev	^[\w]+	École	(0,5)
+Ev	^[\w]+	École	(0,5)
+Ev	^[\w]+	École	(0,5)
+Ev	^[\W]+	École	NOMATCH
+Ev	^[\W]+	École	NOMATCH
 E	^\w+	École	(0,5)
 E	^\w+	École	(0,5)
 
@@ -20,20 +20,20 @@ Ei	École	École	(0,5)
 Ei	SAME	école	(0,5)
 Ei	École	École	(0,5)
 Ei	SAME	école	(0,5)
-Exi	^[\xc8-\xc9]	École	(0,1)
-Exi	SAME	école	(0,1)
+Exiv	^[\xc8-\xc9]	École	(0,1)
+Exiv	SAME	école	(0,1)
 Exi	^\xc9	École	(0,1)
 Exi	SAME	école	(0,1)
-Ex	^[\xc8-\xc9]	École	(0,1)
-Ex	SAME	école	NOMATCH
+Exv	^[\xc8-\xc9]	École	(0,1)
+Exv	SAME	école	NOMATCH
 Ex	^\xc9	École	(0,1)
 Ex	SAME	école	NOMATCH
-E$xi	^[\xc8-\xc9]	École	(0,1)
-E$xi	SAME	école	(0,1)
+E$xiv	^[\xc8-\xc9]	École	(0,1)
+E$xiv	SAME	école	(0,1)
 E$xi	^\xc9	École	(0,1)
 E$xi	SAME	école	(0,1)
-E$x	^[\xc8-\xc9]	École	(0,1)
-E$x	SAME	école	NOMATCH
+E$xv	^[\xc8-\xc9]	École	(0,1)
+E$xv	SAME	école	NOMATCH
 E$x	^\xc9	École	(0,1)
 E$x	SAME	école	NOMATCH
 

@@ -58,8 +58,8 @@ E$	SAME	axbxxbcdefghijb 	(0,6)(1,5)
 E$	SAME	axxxxxbcdefghijb 	(0,7)(1,6)
 E$	SAME	a\x{1234}b 	NOMATCH
 E$	SAME	axxxxxxbcdefghijb 	NOMATCH
-E$	^[a\\x{c0}]	\x{c0}	(0,1)
-E$x	SAME		\x{c0}	(0,1)
+E$v	^[a\\x{c0}]	\x{c0}	(0,1)
+E$xv	SAME		\x{c0}	(0,1)
 E	(?<=aXb)cd	aXbcd	(3,5)
 E$	(?<=a\\x{100}b)cd	a\x{100}bcd	(3,5)
 E$x	SAME			a\x{100}bcd	(3,5)

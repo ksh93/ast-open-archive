@@ -553,7 +553,7 @@ TEST 09 'prereq error'
 	EXEC
 		INPUT Makefile $'target : file1 file2 file3 file4
 	: COMPILE $(>)
-	grep -q error $(*) && exit 1
+	grep error $(*) >/dev/null && exit 1
 	sleep 1
 	touch $(<)'
 		INPUT file1 $'ok'
@@ -561,7 +561,8 @@ TEST 09 'prereq error'
 		INPUT file3 $'ok'
 		INPUT file4 $'ok'
 		ERROR - $'+ : COMPILE file1 file2 file3 file4
-+ grep -q error file1 file2 file3 file4
++ grep error file1 file2 file3 file4
++ 1> /dev/null
 + sleep 1
 + touch target'
 
@@ -573,7 +574,8 @@ TEST 09 'prereq error'
 		INPUT file2 $'error'	# simulate compilation error
 		INPUT file3 $'good'	# simulate good patch
 		ERROR - $'+ : COMPILE file2 file3
-+ grep -q error file1 file2 file3 file4
++ grep error file1 file2 file3 file4
++ 1> /dev/null
 + exit 1
 make: *** exit code 1 making target'
 		EXIT 1
@@ -581,7 +583,8 @@ make: *** exit code 1 making target'
 	EXEC	--regress=sync
 		INPUT file2 $'better'	# simulate good repatch
 		ERROR - $'+ : COMPILE file2 file3
-+ grep -q error file1 file2 file3 file4
++ grep error file1 file2 file3 file4
++ 1> /dev/null
 + sleep 1
 + touch target'
 		EXIT 0

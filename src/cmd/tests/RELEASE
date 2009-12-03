@@ -1,3 +1,4 @@
+09-11-13 vmalloc/trandom.c: fix test logic
 09-07-22 ip6.rt: add trailing :0 tests
 09-04-27 sfio/tpool.c: update to match libast/sfio/sfpool.c patch
 09-02-22 date.dat: add iso duration tests

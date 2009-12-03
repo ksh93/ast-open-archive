@@ -1,4 +1,4 @@
-: strmatch and strgrpmatch tests 2005-03-30
+: strmatch and strgrpmatch tests 2009-11-11
 
 # shell patterns
 
@@ -23,7 +23,11 @@ S	[a-fh-z]*	jack			(0,4)
 S	\i\**		i*hello			(0,7)
 S	[a-z\\]		\			(0,1)
 S	[a-z%_]		b			(0,1)
-S	[\]]		]			(0,1)
+S	[\]		\			(0,1)
+Sv	[\]		\			NOMATCH
+Sv	[\]		[\]			(0,3)
+S	[\]]		]			NOMATCH
+Sv	[\]]		]			(0,1)
 S	\i?*		itch			(0,4)
 S	\i?*		it			(0,2)
 S	?*?*?t		test			(0,4)
@@ -89,14 +93,21 @@ S	[\		test			NOMATCH
 S	\t[est		test			NOMATCH
 S	?*[]		hello			NOMATCH
 S	[]		]			NOMATCH
-S	[\[-\]		[			NOMATCH
-S	[\[-\]]		[			(0,1)
-S	[\[-\]]		]			(0,1)
+S	[\[-\]		[			(0,1)
+Sv	[\[-\]		[			NOMATCH
+S	[\[-\]]		[			NOMATCH
+S	[\[-\]]		[]			(0,2)
+Sv	[\[-\]]		[			(0,1)
+S	[\[-\]]		]			NOMATCH
+S	[\[-\]]		[]			(0,2)
+S	[\[X\]]		[]			(0,2)
+Sv	[\[-\]]		]			(0,1)
 S	[a		atest			NOMATCH
 S	[a-		atest			NOMATCH
 S	[a-z		atest			NOMATCH
 S	[a-fh-z		jack			NOMATCH
-S	[a-fh-z\]	jack			NOMATCH
+S	[a-fh-z\]	jack			(0,1)
+Sv	[a-fh-z\]	jack			NOMATCH
 S	[a-e\		atest			NOMATCH
 S	[a-\		atest			NOMATCH
 S	[a-bd-\		atest			NOMATCH

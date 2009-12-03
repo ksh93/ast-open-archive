@@ -426,18 +426,18 @@ E$	\\d	1	(0,1)
 E$	\\D	-	(0,1)
 E$	SAME	-	(0,1)
 E$	SAME	1	NOMATCH
-E$	[\\w]	a	(0,1)
-E$	[\\W]	-	(0,1)
-E$	SAME	-	(0,1)
-E$	SAME	a	NOMATCH
-E$	a[\\s]b	a b	(0,3)
-E$	a[\\S]b	a-b	(0,3)
-E$	SAME	a-b	(0,3)
-E$	SAME	a b	NOMATCH
-E$	[\\d]	1	(0,1)
-E$	[\\D]	-	(0,1)
-E$	SAME	-	(0,1)
-E$	SAME	1	NOMATCH
+E$v	[\\w]	a	(0,1)
+E$v	[\\W]	-	(0,1)
+E$v	SAME	-	(0,1)
+E$v	SAME	a	NOMATCH
+E$v	a[\\s]b	a b	(0,3)
+E$v	a[\\S]b	a-b	(0,3)
+E$v	SAME	a-b	(0,3)
+E$v	SAME	a b	NOMATCH
+E$v	[\\d]	1	(0,1)
+E$v	[\\D]	-	(0,1)
+E$v	SAME	-	(0,1)
+E$v	SAME	1	NOMATCH
 E	ab|cd	abc	(0,2)
 E	SAME	abcd	(0,2)
 Ez	()ef	def	(1,3)(1,1)
@@ -821,14 +821,14 @@ E	$(?<=^(a))	a	(1,1)(0,1)
 E$	(?=(a+?))(\\1ab)	aaab	(0,4)(0,2)(0,4)
 E$	^(?=(a+?))\\1ab	aaab	(0,4)(0,2)
 E$	SAME	aaab	(0,4)(0,2)
-E$	([\\w:]+::)?(\\w+)$	abcd	(0,4)(?,?)(0,4)
-E$	SAME	xy:z:::abcd	(0,11)(0,7)(7,11)
+E$v	([\\w:]+::)?(\\w+)$	abcd	(0,4)(?,?)(0,4)
+E$v	SAME	xy:z:::abcd	(0,11)(0,7)(7,11)
 E	^[^bcd]*(c+)	aexycd	(0,5)(4,5)
 E	(a*)b+	caab	(1,4)(1,3)
-E$	([\\w:]+::)?(\\w+)$	abcd	(0,4)(?,?)(0,4)
-E$	SAME	xy:z:::abcd	(0,11)(0,7)(7,11)
-E$	SAME	abcd:	NOMATCH
-E$	SAME	abcd:	NOMATCH
+E$v	([\\w:]+::)?(\\w+)$	abcd	(0,4)(?,?)(0,4)
+E$v	SAME	xy:z:::abcd	(0,11)(0,7)(7,11)
+E$v	SAME	abcd:	NOMATCH
+E$v	SAME	abcd:	NOMATCH
 E	^[^bcd]*(c+)	aexycd	(0,5)(4,5)
 E	(?>a+)b	aaab	(0,4)
 E	([[:]+)	a:[b]:	ECTYPE
@@ -842,28 +842,28 @@ E$	SAME	a\nb\n	NOMATCH
 E$	b\\Z	a\nb\n	(2,3)
 E$	b\\Z	a\nb	(2,3)
 E$	b\\z	a\nb	(2,3)
-E$	^(?>(?(1)\\.|())[^\\W_](?>[a-z0-9-]*[^\\W_])?)+$	a	ESUBREG
-E$	SAME	abc	ESUBREG
-E$	SAME	a-b	ESUBREG
-E$	SAME	0-9	ESUBREG
-E$	SAME	a.b	ESUBREG
-E$	SAME	5.6.7	ESUBREG
-E$	SAME	the.quick.brown.fox	ESUBREG
-E$	SAME	a100.b200.300c	ESUBREG
-E$	SAME	12-ab.1245	ESUBREG
-E$	SAME	NULL	ESUBREG
-E$	SAME	.a	ESUBREG
-E$	SAME	-a	ESUBREG
-E$	SAME	a-	ESUBREG
-E$	SAME	a.	ESUBREG
-E$	SAME	a_b	ESUBREG
-E$	SAME	a.-	ESUBREG
-E$	SAME	a..	ESUBREG
-E$	SAME	ab..bc	ESUBREG
-E$	SAME	the.quick.brown.fox-	ESUBREG
-E$	SAME	the.quick.brown.fox.	ESUBREG
-E$	SAME	the.quick.brown.fox_	ESUBREG
-E$	SAME	the.quick.brown.fox+	ESUBREG
+E$v	^(?>(?(1)\\.|())[^\\W_](?>[a-z0-9-]*[^\\W_])?)+$	a	ESUBREG
+E$v	SAME	abc	ESUBREG
+E$v	SAME	a-b	ESUBREG
+E$v	SAME	0-9	ESUBREG
+E$v	SAME	a.b	ESUBREG
+E$v	SAME	5.6.7	ESUBREG
+E$v	SAME	the.quick.brown.fox	ESUBREG
+E$v	SAME	a100.b200.300c	ESUBREG
+E$v	SAME	12-ab.1245	ESUBREG
+E$v	SAME	NULL	ESUBREG
+E$v	SAME	.a	ESUBREG
+E$v	SAME	-a	ESUBREG
+E$v	SAME	a-	ESUBREG
+E$v	SAME	a.	ESUBREG
+E$v	SAME	a_b	ESUBREG
+E$v	SAME	a.-	ESUBREG
+E$v	SAME	a..	ESUBREG
+E$v	SAME	ab..bc	ESUBREG
+E$v	SAME	the.quick.brown.fox-	ESUBREG
+E$v	SAME	the.quick.brown.fox.	ESUBREG
+E$v	SAME	the.quick.brown.fox_	ESUBREG
+E$v	SAME	the.quick.brown.fox+	ESUBREG
 E	(?>.*)(?<=(abcd|wxyz))	alphabetabcd	(0,12)(8,12)
 E	SAME	endingwxyz	(0,10)(6,10)
 E	SAME	a rather long string that doesn't end with one of them	NOMATCH
@@ -889,10 +889,10 @@ Ei	<a +href *= *((["'])(.*?)\2|[^ ]+)	<a href=abcd xyz	(0,12)(8,12)
 Ei	<a +href *= *((["'])(.*?)\2|[^ ]+)	<a href="abcd" xyz	(0,14)(8,14)(8,9)(9,13)
 Ei	<a +href *= *(["'])?(?(1)(.*?)\1|([^ ]+))	<a href=abcd xyz	(0,12)(?,?)(?,?)(8,12)
 Ei	<a +href *= *(["'])?(?(1)(.*?)\1|([^ ]+))	<a href='abcd' xyz	(0,14)(8,9)(9,13)
-Ei	<a[\s]+href[\s]*=[\s]*(["'])?(?(1)(.*?)\1|([^\s]+))	<a href=abcd xyz	(0,12)(?,?)(?,?)(8,12)
-E$ijc	<a[\\s]+href[\\s]*=[\\s]*       # find <a href=\n (["\\'])?                              # find single or double quote\n (?(1) (.*?)\\1 | ([^\\s]+))            # if quote found, match up to\n                                        # next matching quote,\n                                        # otherwise match up to next\n                                        # space\n	<a href=abcd xyz	(0,12)(?,?)(?,?)(8,12)
-E$ijc	SAME	<a href="abcd xyz pqr" cats	(0,22)(8,9)(9,21)
-E$ijc	SAME	<a href='abcd xyz pqr' cats	(0,22)(8,9)(9,21)
+Eiv	<a[\s]+href[\s]*=[\s]*(["'])?(?(1)(.*?)\1|([^\s]+))	<a href=abcd xyz	(0,12)(?,?)(?,?)(8,12)
+E$ijcv	<a[\\s]+href[\\s]*=[\\s]*       # find <a href=\n (["\\'])?                              # find single or double quote\n (?(1) (.*?)\\1 | ([^\\s]+))            # if quote found, match up to\n                                        # next matching quote,\n                                        # otherwise match up to next\n                                        # space\n	<a href=abcd xyz	(0,12)(?,?)(?,?)(8,12)
+E$ijcv	SAME	<a href="abcd xyz pqr" cats	(0,22)(8,9)(9,21)
+E$ijcv	SAME	<a href='abcd xyz pqr' cats	(0,22)(8,9)(9,21)
 E$ijc	<a\\s+href\\s*=\\s* # find <a href=\n (["'])?                    # find single or double quote\n (?(1) (.*?)\\1 | (\\S+))   # if quote found, match to next matching\n                            # quote, otherwise match up to next space\n	<a href=abcd xyz	(0,12)(?,?)(?,?)(8,12)
 E$ijc	SAME	<a href="abcd xyz pqr" cats	(0,22)(8,9)(9,21)
 E$ijc	SAME	<a href       =       'abcd xyz pqr' cats	(0,36)(22,23)(23,35)
@@ -907,12 +907,12 @@ Ez	(Z(())|A)*	ZABCDEFG	(0,2)(1,2)
 E	((?>Z)+|A)*	ZABCDEFG	(0,2)(1,2)
 E	((?>)+|A)*	ZABCDEFG	(0,0)(0,0)
 E	a*	abbab	(0,1)
-E$	^[a-\\d]*	abcde	ERANGE
-E$	^[a-\\d]	abcde	ERANGE
-E$	SAME	-things	ERANGE
-E$	SAME	0digit	ERANGE
-E$	SAME	bcdef	ERANGE
-E$	^[\\d-a]	abcde	ERANGE
-E$	SAME	-things	ERANGE
-E$	SAME	0digit	ERANGE
-E$	SAME	bcdef	ERANGE
+E$v	^[a-\\d]*	abcde	ERANGE
+E$v	^[a-\\d]	abcde	ERANGE
+E$v	SAME	-things	ERANGE
+E$v	SAME	0digit	ERANGE
+E$v	SAME	bcdef	ERANGE
+E$v	^[\\d-a]	abcde	ERANGE
+E$v	SAME	-things	ERANGE
+E$v	SAME	0digit	ERANGE
+E$v	SAME	bcdef	ERANGE

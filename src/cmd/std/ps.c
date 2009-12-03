@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2009-05-15 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2009-11-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"

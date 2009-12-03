@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,168 +20,145 @@
 #include	"vmtest.h"
 #include	<stdlib.h>
 
-#define TWARN		0		/* enable debug warnings	*/
+#ifdef TWARN		/* enable debug warnings */
+#undef	TWARN
+#define TWARN(x)	twarn x
+#else
+#define TWARN(x)
+#endif /*TWARN*/
 
 static unsigned long	RAND_state = 1;
 
 #define RAND()		(RAND_state = RAND_state * 0x63c63cd9L + 0x9c39c33dL)
 
-#define N_OBJ		500000		/* number of allocated objects	*/
-
-#define COMPACT		(N_OBJ/5)	/* period for compacting	*/
-
-#define HUGESZ		(4*1024)	/* increase huge block by this	*/
-#define H_FREQ		(N_OBJ/100)	/* 1/H_FREQ: resizing probab.	*/
-
-/* size of an allocation or resize */
-#define L_FREQ		100		/* one out of L_FREQ is LARGE	*/		
-#define LARGE		10000		/* size of large objects	*/
-#define SMALL		100		/* size of small objects	*/
-#define MICRO		10
-#define L_ALLOC()	(RAND()%LARGE + LARGE)
-#define S_ALLOC()	(RAND()%SMALL + SMALL)
-#define M_ALLOC()	(RAND()%MICRO + 1)
-#define ALLOCSZ()	(RAND()%L_FREQ == 0 ? L_ALLOC() : \
-			 RAND()%2 == 0 ? S_ALLOC() : M_ALLOC() )
-
-/* when to resize or free */
-#define L_RANGE		10000		/* when to resize/free large 	*/
-#define S_RANGE		10		/* when to resize/free small	*/
-#define M_RANGE		5		/* when to resize/free micro	*/
-#define RANGE(sz)	(sz >= LARGE ? L_RANGE : sz >= SMALL ? S_RANGE : M_RANGE)
-#define WHEN(sz)	((RAND() % RANGE(sz)) + 1)
-
 typedef struct _obj_s	Obj_t;
 struct _obj_s
-{	Void_t*	obj;
-	size_t	size;
-	Obj_t*	head;
-	Obj_t*	next;
+{	Void_t*	obj;	/* allocated object	*/
+	size_t	size;	/* its allocated size	*/
+	Obj_t*	next;	/* linked list pointer 	*/
 };
-static Obj_t		Obj[N_OBJ+1];
 
+#define N_OBJ		500000	/* #iterations and #objects */
+static Obj_t		Obj[N_OBJ], *List[N_OBJ+1];
+
+#define Z_HUGE		5000		/* huge block size increment	*/
+#define Z_BIG		10000		/* size range of large objects	*/
+#define Z_MED		100		/* size range of medium objects	*/
+#define Z_TINY		10		/* size range of small objects	*/
+
+#define ALLOCSIZE()	(RAND()%100 == 0 ? (RAND()%Z_BIG + Z_BIG/2 ) : \
+			 RAND()%10  == 0 ? (RAND()%Z_MED + Z_MED ) : \
+					   (RAND()%Z_TINY + 1) )
+
+/* when to resize or free */
+#define TM_BIG		1000		/* life range of a big block 	*/
+#define TM_MED		10		/* life range of a medium block	*/
+#define TM_TINY		5		/* life range of a tiny block	*/
+#define TMRANGE(zz)	(zz >= Z_BIG ? TM_BIG : zz >= Z_MED ? TM_MED : TM_TINY )
+#define TIME(nk,kk,zz)	((nk = kk + (RAND() % TMRANGE(zz)) + 1), \
+			 (nk = nk <= kk ? kk+1 : nk > N_OBJ ? N_OBJ : nk ) )
+
+#define COMPACT(kk)	((kk % (N_OBJ/5000)) == 0 ? 1 : 0)
+#define RESIZE(kk)	((kk % (N_OBJ/500)) == 0 ? 1 : 0)
+
+int
 main()
 {
-	Obj_t		*o, *next, *last, *n, *f;
+	Obj_t		*o, *next;
 	Void_t		*huge;
-	size_t		sz, hugesz;
-	int		counter;
-#if TWARN
+	size_t		hugesz;
 	Vmstat_t	sb;
-#endif
+	ssize_t		k, p;
 
-	hugesz = HUGESZ;
+	srandom(0);
+
+	hugesz = Z_HUGE; /* one huge block to be resized occasionally */
 	if(!(huge = vmalloc(Vmregion, hugesz)) )
 		terror("Can't allocate block");
 
-	for(counter = 1, o = Obj, last = Obj+N_OBJ; o < last; ++o, ++counter)
+	for(k = 0; k < N_OBJ; ++k)
 	{	
-		/* free all stuff that should be freed */
-		for(f = o->head; f; f = next)
-		{	next = f->next;
+		/* free/resize all on this list */
+		for(o = List[k]; o; o = next)
+		{	next = o->next;
 
-			if(f->obj)
-			{	if((RAND()%2) == 0 ) /* resize */
-				{	sz = ALLOCSZ();
-					f->obj = vmresize(Vmregion,f->obj,sz,VM_RSMOVE);
-					if(!f->obj)
-						terror("Vmresize failed");
-					f->size = sz;
-
-					if((n = o + WHEN(sz)) > last)
-						n = last;
-					f->next = n->head;
-					n->head = f;
-				}
-				else	vmfree(Vmregion,f->obj);
+			if((RAND()%2) == 0 ) /* flip a coin to see if freeing */
+				vmfree(Vmregion, o->obj);
+			else /* resizing */
+			{	o->size = ALLOCSIZE();
+				if(!(o->obj = vmresize(Vmregion,o->obj,o->size,VM_RSMOVE)) )
+					terror("Vmresize failed");
+				TIME(p, k, o->size); /* add to a future list */
+				o->next = List[p]; List[p] = o;
 			}
 		}
 
-		if(counter%COMPACT == 0)
+		if(COMPACT(k)) /* global compaction */
 		{	
-#if TWARN
 			if(vmstat(Vmregion, &sb) < 0)
 				terror("Vmstat failed");
-			twarn("Arena: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
+			TWARN(("Arena: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
 				sb.n_busy,sb.s_busy, sb.n_free,sb.s_free,
-				sb.extent, sb.n_seg);
-#endif
+				sb.extent, sb.n_seg));
 			if(vmcompact(Vmregion) < 0 )
 				terror("Vmcompact failed");
-#if TWARN
 			if(vmstat(Vmregion, &sb) < 0)
 				terror("Vmstat failed");
-			twarn("Compact: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
+			TWARN(("Compact: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
 				sb.n_busy,sb.s_busy, sb.n_free,sb.s_free,
-				sb.extent, sb.n_seg);
-#endif
+				sb.extent, sb.n_seg));
 		}
 
-		if(((o-Obj)%H_FREQ) == 0 )
-		{	hugesz += HUGESZ;
+		if(RESIZE(k)) /* make the huge block bigger */
+		{	hugesz += Z_HUGE;
 			if(!(huge = vmresize(Vmregion, huge, hugesz, VM_RSMOVE)) )
 				terror("Bad resize of huge block");
 		}
 
-		sz = ALLOCSZ();
-		o->obj = vmalloc(Vmregion, sz);
-		if(!o->obj)
+		o = Obj+k; /* allocate a new block */
+		o->size = ALLOCSIZE();
+		if(!(o->obj = vmalloc(Vmregion, o->size)) )
 			terror("Vmalloc failed");
-		o->size = sz;
-
-		if((n = o + WHEN(sz)) > last)
-			n = last;
-		o->next = n->head;
-		n->head = o;
+		TIME(p, k, o->size);
+		o->next = List[p]; List[p] = o;
 	}
 
 	if(vmdbcheck(Vmregion) < 0)
 		terror("Corrupted region");
 
-#if TWARN
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	twarn("Full: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
-#endif
+	TWARN(("Full: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
 	if(vmcompact(Vmregion) < 0 )
 		terror("Vmcompact failed");
-#if TWARN
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	twarn("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
-#endif
+	TWARN(("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
 
-	for(f = last->head; f; f = next)
-	{	next = f->next;
-		vmfree(Vmregion,f->obj);
-	}
+	/* now free all left-overs */
+	for(o = List[N_OBJ]; o; o = o->next)
+		vmfree(Vmregion,o->obj);
 	vmfree(Vmregion,huge);
 
-#if TWARN
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	twarn("Free: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
-#endif
+	TWARN(("Free: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
 	if(vmcompact(Vmregion) < 0 )
 		terror("Vmcompact failed2");
-#if TWARN
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	twarn("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
-#endif
+	TWARN(("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
 
-	if(!(huge = vmalloc(Vmregion, SMALL)))
+	if(!(huge = vmalloc(Vmregion, 10)))
 		terror("Vmalloc failed");
-#if TWARN
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	twarn("Small: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
-#endif
+	TWARN(("Small: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
 
 	exit(0);
 }

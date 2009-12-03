@@ -413,7 +413,6 @@ t.i : .PASS.AFTER.t.i .FAIL.AFTER.t.i'
 	EXEC	--regress=sync GEN=false
 		OUTPUT t.i
 		ERROR - '+ false
-make: *** exit code 1 making t.i
 + : .FAIL.AFTER.t.i : t.x : t.i :
 + cp /dev/null t.i
 + touch t'

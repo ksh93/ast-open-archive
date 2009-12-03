@@ -450,58 +450,147 @@ sc(Text *script, Text *t)
 void
 yc(Text *script, Text *t)
 {
-	int i;
+	int i, m, x;
 	int delim;
-	unsigned char *s;
-	unsigned char *p, *q;
+	unsigned char *s, *pb, *qb;
+	unsigned char *p, *q, *o, *v, **w;
+	unsigned int *z;
 	int pc, qc;
-	if((delim = *t->w++) == '\n' || delim=='\\')
-		syntax("missing delimiter");
-	assure(script, UCHAR_MAX+1);
-	s = script->w;
-	for(i=0; i<UCHAR_MAX+1; i++)
-		s[i] = 0;
-	for(q=t->w; (qc = *q++)!=delim; ) {
-		if(qc == '\n')
+	m = 0;
+	if(mbwide()) {
+		pb = t->w;
+		if((delim = mbchar(pb)) == '\n' || delim=='\\')
 			syntax("missing delimiter");
-		if(qc=='\\' && *q==delim)
-			q++;
+		p = pb;
+		while((o=p),(pc = mbchar(p))!=delim) {
+			if(pc=='\n')
+				syntax("missing delimiter");
+			if(pc=='\\') {
+				o = p;
+				pc = mbchar(p);
+			}
+			if((p-o)>1 && pc>m)
+				m = pc;
+		}
 	}
-	for(p=t->w; (pc = *p++) != delim; ) {
-		if(pc=='\\') {
-			if(*p==delim)
-				pc = *p++;
-			else if(*p=='n' && (reflags & REG_LENIENT)) {
-				p++;
-				pc = '\n';
+	if(m) {
+		x = 0;
+		qb = p;
+		while((o=p), (pc = mbchar(p))!=delim) {
+			if(pc=='\\') {
+				o = p;
+				pc = mbchar(p);
+			}
+			x += (p-o)+1;
+		}
+		m++;
+		assure(script, (m+1)*sizeof(unsigned char*)+x);
+		w = (unsigned char**)script->w;
+		*w++ = (unsigned char*)0 + m;
+		script->w += (m+1)*sizeof(unsigned char*);
+		v = (unsigned char*)script->w;
+		script->w += x;
+		for(i=0; i<m; i++)
+			w[i] = 0;
+		p = pb;
+		q = qb;
+		while((pb=p), (pc = mbchar(p))!=delim) {
+			if(pc=='\\') {
+				pb = p;
+				if((qc = mbchar(p))=='n') {
+					if(reflags & REG_LENIENT)
+						pc = '\n';
+					else
+						p = pb-1;
+				}
+				else if(pc==delim)
+					pc = qc;
+				else
+					p = pb-1;
+			}
+			qb = q;
+			if((qc = mbchar(q)) == '\n')
+				syntax("missing delimiter");
+			if(qc==delim)
+				syntax("string lengths differ");
+			if(qc=='\\') {
+				qb = q;
+				if((qc = mbchar(q))=='n') {
+					if(reflags & REG_LENIENT)
+						*qb = '\n';
+					else
+						q = qb-1;
+				}
+				else if(qc!=delim)
+					q = qb-1;
+			}
+			i = q-qb;
+			if(w[pc]) {
+				if(w[pc][0]!=i || memcmp(&w[pc][1], qb, i))
+					syntax("ambiguous map");
+				synwarn("redundant map");
+			}
+			else {
+				w[pc] = v;
+				*v++ = i;
+				memcpy(v, qb, i);
+				v += i;
 			}
 		}
-		if((qc = *q++) == '\n')
-			syntax("missing delimiter");
-		if(qc==delim)
+		if(mbchar(q) != delim)
 			syntax("string lengths differ");
-		if(qc=='\\') {
-			if(*q==delim)
-				qc = *q++;
-			else if(*q=='n' && (reflags & REG_LENIENT)) {
-				q++;
-				qc = '\n';
-			}
-		}
-		if(s[pc]) {
-			if(s[pc]!=qc)
-				syntax("ambiguous map");
-			synwarn("redundant map");
-		}
-		s[pc] = qc;
 	}
-	if(*q++ != delim)
-		syntax("string lengths differ");
-	for(i=0; i<UCHAR_MAX+1; i++)
-		if(s[i] == 0)
-			s[i] = i;
+	else {
+		if((delim = *t->w++) == '\n' || delim=='\\')
+			syntax("missing delimiter");
+		assure(script, sizeof(unsigned char*)+UCHAR_MAX+1);
+		w = (unsigned char**)script->w;
+		*w++ = 0;
+		s = (unsigned char*)w;
+		script->w += sizeof(unsigned char*)+UCHAR_MAX+1;
+		for(i=0; i<UCHAR_MAX+1; i++)
+			s[i] = 0;
+		for(q=t->w; (qc = *q++)!=delim; ) {
+			if(qc == '\n')
+				syntax("missing delimiter");
+			if(qc=='\\' && *q==delim)
+				q++;
+		}
+		for(p=t->w; (pc = *p++) != delim; ) {
+			if(pc=='\\') {
+				if(*p==delim)
+					pc = *p++;
+				else if(*p=='n' && (reflags & REG_LENIENT)) {
+					p++;
+					pc = '\n';
+				}
+			}
+			if((qc = *q++) == '\n')
+				syntax("missing delimiter");
+			if(qc==delim)
+				syntax("string lengths differ");
+			if(qc=='\\') {
+				if(*q==delim)
+					qc = *q++;
+				else if(*q=='n' && (reflags & REG_LENIENT)) {
+					q++;
+					qc = '\n';
+				}
+			}
+			if(s[pc]) {
+				if(s[pc]!=qc)
+					syntax("ambiguous map");
+				synwarn("redundant map");
+			}
+			s[pc] = qc;
+		}
+		if(*q++ != delim)
+			syntax("string lengths differ");
+		for(i=0; i<UCHAR_MAX+1; i++)
+			if(s[i] == 0)
+				s[i] = i;
+	}
 	t->w = q;
-	script->w += UCHAR_MAX+1;
 }
 
 void

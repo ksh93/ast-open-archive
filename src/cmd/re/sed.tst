@@ -470,3 +470,12 @@ TEST 32 'embedded \0'
 	DATA nul.in nul.out
 	EXEC 's/foo/bar/' nul.in
 		SAME OUTPUT nul.out
+
+TEST 33 'multibyte'
+	EXPORT LC_CTYPE=de_DE.UTF-8
+
+	EXEC $'y/\303\240\303\242\303\251\303\250\303\252\303\253\303\256\303\257\303\264\303\266\303\271\303\273\303\247/aaeeeeiioouuc/'
+		INPUT - $'chaine de caract\303\250res d\303\251finie en utf-8'
+		OUTPUT - $'chaine de caracteres definie en utf-8'
+
+	EXEC $'y\342\202\254\303\240\303\242\303\251\303\250\303\252\303\253\303\256\303\257\303\264\303\266\303\271\303\273\303\247\342\202\254aaeeeeiioouuc\342\202\254'

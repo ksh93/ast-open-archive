@@ -538,7 +538,13 @@ exec - regress  cp.tst
 done test.cp virtual
 make test.cut
 make cut.tst
-done cut.tst
+meta cut.tst %.rt>%.tst cut.rt cut
+make cut.rt
+done cut.rt
+exec - if	[[ "1" || "cut.rt" -nt "cut.tst" ]]
+exec - then	mktest --style=regress cut.rt > cut.tst
+exec - fi
+done cut.tst generated
 exec - regress  cut.tst
 done test.cut virtual
 make test.date
