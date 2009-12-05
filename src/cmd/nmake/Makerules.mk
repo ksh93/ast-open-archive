@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-11-13 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-12-04 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -729,7 +729,7 @@ end
 			end
 		end
 		if ( T = "$(%:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1$(CC.SUFFIX.ARCHIVE)/:A=.TARGET)" )
-			if "$(PACKAGE_OPTIMIZE:N=space)" && "$(CC.SUFFIX.SHARED)"
+			if "$(PACKAGE_OPTIONS:N=optimize-space)" && "$(CC.SUFFIX.SHARED)"
 				if ( V = "$(*$(B):N=*$(CC.SUFFIX.SHARED)*:A=.TARGET)" )
 					A := $(V:/\(.*$(CC.SUFFIX.SHARED)\).*/\1/)
 					if "$(A)" != "$(V)"
@@ -3153,10 +3153,10 @@ PACKAGES : .SPECIAL .FUNCTION
 				S =
 				Q := $(N)
 				if N == "optimize"
-					if "$(PACKAGE_OPTIMIZE:N=space)"
+					if "$(PACKAGE_OPTIONS:N=optimize-space)"
 						N = dynamic
 						.PACKAGE.strip = $(CC.LD.STRIP)
-					elif "$(PACKAGE_OPTIMIZE:N=time)"
+					elif "$(PACKAGE_OPTIONS:N=optimize-time)"
 						N = static
 					else
 						N =
@@ -3165,14 +3165,14 @@ PACKAGES : .SPECIAL .FUNCTION
 					private = 1
 					N = static
 				elif N == "space"
-					if ! "$(PACKAGE_OPTIMIZE:N=time)"
+					if ! "$(PACKAGE_OPTIONS:N=optimize-time)"
 						N = dynamic
 						.PACKAGE.strip = $(CC.LD.STRIP)
 					else
 						N =
 					end
 				elif N == "time"
-					if ! "$(PACKAGE_OPTIMIZE:N=space)"
+					if ! "$(PACKAGE_OPTIONS:N=optimize-space)"
 						N = static
 					else
 						N =
@@ -3292,21 +3292,21 @@ PACKAGES : .SPECIAL .FUNCTION
 				end
 				Q := $(N)
 				if N == "optimize"
-					if "$(PACKAGE_OPTIMIZE:N=space)"
+					if "$(PACKAGE_OPTIONS:N=optimize-space)"
 						N = dynamic
-					elif "$(PACKAGE_OPTIMIZE:N=time)"
+					elif "$(PACKAGE_OPTIONS:N=optimize-time)"
 						N = static
 					else
 						N =
 					end
 				elif N == "space"
-					if ! "$(PACKAGE_OPTIMIZE:N=time)"
+					if ! "$(PACKAGE_OPTIONS:N=optimize-time)"
 						N = dynamic
 					else
 						N =
 					end
 				elif N == "time"
-					if ! "$(PACKAGE_OPTIMIZE:N=space)"
+					if ! "$(PACKAGE_OPTIONS:N=optimize-space)"
 						N = static
 					else
 						N =
@@ -4240,7 +4240,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	end
 	CCLDFLAGS &= $$(CCFLAGS:N!=-[DIU]*:@C@$$(CC.ALTPP.FLAGS)@@) $$(LDFLAGS) $(T4:V)
 	if "$(CC.LD.STRIP:V)"
-		if "$(-strip-symbols)" || "$(PACKAGE_OPTIMIZE:N=space)"
+		if "$(-strip-symbols)" || "$(PACKAGE_OPTIONS:N=optimize-space)"
 			.PACKAGE.strip = $(CC.LD.STRIP)
 		end
 		CCLDFLAGS += $$(.PACKAGE.strip)
@@ -4747,7 +4747,7 @@ end
 	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F)
 	E := $(.LIST.PACKAGE.BINARY.EDIT.)
 	if package.strip
-		for I $(*.UNION:T=F:P=A:$(PACKAGE_OPTIMIZE:N=space:Y%:N=$(INSTALLROOT)/(bin|fun|lib)/*:N!=*$(CC.SUFFIX.ARCHIVE)|$(INSTALLROOT)/lib/lib?(/*)%%))
+		for I $(*.UNION:T=F:P=A:$(PACKAGE_OPTIONS:N=optimize-space:Y%:N=$(INSTALLROOT)/(bin|fun|lib)/*:N!=*$(CC.SUFFIX.ARCHIVE)|$(INSTALLROOT)/lib/lib?(/*)%%))
 			if "$(I:T=Y)" == "*/?(x-)(dll|exe)"
 				print ;;filter $(STRIP) $(STRIPFLAGS) $(I);$(I);$(I:$(E))
 			else

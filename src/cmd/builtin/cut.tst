@@ -38,6 +38,17 @@ TEST 02 -c
 		INPUT f1 $'123\n1'
 		OUTPUT - $'\n'
 
+	EXEC	-c-5 f2
+		INPUT f2 1234567890
+		OUTPUT - 12345
+
+	EXEC	-c1-5 f2
+
+	EXEC	-c5- f2
+		OUTPUT - 567890
+
+	EXEC	-c5-10 f2
+
 TEST 03 '-d -f -s'
 
 	EXEC	-s -d: -f2,3 f1

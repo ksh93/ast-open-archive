@@ -733,3 +733,10 @@ NIL	%_X		15:09:47
 NIL	%_y		86
 NIL	%_Y		1986
 NIL	%_z		-0400
+
+# year boundaries
+
+SET			NOW			2009-12-01+00:00:00
+
+next month first day	NULL			Fri Jan  1 00:00:00 EST 2010
+next month final day	NULL			Sun Jan 31 00:00:00 EST 2010

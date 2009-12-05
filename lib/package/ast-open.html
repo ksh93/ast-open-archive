@@ -1046,7 +1046,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-11-30  --- Release ksh93t+  ---
+09-12-03  --- Release ksh93t+  ---
+09-12-03  A bug in which SHLVL exported with some attributes could cause
+	  the shell to abort at startup has been fixed.
+09-12-02  A bug with pipefail in which the shell could hang waiting for the
+	  writer to complete before the last reader command has been fixed.
 09-11-30  A bug in which a trap could be inherited by the first element of
 	  a pipeline when the command had more than 63 arguments that did
 	  not contain any macro expansions has been fixed.
@@ -4119,6 +4123,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-12-04 Makerules.mk: rename PACKAGE_OPTIMIZE=foo to PACKAGE_OPTIONS=optimize-foo
 09-11-13 Makerules.mk: fix .req logic for virtual -lfoo
 09-10-28 command.c: disable *** error status message for .FAILURE targets
 09-10-27 parse.c,make.c: a - b : .JOINT =&gt; b:.DONTCARE (b optionally generated)
@@ -6824,6 +6829,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-12-04 features/options: add "opt map-libc" check
+09-12-03 tm/tmxdate.c: fix 'next month final day' for dec -&gt; jan
 09-11-21 misc/magic.tab: add gimp XCF
 09-11-20 vmalloc/vmtrace.c: add pid to assertion disgnostics
 09-11-11 regex.h,regcomp.c: add REG_CLASS_ESCAPE, &nbsp;inside &#0091;...&#0093; literal by default
@@ -8430,9 +8437,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+09-12-04 cmd.h: fix CMD_DYNAMIC logic
+09-12-04 cut.c: handle -d mb
+09-12-03 mkdir.c: add --verbose
 09-11-30 cat.c,date.c,cksum.c: drop setlocale() call already done by optget()
 09-11-30 join.c: handle -t mb
-09-11-30 TODO cut.c: handle -d mb
 09-11-28 wclib.c: { -w -L } mb independent of -m
 09-11-28 paste.c: handle -d mb
 09-11-28 uniq.c: handle -s mb
@@ -10058,7 +10067,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>December 02, 2009</TD>
+<TD align=right>December 05, 2009</TD>
 </TR>
 </TABLE>
 <P>

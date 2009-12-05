@@ -35,7 +35,7 @@ BUILTINS :COMMAND: cmdlist.h
 	end
 	:ALL: $(BUILTINS)
 	T = -lcmd
-	if "$(PACKAGE_OPTIMIZE:N=space)" && "$(T:T=F)" == "-lcmd"
+	if "$(PACKAGE_OPTIONS:N=optimize-space)" && "$(T:T=F)" == "-lcmd"
 		T := $(BUILTINS:O=1)
 		$(T) :: CMD_BUILTIN=1 CMD_DYNAMIC=1 builtin.c -lcmd -ldll
 		for I $(BUILTINS:O>1)
