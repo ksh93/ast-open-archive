@@ -268,8 +268,10 @@ BEn	a$		a		(0,1)
 BEn$	a$		a\nb		(0,1)
 BEn$	a$		a\na		(0,1)
 BEn$	b$		a\nb		(2,3)
-BE	^^		a		(0,0)
-BE	^^		^		(0,0)
+B	^^		a		NOMATCH
+B	^^		^		(0,1)
+E	^^		a		(0,0)
+E	^^		^		(0,0)
 B	$$		$		(0,1)
 E	$$		$		(1,1)
 B	$$		a		NOMATCH

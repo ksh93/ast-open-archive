@@ -82,7 +82,7 @@ TEST 04 ':MAKE: + MAKEFILES'
 
 	EXEC	-n
 		INPUT Makefile $'MAKEFILES = $(PWD:B).mk
-.EXPORT : MAKEFILES
+.SCRIPT : MAKEFILES
 :MAKE: maintenance'
 		INPUT maintenance/maintenance.mk $'all :
 	: $(PWD:B) : $(MAKEFILES) :'
@@ -91,12 +91,12 @@ TEST 04 ':MAKE: + MAKEFILES'
 
 	EXEC	-n
 		INPUT Makefile $'MAKEFILES = $(PWD:B).mk
-export MAKEFILES
+script MAKEFILES
 :MAKE: maintenance'
 
 	EXEC	-n
 		INPUT Makefile $'MAKEFILES = $(PWD:B).mk
-export MAKEFILES
+script MAKEFILES
 :MAKE:'
 		OUTPUT -
 		ERROR -

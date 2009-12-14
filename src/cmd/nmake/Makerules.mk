@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-12-04 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-12-09 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2577,22 +2577,22 @@ RECURSEROOT = .
 
 /*
  * if rhs is dir then make recursively, else just make
- * rhs name=value are .EXPORT for sub-makes
+ * rhs name=value are .SCRIPT for sub-makes
  */
 
 ":MAKE:" : .MAKE .OPERATOR
 	if "$(-recurse)" != "*combine*"
-		local ATT EXP LHS RHS
+		local ATT EXP LHS RHS SCR
 		if ! ( LHS = "$(<)" )
 			LHS = .RECURSE
 			.ALL .MAIN : $(LHS)
 		end
 		ATT := $(>:A=.ATTRIBUTE)
-		for EXP $(>:N=*=*)
+		for SCR $(>:N=*=*)
 			eval
-			$(EXP)
+			$(SCR)
 			end
-			export $(EXP:/=.*//)
+			script $(SCR:/=.*//)
 		end
 		RHS = $(>:N!=*=*:A!=.ATTRIBUTE)
 		eval

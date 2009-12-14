@@ -176,8 +176,35 @@ unsigned char*	zp;
 			if (!decimal)
 				sigdig++;
 			continue;
-		case 'e':
+		case 'k':
+		case 'K':
+			if (f->flag == 'h')
+				sigdig += 3;
+			goto out;
+		case 'M':
+			if (f->flag == 'h')
+				sigdig += 6;
+			goto out;
+		case 'G':
+			if (f->flag == 'h')
+				sigdig += 9;
+			goto out;
+		case 'T':
+			if (f->flag == 'h')
+				sigdig += 12;
+			goto out;
+		case 'P':
+			if (f->flag == 'h')
+				sigdig += 15;
+			goto out;
 		case 'E':
+			if (f->flag == 'h')
+			{
+				sigdig += 18;
+				goto out;
+			}
+			/*FALLTHROUGH*/
+		case 'e':
 			if (f->flag != 'g')
 				goto out;
 			inv = 1;
@@ -877,6 +904,9 @@ int			end;
 		break;
 	case 'g':
 	case 'n':
+		addcoder(kp, fp, key_n_code, c, 0);
+		break;
+	case 'h':
 		addcoder(kp, fp, key_n_code, c, 0);
 		break;
 	case 'i':

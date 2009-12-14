@@ -1,3 +1,5 @@
+09-12-11 grep.tst: add more -x + -e combos for regcomb() fix
+09-12-11 testregex.dat,regex++.dat: posix semantics for [z-a]
 09-11-20 sed: handle mb chars in y/from/to/
 09-10-31 sed: add a few gnu compatibility options
 09-02-02 repetition.dat,haskell.dat: add tests by Chris Kuklewicz www.haskell.org

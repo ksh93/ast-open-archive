@@ -1,4 +1,4 @@
-: X/Open regex tests 2009-11-11
+: X/Open regex tests 2009-12-11
 
 # basic sanity
 
@@ -187,6 +187,67 @@ Bu	\(a$*b\)	ab	(0,2)(0,2)
 Bu	\(a$*b\)	a$b	(0,3)(0,3)
 Bu	\(a$*b\)	a*b	NOMATCH
 Bu	\(a$*b\)	a$*b	NOMATCH
+
+# anchors aweigh
+
+B	*		*		(0,1)
+B	^*		*		(0,1)
+B	^*		^*		NOMATCH
+
+E	*		*		BADRPT
+E	^*		*		(0,0)
+E	^*		^*		(0,0)
+
+B	^a		a		(0,1)
+B	^^a		a		NOMATCH
+B	^^a		^a		(0,2)
+B	^*a		a		NOMATCH
+B	*a		*a		(0,2)
+B	^*a		*a		(0,2)
+B	^^*a		a		(0,1)
+B	^^*a		^a		(0,2)
+
+E	^a		a		(0,1)
+E	^^a		a		(0,1)
+E	^*a		a		(0,1)
+E	^^*a		a		(0,1)
+
+E	^a		ba		NOMATCH
+E	^^a		ba		NOMATCH
+E	^*a		ba		(1,2)
+E	^^*a		ba		NOMATCH
+
+E	^*		.^^^^^+++++	(0,0)
+E	^^*		.^^^^^+++++	(0,0)
+E	^*		.^^^^^+++++	(0,0)
+E	^^*		.^^^^^+++++	(0,0)
+E	^^*a		abc		(0,1)
+
+E	^+		.^^^^^+++++	(0,0)
+E	^^+		.^^^^^+++++	(0,0)
+E	^+		.^^^^^+++++	(0,0)
+E	^^+		.^^^^^+++++	(0,0)
+E	^^+a		abc		(0,1)
+
+B	a^z		a^z		(0,3)
+B	a^^*z		a^^z		(0,4)
+
+B	a^z		az		NOMATCH
+B	a^z		a^z		(0,3)
+B	a^*z		az		(0,2)
+B	a^*z		a^z		(0,3)
+B	a^*z		a^^z		(0,4)
+B	a^^*z		a^^z		(0,4)
+
+E	a^z		az		NOMATCH
+E	a^z		a^z		NOMATCH
+E	a^*z		az		(0,2)
+E	a^*z		a^z		NOMATCH
+E	a^*z		a^^z		NOMATCH
+E	a^^*z		a^^z		NOMATCH
+
+B	\(abc$\)	abcdef		NOMATCH
+E	(abc$)		abcdef		NOMATCH
 
 # implicit anchoring
 
@@ -439,8 +500,14 @@ BEA	[---]			a-b		(1,2)
 BEA	[^-]			--a		(2,3)
 BEA	[a-]*			--a		(0,3)
 BEA	[a-m-]*			--amoma--	(0,4)
+BEAx	[b-y][b-y]*		-abcmxyz-	(2,7)
+BEAx	[m-y][m-y]*		-abcmxyz-	(4,7)
+BEAx	[b-mm-y][b-mm-y]*	-abcmxyz-	(2,7)
 BEAx	[b-m-y][b-m-y]*		-abcmxyz-	(2,7)
-BEAx	[c-m-b][c-m-b]*		-abcmn-		(2,5)
+BEAx	[c-b][c-b]*		-abcmn-		NOMATCH
+BEAx	[c-m][c-m]*		-abcmn-		(3,5)
+BEAx	[c-m-b][c-m-b]*		-abcmn-		(3,5)
+BEAx	[c-mm-b][c-mm-b]*	-abcmn-		(3,5)
 
 BEA	[z-a]		NULL	ERANGE
 BEA	[^]		NULL	EBRACK

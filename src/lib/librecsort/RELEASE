@@ -1,3 +1,4 @@
+09-12-09 rskey.c: add h option for key_n_code (IEEE 1541-2002 scales)
 09-05-11 rskey.c: add collation mbxfrm() overflow panic (yes I know)
 09-05-11 rskey.c: fix mbxfrm() return value logic
 07-12-14 rskey.c: fix mb fixed field offset >= 99 key gen 

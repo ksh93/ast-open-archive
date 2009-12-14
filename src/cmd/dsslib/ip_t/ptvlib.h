@@ -45,15 +45,11 @@
 	do											\
 	{											\
 		Ptvprefix_t*	_pt_p;								\
-		unsigned char*	_pt_min;							\
-		unsigned char*	_pt_max;							\
-		unsigned char*	m;								\
-		unsigned char*	x;								\
 		unsigned int	b;								\
 		fvset((t)->size, (t)->r[1], 1);							\
 		for (_pt_p = (Ptvprefix_t*)dtfirst((t)->dict); _pt_p; _pt_p = (Ptvprefix_t*)dtnext((t)->dict, _pt_p))				\
 		{										\
-			fvcpy((t)->size, (t)->r[2], _pt_p->min);						\
+			fvcpy((t)->size, (t)->r[2], _pt_p->min);				\
 			do									\
 			{									\
 				fvcpy((t)->size, (t)->r[0], (t)->r[2]);				\

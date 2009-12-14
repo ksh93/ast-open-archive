@@ -36,7 +36,18 @@ end'
 5 4
 5 5'
 
-TEST 02 'export'
+TEST 02 'export variations'
+
+	EXEC	-s
+		INPUT Makefile $'_MAKE_TEST_FOO = foo
+_MAKE_TEST_BAR = bar
+_MAKE_TEST_LCL = lcl
+script _MAKE_TEST_FOO _MAKE_TEST_BAR
+all :
+	export $(=)
+	env | grep "^_MAKE_TEST_" | sort'
+		OUTPUT - $'_MAKE_TEST_BAR=bar
+_MAKE_TEST_FOO=foo'
 
 	EXEC	-s
 		INPUT Makefile $'_MAKE_TEST_FOO = foo
@@ -44,7 +55,10 @@ _MAKE_TEST_BAR = bar
 _MAKE_TEST_LCL = lcl
 export _MAKE_TEST_FOO _MAKE_TEST_BAR
 all :
-	export $(=)
 	env | grep "^_MAKE_TEST_" | sort'
-		OUTPUT - $'_MAKE_TEST_BAR=bar
-_MAKE_TEST_FOO=foo'
+
+	EXEC	-s
+		INPUT Makefile $'export _MAKE_TEST_FOO=foo _MAKE_TEST_BAR=bar
+_MAKE_TEST_LCL=lcl
+all :
+	env | grep "^_MAKE_TEST_" | sort'

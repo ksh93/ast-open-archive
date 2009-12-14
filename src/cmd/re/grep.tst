@@ -3998,7 +3998,7 @@ TEST 06 '-f, -F, big pattern'
 	EXEC	-l . out
 		OUTPUT - out
 	EXEC	-l .
-		OUTPUT - '/dev/stdin'
+		OUTPUT - '(standard input)'
 	EXEC	-l . big.dat big.dat
 		OUTPUT - $'big.dat\nbig.dat'
 	EXEC	-l . /dev/null big.dat big.dat /dev/null
@@ -6331,3 +6331,35 @@ close:245'
 	EXEC	-t -m -e include:include -e define:define g6.dat g7.dat
 		OUTPUT - $'include:55
 define:6'
+
+TEST 15 '-x with -e'
+
+	for op in '' -E -F
+	do
+
+	EXEC	$op -x $'aa'
+		INPUT - $'aa\naabbcc\nbb\nbbccdd\ncc\nccddee'
+		OUTPUT - $'aa'
+	EXEC	$op -x -e $'aa'
+	EXEC	$op -x -e $'aa' -e $'bb'
+		OUTPUT - $'aa\nbb'
+	EXEC	$op -x $'aa\nbb'
+	EXEC	$op -x -e $'aa\nbb'
+	EXEC	$op -x -e $'aa' -e $'bb' -e $'cc'
+		OUTPUT - $'aa\nbb\ncc'
+	EXEC	$op -x -e $'aa\nbb' -e $'cc'
+	EXEC	$op -x $'aa\nbb\ncc'
+
+	done
+
+TEST 16 'ast bm checks'
+
+	EXEC	'\(ab$\)'
+		INPUT - $'abcdefghijklmnopqrstuvwxyz'
+		OUTPUT -
+		EXIT 1
+	EXEC	'\(abcdef$\)'
+	EXEC	'\(abcdefghijklmnopqrstuvwxy$\)'
+	EXEC	-E '(ab$)'
+	EXEC	-E '(abcdef$)'
+	EXEC	'(abcdefghijklmnopqrstuvwxy$)'

@@ -454,7 +454,6 @@ yc(Text *script, Text *t)
 	int delim;
 	unsigned char *s, *pb, *qb;
 	unsigned char *p, *q, *o, *v, **w;
-	unsigned int *z;
 	int pc, qc;
 	m = 0;
 	if(mbwide()) {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-n?\n@(#)$Id: sort (AT&T Research) 2008-04-24 $\n]"
+"[-n?\n@(#)$Id: sort (AT&T Research) 2009-12-09 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -106,6 +106,7 @@ USAGE_LICENSE
 "	must be converted from the \afrom\a codeset to the \ato\a"
 "	codeset. The codesets are:]:[codeset|from::to]{\fcodesets\f}"
 "[f:fold|ignorecase?Fold lower case letters onto upper case.]"
+"[h:scaled|human-readable?Compare numbers scaled with IEEE 1541-2002 suffixes.]"
 "[i:ignorecontrol?Ignore characters outside the ASCII range 040-0176 in"
 "	string comparisons.]"
 "[J:shuffle|jumble?Do a random shuffle of the sort keys. \aseed\a specifies"

@@ -1,3 +1,4 @@
+09-12-09 main.c: add -h, --scaled|--human-readable
 08-04-24 main.c: add optget() 'n' option for -1 => -K1
 07-10-30 main.c: default insize == procsize -- worth ~25% time!
 07-10-30 sort.tst,testsort.sh: export LC_ALL=C

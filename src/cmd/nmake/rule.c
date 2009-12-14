@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1448,7 +1448,7 @@ initrule(void)
 	INIT(dot,		".",		0);
 	INIT(empty,		"",		0);
 	INIT(error,		".ERROR",	0);
-	INIT(exported,		".EXPORT",	P_attribute|P_immediate);
+	INIT(exports,		".EXPORT",	P_attribute|P_immediate);
 	INIT(freeze,		".FREEZE",	P_immediate);
 	INIT(globalfiles,	".GLOBALFILES",	P_internal|P_readonly);
 	INIT(include,		".INCLUDE",	P_immediate);
@@ -1466,6 +1466,7 @@ initrule(void)
 	INIT(retain,		".RETAIN",	P_immediate);
 	INIT(run,		".RUN",		P_immediate);
 	INIT(scan,		".SCAN",	P_attribute|P_readonly);
+	INIT(script,		".SCRIPT",	P_attribute|P_immediate);
 	INIT(semaphore,		".SEMAPHORE",	P_attribute);
 	INIT(source,		".SOURCE",	0);
 	INIT(special,		".SPECIAL",	P_attribute|P_internal|P_readonly);

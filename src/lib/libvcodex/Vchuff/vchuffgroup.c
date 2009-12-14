@@ -437,7 +437,7 @@ size_t		dtsz;	/* data size			*/
 Void_t**	out;	/* to return output buffer 	*/
 #endif
 {
-	ssize_t		n, i, p, k, s;
+	ssize_t		n, i, p, k;
 	ssize_t		*sz, npts, ntbl, ptsz, itbl;
 	ssize_t		freq[VCH_SIZE], size[VCH_SIZE];
 	Vcchar_t	*part;

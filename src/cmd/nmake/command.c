@@ -631,9 +631,11 @@ static void
 execute(register Joblist_t* job)
 {
 	register List_t*	p;
+	char*			s;
 	char*			t;
 	int			flags;
 	Rule_t*			r;
+	Var_t*			v;
 	Sfio_t*			tmp;
 	Sfio_t*			att;
 	Sfio_t*			sp;
@@ -692,6 +694,24 @@ execute(register Joblist_t* job)
 			if (!(state.coshell = coopen(getval(CO_ENV_SHELL, VAL_PRIMARY), flags, sfstruse(sp))))
 				error(ERROR_SYSTEM|3, "coshell open error");
 			sfstrclose(sp);
+		}
+		if (p = internal.exports->prereqs)
+		{
+			do
+			{
+				if (v = getvar(p->rule->name))
+					coexport(state.coshell, p->rule->name, v->value);
+				else if (s = strchr(p->rule->name, '='))
+				{
+					*s = 0;
+					coexport(state.coshell, p->rule->name, s + 1);
+					*s = '=';
+				}
+			} while (p = p->next);
+			#if 0
+			freelist(internal.exports->prereqs);
+			#endif
+			internal.exports->prereqs = 0;
 		}
 		if (job->flags & CO_DATAFILE)
 		{

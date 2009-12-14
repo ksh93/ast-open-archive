@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -220,7 +220,7 @@ getval(register char* s, int op)
 						sep = 1;
 					shquote(internal.val, state.argv[n]);
 				}
-			for (p = internal.exported->prereqs; p; p = p->next)
+			for (p = internal.script->prereqs; p; p = p->next)
 				if (v = getvar(p->rule->name))
 				{
 					if (sep)

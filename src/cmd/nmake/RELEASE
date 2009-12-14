@@ -1,3 +1,5 @@
+09-12-09 Makerules.mk: .EXPORT => .SCRIPT, internal.exported => internal.script
+09-12-09 Makerules.mk: .EXPORT now adds vars to coshell coexport(3) list
 09-12-04 Makerules.mk: rename PACKAGE_OPTIMIZE=foo to PACKAGE_OPTIONS=optimize-foo
 09-11-13 Makerules.mk: fix .req logic for virtual -lfoo
 09-10-28 command.c: disable *** error status message for .FAILURE targets

@@ -609,7 +609,7 @@ Ei	[ABC]+	abcABC	(0,6)
 Ei	[a-z]+	abcABC	(0,6)
 Ei	[A-Z]+	abzANZ	(0,6)
 Ei	[a-Z]+	abzABZ	ERANGE
-Eix	[a-Z]+	abzABZ	(0,1)
+Eix	[a-Z]+	abzABZ	NOMATCH
 Ei	[A-z]+	abzABZ	(0,6)
 Ei	[[:lower:]]+	abyzABYZ	(0,8)
 Ei	[[:upper:]]+	abzABZ	(0,6)
@@ -663,9 +663,9 @@ Ei	[[.A.]]	a	(0,1)
 Ei	[[.A.]-b]+	AaBb	(0,4)
 Ei	[A-[.b.]]+	AaBb	(0,4)
 Ei	[[.a.]-B]+	AaBb	ERANGE
-Eix	[[.a.]-B]+	AaBb	(0,4)
+Eix	[[.a.]-B]+	AaBb	NOMATCH
 Ei	[a-[.B.]]+	AaBb	ERANGE
-Eix	[a-[.B.]]+	AaBb	(0,4)
+Eix	[a-[.B.]]+	AaBb	NOMATCH
 # - match_default normal REG_EXTENDED REG_NO_POSIX_TEST
 Exz$	[\x61]	a	(0,1)
 Exz$	[\x61-c]+	abcd	(0,3)

@@ -92,7 +92,12 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-12-04  --- Release ksh93t+  ---
+09-12-11  --- Release ksh93t+  ---
+09-12-11  A bug where the subscript of an unset variable was not evaluated has
+	  been fixed.
+09-12-09  A bug where shcomp dumped core on certain syntax errors has been fixed.
+09-12-07  A bug where a parent shell environment var reset in a subshell removed
+	  the value in subsequent children of the parent shell has been fixed.
 09-12-04  A bug in which in some cases a trap in a function executed in
 	  a subshell could trigger twice has been fixed.
 09-12-03  A bug in which SHLVL exported with some attributes could cause
@@ -3135,6 +3140,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+09-12-09 Makerules.mk: .EXPORT => .SCRIPT, internal.exported => internal.script
+09-12-09 Makerules.mk: .EXPORT now adds vars to coshell coexport(3) list
 09-12-04 Makerules.mk: rename PACKAGE_OPTIMIZE=foo to PACKAGE_OPTIONS=optimize-foo
 09-11-13 Makerules.mk: fix .req logic for virtual -lfoo
 09-10-28 command.c: disable *** error status message for .FAILURE targets
@@ -5078,6 +5085,8 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+09-12-11 grep.tst: add more -x + -e combos for regcomb() fix
+09-12-11 testregex.dat,regex++.dat: posix semantics for [z-a]
 09-11-20 sed: handle mb chars in y/from/to/
 09-10-31 sed: add a few gnu compatibility options
 09-02-02 repetition.dat,haskell.dat: add tests by Chris Kuklewicz www.haskell.org
@@ -5240,6 +5249,7 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+09-12-09 main.c: add -h, --scaled|--human-readable
 08-04-24 main.c: add optget() 'n' option for -1 => -K1
 07-10-30 main.c: default insize == procsize -- worth ~25% time!
 07-10-30 sort.tst,testsort.sh: export LC_ALL=C
@@ -5307,6 +5317,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+09-12-09 du.c: add -h, --binary-scale|human-readable; -K, --decimal-scale
 09-11-11 features/procfs: handle linux /proc pr_tgrp == pr_tpgid
 09-10-21 locale.c: use fmtquote() to print key values
 09-07-02 ls.c: ftwflags() default only if not --recursive
@@ -5736,6 +5747,13 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-12-11 regex/regcomp.c: posix semantics for [z-a]
+09-12-11 regex/regcomp.c: fix BRE/ERE ^^ logic
+09-12-11 regex/regcomp.c: fix regcomb() for REG_LEFT|REG_RIGHT
+09-12-11 regex/regcomp.c: bm complete=0 if REX_END
+09-12-11 comp/sigflag.c: add with npt check in features/sig.sh
+09-12-11 tm/tminit.c: fix _tzset_environ logic
+09-12-09 tm/tmlocale.c: include "ast_nl_types.h" to pull nl_langinfo in!
 09-12-04 features/options: add "opt map-libc" check
 09-12-03 tm/tmxdate.c: fix 'next month final day' for dec -> jan
 09-11-21 misc/magic.tab: add gimp XCF
@@ -7338,6 +7356,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+09-12-10 join.c: <wctype.h> for iswspace()!
 09-12-04 cmd.h: fix CMD_DYNAMIC logic
 09-12-04 cut.c: handle -d mb
 09-12-03 mkdir.c: add --verbose
@@ -7729,6 +7748,7 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+09-12-09 rskey.c: add h option for key_n_code (IEEE 1541-2002 scales)
 09-05-11 rskey.c: add collation mbxfrm() overflow panic (yes I know)
 09-05-11 rskey.c: fix mbxfrm() return value logic
 07-12-14 rskey.c: fix mb fixed field offset >= 99 key gen 
@@ -7890,6 +7910,7 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+09-12-09 coexport.c: add runtime CO_ENV_EXPORT hook that avoids changing environ
 08-10-28 coopen.c: close write side of parent msgfd -- doh
 08-04-28 coexec.c: check for fd 1,2 equivalence before CO_SERIALIZE 2>&1
 07-10-29 coshell.h,coexec.c: fix procrun()/system() intercept logic

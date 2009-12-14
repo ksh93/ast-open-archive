@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: du (AT&T Research) 2007-03-19 $\n]"
+"[-?\n@(#)$Id: du (AT&T Research) 2009-12-09 $\n]"
 USAGE_LICENSE
 "[+NAME?du - summarize disk usage]"
 "[+DESCRIPTION?\bdu\b reports the number of blocks contained in all files"
@@ -46,6 +46,8 @@ USAGE_LICENSE
 "[b:blocksize?Set the block size to \asize\a. If omitted, \asize\a defaults"
 "	to 512.]#?[size:=512]"
 "[f:silent?Do not report file and directory access errors.]"
+"[h:binary-scale|human-readable?Scale disk usage to powers of 1024.]"
+"[K:decimal-scale?Scale disk usage to powers of 1000.]"
 "[k:kilobytes?List usage in units of 1024 bytes.]"
 "[m:megabytes?List usage in units of 1024K bytes.]"
 "[s:summary|summarize?Only display the total for each \apath\a argument.]"
@@ -76,22 +78,23 @@ USAGE_LICENSE
 
 typedef Sfulong_t Count_t;
 
-static struct				/* program state		*/
+static struct State_s			/* program state		*/
 {
 	int		all;		/* list non-directories too	*/
 	Hash_table_t*	links;		/* hard link hash table		*/
 	int		silent;		/* be silent about errors	*/
 	int		summary;	/* list summary only		*/
+	int		scale;		/* numeric output scale		*/
 	int		total;		/* list complete total only	*/
 	unsigned long	blocksize;	/* blocksize			*/
 	Count_t		count;		/* total block count		*/
 } state;
 
-struct fileid				/* unique file id		*/
+typedef struct Fileid_s			/* unique file id		*/
 {
 	int		dev;
 	int		ino;
-};
+} Fileid_t;
 
 /*
  * list info on a single file
@@ -139,7 +142,7 @@ du(register Ftw_t* ftw)
 	default:
 		if (ftw->statb.st_nlink > 1)
 		{
-			struct fileid	id;
+			Fileid_t	id;
 			Hash_bucket_t*	b;
 
 			id.dev = ftw->statb.st_dev;
@@ -168,7 +171,12 @@ du(register Ftw_t* ftw)
 	if (ftw->parent->local.pointer)
 		*(Count_t*)ftw->parent->local.pointer += n;
 	if (!state.total && (list || ftw->level <= 0))
-		sfprintf(sfstdout, "%I*u\t%s\n", sizeof(Count_t), BLOCKS(n), ftw->path);
+	{
+		if (state.scale)
+			sfprintf(sfstdout, "%s\t%s\n", fmtscale((Sfulong_t)n * state.blocksize, state.scale), ftw->path);
+		else
+			sfprintf(sfstdout, "%I*u\t%s\n", sizeof(Count_t), BLOCKS(n), ftw->path);
+	}
 	return 0;
 }
 
@@ -193,6 +201,12 @@ main(int argc, register char** argv)
 			continue;
 		case 'f':
 			state.silent = 1;
+			continue;
+		case 'h':
+			state.scale = 1024;
+			continue;
+		case 'K':
+			state.scale = 1000;
 			continue;
 		case 'k':
 			state.blocksize = 1024;
@@ -234,7 +248,7 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (!(state.links = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(struct fileid), HASH_name, "hard-links", 0)))
+	if (!(state.links = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(Fileid_t), HASH_name, "hard-links", 0)))
 		error(3, "not enough space for hard link table");
 
 	/*
@@ -243,6 +257,11 @@ main(int argc, register char** argv)
 
 	ftwalk(argv[0] ? (char*)argv : NiL, du, flags, NiL);
 	if (state.total)
-		sfprintf(sfstdout, "%I*u\n", sizeof(Count_t), BLOCKS(state.count));
+	{
+		if (state.scale)
+			sfprintf(sfstdout, "%s\n", fmtscale(state.count * state.blocksize, state.scale));
+		else
+			sfprintf(sfstdout, "%I*u\n", sizeof(Count_t), BLOCKS(state.count));
+	}
 	return error_info.errors != 0;
 }

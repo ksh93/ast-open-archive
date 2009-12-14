@@ -533,7 +533,6 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	Format_t*	tp;
 	Option_t*	op;
 	off_t		n;
-	off_t		z;
 	long		num;
 	int		i;
 	int		m;

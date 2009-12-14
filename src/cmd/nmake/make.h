@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -597,7 +597,7 @@ typedef struct Internal_s		/* internal rule and list info	*/
 	Rule_t*		dot;		/* . rule pointer		*/
 	Rule_t*		empty;		/* "" rule pointer		*/
 	Rule_t*		error;		/* error intercept rule pointer	*/
-	Rule_t*		exported;	/* .EXPORT rule pointer		*/
+	Rule_t*		exports;	/* .EXPORT rule pointer		*/
 	Rule_t*		globalfiles;	/* .GLOBALFILES rule pointer	*/
 	Rule_t*		include;	/* .INCLUDE rule pointer	*/
 	Rule_t*		internal;	/* .INTERNAL rule pointer	*/
@@ -611,6 +611,7 @@ typedef struct Internal_s		/* internal rule and list info	*/
 	Rule_t*		reset;		/* .RESET rule pointer		*/
 	Rule_t*		retain;		/* .RETAIN rule pointer		*/
 	Rule_t*		scan;		/* .SCAN rule pointer		*/
+	Rule_t*		script;		/* .SCRIPT rule pointer		*/
 	Rule_t*		special;	/* .SPECIAL rule pointer	*/
 	Rule_t*		tmplist;	/* .TMPLIST rule pointer	*/
 	Rule_t*		unbind;		/* .UNBIND rule pointer		*/
