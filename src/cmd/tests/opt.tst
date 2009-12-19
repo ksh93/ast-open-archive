@@ -3308,6 +3308,20 @@ return=o option=-o name=-o arg=out num=1'
 		OUTPUT - $'return=f option=-f name=--file arg=in num=1
 return=g option=-g name=--global arg=(null) num=1
 return=o option=-o name=--output arg=out num=1'
+	usage=$'xf:(file)(input-file)g(global)o:(output)(output-file)'
+	EXEC oksh "$usage" --usage
+		OUTPUT - $'return=? option=- name=--usage num=0'
+		ERROR - $'[-][x][f:file|input-file]:[string][g:global][o:output|output-file]:[string]'
+		EXIT 2
+	usage=$'x:f:(file)(input-file)g(global)o:(output)(output-file)'
+	EXEC oksh "$usage" --usage
+		ERROR - $'[-][x]:[string][f:file|input-file]:[string][g:global][o:output|output-file]:[string]'
+	usage=$'f:(file)(input-file)g(global)xo:(output)(output-file)'
+	EXEC oksh "$usage" --usage
+		ERROR - $'[-][f:file|input-file]:[string][g:global][x][o:output|output-file]:[string]'
+	usage=$'f:(file)(input-file)g(global)x:o:(output)(output-file)'
+	EXEC oksh "$usage" --usage
+		ERROR - $'[-][f:file|input-file]:[string][g:global][x]:[string][o:output|output-file]:[string]'
 
 TEST 56 'old format does long options, well, with a lot of secondary work'
 	usage=$'o:-:'
