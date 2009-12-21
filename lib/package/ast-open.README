@@ -92,7 +92,9 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-09-12-18  --- Release ksh93t+  ---
+09-12-21  --- Release ksh93t+  ---
+09-12-21  ast setlocale() reworked to differentiate env var changes from user
+	  override.
 09-12-18  A bug with the SHOPT_BGX option set which disabled traps for signals
 	  < SIGCHLD when a trap for a signal > SIGCHLD was set has been fixed.
 09-12-18  A bug where [[ -v var ]] was incorrect for some variables (including
@@ -5754,6 +5756,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+09-12-21 setlocale.c: locale name "?" prefix defers to LC_ALL (for sh)
 09-12-17 misc/optget.c: handle mixed solaris usage="x:f:(in)yo:(out)"
 09-12-11 regex/regcomp.c: posix semantics for [z-a]
 09-12-11 regex/regcomp.c: fix BRE/ERE ^^ logic
