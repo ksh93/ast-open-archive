@@ -1046,8 +1046,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-12-21  --- Release ksh93t+  ---
-09-12-21  ast setlocale() reworked to differentiate env var changes from user
+09-12-24  --- Release ksh93t+  ---
+09-12-24  ast setlocale() reworked to differentiate env var changes from user
 	  override.
 09-12-18  A bug with the SHOPT_BGX option set which disabled traps for signals
 	  &lt; SIGCHLD when a trap for a signal &gt; SIGCHLD was set has been fixed.
@@ -6851,7 +6851,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-09-12-21 setlocale.c: locale name "?" prefix defers to LC_ALL (for sh)
+09-12-24 comp/setlocale.c: fix setlocale(LC_ALL,"") when already initialized
+09-12-21 comp/setlocale.c: locale name "?" prefix defers to LC_ALL (for sh)
 09-12-17 misc/optget.c: handle mixed solaris usage="x:f:(in)yo:(out)"
 09-12-11 regex/regcomp.c: posix semantics for &#0091;z-a&#0093;
 09-12-11 regex/regcomp.c: fix BRE/ERE ^^ logic
@@ -10101,7 +10102,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>December 22, 2009</TD>
+<TD align=right>December 24, 2009</TD>
 </TR>
 </TABLE>
 <P>
