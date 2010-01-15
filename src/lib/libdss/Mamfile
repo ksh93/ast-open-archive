@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-12-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -213,7 +213,7 @@ done dsshdr.h
 done dssopen.c
 meta dssopen.o %.c>%.o dssopen.c dssopen
 prev dssopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libdss]"\" -D_PACKAGE_ast -D_BLD_dss -D_BLD_cx -D_BLD_tag -c dssopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libdss]"\" -D_PACKAGE_ast -D_BLD_dss -D_BLD_cx -D_BLD_tag -c dssopen.c
 done dssopen.o generated
 make dssfile.o
 make dssfile.c
@@ -284,7 +284,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev tag.h implicit

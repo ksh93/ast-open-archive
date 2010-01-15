@@ -1,3 +1,4 @@
+10-01-15 code-uu.c: add uu-base64-string to encode with no newline separators
 09-06-26 codex.h,codex.c: add Sfio_t* Codex_t.op for open/close/read/write apis
 08-05-23 code-qp.c: avoid isprint()/iscntrl() for CC_NATIVE==CC_ASCII
 07-09-26 code-uu.c: uu_sync() => flush() for encode only -- doh

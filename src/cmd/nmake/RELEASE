@@ -1,3 +1,5 @@
+10-01-01 --- release 5.4 ---
+10-01-01 parse.c: ['"] following # always ignored
 09-12-09 Makerules.mk: .EXPORT => .SCRIPT, internal.exported => internal.script
 09-12-09 Makerules.mk: .EXPORT now adds vars to coshell coexport(3) list
 09-12-04 Makerules.mk: rename PACKAGE_OPTIMIZE=foo to PACKAGE_OPTIONS=optimize-foo

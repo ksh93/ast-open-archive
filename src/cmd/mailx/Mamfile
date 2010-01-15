@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-12-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -205,7 +205,9 @@ done edit.o generated
 make fio.o
 make fio.c
 make ${PACKAGE_ast_INCLUDE}/fts.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/fts.h
 prev mailx.h implicit
@@ -259,7 +261,7 @@ prev mailx.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Kurt Shoens (UCB)][-author?gsf][-copyright?Copyright (c) 1978-2009 The Regents of the University of California and AT&T][-license?http://www.opensource.org/licenses/bsd-license][--catalog?mailx]"\" -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Kurt Shoens (UCB)][-author?gsf][-copyright?Copyright (c) 1978-2010 The Regents of the University of California and AT&T][-license?http://www.opensource.org/licenses/bsd-license][--catalog?mailx]"\" -D_PACKAGE_ast -c main.c
 done main.o generated
 make misc.o
 make misc.c

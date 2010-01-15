@@ -27,7 +27,7 @@ source and link your a.out with libivsa.a.  ivsa.omk (for old make) pulls
 in standalone headers and source.
 
 'testiv --man' lists the test harness man page on the standard error.
-See testiv.c for example api usage -- iv(3) documentation real soon now.
+iv.3 is the api man page.  See testiv.c for example api usage.
 
 ivsa is a subset of the { ast-base ast-dss } packages at
 

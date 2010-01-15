@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-12-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -137,7 +137,7 @@ done ${PACKAGE_ast_INCLUDE}/dss.h
 make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
@@ -145,7 +145,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sortsum.c
 meta sortsum.o %.c>%.o sortsum.c sortsum
 prev sortsum.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortsum]"\" -c sortsum.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortsum]"\" -c sortsum.c
 done sortsum.o generated
 exec - ${AR} -cr libsortsum.a sortsum.o
 exec - (ranlib libsortsum.a) >/dev/null 2>&1 || true

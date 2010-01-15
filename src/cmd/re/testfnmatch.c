@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -23,7 +23,7 @@
  * see testfnmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2008-04-30 $\0\n";
+static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2010-01-01 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -756,6 +756,9 @@ main(int argc, char** argv)
 					continue;
 				case 'u':
 					unspecified = 1;
+					continue;
+				case 'v':
+					cflags = NOTEST;
 					continue;
 				case 'x':
 					cflags = NOTEST;

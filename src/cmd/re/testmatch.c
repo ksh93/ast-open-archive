@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  * see testmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2005-05-20 $\0\n";
+static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2010-01-01 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -883,6 +883,9 @@ main(int argc, char** argv)
 					continue;
 				case 'u':
 					unspecified = 1;
+					continue;
+				case 'v':
+					cflags = NOTEST;
 					continue;
 				case 'x':
 					cflags = NOTEST;

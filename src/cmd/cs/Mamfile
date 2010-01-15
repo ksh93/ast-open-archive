@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-12-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -135,13 +135,10 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/msg.h
 make ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
 make ${PACKAGE_ast_INCLUDE}/fts.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/fts.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -149,7 +146,12 @@ done ${PACKAGE_ast_INCLUDE}/ftwalk.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/times.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
 make ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
@@ -166,7 +168,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cs.c
 meta cs.o %.c>%.o cs.c cs
 prev cs.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c cs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c cs.c
 done cs.o generated
 bind -lcs
 bind -last
@@ -185,7 +187,7 @@ done ${PACKAGE_ast_INCLUDE}/css.h
 done css.c
 meta css.o %.c>%.o css.c css
 prev css.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c css.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c css.c
 done css.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o css css.o ${mam_libcs} ${mam_libast}
 done css generated
@@ -259,7 +261,7 @@ prev ${PACKAGE_ast_INCLUDE}/css.h implicit
 done mbb.c
 meta mbb.o %.c>%.o mbb.c mbb
 prev mbb.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c mbb.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c mbb.c
 done mbb.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mbb.svc mbb.o ${mam_libcs} ${mam_libast}
 done mbb.svc generated

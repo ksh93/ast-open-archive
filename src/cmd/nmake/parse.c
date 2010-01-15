@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -778,8 +778,8 @@ readline(int lead)
 					}
 				break;
 			case COMMENT:
-				if (!q && sfstrtell(pp->ip) > line && isspace(*(sfstrseek(pp->ip, 0, SEEK_CUR) - 1)))
-					for (q = c;;)
+				if (!q && (q = c) && sfstrtell(pp->ip) > line && isspace(*(sfstrseek(pp->ip, 0, SEEK_CUR) - 1)))
+					for (;;)
 						switch (sfgetc(pp->fp))
 						{
 						case EOF:

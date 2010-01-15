@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-12-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -619,6 +619,11 @@ make iv.3
 done iv.3
 exec - test '' = 'iv.3' || ${STDCMP} 2>/dev/null -s iv.3 ${INSTALLROOT}/man/man3/iv.3 || { ${STDMV} ${INSTALLROOT}/man/man3/iv.3 ${INSTALLROOT}/man/man3/iv.3.old 2>/dev/null || true; ${STDCP} iv.3 ${INSTALLROOT}/man/man3/iv.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/iv.3 generated
+make ${INSTALLROOT}/man/man3/ptv.3
+make ptv.3
+done ptv.3
+exec - test '' = 'ptv.3' || ${STDCMP} 2>/dev/null -s ptv.3 ${INSTALLROOT}/man/man3/ptv.3 || { ${STDMV} ${INSTALLROOT}/man/man3/ptv.3 ${INSTALLROOT}/man/man3/ptv.3.old 2>/dev/null || true; ${STDCP} ptv.3 ${INSTALLROOT}/man/man3/ptv.3  		    		    ;}
+done ${INSTALLROOT}/man/man3/ptv.3 generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
 exec - then	mkdir -p ${INSTALLROOT}/lib/lib
@@ -697,7 +702,7 @@ done testiv.c
 meta testiv.o %.c>%.o testiv.c testiv
 prev testiv.c
 setv _BLD_ip_t -U_BLD_ip_t
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_pt -c testiv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_pt -c testiv.c
 done testiv.o generated
 prev libdssip_t.a archive
 bind -ldssip_t

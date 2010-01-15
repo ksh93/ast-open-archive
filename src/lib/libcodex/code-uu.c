@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -22,7 +22,7 @@
 #pragma prototyped
 
 /*
- * quoted printable coder
+ * uuencode familiy coders
  */
 
 #include <codex.h>
@@ -61,6 +61,7 @@ typedef struct State_s
 	int		c1;
 	int		c2;
 	int		nl;
+	int		string;
 	int		text;
 
 	unsigned char	mapbuf[UCHAR_MAX + 2];
@@ -138,8 +139,16 @@ flush(register State_t* state)
 	{
 		if (state->bb)
 			*state->bb = state->data->map[((state->bp - state->bb - x) / UUOUT) * UUIN + 1];
-		if (*(state->bp - 1) != '\n')
-			*state->bp++ = '\n';
+		if (state->string)
+		{
+			if (*(state->bp - 1) == '\n')
+				state->bp--;
+		}
+		else
+		{
+			if (*(state->bp - 1) != '\n')
+				*state->bp++ = '\n';
+		}
 		x = state->bp - state->buf;
 		state->bp = state->buf;
 		state->bl = state->bp + UUOUT * UUCHUNK;
@@ -160,10 +169,11 @@ uu_open(Codex_t* p, char* const args[], Codexnum_t flags)
 	const Data_t*		data;
 	int			c;
 	int			n;
+	int			string;
 	int			text;
 
 	data = &uu_posix;
-	text = 0;
+	string = text = 0;
 	a = (char**)args + 1;
 	while (s = *++a)
 		if (streq(s, "base64") || streq(s, "mime"))
@@ -172,6 +182,16 @@ uu_open(Codex_t* p, char* const args[], Codexnum_t flags)
 			data = &uu_bsd;
 		else if (streq(s, "posix"))
 			data = &uu_posix;
+		else if (streq(s, "string"))
+		{
+			if (data != &uu_base64)
+			{
+				if (p->disc->errorf)
+					(*p->disc->errorf)(NiL, p->disc, 2, "%s: %s: option valid for base64/mime only", p->meth->name, s);
+				return -1;
+			}
+			string = 1;
+		}
 		else if (streq(s, "text"))
 			text = 1;
 		else
@@ -187,6 +207,7 @@ uu_open(Codex_t* p, char* const args[], Codexnum_t flags)
 		return -1;
 	}
 	state->data = data;
+	state->string = string;
 	state->text = text;
 	if (p->flags & CODEX_DECODE)
 	{
@@ -444,7 +465,8 @@ uu_write(Sfio_t* sp, const void* buf, size_t n, Sfdisc_t* disc)
 			*state->bp++ = state->data->map[(b >> 6) & 077];
 			*state->bp++ = state->data->map[b & 077];
 		} while (state->bp < state->bl);
-		*state->bp++ = '\n';
+		if (!state->string)
+			*state->bp++ = '\n';
 		if (state->bp >= state->be)
 		{
 			if (sfwr(sp, state->buf, state->bp - state->buf, disc) != (state->bp - state->buf))
@@ -474,8 +496,9 @@ Codexmeth_t	codex_uu =
 	"[+posix?Posix \buuencode\b(1). This is the default.]"
 	"[+base64|mime?MIME base64 encoding.]"
 	"[+bsd|ucb?BSD \buuencode\b(1).]"
+	"[+string?Encode into a string with no separators (base64 only).]"
 	"[+text?Encode \\n => \\r\\n, decode \\r\\n => \\n.]"
-	"[+(version)?codex-uu (AT&T Research) 1998-11-11]"
+	"[+(version)?codex-uu (AT&T Research) 2010-01-15]"
 	"[+(author)?Glenn Fowler <gsf@research.att.com>]",
 	CODEX_DECODE|CODEX_ENCODE|CODEX_UU,
 	0,

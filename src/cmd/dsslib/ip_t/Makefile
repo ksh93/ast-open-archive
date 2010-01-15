@@ -6,7 +6,7 @@ CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 _BLD_pt == 1
 
-ip_t plugin=dss static :LIBRARY: iv.3 \
+ip_t plugin=dss static :LIBRARY: iv.3 ptv.3 \
 	ip_t.c lib.c \
 	ire.c itl.c \
 	ptaddresses.c ptcopy.c ptcover.c ptdifference.c ptequal.c \
@@ -25,7 +25,7 @@ $(INCLUDEDIR) :INSTALLPROTO: bgp.h fv.h iv.h ivmethods.h pt.h ptv.h
 iv :TEST: testiv iv-prefix.dat iv-addr.dat testiv.out
 	set +x
 	$(*:O<4) > testiv.tmp
-	cmp -s testiv.tmp testiv.out || echo iv test failed
+	cmp -s testiv.tmp $(*:O=4) || echo iv test failed
 
 :INSTALLDIR: bgpsize testiv testptv
 

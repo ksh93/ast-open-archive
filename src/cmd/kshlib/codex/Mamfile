@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-12-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -116,7 +116,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../codex/codex.c
 meta codex.o %.c>%.o ../../codex/codex.c codex
 prev ../../codex/codex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -Dmain=b_codex -D_PACKAGE_ast -D_BLD_codex -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshcodex]"\" -c ../../codex/codex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -Dmain=b_codex -D_PACKAGE_ast -D_BLD_codex -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?kshcodex]"\" -c ../../codex/codex.c
 done codex.o generated
 exec - ${AR} -cr libkshcodex.a codex.o
 exec - (ranlib libkshcodex.a) >/dev/null 2>&1 || true

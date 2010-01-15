@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1996-2009 AT&T Intellectual Property          #
+#          Copyright (c) 1996-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -47,7 +47,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2009-07-01 $
+@(#)$Id: mm2html (AT&T Research) 2010-01-15 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -420,9 +420,9 @@ function getfiles
 	-e 's%</X>%</TT>%g' \
 	-e 's%<CW>%<TT>%g' \
 	-e 's%</CW>%</TT>%g' \
-	-e 's%<EM>\([^<]*\)</EM>(\([0123456789]\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>\2</NOBR>%g' \
-	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0123456789]\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>\2</NOBR>%g' \
-	-e 's%<TT>\([^<]*\)</TT>(\([0123456789]\))%<NOBR><A href="../man\2/\1.html"><TT>\1</TT></A>\2</NOBR>%g' \
+	-e 's%<EM>\([^<]*\)</EM>(\([0123456789][abcdefghijklmnopqrstuvwxyz]*\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>(\2)</NOBR>%g' \
+	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0123456789][abcdefghijklmnopqrstuvwxyz]*\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>(\2)</NOBR>%g' \
+	-e 's%<TT>\([^<]*\)</TT>(\([0123456789][abcdefghijklmnopqrstuvwxyz]*\))%<NOBR><A href="../man\2/\1.html"><TT>\1</TT></A>(\2)</NOBR>%g' \
 	-e 's%\\s+\(.\)\(.*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
 	-e 's%\\s-\(.\)\(.*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
 	-e 's%\\c%<JOIN>%g' \
@@ -777,7 +777,7 @@ function getline
 				shift
 				case $op in
 				.[BIL]R)case $#:$2 in
-					2':('[0123456789]')'*([,.?!:;]))
+					2':('[0123456789]*')'*([,.?!:;]))
 						x=${2#'('*')'}
 						y=${2%$x}
 						n=$y

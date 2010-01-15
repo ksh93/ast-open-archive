@@ -1,3 +1,4 @@
+10-01-01 testfnmatch.c,testmatch.c: ignore 'v' test option
 09-12-11 grep.tst: add more -x + -e combos for regcomb() fix
 09-12-11 testregex.dat,regex++.dat: posix semantics for [z-a]
 09-11-20 sed: handle mb chars in y/from/to/

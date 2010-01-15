@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2009-12-09 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-01-15 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -317,7 +317,7 @@ INSTRUMENT_sentinel = command=CCLD root=SE_HOME CCFLAGS=$(CC.DEBUG)
 	LDLIBRARIES += -lapp
 	.SOURCE.a : $(APP:D:D)
 
-.INSTRUMENT.notfound : .MAKE .FUNCTIONAL .VIRTUAL .FORCE
+.INSTRUMENT.notfound : .FUNCTION
 	error 3 $(-instrument) not found
 
 /*
@@ -1615,17 +1615,6 @@ RECURSEROOT = .
 		error 2 $(<:O=2): only one target expected
 	else
 		local T0 T1 T2 T3 T4 TA TL TP TS OBJ STATIC
-		eval
-			.FILES.$(<:B:S) = $(>:V:N=[!-.]*|.[!A-Z]*)
-			.RHS.$(<:B:S) = $(>:V)
-		end
-		.FILES. += $$(.FILES.$(<:B:S))
-		if "$(.INSTALL.$(<:B:S):V)" != "." && ! "$(.NO.INSTALL.)"
-			.ALL : $(<)
-		end
-		if ! .MAIN.TARGET.
-			.MAIN.TARGET. := $(<:B:S)
-		end
 		if "$(>:V:G=%$(CC.SUFFIX.OBJECT))"
 			OBJ = 1
 		end
@@ -1753,42 +1742,7 @@ RECURSEROOT = .
 				end
 			end
 		end
-		if ! "$(.NO.INSTALL.)"
-			if ! ( T1 = "$(.INSTALL.$(<:B:S):V)" )
-				for T2 $(.INSTALL.MAPS.)
-					if "$(<:$(T2))"
-						T1 = .
-						break
-					end
-				end
-				if ! T1
-					if ( T1 = "$(<:A<=.INSTALL.)" )
-						T1 := $(*$(T1):V)
-					end
-				end
-			end
-			if T1 && T1 != "." && T1 != "$(T0:V:D)"
-				$(T1:V) :INSTALLDIR: $(T0)
-			end
-			let T1 = 1
-			while T1 <= 9
-				if T2 = "$(>:V:N=*.$(T1)?([A-Za-z]))"
-					if ! "$(*$(T0):V:N=$(T2:V))"
-						$$(MANDIR)$(T1) :INSTALLDIR: $(T2:V)
-					end
-				end
-				let T1 = T1 + 1
-			end
-			for T2 $(>:V:N=*.man?(=*))
-				if T2 == "*.man=*"
-					T1 := $(T2:V:/.*man=//)
-					T2 := $(T2:V:/=.*//)
-				else
-					T1 = 1
-				end
-				$$(MANDIR)$(T1)/$(T2:V:D:B:S=.$(T1)) :INSTALL: $(T2:V)
-			end
-		end
+		: $(.INSTALL.COMMON. $(<) $(T0) $(>)) :
 	end
 
 /*
@@ -3647,7 +3601,7 @@ PACKAGES : .SPECIAL .FUNCTION
 .CLEARARGS : .MAKE .VIRTUAL .FORCE
 	.ARGS : .CLEAR
 
-.SELECT. : .MAKE .VIRTUAL .FORCE .FUNCTIONAL
+.SELECT. : .FUNCTION
 	local T X
 	.UNION. : .CLEAR
 	if T = "$(*.ARGS)"
@@ -3678,7 +3632,58 @@ PACKAGES : .SPECIAL .FUNCTION
 	let $(N).COUNT. = $(N).COUNT. + 1
 	return $(N).$($(N).COUNT.).
 
-.INSTALL.LIST. : .FUNCTIONAL .FORCE .MAKE 
+.INSTALL.COMMON. : .FUNCTION
+	local ( T A P ... ) $(%)
+	local B T1 T2
+	if ! "$(A)" || "$(A)" == "-"
+		A := $(T)
+	end
+	B := $(T:B:S)
+	eval
+		.FILES.$(B) = $(P:V:N=[!-.]*|.[!A-Z]*)
+		.RHS.$(B) = $(P:V)
+	end
+	.FILES. += $$(.FILES.$(B))
+	if ! .MAIN.TARGET.
+		.MAIN.TARGET. := $(B)
+	end
+	if ! "$(.NO.INSTALL.)"
+		if "$(.INSTALL.$(B):V)" != "."
+			.ALL : $(T)
+		end
+		if ! ( T1 = "$(.INSTALL.$(B):V)" )
+			for T2 $(.INSTALL.MAPS.)
+				if "$(T:$(T2))"
+					T1 = .
+					break
+				end
+			end
+			if ! T1
+				if ( T1 = "$(T:A<=.INSTALL.)" )
+					T1 := $(*$(T1):V)
+				end
+			end
+		end
+		if T1 && T1 != "." && T1 != "$(A:V:D)"
+			$(T1:V) :INSTALLDIR: $(A)
+		end
+		for T2 $(P:V:N=*.[[:digit:]]*([[:alpha:]]))
+			if ! "$(*$(A):V:N=$(T2:V))"
+				$$(MANDIR)$(T2:V:/.*\.//) :INSTALLDIR: $(T2:V)
+			end
+		end
+		for T2 $(P:V:N=*.man?(=*))
+			if T2 == "*.man=*"
+				T1 := $(T2:V:/.*man=//)
+				T2 := $(T2:V:/=.*//)
+			else
+				T1 = 1
+			end
+			$$(MANDIR)$(T1)/$(T2:V:D:B:S=.$(T1)) :INSTALL: $(T2:V)
+		end
+	end
+
+.INSTALL.LIST. : .FUNCTION
 	set noalias /* don't tell dmr */
 	: $(!.INSTALL)
 	.MAKE : $(~.INSTALL:A=.MAKE)

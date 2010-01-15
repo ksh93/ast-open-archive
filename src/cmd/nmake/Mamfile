@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.4 2009-12-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -281,7 +281,7 @@ make object.c
 make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev options.h implicit
@@ -298,7 +298,7 @@ prev make.h implicit
 done option.c
 meta option.o %.c>%.o option.c option
 prev option.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2009 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt]"\" -D_PACKAGE_ast -c option.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
 make parse.o
 make parse.c
@@ -361,14 +361,14 @@ prev make.h implicit
 done variable.c
 meta variable.o %.c>%.o variable.c variable
 prev variable.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D__OBSOLETE__=20090101 -D_PACKAGE_ast -c variable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D__OBSOLETE__=20100101 -D_PACKAGE_ast -c variable.c
 done variable.o generated
 make version.o
 make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.4 2009-12-09 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.5 2010-01-01 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir

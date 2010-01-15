@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2009-11-11 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2010-01-01 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -1071,7 +1071,7 @@ list(void)
 							} while ((xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->ps->pss);
 							break;
 						}
-					} while (xp->ps->ppid != xp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->seen);
+					} while (xp->ps->ppid != xp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)));
 				}
 		rp = zp = 0;
 		for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
