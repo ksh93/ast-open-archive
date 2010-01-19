@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -430,7 +430,7 @@ typedef struct
 	char		one[2];
 	char*		binsh;
 	char		env3d[sizeof(var_3d)];
-	char		envpwd[sizeof(var_pwd) + PATH_MAX];
+	char		envpwd[sizeof(var_pwd) + 4 * PATH_MAX];
 	char		envshell[sizeof(var_shell) + PATH_MAX];
 	char		envview[sizeof(var_view)];
 	Fs_t		fs[TABSIZE];
@@ -478,7 +478,7 @@ typedef struct
 	pid_t		pid;
 	char*		pwd;
 	int		pwdsize;
-	char		pwdbuf[PATH_MAX];
+	char		pwdbuf[4 * PATH_MAX + 1];
 	long		ret;
 	Fs_t*		safe;
 	char*		shell;

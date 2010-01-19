@@ -92,7 +92,10 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-01-15  --- Release ksh93t+  ---
+10-01-19  --- Release ksh93t+  ---
+10-01-19  A workaround for a double-free of a trap in both a subshell and its
+	  parent has been added.
+10-01-18  A bug in type handling of typeset -H has been fixed.
 10-01-15  The "adding empty subscript" warning now only emitted with -x set.
 10-01-13  A bug in the evaluation of arithmetic expression in which the
 	  subscript was evaluated twice for $((foo[x++]++)) has been fixed.
@@ -2831,6 +2834,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+10-01-19 3d.h: increase some path buffer sizes -- these need to be dynamic!
 09-05-15 dll_3d.h: handle dllopen => dlopen
 08-12-04 fs.c: change open(/dev/fd/NN,...) try open(2) first, then dup(2)
 08-06-20 ast_3d.h,ast.c: add libast/misc/setenviron.c
@@ -3160,6 +3164,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+10-01-19 Makerules.mk: fix .RECURSE to handle install or .INSTALL
 10-01-01 --- release 5.4 ---
 10-01-01 parse.c: ['"] following # always ignored
 09-12-09 Makerules.mk: .EXPORT => .SCRIPT, internal.exported => internal.script
@@ -5771,6 +5776,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-01-19 astlicense.c: add epl
 10-01-01 vmalloc: VMALLOC_OPTIONS env var for all runtime options
 10-01-01 include: change some <ast.h> refs to less intrusive <ast_*.h>
 10-01-01 setlocale.c,translate.c,fmterror.c: AST_LC_internal retains prev state

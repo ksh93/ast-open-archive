@@ -41,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2009-07-01' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2010-01-19' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2010-01-15 $
+@(#)$Id: mm2html (AT&T Research) 2010-01-19 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -435,7 +435,7 @@ function getfiles
 function getline
 {
 	integer i n
-	typeset data a c q v x d
+	typeset data a c d q v x y z
 	if	(( peek ))
 	then	(( peek = 0 ))
 		trap 'set -- "${text[@]}"' 0
@@ -780,15 +780,16 @@ function getline
 					2':('[0123456789]*')'*([,.?!:;]))
 						x=${2#'('*')'}
 						y=${2%$x}
-						n=$y
+						z=${y#'('}
+						z=${z%')'}
 						case $op in
 						.B*)	font1=STRONG ;;
 						.L*)	font1=TT ;;
 						*)	font1=EM ;;
 						esac
 						case $macros in
-						man)	set -A text -- "<NOBR><A href=\"../man$n/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
-						*)	set -A text -- "<NOBR><A href=\"${html.man:=../man}/man$n/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
+						man)	set -A text -- "<NOBR><A href=\"../man$z/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
+						*)	set -A text -- "<NOBR><A href=\"${html.man:=../man}/man$z/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
 						esac
 						break
 						;;

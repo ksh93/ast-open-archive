@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -27,7 +27,7 @@ int
 chdir3d(const char* path)
 {
 	register char*	sp;
-	char		buf[PATH_MAX + 1];
+	char		buf[2 * PATH_MAX + 1];
 
 #if FS
 	if (!fscall(NiL, MSG_stat, 0, path, &state.path.st))

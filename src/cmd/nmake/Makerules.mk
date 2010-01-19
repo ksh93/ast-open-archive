@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-01-15 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-01-19 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1807,7 +1807,7 @@ RECURSEROOT = .
 		if ! "$(DIR:T=F)"
 			{ test -d $(DIR) || $(MKDIR) $(DIR) }
 		end
-		.ORIGINAL.ARGS. := .DLL.$(.ORIGINAL.ARGS.:N=install:@?INSTALL?ALL?)
+		.ORIGINAL.ARGS. := .DLL.$(.ORIGINAL.ARGS.:N=install|.INSTALL:@?INSTALL?ALL?)
 		make $(DIR)
 	end
 

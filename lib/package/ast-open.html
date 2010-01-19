@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Research) 2009-07-01">
+<META name="generator" content="mm2html (AT&T Research) 2010-01-19">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
@@ -1046,7 +1046,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-10-01-15  --- Release ksh93t+  ---
+10-01-19  --- Release ksh93t+  ---
+10-01-19  A workaround for a double-free of a trap in both a subshell and its
+	  parent has been added.
+10-01-18  A bug in type handling of typeset -H has been fixed.
 10-01-15  The "adding empty subscript" warning now only emitted with -x set.
 10-01-13  A bug in the evaluation of arithmetic expression in which the
 	  subscript was evaluated twice for $((foo&#0091;x++&#0093;++)) has been fixed.
@@ -3803,6 +3806,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-01-19 3d.h: increase some path buffer sizes -- these need to be dynamic!
 09-05-15 dll_3d.h: handle dllopen =&gt; dlopen
 08-12-04 fs.c: change open(/dev/fd/NN,...) try open(2) first, then dup(2)
 08-06-20 ast_3d.h,ast.c: add libast/misc/setenviron.c
@@ -4150,6 +4154,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-01-19 Makerules.mk: fix .RECURSE to handle install or .INSTALL
 10-01-01 --- release 5.4 ---
 10-01-01 parse.c: &#0091;'"&#0093; following # always ignored
 09-12-09 Makerules.mk: .EXPORT =&gt; .SCRIPT, internal.exported =&gt; internal.script
@@ -6866,6 +6871,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-01-19 astlicense.c: add epl
 10-01-01 vmalloc: VMALLOC_OPTIONS env var for all runtime options
 10-01-01 include: change some &lt;ast.h&gt; refs to less intrusive &lt;ast_*.h&gt;
 10-01-01 setlocale.c,translate.c,fmterror.c: AST_LC_internal retains prev state
@@ -10122,7 +10128,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>January 18, 2010</TD>
+<TD align=right>January 19, 2010</TD>
 </TR>
 </TABLE>
 <P>

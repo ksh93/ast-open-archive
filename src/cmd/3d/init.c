@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -40,7 +40,7 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2008-12-04 $\0\n"
+"] (AT&T Research) 2010-01-19 $\0\n"
 #else
 "\n@(#)$Id: 3d (AT&T Research) 2008-12-04 $\0\n"
 #endif
