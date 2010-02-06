@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -71,7 +71,7 @@ Vcchar_t	Data[N_RECORDS*60 + 1];	/* (#fields=6) * (maxLength=9) + (Separators=6)
 #define LENGTH(maxn)	((trandom() % (maxn)) + 1)
 #endif
 
-main()
+int main()
 {
 	ssize_t		e, k, r, n, dtsz;
 	Vcrdsepar_t	sep[3];
@@ -303,7 +303,7 @@ main()
 	twarn("\tTransform+Padded fields+Vctable on whole table: Raw size=%d Compressed size=%d", n, e);
 
 	/* test transformation of records with missing fields */
-	strcpy(test, "1.2.3.4\na.b\n5.6.7.8\nc.d.\n"); k = strlen(test);
+	strcpy((char*)test, "1.2.3.4\na.b\n5.6.7.8\nc.d.\n"); k = strlen((char*)test);
 
 	if(!(envc = vcopen(0, Vcrdb, "fsep=[.]", entbl, VC_ENCODE)) ||
 	   !(devc = vcopen(0, Vcrdb, "fsep=[.]", detbl, VC_DECODE)) )

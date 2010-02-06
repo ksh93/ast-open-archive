@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,7 @@
 #include <ast_common.h>
 #include <ip6.h>
 
-#define BGP_VERSION		20080811L	/* interface version	*/
+#define BGP_VERSION		20100201L	/* interface version	*/
 
 #define BGP_SET16		0xffff		/* as16 path set marker	*/
 #define BGP_SET32		0xffffffff	/* as32 path set marker	*/
@@ -90,36 +90,37 @@
 #define BGP_hopv4		((30<<1)|1)
 #define BGP_hopv6		((31<<1)|1)
 #define BGP_label		((32<<1)|1)
-#define BGP_local		((33<<1)|1)
-#define BGP_med			((34<<1)|1)
-#define BGP_message		((35<<1)|1)
-#define BGP_new_state		((36<<1)|1)
-#define BGP_old_state		((37<<1)|1)
-#define BGP_origin		((38<<1)|1)
-#define BGP_originator		((39<<1)|1)
-#define BGP_path		((40<<1)|1)
-#define BGP_path16		((41<<1)|1)
-#define BGP_path32		((42<<1)|1)
-#define BGP_prefix		((43<<1)|1)
-#define BGP_prefixv4		((44<<1)|1)
-#define BGP_prefixv6		((45<<1)|1)
-#define BGP_rd_admin		((46<<1)|1)
-#define BGP_rd_number		((47<<1)|1)
-#define BGP_rd_type		((48<<1)|1)
-#define BGP_safi		((49<<1)|1)
-#define BGP_src_addr		((50<<1)|1)
-#define BGP_src_addrv4		((51<<1)|1)
-#define BGP_src_addrv6		((52<<1)|1)
-#define BGP_src_as		((53<<1)|1)
-#define BGP_src_as16		((54<<1)|1)
-#define BGP_src_as32		((55<<1)|1)
-#define BGP_stamp		((56<<1)|1)
-#define BGP_time		((57<<1)|1)
-#define BGP_type		((58<<1)|1)
-#define BGP_weight		((59<<1)|1)
-#define BGP_unknown		((60<<1)|1)
+#define BGP_labels		((33<<1)|1)
+#define BGP_local		((34<<1)|1)
+#define BGP_med			((35<<1)|1)
+#define BGP_message		((36<<1)|1)
+#define BGP_new_state		((37<<1)|1)
+#define BGP_old_state		((38<<1)|1)
+#define BGP_origin		((39<<1)|1)
+#define BGP_originator		((40<<1)|1)
+#define BGP_path		((41<<1)|1)
+#define BGP_path16		((42<<1)|1)
+#define BGP_path32		((43<<1)|1)
+#define BGP_prefix		((44<<1)|1)
+#define BGP_prefixv4		((45<<1)|1)
+#define BGP_prefixv6		((46<<1)|1)
+#define BGP_rd_admin		((47<<1)|1)
+#define BGP_rd_number		((48<<1)|1)
+#define BGP_rd_type		((49<<1)|1)
+#define BGP_safi		((50<<1)|1)
+#define BGP_src_addr		((51<<1)|1)
+#define BGP_src_addrv4		((52<<1)|1)
+#define BGP_src_addrv6		((53<<1)|1)
+#define BGP_src_as		((54<<1)|1)
+#define BGP_src_as16		((55<<1)|1)
+#define BGP_src_as32		((56<<1)|1)
+#define BGP_stamp		((57<<1)|1)
+#define BGP_time		((58<<1)|1)
+#define BGP_type		((59<<1)|1)
+#define BGP_weight		((60<<1)|1)
+#define BGP_unknown		((61<<1)|1)
 
-#define BGP_LAST		60
+#define BGP_LAST		61
 
 #define BGP_INDEX(x)		(((x)>>1)-1)
 
@@ -171,6 +172,7 @@
 #define BGPCLUSTER(r)		((Bgpnum_t*)((r)->data+(r)->cluster.offset))
 #define BGPCOMMUNITY(r)		((Bgpasn_t*)((r)->data+(r)->community.offset))
 #define BGPEXTENDED(r)		((Bgpasn_t*)((r)->data+(r)->extended.offset))
+#define BGPLABELS(r)		((Bgpasn_t*)((r)->data+(r)->labels.offset))
 #define BGPPATH(r)		((Bgpasn_t*)((r)->data+(r)->path.offset))
 #define BGPPATH32(r)		((Bgpasn_t*)((r)->data+(r)->path32.offset))
 
@@ -241,6 +243,7 @@ struct Bgproute_s
 	Bgpvec_t	cluster;	/* clusters			*/
 	Bgpvec_t	community;	/* communities			*/
 	Bgpvec_t	extended;	/* extended communities		*/
+	Bgpvec_t	labels;		/* NLRI labels			*/
 	Bgpvec_t	path32;		/* as32 path			*/
 	Bgpvec_t	unknown;	/* unknown attributes		*/
 
@@ -273,7 +276,7 @@ struct Bgproute_s
 
 	char		pad[16];	/* pad to 8 byte boundary	*/
 
-	char		data[736];	/* vector data (round to 1K)	*/
+	char		data[1752];	/* vector data (round to 2K)	*/
 };
 
 #endif

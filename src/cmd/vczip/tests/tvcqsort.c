@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -29,7 +29,7 @@ int intcmp(Void_t* one, Void_t* two, Void_t* disc)
 	return i1 - i2;
 }
 
-main()
+int main()
 {
 	int	i;
 

@@ -353,17 +353,6 @@ prev ${INSTALLROOT}/bin
 prev tw
 exec - test '' = 'tw' || ${STDCMP} 2>/dev/null -s tw ${INSTALLROOT}/bin/tw || { ${STDMV} ${INSTALLROOT}/bin/tw ${INSTALLROOT}/bin/tw.old 2>/dev/null || true; ${STDCP} tw ${INSTALLROOT}/bin/tw  		    		    ;}
 done ${INSTALLROOT}/bin/tw generated
-make ${INSTALLROOT}/man/man1
-exec - if	silent test ! -d ${INSTALLROOT}/man/man1
-exec - then	mkdir -p ${INSTALLROOT}/man/man1
-exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/tw.1
-prev ${INSTALLROOT}/man/man1
-make tw.1
-done tw.1
-exec - test '' = 'tw.1' || ${STDCMP} 2>/dev/null -s tw.1 ${INSTALLROOT}/man/man1/tw.1 || { ${STDMV} ${INSTALLROOT}/man/man1/tw.1 ${INSTALLROOT}/man/man1/tw.1.old 2>/dev/null || true; ${STDCP} tw.1 ${INSTALLROOT}/man/man1/tw.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/tw.1 generated
 make ${INSTALLROOT}/bin/find
 prev find
 exec - test '' = 'find' || ${STDCMP} 2>/dev/null -s find ${INSTALLROOT}/bin/find || { ${STDMV} ${INSTALLROOT}/bin/find ${INSTALLROOT}/bin/find.old 2>/dev/null || true; ${STDCP} find ${INSTALLROOT}/bin/find  		    		    ;}

@@ -185,17 +185,6 @@ prev ${INSTALLROOT}/bin
 prev sort
 exec - test '' = 'sort' || ${STDCMP} 2>/dev/null -s sort ${INSTALLROOT}/bin/sort || { ${STDMV} ${INSTALLROOT}/bin/sort ${INSTALLROOT}/bin/sort.old 2>/dev/null || true; ${STDCP} sort ${INSTALLROOT}/bin/sort  		    		    ;}
 done ${INSTALLROOT}/bin/sort generated
-make ${INSTALLROOT}/man/man1
-exec - if	silent test ! -d ${INSTALLROOT}/man/man1
-exec - then	mkdir -p ${INSTALLROOT}/man/man1
-exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/sort.1
-prev ${INSTALLROOT}/man/man1
-make sort.1
-done sort.1
-exec - test '' = 'sort.1' || ${STDCMP} 2>/dev/null -s sort.1 ${INSTALLROOT}/man/man1/sort.1 || { ${STDMV} ${INSTALLROOT}/man/man1/sort.1 ${INSTALLROOT}/man/man1/sort.1.old 2>/dev/null || true; ${STDCP} sort.1 ${INSTALLROOT}/man/man1/sort.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/sort.1 generated
 done install virtual
 make test
 make test.sort

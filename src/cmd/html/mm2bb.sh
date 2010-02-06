@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1996-2009 AT&T Intellectual Property          #
+#          Copyright (c) 1996-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -110,14 +110,17 @@ primary=".BL|.LI|.IX"
 top=
 vg_ps=20
 
+usage()
+{
+	OPTIND=0
+	getopts $ARGV0 "$USAGE" OPT '-?'
+	exit 2
+}
+
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
-	t)	tex=1
-		;;
-	*)	OPTIND=0
-		getopts $ARGV0 "$USAGE" OPT '-?'
-		exit 2
-		;;
+	t)	tex=1 ;;
+	*)	usage ;;
 	esac
 done
 shift OPTIND-1

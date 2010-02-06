@@ -56,7 +56,7 @@ $(ID)$(VARIANTID) $(VERSION) :LIBRARY: README RELEASE PROMO.mm \
 
 if ! VARIANTID
 
-3d :: 2d.1 3d.sh
+3d :: 3d.sh
 
 opaque :: opaque.sh
 

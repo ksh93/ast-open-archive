@@ -182,17 +182,6 @@ prev ${INSTALLROOT}/bin
 prev ss
 exec - test '' = 'ss' || ${STDCMP} 2>/dev/null -s ss ${INSTALLROOT}/bin/ss || { ${STDMV} ${INSTALLROOT}/bin/ss ${INSTALLROOT}/bin/ss.old 2>/dev/null || true; ${STDCP} ss ${INSTALLROOT}/bin/ss  		    		    ;}
 done ${INSTALLROOT}/bin/ss generated
-make ${INSTALLROOT}/man/man1
-exec - if	silent test ! -d ${INSTALLROOT}/man/man1
-exec - then	mkdir -p ${INSTALLROOT}/man/man1
-exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/ss.1
-prev ${INSTALLROOT}/man/man1
-make ss.1
-done ss.1
-exec - test '' = 'ss.1' || ${STDCMP} 2>/dev/null -s ss.1 ${INSTALLROOT}/man/man1/ss.1 || { ${STDMV} ${INSTALLROOT}/man/man1/ss.1 ${INSTALLROOT}/man/man1/ss.1.old 2>/dev/null || true; ${STDCP} ss.1 ${INSTALLROOT}/man/man1/ss.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/ss.1 generated
 make ${INSTALLROOT}/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib
 exec - then	mkdir -p ${INSTALLROOT}/lib

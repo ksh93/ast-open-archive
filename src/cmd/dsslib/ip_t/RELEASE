@@ -1,3 +1,5 @@
+10-02-02 bgp.h: add rfc3107 BGP_labels
+10-02-02 ip_t.c: add labels_t -- pairs of 32 bit integers
 09-09-28 fv.c: fix off-by-one bug in fvplo() and fvphi()
 09-09-28 ptfmin.c,ptvmax.c: call fvplo() and fpvhi()
 09-07-28 fv.h,fv.c: add fvplo(), fvphi()

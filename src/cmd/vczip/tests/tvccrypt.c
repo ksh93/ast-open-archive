@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -75,7 +75,7 @@ static Vcchar_t	Expandedkey[] = /* expanded key */
 	0xe1, 0x3f, 0x0c, 0xc8, 0xb6, 0x63, 0x0c, 0xa6
 };
 
-main()
+int main()
 {
 	Vcchar_t	*plaindt, *edt, *ddt;
 	ssize_t		plainsz, esz, dsz, k;
@@ -146,7 +146,7 @@ main()
 		terror("Can't open encryption handle");
 	if(!(dvc = vcopen(&vcdc, Vccrypt, "aes128", 0, VC_DECODE)) )
 		terror("Can't open decryption handle");
-	plaindt = "NguyenV, we love you!"; plainsz = strlen(plaindt);
+	plaindt = "NguyenV, we love you!"; plainsz = strlen((char*)plaindt);
 	for(k = 0; k < 4; ++k)
 	{	if((esz = vcapply(evc, plaindt, plainsz, &edt)) <= 0)
 			terror("Encryption error");
@@ -167,7 +167,7 @@ main()
 		terror("Can't open encryption handle");
 	if(!(dvc = vcopen(&vcdc, Vccrypt, "aes192.chain", 0, VC_DECODE)) )
 		terror("Can't open decryption handle");
-	plaindt = "NguyenV, we love you!"; plainsz = strlen(plaindt);
+	plaindt = "NguyenV, we love you!"; plainsz = strlen((char*)plaindt);
 	for(k = 0; k < 4; ++k)
 	{	if((esz = vcapply(evc, plaindt, plainsz, &edt)) <= 0)
 			terror("Encryption error");
@@ -188,7 +188,7 @@ main()
 		terror("Can't open encryption handle");
 	if(!(dvc = vcopen(&vcdc, Vccrypt, "aes256.chain", 0, VC_DECODE)) )
 		terror("Can't open decryption handle");
-	plaindt = "NguyenV, we love you!"; plainsz = strlen(plaindt);
+	plaindt = "NguyenV, we love you!"; plainsz = strlen((char*)plaindt);
 	for(k = 0; k < 4; ++k)
 	{	if((esz = vcapply(evc, plaindt, plainsz, &edt)) <= 0)
 			terror("Encryption error");

@@ -64,6 +64,14 @@ esac
 integer tests=0 errors=0 locked=0
 print -u2 "TEST	$unit"
 prev="make test"
+for v in $(dlls --info 2>/dev/null)
+do	if	[[ $v == env=* ]]
+	then	v=${v#env=}
+		nameref e=$v
+		export $v=$INSTALLROOT/lib/vcodex:$INSTALLROOT/lib:$e
+		break
+	fi
+done
 for file in $files
 do	(( tests = tests + 1 ))
 	test=${file%.c}

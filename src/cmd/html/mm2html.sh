@@ -17,7 +17,7 @@
 #                 Glenn Fowler <gsf@research.att.com>                  #
 #                                                                      #
 ########################################################################
-: mm2html - convert mm/man subset to html
+: mm2html - convert mm/man/mandoc subset to html
 
 # it keeps going and going ...
 #
@@ -41,16 +41,16 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2010-01-19' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2010-02-02' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2010-01-19 $
+@(#)$Id: mm2html (AT&T Research) 2010-02-02 $
 ]
 '$USAGE_LICENSE$'
-[+NAME?mm2html - convert mm/man subset to html]
+[+NAME?mm2html - convert mm/man/mandoc subset to html]
 [+DESCRIPTION?\bmm2html\b is a \bsed\b(1)/\bksh\b(1) script (yes!) that
     converts input \bmm\b(1) or \bman\b(1) documents to an \bhtml\b
     document on the standard output. If \afile\a is omitted then the
@@ -92,8 +92,9 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 [t:top?Open non-local urls in the top frame.]
 [x:index?Generate a standalone \aname\a\b-index.html\b for framed HTML
     where \aname\a is specified by \b--frame\b.]
-[ [ dir | file ]
-    ... ]
+
+[ [ dir | file ] ... ]
+
 [+EXTENSIONS?\b.xx\b \aname\a[=\avalue\a]] is a special \bmm2html\b
     request that handles program tracing, \bhtml\b extensions and \atroff\a
     macro package magic. Supported operations are:]
@@ -133,16 +134,18 @@ esac
 
 set -o noglob
 
-integer count row n s ndirs=0 nfiles=0 last_level=0
+integer count row n s ndirs=0 nfiles=0 last_level=0 IN=16 IS=16 man_SY=0
 integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4
 integer labels=0 mark=4 reference=1 ident=0 ce=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
 typeset -u upper
-typeset -x -l OP
-typeset -x -A ds map nr outline
-typeset cond dirs files fg frame label level list prev text trailer type
+typeset -l OP
+typeset -A ds map nr outline set tr
+typeset cond dirs files fg frame label level prev text trailer
 typeset license html meta nl mm index authors vg header references ss
-typeset mm_AF mm_AF_cur mm_AF_old mm_AU
+typeset mm_AF mm_AF_cur mm_AF_old mm_AU tr_chars
+typeset An_sep=-line Rs_sep='' Sh=''
+typeset -a list type
 
 nl=$'\n'
 
@@ -177,6 +180,7 @@ html=(
 		left=
 		top=
 	)
+	labels=0
 	logo=(
 		src=
 	)
@@ -195,16 +199,14 @@ frame=
 framebody=
 framelink=
 framerefs=
-hp=
 ifs=${IFS-'
 	'}
 inch="     "
-indent=
-indent_prev=
 macros=
+variant=
 pd='<P>'
 pm=
-primary=".BL|.LI|.IX"
+primary=".BL|.IX"
 redirect_old=
 redirect_new=
 ss="verdana,arial,helvetica,geneva,sans-serif"
@@ -214,10 +216,14 @@ vg_ps=20
 function setmacros
 {
 	case $1 in
-	man)	mark=6 ;;
-	*)	mark=4 ;;
+	man)	mark=6
+		[[ ${set[html.labels]} ]] || html.labels=0
+		;;
+	*)	mark=4
+		;;
 	esac
 	macros=$1
+	variant=$2
 }
 
 function options
@@ -243,7 +249,8 @@ function options
 			;;
 		esac
 		case $o in
-		no*)	unset ${o#no}
+		no*)	o=${o#no}
+			unset $o
 			;;
 		*)	case $v in
 			"")	v=1 ;;
@@ -257,12 +264,20 @@ function options
 			esac
 			;;
 		esac
+		set[$o]=1
 	done
 }
 
 if	[[ -f $HOME/.2html ]]
 then	. $HOME/.2html
 fi
+
+usage()
+{
+	OPTIND=0
+	getopts $ARGV0 "$USAGE" OPT '-?'
+	exit 2
+}
 
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
@@ -292,9 +307,7 @@ do	case $OPT in
 		;;
 	x)	index=local
 		;;
-	*)	echo "Usage: $command [-x] [-f name] [-h file[?name=value;...]]
-	       [-l file[?name=value;...]] [-o [no]name=value] [ file ... ]" >&2
-		exit 2
+	*)	usage
 		;;
 	esac
 done
@@ -334,11 +347,15 @@ ds[RM]='&#174;'
 ds[SM]='<FONT SIZE=-6><B><SUP>SM</SUP></B></FONT>'
 ds[TM]='<FONT SIZE=-6><B><SUP>TM</SUP></B></FONT>'
 
-map[.Cs]=.EX
+map[.Bd]=.EX
+map[.Bsx]=.Ix
 map[.Ce]=.EE
+map[.Cs]=.EX
+map[.Ed]=.EE
 map[.Sh]=.SH
 map[.Ss]=.SS
 map[.Tp]=.TP
+map[.TQ]=.TP
 
 H=H$(( head + 1 ))
 
@@ -351,9 +368,17 @@ function getfiles
 {
 	sed	\
 	-e 's%\\".*%%' \
+	-e 's%\\\.%.%g' \
+	-e 's%\\:%%g' \
 	-e 's%\\(>=%>=%g' \
 	-e 's%\\(<=%<=%g' \
 	-e 's%&%\&amp;%g' \
+	-e $'s%\xA2%\\&cent;%g' \
+	-e $'s%\xA3%\\&pound;%g' \
+	-e $'s%\xA7%\\&sect;%g' \
+	-e $'s%\xA9%\\&copy;%g' \
+	-e $'s%\xAE%\\&reg;%g' \
+	-e $'s%\xB6%\\&para;%g' \
 	-e 's%<%\&lt;%g' \
 	-e 's%>%\&gt;%g' \
 	-e 's%\[%\&#0091;%g' \
@@ -420,13 +445,14 @@ function getfiles
 	-e 's%</X>%</TT>%g' \
 	-e 's%<CW>%<TT>%g' \
 	-e 's%</CW>%</TT>%g' \
-	-e 's%<EM>\([^<]*\)</EM>(\([0123456789][abcdefghijklmnopqrstuvwxyz]*\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>(\2)</NOBR>%g' \
-	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0123456789][abcdefghijklmnopqrstuvwxyz]*\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>(\2)</NOBR>%g' \
-	-e 's%<TT>\([^<]*\)</TT>(\([0123456789][abcdefghijklmnopqrstuvwxyz]*\))%<NOBR><A href="../man\2/\1.html"><TT>\1</TT></A>(\2)</NOBR>%g' \
+	-e 's%<EM>\([^<]*\)</EM>(\([0123456789][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>(\2)</NOBR>%g' \
+	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0123456789][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>(\2)</NOBR>%g' \
+	-e 's%<TT>\([^<]*\)</TT>(\([0123456789][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*\))%<NOBR><A href="../man\2/\1.html"><TT>\1</TT></A>(\2)</NOBR>%g' \
 	-e 's%\\s+\(.\)\(.*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
 	-e 's%\\s-\(.\)\(.*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
 	-e 's%\\c%<JOIN>%g' \
 	-e 's%\\e%\&#0092;%g' \
+	-e 's,@MAN\([^@]\)EXT@,\1,g' \
 	-e '/^'\''[abcdefghijklmnopqrstuvwxyz][abcdefghijklmnopqrstuvwxyz]\>/s%.%.%' \
 	-e '/^\..*".*\\/s%\\[^\*][^(]%\\&%g' \
 	"$@"
@@ -521,6 +547,8 @@ function getline
 			;;
 		esac
 		case $data in
+		.tr*)	set -A text -- $data
+			;;
 		.?*)	case $data in
 			*[\"]*)
 				unset v
@@ -767,9 +795,11 @@ function getline
 			@($primary))
 				: primary macros take precedence
 				;;
-			.[BILMRUX]?([BILMRUX])|.F|.FR|.MW|.RF)
+			.[BILMRUX]?([BILMRUX])|.CW|.F|.FR|.MW|.RF)
 				case $macros:${text[0]} in
+				mm:.LI)break ;;
 				mm:.RF)	break ;;
+				man:.UR)break ;;
 				esac
 				typeset font1 font2 op
 				set -- "${text[@]}"
@@ -795,7 +825,7 @@ function getline
 						;;
 					esac
 					;;
-				.F)	op=.L ;;
+				.CW|.F)	op=.L ;;
 				.FR)	op=.LR ;;
 				.MW)	op=.L ;;
 				.RF)	op=.RL ;;
@@ -811,7 +841,6 @@ function getline
 					set -- "$*"
 					;;
 				esac
-				set -- "$indent""$@"
 				case $font in
 				"")	data=
 					;;
@@ -913,6 +942,17 @@ function getline
 		esac
 		break
 	done
+	if	[[ $tr_chars && ${text[0]} != .tr && ${text[@]} == *[$tr_chars]* ]]
+	then	for a in ${!tr[@]}
+		do	z=${tr[$a]}
+			for (( i = 0; i < ${#text[@]}; i++))
+			do	if	[[ $a == \\* ]]
+				then	text[i]=${text[i]//\\$a/$z}
+				else	text[i]=${text[i]//$a/$z}
+				fi
+			done
+		done
+	fi
 	trap 'set -- "${text[@]}"' 0
 }
 
@@ -934,7 +974,7 @@ function index
 {
 	if	[[ ! $indexed ]]
 	then	indexed=1
-		if	[[ ! $frame && ${html.labels} ]]
+		if	[[ ! $frame && ${html.labels} != 0 ]]
 		then	redirect_old=9 redirect_new=8
 			eval "exec $redirect_old>&1"
 			t=/tmp/m2hl$$
@@ -1100,6 +1140,7 @@ function heading
 		print -nr -- "$beg<H$count$options>"
 		txt=$*
 		txt=${txt%%*([-,.])}
+		txt=${txt//'&nbsp;'/' '}
 		txt=${txt//\&+([^\;])\;/}
 		if	(( labels >= 0 && count < mark ))
 		then	print -nr -- "<A name=\"$txt\">$txt</A>"
@@ -1149,6 +1190,151 @@ function tbl_attributes
 	esac
 }
 
+typeset Sm=" "
+
+function mandoc
+{
+	typeset op sp=$Sm nsp t o a c p cmp msc ver
+	op=$1
+	shift
+	while	(( $# ))
+	do	case $1 in
+		Ns)	sp=""
+			shift
+			continue
+			;;
+		Po|Xo)	c=.${1%o}c
+			shift
+			p=$*
+			while	getline
+			do	if	[[ $p ]]
+				then	set -- $p "$@"
+					p=
+				fi
+				if	(( $# ))
+				then	o=$1
+					shift
+					case $o in
+					$c)	break
+						;;
+					.[[:upper:]][[:lower:]])
+						o=${o#.}
+						mandoc _mandoc_ $o "$@"
+						a=$_mandoc_
+						[[ $t && $a && $a != [[:punct:]] ]] && t+=$sp
+						t+=$a
+						;;
+					esac
+				fi
+			done
+			case $c in
+			.Po)	t="($t)" ;;
+			esac
+			continue
+			;;
+		esac
+		o=$1
+		shift
+		nsp=$Sm
+		if	(( ! $# )) || [[ $o == @([DFOPQ][co]|Ta) ]]
+		then	a=""
+			nsp=""
+		elif	[[ $o != [[:upper:]][[:lower:]] ]]
+		then	a=""
+		elif	[[ $1 == [[:upper:]][[:lower:]] ]]
+		then	# NOTE: local 'a' should work here -- might not be possible with nameref #
+			mandoc _mandoc_ "$@"
+			a=$_mandoc_
+			shift $#
+		else	a=$1
+			shift
+			while	(( $# )) && [[ $1 != @([[:punct:]]|[[:upper:]][[:lower:]]) ]]
+			do	a+="$sp$1"
+				shift
+			done
+		fi
+		[[ $t && $a && $a != [[:punct:]] ]] && t+=$sp
+		case $o in
+		Ac)	t+="$a&gt;" ;;
+		Ad)	t+="<I>$a</I>" ;;
+		Ao)	t+="&lt;$a" ;;
+		Aq)	t+="&lt;$a&gt;" ;;
+		Ar)	t+="<I>$a</I>" ;;
+		At)	t+="<SMALL><B>AT&amp;T UNIX</B></SMALL>" ;;
+		Bc)	t+="$a]" ;;
+		Bo)	t+="[$a" ;;
+		Bq)	t+="[$a]" ;;
+		Bx)	t+="<SMALL><B>BSD</B></SMALL>" ;;
+		Cd)	t+="<B><I>$a</I></B>" ;;
+		Cm)	t+="<B><TT>$a</TT></B>" ;;
+		Dc)	t+="$a''" ;;
+		Do)	t+="\`\`$a" ;;
+		Dq)	t+="\`\`$a''" ;;
+		Dv)	t+="<TT>$a</TT>" ;;
+		Dx)	t+="<SMALL><B>DragonFly</B></SMALL>" ;;
+		Em)	t+="<U><I>$a</I></U>" ;;
+		Er)	t+="<TT>$a</TT>" ;;
+		Ev)	t+="<B><TT>$a</TT></B>" ;;
+		Ex)	t+="<TT>$a</TT>" ;;
+		Fa)	t+="<TT>$a</TT>" ;;
+		Fc)	t+="<TT>$a)</TT>" ;;
+		Fd)	t+="<TT>$a</TT>" ;;
+		Fl)	t+="<B>&#45;$a</B>" ;;
+		Fn)	t+="<TT>$a</TT>" ;;
+		Fo)	t+="<TT>$a(</TT>" ;;
+		Ft)	t+="<TT>$a</TT>" ;;
+		Fx)	t+="<SMALL><B>FreeBSD</B></SMALL>" ;;
+		Ic)	t+="<B><TT>$a</TT></B>" ;;
+		In)	[[ $Sh == SYNOPSIS ]] && t+="<TT>#include </TT>"; t+="&lt;<B><TT>$a</TT></B>&gt;" ;;
+		Ix)	t+="<SMALL><B>BSDI BSD/OS</B></SMALL>" ;;
+		Lb)	t+="<B><TT>$a</TT></B>" ;;
+		Li)	t+="<TT>$a</TT>" ;;
+		No)	t+="$a" ;;
+		Nx)	t+="<SMALL><B>NetBSD</B></SMALL>" ;;
+		Oc)	t+="<B>]</B>$a" ;;
+		Oo)	t+="<B>[</B>$a" ;;
+		Op)	t+="$sp<B>[</B>$a<B>]</B>$sp" ;;
+		Ox)	t+="<SMALL><B>OpenBSD</B></SMALL>" ;;
+		Pa)	t+="<I>$a</I>" ;;
+		Pc)	t+="$a)" ;;
+		Po)	t+="($a" ;;
+		Pq)	t+="($a)" ;;
+		Qc)	t+="$a&#8220;" ;;
+		Ql)	t+="\`<TT>$a</TT>'" ;;
+		Qo)	t+="&#8220;$a" ;;
+		Qq)	t+="&#8220;$a&#8220;" ;;
+		Rv)	t+="<TT>$a</TT>" ;;
+		Sq)	t+="\`$a'" ;;
+		St)	t+="<B>$a</B>" ;;
+		Sy)	t+="<TT>$a</TT>" ;;
+		Ta)	t+=$'\t' ;;
+		Tn)	typeset -u A=$a; t+="<SMALL>$A</SMALL>" ;;
+		Ux)	t+="<SMALL><B>UNIX</B></SMALL>" ;;
+		Va)	t+="<TT>$a</TT>" ;;
+		Vt)	t+="<TT>$a</TT>" ;;
+		[[:upper:]][[:lower:]]) t+="$a" ;;
+		*)	t+="$o" ;;
+		esac
+		sp=$nsp
+	done
+	case $op in
+	-line)	if	[[ $sp ]]
+		then	sp=""
+			t+="<BR>"
+		else	sp="n"
+		fi
+		print -${sp}r "$t"
+		;;
+	-space)	print -nr "$t$Sm"
+		;;
+	-*)	print -nr "$t"
+		;;
+	*)	nameref ret=$op
+		ret=$t
+		;;
+	esac
+}
+
 if	[[ $frame != '' ]]
 then	framebody=$frame.html
 	exec > $framebody || exit
@@ -1156,10 +1342,10 @@ fi
 
 dirs[++ndirs]=""
 for i
-do	if [[ -d $i ]]
+do	if	[[ -d $i ]]
 	then	dirs[++ndirs]=$i/
 	else	files[++nfiles]=$i
-		if [[ $i == */* ]]
+		if	[[ $i == */* ]]
 		then	dirs[++ndirs]=${i%/*}/
 		fi
 	fi
@@ -1187,23 +1373,9 @@ do	getline || {
 			*)	mm_AF_cur="${mm_AF_cur}<BR>$*" ;;
 			esac
 			;;
-		.AL|.[IR]S|.VL)
-			case $macros:$op in
-			mm:.RS)	Rf="\\u[$reference]\\d"
-				references="$references$nl<DT>[$reference]<DD>"
-				while	getline
-				do	case $1 in
-					.RF)	break ;;
-					esac
-					references="$references$nl$*"
-				done
-				(( reference++ ))
-				continue
-				;;
-			esac
-			type[++lists]=.AL
-			list[lists]=DL
-			print -r -- "<DL COMPACT>"
+		.AL|.VL)type[++lists]=.AL
+			list[lists]=DIV
+			print -r -- "<DIV style=\"padding-left:${IN}px;text-indent:0px\">"
 			case $op in
 			.AL)	case $1 in
 				'')	type[++lists]=.al
@@ -1217,8 +1389,6 @@ do	getline || {
 					;;
 				esac
 				;;
-			.[IR]S)	print -r -- "<DT><DD>"
-				;;
 			.VL)	case $1 in
 				?*)	type[++lists]=.al
 					list[lists]=DL
@@ -1229,19 +1399,14 @@ do	getline || {
 			esac
 			;;
 		.AS|.H|.HU|.SH|.SS|.ce|.CE)
-			if ((nf))
+			if	((nf))
 			then	nf=0
 				print -r -- "</PRE>"
 			fi
-			if ((ce))
+			if	((ce))
 			then	ce=0
 				print -r -- "</CENTER>"
 			fi
-			case $hp in
-			?*)	indent=${indent#$hp}
-				hp=
-				;;
-			esac
 			if	(( lists > pp ))
 			then	case ${type[@]:0:lists} in
 				*.[Aa][Ll]*|*.[IiTt][Pp]*)
@@ -1328,42 +1493,38 @@ do	getline || {
 				done
 				print -r -- "</CENTER>"
 				;;
-			.CE)	if [[ $1 != 0 ]]
+			.CE)	if	[[ $1 != 0 ]]
 				then	ce=1
 					print -r -- "<CENTER>"
 				fi
 				;;
 			.S[HS])	setmacros man
 				while	(( lists > 0 ))
-				do	print -r -- "</${list[lists]}>"
-					case ${type[lists--]} in
-					.S[HS])	break ;;
-					esac
+				do	[[ $op == .SS && ${type[lists]} == .[IRS][EH] ]] && break
+					print -r -- "</${list[lists]}>"
+					[[ ${type[lists--]} == $op ]] && break
 				done
 				type[++lists]=$op
-				list[lists]=DL
-				print -r -- "<DL COMPACT><DT>"
+				list[lists]=DIV
+				n=IN
+				i=";text-indent:0px"
 				case $op in
-				.SS)	type[++lists]=.XX
-					list[lists]=DL
-					print -r -- "<DL COMPACT><DT>"
-					;;
-				esac
-				case $op in
-				.SH)	if	[[ $macros == man && $* == DESCRIPTION && ${html.labels} ]]
+				.SH)	Sh=$*
+					if	[[ $macros == man && $* == DESCRIPTION && ${html.labels} != 0 ]]
 					then	index
 					fi
 					heading .H 2 "$@"
+					if	[[ $* == SYNOPSIS ]]
+					then	i=";text-indent:-${n}px"
+						(( n += IN ))
+					fi
 					;;
 				*)	heading .H 3 "$@"
 					;;
 				esac
-				type[++lists]=.XX
-				list[lists]=DL
-				case $op:$* in
-				.SH:NAME)	print -n -r -- "<DL COMPACT>$nl<DT>" ;;
-				*)		print -r -- "<DL COMPACT><DT>" ;;
-				esac
+				(( n += IN ))
+				print -r -- "<DIV style=\"padding-left:${n}px$i\">"
+				[[ $op == .SH && $* == NAME ]] && print -nr "<!--MAN-INDEX-->"
 				;;
 			*)	heading $op "$@"
 				;;
@@ -1410,12 +1571,12 @@ do	getline || {
 			then	for i
 				do	f=
 					for d in "${dirs[@]}"
-					do	if [[ -f "$d$i" ]]
+					do	if	[[ -f "$d$i" ]]
 						then	f=$d$i
 							break
 						fi
 					done
-					if [[ ! $f ]]
+					if	[[ ! $f ]]
 					then	print -u2 "$command: warning: $i: data file not found"
 					fi
 					if	[[ ! ${oparm.alt} ]]
@@ -1446,9 +1607,9 @@ do	getline || {
 						break
 					fi
 				done
-				if [[ ! $f ]]
+				if	[[ ! $f ]]
 				then	print -u2 "$command: $1: data file not found"
-				elif [[ $f -nt $i ]]
+				elif	[[ $f -nt $i ]]
 				then	ps2gif $f $i
 				fi
 				print -r -- "<CENTER><IMG src=\"$i\"></CENTER>"
@@ -1457,13 +1618,13 @@ do	getline || {
 		.CT)	: ignore $op
 			;;
 		.DE|.dE|.fi)
-			if ((nf))
+			if	((nf))
 			then	nf=0
 				print -r -- "</PRE>"
 			fi
 			;;
 		.DF|.DS|.dS|.nf)
-			if ((!nf))
+			if	((!nf))
 			then	nf=1
 				print -r -- "<PRE>"
 			fi
@@ -1473,20 +1634,30 @@ do	getline || {
 			*)	print -r -- "${ds[Dt]}" ;;
 			esac
 			;;
-		.EE|.eE)if ((nf))
+		.EE|.eE)while	(( lists > 0 ))
+			do	print -r -- "</${list[lists]}>"
+				case ${type[lists--]} in
+				.EX)	break ;;
+				esac
+			done
+			if	((nf))
 			then	nf=0
 				print -r -- "</PRE>"
 			fi
-			if [[ $fg ]]
+			if	[[ $fg ]]
 			then	print -r -- "<H4 align=center>$fg</H4>"
 			fi
-			indent=${indent#$inch}
 			;;
-		.EX|.eX)if ((!nf))
+		.EQ|.EN): ignore $op :
+			;;
+		.EX|.eX)type[++lists]=.EX
+			list[lists]=DIV
+			print -r -- "<DIV style=\"padding-left:${IS}px;text-indent:0px\">"
+			if	((!nf))
 			then	nf=1
 				print -r -- "<PRE>"
+			else	print "<BR>"
 			fi
-			indent=$inch$indent
 			case $# in
 			2)	fg="Figure $1: $2" ;;
 			*)	fg= ;;
@@ -1499,12 +1670,27 @@ do	getline || {
 			;;
 		.FS)	print -r -- '&nbsp;[&nbsp'
 			;;
+		.FT)	: ignore $op :
+			;;
+		.H[01234])
+			if	[[ $macros == man ]]
+			then	: optget --nroff : .Hlevel label :
+				n=${op#.H}
+				while	[[ ${type[lists]} == .H[01234] ]]
+				do	m=${type[lists]#.H}
+					(( m <= n )) && break
+					print -r -- "</${list[lists--]}>"
+				done
+				if	[[ ${type[lists]} != $op ]]
+				then	type[++lists]=$op
+					list[lists]=DL
+					print -r -- "<DL COMPACT>"
+				fi
+				print -r -- "<DT><B>$*</B><DD>"
+			else	warning "$op: unknown op"
+			fi
+			;;
 		.HP|.LP|.P|.PP)
-			case $hp in
-			?*)	indent=${indent#$hp}
-				hp=
-				;;
-			esac
 			if	(( lists > pp ))
 			then	case ${type[@]:0:lists} in
 				*.[Aa][Ll]*|*.[IiTt][Pp]*)
@@ -1533,21 +1719,12 @@ do	getline || {
 			mm:.TP)	continue ;;
 			esac
 			case $op in
-			.IP|.LP|.TF|.TP)OP=$op
-				case ${type[lists]} in
-				$op|$OP);;
-				*)	type[++lists]=$op
+			.IP|.LP|.TF|.TP)
+				if	[[ ${type[lists]} != $op ]]
+				then	type[++lists]=$op
 					list[lists]=DL
-					print -r -- "$pd<DL COMPACT>"
-					case $1 in
-					[0123456789]*)
-						type[++lists]=.tp
-						list[lists]=DL
-						print -r -- "<DL COMPACT>"
-						;;
-					esac
-					;;
-				esac
+					print -r -- "<DL COMPACT>"
+				fi
 				case $op in
 				.IP|.LP|.TF)
 					set -- "<TT>$*</TT>"
@@ -1572,9 +1749,34 @@ do	getline || {
 				;;
 			esac
 			;;
+		.[IR]S)	case $macros:$op in
+			mm:.RS)	Rf="\\u[$reference]\\d"
+				references="$references$nl<DT>[$reference]<DD>"
+				while	getline
+				do	case $1 in
+					.RF)	break ;;
+					esac
+					references="$references$nl$*"
+				done
+				(( reference++ ))
+				continue
+				;;
+			esac
+			type[++lists]=${op%S}E
+			list[lists]=DIV
+			print -r -- "<DIV style=\"padding-left:${IS}px;text-indent:0px\">"
+			;;
+		.[IR]E) while	(( lists > 0 ))
+			do	print -r -- "</${list[lists]}>"
+				case ${type[lists--]} in
+				$op)	break ;;
+				esac
+			done
+			print "<BR>"
+			;;
 		.IX)	: ignore $op
 			;;
-		.LE|.[IR]E|.bE|.sE)
+		.LE|.bE|.sE|.El)
 			case ${type[@]} in
 			*.[Aa][Ll]*)
 				while	(( lists > 0 ))
@@ -1587,15 +1789,21 @@ do	getline || {
 			*)	warning "$op: no current list type"
 				;;
 			esac
-			case $op:$pd in
-			.[IR]E:?*)	print -r -- "$pd" ;;
-			esac
 			;;
 		.LX)	: ignore $op
 			;;
-		.MT)	setmacros mm
+		.ME)	if	[[ $macros == man ]]
+			then	print -r -- "<BR>"
+			fi
 			;;
-		.ND|.Dt)ds[Dt]=$*
+		.MT)	if	[[ $macros == man ]]
+			then	x="<A href=\"mailto:$*\">$*</A>"
+				getline
+				print -nr -- "$*" "$x"
+			else	setmacros mm
+			fi
+			;;
+		.ND|.Dd)ds[Dt]=$*
 			;;
 		.NL)	type[++lists]=.AL
 			list[lists]=OL
@@ -1603,17 +1811,61 @@ do	getline || {
 			;;
 		.OK)	mm.keywords="$*"
 			;;
-		.OP)	: .OP opt arg arg-append arg-prepend
-			x="$4<STRONG>&#45;$1</STRONG><I>$2</I>"
-			case $3 in
-			'[]')	x="[ $x ]" ;;
-			?*)	x="$x$3" ;;
+		.OP)	case $macros in
+			man)	if	(( man_SY ))
+				then	: .OP flag [value] :
+					print -nr -- " [<B>$1</B>"
+					if	(( $# > 1 ))
+					then	shift
+						print -nr -- " <I>$*</I>"
+					fi
+					print -nr -- "]"
+				else	: optget --nroff : .OP flag long types argument :
+					while	[[ ${type[lists]}  == .H[01234] ]]
+					do	print -r -- "</${list[lists--]}>"
+					done
+					if	[[ ${type[lists]} != $op ]]
+					then	type[++lists]=$op
+						list[lists]=DL
+						print -r -- "<DL COMPACT>"
+					fi
+					x="<DT>"
+					if	[[ $1 != - ]]
+					then	x="$x-<B>$1</B>"
+					fi
+					if	[[ $2 != - ]]
+					then	if	[[ $1 != - ]]
+						then	x="$x, "
+						fi
+						x="$x--<B>$2</B>"
+						if	[[ $4 != - ]]
+						then	if	[[ $3 == *optional* ]]
+							then	x="$x&#0091;=<I>$4</I>&#0093;"
+							else	x="$x=<I>$4</I>"
+							fi
+						fi
+					elif	[[ $4 != - ]]
+					then	if	[[ $3 == *optional* ]]
+						then	x="$x &#0091;<I>$4</I>&#0093;"
+						else	x="$x <I>$4</I>"
+						fi
+					fi
+					x="$x<DD>"
+				fi
+				;;
+			*)	: .OP opt arg arg-append arg-prepend
+				x="$4<STRONG>&#45;$1</STRONG><I>$2</I>"
+				case $3 in
+				'[]')	x="[ $x ]" ;;
+				?*)	x="$x$3" ;;
+				esac
+				;;
 			esac
 			print -r -- "$x"
 			;;
 		.PM|.pM)case ${html.company} in
 			'')	pm= ;;
-			*)	pm="${html.company//\&/&amp\;} " ;;
+			*)	pm="${html.company//\&/\&amp\;} " ;;
 			esac
 			case $1 in
 			'')	pm= ;;
@@ -1636,11 +1888,19 @@ do	getline || {
 			;;
 		.SU)	: ignore $op
 			;;
-		.TH|.TL): .TL junk junk
+		.SY)	if	[[ $macros == man ]]
+			then	man_SY=1
+				print -nr -- "<B>$1</B> "
+			fi
+			;;
+		.TH|.TL|.Dt)
+			: .TL junk junk
 			: .TH item section foot_center foot_left head_center
+			: .Dt item section volume
 			case $macros:$op in
-			:.TH)	setmacros man ;;
 			:.TL)	setmacros mm ;;
+			:.TH)	setmacros man ;;
+			:.Dt)	setmacros man mandoc ;;
 			esac
 			case ${html.title} in
 			?*)	title=${html.title}
@@ -1653,17 +1913,27 @@ do	getline || {
 			esac
 			title $title
 			case $op in
-			.TH)	case $3 in
+			.TH|.Dt)case $3 in
 				?*)	dc[++dcs]=$3 ;;
 				esac
 				case $4 in
 				?*)	dl[++dls]=$4 ;;
 				esac
 				case $5 in
-				'')	case $2 in
-					1*)	sec="USER COMMANDS " ;;
+				'')	sec=$2
+					while	:
+					do	case $sec in
+						*C)	cmp="COMPATIBILITY " ;;
+						*U)	ver="UWIN " ;;
+						*X)	msc="MISCELLANEOUS " ;;
+						*)	break ;;
+						esac
+						sec=${sec%?}
+					done
+					case $sec in
+					1M)	sec="MAKE ASSERTION OPERATORS AND RULES" ;;
+					1*)	sec="USER COMMANDS" ;;
 					2*)	sec="SYSTEM CALLS" ;;
-					3C)	sec="COMPATIBILITY FUNCTIONS" ;;
 					3F)	sec="FORTRAN LIBRARY ROUTINES" ;;
 					3K)	sec="KERNEL VM LIBRARY FUNCTIONS" ;;
 					3L)	sec="LIGHTWEIGHT PROCESSES LIBRARY" ;;
@@ -1674,24 +1944,28 @@ do	getline || {
 					3V)	sec="SYSTEM V LIBRARY" ;;
 					3X)	sec="MISCELLANEOUS LIBRARY FUNCTIONS" ;;
 					3*)	sec="C LIBRARY FUNCTIONS" ;;
-					4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
 					4F)	sec="PROTOCOL FAMILIES" ;;
 					4P)	sec="PROTOCOLS" ;;
 					4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
 					5*)	sec="FILE FORMATS" ;;
 					6*)	sec="GAMES AND DEMOS" ;;
 					7*)	sec="PUBLIC FILES AND TABLES" ;;
-					8*)	sec="MAINTENANCE COMMANDS" ;;
+					8*)	sec="ADMINISTRATIVE COMMANDS" ;;
 					L*)	sec="LOCAL COMMANDS" ;;
-					*)	sec="SECTION $2" ;;
+					*)	sec="SECTION $sec" ;;
 					esac
+					sec=$ver$msc$cmp$sec
 					;;
 				*)	sec=$5
 					;;
 				esac
+				if	[[ $frame ]]
+				then	TOP="target=_top "
+				else	TOP=
+				fi
 				MAN="$1($2)"
 				print -r -- "<A name=\"$MAN\"></A>"
-				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$MAN</TH><TH align=center><A href=\".\" title=\"Index\" target=\"_top\">$sec</A></TH><TH align=right>$MAN</TH></TR></TBODY></TABLE></H3>"
+				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$MAN</TH><TH align=center><A href=\".\" ${TOP}title=\"Index\">$sec</A></TH><TH align=right>$MAN</TH></TR></TBODY></TABLE></H3>"
 				print -r -- "<HR>"
 				;;
 			.TL)	getline || break
@@ -1729,14 +2003,14 @@ do	getline || {
 			case $1 in
 			'.T&'*)	continue
 				;;
-			.TE)	if (( tbl_fd != 1 ))
+			.TE)	if	(( tbl_fd != 1 ))
 				then	warning ".TS H without .TH"
 					eval "exec $tbl_fd>&-"
 					(( tbl_fd=1 ))
 					rm -f $tbl_tmp
 					tbl_tmp=
 					trap - 0 1 2 3
-					if (( augment ))
+					if	(( augment ))
 					then	print -r -u$tbl_fd -- "</THEAD><TBODY>"
 					fi
 				fi
@@ -1802,10 +2076,10 @@ do	getline || {
 		case ${opts.border} in
 		'')	opts.border=0 ;;
 		esac
-		if ((!augment))
+		if	((!augment))
 		then	(( augment=1 ))
 			print -r -- "<P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>$nl<TABLE" ${opts/'('@(*)')'/\1} ">"
-			if (( tbl_fd == 3 ))
+			if	(( tbl_fd == 3 ))
 			then	print -r -u$tbl_fd -- "<THEAD>"
 			else	print -r -u$tbl_fd -- "<TBODY>"
 			fi
@@ -1831,7 +2105,7 @@ do	getline || {
 					x=${i//[[:alpha:]]/}
 					case $x in
 					+([0-9]))
-						if (( $x > tbl_ns ))
+						if	(( $x > tbl_ns ))
 						then	tbl_ns=$x
 							tbl_sp=''
 							for ((m=(tbl_ns+1)/2; m>0; m--))
@@ -1885,9 +2159,9 @@ do	getline || {
 			'.T&'*)	(( augment=1 ))
 				continue 2
 				;;
-			.TH*)	if (( tbl_fd != 1 ))
+			.TH*)	if	(( tbl_fd != 1 ))
 				then	print -r -u$tbl_fd -- "</THEAD>"
-					if (( tbl_no == 1 || $# == 1 )) || [[ $2 != N ]]
+					if	(( tbl_no == 1 || $# == 1 )) || [[ $2 != N ]]
 					then	cat $tbl_tmp
 					fi
 					eval "exec $tbl_fd>&-"
@@ -1900,7 +2174,7 @@ do	getline || {
 				continue
 				;;
 			.TE)	(( tbl_no++ ))
-				if (( tbl_fd != 1 ))
+				if	(( tbl_fd != 1 ))
 				then	warning ".TS H without .TH"
 					eval "exec $tbl_fd>&-"
 					(( tbl_fd=1 ))
@@ -1942,7 +2216,7 @@ do	getline || {
 						x=${i//[[:alpha:]]/}
 						case $x in
 						+([0-9]))
-							if (( $x > tbl_ns ))
+							if	(( $x > tbl_ns ))
 							then	tbl_ns=$x
 								tbl_sp=''
 								for ((m=(tbl_ns+1)/2; m>0; m--))
@@ -1994,17 +2268,54 @@ do	getline || {
 			;;
 		.UC)	: ignore $op
 			;;
+		.UE)	if	[[ $1 ]]
+			then	getline
+			fi
+			print -r -- "$*"
+			;;
+		.UR)	x="<A href=\"$*\">$*</A>"
+			getline
+			print -nr -- "$*" "$x"
+			;;
 		.VE)	: ignore $op
 			;;
 		.VS)	: ignore $op
+			;;
+		.YS)	if	(( man_SY ))
+			then	man_SY=0
+				getline
+				print -r -- "$*"
+			fi
+			;;
+		.ad)	: ignore $op
 			;;
 		.al)	: ignore $op
 			;;
 		.bd)	: ignore $op
 			;;
-		.br)	print -r -- "<BR>"
+		.br|.)	if	[[ $Sh == SYNOPSIS ]]
+			then	print "<P>"
+			else	print "<BR>"
+			fi
 			;;
-		.de|.am.ig)
+		.cp)	: ignore $op
+			;;
+		.cs)	: ignore $op
+			;;
+		.da|.di)x=$1
+			t=
+			while	getline
+			do	case $1:$2 in
+				$op:)	break ;;
+				esac
+				t=$t$nl$*
+			done
+			if	[[ $op == .di || ! ${ds[$x]} ]]
+			then	ds[$x]=${t#?}
+			else	ds[$x]=${ds[$x]}$t
+			fi
+			;;
+		.de|.am|.ig)
 			end=..
 			case $#:$op in
 			0:*)	;;
@@ -2017,9 +2328,15 @@ do	getline || {
 				esac
 			done
 			;;
+		.do)	: ignore $op
+			;;
 		.ds)	op=$1
 			shift
 			ds[$op]=$*
+			;;
+		.ec)	: ignore $op
+			;;
+		.eo)	: ignore $op
 			;;
 		.f[tBILPR])
 			case $op in
@@ -2042,6 +2359,8 @@ do	getline || {
 				;;
 			esac
 			;;
+		.fc)	: ignore $op
+			;;
 		.fp)	: ignore $op
 			;;
 		.hc)	: ignore $op
@@ -2050,17 +2369,26 @@ do	getline || {
 			;;
 		.hy)	: ignore $op
 			;;
-		.in)	indent_prev=$indent
-			case $1 in
-			"")	i=$indent_prev; indent_prev=$indent; indent=$i ;;
-			-*)	indent=${indent#$inch} ;;
-			+*)	indent=$inch$indent ;;
-			*)	indent=$inch ;;
+		.in)	case $1 in
+			-*|"")	while	(( lists > 0 ))
+				do	print -r -- "</${list[lists]}>"
+					case ${type[lists--]} in
+					.in)	break ;;
+					esac
+				done
+				;;
+			+*)	type[++lists]=$op
+				list[lists]=DIV
+				print -r -- "<DIV style=\"padding-left:$((2*IN))px;text-indent:-${IN}px\">"
+				;;
 			esac
+			print "<BR>"
 			;;
 		.lf)	: ignore $op
 			;;
 		.ll)	: ignore $op
+			;;
+		.na)	: ignore $op
 			;;
 		.ne)	: ignore $op
 			;;
@@ -2072,11 +2400,15 @@ do	getline || {
 			;;
 		.ns)	: ignore $op
 			;;
+		.pl)	: ignore $op
+			;;
 		.ps|.pS)case $1 in
 			[-+][0123456789])
 				print -r -- "<FONT SIZE=$1>"
 				;;
 			esac
+			;;
+		.rn)	: ignore $op
 			;;
 		.sh)	case $HTMLPATH in
 			'')	;;
@@ -2103,7 +2435,11 @@ do	getline || {
 			done
 			warning "$1: $op cannot read"
 			;;
-		.sp|.SP)case $1 in
+		.sp|.SP|.Sp)
+			while	[[ ${type[lists]}  == .H[01234] ]]
+			do	print -r -- "</${list[lists--]}>"
+			done
+			case $1 in
 			[0123456789]*)
 				count=$1
 				while	(( count >= 0 ))
@@ -2119,7 +2455,24 @@ do	getline || {
 			;;
 		.ti)	: ignore $op
 			;;
+		.tr)	x=$1
+			while	[[ $x ]]
+			do	if	[[ $x == '\('??* ]]
+				then	f=${x:0:4}
+					x=${x#????}
+				else	f=${x:0:1}
+					x=${x#?}
+				fi
+				i=${x#?}
+				t=${x%$i}
+				x=$i
+				tr[$f]=${t:-'&nbsp;'}
+				tr_chars+=\\$f
+			done
+			;;
 		.ul)	: ignore $op
+			;;
+		.vs)	: ignore $op
 			;;
 		.vG)	vg=$1
 			inch=" "
@@ -2173,11 +2526,132 @@ do	getline || {
 			;;
 		.nE|.tE)print -r -- "</DIV>"
 			;;
+		.A[cdoqrt]|.B[coqx]|.C[dm]|.D[coqvx]|.E[mrvx]|.F[acdlnotx]|.I[cnx]|.L[bi]|.N[ox]|.Ox|.P[acfoq]|.Q[cloq]|.Rv|.S[coqty]|.T[an]|.Ux|.V[at]|.Xo)
+			mandoc -space ${op#.} "$@"
+			;;
+		.An)	case $1 in
+			-split)	An_sep=-line
+				;;
+			-nosplit)
+				An_sep=-space
+				;;
+			-*)	;;
+			*)	if	(( $# >= 2 ))
+				then	print -nr -- "$1 $2 "
+					shift 2
+					mandoc $An_sep "$@"
+				else	print -r -- "$1"
+				fi
+				;;
+			esac
+			;;
+		.Bk)	: mandoc :
+			;;
+		.Bl)	i=
+			for o
+			do	case $o in
+				-bullet)	i="type=disc" ;;
+				-dash|-hyphen)	i="type=box" ;;
+				-enum)		i=OL ;;
+				esac
+			done
+			case $i in
+			OL)	type[++lists]=.AL
+				list[lists]=OL
+				print -r -- "<OL>"
+				;;
+			*=*)	type[++lists]=.AL
+				list[lists]=UL
+				print -r -- "<UL $i>"
+				;;
+			*)	type[++lists]=.AL
+				list[lists]=DIV
+				print -r -- "<DIV style=\"padding-left:${IN}px;text-indent:0px\">"
+				type[++lists]=.al
+				list[lists]=DL
+				print -r -- "<DL COMPACT>"
+				;;
+			esac
+			;;
+		.D1)	(( $# )) || getline
+			print -r -- "<DL COMPACT><DT><DD>$*</DL>"
+			;;
+		.Dl)	(( $# )) || getline
+			print -r -- "<DL COMPACT><DT><DD><TT>$*</TT></DL>"
+			;;
+		.Ek)	: mandoc :
+			;;
+		.Id)	meta="$meta$nl<META name=\"ident\" content=\"$*\">"
+			;;
+		.It)	if	(( $# ))
+			then	mandoc label "$@"
+				set -A text -- .LI "$label"
+			elif	[[ ${list[lists]} == DL ]]
+			then	getline
+				if	[[ $1 == .[[:upper:]][[:lower:]] ]]
+				then	x=$1
+					shift
+					set -- "${x#.}" "$@"
+				fi
+				mandoc label "$@"
+				set -A text -- .LI "$label"
+			else	set -A text -- .LI
+			fi
+			peek=1
+			;;
+		.Nd)	print -nr -- "&#45;" "$@" ""
+			;;
+		.Nm)	[[ $1 ]] && ds[Nm]=$1
+			[[ $Sh == SYNOPSIS ]] && print "<BR>"
+			print -nr -- "<B>${ds[Nm]}</B> "
+			;;
+		.Oo)	mandoc -space ${op#.} "$@"
+			;;
+		.O[cp])	mandoc - ${op#.} "$@"
+			;;
+		.Os)	: mandoc :
+			;;
+		.Pp)	print -r -- "<P>"
+			;;
+		.Re)	print -r -- ".<P>"
+			;;
+		.Rs)	print -r -- "<P>"
+			Rs_sep=''
+			;;
+		.Sm)	case $1 in
+			on)	Sm=" " ;;
+			off)	Sm="" ;;
+			*)	case $Sm in
+				" ")	Sm="" ;;
+				"")	Sm=" " ;;
+				esac
+				;;
+			esac
+			;;
+		.Sx)	print -r -- "<NOBR><A href=\"#$1\">$1</A>$2</NOBR>"
+			;;
+		.Xr)	print -r -- "<NOBR><A href=\"../man$2/$1.html\"><B>$1</B></A>($2)$3</NOBR>"
+			;;
+		.%A)	print -nr -- "$Rs_sep$*"
+			Rs_sep=", "
+			;;
+		.%D)	print -nr -- "$Rs_sep$*"
+			Rs_sep=", "
+			;;
+		.%N)	print -nr -- "$Rs_sep<I>$*</I>"
+			Rs_sep=", "
+			;;
+		.%O)	print -nr -- "$Rs_sep$*"
+			Rs_sep=", "
+			;;
+		.%T)	print -nr -- "$Rs_sep<U>$*</U>"
+			Rs_sep=", "
+			;;
 		*)	warning "$op: unknown op"
 			;;
 		esac
 		;;
-	""|[\ \	]*)
+	[\ \	]*)
 		case $macros in
 		man)	leading=1
 			prefix="<TT><PRE>"
@@ -2191,7 +2665,7 @@ do	getline || {
 					esac
 					;;
 				[\ \	]*)
-					print -r -- "$prefix$blank$inch$indent$*"
+					print -r -- "$prefix$blank$inch$*"
 					blank=
 					leading=
 					prefix=
@@ -2206,11 +2680,16 @@ do	getline || {
 			"")	print -r -- "</PRE></TT>" ;;
 			esac
 			;;
-		*)	print -r -- "$indent$*"
+		*)	print -r -- "$*"
 			;;
 		esac
 		;;
-	*)	print -r -- "$indent$*"
+	"")	case $macros in
+		man)	print -r -- "<P>" ;;
+		*)	print -r -- "$*" ;;
+		esac
+		;;
+	*)	print -r -- "$*"
 		;;
 	esac
 done
@@ -2263,7 +2742,7 @@ case ${html.ident} in
 	for i in "${license.organization}" "${license.corporation} ${license.company}" "${license.address}" "${license.location}" "${license.phone}"
 	do	case $i in
 		''|' ')	;;
-		*)	dr[++drs]="${i//\&/&amp\;}" ;;
+		*)	dr[++drs]="${i//\&/\&amp\;}" ;;
 		esac
 	done
 	;;
@@ -2333,15 +2812,16 @@ esac
 trailer="$trailer$nl</HTML>"
 print -r -- "$trailer"
 case $frame in
-?*)	if	[[ $framelink == '' && ${html.labels} != '' ]] && (( labels > 1 ))
+?*)	if	[[ ! $framelink && ${html.labels} != 0 ]] && (( labels > 1 ))
 	then	if	[[ $macros == man ]]
 		then	mv $framebody $frame-man.html
+			frameref=${frame##*/}
 			{
 				ident
 				print -r -- "<TITLE>$file table of contents</TITLE>"
 				print -r -- "</HEAD>"
 				print -r -- "<BODY" ${html.BODY/'('@(*)')'/\1} ">"
-				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left><A target=\"man\" href=\"$frame-man.html#$MAN\">$MAN</A></TH><TH align=right><A href=\".\" target=_top title=\"Command Index.\">COMMANDS</A></TH></TR></TBODY></TABLE></H3>"
+				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left><A target=\"man\" href=\"$frameref-man.html#$MAN\">$MAN</A></TH><TH align=right><A href=\".\" target=_top title=\"Command Index.\">COMMANDS</A></TH></TR></TBODY></TABLE></H3>"
 				print -r -- "<HR>"
 				print -r -- "<UL>"
 				(( lev = level[0] ))
@@ -2354,7 +2834,7 @@ case $frame in
 					do	(( lev-- ))
 						print -r -- "</UL>"
 					done
-					print -r -- "<LI><A href=\"$frame-man.html#${label[n]}\" target=\"man\">${label[n]}</A>"
+					print -r -- "<LI><A href=\"$frameref-man.html#${label[n]}\" target=\"man\">${label[n]}</A>"
 				done
 				while	(( lev > level[0] ))
 				do	(( lev-- ))
@@ -2370,8 +2850,8 @@ case $frame in
 				print -r -- "<BASE>"
 				print -r -- "</HEAD>"
 				print -r -- "<FRAMESET cols=\"20%,80%\">"
-				print -r -- "<FRAME src=\"$frame-toc.html\" name=\"toc\">"
-				print -r -- "<FRAME src=\"$frame-man.html\" name=\"man\">"
+				print -r -- "<FRAME src=\"$frameref-toc.html\" name=\"toc\">"
+				print -r -- "<FRAME src=\"$frameref-man.html\" name=\"man\">"
 				print -r -- "</FRAMESET>"
 				print -r -- "</HTML>"
 			} > $framebody
@@ -2415,9 +2895,8 @@ q
 *)	if	[[ $redirect_old ]]
 	then	eval "exec 1>&$redirect_old $redirect_old>&-"
 	fi
-	if	[[ ${html.labels} != '' ]] && (( labels > 1 ))
-	then
-		if	[[ ${html.labels} != +([0-9]) || ${html.labels} == [01] ]]
+	if	[[ ${html.labels} != 0 ]] && (( labels > 1 ))
+	then	if	[[ ${html.labels} != +([0-9]) || ${html.labels} == 1 ]]
 		then	html.labels=7
 		fi
 		print -r -- "<!--LABELS-->"
@@ -2425,7 +2904,7 @@ q
 		print -r -- "<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey width=90%><TR>"
 		for ((n = 0; n < labels; n++))
 		do	print -r -- "<TD align=center valign=center><A href=\"#${label[n]}\">${label[n]}</A></TD>"
-			if (( (n + 1) < labels && !( (n + 1) % ${html.labels} ) ))
+			if	(( (n + 1) < labels && !( (n + 1) % ${html.labels} ) ))
 			then	print -r -- "</TR><TR>"
 			fi
 		done

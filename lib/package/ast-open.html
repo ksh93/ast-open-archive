@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Research) 2010-01-19">
+<META name="generator" content="mm2html (AT&T Research) 2010-02-02">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
@@ -86,8 +86,10 @@ The
 <STRONG>vpath</STRONG>
 builtin controls the logical
 filesystem view:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     vpath dir_1 dir_2
+vpath dir_1 dir_2
+</DIV>
 </PRE>
 mounts the directory hierarchy
 <EM>dir_1</EM>
@@ -107,8 +109,10 @@ corresponding place in
 <EM>dir_1</EM>.
 <EM>vpaths</EM>
 may be chained:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     vpath dir_2 dir_3
+vpath dir_2 dir_3
+</DIV>
 </PRE>
 <EM>vpaths</EM>
 are per-process; every process may have a different view.
@@ -121,9 +125,11 @@ users set up
 at login or
 <STRONG>xterm</STRONG>
 time:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     export HOSTTYPE=$(package)
-     vpath $HOME/arch/$HOSTTYPE $HOME
+export HOSTTYPE=$(package)
+vpath $HOME/arch/$HOSTTYPE $HOME
+</DIV>
 </PRE>
 with source files in
 <TT>$HOME/src/(cmd|lib)/*</TT>.
@@ -136,8 +142,10 @@ and generated files (objects and executables) are dropped in the top hierarchy.
 can prefix any command to disable 
 <STRONG>3d</STRONG>
 for that command:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     2d ls *.c
+2d ls *.c
+</DIV>
 </PRE>
 <P>
 <STRONG>3d</STRONG>
@@ -149,8 +157,10 @@ The
 name server uses pathname call intercepts to translate network
 pathnames.
 Try this for any host:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     cat /dev/tcp/hostname/inet.daytime
+cat /dev/tcp/hostname/inet.daytime
+</DIV>
 </PRE>
 <P>
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="at">at</A></H3></FONT></FONT></CENTER>
@@ -225,8 +235,10 @@ and allows host expression matching to replace the explicit host name argument.
 Factor of 5 compilation speedups are typical.
 <P>
 To start your local daemon:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     coshell +
+coshell +
+</DIV>
 </PRE>
 To send
 <STRONG>nmake</STRONG>
@@ -235,27 +247,33 @@ or
 actions to
 <STRONG>coshell</STRONG>
 at concurrency level 8:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     export COSHELL=coshell
-     export NPROC=8
+export COSHELL=coshell
+export NPROC=8
+</DIV>
 </PRE>
 To run shell commands on a lightly loaded host:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     coshell -r - 'hostname; sort a &gt; b' &amp;
-     pid=$!
-     # other stuff
-     wait $pid
+coshell -r - 'hostname; sort a &gt; b' &amp;
+pid=$!
+# other stuff
+wait $pid
+</DIV>
 </PRE>
 For interactive
 <STRONG>coshell</STRONG>
 status:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     coshell -
-     coshell&gt; s
-     <EM> ... status ...</EM>
-     coshell&gt; h
-     <EM> ... help ...</EM>
-     coshell&gt; q
+coshell -
+coshell&gt; s
+<EM>... status ...</EM>
+coshell&gt; h
+<EM>... help ...</EM>
+coshell&gt; q
+</DIV>
 </PRE>
 <STRONG>package</STRONG>
 generates static host information and
@@ -483,18 +501,22 @@ The base rules are such a fundamental part of
 that most of its visible features are controlled by them.
 <P>
 Most makefiles are just a few lines:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     :PACKAGE: X11
-     
-     xgame :: README xgame.6 xgame.h xgame.c xutil.c -lXaw -lXmu -lXt
+:PACKAGE: X11
+
+xgame :: README xgame.6 xgame.h xgame.c xutil.c -lXaw -lXmu -lXt
+</DIV>
 </PRE>
 Automatically generated
 <STRONG>probe</STRONG>
 information provides convenient compiler abstractions:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     CCFLAGS = $(CC.DLL)
-     
-     ast 4.0 :LIBRARY: ast.c strmatch.c
+CCFLAGS = $(CC.DLL)
+
+ast 4.0 :LIBRARY: ast.c strmatch.c
+</DIV>
 </PRE>
 In this case if the compiler supports
 shared libraries (aka <STRONG>dll</STRONG><EM>s</EM>) then
@@ -537,24 +559,34 @@ archives are also handled on input and output.
 To create a
 <EM>vdelta</EM>
 compressed base archive:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw | pax -w -f base -z -
+tw | pax -w -f base -z -
+</DIV>
 </PRE>
 To create a delta archive on the base above (record file changes only):
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw | pax -w -f delta -z base
+tw | pax -w -f delta -z base
+</DIV>
 </PRE>
 To read the delta archive:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     pax -r -f delta -z base
+pax -r -f delta -z base
+</DIV>
 </PRE>
 To create a delta archive from linux-1.2.0 to linux-1.2.5:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     pax -rf linux-1.2.5.tar.gz -wf 0-5.pax.gz -x gzip -z linux-1.2.0.tar.gz
+pax -rf linux-1.2.5.tar.gz -wf 0-5.pax.gz -x gzip -z linux-1.2.0.tar.gz
+</DIV>
 </PRE>
 To create the linux-1.2.5 archive:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     pax -rf 0-5.pax.gz -z linux-1.2.0.tar.gz -wf linux-1.2.5.tar.gz -x tar -x gzip
+pax -rf 0-5.pax.gz -z linux-1.2.0.tar.gz -wf linux-1.2.5.tar.gz -x tar -x gzip
+</DIV>
 </PRE>
 The
 <STRONG>bax</STRONG>
@@ -571,8 +603,10 @@ for handy backup control.
 converts ANSI C prototype constructs to constructs compatible
 with K&amp;R C, ANSI C, and C++.
 Only files with the line
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     #pragma prototyped
+#pragma prototyped
+</DIV>
 </PRE>
 in the first 64 lines are processed; other files are silently ignored.
 This is how
@@ -704,12 +738,16 @@ and
 that applies C style expressions on the
 <EM>stat</EM>
 structure of each file in a directory hierarchy.
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw
+tw
+</DIV>
 </PRE>
 lists the directory hierarchy under the current directory,
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw chmod go-rwx
+tw chmod go-rwx
+</DIV>
 </PRE>
 changes the mode of all files in the directory hierarchy under the current
 directory by calling
@@ -717,8 +755,10 @@ directory by calling
 as few times as the
 <EM>exec</EM>
 arg limit allows.
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw -d /usr/src -e "name=='*.&#0091;chly&#0093;'" grep FOOBAR
+tw -d /usr/src -e "name=='*.&#0091;chly&#0093;'" grep FOOBAR
+</DIV>
 </PRE>
 greps for
 <STRONG>FOOBAR</STRONG>
@@ -736,8 +776,10 @@ variable
 controls the default behavior for all
 <STRONG>advsoft</STRONG>
 commands:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     getconf PATH_RESOLVE - physical
+getconf PATH_RESOLVE - physical
+</DIV>
 </PRE>
 sets the default to not follow symbolic links,
 <STRONG>logical</STRONG>
@@ -747,12 +789,16 @@ and
 to follow only command line symbolic links
 (corresponding to the -P, -L and -H command options that override the
 default).
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw -P -e type==LNK
+tw -P -e type==LNK
+</DIV>
 </PRE>
 does a physical walk that lists all symbolic links.
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw -e "mtime&gt;='yesterday morning'"
+tw -e "mtime&gt;='yesterday morning'"
+</DIV>
 </PRE>
 lists all files modified since yesterday morning.
 The magic file types from the
@@ -765,13 +811,17 @@ and
 <STRONG>file</STRONG>
 use the same library routine in
 <STRONG>libast</STRONG>):
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw -e "(mode &amp; 'u+s') &amp;&amp; magic == '*script*'" chmod u-s
+tw -e "(mode &amp; 'u+s') &amp;&amp; magic == '*script*'" chmod u-s
+</DIV>
 </PRE>
 finds all setuid scripts and turns off the setuid mode bit.
 The magic file also contains MIME types:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     tw -e "mime == '*/exe'"
+tw -e "mime == '*/exe'"
+</DIV>
 </PRE>
 lists all executable programs
 (<EM>a.out</EM>'s).
@@ -781,8 +831,10 @@ lists all executable programs
 executes a dynamically linked command in a different time frame.
 It intercepts time related system calls and modifies the times seen by
 the command using the formula:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     time' = time + warp + (time - base) * (factor - 1)
+time' = time + warp + (time - base) * (factor - 1)
+</DIV>
 </PRE>
 where:
 <UL type=square>
@@ -857,12 +909,14 @@ and
 is 1 by default.
 <P>
 Command argument date specifications support common conventions:
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     yesterday
-     next week
-     50 days
-     2000-02-28/00:00
-     feb 28 2000
+yesterday
+next week
+50 days
+2000-02-28/00:00
+feb 28 2000
+</DIV>
 </PRE>
 Absolute seconds since the epoch, a.k.a.
 <STRONG>time_t</STRONG>
@@ -890,23 +944,25 @@ if
 is omitted.
 <P>
 <H4>Examples</H4>
+<DIV style="padding-left:16px;text-indent:0px">
 <PRE>
-     $ date -f %Y-%m-%d/%H:%M
-     1998-03-11/13:41
-     $ warp 2000-02-29/12:30:30 date -f %Y-%m-%d/%H:%M
-     2000-02-29/12:30
-     $ date -f %Y-%m-%d/%H:%M
-     1998-03-11/13:44
-     $ warp +57060970 date
-     2000-01-01/00:00
-     
-     # get a shell where 1 logical day passes for each physical second
-     $ PS1='(warp) ' warp -f $(60*60*24) 2000-02-29/12:30:30
-     (warp) date -f %Y-%m-%d/%H:%M
-     2000-03-07/18:58
-     (warp) sleep 1
-     (warp) date -f %Y-%m-%d/%H:%M
-     2000-03-19/18:58
+$ date -f %Y-%m-%d/%H:%M
+1998-03-11/13:41
+$ warp 2000-02-29/12:30:30 date -f %Y-%m-%d/%H:%M
+2000-02-29/12:30
+$ date -f %Y-%m-%d/%H:%M
+1998-03-11/13:44
+$ warp +57060970 date
+2000-01-01/00:00
+
+# get a shell where 1 logical day passes for each physical second
+$ PS1='(warp) ' warp -f $(60*60*24) 2000-02-29/12:30:30
+(warp) date -f %Y-%m-%d/%H:%M
+2000-03-07/18:58
+(warp) sleep 1
+(warp) date -f %Y-%m-%d/%H:%M
+2000-03-19/18:58
+</DIV>
 </PRE>
 <P>
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tksh">tksh</A></H3></FONT></FONT></CENTER>
@@ -1046,13 +1102,15 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-10-01-19  --- Release ksh93t+  ---
+10-02-02  --- Release ksh93t+  ---
+10-02-02  A buffer overflow in read and another in binary type base64
+	  encoding were fixed.
+10-01-20  A bug in the evaluation of arithmetic expression in which the
+	  subscript was evaluated twice for $((foo&#0091;x++&#0093;++)) has been fixed.
 10-01-19  A workaround for a double-free of a trap in both a subshell and its
 	  parent has been added.
 10-01-18  A bug in type handling of typeset -H has been fixed.
 10-01-15  The "adding empty subscript" warning now only emitted with -x set.
-10-01-13  A bug in the evaluation of arithmetic expression in which the
-	  subscript was evaluated twice for $((foo&#0091;x++&#0093;++)) has been fixed.
 10-01-01  A bug in the parser in which '$((case i in i):;esac);:))' was not
 	  parsed correctly was fixed.
 10-01-01  A bug in the parser in which '$(( 2 , 3.6 ))' dumped core for locales
@@ -1090,7 +1148,7 @@ All recorded changes follow.
 	  local variable.
 09-11-17  "read -n1" from the terminal has been fixed to read exactly one character.
 09-11-11  Job control now works for subshell commands, (...).
-09-11-11  If set -e is on for an interractive shell errors in special builtins
+09-11-11  If set -e is on for an interactive shell errors in special builtins
 	  now cause the shell to exit.
 09-11-11  A bug in which an interrupt handler processed during the read builtin
 	  when IFS did not contain a new line has been fixed.
@@ -1214,7 +1272,7 @@ All recorded changes follow.
 09-05-01  A bug that caused a core dump when SIGWINCH was received and
 	  both vi and emacs mode were off has been fixed.
 09-04-22  Default alias compound='typeset -C' added.
-09-04-15  A bug that caused ${...;} to hang for large files has ben fixed.
+09-04-15  A bug that caused ${...;} to hang for large files has been fixed.
 09-04-08  A change was made in the -n option which printed out an incorrect
 	  warning with &lt;&gt;.
 09-04-07  The emacs edit command M-_ and M_. and the vi command _ was fixed
@@ -3246,6 +3304,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-01-22 pax.c: fix -rw to 1 char dir name that dropped '/' separator
 09-09-09 ax-tar.c: handle gnu tar octal overflow extensions for all octal fields
 08-12-31 pax.c,pax-vczip.c: add vczip compression format
 08-05-08 pax.tst: handle systems with privileged chmod +t / mkfifo
@@ -3560,6 +3619,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-01-31 mm2html.sh: handle bsd mandoc
+10-01-25 mm2html.sh: handle optget --nroff { .H&#0091;01234&#0093; .OP }
 10-01-15 mm2html.sh: handle &lt;name&gt;(&lt;number&gt;&lt;chars&gt;) references
 09-09-17 mm2bb.sh: .sn now uses expand(1) instead of cat(1)
 09-07-01 mm2html.sh: --frame=foo for man generates side content frame
@@ -3662,6 +3723,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-01-20 changes.sh: avoid nmake variable expansions in sh!
 09-03-02 Makefile: eliminate master src paths from ../INIT/proto.c
 09-01-15 sear.sh: update for msvcrt.dll link
 08-11-15 sear.sh: add manifest logic
@@ -4154,6 +4216,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-02-02 Makerules.mk: fix LICENSEINFO search to check $(.PACKAGE.)-foo.lic
 10-01-19 Makerules.mk: fix .RECURSE to handle install or .INSTALL
 10-01-01 --- release 5.4 ---
 10-01-01 parse.c: &#0091;'"&#0093; following # always ignored
@@ -5708,6 +5771,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-02-02 bgp.c,bgp-mrt.c: handle rfc3107
 09-09-28 dss.tst: adjust for ip_t/fv.c fix
 09-03-19 bgp-mrt.c: fix DUMP_V2 ipv6 =&gt; as32
 09-03-11 bgp-mrt.c: handle TABLE_DUMP_V2 &lt;13&gt; records
@@ -5817,6 +5881,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-02-02 bgp.h: add rfc3107 BGP_labels
+10-02-02 ip_t.c: add labels_t -- pairs of 32 bit integers
 09-09-28 fv.c: fix off-by-one bug in fvplo() and fvphi()
 09-09-28 ptfmin.c,ptvmax.c: call fvplo() and fpvhi()
 09-07-28 fv.h,fv.c: add fvplo(), fvphi()
@@ -6871,6 +6937,15 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-02-02 string/base64.c: fix corner case output buffer overflow
+10-02-02 features/fs: sys/mnttab.h requires stdio.h on some systems!!
+10-02-01 misc/optget.c: uppercase --html heading -- doh
+10-01-29 misc/optget.c: &#0091;+NAME?...&#0093; overrides error_info.id for &gt;= STYLE_man
+10-01-25 vmalloc/vmprivate.c: fix seg ptr initialization bug (24 years old!!)
+10-01-20 misc/optget.c: handle nested {...} rendering
+10-01-20 misc/state.c: add ast.version for runtime api version
+10-01-20 port/astconf.c: "_AST_VERSION" now returns ast.version
+10-01-20 include/ast_std.h: add ast.version for runtime api version
 10-01-19 astlicense.c: add epl
 10-01-01 vmalloc: VMALLOC_OPTIONS env var for all runtime options
 10-01-01 include: change some &lt;ast.h&gt; refs to less intrusive &lt;ast_*.h&gt;
@@ -6965,7 +7040,7 @@ All recorded changes follow.
 08-08-19 strn?tol?d: handle long double with smaller exponent range than double
 08-08-18 sfio/sfcvt.c: eliminate excessive multiplies and integral overprecision
 08-08-11 tm/tmxfmt.c: handle %10N and %010N
-08-08-06 include/shcmd.h: add 'int invariant;' for builtin invarinat arg count
+08-08-06 include/shcmd.h: add 'int invariant;' for builtin invariant arg count
 08-08-05 features/ndbm: favor sleepycat ndbm compatibility
 08-07-21 include/glob.h,misc/glob.c: GLOB_STARSTAR only forces lstat on chdir
 08-07-17 sfio: sync with kpv
@@ -8494,6 +8569,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-01-26 tail.c: -f sleep(1) only if no progress from last round of checks
+10-01-20 fts_fix.&#0091;ch&#0093;: use &lt;fts_fix.h&gt; instead of &lt;fts.h&gt; (see fts_fix.c)
+10-01-20 cp.c: free(state) if called from old shell
 09-12-10 join.c: &lt;wctype.h&gt; for iswspace()!
 09-12-04 cmd.h: fix CMD_DYNAMIC logic
 09-12-04 cut.c: handle -d mb
@@ -10128,7 +10206,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>January 19, 2010</TD>
+<TD align=right>February 06, 2010</TD>
 </TR>
 </TABLE>
 <P>

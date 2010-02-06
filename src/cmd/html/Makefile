@@ -6,7 +6,7 @@ LICENSE = since=1996,author=gsf
 
 DEBUG == 1
 
-html2rtf :: html2rtf.1 html2rtf.h html2rtf.c
+html2rtf :: html2rtf.h html2rtf.c
 
 html2db :: html2db.c
 
@@ -14,13 +14,13 @@ bb2tok :: bb2tok.c
 
 htmlrefs :: htmlrefs.c
 
-mm2html :: mm2html.1 mm2html.sh
+mm2html :: mm2html.sh
 
 mm2bb :: mm2bb.sh
 
 mm2twiki :: mm2twiki.sh
 
-troff2html :: troff2html.1 troff2html.h troff2html.c
+troff2html :: troff2html.h troff2html.c
 
 "win32*" :NOOPTIMIZE: troff2html.c
 

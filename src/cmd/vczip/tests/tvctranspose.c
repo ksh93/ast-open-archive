@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -23,7 +23,7 @@
 #define NCOLS	1600
 #define NROWS	2000
 
-main()
+int main()
 {
 	int		i, j;
 	Vcchar_t	matrix[NROWS][NCOLS], trans[NCOLS][NROWS], *tr;

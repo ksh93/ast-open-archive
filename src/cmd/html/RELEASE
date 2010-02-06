@@ -1,3 +1,5 @@
+10-01-31 mm2html.sh: handle bsd mandoc
+10-01-25 mm2html.sh: handle optget --nroff { .H[01234] .OP }
 10-01-15 mm2html.sh: handle <name>(<number><chars>) references
 09-09-17 mm2bb.sh: .sn now uses expand(1) instead of cat(1)
 09-07-01 mm2html.sh: --frame=foo for man generates side content frame

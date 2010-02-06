@@ -14,4 +14,7 @@ vcodex :TEST: testvcodex vctest.h terror.h +lvcodex +last \
 	tvcrle.c tvcsum.c tvcrtable.c tvctable.c tvctranspose.c
 		set +x; $(*:O=1) $(TESTVCODEXFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
+test.vc : testvcodex vctest.h terror.h +lvcodex +last $$(*.ARGS:D=tests:B:S=.c) .CLEARARGS
+	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
+
 :: RELEASE Makefile

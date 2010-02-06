@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2009-09-09 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2010-01-22 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1788,8 +1788,7 @@ main(int argc, char** argv)
 				error(3, "%s: destination must be a directory", state.destination);
 			state.dev = st.st_dev;
 			strcpy(state.pwd, state.destination);
-			state.pwdlen = strlen(state.pwd);
-			if (state.pwdlen > 1)
+			if (state.pwdlen = strlen(state.pwd))
 				state.pwd[state.pwdlen++] = '/';
 			getarchive(OUT);
 			state.out->format = &rw;

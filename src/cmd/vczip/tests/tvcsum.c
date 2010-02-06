@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -33,22 +33,22 @@ static Pair_t	Md5[] =
 	{ 0, 0 }
 };
 
-main()
+int main()
 {
-	ssize_t		k, n, h;
+	ssize_t		k, n;
 	Vcchar_t	*sum, hex[1024];
 	Vcx_t		xx;
 
 	if(vcxinit(&xx, Vcxmd5sum, 0, 0) < 0)
 		terror("Initializing md5 handle");
 	for(k = 0; Md5[k].str; ++k)
-	{	if((n = vcxencode(&xx, Md5[k].str, strlen(Md5[k].str), &sum)) < 0 )
+	{	if((n = vcxencode(&xx, Md5[k].str, strlen((char*)Md5[k].str), &sum)) < 0 )
 			terror("Encoding data");
 		if(n != 16)
 			terror("Bad md5 digest length");
-		if((h = vchexcode(sum, n, hex, sizeof(hex), 1)) != 32)
+		if(vchexcode(sum, n, hex, sizeof(hex), 1) != 32)
 			terror("Bad md5 hex coding length");
-		if(strcmp(Md5[k].sum, hex) != 0)
+		if(strcmp((char*)Md5[k].sum, (char*)hex) != 0)
 			terror("Bad md5 digest");
 	}
 	vcxstop(&xx);

@@ -4,7 +4,7 @@ LICENSE = since=1987,author=gsf
 
 DEBUG == 1
 
-pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
+pax :: RELEASE HISTORY PROMO.mm pax.1.posix \
 	pax.h options.h \
 	bio.c convert.c copy.c pax.c options.c \
 	delta.c file.c format.c misc.c paxlib.c \

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -44,7 +44,7 @@ static Matrix_t Mt =
 	'a', '0', 'u', 'd', 'j', 'e', 'p', 'q'
 };
 
-main()
+int main()
 {
 	Vcodex_t	*tz, *uz;
 	Vcodex_t	*huf, *rle, *mtf;

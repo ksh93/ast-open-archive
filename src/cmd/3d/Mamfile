@@ -1250,17 +1250,6 @@ prev ${INSTALLROOT}/bin
 prev 3d
 exec - test '' = '3d' || ${STDCMP} 2>/dev/null -s 3d ${INSTALLROOT}/bin/3d || { ${STDMV} ${INSTALLROOT}/bin/3d ${INSTALLROOT}/bin/3d.old 2>/dev/null || true; ${STDCP} 3d ${INSTALLROOT}/bin/3d  		    		    ;}
 done ${INSTALLROOT}/bin/3d generated
-make ${INSTALLROOT}/man/man1
-exec - if	silent test ! -d ${INSTALLROOT}/man/man1
-exec - then	mkdir -p ${INSTALLROOT}/man/man1
-exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/2d.1
-prev ${INSTALLROOT}/man/man1
-make 2d.1
-done 2d.1
-exec - test '' = '2d.1' || ${STDCMP} 2>/dev/null -s 2d.1 ${INSTALLROOT}/man/man1/2d.1 || { ${STDMV} ${INSTALLROOT}/man/man1/2d.1 ${INSTALLROOT}/man/man1/2d.1.old 2>/dev/null || true; ${STDCP} 2d.1 ${INSTALLROOT}/man/man1/2d.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/2d.1 generated
 make ${INSTALLROOT}/bin/opaque
 prev opaque
 exec - test '' = 'opaque' || ${STDCMP} 2>/dev/null -s opaque ${INSTALLROOT}/bin/opaque || { ${STDMV} ${INSTALLROOT}/bin/opaque ${INSTALLROOT}/bin/opaque.old 2>/dev/null || true; ${STDCP} opaque ${INSTALLROOT}/bin/opaque  		    		    ;}

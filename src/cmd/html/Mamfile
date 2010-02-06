@@ -383,17 +383,6 @@ prev ${INSTALLROOT}/bin
 prev html2rtf
 exec - test '' = 'html2rtf' || ${STDCMP} 2>/dev/null -s html2rtf ${INSTALLROOT}/bin/html2rtf || { ${STDMV} ${INSTALLROOT}/bin/html2rtf ${INSTALLROOT}/bin/html2rtf.old 2>/dev/null || true; ${STDCP} html2rtf ${INSTALLROOT}/bin/html2rtf  		    		    ;}
 done ${INSTALLROOT}/bin/html2rtf generated
-make ${INSTALLROOT}/man/man1
-exec - if	silent test ! -d ${INSTALLROOT}/man/man1
-exec - then	mkdir -p ${INSTALLROOT}/man/man1
-exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/html2rtf.1
-prev ${INSTALLROOT}/man/man1
-make html2rtf.1
-done html2rtf.1
-exec - test '' = 'html2rtf.1' || ${STDCMP} 2>/dev/null -s html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1 || { ${STDMV} ${INSTALLROOT}/man/man1/html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1.old 2>/dev/null || true; ${STDCP} html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/html2rtf.1 generated
 make ${INSTALLROOT}/bin/html2db
 prev html2db
 exec - test '' = 'html2db' || ${STDCMP} 2>/dev/null -s html2db ${INSTALLROOT}/bin/html2db || { ${STDMV} ${INSTALLROOT}/bin/html2db ${INSTALLROOT}/bin/html2db.old 2>/dev/null || true; ${STDCP} html2db ${INSTALLROOT}/bin/html2db  		    		    ;}
@@ -410,11 +399,6 @@ make ${INSTALLROOT}/bin/mm2html
 prev mm2html
 exec - test '' = 'mm2html' || ${STDCMP} 2>/dev/null -s mm2html ${INSTALLROOT}/bin/mm2html || { ${STDMV} ${INSTALLROOT}/bin/mm2html ${INSTALLROOT}/bin/mm2html.old 2>/dev/null || true; ${STDCP} mm2html ${INSTALLROOT}/bin/mm2html  		    		    ;}
 done ${INSTALLROOT}/bin/mm2html generated
-make ${INSTALLROOT}/man/man1/mm2html.1
-make mm2html.1
-done mm2html.1
-exec - test '' = 'mm2html.1' || ${STDCMP} 2>/dev/null -s mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1.old 2>/dev/null || true; ${STDCP} mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/mm2html.1 generated
 make ${INSTALLROOT}/bin/mm2bb
 prev mm2bb
 exec - test '' = 'mm2bb' || ${STDCMP} 2>/dev/null -s mm2bb ${INSTALLROOT}/bin/mm2bb || { ${STDMV} ${INSTALLROOT}/bin/mm2bb ${INSTALLROOT}/bin/mm2bb.old 2>/dev/null || true; ${STDCP} mm2bb ${INSTALLROOT}/bin/mm2bb  		    		    ;}
@@ -427,11 +411,6 @@ make ${INSTALLROOT}/bin/troff2html
 prev troff2html
 exec - test '' = 'troff2html' || ${STDCMP} 2>/dev/null -s troff2html ${INSTALLROOT}/bin/troff2html || { ${STDMV} ${INSTALLROOT}/bin/troff2html ${INSTALLROOT}/bin/troff2html.old 2>/dev/null || true; ${STDCP} troff2html ${INSTALLROOT}/bin/troff2html  		    		    ;}
 done ${INSTALLROOT}/bin/troff2html generated
-make ${INSTALLROOT}/man/man1/troff2html.1
-make troff2html.1
-done troff2html.1
-exec - test '' = 'troff2html.1' || ${STDCMP} 2>/dev/null -s troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1.old 2>/dev/null || true; ${STDCP} troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/troff2html.1 generated
 make ${INSTALLROOT}/lib/html
 exec - if	silent test ! -d ${INSTALLROOT}/lib/html
 exec - then	mkdir -p ${INSTALLROOT}/lib/html

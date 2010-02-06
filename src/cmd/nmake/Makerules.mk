@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-01-19 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-02-02 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -235,7 +235,7 @@ CATALOG = $(.CATALOG.NAME.)
 HTMLINITFILES = 2HTML:$(HOME)/.2html
 LICENSE =
 LICENSEFILE = LICENSE
-LICENSEFILES = $(.PACKAGE.license) $(LICENSE:/,.*//:N!=*=*) $(LICENSEFILE) $(.PACKAGE.:X=$$(.PACKAGE.):C,/,-,) $(.PACKAGE.:X=$$(PWD:C,^$(INSTALLROOT)/[^/]*/[^/]*/,,:C,/.*,,:/^lib//:/lib$//):C,/,-,) $(.PACKAGE.)
+LICENSEFILES = $(.PACKAGE.license) $(LICENSE:/,.*//:N!=*=*:/.*/$(.PACKAGE.)-& &) $(LICENSEFILE) $(.PACKAGE.:X=$$(.PACKAGE.):C,/,-,) $(.PACKAGE.:X=$$(PWD:C,^$(INSTALLROOT)/[^/]*/[^/]*/,,:C,/.*,,:/^lib//:/lib$//):C,/,-,) $(.PACKAGE.)
 LICENSEINFO = $(.FIND. lib/package .lic $(LICENSEFILES))
 LICENSECLASS = $(LICENSEINFO:P=W=$(LICENSE),query=${type}.${class})
 

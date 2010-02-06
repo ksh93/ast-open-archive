@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1990-2005 AT&T Corp.                  #
+#          Copyright (c) 1990-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -23,7 +23,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: changes (AT&T Research) 2005-05-11 $
+@(#)$Id: changes (AT&T Research) 2010-01-20 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?changes - list changed $PACKAGEROOT package source files]
@@ -113,8 +113,13 @@ do	while	read line
 			done
 			if	(( $# ))
 			then	shift
-				components=$components$sep$*
-				sep=' '
+				for p
+				do	p=${p#'$(PACKAGEROOT)/'}
+					if	[[ $p != *'$('* ]]
+					then	components=$components$sep$p
+						sep=' '
+					fi
+				done
 				break
 			fi
 		fi

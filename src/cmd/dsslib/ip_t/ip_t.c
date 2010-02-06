@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -462,6 +462,36 @@ extended_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdi
 }
 
 static ssize_t
+labels_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+{
+	Cxformat_t*	formats[2];
+
+	formats[0] = 0;
+	formats[1] = format;
+	return itl2external(cx, type, 0, 4, 0, details, formats, value, buf, size, disc);
+}
+
+static ssize_t
+labels_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+{
+	return itl2internal(cx, &ret->value, 0, 4, 0, buf, size, vm, disc);
+}
+
+static void*
+labels_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc_t* disc)
+{
+	if (!cxisstring(pat))
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: match requires %s pattern", sub->name, cx->state->type_string->name, sub->name);
+		return 0;
+	}
+	iredisc.version = IRE_VERSION;
+	iredisc.errorf = disc->errorf;
+	return irecomp(val->string.data, 2, 0, 4, 0, &iredisc);
+}
+
+static ssize_t
 prefixv4_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
 	char*	s;
@@ -670,6 +700,16 @@ static Cxmatch_t	match_extended =
 	"Matches on this type treat a string pattern as an ire(3) integer list regular expression for tuples with 8 integer elements in the range 0..255. Each number in the list is a distinct token. Elements are separated by :. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. If a : tuple separator is omitted then :.* is assumed. For example, '[!1 100]' matches all lists that contain neither 1 nor 100 as the first tuple element, and '^[!1: :100]-:201:199$' matches all lists that don't start with 1 as the first tuple element or 100 as the last tuple element and end with :201:199.",
 	CXH,
 	extended_match_comp,
+	match_list_exec,
+	match_list_free
+};
+
+static Cxmatch_t	match_labels =
+{
+	"labels-re",
+	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. Pairs are separated by :. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. If a : tuple separator is omitted then :.* is assumed. For example, '[!1 100]' matches all lists that contain neither 1 nor 100 as the first pair element, and '^[!1: :100]-701:999$' matches all lists that don't start with 1 as the first pair element or 100 as the second pair element and end with 701:999.",
+	CXH,
+	labels_match_comp,
 	match_list_exec,
 	match_list_free
 };
@@ -954,6 +994,7 @@ Cxtype_t	types[] =
 { "ipv4prefix_t", "/length appended to an ipv4addr_t prefix.", CXH, (Cxtype_t*)"number", 0, prefixv4_external, prefixv4_internal, 0, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_prefixv4 },
 { "ipv6prefix_t", "/length appended to an ipv6addr_t prefix. The details string \"C\" lists the prefix as 17 0x%02x comma-separated values, the first 16 being the address, and the 17th being the number of prefix bits.", CXH, (Cxtype_t*)"buffer", 0, prefixv6_external, prefixv6_internal, 0, 0, { 0 }, &match_prefixv6 },
 { "ipprefix_t", 0, CXH, (Cxtype_t*)"number", 0, prefix_external, prefix_internal, 0, 0, { 0 }, &match_prefix, 0, &prefix_generic[0] },
+{ "labels_t", "A sequence of unsigned 32 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, labels_external, labels_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_labels },
 {0}
 };
 

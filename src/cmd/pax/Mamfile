@@ -577,17 +577,6 @@ prev ${INSTALLROOT}/bin
 prev pax
 exec - test '' = 'pax' || ${STDCMP} 2>/dev/null -s pax ${INSTALLROOT}/bin/pax || { ${STDMV} ${INSTALLROOT}/bin/pax ${INSTALLROOT}/bin/pax.old 2>/dev/null || true; ${STDCP} pax ${INSTALLROOT}/bin/pax  		    		    ;}
 done ${INSTALLROOT}/bin/pax generated
-make ${INSTALLROOT}/man/man1
-exec - if	silent test ! -d ${INSTALLROOT}/man/man1
-exec - then	mkdir -p ${INSTALLROOT}/man/man1
-exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/pax.1
-prev ${INSTALLROOT}/man/man1
-make pax.1
-done pax.1
-exec - test '' = 'pax.1' || ${STDCMP} 2>/dev/null -s pax.1 ${INSTALLROOT}/man/man1/pax.1 || { ${STDMV} ${INSTALLROOT}/man/man1/pax.1 ${INSTALLROOT}/man/man1/pax.1.old 2>/dev/null || true; ${STDCP} pax.1 ${INSTALLROOT}/man/man1/pax.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/pax.1 generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
 exec - then	mkdir -p ${PACKAGE_ast_INCLUDE}
@@ -622,7 +611,13 @@ make ppar.fmt
 done ppar.fmt
 exec - test '' = 'ppar.fmt' || ${STDCMP} 2>/dev/null -s ppar.fmt ${INSTALLROOT}/lib/pax/ppar.fmt || { ${STDMV} ${INSTALLROOT}/lib/pax/ppar.fmt ${INSTALLROOT}/lib/pax/ppar.fmt.old 2>/dev/null || true; ${STDCP} ppar.fmt ${INSTALLROOT}/lib/pax/ppar.fmt  		    		    ;}
 done ${INSTALLROOT}/lib/pax/ppar.fmt generated
+make ${INSTALLROOT}/man/man1
+exec - if	silent test ! -d ${INSTALLROOT}/man/man1
+exec - then	mkdir -p ${INSTALLROOT}/man/man1
+exec - fi
+done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/bax.1
+prev ${INSTALLROOT}/man/man1
 make bax.1
 done bax.1
 exec - test '' = 'bax.1' || ${STDCMP} 2>/dev/null -s bax.1 ${INSTALLROOT}/man/man1/bax.1 || { ${STDMV} ${INSTALLROOT}/man/man1/bax.1 ${INSTALLROOT}/man/man1/bax.1.old 2>/dev/null || true; ${STDCP} bax.1 ${INSTALLROOT}/man/man1/bax.1  		    		    ;}

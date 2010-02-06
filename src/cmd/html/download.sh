@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#           Copyright (c) 1996-2007 AT&T Knowledge Ventures            #
+#          Copyright (c) 1996-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                      by AT&T Knowledge Ventures                      #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -48,18 +48,22 @@ item [ type ... ]
 	;;
 esac
 
+usage()
+{
+	OPTIND=0
+	getopts $ARGV0 "$USAGE" OPT '-?'
+	exit 2
+}
+
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
-	i)	. $OPT || exit 1
-		;;
-	*)	echo "Usage: $command [ options ] item [ type ... ]" >&2
-		exit 2
-		;;
+	i)	. $OPT || exit 1 ;;
+	*)	usage ;;
 	esac
 done
 shift $OPTIND-1
 case $# in
-0|1)	exit ;;
+0|1)	usage ;;
 esac
 
 item=$1

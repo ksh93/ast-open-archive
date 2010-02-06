@@ -1366,11 +1366,8 @@ The tokens whose times are \fIrelop atom\fP are returned.  \fIrelop\fP
 can be <, >, =, <=, >=, or !=.  If \fIatom\fP is not specified, it defaults
 to the current target.  For example,
 .EX
-.in 2i
 $(*:T>T)
-.in
 .EE
-.in 1.5i
 lists the prerequisites whose times are newer than the time for the current
 target.
 .TP
@@ -1893,25 +1890,17 @@ A functional atom is associated with a variable by the same name.
 Each time the variable is expanded the corresponding
 atom is made before the variable value is determined.  For example,
 .EX
-.in 1.5i
 src : .MAKE .FUNCTIONAL
-.in +.5i
 return $(*.SOURCE:L<=*.c)
-.in
 .EE
-.in 1i
 In this example, \f5$(src)\fP evaluates to all the .c files in the directories
 specified as prerequisites of \fB.SOURCE\fP (listed in the ascending order).
 Also, \fB.FUNCTIONAL\fP special atom provides argument support.
 For example,
 .EX
-.in 1.5i
 V : .MAKE .FUNCTIONAL
-.in +.5i
 return $(%:T=F)
-.in
 .EE
-.in 1i
 one can call it by $(V a1 ... an), where a1 ... an is the list of
 arguments that can be referenced by \f5$(%)\fP.
 .TP
@@ -2140,18 +2129,12 @@ The interactive loop can also be invoked by specifying the
 .B .QUERY
 Special Atom on the command line.  The following command line will invoke the
 interactive loop:
-.in 1.5i
 .sp .25
 \f5$ nmake -f nmake_filename .QUERY\fP
 .sp .25
-.in
-.in 1i
 or, more commonly,
-.in
-.in 1.5i
 .sp .25
 \f5$ nmake -f nmake_filename query\fP
-.in
 .TP
 .BI .READ "\|\|\s-1[dynamic\|attribute]\s+1"
 The standard output of the action is read and
@@ -2176,19 +2159,12 @@ is required to force the action to be triggered each time the atom is made.
 Modifies the binding algorithm to allow a bound atom to map to a list of
 bound atoms.  For example:
 .EX
-.in 1.4i
 \&.REQUIRE.\-lcs : .FUNCTION
-.in +.5i
 return \-lcs \-lnsl \-lsocket
-.in
 .EE
-.in 1i
 will return the entire list specified above every time \f5\-lcs\fP is called:
-.in
 .EX
-.in 1.5i
 \-lcs \(-> \-lcs \-lnsl \-lsocket
-.in
 .EE
 .TP
 .BI .RETAIN "\|\|\s-1[immediate\|rule]\s+1"
@@ -2227,11 +2203,9 @@ The \fB.SCANNED\fP attribute may be removed from the \fIstatefile\fP with
 \fB\-SCANNED\fP assertion, thus causing \fInmake\fP to rescan the file being
 scanned at a later time.  For example,
 .EX
-.in 1.4i
 t :: t.c
 t.c : -SCANNED
 .EE
-.in 1i
 \f5t.c\fP file is being scanned by \fInmake\fP using \fB.SCAN.c\fP scan
 strategy and it is marked with \fB.SCANNED\fP attribute.  \f5t.c : -SCANNED\fP
 nullifies this action.
@@ -2505,14 +2479,10 @@ environment variable is generated and set to a different value for each
 shell command.  It is 10 characters long and can be used for temporary file
 names, so names of the form
 .EX
-.in 1.5i
 <pfx>$COTEMP<sfx>
-.in
 .EE
-.in 1i
 will be upto 14 characters to satisfy the system V file name length
 restriction.
-.in
 .TP
 .B MAKE
 The path name of the current
@@ -2594,9 +2564,7 @@ A space separated pair of the build tool script (other than \fInmake\fP)
 and the conversion tool.  Used for compile time makefile conversion.
 For example:
 .EX
-.in 1.5i
 export MAKECONVERT='Make.src "nmakegen $(>)"'
-.in
 .EE
 .TP
 .B MAKEIMPORT

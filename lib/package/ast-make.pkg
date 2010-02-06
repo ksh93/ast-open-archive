@@ -4,6 +4,8 @@ ast-make :PACKAGE: \
 
 :AUXILIARY: bin/proto bin/pax
 
+:LICENSE: *.open
+
 :COVERS: ast-ksh ast-ast
 
 :CATEGORY: devel libs shells

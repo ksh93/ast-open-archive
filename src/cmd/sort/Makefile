@@ -2,7 +2,7 @@
 
 LICENSE = since=1996,author=gsf+kpv+doug
 
-sort :: README RELEASE PROMO.mm sort.1 main.c sfopen.c \
+sort :: README RELEASE PROMO.mm main.c sfopen.c \
 	-lrecsort -ldll -lz
 
 :INSTALLDIR: gen rec testsort

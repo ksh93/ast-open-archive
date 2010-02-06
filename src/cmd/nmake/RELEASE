@@ -1,3 +1,4 @@
+10-02-02 Makerules.mk: fix LICENSEINFO search to check $(.PACKAGE.)-foo.lic
 10-01-19 Makerules.mk: fix .RECURSE to handle install or .INSTALL
 10-01-01 --- release 5.4 ---
 10-01-01 parse.c: ['"] following # always ignored

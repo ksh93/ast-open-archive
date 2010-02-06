@@ -187,7 +187,7 @@ OPTIONS
   stty
 
 SYNOPSIS
-  cmd [ options ]
+  stty [ options ]
 
 OPTIONS
   -a, --aaa       AAA
@@ -202,7 +202,7 @@ OPTIONS
   stty
 
 SYNOPSIS
-  cmd [ options ]
+  stty [ options ]
 
 OPTIONS
   -z, --zzz=path  ZZZ
@@ -775,7 +775,7 @@ getopts (AT&T Research) 1999-02-02'
 <TITLE>getopts man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;getopts&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>getopts&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;GETOPTS&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>GETOPTS&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -1343,7 +1343,7 @@ TEST 11 'find style!'
 .ft R
 .in -3n
 ..
-.TH find 1
+.TH FIND 1
 .SH NAME
 \\fBfind\\fP \\- find files
 .SH SYNOPSIS
@@ -1454,10 +1454,10 @@ TEST 16 'detailed man'
 <HTML>
 <HEAD>
 <META name="generator" content="optget (AT&T Research) 2000-04-01">
-<TITLE>cmd man document</TITLE>
+<TITLE>ah man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;cmd&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>cmd&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;AH&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>AH&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -1467,7 +1467,7 @@ TEST 16 'detailed man'
 </DL>
 <DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
 <DL compact>
-<DT><B>cmd</B> &#0091; <I>options</I> &#0093;
+<DT><B>ah</B> &#0091; <I>options</I> &#0093;
 </DL>
 <DT><H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
 <DL compact>
@@ -1593,7 +1593,7 @@ duh
 .ft R
 .in -3n
 ..
-.TH zwei 1
+.TH ZWEI 1
 .SH SYNOPSIS
 \\fBzwei\\fP\\ [\\ \\fIoptions\\fP\\ ]
 .SH OPTIONS
@@ -1771,10 +1771,10 @@ TEST 24 'detailed html'
 <HEAD>
 <META name="generator" content="optget (AT&T Research) 2000-04-01">
 <!--INTERNAL-->
-<TITLE>test man document</TITLE>
+<TITLE>dd man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;test&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>test&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;DD&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>DD&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -1784,7 +1784,7 @@ TEST 24 'detailed html'
 </DL>
 <DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
 <DL compact>
-<DT><B>test</B> &#0091; <I>options</I> &#0093;
+<DT><B>dd</B> &#0091; <I>options</I> &#0093;
 <P>
 </DL>
 <DT><H4><A name="OPTIONS">OPTIONS</A></H4>
@@ -1840,7 +1840,7 @@ TEST 26 'usage combinations'
   aha - bwoohahahahah
 
 SYNOPSIS
-  combo [ options ]
+  aha [ options ]
 
 OPTIONS
   -a, --aha       AHA
@@ -1893,6 +1893,54 @@ IMPLEMENTATION
 "okeedokee"
 "eekodeeko"
 "\\bslingshot\\b(1)"'
+	usage=$'[-] \t\n[+NAME?bar][f:flag]'
+	EXEC	foo "$usage" --short
+		OUTPUT - $'return=? option=- name=--short num=0'
+		ERROR - $'Usage: foo [-f]'
+	EXEC	foo "$usage" --long
+		OUTPUT - $'return=? option=- name=--long num=0'
+		ERROR - $'Usage: foo [--flag]'
+	EXEC	foo "$usage" --usage
+		OUTPUT - $'return=? option=- name=--usage num=0'
+		ERROR - $'[-] \\t\\n[+NAME?bar][f:flag]'
+	EXEC	foo "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  bar
+
+SYNOPSIS
+  bar [ options ]
+
+OPTIONS
+  -f, --flag'
+	EXEC	foo "$usage" --html
+		OUTPUT - $'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<TITLE>bar man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;BAR&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>BAR&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
+<DT>bar
+<P>
+</DL>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>bar</B> &#0091; <I>options</I> &#0093;
+<P>
+</DL>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>-<B>f</B>, --<B>flag</B>
+</DL></DL>
+</BODY>
+</HTML>'
 
 TEST 27 'opt_info.num with opt_info.arg'
 	usage=$'[-][f:flag][m:must]:[yes][o:optional]:?[maybe]'
@@ -1955,7 +2003,7 @@ return=q option=-q name=--what arg=(null) num=1'
   aha - bwoohahahahah
 
 SYNOPSIS
-  info [ options ]
+  aha [ options ]
 
 OPTIONS
   -a, --aha       AHA.
@@ -1995,7 +2043,7 @@ TEST 30 'library interfaces'
 <TITLE>sum man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;sum&nbsp;(&nbsp;3&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER LIBRARY</A><TH align=right>sum&nbsp;(&nbsp;3&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;SUM&nbsp;(&nbsp;3&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER LIBRARY</A><TH align=right>SUM&nbsp;(&nbsp;3&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -2110,7 +2158,7 @@ href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 .ft R
 .in -3n
 ..
-.TH sum 3
+.TH SUM 3
 .SH NAME
 sum \\- checksum library
 .SH SYNOPSIS
@@ -2227,7 +2275,7 @@ TEST 32 'miscellaneous'
 .ft R
 .in -3n
 ..
-.TH wow 1
+.TH WOW 1
 .SH NAME
 wow \\- zowee
 .SH SYNOPSIS
@@ -2557,7 +2605,7 @@ IMPLEMENTATION
 .ft R
 .in -3n
 ..
-.TH eg 1
+.TH EG 1
 .SH NAME
 eg \\- test example examples
 .SH SYNOPSIS
@@ -2596,7 +2644,7 @@ SpamCo'
 <TITLE>eg man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;eg&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>eg&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;EG&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>EG&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -2884,7 +2932,7 @@ TEST 46 'html escapism'
 <TITLE>codex man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;codex&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>codex&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;CODEX&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>CODEX&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -2977,7 +3025,7 @@ OPTIONS
 <TITLE>make man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;make&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>make&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;MAKE&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>MAKE&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
@@ -3375,7 +3423,7 @@ TEST 60 'about nested components'
   boohoo
 
 SYNOPSIS
-  sort [ options ]
+  boohoo [ options ]
 
 OPTIONS
   -m, --method    The methods are:
@@ -3394,7 +3442,7 @@ OPTIONS
   boohoo
 
 SYNOPSIS
-  sort [ options ]
+  boohoo [ options ]
 
 OPTIONS
   -m, --method    The methods are:
@@ -3410,7 +3458,7 @@ OPTIONS
   boohoo
 
 SYNOPSIS
-  sort [ options ]
+  boohoo [ options ]
 
 OPTIONS
   -m, --method    The methods are:
@@ -3428,7 +3476,7 @@ OPTIONS
   boohoo
 
 SYNOPSIS
-  sort [ options ]
+  boohoo [ options ]
 
 OPTIONS
   -m, --method    The methods are:
@@ -3450,7 +3498,7 @@ OPTIONS
   boohoo
 
 SYNOPSIS
-  sort [ options ]
+  boohoo [ options ]
 
 OPTIONS
   -m, --method    The methods are:
@@ -3484,6 +3532,58 @@ OPTIONS
                             hoo   HOO
                             aha   AHA
                     bob   BOB'
+
+	usage=$'
+[-?\n@(#)$Id: codex (AT&T Research) 2009-04-15 $\n]
+[+NAME?codex - encode/decode filter]
+[+?The supported methods are:]
+    {
+        [+zip\b?zip compression. The first parameter is the PKZIP
+            compression method.]
+            {
+                [+copy|0?No compression.]
+                [+shrink|1?Shrink compression.]
+                [+reduce|2|3|4|5?Reduce compression.]
+                [+implode|6?Implode compression.]
+                [+deflate|8?Deflate compression.]
+            }
+    }
+[d:decode?Apply the \amethod\a operand to the standard input only.]
+[e:encode?Apply the \amethod\a operand to the standard output only.]
+    
+file ...
+
+[+SEE ALSO?\bcodex\b(3), \bvcodex\b(3)]'
+	EXEC codex "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  codex - encode/decode filter
+
+SYNOPSIS
+  codex [ options ] file ...
+
+  The supported methods are:
+    zip   zip compression. The first parameter is the PKZIP compression method.
+            copy|0
+                  No compression.
+            shrink|1
+                  Shrink compression.
+            reduce|2|3|4|5
+                  Reduce compression.
+            implode|6
+                  Implode compression.
+            deflate|8
+                  Deflate compression.
+
+OPTIONS
+  -d, --decode    Apply the method operand to the standard input only.
+  -e, --encode    Apply the method operand to the standard output only.
+
+SEE ALSO
+  codex(3), vcodex(3)
+
+IMPLEMENTATION
+  version         codex (AT&T Research) 2009-04-15'
 
 # skip non-astsa (standalone ast) tests
 
@@ -4058,11 +4158,11 @@ RKNZCYRF
     foo   Sbb one.
     one   One sbb.
 
-FLABCFVF
-  xlate [ bcgvbaf ]
-
   Zber r.t.
     aha   NUN
+
+FLABCFVF
+  xlate [ bcgvbaf ]
 
 VZCYRZRAGNGVBA
   irefvba         kyngr 1.0 
@@ -4143,11 +4243,11 @@ RKNZCYRF
     foo   Sbb one.
     one   One sbb.
 
-FLABCFVF
-  xlate [ bcgvbaf ]
-
   Zber r.t.
     aha   NUN
+
+FLABCFVF
+  xlate [ bcgvbaf ]
 
 VZCYRZRAGNGVBA
   irefvba         kyngr 1.0 

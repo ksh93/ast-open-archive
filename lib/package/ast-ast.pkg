@@ -1,5 +1,7 @@
 ast-ast :PACKAGE: libast
 
+:LICENSE: *.open
+
 :CATEGORY: devel libs
 
 :INDEX: the ast library, period

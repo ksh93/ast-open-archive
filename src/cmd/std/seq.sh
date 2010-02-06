@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#           Copyright (c) 1989-2007 AT&T Knowledge Ventures            #
+#          Copyright (c) 1989-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                      by AT&T Knowledge Ventures                      #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -27,7 +27,7 @@ case $(getopts '[-]' opt "--???man" 2>&1) in
 version=[0-9]*)
 	usage=$'\n[-?\n@(#)$Id: seq (AT&T Labs Research) 2007-06-27 $\n]
 	'$USAGE_LICENSE$'
-	[+NAME? seq - print a sequence of numbers ]
+	[+NAME?seq - print a sequence of numbers]
 	[+DESCRIPTION?\bseq\b writes the numbers from \afirst\a to \alast\a
 		in steps of increments.  If \afirst\a or \aincr\a is omitted,
 		it defaults to 1.  An omitted \aincr\a defaults to 1 even
