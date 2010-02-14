@@ -7,7 +7,7 @@
 
 PACKAGE_LOCAL =
 
-PROTOINSTALL = | $(SED) '/^#[[:space:]]*include[[:space:]]*<ast_/s,<,<ast/,'
+PROTOINSTALL = | $(SED) '/^#[[:space:]]*include[[:space:]]*<\(ast_\|ccode\)/s,<,<ast/,'
 
 RC = rc
 RCFLAGS = -x

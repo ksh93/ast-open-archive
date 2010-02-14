@@ -1,3 +1,5 @@
+10-02-14 make.c,metarule.c: change metget() prereqs arg to active frame
+10-02-14 expand.c,make.c,metarule.c: .IMPLICIT metarules not applied to implicit prereqs
 10-02-02 Makerules.mk: fix LICENSEINFO search to check $(.PACKAGE.)-foo.lic
 10-01-19 Makerules.mk: fix .RECURSE to handle install or .INSTALL
 10-01-01 --- release 5.4 ---

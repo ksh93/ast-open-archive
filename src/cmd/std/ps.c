@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2010-01-01 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2010-02-09 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -663,12 +663,13 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				for (i = 0, j--; i < j; i++)
 					sfputr(state.wrk, state.branch[i] ? " |  " : "    ", -1);
 				sfputr(state.wrk, " \\_ ", -1);
+				i = sfstrtell(state.wrk);
 				sfputr(state.wrk, s, -1);
 				if (!(s = sfstruse(state.wrk)))
 					error(ERROR_SYSTEM|3, "out of space");
+				if (state.escape)
+					fmtesc(s + i);
 			}
-			if (state.escape)
-				s = fmtesc(s);
 			break;
 		case KEY_cpu:
 			if (pp->ps->state == PSS_ZOMBIE)
@@ -895,7 +896,7 @@ ps(Ps_t* pp)
 			goto number;
 		case KEY_npid:
 			n = pr->npid;
-			goto hex;
+			goto number;
 		case KEY_pgrp:
 			n = pr->pgrp;
 			goto number;

@@ -92,7 +92,12 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-02-02  --- Release ksh93t+  ---
+10-02-14  --- Release ksh93t+  ---
+10-02-14  Fix sh_getenv() initialization to cooperate with the 3d fs.
+10-02-12  A bug in which the get discipline function was not invoked for
+	  associative array subscripts for unset array elements has been fixed.
+10-02-12  A bug which could occur if the last line of a script was an eval
+	  that executed multiple commands has been fixed.
 10-02-02  A buffer overflow in read and another in binary type base64
 	  encoding were fixed.
 10-01-20  A bug in the evaluation of arithmetic expression in which the
@@ -3170,6 +3175,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+10-02-14 make.c,metarule.c: change metget() prereqs arg to active frame
+10-02-14 expand.c,make.c,metarule.c: .IMPLICIT metarules not applied to implicit prereqs
 10-02-02 Makerules.mk: fix LICENSEINFO search to check $(.PACKAGE.)-foo.lic
 10-01-19 Makerules.mk: fix .RECURSE to handle install or .INSTALL
 10-01-01 --- release 5.4 ---
@@ -5355,6 +5362,8 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+10-02-09 ps.c: fix --tree --format=... => \\_ instead of \_
+10-02-09 ps.c: ntpid not hex by default
 10-01-01 ps.c: fix { -T -C -P } child detection logic
 09-12-09 du.c: add -h, --binary-scale|human-readable; -K, --decimal-scale
 09-11-11 features/procfs: handle linux /proc pr_tgrp == pr_tpgid

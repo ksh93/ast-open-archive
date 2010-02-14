@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -347,7 +347,7 @@ metaclose(Rule_t* in, Rule_t* out, int c)
  */
 
 Rule_t*
-metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
+metaget(Rule_t* r, Frame_t* active, char* stem, Rule_t** meta)
 {
 	register List_t*	p;
 	register List_t*	q;
@@ -356,13 +356,34 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 	Rule_t*			s;
 	Rule_t*			x;
 	Rule_t*			y;
+	List_t*			prereqs;
 	List_t*			terminal;
 	char*			b;
 	char*			u;
 	char*			t;
+	Flags_t			f;
 	int			matched;
 
 	u = unbound(r);
+	prereqs = 0;
+	if (active)
+	{
+		f = active->flags & P_implicit;
+		do
+		{
+			if (active->prereqs)
+			{
+				prereqs = active->prereqs;
+				break;
+			}
+			else if (active == active->parent)
+				break;
+			else
+				active = active->parent;
+		} while (active);
+	}
+	else
+		f = 0;
 	if (prereqs)
 	{
 		/*
@@ -404,7 +425,7 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 		for (p = internal.metarule->prereqs; p; p = p->next)
 			if (metamatch(stem, u, p->rule->name) && (x = metainfo('I', p->rule->name, NiL, 0)))
 				for (matched = 1, q = x->prereqs; q; q = q->next)
-					if ((m = metarule(q->rule->name, p->rule->name, 0)) && (!(r->property & P_terminal) || (m->property & P_terminal)))
+					if ((m = metarule(q->rule->name, p->rule->name, 0)) && (!(r->property & P_terminal) || (m->property & P_terminal)) && !(m->property & f))
 					{
 						if (!tmp)
 							tmp = sfstropen();
@@ -518,7 +539,7 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 	 */
 
 	for (p = terminal; p; p = p->next)
-		if ((m = metarule(p->rule->name, NiL, 0)) && (!(r->property & P_terminal) || (m->property & P_terminal)))
+		if ((m = metarule(p->rule->name, NiL, 0)) && (!(r->property & P_terminal) || (m->property & P_terminal)) && !(m->property & f))
 		{
 			metaexpand(internal.met, b, p->rule->name);
 			if ((s = bindfile(NiL, sfstruse(internal.met), 0)) && s->time)
@@ -646,7 +667,7 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 			if (x)
 			{
 				metaexpand(internal.met, stem, m->uname);
-				if (!((y = makerule(sfstruse(internal.met)))->property & P_terminal))
+				if (!((y = makerule(sfstruse(internal.met)))->property & P_terminal) && !(y->property & f))
 				{
 					*meta = x;
 					s = y;

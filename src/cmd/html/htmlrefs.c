@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Research) 2006-05-01 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Research) 2010-02-02 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -93,6 +93,8 @@ USAGE_LICENSE
 "	\b--nocopy\b are specified.]"
 "[r:root?The local \adirectory\a for \b--user\b"
 "	references.]:[directory:=~\auser\a]"
+"[K:skip?\apattern\a is used to match file base names that are never"
+"	considered referenced.]:[pattern:=00-INDEX-00]"
 "[s:strict?By default unreferenced \b--index\b files and the containing"
 "	directory are considered referenced; \b--strict\b considers"
 "	unreferenced \b--index\b files unreferenced.]"
@@ -135,6 +137,7 @@ USAGE_LICENSE
 
 #define INDEX			"index.html"
 #define KEEP			".htaccess"
+#define SKIP			"00-INDEX-00"
 
 #define CHECKED			0x001
 #define COPIED			0x002
@@ -207,6 +210,7 @@ typedef struct State_s
 	String_t	limit;
 	String_t	programroot;
 	String_t	root;
+	String_t	skip;
 	String_t	user;
 
 	char		buf[PATH_MAX];
@@ -216,6 +220,25 @@ typedef struct State_s
 
 static const char	internal[] = "<!--INTERNAL-->";
 static const char	external[] = "<!--/INTERNAL-->";
+
+static int
+keep(State_t* state, const char* name, int mode)
+{
+	char*	s;
+
+	if (state->skip.size)
+	{
+		if (s = strrchr(name, '/'))
+			s++;
+		else
+			s = (char*)name;
+		if (strmatch(s, state->skip.data))
+			return 0;
+	}
+	if (mode >= 0 && access(name, mode))
+		return 0;
+	return 1;
+}
 
 /*
  * check for glob(dir/name)
@@ -233,7 +256,7 @@ check(register State_t* state, const char* dir, const char* name, unsigned int f
 	sfsprintf(state->dir, sizeof(state->dir) - 1, "%s/(%s)", dir, name);
 	if (!glob(state->dir, GLOB_AUGMENTED|GLOB_DISC|GLOB_STACK, 0, &gl))
 		for (p = gl.gl_pathv; s = *p++;)
-			if (!dtmatch(state->files, s) && !access(s, F_OK))
+			if (!dtmatch(state->files, s) && keep(state, s, F_OK))
 			{
 				if (!(dp = newof(0, File_t, 1, strlen(s))))
 					error(ERROR_SYSTEM|3, "out of space [file]");
@@ -343,6 +366,8 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 	}
 	if (!(fp = (File_t*)dtmatch(state->files, s)))
 	{
+		if (!keep(state, s, -1))
+			return 0;
 		if (!(fp = newof(0, File_t, 1, strlen(s))))
 			error(ERROR_SYSTEM|3, "out of space [file]");
 		strcpy(fp->name, s);
@@ -924,6 +949,9 @@ main(int argc, char** argv)
 		case 'k':
 			state->keep.size = strlen(state->keep.data = opt_info.arg);
 			continue;
+		case 'K':
+			state->skip.size = strlen(state->skip.data = opt_info.arg);
+			continue;
 		case 'l':
 			state->limit.size = strlen(state->limit.data = opt_info.arg);
 			continue;
@@ -974,6 +1002,8 @@ main(int argc, char** argv)
 		state->index.size = strlen(state->index.data = INDEX);
 	if (!state->keep.size)
 		state->keep.size = strlen(state->keep.data = KEEP);
+	if (!state->skip.size)
+		state->skip.size = strlen(state->skip.data = SKIP);
 	if (!state->user.size)
 		state->user.size = strlen(state->user.data = fmtuid(geteuid()));
 	if (!state->root.size || *state->root.data != '/')
@@ -1175,7 +1205,7 @@ main(int argc, char** argv)
 		if (!(fts = fts_open(dirs, FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
 			error(ERROR_SYSTEM|3, "%s: cannot search directory", state->root.data);
 		while (ent = scan(state, fts))
-			if (!dtmatch(state->files, ent->fts_path) && (!strmatch(ent->fts_name, state->keep.data) || state->ignore.size && strmatch(ent->fts_path, state->ignore.data)))
+			if (!dtmatch(state->files, ent->fts_path) && (!strmatch(ent->fts_name, state->keep.data) || state->skip.size && strmatch(ent->fts_name, state->skip.data) || state->ignore.size && strmatch(ent->fts_path, state->ignore.data)))
 			{
 				if (state->strict || !streq(ent->fts_name, state->index.data))
 				{

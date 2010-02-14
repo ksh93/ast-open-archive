@@ -25,7 +25,7 @@ foo.c : [current] .SCAN.c must=1 regular scanned EXISTS
 
 hdr/foo.h==foo.h : [current] .LCL.INCLUDE .SCAN.c must=1 regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
@@ -34,7 +34,7 @@ uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
 
 bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
 
-()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] built compiled state
+()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: hdr/foo.h==foo.h 
@@ -49,7 +49,7 @@ foo.c : [recent] .SCAN.c regular scanned EXISTS
 
 hdr/foo.h==foo.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [recent] regular EXISTS
@@ -58,7 +58,7 @@ uhdr/bar.G==bar.G : [recent] regular EXISTS
 
 bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
 
-()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] built compiled state
+()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: hdr/foo.h==foo.h 
@@ -89,7 +89,7 @@ foo.c : [current] .SCAN.c must=1 regular scanned EXISTS
 
 hdr/foo.h==foo.h : [current] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c must=1 terminal regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
@@ -98,7 +98,7 @@ uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
 
 bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
 
-()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] built compiled state
+()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: hdr/foo.h==foo.h 
@@ -113,7 +113,7 @@ foo.c : [recent] .SCAN.c regular scanned EXISTS
 
 hdr/foo.h==foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c terminal regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c event=[recent] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [recent] regular EXISTS
@@ -122,7 +122,7 @@ uhdr/bar.G==bar.G : [recent] regular EXISTS
 
 bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
 
-()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] built compiled state
+()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: hdr/foo.h==foo.h 
@@ -153,7 +153,7 @@ foo.c : [current] .SCAN.c must=1 regular scanned EXISTS
 
 foo.h : [current] .LCL.INCLUDE .SCAN.c must=1 regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
@@ -162,7 +162,7 @@ uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
 
 bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
 
-()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] built compiled state
+()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: foo.h 
@@ -177,7 +177,7 @@ foo.c : [recent] .SCAN.c regular scanned EXISTS
 
 foo.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [recent] regular EXISTS
@@ -186,7 +186,7 @@ uhdr/bar.G==bar.G : [recent] regular EXISTS
 
 bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
 
-()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] built compiled state
+()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: foo.h 
@@ -217,7 +217,7 @@ foo.c : [current] .SCAN.c must=1 regular scanned EXISTS
 
 foo.h : [current] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c must=1 terminal regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
@@ -226,7 +226,7 @@ uhdr/bar.G==bar.G : [current] must=1 regular EXISTS
 
 bar.h : [current] .LCL.INCLUDE .SCAN.c must=4 regular scanned triggered EXISTS
 
-()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] built compiled state
+()bar.h : [current] .LCL.INCLUDE .SCAN.c event=[current] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: foo.h 
@@ -241,7 +241,7 @@ foo.c : [recent] .SCAN.c regular scanned EXISTS
 
 foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c terminal regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c event=[recent] compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [recent] regular EXISTS
@@ -250,7 +250,7 @@ uhdr/bar.G==bar.G : [recent] regular EXISTS
 
 bar.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
 
-()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] built compiled state
+()bar.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit built compiled state
 
 (+)bar.h : cancel=[not found] .SCAN.c implicit compiled scanned state
  prerequisites: foo.h 

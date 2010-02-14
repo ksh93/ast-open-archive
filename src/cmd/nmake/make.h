@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -466,6 +466,7 @@ struct Frame_s				/* active target frame		*/
 	char*		original;	/* original bound name		*/
 	char*		primary;	/* metarule primary prereq name	*/
 	char*		stem;		/* metarule stem		*/
+	Flags_t		flags;		/* make() flags			*/
 
 	struct
 	{
@@ -999,7 +1000,7 @@ extern void		merge(Rule_t*, Rule_t*, int);
 extern void		mergestate(Rule_t*, Rule_t*);
 extern void		metaclose(Rule_t*, Rule_t*, int);
 extern void		metaexpand(Sfio_t*, char*, char*);
-extern Rule_t*		metaget(Rule_t*, List_t*, char*, Rule_t**);
+extern Rule_t*		metaget(Rule_t*, Frame_t*, char*, Rule_t**);
 extern Rule_t*		metainfo(int, char*, char*, int);
 extern int		metamatch(char*, char*, char*);
 extern Rule_t*		metarule(char*, char*, int);

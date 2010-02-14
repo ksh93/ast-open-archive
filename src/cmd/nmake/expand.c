@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -2342,6 +2342,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	int			force;
 	int			matched;
 	int			tst;
+	int			f;
 	Time_t			tm;
 	List_t*			q;
 	List_t*			z;
@@ -2632,20 +2633,22 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		}
 		tmp = sfstropen();
 		matched = 0;
+		f = x ? (x->property & P_implicit) : 0;
 		for (z = internal.metarule->prereqs; z; z = z->next)
 		{
 			char	stem[MAXNAME];
 
-			if (metamatch(stem, unbound(r), z->rule->name) && (x = metainfo('I', z->rule->name, NiL, 0)))
+			if (metamatch(stem, unbound(r), z->rule->name) && (!(r->property & P_terminal) || (z->rule->property & P_terminal)) && !(z->rule->property & f) && (x = metainfo('I', z->rule->name, NiL, 0)))
 				for (q = x->prereqs; q; q = q->next)
-				{
-					metaexpand(tmp, stem, q->rule->name);
-					if ((x = bindfile(NiL, sfstruse(tmp), 0)) && (x->time || (x->property & P_target)))
+					if ((x = metarule(q->rule->name, z->rule->name, 0)) && (!(r->property & P_terminal) || (x->property & P_terminal)) && !(x->property & f))
 					{
-						matched = 1;
-						break;
+						metaexpand(tmp, stem, q->rule->name);
+						if ((x = bindfile(NiL, sfstruse(tmp), 0)) && (x->time || (x->property & P_target)))
+						{
+							matched = 1;
+							break;
+						}
 					}
-				}
 		}
 		sfstrclose(tmp);
 		break;

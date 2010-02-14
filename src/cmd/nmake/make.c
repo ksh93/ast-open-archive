@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -456,6 +456,7 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 	r3 = r;
 	r3name = unbound(r3);
 	zero(frame);
+	frame.flags = flags;
 	frame.target = r;
 	frame.parent = state.frame;
 	parent = frame.parent->target;
@@ -824,7 +825,9 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 			error(PANIC, "%s: active=0", r->name);
 		}
 #endif
-		if ((r2 = metaget(r, r->active->prereqs, stem, &r4)) && !(state.questionable & 0x00100000) && ((state.questionable & 0x00200000) || !(r->property & P_implicit)) && strchr(unbound(r), '/') && !strchr(r4->name, '/'))
+		if (r0 && (flags & P_implicit))
+			r0->property |= P_implicit;
+		if ((r2 = metaget(r, r->active, stem, &r4)) && !(state.questionable & 0x00100000) && ((state.questionable & 0x00200000) || !(r->property & P_implicit)) && strchr(unbound(r), '/') && !strchr(r4->name, '/'))
 			r2 = 0;
 		if (r2)
 		{
