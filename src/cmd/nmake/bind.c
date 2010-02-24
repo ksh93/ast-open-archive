@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1323,7 +1323,15 @@ bindfile(register Rule_t* r, char* name, int flags)
 					if (n == '-' || *b)
 					{
 						if (*s)
-							putbound(name, makerule(s)->name);
+						{
+							x = makerule(s);
+							if (!(state.questionable & 0x00000004) && r != x && !r->time && !x->time && !(r->property & P_virtual))
+							{
+								r->property |= P_virtual;
+								return bind(r);
+							}
+							putbound(name, x->name);
+						}
 						sfputr(buf, name, 0);
 					}
 					else

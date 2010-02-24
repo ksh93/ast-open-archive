@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1270,6 +1270,70 @@ b_getconf(char** args)
 	return astconf(name, path, value);
 }
 
+/*
+ * getopts() builtin
+ */
+
+static char*
+b_getopts(char** args)
+{
+	char*	id;
+	char*	usage;
+	char*	prefix;
+	char*	oid;
+	char*	s;
+	Rule_t*	r;
+	int	c;
+	Opt_t	info;
+
+	s = getval(">", 0);
+	if (*s == '-' && (id = *args++) && (usage = *args++) && (prefix = *args))
+	{
+		usage = getval(usage, VAL_PRIMARY);
+		if (*usage == '"')
+			usage++;
+		if (streq(id, "-"))
+			oid = 0;
+		else
+		{
+			oid = error_info.id;
+			error_info.id = id;
+		}
+		info = opt_info;
+		opt_info.index = 0;
+		opt_info.offset = 0;
+		for (;;)
+		{
+			while (isspace(s[opt_info.offset]))
+				opt_info.offset++;
+			if (s[opt_info.offset] != '-')
+				break;
+			switch (c = optstr(s, usage))
+			{
+			case 0:
+				break;
+			case '?':
+				error(ERROR_USAGE|0, "%s", opt_info.arg);
+				return null;
+			case ':':
+				error(2, "%s", opt_info.arg);
+				return null;
+			default:
+				error(1, "AHA %s%s=%I*d", prefix, opt_info.name, sizeof(opt_info.number), opt_info.number);
+				continue;
+			}
+			break;
+		}
+		s += opt_info.offset;
+		opt_info = info;
+		if (oid)
+			error_info.id = oid;
+		error(1, "AHA operands : %s", s);
+		return sfstruse(internal.val);
+	}
+	return null;
+}
+
 typedef int (*Systab_f)(void);
 
 typedef struct Systab_s
@@ -1495,6 +1559,7 @@ initrule(void)
 	 */
 
 	FUNC(			".GETCONF",	b_getconf);
+	FUNC(			".GETOPTS",	b_getopts);
 	FUNC(			".OUTSTANDING",	b_outstanding);
 	FUNC(			".SYSCALL",	b_syscall);
 

@@ -136,7 +136,7 @@
  *
  *	0x00000001 *temporary*
  *	0x00000002 *temporary*
- *	0x00000004 *temporary*
+ *	0x00000004 *temporary* disable bind_p "- ..." and "... ..." virtual logic
  *	0x00000008 1996-10-11 meta rhs prefix dir check even if rhs has prefix
  *	0x00000010 1994-01-01 old out of date if prereq in higher view
  *	0x00000020 1994-01-01 old scan advance logic

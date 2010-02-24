@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-02-02 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-02-14 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1742,7 +1742,7 @@ RECURSEROOT = .
 				end
 			end
 		end
-		: $(.INSTALL.COMMON. $(<) $(T0) $(>)) :
+		: $(.INSTALL.COMMON. - $(<) $(T0) $(>)) :
 	end
 
 /*
@@ -3633,7 +3633,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	return $(N).$($(N).COUNT.).
 
 .INSTALL.COMMON. : .FUNCTION
-	local ( T A P ... ) $(%)
+	local ( D T A P ... ) $(%)
 	local B T1 T2
 	if ! "$(A)" || "$(A)" == "-"
 		A := $(T)
@@ -3652,10 +3652,14 @@ PACKAGES : .SPECIAL .FUNCTION
 			.ALL : $(T)
 		end
 		if ! ( T1 = "$(.INSTALL.$(B):V)" )
-			for T2 $(.INSTALL.MAPS.)
-				if "$(T:$(T2))"
-					T1 = .
-					break
+			if D != "-"
+				T1 := $(D:)
+			else
+				for T2 $(.INSTALL.MAPS.)
+					if "$(T:$(T2))"
+						T1 = .
+						break
+					end
 				end
 			end
 			if ! T1

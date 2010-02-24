@@ -3175,6 +3175,9 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+10-02-14 Makerules.mk: add .INSTALL.COMMON. directory arg
+10-02-14 bind.c: add bind_p "- ..." and "... ..." virtual logic
+10-02-14 debug.mk: set --nonativepp -- doh
 10-02-14 make.c,metarule.c: change metget() prereqs arg to active frame
 10-02-14 expand.c,make.c,metarule.c: .IMPLICIT metarules not applied to implicit prereqs
 10-02-02 Makerules.mk: fix LICENSEINFO search to check $(.PACKAGE.)-foo.lic
@@ -5795,6 +5798,8 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-02-24 comp/getopt.h: fix ast_std.h interactions
+10-02-24 vmalloc/malloc.c: empty { VMALLOC_OPTION VMDEBUG ... } => no debug!
 10-02-02 string/base64.c: fix corner case output buffer overflow
 10-02-02 features/fs: sys/mnttab.h requires stdio.h on some systems!!
 10-02-01 misc/optget.c: uppercase --html heading -- doh

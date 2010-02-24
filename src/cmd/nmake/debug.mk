@@ -1,10 +1,12 @@
 /*
  * interactive debug support
  *
- * @(#)debug (AT&T Research) 2009-10-14
+ * @(#)debug (AT&T Research) 2010-02-14
  *
  * *.i from *.c
  */
+
+set --nonativepp
 
 CCIFLAGS = $(CC.ALTPP.FLAGS) $(CCFLAGS:N=-[DIU]*) $(&$(<:B:S=.o):T=D)
 CCISCOPE =  $(~$(<:B:S=.o):N=*=*:Q)

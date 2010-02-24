@@ -645,20 +645,9 @@ done rm.tst generated
 exec - regress  rm.tst
 done test.rm virtual
 make test.tail
-make tail
-make tail.o
-make tail.c
-prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
-done tail.c
-meta tail.o %.c>%.o tail.c tail
-prev tail.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tail.c
-done tail.o virtual
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tail tail.o ${mam_libast} ${mam_libcmd}
-done tail generated
 make tail.tst
 done tail.tst
-exec - regress  tail.tst tail
+exec - regress  tail.tst
 done test.tail virtual
 make test.tr
 prev tr
