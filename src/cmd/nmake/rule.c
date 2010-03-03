@@ -1287,11 +1287,8 @@ b_getopts(char** args)
 	Opt_t	info;
 
 	s = getval(">", 0);
-	if (*s == '-' && (id = *args++) && (usage = *args++) && (prefix = *args))
+	if (*s == '-' && (id = *args++) && (r = getrule(*args++)) && (usage = r->action) && (prefix = *args))
 	{
-		usage = getval(usage, VAL_PRIMARY);
-		if (*usage == '"')
-			usage++;
 		if (streq(id, "-"))
 			oid = 0;
 		else
@@ -1314,12 +1311,17 @@ b_getopts(char** args)
 				break;
 			case '?':
 				error(ERROR_USAGE|0, "%s", opt_info.arg);
-				return null;
+				opt_info.offset = 0;
+				s = null;
+				break;
 			case ':':
 				error(2, "%s", opt_info.arg);
-				return null;
+				opt_info.offset = 0;
+				s = null;
+				break;
 			default:
-				error(1, "AHA %s%s=%I*d", prefix, opt_info.name, sizeof(opt_info.number), opt_info.number);
+				sfprintf(internal.wrk, "%s%s", prefix, opt_info.name);
+				setvar(sfstruse(internal.wrk), opt_info.arg && *opt_info.arg ? opt_info.arg : opt_info.num ? "1" : null, 0);
 				continue;
 			}
 			break;
@@ -1328,8 +1330,7 @@ b_getopts(char** args)
 		opt_info = info;
 		if (oid)
 			error_info.id = oid;
-		error(1, "AHA operands : %s", s);
-		return sfstruse(internal.val);
+		return s;
 	}
 	return null;
 }

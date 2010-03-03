@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -136,6 +136,7 @@ getval(register char* s, int op)
 	Var_t*			v;
 	Var_t*			a;
 	char*			t;
+	char*			o;
 	char*			val;
 	char*			next;
 	int			c;
@@ -487,6 +488,7 @@ getval(register char* s, int op)
 		{
 			ap = arg;
 			if (t)
+			{
 				for (;;)
 				{
 					while (isspace(*t))
@@ -498,10 +500,27 @@ getval(register char* s, int op)
 						break;
 					while (*t && !isspace(*t))
 						t++;
+					if (*t == '"' || *t == '\'')
+					{
+						o = t;
+						n = *t++;
+						while (*t && (n || !isspace(*t)))
+						{
+							if (*t == n)
+								n = 0;
+							else if (!n && (*t == '"' || *t == '\''))
+								n = *t;
+							else
+								*o++ = *t;
+							t++;
+						}
+						*o = 0;
+					}
 					if (!*t)
 						break;
 					*t++ = 0;
 				}
+			}
 			*ap = 0;
 			return (t = (*v->builtin)(arg)) ? t : null;
 		}

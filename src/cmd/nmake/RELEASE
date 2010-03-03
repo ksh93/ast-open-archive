@@ -1,3 +1,4 @@
+10-02-24 rule.c: add .GETOPTS and b_getopts() builtin for optget()
 10-02-14 Makerules.mk: add .INSTALL.COMMON. directory arg
 10-02-14 bind.c: add bind_p "- ..." and "... ..." virtual logic
 10-02-14 debug.mk: set --nonativepp -- doh
