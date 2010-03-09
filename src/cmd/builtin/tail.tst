@@ -495,3 +495,74 @@ TEST 31 'fifo by path'
 		INPUT fifo $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
 		OUTPUT - $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
 	CONTINUE
+
+function partial
+{
+	integer n=${1:-4} s=1 i j
+	typeset -A f
+
+	for ((i = 1; i <= n; i++))
+	do	f[$i]=1
+		{
+			print $i
+			for ((j = 1; j <= i; j++))
+			do	print -n "$i $j ... "
+				sleep $s
+				print $i $j ok
+			done 
+		} > $i &
+	done
+}
+
+TEST 32 'tail -f with partial lines'
+
+	PROG partial 4
+
+	EXEC -t2 -f 1 2 3 4
+		OUTPUT - $'==> 1 <==
+1
+
+==> 2 <==
+2
+
+==> 3 <==
+3
+
+==> 4 <==
+4
+
+==> 1 <==
+1 1 ... 1 1 ok
+
+==> 2 <==
+2 1 ... 2 1 ok
+
+==> 3 <==
+3 1 ... 3 1 ok
+
+==> 4 <==
+4 1 ... 4 1 ok
+
+==> 2 <==
+2 2 ... 2 2 ok
+
+==> 3 <==
+3 2 ... 3 2 ok
+
+==> 4 <==
+4 2 ... 4 2 ok
+
+==> 3 <==
+3 3 ... 3 3 ok
+
+==> 4 <==
+4 3 ... 4 3 ok
+4 4 ... 4 4 ok'
+		ERROR - $'tail: warning: 1: 2.00s timeout
+tail: warning: 2: 2.00s timeout
+tail: warning: 3: 2.00s timeout
+tail: warning: 4: 2.00s timeout'
+
+	PROG wait
+		OUTPUT -
+		ERROR -

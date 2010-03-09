@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-02-14 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-03-04 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1085,8 +1085,8 @@ end
 	case $(-mam:N=(regress|static)*:/:.*//)$(-regress):$OPTIND:$RANDOM in
 	?*:*:*|*::*|*:*:$RANDOM)
 		;;
-	*)	if	ENV= x= $SHELL -nc ': ${list[level]} $$(( 1 + $x )) !(pattern)' 2>/dev/null
-		then	ENV= $SHELL -n $(>)
+	*)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]} $$(( 1 + $x )) !(pattern)' 2>/dev/null
+		then	ENV= LC_ALL=C $SHELL -n $(>)
 		fi
 		;;
 	esac

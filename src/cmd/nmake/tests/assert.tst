@@ -129,8 +129,8 @@ TEST 07 ':INSTALLDIR:'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= $SHELL -n test.sh
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ 	then	ENV= LC_ALL=C $SHELL -n test.sh
 + 	fi
 + 	;;
 + esac
@@ -365,8 +365,8 @@ TEST 15 ':: .sh rhs mismatch with lhs'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= $SHELL -n foo.sh
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ 	then	ENV= LC_ALL=C $SHELL -n foo.sh
 + 	fi
 + 	;;
 + esac
@@ -478,8 +478,8 @@ ug gu :LINK: gg'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= $SHELL -n gg.sh
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ 	then	ENV= LC_ALL=C $SHELL -n gg.sh
 + 	fi
 + 	;;
 + esac
@@ -618,8 +618,8 @@ BBB :: BBB.sh'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= $SHELL -n AAA.sh
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ 	then	ENV= LC_ALL=C $SHELL -n AAA.sh
 + 	fi
 + 	;;
 + esac
@@ -649,8 +649,8 @@ BBB :: BBB.sh'
 + case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= $SHELL -n BBB.sh
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ 	then	ENV= LC_ALL=C $SHELL -n BBB.sh
 + 	fi
 + 	;;
 + esac

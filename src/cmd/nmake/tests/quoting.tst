@@ -23,8 +23,8 @@ tst :: tst.sh'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= $SHELL -n tst.sh
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ 	then	ENV= LC_ALL=C $SHELL -n tst.sh
 + 	fi
 + 	;;
 + esac

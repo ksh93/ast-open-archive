@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-02-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -45,8 +45,8 @@ prev mamdag.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n mamdag.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n mamdag.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -82,8 +82,8 @@ prev mamdot.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n mamdot.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n mamdot.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -119,8 +119,8 @@ prev mamexec.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n mamexec.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n mamexec.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -264,8 +264,8 @@ prev mamsh.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n mamsh.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n mamsh.sh
 exec - 	fi
 exec - 	;;
 exec - esac

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-02-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -501,8 +501,8 @@ prev delta2patch.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n delta2patch.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n delta2patch.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -538,8 +538,8 @@ prev rpm2cpio.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n rpm2cpio.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n rpm2cpio.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -647,8 +647,8 @@ prev testpax.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n testpax.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n testpax.sh
 exec - 	fi
 exec - 	;;
 exec - esac

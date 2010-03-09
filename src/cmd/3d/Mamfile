@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-02-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -402,6 +402,9 @@ prev ${PACKAGE_ast_INCLUDE}/times.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tm.h dontcare
+make ${PACKAGE_ast_INCLUDE}/tv.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done ${PACKAGE_ast_INCLUDE}/tv.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/path/pathtemp.c dontcare
@@ -1115,8 +1118,8 @@ prev 3d.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n 3d.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n 3d.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -1153,8 +1156,8 @@ prev opaque.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n opaque.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n opaque.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -1190,8 +1193,8 @@ prev vex.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n vex.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n vex.sh
 exec - 	fi
 exec - 	;;
 exec - esac

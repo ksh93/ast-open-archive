@@ -87,4 +87,4 @@ dontcare -lutil
 :: PROMO.mm RELEASE
 
 :TEST: asa cat chmod chown cksum cp cut date expr fmt head join ln look \
-	mkdir mkfifo mv nl od paste rm tail tr uniq uuencode wc
+	mkdir mkfifo mktemp mv nl od paste rm tail tr uniq uuencode wc

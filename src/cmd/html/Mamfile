@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-02-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -197,8 +197,8 @@ prev mm2html.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n mm2html.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n mm2html.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -234,8 +234,8 @@ prev mm2bb.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n mm2bb.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n mm2bb.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -271,8 +271,8 @@ prev mm2twiki.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n mm2twiki.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n mm2twiki.sh
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -344,8 +344,8 @@ prev download.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n download.sh
+exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= LC_ALL=C $SHELL -n download.sh
 exec - 	fi
 exec - 	;;
 exec - esac

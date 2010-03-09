@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-02-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -611,6 +611,17 @@ exec - fi
 done mkfifo.tst generated
 exec - regress  mkfifo.tst
 done test.mkfifo virtual
+make test.mktemp
+make mktemp.tst
+meta mktemp.tst %.rt>%.tst mktemp.rt mktemp
+make mktemp.rt
+done mktemp.rt
+exec - if	[[ "1" || "mktemp.rt" -nt "mktemp.tst" ]]
+exec - then	mktest --style=regress mktemp.rt > mktemp.tst
+exec - fi
+done mktemp.tst generated
+exec - regress  mktemp.tst
+done test.mktemp virtual
 make test.mv
 make mv.tst
 done mv.tst

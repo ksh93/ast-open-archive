@@ -1102,7 +1102,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-10-02-14  --- Release ksh93t+  ---
+10-03-05  --- Release ksh93t+  ---
+10-03-05  A varibale unset memory leak has been fixed and tests/leaks.sh
+	  has been added to verify the fix.
+10-03-04  Documentation, comment, and disgnostic spelling typos corrected.
 10-02-14  Fix sh_getenv() initialization to cooperate with the 3d fs.
 10-02-12  A bug in which the get discipline function was not invoked for
 	  associative array subscripts for unset array elements has been fixed.
@@ -4221,6 +4224,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-03-09 read.c: fix ancient makefile cpp comment check that missed /**...
+10-03-04 Makerules.sh: LC_ALL=C for %:%.sh $SHELL -n to avoid 1.2 arith syntax errors
 10-02-24 rule.c: add .GETOPTS and b_getopts() builtin for optget()
 10-02-14 Makerules.mk: add .INSTALL.COMMON. directory arg
 10-02-14 bind.c: add bind_p "- ..." and "... ..." virtual logic
@@ -5596,6 +5601,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-03-07 tail.tst: add partial line -f test
+10-03-05 mktemp.rt: add
 09-09-24 uuencode,uudecode: use uumeth(0) to generate usage method list
 09-08-18 testtail.sh: add fifo tests
 09-08-01 join.tst: TEST 19 for empty field defref bug
@@ -6950,6 +6957,14 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-03-08 features/tvlib: fix utimensat probe to include all macros/structs
+10-03-07 features/lib: change stream_peek to test pipes only
+10-03-07 string/strelapsed.c: fix next char return overrun
+10-03-06 tm/tvtouch.c: use runtime fallback if utimensat() fails with ENOSYS
+10-03-05 path/pathtemp.c: add pfx /seed for regression testing
+10-03-04 vmalloc/vmwalk.c: add user supplied handle arg
+10-03-04 path/pathtemp.c: properly handle mktemp()-style *+(X) templates
+10-03-03 include/ast_getopt.h: remove NULL guard - _AST_GETOPT_H now handles it
 10-02-24 comp/getopt.h: fix ast_std.h interactions
 10-02-24 vmalloc/malloc.c: empty { VMALLOC_OPTION VMDEBUG ... } =&gt; no debug!
 10-02-02 string/base64.c: fix corner case output buffer overflow
@@ -8584,6 +8599,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-03-07 tail.c: sfsync(sfstdout) after all -f done, fix -f partial line
+10-03-05 mktemp.c: add --regress=seed for testing
+10-03-05 vmstate.c: add
 10-01-26 tail.c: -f sleep(1) only if no progress from last round of checks
 10-01-20 fts_fix.&#0091;ch&#0093;: use &lt;fts_fix.h&gt; instead of &lt;fts.h&gt; (see fts_fix.c)
 10-01-20 cp.c: free(state) if called from old shell
@@ -10221,7 +10239,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>March 02, 2010</TD>
+<TD align=right>March 09, 2010</TD>
 </TR>
 </TABLE>
 <P>

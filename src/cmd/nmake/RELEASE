@@ -1,3 +1,5 @@
+10-03-09 read.c: fix ancient makefile cpp comment check that missed /**...
+10-03-04 Makerules.sh: LC_ALL=C for %:%.sh $SHELL -n to avoid 1.2 arith syntax errors
 10-02-24 rule.c: add .GETOPTS and b_getopts() builtin for optget()
 10-02-14 Makerules.mk: add .INSTALL.COMMON. directory arg
 10-02-14 bind.c: add bind_p "- ..." and "... ..." virtual logic

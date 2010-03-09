@@ -499,7 +499,7 @@ all :
 + : ^a ~b <c >d !e =f
 + : 
 + : =f'
-		ERROR - $'make: regular expression: !.*: unary op not preceeded by re'
+		ERROR - $'make: regular expression: !.*: unary op not preceded by re'
 
 TEST 18 ':P=D:'
 
