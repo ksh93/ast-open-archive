@@ -7,6 +7,7 @@ UNIT cat --regress
 TEST 01 basics
 
 	EXEC	d00000
+		INPUT -n -
 		INPUT d00000 $'\n\n\n\n'
 		INPUT d00001 $'\n\n\n\na'
 		INPUT d00010 $'\n\n\na\n'
@@ -40,6 +41,7 @@ TEST 01 basics
 		INPUT d11110 $'a\nb\nc\nd\n'
 		INPUT d11111 $'a\nb\nc\nd\ne'
 		OUTPUT - $'\n\n\n\n'
+		ERROR -n -
 
 	EXEC	d00001
 		OUTPUT - $'\n\n\n\na'
@@ -1573,3 +1575,15 @@ TEST 01 basics
 
 	EXEC	--show-ends --show-nonprinting --number-nonblank --squeeze-blank d11111
 		OUTPUT - $'     1\ta$\n     2\tb$\n     3\tc$\n     4\td$\n     5\te$'
+
+TEST 02 -v
+
+	EXEC	-v i
+		INPUT -n -
+		INPUT i $'a\211b\311c\tdIe'
+		INPUT -n j X
+		OUTPUT - $'aM-\tbM-Ic\tdIe'
+		ERROR -n -
+
+	EXEC	-v j
+		OUTPUT -n - X

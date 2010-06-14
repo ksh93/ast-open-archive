@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -764,10 +764,14 @@ setop(register Option_t* op, register int n, char* s, int type)
 			sfprintf(internal.tmp, "%s", op->name);
 			if (type == ':' && !(op->flags & OPT_SET))
 				sfputc(internal.tmp, ':');
-			if (s)
-				sfprintf(internal.tmp, "=%s", s);
-			else
+			if (!s)
 				sfprintf(internal.tmp, "=%d", n);
+			else if (!strchr(s, ' ') && !strchr(s, '\t'))
+				sfprintf(internal.tmp, "=%s", s);
+			else if (!strchr(s, '\''))
+				sfprintf(internal.tmp, "='%s'", s);
+			else
+				sfprintf(internal.tmp, "=\"%s\"", s);
 			n = sfstrtell(internal.tmp);
 			s = sfstruse(internal.tmp);
 			x = newof(0, Oplist_t, 1, n);
@@ -1701,7 +1705,24 @@ optset(int i, char* v, Sfio_t* scope)
 	{
 		if (state.readonly && !state.interpreter)
 		{
-			x = newof(0, Oplist_t, 1, strlen(v) + 1);
+			if (strchr(v, ' ') || strchr(v, '\t'))
+			{
+				while (*v && *v != '=')
+					sfputc(internal.tmp, *v++);
+				if (*v)
+				{
+					sfputc(internal.tmp, *v++);
+					if (!strchr(v, '\"'))
+						sfprintf(internal.tmp, "\"%s\"", v);
+					else
+						sfprintf(internal.tmp, "'%s'", v);
+				}
+				n = sfstrtell(internal.tmp);
+				v = sfstruse(internal.tmp);
+			}
+			else
+				n = strlen(v);
+			x = newof(0, Oplist_t, 1, n + 1);
 			x->option = strcpy((char*)(x + 1), v);
 			if (opt.lastdelayed)
 				opt.lastdelayed = opt.lastdelayed->next = x;

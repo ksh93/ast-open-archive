@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -44,7 +44,6 @@
 #define hashsize	_3d_hashsize
 #define hashwalk	_3d_hashwalk
 #define pathbin		_3d_pathbin
-#define pathcat		_3d_pathcat
 #define pathcheck	_3d_pathcheck
 #define pathshell	_3d_pathshell
 #define pathtemp	_3d_pathtemp

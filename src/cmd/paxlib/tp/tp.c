@@ -174,7 +174,7 @@ Paxformat_t	pax_tp_format =
 	PAX_DEFBUFFER,
 	PAX_DEFBLOCKS,
 	PAX_BLOCK,
-	PAXNEXT(pax_tp_next),
+	PAXNEXT(tp),
 	0,
 	tp_done,
 	tp_getprologue,
@@ -182,4 +182,4 @@ Paxformat_t	pax_tp_format =
 	tp_getdata,
 };
 
-PAXLIB(&pax_tp_format)
+PAXLIB(tp)

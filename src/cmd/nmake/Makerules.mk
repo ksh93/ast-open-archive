@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-03-04 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-06-01 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1577,10 +1577,10 @@ RECURSEROOT = .
 .RECURSE.DIR : .USE .ALWAYS .LOCAL .FORCE .RECURSE.FLUSH .RECURSE.SEMAPHORE
 	set -
 	if	$(*.VIEW:O=2:N=...:+2d) test -d $(<) $(-virtual:+|| $(MKDIR) $(<))
-	then	$(-silent:~echo $(-recurse-enter) $(.RWD.:+$(<:N!=/*:+$(.RWD.)/))$(<)$$(":") >&2)
+	then	$(-silent:~echo $$(-recurse-enter) $$(.RWD.:+$$$(<:N!=/*:+$$$$(.RWD.)/))$$(<)$$(":") >&2)
 		cd $(<)
 		$(MAKE) $(-) --errorid=$(<:Q) $(=:V:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:C%$%/%)$(<) $(.RECURSE.OPTIONS.) $(.RECURSE.ARGS.)
-		$(-recurse-leave:+$(-silent:~echo $(-recurse-leave) $(.RWD.:+$(<:N!=/*:+$$(.RWD.)/))$(<)$$$(":") >&2))
+		$(-recurse-leave:+$$(-silent:~echo $$$(-recurse-leave) $$$(.RWD.:+$$$$(<:N!=/*:+$$$$$(.RWD.)/))$$$(<)$$$(":") >&2))
 	else	echo $(<): warning: cannot recurse on virtual directory >&2
 	fi
 
@@ -3167,6 +3167,23 @@ PACKAGES : .SPECIAL .FUNCTION
 					else
 						PACKAGE_IGNORE := $(V)
 					end
+				elif N == "latest"
+					_API_DEFAULT == 99999999
+				elif N == "api"
+					if V == 0
+						eval
+						_$(P:F=%(upper)s)_API_H == 1
+						end
+					else
+						if V == "latest"
+							V = 99999999
+						end
+						if V >= 19700101
+							eval
+							_API_DEFAULT == $(V)
+							end
+						end
+					fi
 				elif O == "--*" || N == "debug|profile|threads"
 					set $(O)
 				end
@@ -3330,6 +3347,22 @@ PACKAGES : .SPECIAL .FUNCTION
 				elif N == "plugin"
 					A = 1
 					.PACKAGE.$(N) := $(P)
+				elif N == "api|[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
+					if V == 0
+						eval
+						_$(P:F=%(upper)s)_API_H == 1
+						end
+					else
+						if N != "api"
+							V := $(N)
+						end
+						if V == "latest"
+							V = 99999999
+						end
+						eval
+						_API_$(P) == $(N)
+						end
+					end
 				else
 					.PACKAGE.$(P).option.$(N) := $(V)
 				end

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -21,10 +21,17 @@
 #ifndef _RECSORT_H
 #define	_RECSORT_H		1
 
-#define RS_VERSION	20030811L
-#define RSKEY_VERSION	19961031L
+#if _PACKAGE_ast
+#include <ast.h>
+#else
+#include <sfio.h>
+#endif
 
-#include	<sfio.h>
+#define RS_PLUGIN_VERSION	AST_PLUGIN_VERSION(20100528L)
+#define RS_VERSION		20030811L
+#define RSKEY_VERSION		19961031L
+
+#define SORTLIB(m)		unsigned long plugin_version(void) { return RS_PLUGIN_VERSION; }
 
 typedef struct _rsobj_s		Rsobj_t;
 typedef struct _rs_s		Rs_t;
@@ -99,9 +106,11 @@ struct _rskey_s
 
 	int		merge;		/* merge sorted input files	*/
 	int		nproc;		/* max number of processes	*/
-	int		tab;		/* global tab char		*/
 	int		verbose;	/* trace execution		*/
 	int		code;		/* global ccode translation	*/
+
+	unsigned char	tab[32];	/* global tab char/string	*/
+
 #ifdef _RSKEY_PRIVATE_
 	_RSKEY_PRIVATE_
 #endif
@@ -213,7 +222,7 @@ extern Rs_t*		rsopen _ARG_((Rsdisc_t*, Rsmethod_t*, ssize_t, int));
 extern int		rsclear _ARG_((Rs_t*));
 extern int		rsclose _ARG_((Rs_t*));
 extern ssize_t		rsprocess _ARG_((Rs_t*, Void_t*, ssize_t));
-extern int		rslib _ARG_((Rs_t*, Rskey_t*, const char*));
+extern int		rslib _ARG_((Rs_t*, Rskey_t*, const char*, int));
 extern Rsobj_t*		rslist _ARG_((Rs_t*));
 extern int		rswrite _ARG_((Rs_t*, Sfio_t*, int));
 extern int		rsmerge _ARG_((Rs_t*, Sfio_t*, Sfio_t**, int, int));

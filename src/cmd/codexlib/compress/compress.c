@@ -736,7 +736,7 @@ Codexmeth_t	codex_compress =
 	0,
 	0,
 	0,
-	CODEXNEXT(codex_compress_next)
+	CODEXNEXT(compress)
 };
 
-CODEXLIB(&codex_compress)
+CODEXLIB(compress)

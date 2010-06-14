@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,10 +26,9 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss opaque method (AT&T Research) 2002-11-22 $\n]"
-USAGE_LICENSE
-"[+NAME?opaque - dss opaque method]"
-"[+DESCRIPTION?The \bdss\b opaque method handles anonymous fixed record data.]"
+"[+PLUGIN?\findex\f]"
+"[+DESCRIPTION?The \bdss\b opaque method handles anonymous fixed record "
+    "data. Field names and expressions are not supported.]"
 "[n:name?The magic header generic data/application name.]:[name]"
 "[s:size?The fixed record size; must be specified.]#[size]"
 "[t:type?The magic header specific data type.]:[type]"
@@ -47,6 +46,8 @@ struct Opaque_s
 	Dssmeth_t	meth;
 	Magicid_t	magic;
 };
+
+extern Dsslib_t		dss_lib_opaque;
 
 /*
  * identf
@@ -156,6 +157,7 @@ static Dssmeth_t*
 opaquemeth(const char* name, const char* options, const char* schema, Dssdisc_t* disc, Dssmeth_t* meth)
 {
 	register Opaque_t*	opaque;
+	char*			s;
 
 	if (!(opaque = newof(0, Opaque_t, 1, 0)))
 	{
@@ -166,9 +168,12 @@ opaquemeth(const char* name, const char* options, const char* schema, Dssdisc_t*
 	opaque->meth = *meth;
 	opaque->meth.data = opaque;
 	if (options)
+	{
+		sfprintf(meth->cx->buf, "%s%s", strchr(dss_lib_opaque.description, '['), usage);
+		s = sfstruse(meth->cx->buf);
 		for (;;)
 		{
-			switch (optstr(options, usage))
+			switch (optstr(options, s))
 			{
 			case 'n':
 				opaque->magic.magic = MAGICID;
@@ -196,6 +201,7 @@ opaquemeth(const char* name, const char* options, const char* schema, Dssdisc_t*
 			}
 			break;
 		}
+	}
 	if (!opaque->magic.size)
 	{
 		if (disc->errorf)
@@ -212,23 +218,18 @@ opaquemeth(const char* name, const char* options, const char* schema, Dssdisc_t*
 static Dssmeth_t method =
 {
 	"opaque",
-	"Opaque fixed record data with optional magic. Field names and"
-	" expressions are not supported.",
+	"opaque fixed record data with optional magic",
 	CXH,
 	opaquemeth
 };
 
-static Dsslib_t lib =
+Dsslib_t	dss_lib_opaque =
 {
 	"opaque",
-	"opaque method",
+	"opaque method"
+	"[-1ls5Pp0?\n@(#)$Id: dss opaque method (AT&T Research) 2002-11-22 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	&method
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

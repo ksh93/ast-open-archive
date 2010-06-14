@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -115,3 +115,5 @@ extern int E38(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(38, rp, dp, 
 extern int E39(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(39, rp, dp, state); }
 
 #undef	extern
+
+SORTLIB(test)

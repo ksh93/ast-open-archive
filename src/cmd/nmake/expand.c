@@ -1005,11 +1005,11 @@ relative(Sfio_t* xp, register char* s, register char* t)
 	if (*s != '/') sfprintf(tmp, "%s/", internal.pwd);
 	sfprintf(tmp, "%s/", s);
 	s = sfstruse(tmp);
-	pos = pathcanon(s, 0) - s + 1;
+	pos = pathcanon(s, 0, 0) - s + 1;
 	sfstrseek(tmp, pos, SEEK_SET);
 	if (*t != '/') sfprintf(tmp, "%s/", internal.pwd);
 	sfprintf(tmp, "%s/%c", t, 0);
-	pathcanon(v = t = sfstrseek(tmp, pos, SEEK_SET), 0);
+	pathcanon(v = t = sfstrseek(tmp, pos, SEEK_SET), 0, 0);
 	u = s = sfstrbase(tmp);
 	while (*s && *s == *t)
 		if (*s++ == '/')
@@ -1112,11 +1112,12 @@ native(Sfio_t* xp, const char* s)
 	}
 }
 
-#define ORDER_COMMAND	""		/* command assertion operator	*/
-#define ORDER_INIT	"INIT"		/* no prereq dir prefix		*/
-#define ORDER_LIBRARY	"LIBRARY"	/* library assertion operator	*/
-#define ORDER_PACKAGE	"PACKAGE"	/* package assertion operator	*/
-#define ORDER_RECURSE	"MAKE"		/* recursion assertion operator	*/
+#define ORDER_COMMAND	""		/* command assertion operator		*/
+#define ORDER_INIT	"INIT"		/* no prereq dir prefix			*/
+#define ORDER_LIBRARY	"LIBRARY"	/* library assertion operator		*/
+#define ORDER_PACKAGE	"PACKAGE"	/* package assertion operator		*/
+#define ORDER_RECURSE	"MAKE"		/* recursion assertion operator		*/
+#define ORDER_REQUIRE	"REQUIRE"	/* library prerequisite operator	*/
 
 #define ORDER_all	0x01
 #define ORDER_directory	0x02
@@ -1455,7 +1456,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 					else if ((t[0] == '-' || t[0] == '+') && t[1] == 'l')
 					{
 						a = 0;
-						for (u = t += 2; istype(*u, C_ID1|C_ID2) || *u == '/' && (a = u); u++);
+						for (u = t += 2; istype(*u, C_ID1|C_ID2) || *u == '-' || *u == '/' && (a = u); u++);
 						*u = 0;
 						if (!*t)
 							continue;
@@ -1503,10 +1504,10 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 					{
 						if (j != ':' || !isupper(*t))
 							k = 0;
-						else if ((i = streq(t, ORDER_COMMAND)) || streq(t, ORDER_LIBRARY))
+						else if ((i = streq(t, ORDER_COMMAND)) || streq(t, ORDER_LIBRARY) || streq(t, ORDER_REQUIRE))
 						{
 							for (; *b == ' ' || *b == '\t' || *b == '\r'; b++);
-							for (u = b; istype(*b, C_ID1|C_ID2); b++);
+							for (u = b; istype(*b, C_ID1|C_ID2) || *b == '-'; b++);
 							if (!*b || *b == ':' || *b == ' ' || *b == '\t' || *b == '\r')
 							{
 								*b = 0;
@@ -2022,7 +2023,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 							sfprintf(internal.nam, "/%s", s);
 					}
 					t = sfstruse(internal.nam);
-					pathcanon(t, 0);
+					pathcanon(t, 0, 0);
 					if (!stat(t, &st))
 					{
 						if (sep)
@@ -2060,7 +2061,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			op++;
 		if ((t = strchr(op, ',')) || (t = strchr(op, ' ')))
 			*t++ = 0;
-		if (s = pathprobe(sfstrrsrv(xp, MAXNAME), NiL, op, t ? t : idname, s, 0))
+		if (s = pathprobe(op, t ? t : idname, s, 0, sfstrrsrv(xp, MAXNAME), MAXNAME, NiL, 0))
 		{
 			sfstrseek(xp, strlen(s), SEEK_CUR);
 			makerule(s)->dynamic |= D_built|D_global;
@@ -2101,7 +2102,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				{
 					sfprintf(internal.nam, "%s/%s", op, s);
 					s = sfstruse(internal.nam);
-					pathcanon(s, 0);
+					pathcanon(s, 0, 0);
 				}
 				if (*s++ != '.' || *s++ != '.' || *s && *s != '/')
 					c = 1;

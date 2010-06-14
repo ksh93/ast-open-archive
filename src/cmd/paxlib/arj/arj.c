@@ -234,7 +234,7 @@ Paxformat_t	pax_arj_format =
 	PAX_DEFBUFFER,
 	PAX_DEFBLOCKS,
 	0,
-	PAXNEXT(pax_arj_next),
+	PAXNEXT(arj),
 	0,
 	arj_done,
 	arj_getprologue,
@@ -242,4 +242,4 @@ Paxformat_t	pax_arj_format =
 	arj_getdata,
 };
 
-PAXLIB(&pax_arj_format)
+PAXLIB(arj)

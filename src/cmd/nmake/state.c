@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -56,7 +56,7 @@ catrule(register char* s1, register char* s2, register char* s3, int force)
 	{
 		if (force < 0)
 		{
-			pathcanon(s1, 0);
+			pathcanon(s1, 0, 0);
 			if (r = getrule(s1))
 				return r;
 		}
@@ -950,7 +950,7 @@ checkcurrent(register Rule_t* r, Stat_t* st)
 	sfputc(internal.nam, 0);
 	sfputr(internal.nam, r->name, 0);
 	s = sfstrseek(internal.nam, pos + 1, SEEK_SET);
-	pathcanon(s, 0);
+	pathcanon(s, 0, 0);
 	if (!streq(r->name, s))
 	{
 		if (!r->uname)

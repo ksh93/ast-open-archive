@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2007-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2007-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -355,3 +355,5 @@ b_dbm_set(int argc, char** argv, void* context)
 	return 1;
 #endif
 }
+
+SHLIB(dbm)

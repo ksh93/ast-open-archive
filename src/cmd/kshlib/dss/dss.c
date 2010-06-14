@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1405,10 +1405,8 @@ static int loadlib(int argc, char *argv[], void *data)
 	if(error_info.errors || !*argv)
 		 errormsg(SH_DICT,ERROR_usage(2),"%s",optusage((char*)0));
 	while(name = *argv++)
-	{
-		if(dssload(name, dp) < 0)
+		if(!dssload(name, dp))
 			error_info.errors = 1;
-	}
 	return(error_info.errors);
 }
 
@@ -1609,3 +1607,5 @@ void lib_init(int flag, void* context)
 	nfp->nnames = n;
 	nfp->sh = shp;
 }
+
+SHLIB(dss)

@@ -79,7 +79,7 @@
 #undef	setbit		/* netbsd has one in <sys/param.h> */
 
 #define bind		bindrule /* avoids possible socket clash */
-#define canon(x)	((state.context&&iscontextp(x,&state.tmppchar))?state.tmppchar:(state.mam.statix?mamcanon(x):pathcanon(x,0)))
+#define canon(x)	((state.context&&iscontextp(x,&state.tmppchar))?state.tmppchar:(state.mam.statix?mamcanon(x):pathcanon(x,0,0)))
 #define clrbit(v,b)	((v)&=~(1L<<(b)))
 #define getar(name)	((Dir_t*)hashget(table.ar,(name)))
 #define getbound(name)	((char*)hashget(table.bound,(name)))

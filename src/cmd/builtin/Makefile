@@ -78,7 +78,7 @@ BUILTINS :COMMAND: cmdlist.h
 	end
 
 :BUILTIN: dlls LICENSE=since=2002,author=gsf -ldll look mime \
-		pty LICENSE=since=2001,author=dgk -lutil \
+		pty LICENSE=since=2001,author=gsf+dgk -lutil \
 		nl LICENSE=since=2003,author=dgk asa od pr \
 		strings tr uudecode -luu uuencode -luu what who
 
@@ -86,5 +86,5 @@ dontcare -lutil
 
 :: PROMO.mm RELEASE
 
-:TEST: asa cat chmod chown cksum cp cut date expr fmt head join ln look \
-	mkdir mkfifo mktemp mv nl od paste rm tail tr uniq uuencode wc
+:TEST: asa cat chmod chown cksum cmp cp cut date expr fmt head join ln \
+	look mkdir mkfifo mktemp mv nl od paste rm tail tr uniq uuencode wc

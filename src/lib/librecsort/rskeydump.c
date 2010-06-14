@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -72,7 +72,7 @@ register Sfio_t*	sp;
 	sfprintf(sp, "\tinsize=%ld outsize=%ld\n", kp->insize, kp->outsize);
 	sfprintf(sp, "\talignsize=%ld procsize=%ld recsize=%ld\n", kp->alignsize, kp->procsize, kp->recsize);
 	sfprintf(sp, "\tmerge=%d reverse=%d stable=%d uniq=%d ignore=%d verbose=%d\n", kp->merge, !!(kp->type & RS_REVERSE), !(kp->type & RS_DATA), !!(kp->type & RS_UNIQ), !!(kp->type & RS_IGNORE), kp->verbose);
-	sfprintf(sp, "\ttab='%c' keys=%s maxfield=%d", kp->tab ? kp->tab : ' ', kp->coded ? "coded" : "", kp->field.maxfield);
+	sfprintf(sp, "\ttab='%s' keys=%s maxfield=%d", kp->tab[0] ? (char*)kp->tab : " ", kp->coded ? "coded" : "", kp->field.maxfield);
 	if (kp->fixed)
 		sfprintf(sp, " fixed=%d", kp->fixed);
 	if (kp->nproc > 1)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -402,6 +402,13 @@ struct Filter_s
 	char**		patharg;	/* file arg in argv		*/
 };
 
+typedef struct Pattern_s
+{
+	char*		pattern;
+	unsigned char	directory;
+	unsigned char	matched;
+} Pattern_t;
+
 #define _PAX_ARCHIVE_PRIVATE_ \
 	unsigned long	checksum;	/* running checksum		*/ \
 	int		checkdelta;	/* getprologue delta check	*/ \
@@ -565,7 +572,8 @@ struct Filter_s
 	int		owner;		/* set owner info		*/ \
 	Archive_t*	out;		/* output archive info		*/ \
 	int		pass;		/* archive to archive		*/ \
-	char**		patterns;	/* name match patterns		*/ \
+	Pattern_t*	pattern;	/* current name match pattern	*/ \
+	Pattern_t*	patterns;	/* name match patterns		*/ \
 	char*		peekfile;	/* stdin file list peek		*/ \
 	int		peeklen;	/* peekfile length		*/ \
 	char		pwd[PATH_MAX];	/* full path of .		*/ \
@@ -668,7 +676,7 @@ extern void		deltaout(Archive_t*, Archive_t*, File_t*);
 extern void		deltapass(Archive_t*, Archive_t*);
 extern void		deltaset(Archive_t*, char*);
 extern void		deltaverify(Archive_t*);
-extern int		dirprefix(char*, char*);
+extern int		dirprefix(char*, char*, int);
 extern void		filein(Archive_t*, File_t*);
 extern void		fileout(Archive_t*, File_t*);
 extern void		fileskip(Archive_t*, File_t*);
@@ -688,7 +696,7 @@ extern ssize_t		holewrite(int, void*, size_t);
 extern Archive_t*	initarchive(const char*, int);
 extern void		initdelta(Archive_t*, Format_t*);
 extern void		initfile(Archive_t*, File_t*, struct stat*, char*, int);
-extern char**		initmatch(char**);
+extern void		initmatch(char**);
 extern void		interactive(void);
 extern void		listentry(File_t*);
 extern int		listprintf(Sfio_t*, Archive_t*, File_t*, const char*);

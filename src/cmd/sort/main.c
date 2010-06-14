@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -37,187 +37,201 @@
  */
 
 static const char usage[] =
-"[-n?\n@(#)$Id: sort (AT&T Research) 2009-12-09 $\n]"
+"[-n?\n@(#)$Id: sort (AT&T Research) 2010-05-25 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
-"[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
-"	writes the result on the standard output. The file name \b-\b"
-"	means the standard input. If no files are named, the standard"
-"	input is sorted.]"
-"[+?The default sort key is an entire line. Default ordering is"
-"	lexicographic by bytes in machine collating sequence. The"
-"	ordering is affected globally by the following options, one"
-"	or more of which may appear. See \brecsort\b(3) for details.]"
-"[+?For backwards compatibility the \b-o\b option is allowed in any file"
-"	operand position when neither the \b-c\b nor the \b--\b options"
-"	are specified.]"
-
-"[k:key?Restrict the sort key to a string beginning at \apos1\a and"
-"	ending at \apos2\a. \apos1\a and \apos2\a each have the form \am.n\a,"
-"	counting from 1, optionally followed by one or more of the flags"
-"	\bCMbdfginprZ\b; \bm\b counts fields from the beginning of the"
-"	line and \bn\b counts characters from the beginning of the"
-"	field. If any flags are present they override all the"
-"	global ordering options for this key. If \a.n\a is missing"
-"	from \apos1\a, it is taken to be 1; if missing from \apos2\a,"
-"	it is taken to be the end of the field. If \apos2\a is"
-"	missing, it is taken to be end of line. The second form"
-"	specifies a fixed record length \areclen\a, and the last form"
-"	specifies a fixed field at byte position \aposition\a"
-"	(counting from 1) of \alength\a bytes. The obsolescent"
-"	\breclen:fieldlen:offset\b (byte offset from 0) is also"
-"	accepted.]:[pos1[,pos2]]|.reclen|.position.length]]]]]"
-"[K:oldkey?Specified in pairs: \b-K\b \apos1\a \b-K\b \apos2\a,"
-"	where positions count from 0.]#"
-"		[pos]"
-"[R:record|recfmt?Sets the record format to \aformat\a; newlines will be"
-"	treated as normal characters. The formats are:]:[format]{"
-"		[+d[\aterminator\a]]?Variable length with record"
-"			\aterminator\a character, \b\\n\b by default.]"
-"		[+[f]]\areclen\a?Fixed record length \areclen\a.]"
-"		[+v[op...]]?Variable length.  \bh4o0z2bi\b (4 byte IBM V format descriptor)"
-"			if \aop\a are omitted.  \aop\a may be a combination of:]{"
-"			[+h\an\a?Header size is \an\a bytes (default 4).]"
-"			[+o\an\a?Size offset in header is \an\a bytes (default 0).]"
-"			[+z\an\a?Size length is \an\a bytes (default min(\bh\b-\bo\b,2)).]"
-"			[+b?Size is big-endian (default).]"
-"			[+l?Size is little-endian (default \bb\b).]"
-"			[+i?Record length includes header (default).]"
-"			[+n?Record length does not include header (default \bi\b).]"
-"			}"
-"		[+%?If the record format is not otherwise specified, and the"
-"			any input file name, from left to right, ends with"
-"			\b%\b\aformat\a or \b%\b\aformat\a\b.\b* then the"
-"			record format is set to \aformat\a.  In addition, the"
-"			\b-o\b path, if specified and if it does not contain"
-"			\b%\b and if it names a regular file, is renamed to"
-"			contain the input \b%\b\aformat\a.]"
-"		[+-?The first block of the first input file is sampled to check"
-"			for \bv\b variable length and \bf\b fixed length format"
-"			records. Not all formats are detected.  \bsort\b exits"
-"			with an error diagnostic if the record format cannot be"
-"			determined from the sample.]"
-"}"
-"[b:ignorespace?Ignore leading white space (spaces and tabs) in field"
-"	comparisons.]"
-"[d:dictionary?`Phone directory' order: only letters, digits and white space"
-"	are significant in string comparisons.]"
-"[C:codeset|convert?The field data codeset is \acodeset\a or the field data"
-"	must be converted from the \afrom\a codeset to the \ato\a"
-"	codeset. The codesets are:]:[codeset|from::to]{\fcodesets\f}"
+"[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and "
+    "writes the result on the standard output. The file name \b-\b means the "
+    "standard input. If no files are named, the standard input is sorted.]"
+"[+?The default sort key is an entire line. Default ordering is "
+    "lexicographic by bytes in machine collating sequence. The ordering is "
+    "affected globally by the locale and/or the following options, one or "
+    "more of which may appear. See \brecsort\b(3) for details.]"
+"[+?For backwards compatibility the \b-o\b option is allowed in any file "
+    "operand position when neither the \b-c\b nor the \b--\b options are "
+    "specified.]"
+"[k:key?Restrict the sort key to a string beginning at \apos1\a and "
+    "ending at \apos2\a. \apos1\a and \apos2\a each have the form \am.n\a, "
+    "counting from 1, optionally followed by one or more of the flags "
+    "\bCMbdfginprZ\b; \bm\b counts fields from the beginning of the line and "
+    "\bn\b counts characters from the beginning of the field. If any flags "
+    "are present they override all the global ordering options for this key. "
+    "If \a.n\a is missing from \apos1\a, it is taken to be 1; if missing "
+    "from \apos2\a, it is taken to be the end of the field. If \apos2\a is "
+    "missing, it is taken to be end of line. The second form specifies a "
+    "fixed record length \areclen\a, and the last form specifies a fixed "
+    "field at byte position \aposition\a (counting from 1) of \alength\a "
+    "bytes. The obsolescent \breclen:fieldlen:offset\b (byte offset from 0) "
+    "is also accepted.]:[pos1[,pos2]]|.reclen|.position.length]]]]]"
+"[K:oldkey?Specified in pairs: \b-K\b \apos1\a \b-K\b \apos2\a, where "
+    "positions count from 0.]# [pos]"
+"[R:record|recfmt?Sets the record format to \aformat\a; newlines will be "
+    "treated as normal characters. The formats are:]:[format]"
+    "{"
+        "[+d[\aterminator\a]]?Variable length with record \aterminator\a "
+            "character, \b\\n\b by default.]"
+        "[+[f]]\areclen\a?Fixed record length \areclen\a.]"
+        "[+v[op...]]?Variable length. \bh4o0z2bi\b (4 byte IBM V format "
+            "descriptor) if \aop\a are omitted. \aop\a may be a combination "
+            "of:]"
+            "{"
+                "[+h\an\a?Header size is \an\a bytes (default 4).]"
+                "[+o\an\a?Size offset in header is \an\a bytes (default "
+                    "0).]"
+                "[+z\an\a?Size length is \an\a bytes (default "
+                    "min(\bh\b-\bo\b,2)).]"
+                "[+b?Size is big-endian (default).]"
+                "[+l?Size is little-endian (default \bb\b).]"
+                "[+i?Record length includes header (default).]"
+                "[+n?Record length does not include header (default "
+                    "\bi\b).]"
+            "}"
+        "[+%?If the record format is not otherwise specified, and the "
+            "any input file name, from left to right, ends with "
+            "\b%\b\aformat\a or \b%\b\aformat\a\b.\b* then the record format "
+            "is set to \aformat\a. In addition, the \b-o\b path, if "
+            "specified and if it does not contain \b%\b and if it names a "
+            "regular file, is renamed to contain the input \b%\b\aformat\a.]"
+        "[+-?The first block of the first input file is sampled to check "
+            "for \bv\b variable length and \bf\b fixed length format "
+            "records. Not all formats are detected. \bsort\b exits with an "
+            "error diagnostic if the record format cannot be determined from "
+            "the sample.]"
+    "}"
+"[b:ignorespace|ignore-leading-blanks?Ignore leading white space (spaces "
+    "and tabs) in field comparisons.]"
+"[d:dictionary?`Phone directory' order: only letters, digits and white "
+    "space are significant in string comparisons.]"
+"[E:codeset|convert?The field data codeset is \acodeset\a or the field "
+    "data must be converted from the \afrom\a codeset to the \ato\a codeset. "
+    "The codesets are:]:[codeset|from::to]"
+    "{\fcodesets\f}"
 "[f:fold|ignorecase?Fold lower case letters onto upper case.]"
-"[h:scaled|human-readable?Compare numbers scaled with IEEE 1541-2002 suffixes.]"
-"[i:ignorecontrol?Ignore characters outside the ASCII range 040-0176 in"
-"	string comparisons.]"
-"[J:shuffle|jumble?Do a random shuffle of the sort keys. \aseed\a specifies"
-"	a pseudo random number generator seed. A \aseed\a of 0 generates a"
-"	seed based on time and pid.]#[seed]"
-"[n:numeric?An initial numeric string, consisting of optional white"
-"	space, optional sign, and a nonempty string of digits"
-"	with optional decimal point, is sorted by value.]"
+"[h:scaled|human-readable?Compare numbers scaled with IEEE 1541-2002 "
+    "suffixes.]"
+"[i:ignorecontrol?Ignore characters outside the ASCII range 040-0176 in "
+    "string comparisons.]"
+"[J:shuffle|jumble?Do a random shuffle of the sort keys. \aseed\a "
+    "specifies a pseudo random number generator seed. A \aseed\a of 0 "
+    "generates a seed based on time and pid.]#[seed]"
+"[n:numeric?An initial numeric string, consisting of optional white "
+    "space, optional sign, and a nonempty string of digits with optional "
+    "decimal point, is sorted by value.]"
 "[g:floating?Numeric, like \b-n\b, with \be\b-style exponents allowed.]"
-"[p:bcd|packed-decimal?Compare packed decimal (bcd) numbers with trailing"
-"	sign.]"
-"[M:months?Compare as month names. The first three characters"
-"	after optional white space are folded to lower case and"
-"	compared. Invalid fields compare low to \bjan\b.]"
+"[p:bcd|packed-decimal?Compare packed decimal (bcd) numbers with "
+    "trailing sign.]"
+"[M:months?Compare as month names. The first three characters after "
+    "optional white space are folded to lower case and compared. Invalid "
+    "fields compare low to \bjan\b.]"
 "[r:reverse|invert?Reverse the sense of comparisons.]"
 "[t:tabs?`Tab character' separating fields is \achar\a.]:[tab-char]"
-"[c:check?Check that the single input file is sorted according to"
-"	the ordering rules; give no output unless the file is"
-"	out of sort.]"
-"[j:processes|nproc|jobs?Use up to \ajobs\a separate processes to"
-"	sort the input. The current implementation still uses one process for"
-"	the final merge phase; improvements are planned.]#[processes]"
+"[c:check?Check that the single input file is sorted according to the "
+    "ordering rules; give no output on the standard output. If the input "
+    "is out of sort then write one diagnostic line on the standard error "
+    "and exit with code \b1\b.]"
+"[C:silent-check?Like \b--check\b except no diagnostic is written.]"
+"[j:processes|nproc|jobs?Use up to \ajobs\a separate processes to sort "
+    "the input. The current implementation still uses one process for the "
+    "final merge phase; improvements are planned.]#[processes]"
 "[m:merge?Merge; the input files are already sorted.]"
-"[u:unique?Unique. Keep only the first of two lines that compare"
-"	equal on all keys. Implies \b-s\b.]"
-"[s:stable?Stable sort. When all keys compare equal, preserve input order.]"
-"[S:unstable?Unstable sort. When all keys compare equal, break the tie"
-"	by using the entire record, ignoring all but the \b-r\b option."
-"	This is the default.]"
-"[o:output?Place output in the designated \afile\a instead of on the"
-"	standard output. This file may be the same as one of"
-"	the inputs. The \afile\a \b-\b names the standard output."
-"	The option may appear among the file arguments, except"
-"	after \b--\b.]:[output]"
-"[l:library?Load the external sort discipline \alibrary\a with optional comma"
-"	separated \aname=value\a arguments. Libraries are loaded, in left"
-"	to right order, after the sort method has been"
-"	initialized.]:[library[,name=value...]]]"
+"[u:unique?Unique. Keep only the first of two lines that compare equal "
+    "on all keys. Implies \b-s\b.]"
+"[s:stable?Stable sort. When all keys compare equal, preserve input "
+    "order. The default is \b--nostable\b (\aunstable\a sort): when all "
+    "keys compare equal, break the tie by using the entire record, ignoring "
+    "all but the \b-r\b option.]"
+"[o:output?Place output in the designated \afile\a instead of on the "
+    "standard output. This file may be the same as one of the inputs. The "
+    "\afile\a \b-\b names the standard output. The option may appear among "
+    "the file arguments, except after \b--\b.]:[output]"
+"[l:library?Load the external sort discipline \alibrary\a with optional "
+    "comma separated \aname=value\a arguments. Libraries are loaded, in left "
+    "to right order, after the sort method has been "
+    "initialized.]:[library[,name=value...]]]"
 "[T:tempdir?Put temporary files in \atempdir\a.]:[tempdir:=/usr/tmp]"
 "[L:list?List the available sort methods. See the \b-x\b option.]"
-"[x:method?Specify the sort method to apply:]:[method:=rasp]{\fmethods\f}"
-"[v:verbose?Trace the sort progress on the standard error.]"
-"[Z:zd|zoned-decimal?Compare zoned decimal (ZD) numbers with embedded"
-"	trailing sign.]"
-"[z:size|zip?Suggest using the specified number of bytes of internal store"
-"	to tune performance. Type is a single character and may be one"
-"	of:]:[type[size]]]{"
-"		[+a?Buffer alignment.]"
-"		[+b?Input reserve buffer size.]"
-"		[+c?Input chunk size; sort chunks of this size and disable merge.]"
-"		[+i?Input buffer size.]"
-"		[+m?Maximum number of intermediate merge files.]"
-"		[+p?Input sort size; sort chunks of this size before merge.]"
-"		[+o?Output buffer size.]"
-"		[+r?Maximum record size.]"
-"		[+I?Decompress the input if it is compressed.]"
-"		[+O?\bgzip\b(1) compress the output.]"
-"	}"
-"[y:size?Equivalent to \b-zi\b\asize\a.]:[size]"
-"[X:test?Enables implementation defined test code. Some or all of these"
-"	may be disabled.]:[test]{"
-"		[+dump?List detailed information on the option settings.]"
-"		[+io?List io file paths.]"
-"		[+keys?List the canonical key for each record.]"
-"		[+read?Force input file read by disabling memory mapping.]"
-"		[+show?Show setup information and exit before sorting.]"
-"		[+test?Immediatly exit with status 0; used to verify"
-"			this implementation]"
-"	}"
-"[D:debug?Sets the debug trace level. Higher levels produce more output.]#"
-"		[level]"
+"[x:method?Specify the sort method to apply:]:[method:=rasp]"
+    "{\fmethods\f} [v:verbose?Trace the sort progress on the standard "
+    "error.]"
+"[P:plugins?List plugin information for each \afile\a operand in "
+    "--\astyle\a on the standard error. If no \afile\a operands are "
+    "specified then the first instance of each \bsort\b plugin installed on "
+    "\b$PATH\b or a sibling dir on \b$PATH\b is listed. The special "
+    "\astyle\a \blist\b lists a line on the standard output for each plugin "
+    "with the name, a tab character, and plugin specific command line "
+    "options parameterized by \b${style}\b (suitable for \beval\b'ing in "
+    "\bsh\b(1).)]:[style:=list|man|html|nroff|usage]"
+"[Z:zd|zoned-decimal?Compare zoned decimal (ZD) numbers with embedded "
+    "trailing sign.]"
+"[z:size|zip?Suggest using the specified number of bytes of internal "
+    "store to tune performance. Power of 2 and power of 10 size suffixes are "
+    "accepted. Type is a single character and may be one of:]:[type[size]]]"
+    "{"
+        "[+a?Buffer alignment.]"
+        "[+b?Input reserve buffer size.]"
+        "[+c?Input chunk size; sort chunks of this size and disable "
+            "merge.]"
+        "[+i?Input buffer size.]"
+        "[+m?Maximum number of intermediate merge files.]"
+        "[+p?Input sort size; sort chunks of this size before merge.]"
+        "[+o?Output buffer size.]"
+        "[+r?Maximum record size.]"
+        "[+I?Decompress the input if it is compressed.]"
+        "[+O?\bgzip\b(1) compress the output.]"
+    "}"
+"[X:test?Enables implementation defined test code. Some or all of these "
+    "may be disabled.]:[test]"
+    "{"
+        "[+dump?List detailed information on the option settings.]"
+        "[+io?List io file paths.]"
+        "[+keys?List the canonical key for each record.]"
+        "[+read?Force input file read by disabling memory mapping.]"
+        "[+show?Show setup information and exit before sorting.]"
+        "[+test?Immediatly exit with status 0; used to verify this "
+            "implementation]"
+    "}"
+"[D:debug?Sets the debug trace level. Higher levels produce more "
+    "output.]# [level]"
+"[S|y?Equivalent to \b-zp\b\asize\a; if \asize\a has no suffix then \bki\b "
+    "is assumed.]:[size]"
 
 "\n"
 "\n[ file ... ]\n"
 "\n"
 
-"[+?+\apos1\a -\apos2\a is the classical alternative to \b-k\b,"
-"	with counting from 0 instead of 1, and pos2 designating"
-"	next-after-last instead of last character of the key."
-"	A missing character count in \apos2\a means 0, which in turn"
-"	excludes any \b-t\b tab character from the end of the key."
-"	Thus +1 -1.3 is the same as \b-k\b 2,2.3 and +1r -3 is the"
-"	same as \b-k\b 2r,3.]"
-"[+?Under option \b-t\b\ax\a fields are strings separated by \ax\a;"
-"	otherwise fields are non-empty strings separated by white space."
-"	White space before a field is part of the field, except"
-"	under option \b-b\b. A \bb\b flag may be attached independently to"
-"	\apos1\a and \apos2\a.]"
-"[+?When there are multiple sort keys, later keys are compared"
-"	only after all earlier keys compare equal. Except under"
-"	option \b-s\b, lines with all keys equal are ordered with all"
-"	bytes significant. \b-S\b turns off \b-s\b, the last occurrence,"
-"	left-to-right, takes affect.]"
-"[+?Sorting is done by a method determined by the \b-x\b option. \b-L\b"
-"	lists the available methods. rasp (radix+splay-tree) is the"
-"	default and current all-around best.]"
-"[+?Single-letter options may be combined into a single string,"
-"	such as \b-cnrt:\b. The option combination \b-di\b and the combination"
-"	of \b-n\b with any of \b-diM\b are improper. Posix argument"
-"	conventions are supported.]"
-"[+?Options \b-b\b, \b-c\b, \b-d\b, \b-f\b, \b-i\b, \b-k\b, \b-m\b,"
-"	\b-n\b, \b-o\b, \b-r\b, \b-t\b, and \b-u\b are in the Posix"
-"	and/or X/Open standards.]"
+"[+?+\apos1\a -\apos2\a is the classical alternative to \b-k\b, with "
+    "counting from 0 instead of 1, and pos2 designating next-after-last "
+    "instead of last character of the key. A missing character count in "
+    "\apos2\a means 0, which in turn excludes any \b-t\b tab character from "
+    "the end of the key. Thus +1 -1.3 is the same as \b-k\b 2,2.3 and +1r -3 "
+    "is the same as \b-k\b 2r,3.]"
+"[+?Under option \b-t\b\ax\a fields are strings separated by \ax\a; "
+    "otherwise fields are non-empty strings separated by white space. White "
+    "space before a field is part of the field, except under option \b-b\b. "
+    "A \bb\b flag may be attached independently to \apos1\a and \apos2\a.]"
+"[+?When there are multiple sort keys, later keys are compared only "
+    "after all earlier keys compare equal. Except under option \b-s\b, lines "
+    "with all keys equal are ordered with all bytes significant. \b-S\b "
+    "turns off \b-s\b, the last occurrence, left-to-right, takes affect.]"
+"[+?Sorting is done by a method determined by the \b-x\b option. \b-L\b "
+    "lists the available methods. rasp (radix+splay-tree) is the default and "
+    "current all-around best.]"
+"[+?Single-letter options may be combined into a single string, such as "
+    "\b-cnrt:\b. The option combination \b-di\b and the combination of "
+    "\b-n\b with any of \b-diM\b are improper. Posix argument conventions "
+    "are supported.]"
+"[+?Options \b-b\b, \b-c\b, \b-d\b, \b-f\b, \b-i\b, \b-k\b, \b-m\b, "
+    "\b-n\b, \b-o\b, \b-r\b, \b-t\b, and \b-u\b are in the Posix and/or "
+    "X/Open standards.]"
 
-"[+DIAGNOSTICS?\asort\a comments and exits with non-zero status for various"
-"	trouble conditions and for disorder discovered under option \b-c\b.]"
+"[+DIAGNOSTICS?\asort\a comments and exits with non-zero status for "
+    "various trouble conditions and for disorder discovered under option "
+    "\b-c\b.]"
 "[+SEE ALSO?\bcomm\b(1), \bjoin\b(1), \buniq\b(1), \brecsort\b(3)]"
-"[+CAVEATS?The never-documented default \apos1\a=0 for cases such as"
-"	\bsort -1\b has been abolished. An input file overwritten by \b-o\b"
-"	is not replaced until the entire output file is generated in the same"
-"	directory as the input, at which point the input is renamed.]"
+"[+CAVEATS?The never-documented default \apos1\a=0 for cases such as "
+    "\bsort -1\b has been abolished. An input file overwritten by \b-o\b is "
+    "not replaced until the entire output file is generated in the same "
+    "directory as the input, at which point the input is renamed.]"
 ;
 
 #include <sfio_t.h>
@@ -233,6 +247,7 @@ USAGE_LICENSE
 #include <vmalloc.h>
 #include <wait.h>
 #include <iconv.h>
+#include <dlldefs.h>
 
 #define INMIN		(1024)		/* min input buffer size	*/
 #define INBRK		(64*INMIN)	/* default heap increment	*/
@@ -249,7 +264,7 @@ USAGE_LICENSE
 #define pathstdin(s)	(!(s)||streq(s,"-")||streq(s,"/dev/stdin")||streq(s,"/dev/fd/0"))
 #define pathstdout(s)	(!(s)||streq(s,"-")||streq(s,"/dev/stdout")||streq(s,"/dev/fd/1"))
 
-typedef struct
+typedef struct Part_s
 {
 	Sfdisc_t	disc;		/* sfio discipline		*/
 	off_t		offset;		/* file offset			*/
@@ -257,7 +272,7 @@ typedef struct
 	off_t		remain;		/* read size remaining		*/
 } Part_t;
 
-typedef struct
+typedef struct Job_s
 {
 	off_t		offset;		/* file part offset		*/
 	off_t		size;		/* file part size		*/
@@ -265,7 +280,7 @@ typedef struct
 	int		intermediates;	/* number of intermediate files	*/
 } Job_t;
 
-typedef struct
+typedef struct Sort_s
 {
 	Rskeydisc_t	disc;		/* rskey discipline		*/
 	Rs_t*		rec;		/* rsopen() context		*/
@@ -332,6 +347,14 @@ verify(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 	return 0;
 }
 
+static int
+verify_silent(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
+{
+	if (op == RS_VERIFY)
+		exit(1);
+	return 0;
+}
+
 /*
  * return read stream for path
  */
@@ -367,6 +390,66 @@ fileopen(register Sort_t* sp, const char* path)
 	return fp;
 }
 
+/*
+ * prevent ERROR_USAGE|4 messages from exiting
+ */
+
+static void
+noexit(int code)
+{
+}
+
+/*
+ * list info for one plugin on the standard error
+ */
+
+static void
+showlib(Sort_t* sp, Rskey_t* kp, const char* name, const char* style)
+{
+	char*		args;
+	char		buf[128];
+
+	if (style)
+		sfsprintf(args = buf, sizeof(buf), "%s,%s", name, style);
+	else
+		args = (char*)name;
+	if (!rslib(sp->rec, kp, args, RS_IGNORE) && !style)
+		sfprintf(sfstdout, "%s\t--library=%s,${style}\n", name, name);
+}
+
+/*
+ * list info for all [selected] plugins on the standard error
+ */
+
+static int
+showplugins(Sort_t* sp, Rskey_t* kp, const char* style)
+{
+	Dllscan_t*	dls;
+	Dllent_t*	dle;
+	char*		name;
+	void		(*oexit)(int);
+
+	if (streq(style, "list"))
+		style = 0;
+	else
+	{
+		oexit = error_info.exit;
+		error_info.exit = noexit;
+	}
+	if (*kp->input)
+		while (name = *kp->input++)
+			showlib(sp, kp, name, style);
+	else if (dls = dllsopen("sort", NiL, NiL))
+	{
+		while (dle = dllsread(dls))
+			showlib(sp, kp, dle->name, style);
+		dllsclose(dls);
+	}
+	if (style)
+		error_info.exit = oexit;
+	return 0;
+}
+
 struct Lib_s; typedef struct Lib_s Lib_t;
 
 struct Lib_s
@@ -392,12 +475,13 @@ parse(register Sort_t* sp, char** argv)
 	size_t			z;
 	int			i;
 	int			map;
+	char*			plugins = 0;
 	Lib_t*			firstlib = 0;
 	Lib_t*			lastlib = 0;
 	Lib_t*			lib;
 	Recfmt_t		r;
 	int			obsolescent = 1;
-	char			opt[16];
+	char			opt[64];
 	Optdisc_t		optdisc;
 	struct stat		st;
 
@@ -409,12 +493,13 @@ parse(register Sort_t* sp, char** argv)
 		case 0:
 			break;
 		case 'c':
+		case 'C':
 			obsolescent = 0;
 			key->meth = Rsverify;
 			key->disc->events = RS_VERIFY;
-			key->disc->eventf = verify;
+			key->disc->eventf = opt_info.option[1] == 'C' ? verify_silent : verify;
 			continue;
-		case 'C':
+		case 'E':
 		case 'J':
 			sfsprintf(opt, sizeof(opt), "%c%s", opt_info.option[1], opt_info.arg);
 			if (rskeyopt(key, opt, 1))
@@ -443,14 +528,23 @@ parse(register Sort_t* sp, char** argv)
 			key->output = opt_info.arg;
 			continue;
 		case 's':
-			key->type &= ~RS_DATA;
+			if (opt_info.num)
+				key->type &= ~RS_DATA;
+			else
+				key->type |= RS_DATA;
 			continue;
 		case 't':
-			if (key->tab)
-				error(1, "%s: %c conflicts with %c", opt_info.option, *opt_info.arg, key->tab);
-			if (*(opt_info.arg + 1))
-				error(1, "%s %s: single character expected", opt_info.option, opt_info.arg);
-			key->tab = *opt_info.arg;
+			if (key->tab[0])
+				error(1, "%s: %s conflicts with %s", opt_info.option, *opt_info.arg, key->tab);
+			if ((n = mbsize(opt_info.arg)) < 1)
+			{
+				error(1, "%s: %s: invalid tab character", opt_info.option, opt_info.arg);
+				n = 0;
+			}
+			if (*(opt_info.arg + n) || n >= sizeof(key->tab))
+				error(1, "%s: %s: single character expected", opt_info.option, opt_info.arg);
+			memcpy(key->tab, opt_info.arg, n);
+			key->tab[n] = 0;
 			continue;
 		case 'u':
 			key->type &= ~RS_DATA;
@@ -464,10 +558,6 @@ parse(register Sort_t* sp, char** argv)
 			if (!(key->meth = rskeymeth(key, opt_info.arg)))
 				error(2, "%s: unknown method", opt_info.arg);
 			continue;
-		case 'y':
-			n = 'i';
-			s = opt_info.arg;
-			goto size;
 		case 'z':
 			if (isalpha(n = *(s = opt_info.arg)))
 				s++;
@@ -475,6 +565,11 @@ parse(register Sort_t* sp, char** argv)
 				n = 'r';
 		size:
 			z = strton(s, &e, NiL, 1);
+			if (*e == '%')
+			{
+				error(2, "%s %c%s: %% not supported -- do you really want that much memory?", opt_info.option, n, s);
+				return -1;
+			}
 			if (*e || z < ((n == 'm' || n == 'o' || n == 'r' || isupper(n)) ? 0 : 512))
 			{
 				error(2, "%s %c%s: invalid size", opt_info.option, n, s);
@@ -532,6 +627,9 @@ parse(register Sort_t* sp, char** argv)
 		case 'L':
 			rskeylist(key, sfstdout, 0);
 			exit(0);
+		case 'P':
+			plugins = opt_info.arg;
+			continue;
 		case 'R':
 			key->disc->data = recstr(opt_info.arg, &e);
 			if (*e)
@@ -541,8 +639,15 @@ parse(register Sort_t* sp, char** argv)
 			}
 			continue;
 		case 'S':
-			key->type |= RS_DATA;
-			continue;
+		case 'y':
+			n = 'p';
+			s = opt_info.arg;
+			if (*s && *(e = s + strlen(s) - 1) != '%' && !isalpha(*e))
+			{
+				sfsprintf(opt, sizeof(opt), "%ski", s);
+				s = opt;
+			}
+			goto size;
 		case 'T':
 			pathtemp(NiL, 0, opt_info.arg, "/TMPPATH", NiL);
 			continue;
@@ -625,11 +730,18 @@ parse(register Sort_t* sp, char** argv)
 
 	while (lib = firstlib)
 	{
-		if (rslib(sp->rec, key, lib->name))
+		if (rslib(sp->rec, key, lib->name, 0))
 			return 1;
 		firstlib = firstlib->next;
 		free(lib);
 	}
+
+	/*
+	 * plugins list bails early
+	 */
+
+	if (plugins)
+		exit(showplugins(sp, key, plugins));
 
 	/*
 	 * record format chicanery

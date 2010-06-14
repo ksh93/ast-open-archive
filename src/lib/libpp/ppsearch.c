@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1986-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1986-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -289,7 +289,7 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 					*t = 0;
 					if (!streq(s, VDB_DIRECTORY))
 					{
-						pathcanon(s, 0);
+						pathcanon(s, 0, 0);
 						ap = newof(0, struct ppmember, 1, 0);
 						ap->archive = dp;
 						ap->offset = strtol(t + 1, &t, 10);
@@ -370,7 +370,7 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 						strcpy(pp.path, fp->name);
 					else
 						sfsprintf(pp.path, PATH_MAX - 1, "%s/%s", dp->name, fp->name);
-					pathcanon(pp.path, 0);
+					pathcanon(pp.path, 0, 0);
 					if (!xp || !streq(xp->name, pp.path))
 					{
 						fp->bound[index] = xp = ppsetfile(pp.path);
@@ -418,7 +418,7 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 				strcpy(pp.path, fp->name);
 			else
 				sfsprintf(pp.path, PATH_MAX - 1, "%s/%s", dp->name, fp->name);
-			pathcanon(pp.path, 0);
+			pathcanon(pp.path, 0, 0);
 			if (!(flags & SEARCH_SKIP))
 			{
 				int		found;
@@ -616,7 +616,7 @@ ppsearch(char* file, int type, int flags)
 	else
 		dospath = 0;
  again:
-	pathcanon(file, 0);
+	pathcanon(file, 0, 0);
 	if (chop)
 		for (cp = pp.chop; cp; cp = cp->next)
 			if (strneq(file, cp->value, cp->op))
@@ -738,7 +738,7 @@ ppsearch(char* file, int type, int flags)
 			if (fd >= 0)
 			{
 				sfsprintf(name, sizeof(name) - 1, "%s/%s", pp.in->prefix, fp->name);
-				pathcanon(name, 0);
+				pathcanon(name, 0, 0);
 				xp = ppsetfile(name);
 				if ((fd = search(xp, dp, type, flags)) >= 0)
 					return fd;
@@ -770,7 +770,7 @@ ppsearch(char* file, int type, int flags)
 			{
 				file[1] = file[0];
 				file[0] = '/';
-				pathcanon(file, 0);
+				pathcanon(file, 0, 0);
 				dospath = 2;
 				goto again;
 			}

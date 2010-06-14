@@ -58,7 +58,6 @@ share : genshare FEATURE/lib $(SHAREDIR)
 	then	{
 		rsh=`$(SED) -e '/^#define CS_REMOTE_SHELL/!d' -e 's/.*"\(.*\)".*/\1/' $(*:O=2)`
 		echo "#!!! 1 to update this file: $INSTALLROOT/lib/$(ID)/$(*:O=1) -d $(*:O=3) -r $rsh > $(<) !!!"
-		$(*:O=1) -d $(*:O=3) -r $rsh
 		} > $(<)
 	fi
 
@@ -67,7 +66,6 @@ share : genshare FEATURE/lib $(SHAREDIR)
 	then	{
 		rsh=`$(SED) -e '/^#define CS_REMOTE_SHELL/!d' -e 's/.*"\(.*\)".*/\1/' $(*:O=2)`
 		echo "#!!! 1 to update this file: $INSTALLROOT/lib/$(ID)/$(*:O=1) -r $rsh > $(<) !!!"
-		ignore $(*:O=1) -f $(*:O=3) -r $rsh local
 		} > $(<)
 	fi
 

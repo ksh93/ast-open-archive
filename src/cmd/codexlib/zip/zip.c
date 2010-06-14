@@ -84,7 +84,7 @@ Codexmeth_t	codex_zip =
 	0,
 	0,
 	0,
-	CODEXNEXT(codex_zip_next)
+	CODEXNEXT(zip)
 };
 
-CODEXLIB(&codex_zip)
+CODEXLIB(zip)

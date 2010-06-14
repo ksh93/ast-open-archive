@@ -26,6 +26,8 @@ function DATA
 				done
 			done
 			;;
+		empty)	mkdir -p empty
+			;;
 		match)	mkdir -p match/.ghi match/jkl
 			: > match/.abc > match/def
 			: > match/.ghi/.mno > match/.ghi/pqr
@@ -185,6 +187,12 @@ data/zzz/333/7/s.z'
 	EXEC	--P data -sort -name --print
 	EXEC	-physical data -sort -name --print
 	EXEC	--physical data -sort -name --print
+	EXEC	foo
+		OUTPUT -
+		ERROR - $'find: foo: not found'
+		EXIT 1
+	EXEC	foo bar
+		ERROR - $'find: foo: not found\nfind: bar: not found'
 
 TEST 02 'patterns'
 	DO	DATA data
@@ -1103,7 +1111,14 @@ size/5457
 size/5778'
 
 TEST 07 '[ -exec -xargs ] X {} X [ ; + ]'
-	DO	DATA mode
+	DO	DATA empty mode
+	EXEC	empty -exec echo \;
+		OUTPUT - $'empty'
+	EXEC	empty -exec echo {} \;
+	EXEC	empty -exec echo {} {} \;
+		OUTPUT - $'empty empty'
+	EXEC	empty -exec echo {} {} {} \;
+		OUTPUT - $'empty empty empty'
 	EXEC	mode -sort -name -exec echo ';'
 		OUTPUT - $'mode\nmode/000\nmode/111\nmode/222\nmode/333\nmode/444\nmode/555\nmode/666\nmode/777'
 	EXEC	mode -sort -name -exec echo {} ';'

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -111,6 +111,8 @@ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_
 done FEATURE/peek dontcare generated
 make ../../lib/libcs/msg.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -155,9 +157,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 done ../../lib/libcs/msg.h dontcare
@@ -198,8 +197,8 @@ prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make lib_3d.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev std_3d.h implicit
 make dll_3d.h implicit
 prev ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
@@ -409,6 +408,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/path/pathtemp.c dontcare
 make ../../lib/libast/path/pathcat.c implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/path/pathcat.c dontcare
 make ../../lib/libast/comp/eaccess.c implicit
@@ -452,7 +452,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/getwd.c
 make ../../lib/libast/misc/getcwd.c implicit
 prev ${PACKAGE_ast_INCLUDE}/fs3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_dir.h implicit
 make ${PACKAGE_ast_INCLUDE}/dirent.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_dirent.h implicit
@@ -476,6 +475,8 @@ done ../../lib/libast/dir/dirlib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_dir.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev FEATURE/syscall implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/misc/getcwd.c
 make ../../lib/libast/misc/setenviron.c implicit
@@ -503,7 +504,7 @@ prev 3d.h implicit
 done ast.c
 meta ast.o %.c>%.o ast.c ast
 prev ast.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -D_PACKAGE_ast -DFS -DDEBUG -D_BLD_3d -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -D_PACKAGE_ast -D_BLD_3d -DFS -DDEBUG -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
 done ast.o generated
 make cs.o
 make cs.c

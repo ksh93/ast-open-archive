@@ -4,7 +4,7 @@ LICENSE = since=2003,author=gsf
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
-tst plugin=dss :LIBRARY: test.c -ldss
+test plugin=dss :LIBRARY: test.c lib.c -ldss
 
 :TEST: dss
 

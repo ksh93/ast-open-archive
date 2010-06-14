@@ -345,7 +345,7 @@ Paxformat_t	pax_zip_format =
 	PAX_DEFBUFFER,
 	PAX_DEFBLOCKS,
 	0,
-	PAXNEXT(pax_zip_next),
+	PAXNEXT(zip),
 	0,
 	zip_done,
 	zip_getprologue,
@@ -353,4 +353,4 @@ Paxformat_t	pax_zip_format =
 	zip_getdata,
 };
 
-PAXLIB(&pax_zip_format)
+PAXLIB(zip)

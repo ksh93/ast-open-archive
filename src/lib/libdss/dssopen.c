@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,14 +26,17 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss library (AT&T Research) 2008-06-11 $\n]"
+"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2010-04-22 $\n]"
 USAGE_LICENSE
-"[+NAME?\findex\f]"
-"[+DESCRIPTION?The \bdss\b default method schema is a pure XML (tags only)"
-"	file that specifies the \bdss\b method and optional field value maps"
-"	and constraints. Public schemas are usually placed in a"
-"	\b../lib/dss\b sibling directory on \b$PATH\b. The supported tags"
-"	are:]{"
+"[+PLUGIN?\findex\f]"
+"[+DESCRIPTION?The \bdss\b default method provides types, global "
+    "variables, and a schema available for all other methods.]"
+"{\fvariables\f}"
+"[+?The schema is a pure XML (tags "
+    "only) file that specifies the \bdss\b method and optional field value "
+    "maps and constraints. Public schemas are usually placed in a "
+    "\b../lib/dss\b sibling directory on \b$PATH\b. The supported tags are:]"
+"{"
 ;
 
 #include "dsshdr.h"
@@ -48,6 +51,26 @@ static const char	id[] = DSS_ID;
 
 static Dssstate_t	state;
 
+#define DSS_MEM_file		1
+#define DSS_MEM_format		2
+#define DSS_MEM_length		3
+#define DSS_MEM_offset		4
+#define DSS_MEM_queried		5
+#define DSS_MEM_record		6
+#define DSS_MEM_selected	7
+
+static Cxvariable_t dss_mem_struct[] =
+{
+CXV("file",     "string", DSS_MEM_file,     "Current record file name.")
+CXV("format",   "string", DSS_MEM_format,   "Current record format.")
+CXV("length",   "number", DSS_MEM_length,   "Current record length (always 0 for some formats.)")
+CXV("offset",   "number", DSS_MEM_offset,   "Current record offset (always 0 for some formats.).")
+CXV("queried",  "number", DSS_MEM_queried,  "Current queried record count.")
+CXV("record",   "number", DSS_MEM_record,   "Current record number.")
+CXV("selected", "number", DSS_MEM_selected, "Current selected record count.")
+{0}
+};
+
 /*
  * find and open file for read
  */
@@ -59,13 +82,20 @@ dssfind(const char* name, const char* suffix, Dssflags_t flags, char* path, size
 
 	if (!suffix)
 		suffix = id;
-	if (!pathfind(name, id, suffix, path, size))
+	if (*name == ':')
+	{
+		sfsprintf(path, size, "%s", "schema-string");
+		sp = sfnew(NiL, (char*)name + 1, strlen(name) - 1, -1, SF_READ|SF_STRING);
+	}
+	else if (!pathfind(name, id, suffix, path, size))
 	{
 		if ((flags & DSS_VERBOSE) && disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: %s file not found", name, suffix);
 		return 0;
 	}
-	else if (!(sp = sfopen(NiL, path, "r")))
+	else
+		sp = sfopen(NiL, path, "r");
+	if (!sp)
 	{
 		if ((flags & DSS_VERBOSE) && disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: cannot read %s file", path, suffix);
@@ -84,6 +114,8 @@ loadtags(const char* name, const char* suffix, Dssdisc_t* disc, Dssmeth_t* meth)
 	Sfio_t*		sp;
 	char		path[PATH_MAX];
 
+	if (streq(name, DSS_ID))
+		return meth;
 	if (!(sp = dssfind(name, suffix, DSS_VERBOSE, path, sizeof(path), disc)))
 		return 0;
 	return dsstags(sp, path, 1, 0, disc, meth);
@@ -176,6 +208,16 @@ static Dssformat_t	dss_format =
 	dssclosef
 };
 
+static Dssmeth_t*	dssmethf(const char*, const char*, const char*, Dssdisc_t*, Dssmeth_t*);
+
+static Dssmeth_t	dss_method =
+{
+	&id[0],
+	"meta-method that specifies a method, value maps and constraints",
+	CXH,
+	dssmethf
+};
+
 /*
  * dss methf
  */
@@ -209,6 +251,8 @@ dssmethf(const char* name, const char* options, const char* schema, Dssdisc_t* d
 			sfclose(up);
 			return 0;
 		}
+		dss_method.data = dss_mem_struct;
+		state.global = &dss_method;
 		for (;;)
 		{
 			switch (optstr(options, us))
@@ -224,6 +268,7 @@ dssmethf(const char* name, const char* options, const char* schema, Dssdisc_t* d
 			}
 			break;
 		}
+		state.global = 0;
 		sfclose(up);
 	}
 	if (schema)
@@ -231,14 +276,6 @@ dssmethf(const char* name, const char* options, const char* schema, Dssdisc_t* d
 	dtinsert(meth->formats, &dss_format);
 	return meth;
 }
-
-static Dssmeth_t	dss_method =
-{
-	&id[0],
-	"A pseudo-method that specifies a method, value maps and constraints.",
-	CXH,
-	dssmethf
-};
 
 #include "dss-compress.h"
 #include "dss-count.h"
@@ -344,6 +381,8 @@ dsslib(const char* name, Dssflags_t flags, Dssdisc_t* disc)
 		}
 		return (Dsslib_t*)dtfirst(state.cx->libraries);
 	}
+	if (streq(name, DSS_ID "_s") || streq(name, DSS_ID "_t")) /* XXX: must be a better way around this */
+		return 0;
 
 	/*
 	 * determine the base name
@@ -376,7 +415,7 @@ dsslib(const char* name, Dssflags_t flags, Dssdisc_t* disc)
 
 		test[order] = (char*)name;
 		test[!order] = base;
-		if (!(dll = dllplug(id, test[0], NiL, RTLD_LAZY, path, sizeof(path))) && (streq(test[0], test[1]) || !(dll = dllplug(id, test[1], NiL, RTLD_LAZY, path, sizeof(path)))))
+		if (!(dll = dllplugin(id, test[0], NiL, DSS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path))) && (streq(test[0], test[1]) || !(dll = dllplugin(id, test[1], NiL, DSS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path)))))
 		{
 			if ((flags & DSS_VERBOSE) && disc->errorf)
 				(*disc->errorf)(NiL, disc, 2, "%s: library not found", name);
@@ -401,7 +440,7 @@ dssadd(register Dsslib_t* lib, Dssdisc_t* disc)
 	lib->header.flags |= CX_INITIALIZED;
 	if (lib->libraries)
 		for (i = 0; lib->libraries[i]; i++)
-			if (dssload(lib->libraries[i], disc))
+			if (!dssload(lib->libraries[i], disc))
 				return -1;
 	if (lib->types)
 		for (i = 0; lib->types[i].name; i++)
@@ -440,14 +479,14 @@ dssadd(register Dsslib_t* lib, Dssdisc_t* disc)
  * find and add library name
  */
 
-int
+Dsslib_t*
 dssload(const char* name, Dssdisc_t* disc)
 {
 	Dsslib_t*	lib;
 
 	if (!(lib = dsslib(name, DSS_VERBOSE, disc)))
-		return -1;
-	return dssadd(lib, disc);
+		return 0;
+	return dssadd(lib, disc) ? 0 : lib;
 }
 
 /*
@@ -487,20 +526,6 @@ location(Cx_t* cx, void* data, Cxdisc_t* disc)
 	return loc;
 }
 
-#define DSS_MEM_file	1
-#define DSS_MEM_format	2
-#define DSS_MEM_offset	3
-#define DSS_MEM_record	4
-
-static Cxvariable_t dss_mem_struct[] =
-{
-CXV("file",   "string", DSS_MEM_file,   "Current record file name.")
-CXV("format", "string", DSS_MEM_format, "Current record format.")
-CXV("offset", "number", DSS_MEM_offset, "Current record offset.")
-CXV("record", "number", DSS_MEM_record, "Current record number.")
-{0}
-};
-
 static int
 dss_mem_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
@@ -516,11 +541,20 @@ dss_mem_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxope
 		r->value.string.data = (char*)file->format->name;
 		r->value.string.size = strlen(file->format->name);
 		break;
+	case DSS_MEM_length:
+		r->value.number = file->length;
+		break;
 	case DSS_MEM_offset:
 		r->value.number = file->offset;
 		break;
+	case DSS_MEM_queried:
+		r->value.number = cx->expr ? cx->expr->parent->queried : 0;
+		break;
 	case DSS_MEM_record:
 		r->value.number = file->count;
+		break;
+	case DSS_MEM_selected:
+		r->value.number = cx->expr ? cx->expr->parent->selected : 0;
 		break;
 	default:
 		return -1;
@@ -543,6 +577,7 @@ static Cxtype_t		dss_type[] =
 
 static Cxvariable_t	dss_var[] =
 {
+	CXV(".",	DSS_ID "_t",	0,	"Global State.")
 	CXV(DSS_ID,	DSS_ID "_t",	0,	"Global State.")
 };
 
@@ -603,6 +638,8 @@ dssopen(Dssflags_t flags, Dssflags_t test, Dssdisc_t* disc, Dssmeth_t* meth)
 	dss->flags = flags;
 	dss->test = test;
 	dss->state = &state;
+	if (!meth->cx)
+		dssmethinit(NiL, NiL, NiL, disc, meth);
 	if (!(dss->cx = cxscope(NiL, meth->cx, flags & DSS_CX_FLAGS, test, disc)) || disc->map && !loadtags(disc->map, "map", disc, meth))
 		goto bad;
 	dss->cx->caller = dss;
@@ -672,21 +709,23 @@ dssmethinit(const char* name, const char* options, const char* schema, Dssdisc_t
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return 0;
 	}
-	if (meth->methf)
+	if (name)
 	{
-		ometh = meth;
-		opt = opt_info;
-		state.cx->header = (Cxheader_t*)meth;
-		meth = (*meth->methf)(name, options, schema, disc, meth);
-		opt_info = opt;
-		if (!meth)
+		if (meth->methf)
+		{
+			ometh = meth;
+			opt = opt_info;
+			state.cx->header = (Cxheader_t*)meth;
+			state.meth = meth;
+			meth = (*meth->methf)(name, options, schema, disc, meth);
+			opt_info = opt;
+			if (!meth)
+				return 0;
+			if (meth != ometh)
+				dtinsert(state.cx->methods, meth);
+		}
+		else if (options)
 			return 0;
-		if (meth != ometh)
-			dtinsert(state.cx->methods, meth);
-	}
-	else if (options)
-	{
-		return 0;
 	}
 	return state.meth = meth;
 }
@@ -848,6 +887,8 @@ dssrun(Dss_t* dss, const char* expression, const char* head, const char* tail, c
 				goto bad;
 			}
 			x->vm = expr->vm;
+			x->done = expr->done;
+			x->stack = expr->stack;
 			x->op = expr->op;
 			x->query = (Cxquery_t*)(x + 1);
 			x->group = expr;

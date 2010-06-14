@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*          Copyright (c) 1986-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -72,9 +72,9 @@ exists(int op, char* pred, register char* args)
 		{
 			while ((c = pplex()) == T_STRING)
 			{
-				if (pathaccess(pp.path, pp.token, file, NiL, 0))
+				if (pathaccess(pp.token, file, NiL, 0, pp.path, MAXTOKEN + 1))
 				{
-					pathcanon(pp.path, 0);
+					pathcanon(pp.path, 0, 0);
 					message((-2, "%s: %s found", pred, pp.path));
 					c = 1;
 					goto done;

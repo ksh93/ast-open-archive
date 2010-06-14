@@ -294,7 +294,7 @@ Paxformat_t	pax_zoo_format =
 	PAX_DEFBUFFER,
 	PAX_DEFBLOCKS,
 	0,
-	PAXNEXT(pax_zoo_next),
+	PAXNEXT(zoo),
 	0,
 	zoo_done,
 	zoo_getprologue,
@@ -302,4 +302,4 @@ Paxformat_t	pax_zoo_format =
 	zoo_getdata,
 };
 
-PAXLIB(&pax_zoo_format)
+PAXLIB(zoo)

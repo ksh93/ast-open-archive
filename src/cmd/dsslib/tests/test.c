@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,10 +26,10 @@ typedef struct State_s
 	Cxunsigned_t	selected;
 } State_t;
 
+extern Dsslib_t		dss_lib_test;
+
 static const char even_usage[] =
-"[-1?\n@(#)$Id: dss even test query (AT&T Research) 2003-09-22 $\n]"
-USAGE_LICENSE
-"[+LIBRARY?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \beven\b test query selects even ordinal records.]"
 "\n"
 "\n[ file ... ]\n"
@@ -40,6 +40,7 @@ static int
 even_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	State_t*	state;
+	char*		s;
 	int		errors;
 
 	errors = error_info.errors;
@@ -50,9 +51,11 @@ even_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		return -1;
 	}
 	expr->data = state;
+	sfprintf(cx->buf, "%s%s", strchr(dss_lib_test.description, '['), even_usage);
+	s = sfstruse(cx->buf);
 	for (;;)
 	{
-		switch (optget((char**)data, even_usage))
+		switch (optget((char**)data, s))
 		{
 		case '?':
 			if (disc->errorf)
@@ -106,9 +109,7 @@ even_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 }
 
 static const char odd_usage[] =
-"[-1?\n@(#)$Id: dss odd test query (AT&T Research) 2003-09-22 $\n]"
-USAGE_LICENSE
-"[+LIBRARY?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bodd\b test query selects odd ordinal records.]"
 "\n"
 "\n[ file ... ]\n"
@@ -119,6 +120,7 @@ static int
 odd_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	State_t*	state;
+	char*		s;
 	int		errors;
 
 	errors = error_info.errors;
@@ -129,9 +131,11 @@ odd_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		return -1;
 	}
 	expr->data = state;
+	sfprintf(cx->buf, "%s%s", strchr(dss_lib_test.description, '['), odd_usage);
+	s = sfstruse(cx->buf);
 	for (;;)
 	{
-		switch (optget((char**)data, odd_usage))
+		switch (optget((char**)data, s))
 		{
 		case '?':
 			if (disc->errorf)
@@ -188,7 +192,7 @@ static Cxquery_t	queries[] =
 {
 	{
 		"even",
-		"Select even ordinal records.",
+		"select even ordinal records",
 		CXH,
 		even_beg,
 		even_sel,
@@ -197,7 +201,7 @@ static Cxquery_t	queries[] =
 	},
 	{
 		"odd",
-		"Select odd ordinal records.",
+		"select odd ordinal records",
 		CXH,
 		odd_beg,
 		odd_sel,
@@ -207,10 +211,12 @@ static Cxquery_t	queries[] =
 	{0}
 };
 
-static Dsslib_t		lib =
+Dsslib_t		dss_lib_test =
 {
 	"test",
-	"test queries",
+	"test queries"
+	"[-1lms5P?\n@(#)$Id: dss test queries (AT&T Research) 2003-09-22 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,
@@ -220,9 +226,3 @@ static Dsslib_t		lib =
 	0,
 	&queries[0]
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

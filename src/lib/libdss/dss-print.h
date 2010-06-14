@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,26 +24,29 @@
  */
 
 static const char print_usage[] =
-"[-1l?\n@(#)$Id: dss print query (AT&T Research) 2003-02-19 $\n]"
+"[-1ls5P?\n@(#)$Id: dss print query (AT&T Research) 2010-04-22 $\n]"
 USAGE_LICENSE
-"[+NAME?\findex\f]"
-"[+DESCRIPTION?The \bdss\b \bprint\b query formats and prints the"
-"	current record according to \aformat\a. If \aformat\a is omitted"
-"	then the default method \bprint\b format is used; an error occurs if"
-"	there is no default \bprint\b format.]"
-"[+?\aformat\a follows \bprintf\b(3) conventions, except"
-"	that \bsfio\b(3) inline ids are used instead of arguments:"
-"	%[-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
-"	If \achar\a is \bs\b then the string form of the item is listed,"
-"	otherwise the corresponding numeric form is listed. If \achar\a is"
-"	\bq\b then the string form of the item is $'...' quoted if it contains"
-"	space or non-printing characters. If \awidth\a is omitted then the"
-"	default width is assumed. \asubformat\a optionally specifies field"
-"	specific subformats. For example, a \bstrftime\b(3) format for time"
-"	fields, or a field separator for array fields. The \bdf\b(1),"
-"	\bls\b(1) and \bpax\b(1) commands have \b--format\b options in this"
-"	same style.]"
-"[+?The default print format is \fprint\f.]"
+"[+PLUGIN?\findex\f]"
+"[+DESCRIPTION?The \bdss\b \bprint\b query formats and prints the "
+    "current record according to \aformat\a. If \aformat\a is omitted then "
+    "the default method \bprint\b format is used; an error occurs if there "
+    "is no default \bprint\b format.]"
+"[+?\aformat\a follows \bprintf\b(3) conventions, except that "
+    "\bsfio\b(3) inline ids are used instead of arguments: "
+    "%[-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\adetails\a]])\achar\a.]"
+"[+?If \achar\a is \bs\b then the string form of the value of \aid\a is "
+    "listed, otherwise the corresponding numeric form is listed. If "
+    "\awidth\a is omitted then the default width is assumed. \adetails\a "
+    "optionally specify field type specific details. Documentation for "
+    "format details appear with \bdss\b types that support them. For "
+    "example, a \bstrftime\b(3) format for \btime_t\b fields, or a field "
+    "separator for array fields.]"
+"[+?A format specification %(:\adetails\a:)\achar\a (\aid\a omitted) "
+    "causes no output but instead specifies default \adetails\a for all "
+    "subsequent %...\achar\a. Multiple default specifications may appear.]"
+"[+?The default print format is \fprint\f. The \bdf\b(1), \bls\b(1), "
+    "\bpax\b(1) and \bps\b(1) commands have \b--format\b options in this "
+    "same style.]"
 "\n"
 "\n[ format ]\n"
 "\n";
@@ -87,13 +90,28 @@ print_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_USAGE|4, "%s", optusage(NiL));
 		return -1;
 	}
-	return 0;
+	return cx->referencef ? dssprintf(DSS(cx), 0, (char*)expr->data, NiL) : 0;
 }
 
 static int
 print_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	return dssprintf(DSS(cx), expr->op, (char*)expr->data, data);
+}
+
+static int
+print_ref(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
+{
+	char*	s;
+	char**	a;
+
+	if (cx->referencef && (a = (char**)data) && *a++)
+		while (s = *a++)
+			if (*s != '-')
+				return dssprintf(DSS(cx), 0, s, NiL);
+			else if (*(s + 1) == '-' && !*(s + 2))
+				return *a ? dssprintf(DSS(cx), 0, *a, NiL) : 0;
+	return 0;
 }
 
 #define QUERY_print \
@@ -104,5 +122,8 @@ print_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		print_beg, \
 		0, \
 		print_act, \
+		0, \
+		0, \
+		print_ref, \
 		0 \
 	}

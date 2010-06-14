@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -29,12 +29,13 @@ typedef Rsdisc_t* (*Rslib_f)(Rskey_t*, const char*);
 
 int
 #if __STD_C
-rslib(Rs_t* rs, Rskey_t* kp, const char* lib)
+rslib(Rs_t* rs, Rskey_t* kp, const char* lib, int flags)
 #else
-rslib(rs, kp, lib)
+rslib(rs, kp, lib, flags)
 Rs_t*		rs;
 Rskey_t*	kp;
 const char*	lib;
+int		flags;
 #endif
 {
 	register char*		s;
@@ -48,20 +49,22 @@ const char*	lib;
 
 	for (s = (char*)lib; *s && *s != ',' && *s != '\t' && *s != '\r' && *s != '\n'; s++);
 	sfsprintf(path, sizeof(path), "%-.*s", s - (char*)lib, lib);
-	if (!(dll = dllplug("sort", path, NiL, RTLD_LAZY, path, sizeof(path))))
+	if (!(dll = dllplugin("sort", path, NiL, RS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path))))
 	{
-		if (kp->keydisc->errorf)
+		if (!(flags & RS_IGNORE) && kp->keydisc->errorf)
 			(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: library not found", path);
 		return -1;
 	}
 	if (!(fun = (Rslib_f)dlllook(dll, symbol)))
 	{
-		if (kp->keydisc->errorf)
+		if (!(flags & RS_IGNORE) && kp->keydisc->errorf)
 			(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: %s: initialization function not found in library", path, symbol);
 		return -1;
 	}
 	if (*s)
 		s++;
+	else if (flags & RS_IGNORE)
+		return 0;
 	opt = opt_info;
 	disc = (*fun)(kp, s);
 	opt_info = opt;

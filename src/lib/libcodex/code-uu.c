@@ -514,7 +514,7 @@ Codexmeth_t	codex_uu =
 	0,
 	0,
 	0,
-	CODEXNEXT(codex_uu_next)
+	CODEXNEXT(uu)
 };
 
-CODEXLIB(&codex_uu)
+CODEXLIB(uu)

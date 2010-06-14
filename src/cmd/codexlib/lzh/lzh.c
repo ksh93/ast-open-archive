@@ -1251,7 +1251,7 @@ Codexmeth_t	codex_lzh =
 	0,
 	0,
 	0,
-	CODEXNEXT(codex_lzh_next)
+	CODEXNEXT(lzh)
 };
 
-CODEXLIB(&codex_lzh)
+CODEXLIB(lzh)

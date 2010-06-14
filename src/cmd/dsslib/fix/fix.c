@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -19,10 +19,8 @@
 ***********************************************************************/
 #pragma prototyped
 
-static const char fix_usage[] =
-"[-1?\n@(#)$Id: dss fix query (AT&T Research) 2003-01-30 $\n]"
-USAGE_LICENSE
-"[+LIBRARY?\findex\f]"
+static const char usage[] =
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The fix query generates a fixed binary flat schema from the"
 "	input file schema on the standard output. If the input schema is"
 "	variable width then the input file is used to estimate average and"
@@ -78,11 +76,14 @@ fieldcmp(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 	return strcmp(fa->variable->name, fb->variable->name);
 }
 
+extern Dsslib_t	dss_lib_fix;
+
 static int
 fix_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	char**		argv = (char**)data;
 	int		errors = error_info.errors;
+	char*		s;
 	State_t*	state;
 	Cxvariable_t*	variable;
 	Field_t*	field;
@@ -97,9 +98,11 @@ fix_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		return -1;
 	}
 	state->vm = vm;
+	sfprintf(cx->buf, "%s%s", strchr(dss_lib_fix.description, '['), usage);
+	s = sfstruse(cx->buf);
 	for (;;)
 	{
-		switch (optget(argv, fix_usage))
+		switch (optget(argv, s))
 		{
 		case 's':
 			if (!(state->stamp = strdup(opt_info.arg)))
@@ -351,10 +354,12 @@ static Cxquery_t	queries[] =
 	{0}
 };
 
-static Dsslib_t		lib =
+Dsslib_t	dss_lib_fix =
 {
 	"fix",
-	"fix query",
+	"fix query"
+	"[-1lms5P?\n@(#)$Id: dss fix query (AT&T Research) 2003-01-30 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,
@@ -364,9 +369,3 @@ static Dsslib_t		lib =
 	0,
 	&queries[0]
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

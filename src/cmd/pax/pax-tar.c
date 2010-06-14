@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -60,6 +60,7 @@ putkey(Archive_t* ap, Sfio_t* sp, Option_t* op, const char* value, Sfulong_t num
 		n = sfprintf(ap->tmp.key, "%I*u", sizeof(number), number);
 		sfstrseek(ap->tmp.key, 0, SEEK_SET);
 	}
+	error(-5, "putkey %s=%s", op->name, value ? value : sfstrseek(ap->tmp.key, 0, SEEK_CUR));
 	n += strlen(op->name) + 3 + ((op->flags & OPT_VENDOR) ? sizeof(VENDOR) : 0);
 	o = 0;
 	for (;;)
@@ -345,7 +346,8 @@ extend(Archive_t* ap, File_t* f, int type)
 	case EXTTYPE:
 		sp = ap->tmp.extended;
 		fmt = state.header.extended;
-		lev = alt = 7;
+		lev = 7;
+		alt = 4;
 		break;
 	case GLBTYPE:
 		sp = ap->tmp.global;
@@ -389,7 +391,7 @@ extend(Archive_t* ap, File_t* f, int type)
 							tvgetctime(&tv, f->st);
 							break;
 						}
-						if (!tv.tv_nsec)
+						if (!tv.tv_nsec && op->index == OPT_mtime)
 							continue;
 						s = num + sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
 						while (*(s - 1) == '0')
@@ -994,7 +996,7 @@ Format_t	pax_tar_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
-	PAXNEXT(pax_ustar_next),
+	PAXNEXT(tar),
 	0,
 	tar_done,
 	tar_getprologue,
@@ -1025,7 +1027,7 @@ Format_t	pax_pax_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
-	PAXNEXT(&pax_tar_format),
+	PAXNEXT(pax),
 	0,
 	tar_done,
 	tar_getprologue,
@@ -1056,7 +1058,7 @@ Format_t	pax_ustar_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
-	&pax_pax_format,
+	PAXNEXT(ustar),
 	0,
 	tar_done,
 	tar_getprologue,
@@ -1077,4 +1079,4 @@ Format_t	pax_ustar_format =
 	PAX_EVENT_SKIP_JUNK
 };
 
-PAXLIB(&pax_ustar_format)
+PAXLIB(ustar)

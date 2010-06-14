@@ -247,7 +247,7 @@ Paxformat_t	pax_rar_format =
 	PAX_DEFBUFFER,
 	PAX_DEFBLOCKS,
 	0,
-	PAXNEXT(pax_rar_next),
+	PAXNEXT(rar),
 	0,
 	rar_done,
 	rar_getprologue,
@@ -255,4 +255,4 @@ Paxformat_t	pax_rar_format =
 	rar_getdata,
 };
 
-PAXLIB(&pax_rar_format)
+PAXLIB(rar)

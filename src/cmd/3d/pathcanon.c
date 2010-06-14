@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -34,7 +34,7 @@
 #include "3d.h"
 
 char*
-pathcanon(char* path, int phys)
+pathcanon(char* path, size_t size, int phys)
 {
 	register char*	sp;
 	register char*	dp = path;
@@ -44,6 +44,7 @@ pathcanon(char* path, int phys)
 	long		visits = 0;
 
 	message((-6, "patcanon: ++ %s%s", path, phys ? " [PHYSICAL]" : ""));
+	if (!size) size = strlen(dp) + 1;
 #if PRESERVE_LEADING_SLASH_SLASH
 	if (*dp == '/' && *(dp + 1) == '/')
 		path = ++dp;

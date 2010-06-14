@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,17 +26,28 @@
 
 /*
  * format optget(3) description item on sp given plain text and item name
+ * you're in unless you optout
  */
 
 static int
-optout(register Sfio_t* sp, const char* name, const char* type, const char* map, register const char* s, const char* x)
+optout(register Sfio_t* sp, const char* name, const char* type, const char* map, const char* ret, register const char* s, const char* x)
 {
+	register const char*	t;
+	register int		c;
+
 	sfputc(sp, '[');
 	sfputc(sp, '+');
 	if (name)
 	{
-		sfprintf(sp, "%s", name);
-		if (type)
+		if (ret)
+			sfprintf(sp, "%s ", ret);
+		for (t = name; c = *t++;)
+		{
+			if (c == ':')
+				sfputc(sp, c);
+			sfputc(sp, c);
+		}
+		if (type && !ret)
 			sfputc(sp, ' ');
 	}
 	if (type)
@@ -76,7 +87,7 @@ optmem(register Sfio_t* sp, Cxtype_t* type)
 	sfprintf(sp, "{\n");
 	for (mp = (Cxvariable_t*)dtfirst(type->member->members); mp; mp = (Cxvariable_t*)dtnext(type->member->members, mp))
 	{
-		if (optout(sp, mp->name, mp->type->name, NiL, mp->description, mp->type->member ? "This structure type has the following members:" : (char*)0))
+		if (optout(sp, mp->name, mp->type->name, NiL, NiL, mp->description, mp->type->member ? "This structure type has the following members:" : (char*)0))
 			return -1;
 		if (mp->type->member && optmem(sp, mp->type))
 			return -1;
@@ -122,7 +133,7 @@ opttype(Sfio_t* sp, register Cxtype_t* tp, int members)
 		sfprintf(tmp, " at runtime.");
 		d = sfstruse(tmp);
 	}
-	i = optout(sp, tp->name, tp->base ? tp->base->name : (const char*)0, NiL, d, x);
+	i = optout(sp, tp->name, tp->base ? tp->base->name : (const char*)0, NiL, NiL, d, x);
 	if (tmp)
 		sfstrclose(tmp);
 	if (i)
@@ -137,6 +148,7 @@ opttype(Sfio_t* sp, register Cxtype_t* tp, int members)
 				return -1;
 	return 0;
 }
+
 /*
  * data map output
  */
@@ -156,7 +168,7 @@ optmap(register Sfio_t* sp, Cxmap_t* map)
 	if (map->num2str)
 	{
 		if ((n = dtsize(map->num2str)) > 16)
-			sfprintf(sp, "[+-----?%u entries omitted -----]", n);
+			sfprintf(sp, "[+----- %u entries omitted -----]", n);
 		else
 			for (item = (Cxitem_t*)dtfirst(map->num2str); item; item = (Cxitem_t*)dtnext(map->num2str, item))
 				if (item->mask == item->value)
@@ -195,12 +207,14 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 	Dssdisc_t*	disc = ((Dssoptdisc_t*)dp)->disc;
 	Dssstate_t*	state = dssstate(disc);
 	Dsslib_t*	lib;
+	Dssmeth_t*	meth;
 	Dssformat_t*	format;
 	Cxmap_t*	mp;
 	Cxtype_t*	tp;
 	Cxvariable_t*	vp;
 	long		pos;
 	int		head;
+	char		name[64];
 
 	switch (*s)
 	{
@@ -219,7 +233,7 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		}
 		return 0;
 	case 'i':
-		/* ident */
+		/* ident|index */
 		if (state->cx->header)
 			sfprintf(sp, "%s - %s", state->cx->header->name, state->cx->header->description);
 		else
@@ -237,7 +251,7 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		{
 			/* methods */
 			for (lib = dsslib(NiL, DSS_VERBOSE, disc); lib; lib = (Dsslib_t*)dtnext(state->cx->libraries, lib))
-				if (lib->meth && optout(sp, lib->meth->name, NiL, NiL, lib->meth->description, NiL))
+				if (lib->meth && optout(sp, lib->meth->name, NiL, NiL, NiL, lib->meth->description, NiL))
 					return -1;
 		}
 		return 0;
@@ -260,38 +274,45 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		sfputc(sp, '}');
 		return 0;
 	}
-	if (!state->meth)
+	if (!(meth = state->meth) && !(meth = state->global))
 	{
 		sfprintf(sp, "[+NOTE::?Specify \b--method\b=\amethod\a for a list of supported \b%s\b.]", s);
 		return 0;
 	}
 	pos = sfstrtell(sp);
+	head = 0;
 	switch (*s)
 	{
 	case 'f':
 		if (*(s + 1) != 'i')
 		{
 			/* formats */
-			if (!dtsize(state->meth->formats))
-				sfprintf(sp, "[+NOTE::?The \b%s\b method defines no formats.]", state->meth->name);
-			else
-				for (format = (Dssformat_t*)dtfirst(state->meth->formats); format; format = (Dssformat_t*)dtnext(state->meth->formats, format))
-					if (optout(sp, format->name, NiL, NiL, format->description, NiL))
+			if ((head = !!strchr(s, ' ')) && meth->description && optout(sp, meth->name, NiL, NiL, NiL, meth->description, NiL))
+				return -1;
+			if (meth->formats && dtsize(meth->formats))
+			{
+				if (optout(sp, "----- formats -----", NiL, NiL, NiL, NiL, NiL))
+					return -1;
+				for (format = (Dssformat_t*)dtfirst(meth->formats); format; format = (Dssformat_t*)dtnext(meth->formats, format))
+					if (optout(sp, format->name, NiL, NiL, NiL, format->description, NiL))
 						return -1;
-			break;
+			}
+			if (!head)
+				break;
 		}
 		/*FALLTHROUGH*/
 	case 'v':
 		/* fields|variables */
-		if (state->meth->description && optout(sp, state->meth->name, NiL, NiL, state->meth->description, NiL))
+		if (head)
+			head = 0;
+		else if (meth->description && optout(sp, meth->name, NiL, NiL, NiL, meth->description, NiL))
 			return -1;
-		head = 0;
 		for (tp = (Cxtype_t*)dtfirst(state->cx->types); tp; tp = (Cxtype_t*)dtnext(state->cx->types, tp))
-			if ((tp->base || tp->match) && (tp->header.flags & CX_REFERENCED))
+			if ((tp->base || tp->match) && (tp->header.flags & CX_REFERENCED) || !state->meth)
 			{
 				if (!head)
 				{
-					if (optout(sp, "-----", NiL, NiL, "data types -----", NiL))
+					if (optout(sp, "----- data types -----", NiL, NiL, NiL, NiL, NiL))
 						return -1;
 					head = 1;
 				}
@@ -300,40 +321,45 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 			}
 		head = 0;
 		for (mp = (Cxmap_t*)dtfirst(state->cx->maps); mp; mp = (Cxmap_t*)dtnext(state->cx->maps, mp))
-			if (mp->header.flags & CX_REFERENCED)
+			if ((mp->header.flags & CX_REFERENCED) || !state->meth)
 			{
 				if (!head)
 				{
-					if (optout(sp, "-----", NiL, NiL, "data maps -----", NiL))
+					if (optout(sp, "----- data maps -----", NiL, NiL, NiL, NiL, NiL))
 						return -1;
 					head = 1;
 				}
-				if (optout(sp, mp->name, NiL, NiL, mp->description, NiL))
+				if (optout(sp, mp->name, NiL, NiL, NiL, mp->description, NiL))
 					return -1;
 				if (optmap(sp, mp))
 					return -1;
 			}
 		head = 0;
-		for (vp = (Cxvariable_t*)dtfirst(state->meth->cx->fields); vp; vp = (Cxvariable_t*)dtnext(state->meth->cx->fields, vp))
-		{
-			if (!head)
+		if (state->meth && meth->cx && meth->cx->fields)
+			for (vp = (Cxvariable_t*)dtfirst(meth->cx->fields); vp; vp = (Cxvariable_t*)dtnext(meth->cx->fields, vp))
 			{
-				if (optout(sp, "-----", NiL, NiL, "data fields -----", NiL))
+				if (!head)
+				{
+					if (optout(sp, "----- data fields -----", NiL, NiL, NiL, NiL, NiL))
+						return -1;
+					head = 1;
+				}
+				if (optout(sp, vp->name, vp->type->name, vp->format.map ? vp->format.map->name : (char*)0, NiL, vp->description, NiL))
 					return -1;
-				head = 1;
 			}
-			if (optout(sp, vp->name, vp->type->name, vp->format.map ? vp->format.map->name : (char*)0, vp->description, NiL))
-				return -1;
-		}
-		break;
-	case 'p':
-		/* default print format */
-		if (!dtsize(state->meth->formats))
-			sfprintf(sp, "[+NOTE::?The \b%s\b method defines no formats.]", state->meth->name);
-		else
-			for (format = (Dssformat_t*)dtfirst(state->meth->formats); format; format = (Dssformat_t*)dtnext(state->meth->formats, format))
-				if (optout(sp, format->name, NiL, NiL, format->description, NiL))
+		else if (meth->data)
+			for (vp = (Cxvariable_t*)meth->data; vp->name; vp = vp++)
+			{
+				if (!head)
+				{
+					if (optout(sp, "----- data fields -----", NiL, NiL, NiL, NiL, NiL))
+						return -1;
+					head = 1;
+				}
+				sfsprintf(name, sizeof(name), ".%s", vp->name);
+				if (optout(sp, name, (char*)vp->type, vp->format.map ? vp->format.map->name : (char*)0, NiL, vp->description, NiL))
 					return -1;
+			}
 		break;
 	}
 	if (sfstrtell(sp) == pos)
@@ -349,22 +375,24 @@ int
 dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 {
 	register int	i;
+	register char*	s;
+	Dssstate_t*	state = dssstate(disc);
 
 	if (lib->libraries)
 		for (i = 0; lib->libraries[i]; i++)
-			if (dssload(lib->libraries[i], disc))
+			if (!dssload(lib->libraries[i], disc))
 				return -1;
 	if (dssadd(lib, disc))
 		return -1;
-	sfprintf(sp, "[+LIBRARY?%s - %s]\n", lib->name, lib->description ? lib->description : "support library");
-	if (lib->path)
-		sfprintf(sp, "[+PATH?%s]\n", lib->path);
+	if (lib->description && (s = strchr(lib->description, '[')))
+		sfprintf(sp, "%s[+PLUGIN?%s - %-.*s]\n", s, lib->name, s - lib->description, lib->description);
+	else
+		sfprintf(sp, "[-1ls5Pp0?][+PLUGIN?%s - %s]\n", lib->name, lib->description ? lib->description : "support library");
 	if (lib->meth)
 	{
-		sfprintf(sp, "[+METHOD]{\n");
-		if (optout(sp, lib->meth->name, NiL, NiL, lib->meth->description, NiL))
-			return -1;
-		sfprintf(sp, "\t}\n");
+		if (!state->meth)
+			state->meth = lib->meth;
+		sfprintf(sp, "[+DESCRIPTION?The %s method handles %s.]\n{\fformats and variables\f}\n\n--method=%s[,option...]\n\n", lib->meth->name, lib->meth->description, lib->meth->name);
 	}
 	if (lib->types)
 	{
@@ -378,7 +406,7 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	{
 		sfprintf(sp, "[+MAPS]{\n");
 		for (i = 0; lib->maps[i]; i++)
-			if (optout(sp, lib->maps[i]->name, NiL, NiL, lib->maps[i]->description, NiL))
+			if (optout(sp, lib->maps[i]->name, NiL, NiL, NiL, lib->maps[i]->description, NiL))
 				return -1;
 			else if (optmap(sp, lib->maps[i]))
 				return -1;
@@ -388,7 +416,7 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	{
 		sfprintf(sp, "[+CALLOUTS]{\n");
 		for (i = 0; lib->callouts[i].callout; i++)
-			if (optout(sp, cxopname(lib->callouts[i].op.code, lib->callouts[i].op.type1, lib->callouts[i].op.type2), NiL, NiL, lib->callouts[i].description, NiL))
+			if (optout(sp, cxopname(lib->callouts[i].op.code, lib->callouts[i].op.type1, lib->callouts[i].op.type2), NiL, NiL, NiL, lib->callouts[i].description, NiL))
 				return -1;
 		sfprintf(sp, "}\n");
 	}
@@ -396,7 +424,7 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	{
 		sfprintf(sp, "[+RECODES]{\n");
 		for (i = 0; lib->recodes[i].recode; i++)
-			if (optout(sp, cxopname(lib->recodes[i].op.code, lib->recodes[i].op.type1, lib->recodes[i].op.type2), NiL, NiL, lib->recodes[i].description, NiL))
+			if (optout(sp, cxopname(lib->recodes[i].op.code, lib->recodes[i].op.type1, lib->recodes[i].op.type2), NiL, NiL, NiL, lib->recodes[i].description, NiL))
 				return -1;
 		sfprintf(sp, "}\n");
 	}
@@ -404,7 +432,7 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	{
 		sfprintf(sp, "[+QUERIES]{\n");
 		for (i = 0; lib->queries[i].name; i++)
-			if (optout(sp, lib->queries[i].name, NiL, NiL, lib->queries[i].description, lib->queries[i].method ? sfprints("Limited to methods matching \"%s\".", lib->queries[i].method) : (char*)0))
+			if (optout(sp, lib->queries[i].name, NiL, NiL, NiL, lib->queries[i].description, lib->queries[i].method ? sfprints("Limited to methods matching \"%s\".", lib->queries[i].method) : (char*)0))
 				return -1;
 		sfprintf(sp, "}\n");
 	}
@@ -412,7 +440,7 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	{
 		sfprintf(sp, "[+CONSTRAINTS]{\n");
 		for (i = 0; lib->constraints[i].name; i++)
-			if (optout(sp, lib->constraints[i].name, NiL, NiL, lib->constraints[i].description, NiL))
+			if (optout(sp, lib->constraints[i].name, NiL, NiL, NiL, lib->constraints[i].description, NiL))
 				return -1;
 		sfprintf(sp, "}\n");
 	}
@@ -420,7 +448,15 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	{
 		sfprintf(sp, "[+EDITS]{\n");
 		for (i = 0; lib->edits[i].name; i++)
-			if (optout(sp, lib->edits[i].name, NiL, NiL, lib->edits[i].description, NiL))
+			if (optout(sp, lib->edits[i].name, NiL, NiL, NiL, lib->edits[i].description, NiL))
+				return -1;
+		sfprintf(sp, "}\n");
+	}
+	if (lib->functions)
+	{
+		sfprintf(sp, "[+FUNCTIONS]{\n");
+		for (i = 0; lib->functions[i].name; i++)
+			if (optout(sp, lib->functions[i].name, lib->functions[i].prototype, NiL, (lib->functions[i].header.flags & CX_INITIALIZED) ? lib->functions[i].type->name : (char*)lib->functions[i].type, lib->functions[i].description, NiL))
 				return -1;
 		sfprintf(sp, "}\n");
 	}

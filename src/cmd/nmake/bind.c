@@ -1807,7 +1807,7 @@ source(register Rule_t* r)
 				{
 					sfputr(tmp, t, -1);
 					t = sfstruse(tmp);
-					pathcanon(t, 0);
+					pathcanon(t, 0, 0);
 					if (!(x = getrule(t)))
 						x = makerule(t);
 					if (!(x->mark & M_directory))
@@ -1838,7 +1838,7 @@ source(register Rule_t* r)
 						else
 							sfputr(tmp, t, -1);
 						s = sfstruse(tmp);
-						pathcanon(s, 0);
+						pathcanon(s, 0, 0);
 						x = makerule(s);
 						if (!(x->dynamic & D_source))
 						{
@@ -1895,7 +1895,7 @@ source(register Rule_t* r)
 									dotted = 1;
 									sfputr(tmp, t, -1);
 									t = sfstruse(tmp);
-									pathcanon(t, 0);
+									pathcanon(t, 0, 0);
 									z = z->next = cons(makerule(t), NiL);
 								}
 								if (dot)
@@ -1910,7 +1910,7 @@ source(register Rule_t* r)
 									sfprintf(tmp, "%s/%s", s, t);
 							}
 							t = sfstruse(tmp);
-							pathcanon(t, 0);
+							pathcanon(t, 0, 0);
 							x = makerule(t);
 							if (!(x->dynamic & D_source))
 							{
@@ -1930,7 +1930,7 @@ source(register Rule_t* r)
 				{
 					sfputr(tmp, t, -1);
 					t = sfstruse(tmp);
-					pathcanon(t, 0);
+					pathcanon(t, 0, 0);
 					if (!(x = getrule(t)))
 						x = makerule(t);
 					if (!(x->mark & M_directory))

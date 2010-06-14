@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -627,10 +627,13 @@ CXC(CX_GET, "void", "void", op_get, 0)
  * methf
  */
 
+extern Dsslib_t		dss_lib_netflow;
+
 static Dssmeth_t*
 netflowmeth(const char* name, const char* options, const char* schema, Dssdisc_t* disc, Dssmeth_t* meth)
 {
 	Dssformat_t*	fp;
+	char*		s;
 	int		i;
 
 	for (fp = netflow_formats; fp; fp = fp->next)
@@ -641,6 +644,27 @@ netflowmeth(const char* name, const char* options, const char* schema, Dssdisc_t
 	for (i = 0; fields[i].name; i++)
 		if (cxaddvariable(meth->cx, &fields[i], disc))
 			return 0;
+	if (options)
+	{
+		if (dssoptlib(meth->cx->buf, &dss_lib_netflow, disc))
+			return 0;
+		s = sfstruse(meth->cx->buf);
+		for (;;)
+		{
+			switch (optstr(options, s))
+			{
+			case '?':
+				if (disc->errorf)
+					(*disc->errorf)(NiL, disc, ERROR_USAGE|4, "%s", opt_info.arg);
+				return 0;
+			case ':':
+				if (disc->errorf)
+					(*disc->errorf)(NiL, disc, 2, "%s", opt_info.arg);
+				return 0;
+			}
+			break;
+		}
+	}
 	return meth;
 }
 
@@ -801,7 +825,7 @@ static const char*	libraries[] = { "time_t", "ip_t", 0 };
 static Dssmeth_t	method =
 {
 	"netflow",
-	"Cisco router netflow dump.",
+	"Cisco router netflow dump data",
 	CXH,
 	netflowmeth,
 	netflowopen,
@@ -810,17 +834,13 @@ static Dssmeth_t	method =
 	"%(time:%+u%K)s %(prot)d %(src_addr)s:%(src_port)d %(dst_addr)s:%(dst_port)d %(hop)s"
 };
 
-static Dsslib_t		lib =
+Dsslib_t		dss_lib_netflow =
 {
 	"netflow",
-	"netflow method",
+	"netflow method"
+	"[-1ls5Pp0?\n@(#)$Id: dss netflow method (AT&T Research) 2010-02-02 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	&libraries[0],
 	&method,
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

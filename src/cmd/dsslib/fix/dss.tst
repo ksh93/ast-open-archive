@@ -11,7 +11,7 @@ TEST 01 'basics'
 		OUTPUT - $'<METHOD>flat</>
 <FLAT>
 	<NAME>netflow</>
-	<DESCRIPTION>Cisco router netflow dump fixed width binary format.</>
+	<DESCRIPTION>Cisco router netflow dump data fixed width binary format.</>
 	<IDENT>@(#)$Id: netflow bin 2003-01-31 $</>
 	<MAGIC>
 		<STRING>netflow</>

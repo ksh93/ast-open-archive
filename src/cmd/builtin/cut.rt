@@ -116,7 +116,7 @@ TEST 10 'misc errors'
 
 TEST 11 'multibyte UTF-8 -- off-by-oners doomed here'
 
-	EXPORT LC_CTYPE=de_DE.UTF-8
+	EXPORT LC_CTYPE=C.UTF-8
 
 	DATA a.dat $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274'
 	EXEC -d $'\342\202\254' -f1 a.dat

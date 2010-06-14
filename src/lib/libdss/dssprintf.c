@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,6 +31,7 @@ struct Arg_s; typedef struct Arg_s Arg_t;
 struct Arg_s
 {
 	Cxvariable_t*		variable;
+	Cxexpr_t*		expr;
 	Cxtype_t*		cast;
 	char*			details;
 	char*			qb;
@@ -75,7 +76,7 @@ typedef union
 #define DSS_FORMAT_long		4
 #define DSS_FORMAT_string	5
 
-#define DSS_FORMAT_fmt		0x01
+#define DSS_FORMAT_quote	0x01
 
 /*
  * sfio %! extension function
@@ -89,7 +90,7 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	Value_t*	value = (Value_t*)vp;
 	Cxoperand_t	ret;
 
-	if (cxcast(fp->dss->cx, &ret, ap->variable, ap->cast, fp->data, ap->details))
+	if (ap->expr && cxeval(fp->dss->cx, ap->expr, fp->data, &ret) < 0 || cxcast(fp->dss->cx, &ret, ap->variable, ap->cast, fp->data, ap->details))
 	{
 		fp->errors++;
 		return -1;
@@ -111,6 +112,13 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		value->f = ret.value.number;
 		break;
 	case DSS_FORMAT_int:
+#if 0
+		/*
+		 * this code is technically correct but overly
+		 * complicates script portability between architectures
+		 * with differing sizeof(int) and/or sizeof(long)
+		 */
+
 		fp->fmt.size = sizeof(int);
 		if (((ret.value.number >= 0) ? ret.value.number : -ret.value.number) < 1)
 			value->i = 0;
@@ -121,6 +129,7 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		else
 			value->i = (unsigned int)ret.value.number;
 		break;
+#endif
 	case DSS_FORMAT_long:
 		fp->fmt.size = sizeof(Sflong_t);
 		if (((ret.value.number >= 0) ? ret.value.number : -ret.value.number) < 1)
@@ -135,7 +144,9 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	case DSS_FORMAT_string:
 		value->s = ret.value.string.data;
 		fp->fmt.size = ret.value.string.size;
-		if (ap->flags & DSS_FORMAT_fmt)
+		if (ap->fmt & (FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_NOCR|FMT_EXP_NONL|FMT_EXP_WIDE))
+			fp->fmt.size = strexp(value->s, ap->fmt);
+		if (ap->flags & DSS_FORMAT_quote)
 			fp->fmt.size = strlen(value->s = fmtquote(value->s, ap->qb, ap->qe, fp->fmt.size, ap->fmt));
 		break;
 	}
@@ -157,18 +168,24 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 	register int	q;
 	register Arg_t*	ap;
 	int		l;
+	int		x;
 	char*		f;
+	char*		w;
 	Format_t*	fp;
 	Fmt_t		fmt;
 
 	for (fp = dss->print; fp && fp->oformat != (char*)format; fp = fp->next);
 	if (!fp)
 	{
+		char*	details['z' - 'a' + 1];
+
+		memset(details, 0, sizeof(details));
 		f = s = (char*)format;
 		d = 0;
 		l = 0;
 		n = 0;
 		q = 0;
+		w = 0;
 		for (;;)
 		{
 			switch (*s++)
@@ -208,7 +225,9 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 								break;
 							continue;
 						case ':':
-							if (!d)
+							if (*s == ':')
+								s++;
+							else if (!d)
 								d = s;
 							continue;
 						default:
@@ -275,6 +294,7 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 				{
 					q++;
 					t--;
+					x = 0;
 					v = s;
 					for (;;)
 					{
@@ -286,20 +306,26 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 							return -1;
 						case '(':
 							if (!d)
-								d = s;
+								x = 1;
 							q++;
 							continue;
 						case ')':
 							if (--q == 1)
 								break;
-							if (!d)
-								d = s;
 							continue;
 						case ':':
-							if (!d)
+							if (*s == ':')
+								s++;
+							else if (!d && q == 2)
 								d = s;
 							continue;
+						case ',':
+							if (!d)
+								x = 1;
+							continue;
 						default:
+							if (!d && dss->cx->table->opcode[*(unsigned char*)(s - 1)])
+								x = 1;
 							continue;
 						}
 						break;
@@ -307,8 +333,38 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 					if (d)
 						*(d - 1) = 0;
 					*(s - 1) = 0;
-					if (!(ap->variable = cxvariable(dss->cx, v, NiL, dss->cx->disc)))
-						return -1;
+					if (*v)
+					{
+						if (x)
+						{
+							void*	pop;
+
+							if (!(pop = cxpush(dss->cx, NiL, NiL, v, (d ? d : s) - v - 1, 0)))
+								return -1;
+							ap->expr = cxcomp(dss->cx);
+							cxpop(dss->cx, pop);
+							if (!ap->expr)
+								return -1;
+						}
+						else if (dss->cx->referencef)
+						{
+							Cxoperand_t	a;
+							Cxoperand_t	b;
+							Cxoperand_t	r;
+
+							a.type = dss->cx->state->type_string;
+							a.value.string.size = s - v - 1;
+							a.value.string.data = v;
+							b.type = a.type;
+							if ((*dss->cx->referencef)(dss->cx, NiL, &r, &b, &a, NiL, dss->cx->disc))
+								return -1;
+							ap->variable = r.value.variable;
+						}
+						else if (!(ap->variable = cxvariable(dss->cx, v, NiL, dss->cx->disc)))
+							return -1;
+					}
+					else if (d)
+						w = d;
 				}
 				continue;
 			case 'c':
@@ -366,7 +422,14 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 					ap->type = DSS_FORMAT_string;
 					ap->cast = dss->cx->state->type_string;
 				set:
-					if (!ap->variable)
+					if (w)
+					{
+						details[*(s-1) - 'a'] = w;
+						w = 0;
+						fp->nformat = t = s;
+						continue;
+					}
+					if (!ap->variable && !ap->expr)
 					{
 						if (dss->disc->errorf)
 						{
@@ -377,7 +440,7 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 					}
 					l = 0;
 					q = 0;
-					if (d)
+					if (d || (d = details[*(s-1) - 'a']) || (d = dss->cx->state->type_string->format.details))
 					{
 						ap->fmt = FMT_ALWAYS|FMT_ESCAPED;
 						while (*d)
@@ -393,6 +456,57 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 							{
 								ap->qe = v += 8;
 								while (*f++ = *v++);
+							}
+							else if (streq(v, "expand"))
+							{
+								ap->fmt |= FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_WIDE;
+								continue;
+							}
+							else if (strneq(v, "expand=", 7))
+							{
+								v += 7;
+								while (*v)
+								{
+									if (*v == '|' || *v == ',')
+									{
+										v++;
+										continue;
+									}
+									if (strneq(v, "all", 3))
+									{
+										ap->fmt |= FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_WIDE;
+										break;
+									}
+									else if (strneq(v, "char", 4))
+									{
+										v += 4;
+										ap->fmt |= FMT_EXP_CHAR;
+									}
+									else if (strneq(v, "line", 4))
+									{
+										v += 4;
+										ap->fmt |= FMT_EXP_LINE;
+									}
+									else if (strneq(v, "nocr", 4))
+									{
+										v += 4;
+										ap->fmt |= FMT_EXP_NOCR;
+									}
+									else if (strneq(v, "nonl", 4))
+									{
+										v += 4;
+										ap->fmt |= FMT_EXP_NONL;
+									}
+									else if (strneq(v, "wide", 4))
+									{
+										v += 4;
+										ap->fmt |= FMT_EXP_WIDE;
+									}
+									else
+										while (*v && *v != '|' && *v != ',')
+											v++;
+								}
+								continue;
 							}
 							else if (streq(v, "escape"))
 								ap->fmt &= ~FMT_ESCAPED;
@@ -432,7 +546,7 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 								d = v;
 								break;
 							}
-							ap->flags |= DSS_FORMAT_fmt;
+							ap->flags |= DSS_FORMAT_quote;
 						}
 						ap->details = f;
 						while (*f++ = *d++);
@@ -453,6 +567,8 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 			}
 			break;
 		}
+		if (!sp)
+			return 0;
 	}
 	memset(&fmt, 0, sizeof(fmt));
 	fmt.fmt.version = SFIO_VERSION;
@@ -462,5 +578,5 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 	fmt.data = record;
 	fmt.ap = &fp->arg[0];
 	n = sfprintf(sp, "%!", &fmt);
-	return (fmt.errors || n <= 0 && sferror(sp)) ? -1 : n;
+	return !sp ? 0 : (fmt.errors || n <= 0 && sp && sferror(sp)) ? -1 : n;
 }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2007-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2007-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -431,3 +431,5 @@ void lib_init(int flag, void* context)
 	mp = nv_search("typeset",shp->bltin_tree,0);
 	nv_onattr(bp,nv_isattr(mp,NV_PUBLIC));
 }
+
+SHLIB(dbm_t)

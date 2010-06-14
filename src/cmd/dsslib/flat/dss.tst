@@ -92,15 +92,15 @@ wwxxyyzz'
 		INPUT -n - $'abcdefghijklmnop'
 		OUTPUT - '<ab> <cd> <ef> <gh>
 <ij> <kl> <mn> <op>'
-		ERROR - $'scan: warning: stdin, record 1, offset 0: flat record terminator ignored'
+		ERROR - $'dss::scan: warning: stdin, record 1, offset 0: flat record terminator ignored'
 
 TEST 04 'flat conversion'
 
-	EXEC -I $data -x pwd-txt '{flat pwd-bin}' $data/pwd-txt.dat
+	EXEC -I $data -x pwd-txt '{flatten pwd-bin}' $data/pwd-txt.dat
 		SAME OUTPUT $data/pwd-bin.dat
-		ERROR - $'flat: warning: pad: field not in source record -- default value will be output'
+		ERROR - $'dss::flatten: warning: pad: field not in source record -- default value will be output'
 
-	EXEC -I $data -x pwd-bin '{flat pwd-txt}' $data/pwd-bin.dat
+	EXEC -I $data -x pwd-bin '{flatten pwd-txt}' $data/pwd-bin.dat
 		SAME OUTPUT $data/pwd-txt.dat
 		ERROR -
 
@@ -162,31 +162,31 @@ TEST 05 'keyed data'
 
 	EXEC -I $data -x key-1 - /dev/null
 		ERROR - "dss: \"$data/key-1.dss\", line 28: warning: id: id: field key is ambiguous -- qualification required
-scan: warning: ID: id: field key is ambiguous -- qualification required"
+dss::scan: warning: ID: id: field key is ambiguous -- qualification required"
 
 	EXEC -I $data -x key-2 - /dev/null
-		ERROR - "scan: warning: ID: id: field key is ambiguous -- qualification required"
+		ERROR - "dss::scan: warning: ID: id: field key is ambiguous -- qualification required"
 
 	EXEC -I $data -x key-3 - /dev/null
 		ERROR - "dss: \"$data/key-3.dss\", line 29: warning: id: id: field key is ambiguous -- qualification required"
 
 TEST 06 'copybook conversion'
 
-	EXEC -I $data -x cpy-txt '{flat cpy-bin}' $data/cpy-txt.dat
+	EXEC -I $data -x cpy-txt '{flatten cpy-bin}' $data/cpy-txt.dat
 		SAME OUTPUT $data/cpy-bin.dat
 
-	EXEC -I $data -x cpy-bin '{flat cpy-txt}' $data/cpy-bin.dat
+	EXEC -I $data -x cpy-bin '{flatten cpy-txt}' $data/cpy-bin.dat
 		SAME OUTPUT $data/cpy-txt.dat
 
-	EXEC -I $data -x cpy-bin '{flat --emptyspace cpy-txt}' $data/cpy-bin.dat
+	EXEC -I $data -x cpy-bin '{flatten --emptyspace cpy-txt}' $data/cpy-bin.dat
 		OUTPUT - $'12345678|MOE     |1|0|1|01/02/2003|03/02/2001|X|00000000|RUN  |L|1|Q|00000000|Q|        |95|00000004|00000000|Q| |01/01/1900|USD|Q|ENG|2004-05-06-07.08.09.123456|6|HOWARD
 12345678|LARRY   |1|0|1|04/05/2006|06/05/2004|X|00000000|DUCK |R|2|Q|00000000|Q|        |12.1234567890123|00000005|00000000|Q| |01/01/1900|USD|Q|ENG|2004-05-06-07.08.10.789012|4|FINE
 87654321|CURLY   |1|0|2|07/08/2009|09/08/2007|X|00000000|HYDE |L|3|Q|00000000|Q|        |0|00000006|00000000|Q| |01/01/1900|USD|Q|ENG|2004-05-06-07.08.11.345678|0| '
 
-	EXEC -I $data -x cpy-str-txt '{flat cpy-str-bin}' $data/cpy-txt.dat
+	EXEC -I $data -x cpy-str-txt '{flatten cpy-str-bin}' $data/cpy-txt.dat
 		SAME OUTPUT $data/cpy-bin.dat
 
-	EXEC -I $data -x cpy-str-bin '{flat cpy-str-txt}' $data/cpy-bin.dat
+	EXEC -I $data -x cpy-str-bin '{flatten cpy-str-txt}' $data/cpy-bin.dat
 		SAME OUTPUT $data/cpy-txt.dat
 
 TEST 07 'fixed with variable sized but bounded fields'
@@ -318,43 +318,43 @@ char			_delimiter_1;	/* delimiter \'\\n\' */
 
 TEST 10 'quote + escape vs. delimiters and terminators'
 
-	EXEC -I $data -x qe-bin '{flat q-txt.dss}' qe-bin.dat
+	EXEC -I $data -x qe-bin '{flatten q-txt.dss}' qe-bin.dat
 		OUTPUT - $'AB"|"D|wxyz
 a"|"cd|HI""""K
 LM\\O|p""""""s
 """"""""""|\\\\\\\\'
 		COPY OUTPUT qe.dat
 
-	EXEC -I $data -x q-txt '{flat q-txt.dss}' qe.dat
+	EXEC -I $data -x q-txt '{flatten q-txt.dss}' qe.dat
 
-	EXEC -I $data -x qe-bin '{flat qa-txt.dss}' qe-bin.dat
+	EXEC -I $data -x qe-bin '{flatten qa-txt.dss}' qe-bin.dat
 		OUTPUT - $'"AB|D"|"wxyz"
 "a|cd"|"HI""K"
 "LM\\O"|"p""""s"
 """"""""""|"\\\\\\\\"'
 		COPY OUTPUT qe.dat
 
-	EXEC -I $data -x qa-txt '{flat qa-txt.dss}' qe.dat
+	EXEC -I $data -x qa-txt '{flatten qa-txt.dss}' qe.dat
 
-	EXEC -I $data -x qe-bin '{flat e-txt.dss}' qe-bin.dat
+	EXEC -I $data -x qe-bin '{flatten e-txt.dss}' qe-bin.dat
 		OUTPUT - $'AB\\|D|wxyz
 a\\|cd|HI"K
 LM\\\\O|p""s
 """"|\\\\\\\\\\\\\\\\'
 		COPY OUTPUT qe.dat
 
-	EXEC -I $data -x e-txt '{flat e-txt.dss}' qe.dat
+	EXEC -I $data -x e-txt '{flatten e-txt.dss}' qe.dat
 
-	EXEC -I $data -x qe-bin '{flat qe-txt.dss}' qe-bin.dat
+	EXEC -I $data -x qe-bin '{flatten qe-txt.dss}' qe-bin.dat
 		OUTPUT - $'AB\\|D|wxyz
 a\\|cd|HI\\"K
 LM\\\\O|p\\"\\"s
 \\"\\"\\"\\"|\\\\\\\\\\\\\\\\'
 		COPY OUTPUT qe.dat
 
-	EXEC -I $data -x qe-txt '{flat qe-txt.dss}' qe.dat
+	EXEC -I $data -x qe-txt '{flatten qe-txt.dss}' qe.dat
 
-	EXEC -I $data -x ff-bin '{flat --emptyspace ff-txt.dss}' ff-bin.dat
+	EXEC -I $data -x ff-bin '{flatten --emptyspace ff-txt.dss}' ff-bin.dat
 		OUTPUT - $'"00"|"\xff*"
 "01"|"\xff*"
 "02"|"\xff*"

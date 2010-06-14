@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,8 +24,6 @@
  * Glenn Fowler
  * AT&T Research
  */
-
-static const char id[] = "\n@(#)$Id: dss time type library (AT&T Research) 2009-01-30 $\0\n";
 
 #include <dsslib.h>
 #include <tmx.h>
@@ -579,7 +577,9 @@ static Cxtype_t types[] =
 Dsslib_t dss_lib_time_t =
 {
 	"time_t",
-	"time type support",
+	"time type support"
+	"[-?\n@(#)$Id: dss time type library (AT&T Research) 2009-01-30 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,

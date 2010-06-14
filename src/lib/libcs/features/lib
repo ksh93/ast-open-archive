@@ -31,9 +31,9 @@ tst	stream_pipe note{ pipes are streams }end execute{
 tst	tst_rsh run{
 	: remote shell
 	path=`echo $PATH:/usr/add-on/ucb/bin:/usr/add-on/bsd/bin:/usr/ucb:/usr/bsd | sed 's/:/ /g'`
-	rsh=rsh
-	hostname=`(hostname || uname -n || cat /etc/whoami || echo local) 2>/dev/null`
-	for b in remsh rsh ssh
+	rsh=ssh
+	hostname=`exec 2>/dev/null && hostname || uname -n || cat /etc/whoami || echo local`
+	for b in ssh rsh remsh
 	do	for d in $path
 		do	if	test -x $d/$b
 			then	case $b in

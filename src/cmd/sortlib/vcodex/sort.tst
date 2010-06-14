@@ -44,7 +44,7 @@ TEST 01 'basics'
 	EXEC -lvcodex,notemporary,nooutput -o rev.out rev.tmp.qz
 		SAME rev.out rev.sorted
 
-	EXEC -v -za16k -zb16k -zi16k -lvcodex,nooutput,verbose,regress -o rev.out rev.qz
+	EXEC -v -za16ki -zb16ki -zi16ki -lvcodex,nooutput,verbose,regress -o rev.out rev.qz
 		SAME rev.out rev.sorted
 		ERROR - $'sort d record format
 sort vcodex decode rev.qz (transpose,rle,huffman)
@@ -70,7 +70,7 @@ sort write intermediate
 sort vcodex decode temporary-11
 sort merge text'
 
-	EXEC -v -za16k -zb16k -zi16k -lvcodex,nooutput,verbose,regress,temporary=rle^huffman -o rev.out rev.qz
+	EXEC -v -za16ki -zb16ki -zi16ki -lvcodex,nooutput,verbose,regress,temporary=rle^huffman -o rev.out rev.qz
 		SAME rev.out rev.sorted
 		ERROR - $'sort d record format
 sort vcodex decode rev.qz (transpose,rle,huffman)

@@ -1,3 +1,6 @@
+10-06-11 sed: drop space|semicolon separators warning
+10-06-11 sed: fix G to always emit newline
+10-06-11 sed: change 'l' command max line size to 72
 10-01-01 testfnmatch.c,testmatch.c: ignore 'v' test option
 09-12-11 grep.tst: add more -x + -e combos for regcomb() fix
 09-12-11 testregex.dat,regex++.dat: posix semantics for [z-a]

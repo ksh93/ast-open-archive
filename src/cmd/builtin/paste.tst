@@ -33,9 +33,9 @@ TEST 01 'basics'
 	EXEC	-s -d',;.:' - - - - -
 		OUTPUT - $'1,2;3.4:\n\n\n\n'
 
-TEST 02 'multibyte'
+TEST 02 'multibyte C.UTF-8'
 
-	EXPORT LC_CTYPE=de_DE.UTF-8
+	EXPORT LC_CTYPE=C.UTF-8
 
 	EXEC	-d$'\342\202\254' - - -
 		INPUT - $'1\n2\n3\n4\n'

@@ -7,6 +7,9 @@ UNIT mkdir
 TEST 01 '"-m =" vs. umask'
 
 	EXEC	-m =rx d
+		INPUT -n -
+		OUTPUT -
+		ERROR -n -
 		UMASK 000
 
 	PROG	chmod -v + d
@@ -912,10 +915,18 @@ TEST 01 '"-m =" vs. umask'
 
 TEST 02 '-p vs umask vs intermediate and final modes'
 
-	EXEC	-p a/b/c
+	EXEC	-pv a/b/c
+		INPUT -n -
+		OUTPUT -
+		ERROR - $'a: directory created\na/b: directory created\na/b/c: directory created'
 		UMASK 0202
 
 	PROG	chmod -v + a a/b a/b/c
 		OUTPUT - $'a: mode changed to 0775 (rwxrwxr-x)
 a/b: mode changed to 0775 (rwxrwxr-x)
 a/b/c: mode changed to 0575 (r-xrwxr-x)'
+		ERROR -n -
+
+	EXEC	-v d
+		OUTPUT -
+		ERROR - 'd: directory created'

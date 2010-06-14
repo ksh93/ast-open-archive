@@ -26,8 +26,6 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)$Id: dss ip type library (AT&T Research) 2008-08-11 $\0\n";
-
 #include <dsslib.h>
 #include <bgp.h>
 #include <ire.h>
@@ -1001,7 +999,9 @@ Cxtype_t	types[] =
 Dsslib_t dss_lib_ip_t =
 {
 	"ip_t",
-	"IP type support",
+	"IP type support"
+	"[-?\n@(#)$Id: dss ip type library (AT&T Research) 2008-08-11 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,

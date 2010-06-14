@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -116,15 +116,14 @@ done ${PACKAGE_ast_INCLUDE}/stak.h dontcare
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/option.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -196,6 +195,8 @@ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc
 done FEATURE/pty generated
 make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_time.h
+prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/proc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -206,8 +207,8 @@ done pty.c
 meta pty.o %.c>%.o pty.c pty
 prev pty.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_pty"
-setv LICENSE -DLICENSE="since=2001,author=dgk"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_pty -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2001-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c pty.c
+setv LICENSE -DLICENSE="since=2001,author=gsf+dgk"
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_pty -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2001-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c pty.c
 done pty.o generated
 bind -lutil dontcare
 setv CMD_STANDALONE -DCMD_STANDALONE="b_pty"
@@ -244,6 +245,7 @@ done asa generated
 make od
 make od.o
 make od.c
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/iconv.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_iconv.h implicit
@@ -531,6 +533,17 @@ make cksum.tst
 done cksum.tst
 exec - regress  cksum.tst
 done test.cksum virtual
+make test.cmp
+make cmp.tst
+meta cmp.tst %.rt>%.tst cmp.rt cmp
+make cmp.rt
+done cmp.rt
+exec - if	[[ "1" || "cmp.rt" -nt "cmp.tst" ]]
+exec - then	mktest --style=regress cmp.rt > cmp.tst
+exec - fi
+done cmp.tst generated
+exec - regress  cmp.tst
+done test.cmp virtual
 make test.cp
 make cp.tst
 done cp.tst

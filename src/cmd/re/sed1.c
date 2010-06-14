@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -41,8 +41,6 @@ unsigned char *succi(unsigned char*);
 extern void regdump(regex_t*);	/* secret entry into regex pkg */
 #endif
 
-static int semicolon;
-static int spaces;
 static Text rebuf;
 
 static const unsigned char adrs[UCHAR_MAX+1] = {	/* max no. of addrs, 3 is illegal */
@@ -728,18 +726,12 @@ compile(Text *script, Text *t)
 		}
 		(*docom[ccmapchr(map,cmd)&0x7f])(script, t);
 		while(*t->w == ' ' || *t->w == '\t' || *t->w == '\r')
-		{
 			t->w++;
-			if(!(reflags & REG_LENIENT) && !spaces++)
-				synwarn("space separators");
-		}
 		switch(*t->w) {
 		case 0:
 			script->w = script->s + loc;
 			break;
 		case ';':
-			if(!(reflags & REG_LENIENT) && !semicolon++)
-				synwarn("semicolon separators");
 		case '\n':
 			t->w++;
 			break;

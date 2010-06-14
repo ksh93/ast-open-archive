@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -244,7 +244,7 @@ pathreal(const char* apath, register int type, struct stat* st)
 	if (type & P_DOTDOT)
 		strcpy(sp, "/..");
 	sp = state.path.name;
-	if (!(ip = pathcanon(sp + safe_dir, 0)))
+	if (!(ip = pathcanon(sp + safe_dir, sizeof(state.path.name) - safe_dir, 0)))
 	{
 		errno = ENOENT;
 		return 0;

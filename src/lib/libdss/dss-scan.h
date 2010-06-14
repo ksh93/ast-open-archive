@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,9 +24,9 @@
  */
 
 static const char scan_usage[] =
-"[-1l?\n@(#)$Id: dss scan query (AT&T Research) 2003-02-06 $\n]"
+"[-1ls5P?\n@(#)$Id: dss scan query (AT&T Research) 2003-02-06 $\n]"
 USAGE_LICENSE
-"[+NAME?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b \bscan\b query reads records from each input"
 "	\afile\a and passes the records to the remainder of the query."
 "	If \afile\a is omitted then the standard input is read.]"
@@ -110,6 +110,7 @@ scan_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		"scan all input files", \
 		CXH, \
 		scan_beg, \
+		0, \
 		0, \
 		0, \
 		0, \

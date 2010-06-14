@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -33,11 +33,12 @@ Dssexpr_t*
 dsscomp(Dss_t* dss, const char* s, Sfio_t* sp)
 {
 	Cxexpr_t*	expr;
+	void*		pop;
 
-	if (cxpush(dss->cx, NiL, sp, s, -1))
+	if (!(pop = cxpush(dss->cx, NiL, sp, s, -1, CX_INCLUDE)))
 		return 0;
 	expr = cxcomp(dss->cx);
-	while (!dss->cx->eof && !cxpop(dss->cx));
+	cxpop(dss->cx, pop);
 	return expr;
 }
 

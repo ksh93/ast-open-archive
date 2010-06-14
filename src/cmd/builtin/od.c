@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1992-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1992-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -28,79 +28,95 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2006-10-31 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2010-06-14 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
-"[+DESCRIPTION?\bod\b dumps the contents of the input files"
-"	in various formats on the standard output. The standard input"
-"	is read if \b-\b or no files are specified. Each output line contains"
-"	the file offset of the data in the leftmost column, followed"
-"	by one or more columns in the specified format. If more than"
-"	one format is specified then the subsequent lines are listed"
-"	with the offset column blank. Second and subsequent occurrences"
-"	of a repeated output line are replaced by a single line with `*'"
-"	in the first data column.]"
-"[+?If the output format is specified by one of the obsolete forms (not \b-t\b)"
-"	then the last file argument is interpreted as an offset expression"
-"	if it matches the extended regular expression"
-"	\b+?[0-9]]+\\.?[bkm]]?(ll|LL)?\b . In this case the first \aoffset\a"
-"	bytes of the file are skipped. The optional \bb\b means bytes, \bk\b"
-"	means Kb, and \bm\b means Mb. \bll\b and \bLL\b are ignored for"
-"	compatibility with some systems.]"
-
-"[A:address-radix?The file offset radix.]:[radix:=o]{"
-"	[+d?decimal]"
-"	[+o?octal]"
-"	[+x?hexadecimal]"
-"	[+n?none - do not print offset]"
-"}"
-"[B:swap?Swap input bytes according to the bit mask \aop\a, which is the"
-"	inclusive or of:]#[op]{"
-"		[+01?swap 8-bit bytes]"
-"		[+02?swap 16-bit words]"
-"		[+04?swap 32-bit longs]"
-"		[+0?swap for big endian testing]"
-"}"
-"[j:skip-bytes?Skip \bbytes\b bytes into the data before formatting.]#[bytes]"
+"[+DESCRIPTION?\bod\b dumps the contents of the input files in various "
+    "formats on the standard output. The standard input is read if \b-\b or "
+    "no files are specified. Each output line contains the file offset of "
+    "the data in the leftmost column, followed by one or more columns in the "
+    "specified format. If more than one format is specified then the "
+    "subsequent lines are listed with the offset column blank. Second and "
+    "subsequent occurrences of a repeated output line are replaced by a "
+    "single line with `*' in the first data column.]"
+"[+?\b--format=c\b, \b--format=C\b and \b--format=O\b interpret bytes as "
+    "characters in the LC_CTYPE locale category. The three types differ only "
+    "in the C style escape sequences recognized; \b--format=C\b explicitly "
+    "allows future extensions. The backslash character is written as `\\' "
+    "and NUL is written as `\\0'. Other non-printable characters are written "
+    "as one three-digit octal number for each byte in the character. "
+    "Printable multi-byte characters are written in the area corresponding "
+    "to the first byte of the character; the two-character sequence `**' is "
+    "written in the area corresponding to each remaining byte in the "
+    "character; the remaining bytes for \b-p\b are written as ` '. If "
+    "\b--skip\b or \b--count\b position the file into the middle of a "
+    "multibyte character then the entire multibyte character is silently "
+    "treated as non-character bytes.]"
+"[+?If the output format is specified by one of the obsolete forms (not "
+    "\b--format\b) then the last file argument is interpreted as an offset "
+    "expression if it matches the extended regular expression "
+    "\b+?[0-9]]+\\.?[bkm]]?(ll|LL)?\b . In this case the first \aoffset\a "
+    "bytes of the file are skipped. The optional \bb\b means bytes, \bk\b "
+    "means Kb, and \bm\b means Mb. \bll\b and \bLL\b are ignored for "
+    "compatibility with some systems.]"
+"[A:address-radix?The file offset radix.]:[radix:=o]"
+    "{"
+        "[+d?decimal]"
+        "[+o?octal]"
+        "[+x?hexadecimal]"
+        "[+n?none - do not print offset]"
+    "}"
+"[B:swap?Swap input bytes according to the bit mask \aop\a, which is the "
+    "inclusive or of:]#[op]"
+    "{"
+        "[+01?swap 8-bit bytes]"
+        "[+02?swap 16-bit words]"
+        "[+04?swap 32-bit longs]"
+        "[+0?swap for big endian testing]"
+    "}"
+"[j:skip-bytes?Skip \bbytes\b bytes into the data before "
+    "formatting.]#[bytes]"
 "[N:count|read-bytes?Output only \bbytes\b bytes of data.]#[bytes]"
-"[m:map?\b--printable\b and \b--format=m\b bytes are converted from"
-"	\acodeset\a to the native codeset. The codesets"
-"	are:]:[codeset]{\fcodesets\f}"
-"[p:printable?Output the printable bytes (after \b--map\b if specified), in"
-"	the last data column. Non-printable byte values are printed as `.'.]"
-"[z:strings?Output NUL terminated strings of at least \alength\a bytes.]#?"
-"	[length:=3]"
-"[t:format|type?The data item output \aformat\a and \asize\a. A decimal byte" 
-"	count or size code may follow all but the \ba\b, \bc\b and \bm\b"
-"	formats.]:[format[size]]:=o2]{\ftypes\f}"
-"[T:test?Enable internal implementation specific tests.]:[test]{"
-"	[+b\an\a?Allocate a fixed input buffer of size \an\a.]"
-"	[+m\an\a?Set the mapped input buffer size to \an\a.]"
-"	[+n?Turn off the \bSF_SHARE\b input buffer flag.]"
-"}"
+"[m:map?\b--printable\b and \b--format=m\b bytes are converted from "
+    "\acodeset\a to the native codeset. The codesets are:]:[codeset]"
+    "{\fcodesets\f} [p:printable?Output the printable bytes (after \b--map\b "
+    "if specified), in the last data column. Non-printable byte values are "
+    "printed as `.'.]"
+"[z:strings?Output NUL terminated strings of at least \alength\a "
+    "bytes.]#? [length:=3]"
+"[t:format|type?The data item output \aformat\a and \asize\a. A decimal byte "
+    "count or size code may follow all but the \ba\b, \bc\b, \bC\b, \bm\b "
+    "and \bO\b formats.]:[format[size]]:=o2]"
+    "{\ftypes\f}"
+"[T:test?Enable internal implementation specific tests.]:[test]"
+    "{"
+        "[+b\an\a?Allocate a fixed input buffer of size \an\a.]"
+        "[+m\an\a?Set the mapped input buffer size to \an\a.]"
+        "[+n?Turn off the \bSF_SHARE\b input buffer flag.]"
+    "}"
 "[v:all|output-duplicates?Output all data.]"
-"[w:per-line|width?The number of items to format per output line."
-"	\aper-line\a must be a multiple of the least common multiple"
-"	of the sizes of the format types.]#[per-line]"
-"	[a?Equivalent to \b-ta\b.]"
-"	[b?Equivalent to \b-toC\b.]"
-"	[c?Equivalent to \b-tc\b.]"
-"	[d?Equivalent to \b-tuS\b.]"
-"	[D?Equivalent to \b-tuL\b.]"
-"	[f?Equivalent to \b-tfF\b.]"
-"	[F?Equivalent to \b-tfD\b.]"
-"	[h?Equivalent to \b-txS\b.]"
-"	[i?Equivalent to \b-tdS\b.]"
-"	[l?Equivalent to \b-tdL\b.]"
-"	[o?Equivalent to \b-toS\b.]"
-"	[O?Equivalent to \b-toL\b.]"
-"	[s?Equivalent to \b-tdS\b.]"
-"	[S?Equivalent to \b-tdL\b.]"
-"	[u?Equivalent to \b-tuS\b.]"
-"	[U?Equivalent to \b-tuL\b.]"
-"	[x?Equivalent to \b-txS\b.]"
-"	[X?Equivalent to \b-txL\b.]"
-
+"[w:per-line|width?The number of items to format per output line. "
+    "\aper-line\a must be a multiple of the least common multiple of the "
+    "sizes of the format types.]#[per-line]"
+"[a?Equivalent to \b-ta\b.]"
+"[b?Equivalent to \b-toC\b.]"
+"[c?Equivalent to \b-tO\b.]"
+"[C?Equivalent to \b-tO\b.]"
+"[d?Equivalent to \b-tuS\b.]"
+"[D?Equivalent to \b-tuL\b.]"
+"[f?Equivalent to \b-tfF\b.]"
+"[F?Equivalent to \b-tfD\b.]"
+"[h?Equivalent to \b-txS\b.]"
+"[i?Equivalent to \b-tdS\b.]"
+"[l?Equivalent to \b-tdL\b.]"
+"[o?Equivalent to \b-toS\b.]"
+"[O?Equivalent to \b-toL\b.]"
+"[s?Equivalent to \b-tdS\b.]"
+"[S?Equivalent to \b-tdL\b.]"
+"[u?Equivalent to \b-tuS\b.]"
+"[U?Equivalent to \b-tuL\b.]"
+"[x?Equivalent to \b-txS\b.]"
+"[X?Equivalent to \b-txL\b.]"
 "\n"
 "\n[ file ... ] [ [+]offset[.|b|k|m|ll|LL] ]\n"
 "\n"
@@ -114,6 +130,12 @@ USAGE_LICENSE
 #include <ctype.h>
 #include <iconv.h>
 #include <vmalloc.h>
+
+#if _hdr_wctype
+#include <wctype.h>
+#else
+#define iswcntrl(w)	iscntrl(w)
+#endif
 
 #define NEW		(1<<0)
 #define OLD		(1<<1)
@@ -137,7 +159,7 @@ USAGE_LICENSE
 
 struct State_s; typedef struct State_s State_t;
 
-typedef char* (*Format_f)(State_t*, int, char*, size_t);
+typedef char* (*Format_f)(State_t*, unsigned char*, char*, size_t);
 
 typedef struct Size_s
 {
@@ -154,6 +176,7 @@ typedef struct Type_s
 {
 	char*		desc;
 	char		name;
+	char		mb;
 	const char*	fill;
 	Format_f	fun;
 	const Size_t*	size;
@@ -187,8 +210,6 @@ struct State_s
 	size_t		size;
 	int		noshare;
 	}		buffer;
-	char*		buf;
-	size_t		bufsize;
 	size_t		count;
 	struct
 	{
@@ -197,10 +218,14 @@ struct State_s
 	int		mark;
 	size_t		size;
 	}		dup;
+	unsigned char*	eob;
 	char*		file;
 	Format_t*	form;
 	Format_t*	last;
 	unsigned char*	map;
+	int		mb;
+	int		mbmax;
+	int		mbp;
 	intmax_t	offset;
 	struct
 	{
@@ -210,6 +235,8 @@ struct State_s
 	int		printable;
 	int		size;
 	size_t		skip;
+	char*		span;
+	int		spansize;
 	int		strings;
 	int		style;
 	int		swap;
@@ -254,8 +281,10 @@ static const Size_t	fsize[] =
 };
 
 static char*
-aform(State_t* state, int c, char* buf, size_t siz)
+aform(State_t* state, unsigned char* u, char* buf, size_t siz)
 {
+	register char		c = *u;
+
 	static const char	anames[] = "nulsohstxetxeoteqnackbel bs ht nl vt ff cr so sidledc1dc2dc3dc4naksynetbcan emsubesc fs gs rs us sp";
 
 	if ((c &= 0177) == 0177)
@@ -271,23 +300,118 @@ aform(State_t* state, int c, char* buf, size_t siz)
 }
 
 static char*
-bform(State_t* state, int c, char* buf, size_t siz)
+bform(State_t* state, unsigned char* u, char* buf, size_t siz)
 {
-	sfsprintf(buf, siz, "%08..2u", c);
+	sfsprintf(buf, siz, "%08..2u", *u);
 	return buf;
 }
 
 static char*
-cform(State_t* state, int c, char* buf, size_t siz)
+cform(State_t* state, unsigned char* u, char* buf, size_t siz)
 {
-	register char*	s;
+	unsigned char*	v;
+	char*		s;
+	wchar_t		w;
+	int		i;
+	int		j;
 
-	switch (buf[0] = c)
+	if (state->mb)
+	{
+		state->mb--;
+		return "**";
+	}
+	switch (buf[0] = *u)
 	{
 	case 0:
 		return "\\0";
 	case '\\':
 		return "\\";
+	}
+	v = u;
+	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
+	{
+		if (i >= siz)
+			i = siz - 1;
+		state->mb = i - 1;
+		s = buf;
+		for (j = 3 - mbwidth(w); j > 0; j--)
+			*s++ = ' ';
+		while (i--)
+			*s++ = *v++;
+		i = state->mb;
+		*s = 0;
+		return buf;
+	}
+	buf[1] = 0;
+	s = fmtesc(buf);
+
+	/*
+	 * posix shalls are sometimes an impediment to progress
+	 */
+
+	if (*s == '\\')
+		switch (*(s + 1))
+		{
+		case 'a':
+		case 'b':
+		case 'f':
+		case 'n':
+		case 'r':
+		case 't':
+		case 'v':
+			break;
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+			s++;
+			break;
+		default:
+			sfsprintf(s = buf, siz, "%03o", *v);
+			break;
+		}
+	return s;
+}
+
+static char*
+Cform(State_t* state, unsigned char* u, char* buf, size_t siz)
+{
+	unsigned char*	v;
+	char*		s;
+	wchar_t		w;
+	int		i;
+	int		j;
+
+	if (state->mb)
+	{
+		state->mb--;
+		return "**";
+	}
+	switch (buf[0] = *u)
+	{
+	case 0:
+		return "\\0";
+	case '\\':
+		return "\\";
+	}
+	v = u;
+	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
+	{
+		if (i >= siz)
+			i = siz - 1;
+		state->mb = i - 1;
+		s = buf;
+		for (j = 3 - mbwidth(w); j > 0; j--)
+			*s++ = ' ';
+		while (i--)
+			*s++ = *v++;
+		i = state->mb;
+		*s = 0;
+		return buf;
 	}
 	buf[1] = 0;
 	s = fmtesc(buf);
@@ -297,11 +421,11 @@ cform(State_t* state, int c, char* buf, size_t siz)
 }
 
 static char*
-mform(State_t* state, int c, char* buf, size_t siz)
+mform(State_t* state, unsigned char* u, char* buf, size_t siz)
 {
 	register char*	s;
 
-	switch (buf[0] = ccmapchr(state->map, c))
+	switch (buf[0] = ccmapchr(state->map, *u))
 	{
 	case 0:
 		return "00";
@@ -315,47 +439,124 @@ mform(State_t* state, int c, char* buf, size_t siz)
 	return s;
 }
 
+static char*
+Oform(State_t* state, unsigned char* u, char* buf, size_t siz)
+{
+	unsigned char*	v;
+	char*		s;
+	wchar_t		w;
+	int		i;
+	int		j;
+
+	if (state->mb)
+	{
+		state->mb--;
+		return "**";
+	}
+	switch (buf[0] = *u)
+	{
+	case 0:
+		return "\\0";
+	case '\\':
+		return "\\";
+	}
+	v = u;
+	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
+	{
+		if (i >= siz)
+			i = siz - 1;
+		state->mb = i - 1;
+		s = buf;
+		for (j = 3 - mbwidth(w); j > 0; j--)
+			*s++ = ' ';
+		while (i--)
+			*s++ = *v++;
+		i = state->mb;
+		*s = 0;
+		return buf;
+	}
+	buf[1] = 0;
+	s = fmtesc(buf);
+
+	/*
+	 * posix shalls are sometimes an impediment to progress
+	 */
+
+	if (*s == '\\')
+		switch (*(s + 1))
+		{
+		case 'b':
+		case 'f':
+		case 'n':
+		case 'r':
+		case 't':
+			break;
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+			s++;
+			break;
+		default:
+			sfsprintf(s = buf, siz, "%03o", *v);
+			break;
+		}
+	return s;
+}
+
 static const Type_t	type[] =
 {
 {
-	"named character (ASCII 3-characters)",
-	'a',	0,	aform,	csize,	 3,  0,  0,  0,  0
+	"ISO/IEC 646:1991 named characters",
+	'a',	0,	0,	aform,	csize,	 3,  0,  0,  0,  0
 },
 {
 	"binary character",
-	'b',	0,	bform,	csize,	 8, 0,  0,  0,  0
+	'b',	0,	0,	bform,	csize,	 8, 0,  0,  0,  0
 },
 {
-	"ASCII character or backslash escape",
-	'c',	0,	cform,	csize,	 3,  0,  0,  0,  0
+	"locale character or backslash escape (\\a \\b \\f \\n \\r \\t \\v)",
+	'c',	0,	0,	cform,	csize,	 3,  0,  0,  0,  0
+},
+{
+	"locale character or backslash escape (current and future escapes)",
+	'C',	0,	0,	Cform,	csize,	 3,  0,  0,  0,  0
 },
 {
 	"signed decimal",
-	'd',	0,	0,	isize,	 4,  6, 11, 21, 31
+	'd',	0,	0,	0,	isize,	 4,  6, 11, 21, 31
 },
 {
 	"floating point",
-	'f',	0,	0,	fsize,	 9,  9, 15, 24, 42
+	'f',	0,	0,	0,	fsize,	 9,  9, 15, 24, 42
 },
 {
 	"\b--map\b mapped character or hexadecimal value if not printable",
-	'm',	0,	mform,	csize,	 2,  0,  0,  0,  0
+	'm',	0,	0,	mform,	csize,	 2,  0,  0,  0,  0
 },
 {
 	"octal",
-	'o',	"0",	0,	isize,	 3,  6, 11, 22, 33
+	'o',	0,	"0",	0,	isize,	 3,  6, 11, 22, 33
+},
+{
+	"locale character or backslash escape (\\b \\f \\n \\r \\t)",
+	'O',	0,	0,	Oform,	csize,	 3,  0,  0,  0,  0
 },
 {
 	"unsigned decimal",
-	'u',	0,	0,	isize,	 3,  5, 10, 20, 30
+	'u',	0,	0,	0,	isize,	 3,  5, 10, 20, 30
 },
 {
 	"hexadecimal",
-	'x',	"0",	0,	isize,	 2,  4,  8, 16, 32
+	'x',	0,	"0",	0,	isize,	 2,  4,  8, 16, 32
 },
 {
 	"printable bytes",
-	'z',	0,	0,	0,	 1,  0,  0, 0, 0
+	'z',	0,	0,	0,	0,	 1,  0,  0, 0, 0
 },
 };
 
@@ -414,9 +615,15 @@ format(State_t* state, register char* t)
 			if (!zp->name)
 			{
 				if (c)
+				{
 					error(2, "%c: invalid size for type %c", c, tp->name);
-				else if (!(zp = xp) || tp->size == fsize)
+					return;
+				}
+				if (!(zp = xp) || tp->size == fsize)
+				{
 					error(2, "%d: invalid size for type %c", n, tp->name);
+					return;
+				}
 				break;
 			}
 			if (n)
@@ -438,8 +645,11 @@ format(State_t* state, register char* t)
 			}
 			else if (!c && !n && zp->dflt)
 				break;
-			else zp++;
+			else
+				zp++;
 		}
+		if (tp->mb && (i = mbmax()) > 1)
+			state->mbmax = i;
 		i = zp - tp->size;
 		if (!(fp = vmnewof(state->vm, 0, Format_t, 1, 0)))
 		{
@@ -455,7 +665,7 @@ format(State_t* state, register char* t)
 		fp->us = tp->name != 'd';
 		fp->size.internal = zp->size;
 		fp->size.external = n ? n : zp->size;
-		if (fp->size.external > state->size)
+		if (state->size < fp->size.external)
 			state->size = fp->size.external;
 		fp->width = tp->width[i = WIDTHINDEX(fp->size.internal)];
 		if (n > 1 && (n & (n - 1)))
@@ -550,11 +760,12 @@ init(State_t* state, char*** p)
 				}
 			}
 		}
-		return ip;
+		break;
 	next:
 		if (ip != sfstdin)
 			sfclose(ip);
 	}
+	return ip;
 }
 
 static int
@@ -601,7 +812,7 @@ block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base, char* buf, 
 		for (;;)
 		{
 			if (fp->fun)
-				f = (*fp->fun)(state, *u, buf, siz);
+				f = (*fp->fun)(state, u, buf, siz);
 			else
 			{
 				f = buf;
@@ -663,16 +874,39 @@ block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base, char* buf, 
 				if (state->printable && fp == state->form)
 				{
 					register int	c;
+					unsigned char*	v;
+					wchar_t		w;
 
 					if (c = (state->block - (ep - bp)) / state->size * (state->width + 1))
 						sfprintf(op, "%*s", c, "");
 					sfputc(op, ' ');
-					for (u = (unsigned char*)bp; u < (unsigned char*)ep;)
-					{
-						if ((c = ccmapchr(state->map, *u++)) < 040 || c >= 0177)
-							c = '.';
-						sfputc(op, c);
-					}
+					if (state->mbmax)
+						for (u = (unsigned char*)bp; u < (unsigned char*)ep; u++)
+						{
+							if (state->mbp)
+							{
+								state->mbp--;
+								sfputc(op, '.');
+							}
+							else if ((v = u) && (w = mbnchar(v, state->eob - u)) > 0 && (c = v - u) > 1 && !iswcntrl(w))
+							{
+								sfwrite(op, u, c);
+								state->mbp = c - 1;
+							}
+							else
+							{
+								if ((c = ccmapchr(state->map, *u)) < 040 || c >= 0177)
+									c = '.';
+								sfputc(op, c);
+							}
+						}
+					else
+						for (u = (unsigned char*)bp; u < (unsigned char*)ep;)
+						{
+							if ((c = ccmapchr(state->map, *u++)) < 040 || c >= 0177)
+								c = '.';
+							sfputc(op, c);
+						}
 				}
 				sfputc(op, '\n');
 				break;
@@ -692,12 +926,12 @@ od(State_t* state, char** files)
 	register char*	s;
 	register char*	e;
 	register char*	x;
-	register char*	split = 0;
+	register char*	span = 0;
 	register int	c;
 	Sfio_t*		ip;
-	unsigned long	n;
-	unsigned long	m;
-	unsigned long	r;
+	size_t		n;
+	size_t		m;
+	ssize_t		r;
 	char		tmp[256];
 
 	if (!(ip = init(state, &files)))
@@ -709,23 +943,25 @@ od(State_t* state, char** files)
 			state->peek.data = 0;
 			n = state->peek.size;
 		}
-		else for (;;)
-		{
-			s = sfreserve(ip, SF_UNBOUND, 0);
-			n = sfvalue(ip);
-			if (s)
-				break;
-			if (n)
-				error(ERROR_system(2), "%s: read error", state->file);
-			if (ip != sfstdin)
-				sfclose(ip);
-			if (!(ip = init(state, &files)))
+		else
+			for (;;)
 			{
-				s = 0;
-				n = 0;
-				break;
+				s = sfreserve(ip, SF_UNBOUND, 0);
+				n = sfvalue(ip);
+				if (s)
+					break;
+				if (n)
+					error(ERROR_system(2), "%s: read error", state->file);
+				if (ip != sfstdin)
+					sfclose(ip);
+				if (!(ip = init(state, &files)))
+				{
+					s = 0;
+					n = 0;
+					break;
+				}
 			}
-		}
+		state->eob = s + n;
 		if (state->count)
 		{
 			if (state->total >= state->count)
@@ -736,50 +972,46 @@ od(State_t* state, char** files)
 			else if ((state->total += n) > state->count)
 				n -= state->total - state->count;
 		}
-		if (split)
+		if (span)
 		{
+		respan:
 			if (s)
 			{
-				m = state->block - (split - state->buf);
-				r = (m > n) ? m : n;
-				if (state->bufsize < (r += (split - state->buf)))
-				{
-					state->bufsize = roundof(r, 1024);
-					r = split - state->buf;
-					if (!(state->buf = vmnewof(state->vm, state->buf, char, state->bufsize, 0)))
-					{
-						error(ERROR_SYSTEM|2, "out of space");
-						goto bad;
-					}
-					split = state->buf + r;
-				}
+				m = state->spansize - (span - state->span);
 				if (m > n)
 				{
-					memcpy(split, s, n);
-					split += n;
+					memcpy(span, s, n);
+					span += n;
 					continue;
 				}
-				else
-				{
-					memcpy(split, s, m);
-					split += m;
-					s += m;
-					n -= m;
-				}
+				memcpy(span, s, m);
+				span += m;
+				s += m;
+				n -= m;
 			}
-			r = split - state->buf;
-			if (m = (split - state->buf) % state->size)
+			if (m = (span - state->span) % state->size)
 			{
 				m = state->size - m;
 				while (m--)
-					*split++ = 0;
+					*span++ = 0;
 			}
-			if (block(state, sfstdout, state->buf, state->buf + r, state->offset, tmp, sizeof(tmp)))
+			state->eob = span;
+			if ((m = span - state->span) > state->block)
+				m = state->block;
+			if (block(state, sfstdout, state->span, state->span + m, state->offset, tmp, sizeof(tmp)))
 				goto bad;
-			split = 0;
+			state->offset += m;
 			if (!state->verbose)
-				memcpy(state->dup.data = state->dup.buf, state->buf, state->dup.size = r);
-			state->offset += r;
+				memcpy(state->dup.data = state->dup.buf, state->span, state->dup.size = m);
+			if ((r = (span - state->span) - m) > 0)
+			{
+				span = state->span;
+				x = state->span + m;
+				while (r--)
+					*span++ = *x++;
+				goto respan;
+			}
+			span = 0;
 			if (s && !n)
 				continue;
 		}
@@ -812,15 +1044,17 @@ od(State_t* state, char** files)
 		else
 		{
 			e = s + (n / state->block) * state->block;
+			if (state->mbmax)
+				e -= state->block + state->mbmax;
 			if (s < e)
 			{
 				do
 				{
 					if (block(state, sfstdout, s, s + state->block, state->offset, tmp, sizeof(tmp)))
 						goto bad;
+					state->offset += state->block;
 					state->dup.data = s;
 					state->dup.size = state->block;
-					state->offset += state->block;
 				} while ((s += state->block) < e);
 				if (!state->verbose)
 				{
@@ -830,19 +1064,8 @@ od(State_t* state, char** files)
 			}
 			if (n = x - s)
 			{
-				if (state->bufsize < 2 * n)
-				{
-					if ((state->bufsize = 2 * n) < LINE_LENGTH * sizeof(intmax_t))
-						state->bufsize = LINE_LENGTH * sizeof(intmax_t);
-					state->bufsize = roundof(state->bufsize, 1024);
-					if (!(state->buf = vmnewof(state->vm, state->buf, char, state->bufsize, 0)))
-					{
-						error(ERROR_SYSTEM|2, "out of space");
-						goto bad;
-					}
-				}
-				memcpy(state->buf, s, n);
-				split = state->buf + n;
+				memcpy(state->span, s, n);
+				span = state->span + n;
 			}
 		}
 	}
@@ -921,13 +1144,12 @@ b_od(int argc, char** argv, void* context)
 	}
 	optinit(&optdisc, optinfo);
 	per = 0;
-	state.swap = int_swap;
 	state.map = ccmap(CC_ASCII, CC_ASCII);
+	state.swap = int_swap;
 	for (;;)
 	{
 		switch (optget(argv, usage))
 		{
-
 		case 'A':
 			*state.base = *opt_info.arg;
 			state.style |= NEW;
@@ -998,10 +1220,10 @@ b_od(int argc, char** argv, void* context)
 		case 'z':
 			state.strings = opt_info.num;
 			continue;
-
 		case 'a':
 		case 'b':
 		case 'c':
+		case 'C':
 		case 'd':
 		case 'D':
 		case 'f':
@@ -1017,8 +1239,17 @@ b_od(int argc, char** argv, void* context)
 		case 'U':
 		case 'x':
 		case 'X':
+			s = buf;
 			switch (n = opt_info.option[1])
 			{
+			case 'b':
+				*s++ = 'o';
+				*s++ = 'C';
+				break;
+			case 'c':
+			case 'C':
+				*s++ = 'O';
+				break;
 			case 'D':
 				n = 'U';
 				break;
@@ -1037,46 +1268,44 @@ b_od(int argc, char** argv, void* context)
 				n = 'D';
 				break;
 			}
-			s = buf;
-			if (isupper(n)) switch (*s++ = tolower(n))
+			if (s == buf)
 			{
-			case 'f':
-				*s++ = 'D';
-				break;
-			default:
-				*s++ = 'L';
-				break;
-			}
-			else switch (*s++ = n)
-			{
-			case 'b':
-				*buf = 'o';
-				*s++ = 'C';
-				break;
-			case 'd':
-			case 'o':
-			case 's':
-			case 'u':
-			case 'x':
-				/* pronounce that! */
-				*s++ = 'S';
-				break;
-			case 'f':
-				*s++ = 'F';
-				break;
+				if (isupper(n))
+					switch (*s++ = tolower(n))
+					{
+					case 'f':
+						*s++ = 'D';
+						break;
+					default:
+						*s++ = 'L';
+						break;
+					}
+				else
+					switch (*s++ = n)
+					{
+					case 'd':
+					case 'o':
+					case 's':
+					case 'u':
+					case 'x':
+						/* pronounce that! */
+						*s++ = 'S';
+						break;
+					case 'f':
+						*s++ = 'F';
+						break;
+					}
 			}
 			*s = 0;
 			format(&state, buf);
 			state.style |= OLD;
 			continue;
-
 		case ':':
 			error(2, "%s", opt_info.arg);
 			continue;
 		case '?':
 			error(ERROR_usage(2), "%s", opt_info.arg);
 			continue;
-
 		}
 		break;
 	}
@@ -1108,7 +1337,7 @@ b_od(int argc, char** argv, void* context)
 		break;
 	}
 	if (!state.form)
-		format(&state, "o2");
+		format(&state, "oS");
 	else if (state.strings)
 		error(2, "--strings must be the only format type");
 	if (error_info.errors)
@@ -1133,6 +1362,12 @@ b_od(int argc, char** argv, void* context)
 	if (per)
 		n = per;
 	state.block = n * state.size;
+	state.spansize = state.block + state.mbmax;
+	if (!(state.span = vmnewof(state.vm, 0, char, state.spansize, 0)))
+	{
+		error(ERROR_SYSTEM|2, "out of space");
+		goto done;
+	}
 	if (!(state.style & NEW) && (s = *argv))
 	{
 		e = "?(+)+([0-9])?(.)?([bkm])?(ll|LL)";

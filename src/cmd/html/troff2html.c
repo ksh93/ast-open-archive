@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1150,7 +1150,7 @@ find(char* name, char** found, int verbose)
 		{
 			sfprintf(state.tmp, pathdirs[i], name);
 			path = use(state.tmp);
-			if (pathpath(buf + 1, path, "", PATH_REGULAR|PATH_READ) && (sp = sfopen(NiL, buf + 1, "r")))
+			if (pathpath(path, "", PATH_REGULAR|PATH_READ, buf + 1, sizeof(buf) - 1) && (sp = sfopen(NiL, buf + 1, "r")))
 			{
 				*(path = buf) = '/';
 				goto hit;
@@ -1177,7 +1177,7 @@ find(char* name, char** found, int verbose)
 					{
 						sfprintf(state.tmp, "lib/html/%s%s", s, x);
 						path = use(state.tmp);
-						if (pathpath(buf + 1, path, "", PATH_REGULAR|PATH_READ) && (sp = sfopen(NiL, buf + 1, "r")))
+						if (pathpath(path, "", PATH_REGULAR|PATH_READ, buf + 1, sizeof(buf) - 1) && (sp = sfopen(NiL, buf + 1, "r")))
 						{
 							*(path = buf) = '/';
 							goto hit;

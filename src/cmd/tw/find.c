@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2007-10-26 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2010-04-05 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -1105,7 +1105,7 @@ compile(State_t* state, char** argv, register Node_t* np, int nested)
 					break;
 				if (strmatch(b, "*{}*"))
 				{
-					if (streq(b, "{}") && (b = argv[opt_info.index]) && (streq(b, ";") || streq(b, "+") && !(i = 0)))
+					if (!(k & CMD_INSERT) && streq(b, "{}") && (b = argv[opt_info.index]) && (streq(b, ";") || streq(b, "+") && !(i = 0)))
 					{
 						argv[opt_info.index - 1] = 0;
 						opt_info.index++;
@@ -1844,18 +1844,18 @@ main(int argc, char** argv)
 		find(&state, op, state.walkflags, sort);
 	}
  done:
-	if (state.vm)
-		vmclose(state.vm);
-	if (state.str)
-		sfstrclose(state.str);
-	if (state.tmp)
-		sfstrclose(state.tmp);
 	while (state.cmd)
 	{
 		cmdflush(state.cmd->first.xp);
 		cmdclose(state.cmd->first.xp);
 		state.cmd = state.cmd->second.np;
 	}
+	if (state.vm)
+		vmclose(state.vm);
+	if (state.str)
+		sfstrclose(state.str);
+	if (state.tmp)
+		sfstrclose(state.tmp);
 	if (fp && findclose(fp))
 		error(ERROR_SYSTEM|2, "fast find error");
 	if (state.proc && (r = procclose(state.proc)))

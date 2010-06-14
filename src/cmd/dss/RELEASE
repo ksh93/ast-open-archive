@@ -1,3 +1,6 @@
+10-05-21 dss.c: add SEE ALSO \bdss::dss\b(5P) (after libast::optget() fix)
+10-05-11 dss.c: drop --info=style in favor of generic --plugins=style
+10-05-04 dss.c: change -i,--info to -i,--info={man|html|nroff|usage}
 09-07-02 dss.c: fix EXAMPLES typo
 08-07-17 dss.c: tweak self-docs
 06-10-11 add sfstruse() error checks

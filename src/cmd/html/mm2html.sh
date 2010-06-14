@@ -41,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2010-02-02' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2010-05-09' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2010-02-02 $
+@(#)$Id: mm2html (AT&T Research) 2010-05-09 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man/mandoc subset to html]
@@ -1142,12 +1142,11 @@ function heading
 		txt=${txt%%*([-,.])}
 		txt=${txt//'&nbsp;'/' '}
 		txt=${txt//\&+([^\;])\;/}
+		print -nr -- "<A name=\"$txt\">$txt</A>"
 		if	(( labels >= 0 && count < mark ))
-		then	print -nr -- "<A name=\"$txt\">$txt</A>"
-			last_level=$count
+		then	last_level=$count
 			level[labels]=$count
 			label[labels++]=$txt
-		else	print -nr "$txt"
 		fi
 		print -r -- "</H$count>$end"
 		;;
@@ -1920,40 +1919,7 @@ do	getline || {
 				?*)	dl[++dls]=$4 ;;
 				esac
 				case $5 in
-				'')	sec=$2
-					while	:
-					do	case $sec in
-						*C)	cmp="COMPATIBILITY " ;;
-						*U)	ver="UWIN " ;;
-						*X)	msc="MISCELLANEOUS " ;;
-						*)	break ;;
-						esac
-						sec=${sec%?}
-					done
-					case $sec in
-					1M)	sec="MAKE ASSERTION OPERATORS AND RULES" ;;
-					1*)	sec="USER COMMANDS" ;;
-					2*)	sec="SYSTEM CALLS" ;;
-					3F)	sec="FORTRAN LIBRARY ROUTINES" ;;
-					3K)	sec="KERNEL VM LIBRARY FUNCTIONS" ;;
-					3L)	sec="LIGHTWEIGHT PROCESSES LIBRARY" ;;
-					3M)	sec="MATHEMATICAL LIBRARY" ;;
-					3N)	sec="NETWORK FUNCTIONS" ;;
-					3R)	sec="RPC SERVICES LIBRARY" ;;
-					3S)	sec="STANDARD I/O FUNCTIONS" ;;
-					3V)	sec="SYSTEM V LIBRARY" ;;
-					3X)	sec="MISCELLANEOUS LIBRARY FUNCTIONS" ;;
-					3*)	sec="C LIBRARY FUNCTIONS" ;;
-					4F)	sec="PROTOCOL FAMILIES" ;;
-					4P)	sec="PROTOCOLS" ;;
-					4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
-					5*)	sec="FILE FORMATS" ;;
-					6*)	sec="GAMES AND DEMOS" ;;
-					7*)	sec="PUBLIC FILES AND TABLES" ;;
-					8*)	sec="ADMINISTRATIVE COMMANDS" ;;
-					L*)	sec="LOCAL COMMANDS" ;;
-					*)	sec="SECTION $sec" ;;
-					esac
+				'')	sec=$(set --'???'MAN=$2 2>&1)
 					sec=$ver$msc$cmp$sec
 					;;
 				*)	sec=$5

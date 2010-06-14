@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -141,7 +141,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 				state.profile = dupstring(state.profile, a->global.profile);
 			if (a->global.set & SETREMOTE)
 			{
-				pathrepl(a->global.remote, state.home->type, "%s");
+				pathrepl(a->global.remote, 0, state.home->type, "%s");
 				state.remote = dupstring(state.remote, a->global.remote);
 			}
 			if (a->global.set & SETSCHEDULE)
@@ -161,7 +161,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 			}
 			if (a->global.set & SETSHELL)
 			{
-				pathrepl(a->global.shell, state.home->type, "%s");
+				pathrepl(a->global.shell, 0, state.home->type, "%s");
 				state.sh = dupstring(state.sh, a->global.shell);
 			}
 			if (a->global.set & SETFILE)
@@ -544,7 +544,7 @@ info(int op, char* file)
 	{
 		if (!(file = apath))
 		{
-			if (!(file = sfstrrsrv(state.string, PATH_MAX)) || !pathaccess(file, csvar(CS_VAR_TRUST, 1), csvar(CS_VAR_SHARE, 0), CS_SVC_ACCESS, PATH_REGULAR) || !(file = strdup(file)))
+			if (!(file = sfstrrsrv(state.string, PATH_MAX)) || !pathaccess(csvar(CS_VAR_TRUST, 1), csvar(CS_VAR_SHARE, 0), CS_SVC_ACCESS, PATH_REGULAR, file, PATH_MAX) || !(file = strdup(file)))
 			{
 				state.access = cs.time + ACCESS_SEARCH;
 				return(0);

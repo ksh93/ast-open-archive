@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -318,7 +318,7 @@ static Type_t types[] =
 {
 BT(CX_void,	&name_void[0],	   &state.type_void,	"No value. May be used for padding.", void_external, void_internal, 0)
 BT(CX_number,	&name_number[0],   &state.type_number,	"An integral or floating point number.", number_external, number_internal, 0)
-BT(CX_string,	&name_string[0],   &state.type_string,	"A 0-terminated string.", string_external, string_internal, &match_string)
+BT(CX_string,	&name_string[0],   &state.type_string,	"A string. The format details string specifies quoting and C style character escape processing: \bquote\b[=\achar\a] quotes string with \achar\a (\b\"\b) as the begin and end quote; \bendquote\b=\achar\a changes the \bquote\b end to \achar\a; \bshell\b[=\abeg\a] quotes using shell conventions and \abeg\a (\b$'\b) as the quote begin; \bopt\b performs \bquote\b and \bshell\b quoting only when necessary; \bescape\b assumes that escape processing has already been performed; \bwide\b does not escape characters with the bit 8 set; \bexpand\b=\amask\a expands escaped characters according to \amask\a which may be a \b,\b or \b|\b separated list of \ball\b: expand all escaped chars, \bchar\b expands 7 bit character escapes, \bline\b expands \b\\r\b and \b\\n\b escapes, \bwide\b expands wide character escapes, \bnocr\b eliminates \b\\r\b, and \bnonl\b eliminates \b\\n\b.", string_external, string_internal, &match_string)
 BT(CX_reference,&name_reference[0],&state.type_reference,"A referenced type.", 0,0,0)
 BT(CX_buffer,	&name_buffer[0],   &state.type_buffer,	"A separately allocated sized buffer. The external representation is a newline separated base64 mime encoding.", buffer_external, buffer_internal, 0)
 BT(CX_pointer,	&name_pointer[0],  0,			"A generic pointer.", 0,0,0)
@@ -459,14 +459,14 @@ op_xor_N(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperan
 static int
 op_andand_N(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
-	r->value.number = a->value.number != 0 && b->value.number != 0;
+	r->value.number = a->value.number > 0 && b->value.number > 0;
 	return 0;
 }
 
 static int
 op_oror_N(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
-	r->value.number = a->value.number != 0 || b->value.number != 0;
+	r->value.number = a->value.number > 0 || b->value.number > 0;
 	return 0;
 }
 
@@ -494,7 +494,7 @@ op_inv_N(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperan
 static int
 op_log_N(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
-	r->value.number = b->value.number != 0.0;
+	r->value.number = b->value.number > 0.0;
 	return 0;
 }
 
@@ -619,6 +619,13 @@ op_gt_S(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand
 }
 
 static int
+op_not_S(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	r->value.number = *b->value.string.data == 0;
+	return 0;
+}
+
+static int
 op_lt_B(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
 	int	c;
@@ -665,6 +672,24 @@ op_gt_B(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand
 	int	c;
 
 	r->value.number = (c = memcmp(a->value.buffer.data, b->value.buffer.data, CXMIN(a->value.buffer.size, b->value.buffer.size))) > 0 || c == 0 && a->value.buffer.size > b->value.buffer.size;
+	return 0;
+}
+
+static int
+op_not_B(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	r->value.number = b->value.buffer.size == 0;
+	return 0;
+}
+
+static int
+op_cast_SN(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	char*	e;
+
+	r->value.number = strtod(b->value.string.data, &e);
+	if (*e && cx->disc->errorf)
+		(*cx->disc->errorf)(cx, cx->disc, 2, "%s: invalid number", b->value.string.data);
 	return 0;
 }
 
@@ -758,12 +783,18 @@ CXC(CX_NE,	CX_string_t,	CX_string_t,	op_ne_S,	0)
 CXC(CX_GE,	CX_string_t,	CX_string_t,	op_ge_S,	0)
 CXC(CX_GT,	CX_string_t,	CX_string_t,	op_gt_S,	0)
 
+CXC(CX_NOT,	CX_string_t,	CX_void_t,	op_not_S,	0)
+
 CXC(CX_LT,	CX_buffer_t,	CX_buffer_t,	op_lt_B,	0)
 CXC(CX_LE,	CX_buffer_t,	CX_buffer_t,	op_le_B,	0)
 CXC(CX_EQ,	CX_buffer_t,	CX_buffer_t,	op_eq_B,	0)
 CXC(CX_NE,	CX_buffer_t,	CX_buffer_t,	op_ne_B,	0)
 CXC(CX_GE,	CX_buffer_t,	CX_buffer_t,	op_ge_B,	0)
 CXC(CX_GT,	CX_buffer_t,	CX_buffer_t,	op_gt_B,	0)
+
+CXC(CX_NOT,	CX_buffer_t,	CX_void_t,	op_not_B,	0)
+
+CXC(CX_CAST,	CX_string_t,	CX_number_t,	op_cast_SN,	0)
 
 };
 
@@ -788,6 +819,12 @@ cxopen(Cxflags_t flags, Cxflags_t test, Cxdisc_t* disc)
 	register Vmalloc_t*	vm;
 	register Vmalloc_t*	em;
 	register Vmalloc_t*	rm;
+	register int		i;
+
+	static const char	cx_alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$";
+	static const char	cx_digit[] = "0123456789";
+	static const char	cx_float[] = "_.#";
+	static const char	cx_space[] = " \f\n\t\r\v";
 
 	if (!(vm = vmopen(Vmdcheap, Vmbest, 0)) || !(em = vmopen(Vmdcheap, Vmlast, 0)) || !(rm = vmopen(Vmdcheap, Vmlast, 0)))
 	{
@@ -819,7 +856,7 @@ cxopen(Cxflags_t flags, Cxflags_t test, Cxdisc_t* disc)
 	cx->redisc.re_version = REG_VERSION;
 	cx->redisc.re_flags = REG_NOFREE;
 	cx->redisc.re_errorf = (regerror_t)disc->errorf;
-	if (!(cx->buf = sfstropen()) || !(cx->tp = sfstropen()) || !(cx->xp = sfstropen()))
+	if (!(cx->buf = sfstropen()) || !(cx->tp = sfstropen()))
 	{
 		cxclose(cx);
 		return 0;
@@ -827,8 +864,8 @@ cxopen(Cxflags_t flags, Cxflags_t test, Cxdisc_t* disc)
 	cx->scoped = 1;
 	if (!(flags & CX_SCOPE))
 	{
-		cx->oop = cx->op = sfstdout;
-		if (!(cx->variables = dtnew(cx->vm, &state.namedisc, Dttree)) || !(cx->fields = dtnew(cx->vm, &state.listdisc, Dtqueue)) || !(cx->buf = sfstropen()) || !(cx->tp = sfstropen()) || !(cx->xp = sfstropen()))
+		cx->op = sfstdout;
+		if (!(cx->variables = dtnew(cx->vm, &state.namedisc, Dttree)) || !(cx->fields = dtnew(cx->vm, &state.listdisc, Dtqueue)) || !(cx->buf = sfstropen()) || !(cx->tp = sfstropen()))
 		{
 			cxclose(cx);
 			return 0;
@@ -841,6 +878,14 @@ cxopen(Cxflags_t flags, Cxflags_t test, Cxdisc_t* disc)
 		cx->recodes = state.recodes;
 		cx->types = state.types;
 	}
+	for (i = 0; i < (sizeof(cx_alpha) - 1); i++)
+		cx->ctype[cx_alpha[i]] |= CX_CTYPE_ALPHA;
+	for (i = 0; i < (sizeof(cx_digit) - 1); i++)
+		cx->ctype[cx_digit[i]] |= CX_CTYPE_DIGIT;
+	for (i = 0; i < (sizeof(cx_float) - 1); i++)
+		cx->ctype[cx_float[i]] |= CX_CTYPE_FLOAT;
+	for (i = 0; i < (sizeof(cx_space) - 1); i++)
+		cx->ctype[cx_space[i]] |= CX_CTYPE_SPACE;
 	return cx;
  bad:
 	vmclose(vm);
@@ -860,7 +905,7 @@ cxscope(Cx_t* top, Cx_t* bot, Cxflags_t flags, Cxflags_t test, Cxdisc_t* disc)
 	{
 		if (!(top = cxopen(CX_SCOPE|flags, test, disc)))
 			return 0;
-		top->op = top->oop = sfstdout;
+		top->op = sfstdout;
 	}
 	if (top->scoped != 1)
 	{
@@ -987,8 +1032,6 @@ cxclose(register Cx_t* cx)
 			sfclose(cx->buf);
 		if (cx->tp)
 			sfclose(cx->tp);
-		if (cx->xp)
-			sfclose(cx->xp);
 		if (cx->em)
 			vmclose(cx->em);
 		if (cx->rm)
@@ -1140,7 +1183,24 @@ cxaddtype(Cx_t* cx, register Cxtype_t* type, Cxdisc_t* disc)
 Cxtype_t*
 cxtype(Cx_t* cx, const char* name, Cxdisc_t* disc)
 {
-	return (Cxtype_t*)dtmatch(cx ? cx->types : state.types, name);
+	register char*	s;
+	register char*	lib;
+	Cxtype_t*	t;
+	size_t		n;
+
+	if ((s = strchr(name, ':')) && *++s == ':')
+	{
+		n = s - (char*)name;
+		lib = fmtbuf(n);
+		memcpy(lib, name, --n);
+		lib[n] = 0;
+		name = (const char*)s + 1;
+	}
+	else
+		lib = (char*)name;
+	if (!(t = (Cxtype_t*)dtmatch(cx ? cx->types : state.types, name)) && disc->loadf && (*disc->loadf)(lib, disc))
+		t = (Cxtype_t*)dtmatch(cx ? cx->types : state.types, name);
+	return t;
 }
 
 /*
@@ -1208,7 +1268,12 @@ cxaddcallout(Cx_t* cx, register Cxcallout_t* callout, Cxdisc_t* disc)
 			return -1;
 		}
 	}
-	dtinsert(dict, callout);
+	if ((Cxcallout_t*)dtinsert(dict, callout) != callout)
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "callout initialization error");
+		return -1;
+	}
 	return 0;
 }
 
@@ -1223,7 +1288,7 @@ cxcallout(Cx_t* cx, int code, Cxtype_t* type1, Cxtype_t* type2, Cxdisc_t* disc)
 	Cxop_t		op;
 
 	memset(&op, 0, sizeof(op));
-	op.code = code;;
+	op.code = code;
 	if (!(op.type1 = type1))
 		op.type1 = state.type_void;
 	if (!(op.type2 = type2))
@@ -1310,9 +1375,68 @@ cxquery(Cx_t* cx, const char* name, Cxdisc_t* disc)
 	}
 	else
 		lib = (char*)name;
-	if (!(q = (Cxquery_t*)dtmatch(cx ? cx->queries : state.queries, name)) && disc->loadf && !(*disc->loadf)(lib, disc))
+	if (!(q = (Cxquery_t*)dtmatch(cx ? cx->queries : state.queries, name)) && disc->loadf && (*disc->loadf)(lib, disc))
 		q = (Cxquery_t*)dtmatch(cx ? cx->queries : state.queries, name);
 	return q;
+}
+
+/*
+ * return function given name
+ */
+
+Cxvariable_t*
+cxfunction(Cx_t* cx, const char* name, Cxdisc_t* disc)
+{
+	register char*	s;
+	register char*	p;
+	Cxvariable_t*	f;
+	Cxlib_t*	lib;
+	int		i;
+
+	if (!cx)
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: function must be local", name);
+		return 0;
+	}
+	if (f = (Cxvariable_t*)dtmatch(cx->variables, name))
+	{
+		if (f->function)
+			return f;
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: not a function", name);
+		return 0;
+	}
+	if (!(s = strchr(name, ':')) || *++s != ':')
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: function must be local", name);
+		return 0;
+	}
+	i = s - (char*)name;
+	p = fmtbuf(i);
+	memcpy(p, name, --i);
+	p[i] = 0;
+	if (!disc->loadf || !(lib = (*disc->loadf)(p, disc)))
+		return 0;
+	if (lib->functions)
+		for (i = 0; lib->functions[i].name; i++)
+			if (cxaddvariable(cx, &lib->functions[i], disc))
+				return 0;
+	if (f = (Cxvariable_t*)dtmatch(cx->variables, name))
+	{
+		if (f->function)
+			return f;
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: not a function", name);
+	}
+	else
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: undefined function", name);
+		return 0;
+	}
+	return 0;
 }
 
 /*
@@ -1714,7 +1838,7 @@ cxvariable(Cx_t* cx, const char* name, register Cxtype_t* m, Cxdisc_t* disc)
 			{
 				if (t)
 					*t++ = 0;
-				v = (Cxvariable_t*)dtmatch(dict, s);
+				v = (Cxvariable_t*)dtmatch(dict, *s ? s : ".");
 				if (!v)
 				{
 					if (disc->errorf)
@@ -1892,6 +2016,8 @@ cxcast(Cx_t* cx, Cxoperand_t* ret, Cxvariable_t* var, Cxtype_t* type, void* data
 	}
 	return 0;
  bad:
+	if ((x.callout = cxcallout(cx, CX_CAST, ret->type, type, cx->disc)) && !(*x.callout)(cx, &x, ret, NiL, &val, NiL, cx->disc))
+		return 0;
 	if (cx->disc->errorf)
 		(*cx->disc->errorf)(cx, cx->disc, 2, "cannot cast %s to %s", ret->type->name, type->name);
 	return -1;

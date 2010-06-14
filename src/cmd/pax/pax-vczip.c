@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -51,7 +51,7 @@ Format_t	pax_vczip_format =
 	0,
 	0,
 	0,
-	PAXNEXT(pax_vczip_next),
+	PAXNEXT(vczip),
 	&pax_vczip_data,
 	0,
 	vczip_getprologue,
@@ -68,4 +68,4 @@ Format_t	pax_vczip_format =
 	0
 };
 
-PAXLIB(&pax_vczip_format)
+PAXLIB(vczip)

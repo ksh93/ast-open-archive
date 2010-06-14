@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -77,6 +77,7 @@ typedef struct Field_s			/* key field			*/
 	int		freetrans;	/* free trans on close		*/
 	unsigned char*	trans;		/* translation table		*/
 	unsigned char*	keep;		/* deletion table		*/
+	void*		data;		/* coder specific data		*/
 	Position_t	begin;		/* key begins here		*/
 	Position_t	end;		/* and ends here		*/
 	unsigned char	aflag;		/* accumulate dups here		*/

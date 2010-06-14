@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -25,8 +25,6 @@
  * Glenn Fowler
  * AT&T Research
  */
-
-static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 2008-06-11 $\0\n";
 
 #include <dsslib.h>
 #include <hashpart.h>
@@ -1148,7 +1146,9 @@ static Cxtype_t types[] =
 Dsslib_t dss_lib_num_t =
 {
 	"num_t",
-	"numeric type support",
+	"numeric type support"
+	"[-?\n@(#)$Id: dss numeric type library (AT&T Research) 2008-06-11 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,

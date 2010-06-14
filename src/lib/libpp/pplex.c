@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1986-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1986-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -2426,7 +2426,7 @@ pool(void)
 			if (open(ofile, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 1)
 				error(ERROR_SYSTEM|3, "%s: cannot create", ofile);
 			pp.outfile = ofile;
-			pathcanon(ifile, 0);
+			pathcanon(ifile, 0, 0);
 			ifile = ppsetfile(ifile)->name;
 #if CHECKPOINT
 			if (pp.mode & DUMP)

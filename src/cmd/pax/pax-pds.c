@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -184,7 +184,7 @@ Format_t	pax_pds_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,
-	PAXNEXT(pax_pds_next),
+	PAXNEXT(pds),
 	0,
 	pds_done,
 	pds_getprologue,
@@ -192,4 +192,4 @@ Format_t	pax_pds_format =
 	pds_getdata,
 };
 
-PAXLIB(&pax_pds_format)
+PAXLIB(pds)

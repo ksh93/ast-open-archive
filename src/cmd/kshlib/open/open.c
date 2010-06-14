@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2007-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2007-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -534,3 +534,5 @@ extern int b_open(int argc, char *argv[], void *context)
 	fdp->name = strdup(argv[1]);
 	return(0);
 }
+
+SHLIB(open)

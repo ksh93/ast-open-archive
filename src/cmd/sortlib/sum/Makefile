@@ -8,4 +8,4 @@ sum plugin=sort :LIBRARY: sortsum.c -lrecsort -ldss
 
 :TEST: sort
 
-:: RELEASE data/nyse.dat
+:: RELEASE data/nyse.dat data/euro.dat

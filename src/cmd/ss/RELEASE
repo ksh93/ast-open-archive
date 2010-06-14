@@ -1,3 +1,4 @@
+10-06-01 sync with ast api 20100601
 04-07-22 ssd.c: access() => eaccess()
 03-07-29 ssd.c,features/cmd: add utmpx support
 99-05-18 ss: long options

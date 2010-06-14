@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1430,7 +1430,7 @@ load(Ss_t* ss, const char* usr, const char* fun, const char* lib, Ssdisc_t* disc
 	static const char*	sys[] = { "syncsort", "sort" };
 
 	for (i = 0; i < elementsof(sys); i++)
-		if (dll = dllplug(sys[i], lib, NiL, RTLD_LAZY, path, sizeof(path)))
+		if (dll = dllplugin(sys[i], lib, NiL, RS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path)))
 			break;
 	if (!dll)
 	{
@@ -1449,7 +1449,7 @@ load(Ss_t* ss, const char* usr, const char* fun, const char* lib, Ssdisc_t* disc
 				if (*t)
 				{
 					for (i = 0; i < elementsof(sys); i++)
-						if (dll = dllplug(sys[i], t, NiL, RTLD_LAZY, path, sizeof(path)))
+						if (dll = dllplugin(sys[i], t, NiL, RS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path)))
 							break;
 					if (dll)
 						break;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -20,9 +20,7 @@
 #pragma prototyped
 
 static const char stats_usage[] =
-"[-1?\n@(#)$Id: dss stats query (AT&T Research) 2003-05-05 $\n]"
-USAGE_LICENSE
-"[+LIBRARY?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The stats query lists the sum, average, unbiased standard"
 "	deviation, and minimum and maximum range values of the numeric"
 "	\afield\a operands. If no operands are specified then all numeric"
@@ -134,6 +132,8 @@ CXV("MAX",      "number", STATS_MAX,       "Maximum value.")
 CXV("MIN",      "number", STATS_MIN,       "Minimum value.")
 CXV("SUM",      "number", STATS_SUM,       "Sum of values.")
 };
+
+extern Dsslib_t	dss_lib_stats;
 
 static int
 getop(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
@@ -257,6 +257,7 @@ stats_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	int		errors = error_info.errors;
 	int		all;
 	int		i;
+	char*		s;
 	State_t*	state;
 	Cxvariable_t*	variable;
 	Field_t*	field;
@@ -295,9 +296,11 @@ stats_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 			goto bad;
 		variables[i].data = &variables[0];
 	}
+	sfprintf(cx->buf, "%s%s", strchr(dss_lib_stats.description, '['), stats_usage);
+	s = sfstruse(cx->buf);
 	for (;;)
 	{
-		switch (optget(argv, stats_usage))
+		switch (optget(argv, s))
 		{
 		case 'a':
 			state->op |= STATS_AVERAGE;
@@ -709,10 +712,12 @@ static Cxquery_t	queries[] =
 	{0}
 };
 
-static Dsslib_t		lib =
+Dsslib_t		dss_lib_stats =
 {
 	"stats",
-	"stats query",
+	"stats query"
+	"[-1lms5P?\n@(#)$Id: dss stats query (AT&T Research) 2003-05-05 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,
@@ -722,9 +727,3 @@ static Dsslib_t		lib =
 	0,
 	&queries[0]
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

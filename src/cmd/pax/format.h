@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -45,7 +45,9 @@ extern Format_t			PAX_DEBUG_FORMAT;
 #define pax_ibm_next		(&pax_binary_format)
 #define pax_binary_next		(&pax_cpio_format)
 #define pax_cpio_next		(&pax_ustar_format)
-#define pax_ustar_next		(&pax_asc_format)
+#define pax_ustar_next		(&pax_pax_format)
+#define pax_pax_next		(&pax_tar_format)
+#define pax_tar_next		(&pax_asc_format)
 #define pax_asc_next		(&pax_aschk_format)
 #define pax_aschk_next		(&pax_vmsbackup_format)
 #define pax_vmsbackup_next	(&pax_ar_format)

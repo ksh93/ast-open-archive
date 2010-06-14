@@ -19,6 +19,11 @@ function DATA
 			do	print $i
 			done
 			;;
+		500000.dat)
+			for ((i = 1; i <= 500000; i++))
+			do	print $i
+			done
+			;;
 		a.dat)	print a
 			;;
 		b.dat)	print b
@@ -566,3 +571,33 @@ tail: warning: 4: 2.00s timeout'
 	PROG wait
 		OUTPUT -
 		ERROR -
+
+TEST 33 "-f large initial context"
+
+	DO	DATA 500000.dat
+
+	EXEC	-n 600000 -f -t 1 500000.dat
+		SAME OUTPUT 500000.dat
+		ERROR - 'tail: warning: 500000.dat: 1.00s timeout'
+
+TEST 34 "no initial context"
+
+	DO	DATA 10.dat
+
+	EXEC	-n 0 10.dat
+		OUTPUT -
+
+	EXEC	-n -0 10.dat
+		OUTPUT -
+
+	EXEC	-0 10.dat
+		OUTPUT -
+
+	EXEC	-n 0 -f -t 1 10.dat
+		ERROR - 'tail: warning: 10.dat: 1.00s timeout'
+
+	EXEC	-n -0 -f -t 1 10.dat
+
+	EXEC	-0 -f -t 1 10.dat
+
+	EXEC	-0f -t 1 10.dat

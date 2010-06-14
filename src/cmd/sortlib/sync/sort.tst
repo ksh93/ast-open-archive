@@ -370,7 +370,7 @@ TEST 09 'selection expressions'
 
 TEST 10 '/dev/null => RS_IGNORE'
 
-	EXEC -lsync,control=$data/c.ss -Xdump -za16k -zi16k -zm16 -zo16k -o /dev/null /dev/null
+	EXEC -lsync,control=$data/c.ss -Xdump -za16ki -zi16ki -zm16 -zo16ki -o /dev/null /dev/null
 		ERROR - $'main
 	intermediates=16
 state

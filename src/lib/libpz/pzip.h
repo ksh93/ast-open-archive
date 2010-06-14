@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*          Copyright (c) 1998-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -32,7 +32,15 @@
 #include <sfdcgzip.h>
 #include <vmalloc.h>
 
+#define PZ_PLUGIN_VERSION	AST_PLUGIN_VERSION(PZ_VERSION)
+
 #define PZ_VERSION	19990811L	/* interface version		*/
+
+#if __STDC__
+#define PZLIB(m)	unsigned long	plugin_version(void) { return PZ_PLUGIN_VERSION; }
+#else
+#define PZLIB(m)	unsigned long	plugin_version() { return PZ_PLUGIN_VERSION; }
+#endif
 
 #define PZ_DATA_SUF	"pz"		/* data file suffix		*/
 #define PZ_PART_SUF	"prt"		/* partition file suffix	*/

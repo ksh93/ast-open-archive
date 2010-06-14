@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -70,7 +70,6 @@
 #define mapinit		_3d_mapinit
 #define mapset		_3d_mapset
 #define nosys		_3d_nosys
-#define pathcanon	_3d_pathcanon
 #define pathreal	_3d_pathreal
 #define peek		_3d_peek
 #define search		_3d_search
@@ -80,5 +79,12 @@
 #define stub		_3d_stub
 #define syscall3d	_3d_syscall
 #define sysfunc		_3d_sysfunc
+
+#include <ast.h>
+
+#undef	pathcanon
+#define pathcanon	_3d_pathcanon
+#undef	pathcat
+#define pathcat		_3d_pathcat
 
 #endif

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1039,7 +1039,7 @@ Format_t	pax_ibm_format =
 	4,
 	4,
 	0,
-	PAXNEXT(pax_ibm_next),
+	PAXNEXT(ibm),
 	0,
 	slt_done,
 	ibm_getprologue,
@@ -1058,4 +1058,4 @@ Format_t	pax_ibm_format =
 	slt_validate
 };
 
-PAXLIB(&pax_ibm_format)
+PAXLIB(ibm)

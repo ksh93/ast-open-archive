@@ -535,7 +535,7 @@ NIL	%C		19
 NIL	%d		22
 NIL	%D		09/22/86
 NIL	%e		22
-NIL	%E		22
+NIL	%E		%E
 NIL	%f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%F		1986-09-22
 NIL	%g		86
@@ -553,10 +553,10 @@ NIL	%L		Mon Sep 22 15:09:47 EDT 1986
 NIL	%m		09
 NIL	%M		09
 NIL	%N		000000000
-NIL	%o		Mon Sep 22 15:09:47 EDT 1986
-NIL	%O		Mon Sep 22 15:09:47 EDT 1986
+NIL	%o		%o
+NIL	%O		%O
 NIL	%p		PM
-NIL	%P		%P
+NIL	%P		pm
 NIL	%Q/%Qr/%Qd/	Sep 22  1986
 NIL	%Qd		Sep 22  1986
 NIL	%Qr		Sep 22 15:09
@@ -587,7 +587,7 @@ NIL	%0C		19
 NIL	%0d		22
 NIL	%0D		09/22/86
 NIL	%0e		22
-NIL	%0E		22
+NIL	%0E		%E
 NIL	%0f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%0F		1986-09-22
 NIL	%0g		86
@@ -605,10 +605,10 @@ NIL	%0L		Mon Sep 22 15:09:47 EDT 1986
 NIL	%0m		09
 NIL	%0M		09
 NIL	%0N		000000000
-NIL	%0o		Mon Sep 22 15:09:47 EDT 1986
-NIL	%0O		Mon Sep 22 15:09:47 EDT 1986
+NIL	%0o		%o
+NIL	%0O		%O
 NIL	%0p		PM
-NIL	%0P		%P
+NIL	%0P		pm
 NIL	%0Q/%Qr/%Qd/	Sep 22  1986
 NIL	%0Qd		Sep 22  1986
 NIL	%0Qr		Sep 22 15:09
@@ -639,7 +639,7 @@ NIL	%-C		19
 NIL	%-d		22
 NIL	%-D		09/22/86
 NIL	%-e		22
-NIL	%-E		22
+NIL	%-E		%E
 NIL	%-f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%-F		1986-09-22
 NIL	%-g		86
@@ -657,10 +657,10 @@ NIL	%-L		Mon Sep 22 15:09:47 EDT 1986
 NIL	%-m		9
 NIL	%-M		9
 NIL	%-N		0
-NIL	%-o		Mon Sep 22 15:09:47 EDT 1986
-NIL	%-O		Mon Sep 22 15:09:47 EDT 1986
+NIL	%-o		%o
+NIL	%-O		%O
 NIL	%-p		PM
-NIL	%-P		%P
+NIL	%-P		pm
 NIL	%-Q/%Qr/%Qd/	Sep 22  1986
 NIL	%-Qd		Sep 22  1986
 NIL	%-Qr		Sep 22 15:09
@@ -691,7 +691,7 @@ NIL	%_C		19
 NIL	%_d		22
 NIL	%_D		09/22/86
 NIL	%_e		22
-NIL	%_E		22
+NIL	%_E		%E
 NIL	%_f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%_F		1986-09-22
 NIL	%_g		86
@@ -709,10 +709,10 @@ NIL	%_L		Mon Sep 22 15:09:47 EDT 1986
 NIL	%_m		 9
 NIL	%_M		 9
 NIL	%_N		        0
-NIL	%_o		Mon Sep 22 15:09:47 EDT 1986
-NIL	%_O		Mon Sep 22 15:09:47 EDT 1986
+NIL	%_o		%o
+NIL	%_O		%O
 NIL	%_p		PM
-NIL	%_P		%P
+NIL	%_P		pm
 NIL	%_Q/%Qr/%Qd/	Sep 22  1986
 NIL	%_Qd		Sep 22  1986
 NIL	%_Qr		Sep 22 15:09

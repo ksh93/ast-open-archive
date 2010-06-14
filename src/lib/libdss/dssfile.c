@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -282,7 +282,7 @@ dssfread(Dssfile_t* file)
 	int	r;
 
 	file->count++;
-	file->offset = sftell(file->io);
+	file->offset += file->length;
 	if ((r = (*file->readf)(file, &file->record, file->dss->disc)) <= 0)
 	{
 		if (r < 0)
@@ -290,6 +290,7 @@ dssfread(Dssfile_t* file)
 		file->count--;
 		return 0;
 	}
+	file->length = sftell(file->io) - file->offset;
 	return &file->record;
 }
 

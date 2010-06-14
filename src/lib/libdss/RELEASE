@@ -1,3 +1,16 @@
+10-05-04 dssopt.c: check for '[' usage in description, drop [+PATH?...]
+10-05-01 cxopen.c: document string type format details
+10-04-22 dssprintf.c: %(:details:)s for default %s details
+10-04-22 dssopt.c: handle dss default method special cases
+10-04-22 dssprintf.c: treat { %d %ld %lld %Ld } as intmax_t
+10-04-22 add (type)var and (type)lib::fun() casts
+10-04-22 add lib::fun and lib::type plugin lib bindings
+10-04-22 fix unary ! logic bugs
+10-04-22 add Dsslib_t.variables variable/function table
+10-04-21 dssprintf.c: allow expressions in %(...)c
+10-04-15 add string=>number CX_CAST callout for stringvar op number
+10-04-15 add lazy lookup for self-describing data { e.g. xml json }
+10-04-08 dssopen.c: name=="method::..." is schema here doc
 08-06-24 dss.h: add per-Dssfile_t vm
 08-06-17 cx.h: add Cxtype_t* arg to Cxmatchexec_f for delayed eval
 08-05-08 cxopen.c: fix number_external() width logic

@@ -7,7 +7,7 @@ export TZ=EST5EDT
 VIEW data
 
 TEST 01 'netflow method, version 5'
-	EXEC -x netflow -p '%(time:%+u%K)s %(prot)d %(src_addr)s:%(src_port)d %(dst_addr)s:%(dst_port)d %(hop)s' prot==6 $data/netflow-5.dat
+	EXEC -x netflow -p '%(time:%=u%K)s %(prot)d %(src_addr)s:%(src_port)d %(dst_addr)s:%(dst_port)d %(hop)s' prot==6 $data/netflow-5.dat
 		OUTPUT - $'2002-02-17+00:21:21 6 209.50.252.151:80 24.159.97.130:2912 12.123.20.193
 2002-02-17+00:21:21 6 209.50.252.151:80 24.159.97.130:2912 12.123.20.193
 2002-02-17+00:21:21 6 209.126.184.10:80 24.159.97.130:2939 12.123.20.185
@@ -150,7 +150,7 @@ TEST 01 'netflow method, version 5'
 2002-02-17+00:31:16 6 208.184.29.150:80 24.159.97.88:3245 12.123.20.185
 2002-02-17+00:31:16 6 208.184.29.150:80 24.159.97.88:3246 12.123.20.185
 2002-02-17+00:31:16 6 80.1.50.125:2377 24.159.97.1:1214 12.123.20.193'
-	EXEC -x netflow '(prot==6)|{print "%(time:%+u%K)s %(prot)d %(src_addr)s:%(src_port)d %(dst_addr)s:%(dst_port)d %(hop)s"}' $data/netflow-5.dat
+	EXEC -x netflow '(prot==6)|{print "%(time:%=u%K)s %(prot)d %(src_addr)s:%(src_port)d %(dst_addr)s:%(dst_port)d %(hop)s"}' $data/netflow-5.dat
 	EXEC -x netflow -c 'time.min>=28&&time.min<=31&&time.sec==37' $data/netflow-5.dat
 		OUTPUT - $'2/247'
 	EXEC -x netflow '(time.min>=28&&time.min<=31&&time.sec==37)|{count}' $data/netflow-5.dat

@@ -33,6 +33,8 @@ TEST '-p vs umask vs intermediate and final modes'
 
 	UMASK 0202
 
-	EXEC -p a/b/c
+	EXEC -pv a/b/c
 
 	PROG chmod -v + a a/b a/b/c
+
+	EXEC -v d

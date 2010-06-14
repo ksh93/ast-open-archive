@@ -9,10 +9,10 @@ VIEW data ../bgp/data
 TEST 01 'diagnostics'
 	EXEC -x bgp '{validate}|{count}' $data/mrt.dat
 		OUTPUT - $'19649/19649'
-		ERROR - $'validate: warning: no field has constraints or maps'
+		ERROR - $'dss::validate: warning: no field has constraints or maps'
 	EXEC -x bgp-map '{validate --repair}|{count}' $data/mrt.dat
 		OUTPUT -
-		ERROR - $'validate: reair requires CX_SET callout'
+		ERROR - $'dss::validate: reair requires CX_SET callout'
 		EXIT 1
 
 TEST 02 'summaries and counts'

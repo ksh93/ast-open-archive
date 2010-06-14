@@ -1,3 +1,8 @@
+10-05-25 main.c: handle mb -t
+10-05-11 main.c: add -p,--plugins=style -- common to all command swith plugins
+10-04-22 main.c: -C => -E, add posix --silent-check, -C
+10-04-11 main.c: drop -S,--unstable, handle --nostable, -[Sy]N => -zpN
+10-04-03 main.c: add locale reference to the sort order description
 09-12-09 main.c: add -h, --scaled|--human-readable
 08-04-24 main.c: add optget() 'n' option for -1 => -K1
 07-10-30 main.c: default insize == procsize -- worth ~25% time!

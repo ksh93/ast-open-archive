@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,9 +24,9 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dfsort (AT&T Research) 2007-01-25 $\n]"
+"[-1lp0s5P?\n@(#)$Id: dfsort (AT&T Research) 2007-01-25 $\n]"
 USAGE_LICENSE
-"[+NAME?sync - IBM dfsort discipline]"
+"[+PLUGIN?sync - IBM dfsort discipline]"
 "[+DESCRIPTION?The \bsync\b \bsort\b(1) discipline applies an IBM \bDFSORT\b"
 "	control file to the input data. Command line keys are overidden"
 "	by the control file. Auxilliary output files must be named by"
@@ -78,6 +78,7 @@ USAGE_LICENSE
 "		\b02\b in \bout.2\b.]"
 "}"
 "[+SEE ALSO?\bsort\b(1), \bDFSORT\b(IBM), \brecsort\b(3)]"
+"\n\n--library=sync[,option[=value]...]\n\n"
 ;
 
 #include <ast.h>
@@ -668,3 +669,5 @@ rs_disc(Rskey_t* key, const char* options)
 		free(ssdisc);
 	return 0;
 }
+
+SORTLIB(sync)

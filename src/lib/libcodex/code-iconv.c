@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -251,7 +251,7 @@ Codexmeth_t	codex_iconv =
 	0,
 	0,
 	0,
-	CODEXNEXT(codex_iconv_next)
+	CODEXNEXT(iconv)
 };
 
-CODEXLIB(&codex_iconv)
+CODEXLIB(iconv)

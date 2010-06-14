@@ -1,3 +1,11 @@
+10-06-01 od.c: add -c locale checks (and undo some fmtesc() work), add ast -tC1
+10-04-12 pty: fix sfpoll() result read/write bug
+10-04-12 cat.rt: add -v tests
+10-04-11 cmp.rt: add
+10-04-01 pty: add --tty='stty-settings'
+10-03-23 tail.tst: add -f large initial offset test
+10-03-19 pty: add --dialogue
+10-03-15 pty: fix select() fd management
 10-03-07 tail.tst: add partial line -f test
 10-03-05 mktemp.rt: add
 09-09-24 uuencode,uudecode: use uumeth(0) to generate usage method list

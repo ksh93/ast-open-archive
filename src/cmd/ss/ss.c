@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1990-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -221,7 +221,7 @@ main(int argc, char** argv)
 	if (state.keys)
 		while (!(state.keys & SORT))
 			state.keys >>= SHIFT;
-	if (!pathpath(buf, CS_STAT_DIR, argv[0], PATH_EXECUTE))
+	if (!pathpath(CS_STAT_DIR, argv[0], PATH_EXECUTE, buf, sizeof(buf)))
 		error(3, "%s: cannot find data directory", CS_STAT_DIR);
 	if (!(state.next = state.base = newof(0, Sys_t*, n = 64, 0)))
 		error(3, "out of space [vec %d]", n);

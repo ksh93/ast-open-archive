@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -35,7 +35,7 @@
  * <time> is the earliest absolute time the job can be run
  */
 
-static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2007-02-09 $\0\n";
+static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2010-03-19 $\0\n";
 
 #include "at.h"
 
@@ -393,7 +393,7 @@ update(register State_t* state)
 	sfprintf(state->tmp, "%s/%s/%s", state->pwd, state->pwd, AT_QUEUE_FILE);
 	if (!(path = sfstruse(state->tmp)))
 		error(ERROR_SYSTEM|3, "out of space");
-	pathcanon(path, 0);
+	pathcanon(path, 0, 0);
 	if (sp = sfopen(NiL, path, "r"))
 	{
 		error(0, "scan %s queue list", path);
@@ -421,7 +421,7 @@ update(register State_t* state)
 		sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_ALLOW_FILE);
 		if (!(path = sfstruse(state->tmp)))
 			error(ERROR_SYSTEM|3, "out of space");
-		pathcanon(path, 0);
+		pathcanon(path, 0, 0);
 		if (sp = sfopen(NiL, path, "r"))
 			permit = 1;
 		else
@@ -430,7 +430,7 @@ update(register State_t* state)
 			sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_DENY_FILE);
 			if (!(path = sfstruse(state->tmp)))
 				error(ERROR_SYSTEM|3, "out of space");
-			pathcanon(path, 0);
+			pathcanon(path, 0, 0);
 			sp = sfopen(NiL, path, "r");
 		}
 
@@ -562,13 +562,16 @@ execute(register State_t* state, register Job_t* job)
 	Proc_t*		proc;
 	unsigned long	pid;
 	char*		argv[4];
+	long		ops[3];
 
 	argv[0] = state->atx;
 	argv[1] = job->shell;
 	argv[2] = job->name;
 	argv[3] = 0;
+	ops[0] = PROC_SYS_PGRP(1);
+	ops[1] = 0;
 	message((-2, "%s %s %s", argv[0], argv[1], argv[2]));
-	if (!(proc = procopen(argv[0], argv, NiL, NiL, 0)))
+	if (!(proc = procopen(argv[0], argv, NiL, ops, 0)))
 		return 0;
 	pid = proc->pid;
 	procfree(proc);
@@ -1090,7 +1093,7 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 		sfprintf(state->tmp, "%s/%s", state->pwd, AT_LOG_FILE);
 		if (!(s = sfstruse(state->tmp)))
 			error(ERROR_SYSTEM|3, "out of space");
-		pathcanon(s, 0);
+		pathcanon(s, 0, 0);
 		error(ERROR_OUTPUT|0, con->fd, "%s", s);
 		break;
 	case AT_QUIT:
@@ -1344,7 +1347,7 @@ init(const char* path)
 	*ap++ = state->con[0].id.uid = geteuid();
 	*ap++ = 0;
 	s = state->buf;
-	if (!pathpath(s, AT_JOB_DIR, "", PATH_ABSOLUTE|PATH_EXECUTE) || lstat(s, &ds) || !AT_DIR_OK(&ds))
+	if (!pathpath(AT_JOB_DIR, "", PATH_ABSOLUTE|PATH_EXECUTE, s, state->bufsiz) || lstat(s, &ds) || !AT_DIR_OK(&ds))
 		error(ERROR_SYSTEM|3, "%s: job directory not found", AT_JOB_DIR);
 	if (ds.st_uid != state->admin[0])
 		error(ERROR_SYSTEM|3, "%s: job directory uid %d != effective uid %d", s, ds.st_uid, state->admin[0]);
@@ -1373,7 +1376,7 @@ init(const char* path)
 	if (hs.st_uid != state->admin[0])
 		error(AT_STRICT, "%s: directory owner %s does not match daemon %s", s, fmtuid(hs.st_uid), fmtuid(state->admin[0]));
 	sfsprintf(s, state->bufsiz, "%s/%s", state->pwd, AT_EXEC_FILE);
-	pathcanon(s, 0);
+	pathcanon(s, 0, 0);
 	if (lstat(s, &xs))
 		error(ERROR_SYSTEM|3, "%s: job exec command not found", s);
 	if (!S_ISREG(xs.st_mode))

@@ -1,3 +1,10 @@
+10-06-01 ast api 20100601
+10-06-01 Makerules.mk: :PACKAGE: --latest --api=YYYYMMDD|latest FOO:YYYYMMDD
+10-05-25 pkg-X11.mk: add CC.STDLIB.BASE checks for PACKAGE_X11_LIB
+10-04-15 command.c: update to latest cowait() api
+10-03-11 object.c: fix rare 0 complink compile bug
+10-03-11 option.c: handle delayed option quoting if needed
+10-03-10 expand.c: add '-' to order prereq token char set
 10-03-09 read.c: fix ancient makefile cpp comment check that missed /**...
 10-03-04 Makerules.sh: LC_ALL=C for %:%.sh $SHELL -n to avoid 1.2 arith syntax errors
 10-02-24 rule.c: add .GETOPTS and b_getopts() builtin for optget()

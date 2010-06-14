@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -20,9 +20,7 @@
 #pragma prototyped
 
 static const char validate_usage[] =
-"[-1?\n@(#)$Id: dss validate query (AT&T Research) 2003-04-05 $\n]"
-USAGE_LICENSE
-"[+LIBRARY?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The validate query validates the constraints of the"
 "	\afield\a operands. If no operands are specified then all"
 "	fields with constraints or maps are validated. A warning is"
@@ -73,6 +71,8 @@ struct State_s
 	unsigned char	summary;
 	unsigned char	verbose;
 };
+
+extern Dsslib_t		dss_lib_validate;
 
 static void
 number(Sfio_t* op, const char* label, Cxnumber_t n, Cxformat_t* format)
@@ -130,6 +130,7 @@ validate_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	char**			argv = (char**)data;
 	int			errors = error_info.errors;
+	char*			s;
 	State_t*		state;
 	Cxvariable_t*		variable;
 	register Field_t*	field;
@@ -149,9 +150,11 @@ validate_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	}
 	state->vm = vm;
 	list = 0;
+	sfprintf(cx->buf, "%s%s", strchr(dss_lib_validate.description, '['), validate_usage);
+	s = sfstruse(cx->buf);
 	for (;;)
 	{
-		switch (optget(argv, validate_usage))
+		switch (optget(argv, s))
 		{
 		case 'd':
 			state->discard = 1;
@@ -441,10 +444,12 @@ static Cxquery_t	queries[] =
 	{0}
 };
 
-static Dsslib_t		lib =
+Dsslib_t		dss_lib_validate =
 {
 	"validate",
-	"validate query",
+	"validate query"
+	"[-1lms5P?\n@(#)$Id: dss validate query (AT&T Research) 2003-04-05 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,
@@ -454,9 +459,3 @@ static Dsslib_t		lib =
 	0,
 	&queries[0]
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

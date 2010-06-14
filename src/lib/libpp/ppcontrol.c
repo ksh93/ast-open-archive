@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1986-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1986-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1470,7 +1470,7 @@ ppcontrol(void)
 			case T_STRING:
 				s = error_info.file;
 				if (*(p = pp.token))
-					pathcanon(p, 0);
+					pathcanon(p, 0, 0);
 				fp = ppsetfile(p);
 				error_info.file = fp->name;
 				if (error_info.line == 1)

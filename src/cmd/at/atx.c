@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -59,6 +59,7 @@ main(int argc, char** argv)
 		error(3, "%s: user denied", argv[2]);
 	if (setgid(gid))
 		error(3, "%s: group denied", argv[2]);
+	setsid();
 	argv++;
 	execvp(argv[0], argv);
 	error(3, "%s: exec failed", argv[2]);

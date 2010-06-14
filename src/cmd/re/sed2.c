@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -194,8 +194,7 @@ Ge(Text *script, unsigned char *pc, Text *data)
 	script = script;
 	if(hold.s == 0) 
 		vacate(&hold);
-	if(data->w > data->s)
-		*data->w++ = '\n';
+	*data->w++ = '\n';
 	tcopy(&hold, data);
 	return nexti(pc);
 }
@@ -204,7 +203,13 @@ unsigned char *
 ge(Text *script, unsigned char *pc, Text *data)
 {
 	vacate(data);
-	return Ge(script, pc, data);
+	script = script;
+	if(hold.s == 0) 
+		vacate(&hold);
+	if(data->w > data->s)
+		*data->w++ = '\n';
+	tcopy(&hold, data);
+	return nexti(pc);
 }
 
 unsigned char *
@@ -421,34 +426,51 @@ struct { char p, q; } digram[] = {
 	'\v',	'v',
 };
 
+#define LEMAX	72
+#define CHMAX	4
+
 unsigned char *
 le(Text *script, unsigned char *pc, Text *data)
 {
-	int i = 0;
+	int i;
 	int j;
 	unsigned char *s;
+	unsigned char *b;
+	unsigned char *o;
+	unsigned char *e;
+	unsigned char buf[LEMAX+CHMAX+1];
 	script = script;
-	for(s=data->s; s<data->w; s++, i++) {
-		if(i >= 60) {
-			cputchar('\\');
-			cputchar('\n');
-			i = 0;
-		}
+	b = buf;
+	for(s=data->s; s<data->w; s++) {
+		o = b;
 		for(j=0; j<sizeof(digram)/sizeof(*digram); j++)
 			if(*s == digram[j].p) {
-				cputchar('\\');
-				cputchar(digram[j].q);
-				goto cont;
+				*b++ = '\\';
+				*b++ = digram[j].q;
+				goto hit;
 			}
-		if(!isprint(*s)) {
-			if(sfprintf(sfstdout, "\\%3.3o", *s) <= 0)
+		if(!isprint(*s))
+			b += sfsprintf(b, CHMAX+1, "\\%3.3o", *s);
+		else
+			*b++ = *s;
+	hit:
+		if((b - buf) >= LEMAX) {
+			i = o - buf;
+			if(sfwrite(sfstdout, buf, i) != i)
 				error(ERROR_SYSTEM|3, stdouterr);
-		} else
-			cputchar(*s);
-	cont:	;
+			cputchar('\\');
+			cputchar('\n');
+			e = b;
+			b = buf;
+			while(o < e)
+				*b++ = *o++;
+		}
 	}
-	cputchar('$');
-	cputchar('\n');
+	*b++ = '$';
+	*b++ = '\n';
+	i = b - buf;
+	if(sfwrite(sfstdout, buf, i) != i)
+		error(ERROR_SYSTEM|3, stdouterr);
 	return nexti(pc);
 }	
 

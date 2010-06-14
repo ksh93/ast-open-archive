@@ -237,7 +237,7 @@ Codexmeth_t	codex_lzd =
 	0,
 	0,
 	0,
-	CODEXNEXT(codex_lzd_next)
+	CODEXNEXT(lzd)
 };
 
-CODEXLIB(&codex_lzd)
+CODEXLIB(lzd)

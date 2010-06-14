@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -235,7 +235,7 @@ Format_t	pax_tnef_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,
-	PAXNEXT(pax_tnef_next),
+	PAXNEXT(tnef),
 	0,
 	tnef_done,
 	tnef_getprologue,
@@ -244,4 +244,4 @@ Format_t	pax_tnef_format =
 	tnef_gettrailer,
 };
 
-PAXLIB(&pax_tnef_format)
+PAXLIB(tnef)

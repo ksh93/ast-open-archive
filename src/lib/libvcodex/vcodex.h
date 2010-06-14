@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -40,6 +40,8 @@
 #define VCSFIO		0
 #define VCPROPRIETARY	1
 #endif
+
+#define VCODEX_PLUGIN_VERSION	AST_PLUGIN_VERSION(VC_VERSION)
 
 #if VCSFIO == 1
 #include	<sfio.h>
@@ -610,12 +612,15 @@ _END_EXTERNS_
 
 #ifdef __STDC__
 #if defined(__EXPORT__)
-#define VCLIB(m)	Vcmethod_t* m = &_##m; extern __EXPORT__ Vcmethod_t* vcodex_lib(const char* path) { return m; }
+#define VCLIB(m)	Vcmethod_t* m = &_##m; extern __EXPORT__ Vcmethod_t* vcodex_lib(const char* path) { return m; } \
+			unsigned long plugin_version(void) { return VCODEX_PLUGIN_VERSION; }
 #else
-#define VCLIB(m)	Vcmethod_t* m = &_##m; extern Vcmethod_t* vcodex_lib(const char* path) { return m; }
+#define VCLIB(m)	Vcmethod_t* m = &_##m; extern Vcmethod_t* vcodex_lib(const char* path) { return m; } \
+			unsigned long plugin_version(void) { return VCODEX_PLUGIN_VERSION; }
 #endif
 #else
-#define VCLIB(m)	Vcmethod_t* m = &_/**/m; extern Vcmethod_t* vcodex_lib(path) char* path; { return m; }
+#define VCLIB(m)	Vcmethod_t* m = &_/**/m; extern Vcmethod_t* vcodex_lib(path) char* path; { return m; } \
+			unsigned long plugin_version() { return VCODEX_PLUGIN_VERSION; }
 #endif
 
 #endif

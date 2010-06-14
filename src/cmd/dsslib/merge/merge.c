@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -20,9 +20,7 @@
 #pragma prototyped
 
 static const char merge_usage[] =
-"[-1?\n@(#)$Id: dss merge query (AT&T Research) 2003-02-14 $\n]"
-USAGE_LICENSE
-"[+LIBRARY?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bmerge\b query merges the input files based on"
 "	the ordering specified by \b--key\b and \b--reverse\b options."
 "	The files must already be ordered; there is no verification."
@@ -67,6 +65,8 @@ struct State_s
 	Cxcallout_f	getf;
 	File_t		files[1];
 };
+
+extern Dsslib_t	dss_lib_merge;
 
 static int
 ordercmp(Dt_t* dict, void* a, void* b, Dtdisc_t* disc)
@@ -138,6 +138,7 @@ merge_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	int			n;
 	int			r;
 	char*			path;
+	char*			u;
 	char**			v;
 	Cxvariable_t*		variable;
 	Cxoperand_t*		operands;
@@ -155,9 +156,11 @@ merge_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	r = -1;
 	k = 0;
 	keys = 0;
+	sfprintf(cx->buf, "%s%s", strchr(dss_lib_merge.description, '['), merge_usage);
+	u = sfstruse(cx->buf);
 	for (;;)
 	{
-		switch (i = optget(argv, merge_usage))
+		switch (i = optget(argv, u))
 		{
 		case 'k':
 		case 'r':
@@ -289,15 +292,18 @@ static Cxquery_t	queries[] =
 		0,
 		0,
 		0,
+		0,
 		1
 	},
 	{0}
 };
 
-static Dsslib_t		lib =
+Dsslib_t		dss_lib_merge =
 {
 	"merge",
-	"merge query",
+	"merge query"
+	"[-1lms5P?\n@(#)$Id: dss merge query (AT&T Research) 2003-02-14 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	0,
@@ -307,9 +313,3 @@ static Dsslib_t		lib =
 	0,
 	&queries[0]
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

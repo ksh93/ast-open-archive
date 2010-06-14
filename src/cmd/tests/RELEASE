@@ -1,4 +1,7 @@
-09-12-17 opt.tst: opdate for solaris short/long mix
+10-05-28 date.dat,datey2k.dat: update for ast move to %Q? %K
+10-04-05 opt.tst: add head --nroff .TH fix tests
+10-04-02 opt.tst: add head --version bug fix test
+09-12-17 opt.tst: update for solaris short/long mix
 09-11-13 vmalloc/trandom.c: fix test logic
 09-07-22 ip6.rt: add trailing :0 tests
 09-04-27 sfio/tpool.c: update to match libast/sfio/sfpool.c patch

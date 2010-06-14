@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -21,10 +21,4 @@
 
 #include <dss.h>
 
-extern Dsslib_t	dss_lib_ip_t;
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &dss_lib_ip_t;
-}
+DSSLIB(ip_t)

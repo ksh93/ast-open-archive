@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -29,48 +29,30 @@
 
 struct Cxtable_s;
 
+struct Cxcompile_s; typedef struct Cxcompile_s Cxcompile_t;
 struct Cxdone_s; typedef struct Cxdone_s Cxdone_t;
 struct Cxinclude_s; typedef struct Cxinclude_s Cxinclude_t;
 
 #define _CX_PRIVATE_ \
+	Cxexpr_t*		expr; \
+	struct Cxinclude_s*	include; \
 	struct Cxtable_s*	table; \
-	Cxdone_t*		done; \
-	Sfio_t*			ip; \
 	Sfio_t*			op; \
-	Sfio_t*			oop; \
-	Sfio_t*			tp; \
-	Sfio_t*			xp; \
-	Cxinclude_t*		include; \
-	Vmalloc_t*		pm; \
-	char*			base; \
-	char*			next; \
-	char*			last; \
-	char*			ccbuf; \
-	char*			cvtbuf; \
-	size_t			ccsiz; \
-	size_t			cvtsiz; \
-	ssize_t			error; \
-	int			balanced; \
-	int			collecting; \
-	int			head; \
-	int			index; \
-	int			jump; \
-	int			paren; \
-	int			reclaim; \
-	int			scoped; \
-	int			view; \
-	unsigned int		level; \
-	unsigned int		depth; \
-	unsigned int		pp; \
-	char			opbuf[16]; \
-	Cxtype_t*		type; \
 	regdisc_t		redisc; \
 	Cxcallout_f		deletef; \
 	Cxcallout_f		getf; \
 	Cxcallout_f		returnf; \
 	Cxcallout_f		referencef; \
-	struct Cxoperand_s*	stack; \
-	unsigned int		stacksize;
+	char*			ccbuf; \
+	char*			cvtbuf; \
+	size_t			ccsiz; \
+	size_t			cvtsiz; \
+	int			evaluating; \
+	int			index; \
+	int			jump; \
+	int			scoped; \
+	int			view; \
+	Sfio_t*			tp;
 
 #define _CX_CONSTRAINT_PRIVATE_ \
 	regex_t*		re;
@@ -82,7 +64,10 @@ struct Cxinclude_s; typedef struct Cxinclude_s Cxinclude_t;
 	char**			files; \
 	Vmalloc_t*		vm; \
 	Cxdone_t*		done; \
-	int			begun;
+	struct Cxoperand_s*	stack; \
+	unsigned int		stacksize; \
+	int			begun; \
+	int			reclaim;
 
 #define _CX_ITEM_PRIVATE_ \
 	Dtlink_t		str2num; \
@@ -133,6 +118,27 @@ struct Cxinclude_s; typedef struct Cxinclude_s Cxinclude_t;
 #define CXT(n,b,e,i,m,d)	CX_TYPE_INIT(n,b,e,i,m,d)
 #define CXV(n,t,i,d)		CX_VARIABLE_INIT(n,t,i,d)
 
+struct Cxcompile_s
+{
+	Cxcompile_t*		next;
+	Cx_t*			cx;
+	int			balanced;
+	int			collecting;
+	int			paren;
+	int			reclaim;
+	unsigned int		level;
+	unsigned int		depth;
+	unsigned int		pp;
+	unsigned int		stacksize;
+	Sfio_t*			ip;
+	Sfio_t*			tp;
+	Sfio_t*			xp;
+	Vmalloc_t*		vm;
+	Cxdone_t*		done;
+	Cxtype_t*		type;
+	struct Cxoperand_s*	stack;
+};
+
 struct Cxdone_s
 {
 	Cxdone_t*		next;
@@ -142,13 +148,20 @@ struct Cxdone_s
 
 struct Cxinclude_s
 {
-	Cxinclude_t*		next;
+	Cxinclude_t*		pop;
+	Sfio_t*			sp;
+	char*			base;
+	char*			next;
+	char*			last;
 	char*			ofile;
+	int			eof;
+	int			final;
+	int			head;
+	int			interactive;
 	int			newline;
 	int			oline;
 	int			prompt;
 	int			retain;
-	Sfio_t*			sp;
 	char			file[1];
 };
 

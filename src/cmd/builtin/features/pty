@@ -7,8 +7,10 @@ header	sys/pty.h
 header	sys/ptyio.h
 header	sys/vty.h
 header	sys/ioctl.h
+header	stropts.h
 
 lib	openpty,_getpty,ptsname -lutil
+lib	grantpt,unlockpt,posix_openpt stdlib.h
 
 tst - output{
 	#include	<sys/types.h>

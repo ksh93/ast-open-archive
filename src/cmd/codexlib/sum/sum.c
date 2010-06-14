@@ -107,7 +107,7 @@ Codexmeth_t	codex_sum =
 	sum_data,
 	0,
 	0,
-	CODEXNEXT(codex_sum_next)
+	CODEXNEXT(sum)
 };
 
-CODEXLIB(&codex_sum)
+CODEXLIB(sum)

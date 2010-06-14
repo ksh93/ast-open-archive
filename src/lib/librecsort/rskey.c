@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,6 +31,7 @@
 
 #include "rskeyhdr.h"
 
+#include <tm.h>
 #include <hashpart.h>
 
 #if _sys_resource && _lib_getrlimit
@@ -548,16 +549,6 @@ unsigned char*	zp;
 	return xp - cp;
 }
 
-/*
- * sort by month name
- */
-
-static const char*	month[] =
-{
-	"jan", "feb", "mar", "apr", "may", "jun",
-	"jul", "aug", "sep", "oct", "nov", "dec"
-};
-
 static int
 #if __STD_C
 key_m_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
@@ -574,26 +565,34 @@ unsigned char*	zp;
 	register int	c;
 	int		j = -1;
 	int		i;
-	unsigned char*	xp;
+	unsigned char*	mp;
 	unsigned char*	trans = f->trans;
+	char**		month = (char**)f->data;
 
 	for (; len > 0 && blank(trans[*dp]); dp++, len--);
-	if (len >= 3)
-		while (++j < elementsof(month))
+	if (len > 0)
+		while (++j < 12)
 		{
-			xp = (unsigned char*)month[j];
-			for (i = 0; i < 3; i++)
+			mp = (unsigned char*)month[j];
+			for (i = 0; mp[i] && i < len; i++)
 			{
 				c = trans[dp[i]];
-				if (isupper(c))
-					c = tolower(c);
-				if (c != *xp++)
-					break;
+				if (c != mp[i])
+				{
+					if (isupper(c))
+						c = tolower(c);
+					else if (islower(c))
+						c = toupper(c);
+					else
+						break;
+					if (c != mp[i])
+						break;
+				}
 			}
-			if (i >= 3)
+			if (!mp[i])
 				break;
 		}
-	*cp = j >= elementsof(month) ? 0 : j + 1;
+	*cp = j >= 12 ? 0 : j + 1;
 	if (f->rflag)
 		*cp ^= ~0;
 	return 1;
@@ -624,6 +623,8 @@ Rsdisc_t*	disc;
 	unsigned char*	op = key;
 	unsigned char*	zp = key + keylen;
 	unsigned char*	xp = dat + datlen;
+	unsigned char*	tp;
+	int		n;
 	int		t;
 	int		np;
 	int		m = kp->field.maxfield;
@@ -631,7 +632,7 @@ Rsdisc_t*	disc;
 
 	pp[0] = dat;
 	np = 1;
-	switch (t = kp->tab)
+	switch (t = kp->tab[0])
 	{
 	case 0:
 		for (cp = dat; cp < xp && np < m;)
@@ -646,17 +647,30 @@ Rsdisc_t*	disc;
 	case '\n':
 		break;
 	default:
+		tp = kp->tab[1] ? (kp->tab + 1) : 0;
 		for (cp = dat; cp < xp && np < m;)
 			if (*cp++ == t)
-				pp[np++] = cp;
+			{
+				if (!tp)
+					pp[np++] = cp;
+				else
+					for (n = 0; (cp + n) < xp; n++)
+						if (!tp[n])
+						{
+							pp[np++] = cp + n;
+							break;
+						}
+						else if (tp[n] != cp[n])
+							break;
+			}
 		break;
 	}
 	for (fp = kp->field.head; fp; fp = fp->next)
 	{
-		t = fp->begin.field;
-		if (t < np)
+		n = fp->begin.field;
+		if (n < np)
 		{
-			cp = pp[t];
+			cp = pp[n];
 			if (fp->bflag && kp->field.global.next)
 				while (cp < xp && blank(*cp))
 					cp++;
@@ -666,23 +680,23 @@ Rsdisc_t*	disc;
 		}
 		else
 			cp = xp;
-		t = fp->end.field;
-		if (t < np)
+		n = fp->end.field;
+		if (n < np)
 		{
 			if (fp->end.index < 0)
 			{
-				if (t >= np - 1)
+				if (n >= np - 1)
 					ep = xp;
 				else
 				{
-					ep = pp[t + 1];
-					if (kp->tab)
+					ep = pp[n + 1];
+					if (t)
 						ep--;
 				}
 			}
 			else
 			{
-				ep = pp[t];
+				ep = pp[n];
 				if (fp->eflag)
 					while(ep < xp && blank(*ep))
 						ep++;
@@ -842,7 +856,10 @@ int			end;
 		else
 			fp->bflag = 1;
 		return s - b;
-	case 'C':
+	case 'd':
+		addtable(kp, c, &fp->keep, kp->state->dict);
+		break;
+	case 'E':
 		switch (*s++)
 		{
 		case 'a':
@@ -896,9 +913,6 @@ int			end;
 				kp->code = fp->code;
 		}
 		return s - b;
-	case 'd':
-		addtable(kp, c, &fp->keep, kp->state->dict);
-		break;
 	case 'f':
 		addtable(kp, c, &fp->trans, kp->state->fold);
 		break;
@@ -920,6 +934,8 @@ int			end;
 		addcoder(kp, fp, key_j_code, c, 0);
 		break;
 	case 'M':
+		tminit(NiL);
+		fp->data = tm_info.format + TM_MONTH_ABBREV;
 		addcoder(kp, fp, key_m_code, c, 0);
 		break;
 	case 'p':
@@ -1229,7 +1245,7 @@ register Rskey_t*	kp;
 		}
 		else if (!fp->end.index && fp->end.field)
 		{
-			if (kp->tab && fp->eflag)
+			if (kp->tab[0] && fp->eflag)
 			{
 				if (kp->keydisc->errorf)
 					(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "skipping blanks right after tab-char is ill-defined");
@@ -1260,7 +1276,7 @@ register Rskey_t*	kp;
 	if (fp = fp->next)
 	{
 		kp->field.head = fp;
-		if (!fp->next && !kp->tab && !fp->begin.field && !fp->end.field && fp->end.index > 0 && fp->flag == 't' && fp->trans == kp->state->ident && fp->keep == kp->state->all && !fp->bflag && !fp->eflag && !fp->rflag)
+		if (!fp->next && !kp->tab[0] && !fp->begin.field && !fp->end.field && fp->end.index > 0 && fp->flag == 't' && fp->trans == kp->state->ident && fp->keep == kp->state->all && !fp->bflag && !fp->eflag && !fp->rflag)
 		{
 			kp->disc->type |= RS_KSAMELEN;
 			kp->disc->key = fp->begin.index;

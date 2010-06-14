@@ -239,7 +239,7 @@ Paxformat_t	pax_lha_format =
 	PAX_DEFBUFFER,
 	PAX_DEFBLOCKS,
 	0,
-	PAXNEXT(pax_lha_next),
+	PAXNEXT(lha),
 	0,
 	lha_done,
 	lha_getprologue,
@@ -247,4 +247,4 @@ Paxformat_t	pax_lha_format =
 	lha_getdata,
 };
 
-PAXLIB(&pax_lha_format)
+PAXLIB(lha)

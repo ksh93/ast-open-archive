@@ -5,7 +5,7 @@ UNIT mv
 TEST 01 basics
 
 	EXEC	a b
-		ERROR - 'mv: a: cannot move [No such file or directory]'
+		ERROR - 'mv: a: not found'
 		EXIT 1
 
 	EXEC	a b

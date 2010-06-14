@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -46,6 +46,7 @@
 #define CX_VERBOSE	(1<<5)			/* verbose feedback	*/
 
 #define CX_BALANCED	(1<<6)			/* cx input () balanced	*/
+#define CX_INCLUDE	(1<<7)			/* include cxpush()	*/
 #define CX_FLAGS	(1L<<8)			/* first caller flag	*/
 
 /* _CX_HEADER_.flags */
@@ -81,6 +82,7 @@
 #define CX_NUL		0x0400
 #define CX_VARIABLE	0x0800
 #define CX_QUOTEALL	0x1000
+#define CX_LONG		0x2000
 
 #define CX_ASSIGN	01
 #define CX_X2		02
@@ -137,6 +139,11 @@
 #define CX_LE		(CX_LT|CX_ASSIGN)
 #define CX_NE		((CX_NOT&~CX_UNARY)|CX_ASSIGN)
 
+#define CX_CTYPE_ALPHA	(1<<0)
+#define CX_CTYPE_DIGIT	(1<<1)
+#define CX_CTYPE_FLOAT	(1<<2)
+#define CX_CTYPE_SPACE	(1<<3)
+
 #define CXMIN(a,b)	(((a)<(b))?(a):(b))
 #define CXMAX(a,b)	(((a)>(b))?(a):(b))
 
@@ -187,6 +194,7 @@ struct Cxexpr_s; typedef struct Cxexpr_s Cxexpr_t;
 struct Cxformat_s; typedef struct Cxformat_s Cxformat_t;
 struct Cxinstruction_s; typedef struct Cxinstruction_s Cxinstruction_t;
 struct Cxitem_s; typedef struct Cxitem_s Cxitem_t;
+struct Cxlib_s; typedef struct Cxlib_s Cxlib_t;
 struct Cxmatch_s; typedef struct Cxmatch_s Cxmatch_t;
 struct Cxmap_s; typedef struct Cxmap_s Cxmap_t;
 struct Cxmember_s; typedef struct Cxmember_s Cxmember_t;
@@ -288,7 +296,7 @@ typedef void*	(*Cxinit_f)	(void*, Cxdisc_t*);
 typedef ssize_t	(*Cxinternal_f)	(Cx_t*, Cxtype_t*, const char*, Cxformat_t*, 
 				 Cxoperand_t*, const char*, size_t, Vmalloc_t*, 
 				 Cxdisc_t*);
-typedef int	(*Cxload_f)	(const char*, Cxdisc_t*);
+typedef Cxlib_t*(*Cxload_f)	(const char*, Cxdisc_t*);
 typedef char*	(*Cxlocation_f)	(Cx_t*, void*, Cxdisc_t*);
 typedef void*	(*Cxmatchcomp_f)(Cx_t*, Cxtype_t*, Cxtype_t*, Cxvalue_t*, Cxdisc_t*);
 typedef int	(*Cxmatchexec_f)(Cx_t*, void*, Cxtype_t*, Cxvalue_t*, Cxdisc_t*);
@@ -502,9 +510,33 @@ struct Cxquery_s			/* query			*/
 	Cxquery_f	act;		/* act on selected data		*/
 	Cxquery_f	end;		/* called after last eval	*/
 	const char*	method;		/* caller specific method match	*/
+	Cxquery_f	ref;		/* compile-time reference	*/
 #ifdef _CX_QUERY_PRIVATE_
 	_CX_QUERY_PRIVATE_
 #endif
+};
+
+struct Cxmeth_s; typedef struct Cxmeth_s Cxmeth_t;
+
+struct Cxlib_s				/* Cxdisc_t.loadf library info	*/
+{
+	_CX_NAME_HEADER_
+	const char**	libraries;	/* library list			*/
+	Cxmeth_t*	meth;		/* caller method		*/
+	Cxtype_t*	types;		/* type table			*/
+	Cxcallout_t*	callouts;	/* callout table		*/
+	Cxrecode_t*	recodes;	/* recode table			*/
+	Cxmap_t**	maps;		/* map table			*/
+	Cxquery_t*	queries;	/* query table			*/
+	Cxconstraint_t*	constraints;	/* constraint table		*/
+	Cxedit_t*	edits;		/* edit table			*/
+	Cxvariable_t*	functions;	/* function table		*/
+
+	void*		pad[7];		/* pad for future expansion	*/
+
+	/* the remaining are set by Cxdisc_t.loadf			*/
+
+	const char*	path;		/* library path name		*/
 };
 
 struct Cxexpr_s				/* compiled expression node	*/
@@ -555,7 +587,8 @@ struct Cx_s				/* interface handle		*/
 	Vmalloc_t*	rm;		/* record memory		*/
 	Cxflags_t	flags;		/* CX_* flags			*/
 	Cxflags_t	test;		/* test mask			*/
-	int		eof;		/* input eof			*/
+	int		eof;		/* input at eof			*/
+	int		error;		/* error occurred		*/
 	int		interactive;	/* interactive input		*/
 	Cxstate_t*	state;		/* global state			*/
 	Cxdisc_t*	disc;		/* user discipline		*/
@@ -571,6 +604,7 @@ struct Cx_s				/* interface handle		*/
 	Dt_t*		constraints;	/* Cxconstraint_t dictionary	*/
 	Dt_t*		edits;		/* Cxedit_t dictionary		*/
 	Cx_t*		scope;		/* next scope			*/
+	unsigned char	ctype[UCHAR_MAX+1];	/* ctype table		*/
 #ifdef _CX_PRIVATE_
 	_CX_PRIVATE_
 #endif
@@ -588,8 +622,8 @@ extern Cx_t*		cxopen(Cxflags_t, Cxflags_t, Cxdisc_t*);
 extern Cx_t*		cxscope(Cx_t*, Cx_t*, Cxflags_t, Cxflags_t, Cxdisc_t*);
 extern int		cxclose(Cx_t*);
 
-extern int		cxpush(Cx_t*, const char*, Sfio_t*, const char*, ssize_t);
-extern int		cxpop(Cx_t*);
+extern void*		cxpush(Cx_t*, const char*, Sfio_t*, const char*, ssize_t, Cxflags_t);
+extern int		cxpop(Cx_t*, void*);
 extern ssize_t		cxtell(Cx_t*);
 extern Cxexpr_t*	cxcomp(Cx_t*);
 extern int		cxbeg(Cx_t*, Cxexpr_t*, const char*);
@@ -602,7 +636,7 @@ extern int		cxcast(Cx_t*, Cxoperand_t*, Cxvariable_t*, Cxtype_t*, void*, const c
 extern char*		cxcontext(Cx_t*);
 extern char*		cxlocation(Cx_t*, void*);
 
-extern void		cxcodetrace(Cx_t*, const char*, Cxinstruction_t*, unsigned int);
+extern void		cxcodetrace(Cx_t*, const char*, Cxinstruction_t*, unsigned int, Cxoperand_t*, Cxoperand_t*);
 extern char*		cxcodename(int);
 extern char*		cxopname(int, Cxtype_t*, Cxtype_t*);
 
@@ -619,6 +653,7 @@ extern Cxtype_t*	cxattr(Cx_t*, const char*, char**, Cxformat_t*, Cxdisc_t*);
 extern Cxcallout_f	cxcallout(Cx_t*, int, Cxtype_t*, Cxtype_t*, Cxdisc_t*);
 extern Cxconstraint_t*	cxconstraint(Cx_t*, const char*, Cxdisc_t*);
 extern Cxedit_t*	cxedit(Cx_t*, const char*, Cxdisc_t*);
+extern Cxvariable_t*	cxfunction(Cx_t*, const char*, Cxdisc_t*);
 extern Cxmap_t*		cxmap(Cx_t*, const char*, Cxdisc_t*);
 extern Cxquery_t*	cxquery(Cx_t*, const char*, Cxdisc_t*);
 extern Cxrecode_f	cxrecode(Cx_t*, int, Cxtype_t*, Cxtype_t*, Cxdisc_t*);

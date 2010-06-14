@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,18 +26,21 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss text method (AT&T Research) 2002-12-17 $\n]"
-USAGE_LICENSE
-"[+NAME?text - dss text method schema description]"
+"[+PLUGIN?text - dss text method]"
 "[+DESCRIPTION?The \bdss\b text method describes newline-terminated"
 "	field-delimited text file data. The method schema is a \bscanf\b(3)"
 "	style format string with embedded field names of the form"
 "	\b%(\b\afield\a\b)\b\aformat-char\a \adelimiter\a ...]"
+"[+?Use the \bdss\b \bflat\b method for generic record-oriented flat "
+    "file data.]"
 "[+EXAMPLES]{"
-"	[+dss -x text::\b\"%(name)s::%(passwd::Encrypted\\ password.)s::%(uid)d::%(gid)d::%(comment)s::%(home)s::%(shell)s\"\\ 'passwd==\"\"&&uid==0'\\ "
+"	[+dss -x text::::\b\"%(name)s::%(passwd::Encrypted\\ password.)s::%(uid)d::%(gid)d::%(comment)s::%(home)s::%(shell)s\"\\ 'passwd==\"\"&&uid==0'\\ "
 "	/etc/passwd?Prints \b/etc/passwd\b entries with uid==0 and no"
 "	password.]"
 "}"
+"\n"
+"\n--method=text[,option...]\n"
+"\n"
 ;
 
 #include <dsslib.h>
@@ -56,6 +59,8 @@ struct Text_s				/* Dssmeth_t.data		*/
 };
 
 static char		null[1];
+
+extern Dsslib_t		dss_lib_text;
 
 /*
  * text identf
@@ -456,9 +461,11 @@ textmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 
 	if (options)
 	{
+		sfprintf(ometh->cx->buf, "%s%s", strchr(dss_lib_text.description, '['), usage);
+		s = sfstruse(ometh->cx->buf);
 		for (;;)
 		{
-			switch (optstr(options, usage))
+			switch (optstr(options, s))
 			{
 			case '?':
 				if (disc->errorf)
@@ -659,17 +666,13 @@ static Dssmeth_t	method =
 	0
 };
 
-static Dsslib_t		lib =
+Dsslib_t		dss_lib_text =
 {
 	"text",
-	"text method",
+	"text method"
+	"[-1ls5Pp0?\n@(#)$Id: dss text method (AT&T Research) 2002-12-17 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	&method,
 };
-
-Dsslib_t*
-dss_lib(const char* name, Dssdisc_t* disc)
-{
-	return &lib;
-}

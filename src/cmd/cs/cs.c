@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1990-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -278,7 +278,7 @@ list(register Ftw_t* ftw)
 					port = "";
 				if (stat(p, &st))
 					st.st_mtime = ftw->statb.st_mtime;
-				tmfmt(time_buf, sizeof(time_buf), "%?%l", &st.st_mtime);
+				tmfmt(time_buf, sizeof(time_buf), "%?%QL", &st.st_mtime);
 				*s = CS_MNT_LOG;
 				if (stat(p, &st))
 					st = ftw->statb;
@@ -309,7 +309,7 @@ list(register Ftw_t* ftw)
 				{
 					sfsprintf(port_buf, sizeof(port_buf) - 1, "%s/%s/%s/%s%s", CS_SVC_DIR, label[0], label[2], label[2], CS_SVC_SUFFIX);
 					uid = strtol(ftw->name, NiL, 0);
-					if (!pathpath(serv_buf, port_buf, "", PATH_ABSOLUTE|PATH_EXECUTE) || stat(serv_buf, &st) || st.st_uid != uid)
+					if (!pathpath(port_buf, "", PATH_ABSOLUTE|PATH_EXECUTE, serv_buf, sizeof(serv_buf)) || stat(serv_buf, &st) || st.st_uid != uid)
 						n += sfprintf(sfstdout, "/trust=%s", fmtuid(uid));
 				}
 				if (qual_buf[0])
@@ -640,7 +640,7 @@ main(int argc, char** argv)
 			error(1, "%s: argument not expected", path);
 		ap = av;
 		*ap++ = csvar(CS_VAR_LOCAL, 0);
-		if (pathpath(tmp, csvar(CS_VAR_SHARE, 0), "", PATH_EXECUTE))
+		if (pathpath(csvar(CS_VAR_SHARE, 0), "", PATH_EXECUTE, tmp, sizeof(tmp)))
 			*ap++ = tmp;
 		*ap = 0;
 		ftwalk((char*)av, list, FTW_MULTIPLE|FTW_PHYSICAL, order);

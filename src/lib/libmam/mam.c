@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -136,7 +136,7 @@ alias(struct proc* pp, const char* name)
 
 	if (*name != '/' || *pp->fp->rule->name == '/' || !pp->pwd) return(0);
 	sfsprintf(buf, sizeof(buf), "%s/%s", pp->pwd, pp->fp->rule->name);
-	pathcanon(buf, 0);
+	pathcanon(buf, sizeof(buf), 0);
 	if (!streq(buf, name)) return(0);
 	putrule(pp, name, pp->fp->rule);
 	return(pp->fp->rule);

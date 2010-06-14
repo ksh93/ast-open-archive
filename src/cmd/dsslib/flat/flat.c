@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,10 +26,11 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss flat method (AT&T Research) 2008-08-30 $\n]"
-USAGE_LICENSE
-"[+NAME?flat - dss flat method schema description]"
-"[+DESCRIPTION?The \bdss\b flat method schema is an XML file.]"
+"[+PLUGIN?\findex\f]"
+"[+DESCRIPTION?The \bdss\b flat method schema is the name of an XML file "
+    "that describes fixed-width and/or field-delimited flat files. Public "
+    "schemas are usually placed in a \b../lib/dss\b sibling directory on "
+    "\b$PATH\b.]"
 "[b!:binary?Enable the fixed binary record field optimization.]"
 "[e:emptyspace?Write empty field values as one \bspace\b character.]"
 "[h:header?Print a C header for schema member access on the standard"
@@ -54,7 +55,7 @@ USAGE_LICENSE
 #include <magicid.h>
 #include <regex.h>
 
-struct Convert_s; typedef struct Convert_s Convert_t;
+struct Flatten_s; typedef struct Flatten_s Flatten_t;
 struct Field_s; typedef struct Field_s Field_t;
 struct Flat_s; typedef struct Flat_s Flat_t;
 struct Format_s; typedef struct Format_s Format_t;
@@ -69,7 +70,7 @@ struct Size_s; typedef struct Size_s Size_t;
 struct Table_s; typedef struct Table_s Table_t;
 struct Value_s; typedef struct Value_s Value_t;
 
-typedef Cxvalue_t* (*Convertget_f)(Convert_t*, Cxvariable_t*, void*);
+typedef Cxvalue_t* (*Flattenget_f)(Flatten_t*, Cxvariable_t*, void*);
 typedef Cxoperand_t* (*Flatget_f)(Record_t*, int);
 
 struct Value_s
@@ -85,7 +86,7 @@ struct Physical_s			/* physical field info		*/
 	Cxarray_t*	array;		/* physical array info		*/
 };
 
-struct Convert_s
+struct Flatten_s
 {
 	Dss_t*		dss;		/* output method stream		*/
 	Dssfile_t*	file;		/* output file			*/
@@ -93,7 +94,7 @@ struct Convert_s
 	Flat_t*		flat;		/* dss->meth->data		*/
 	Vmalloc_t*	vm;		/* vm region			*/
 	Cxcallout_f	getf;		/* dss->cx->getf		*/
-	Cxoperand_t	value;		/* convertget() value		*/
+	Cxoperand_t	value;		/* flattenget() value		*/
 	int		emptyspace;	/* empty field value => space	*/
 };
 
@@ -115,8 +116,8 @@ struct Field_s				/* field info			*/
 	Physical_t	physical;	/* physical field info		*/
 	Field_t* 	next;		/* next in list			*/
 	Cxexpr_t*	width;		/* variable size		*/
-	Cxvariable_t*	convert;	/* convert source variable	*/
-	Convertget_f	convertgetf;	/* convert flatget()		*/
+	Cxvariable_t*	flatten;	/* flatten source variable	*/
+	Flattenget_f	flattengetf;	/* flatten flatget()		*/
 	Flatget_f	flatgetf;	/* flat flatget()		*/
 	Cxstructure_t	structure;	/* structure info		*/
 	Record_t*	record;		/* sub-record context		*/
@@ -254,7 +255,6 @@ struct Flat_s				/* Dssmeth_t.data		*/
 	unsigned char*	e2a;
 	Size_t*		record;
 	Size_t*		block;
-	Cx_t*		qualification;
 	struct
 	{
 	size_t*		field;
@@ -351,7 +351,7 @@ flatget(register Record_t* r, int index)
 				{
 					if (f->width)
 					{
-						if (cxeval(flat->qualification, f->width, r->record, &a) < 0)
+						if (cxeval(r->cx, f->width, r->record, &a) < 0)
 							goto empty;
 						n = a.value.number;
 					}
@@ -452,10 +452,12 @@ flatget(register Record_t* r, int index)
 				{
 					if (f->width)
 					{
-						if (cxeval(flat->qualification, f->width, r->record, &a) < 0)
+						if (cxeval(r->cx, f->width, r->record, &a) < 0)
 							goto empty;
 						n = a.value.number;
 					}
+					else if (f->physical.format.flags & CX_VARIABLE)
+						n = e - s;
 					else
 						n = f->physical.format.width;
 					t = s + n;
@@ -507,7 +509,7 @@ flatget(register Record_t* r, int index)
 							for (u = s++; u > t && isspace(*(u - 1)); u--);
 							do
 							{
-								if (!k->expr || cxeval(flat->qualification, k->expr, r->record, &a) > 0)
+								if (!k->expr || cxeval(r->cx, k->expr, r->record, &a) > 0)
 								{
 									p = &r->fields[k->field->variable.index];
 									p->off = t - (unsigned char*)r->buf;
@@ -546,7 +548,7 @@ flatget(register Record_t* r, int index)
 	found:
 		if (w->field->width)
 		{
-			if (cxeval(flat->qualification, w->field->width, r->record, &a) < 0)
+			if (cxeval(r->cx, w->field->width, r->record, &a) < 0)
 				goto empty;
 			n = a.value.number;
 			if (w->field->physical.format.width && n > w->field->physical.format.width)
@@ -575,6 +577,8 @@ flatget(register Record_t* r, int index)
 				}
 			}
 		}
+		else if (w->field->physical.format.flags & CX_VARIABLE)
+			w->siz = r->siz - w->off;
 		if (m = w->field->map)
 			s = (unsigned char*)ccmapcpy(m, fmtbuf(w->siz), (char*)s, w->siz);
 		w->ret.type = w->field->variable.type;
@@ -1203,13 +1207,12 @@ static Cxexpr_t*
 keycomp(Flat_t* flat, const char* s, Dssdisc_t* disc)
 {
 	Cxexpr_t*	expr;
+	void*		pop;
 
-	if (!flat->qualification && !(flat->qualification = cxscope(NiL, flat->meth.cx, 0, 0, disc)))
+	if (!(pop = cxpush(flat->meth.cx, NiL, NiL, s, -1, 0)))
 		return 0;
-	if (cxpush(flat->qualification, NiL, NiL, s, -1))
-		return 0;
-	expr = cxcomp(flat->qualification);
-	while (!flat->qualification->eof && !cxpop(flat->qualification));
+	expr = cxcomp(flat->meth.cx);
+	cxpop(flat->meth.cx, pop);
 	return expr;
 }
 
@@ -1266,6 +1269,8 @@ recinit(register Flat_t* flat, Dssfile_t* file, Record_t* b, Table_t* t, Field_t
 	size_t			level;
 	size_t			off;
 
+	if (!fields)
+		return 0;
 	level = fields->structure.level;
 	if (!n)
 		for (f = fields; f; f = f->next, n++)
@@ -1707,6 +1712,23 @@ flat_field_width_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* di
 }
 
 static int
+flat_field_remainder_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc)
+{
+	register Flat_t*	flat = (Flat_t*)disc;
+	char*			e;
+
+	flat->format->width = strtoul(data, &e, 0);
+	if (*e)
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: invalid number", data);
+		return -1;
+	}
+	flat->format->flags |= CX_VARIABLE;
+	return 0;
+}
+
+static int
 flat_field_fill_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc)
 {
 	register Flat_t*	flat = (Flat_t*)disc;
@@ -2101,6 +2123,8 @@ static Tags_t	tags_flat_field[] =
 			0,0,flat_field_fixedpoint_dat,0,
 	"WIDTH",	"Field fixed width in bytes.",
 			0,0,flat_field_width_dat,0,
+	"REMAINDER",	"Field is variable length up to the end of record.",
+			0,0,flat_field_remainder_dat,0,
 	"BASE",		"Numeric field representation base.",
 			0,0,flat_field_base_dat,0,
 	"FILL",		"Fixed width field fill character.",
@@ -3115,6 +3139,8 @@ defaults(register Cxtype_t* type, register Cxformat_t* format, int binary, Dssdi
  * methf
  */
 
+extern Dsslib_t	dss_lib_flat;
+
 static Dssmeth_t*
 flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* disc, Dssmeth_t* meth)
 {
@@ -3124,7 +3150,7 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 	Field_t*		g;
 	Tag_t*			tag;
 	Sfio_t*			sp;
-	char*			us;
+	char*			s;
 	ssize_t			n;
 	int			i;
 	int			errors;
@@ -3148,28 +3174,17 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 	flat->code = CC_NATIVE;
 	flat->swap = SWAP_none;
 	flat->delimiter = flat->escape = flat->quotebegin = flat->quoteend = flat->terminator = flat->continuator = -1;
+	sp = 0;
 	if (options)
 	{
-		if (!(sp = sfstropen()))
-		{
-			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
+		sfprintf(meth->cx->buf, "%s%s", strchr(dss_lib_flat.description, '['), usage);
+		if (tagusage(tags, meth->cx->buf, &flat->dsstagdisc.tagdisc))
 			goto drop;
-		}
-		sfprintf(sp, "%s", usage);
-		if (tagusage(tags, sp, &flat->dsstagdisc.tagdisc))
-			goto drop;
-		sfputc(sp, '}');
-		sfputc(sp, '\n');
-		if (!(us = sfstruse(sp)))
-		{
-			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
-			goto drop;
-		}
+		sfprintf(meth->cx->buf, "}\n\n--method=%s[,option...]\n\n", meth->name);
+		s = sfstruse(meth->cx->buf);
 		for (;;)
 		{
-			switch (optstr(options, us))
+			switch (optstr(options, s))
 			{
 			case 'b':
 				flat->binary = opt_info.num;
@@ -3199,8 +3214,6 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 			}
 			break;
 		}
-		sfclose(sp);
-		sp = 0;
 	}
 	if (schema && *schema)
 	{
@@ -3215,7 +3228,7 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 	}
 	dtinsert(flat->meth.formats, &flat_format);
 	for (p = flat->libraries; p; p = p->next)
-		if (dssload(p->name, disc))
+		if (!dssload(p->name, disc))
 			return 0;
 	for (i = 0; i < elementsof(local_callouts); i++)
 		if (cxaddcallout(flat->meth.cx, &local_callouts[i], disc))
@@ -3224,25 +3237,25 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 	{
 		if (cxaddvariable(flat->meth.cx, &f->variable, disc))
 			return 0;
-		if ((us = (char*)f->width) && !(f->width = keycomp(flat, us, disc)))
+		if ((s = (char*)f->width) && !(f->width = keycomp(flat, s, disc)))
 		{
 			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, 2, "%s: %s: invalid field width index", f->variable.name, us);
+				(*disc->errorf)(NiL, disc, 2, "%s: %s: invalid field width index", f->variable.name, s);
 			return 0;
 		}
-		if (f->variable.array && (us = (char*)f->variable.array->variable) && !(f->variable.array->variable = (Cxvariable_t*)dtmatch(flat->meth.cx->variables, us)))
+		if (f->variable.array && (s = (char*)f->variable.array->variable) && !(f->variable.array->variable = (Cxvariable_t*)dtmatch(flat->meth.cx->variables, s)))
 		{
 			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, 2, "%s: %s: unknown array index", f->variable.name, us);
+				(*disc->errorf)(NiL, disc, 2, "%s: %s: unknown array index", f->variable.name, s);
 			return 0;
 		}
 		defaults(f->variable.type, &f->variable.format, 0, disc);
-		if (!(us = (char*)f->physical.type))
+		if (!(s = (char*)f->physical.type))
 			f->physical.type = f->variable.type;
-		else if (!(f->physical.type = cxtype(flat->meth.cx, us, disc)))
+		else if (!(f->physical.type = cxtype(flat->meth.cx, s, disc)))
 		{
 			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, 2, "%s: %s: unknown type", f->variable.name, us);
+				(*disc->errorf)(NiL, disc, 2, "%s: %s: unknown type", f->variable.name, s);
 			return 0;
 		}
 		defaults(f->physical.type, &f->physical.format, flat->binary, disc);
@@ -3780,9 +3793,7 @@ flatopen(Dss_t* dss, Dssdisc_t* disc)
 static Dssmeth_t method =
 {
 	"flat",
-	"Fixed-width and/or field-delimited flat file; the method schema is"
-	" the name of an XML description file. Public schemas are usually"
-	" placed in a ../lib/dss sibling directory on $PATH.",
+	"fixed-width and/or field-delimited flat file data",
 	CXH,
 	flatmeth,
 	flatopen,
@@ -3790,11 +3801,11 @@ static Dssmeth_t method =
 	0
 };
 
-static const char convert_usage[] =
-"[-1l?\n@(#)$Id: dss flat conversion query (AT&T Research) 2005-05-09 $\n]"
+static const char flatten_usage[] =
+"[-1ls5P?\n@(#)$Id: dss flatten query (AT&T Research) 2005-05-09 $\n]"
 USAGE_LICENSE
-"[+LIBRARY?\findex\f]"
-"[+DESCRIPTION?Convert input data to match flat method schema.]"
+"[+PLUGIN?\findex\f]"
+"[+DESCRIPTION?Flatten input data to match flat method \bschema\b.]"
 "[e:emptyspace?Write empty field values as one \bspace\b character.]"
 "\n"
 "\nschema\n"
@@ -3806,7 +3817,7 @@ USAGE_LICENSE
  */
 
 static Cxvalue_t*
-convertget(register Convert_t* convert, Cxvariable_t* var, void* data)
+flattenget(register Flatten_t* flatten, Cxvariable_t* var, void* data)
 {
 	Cxinstruction_t	x;
 	Cxreference_t*	ref;
@@ -3814,36 +3825,36 @@ convertget(register Convert_t* convert, Cxvariable_t* var, void* data)
 	if (ref = var->reference)
 	{
 		x.data.variable = ref->variable;
-		if ((*convert->cx->getf)(convert->cx, &x, &convert->value, NiL, NiL, data, convert->cx->disc))
+		if ((*flatten->cx->getf)(flatten->cx, &x, &flatten->value, NiL, NiL, data, flatten->cx->disc))
 			return &nullval;
 		while (ref = ref->next)
 		{
 			x.data.variable = ref->variable;
-			if ((*ref->member->getf)(convert->cx, &x, &convert->value, NiL, NiL, NiL, convert->cx->disc))
+			if ((*ref->member->getf)(flatten->cx, &x, &flatten->value, NiL, NiL, NiL, flatten->cx->disc))
 				return &nullval;
 		}
 	}
 	else
 	{
 		x.data.variable = var;
-		if ((*convert->cx->getf)(convert->cx, &x, &convert->value, NiL, NiL, data, convert->cx->disc))
+		if ((*flatten->cx->getf)(flatten->cx, &x, &flatten->value, NiL, NiL, data, flatten->cx->disc))
 			return &nullval;
 	}
-	return &convert->value.value;
+	return &flatten->value.value;
 }
 
 /*
- * convertget() with cxnum2str()
+ * flattenget() with cxnum2str()
  */
 
 static Cxvalue_t*
-convertnum2str(register Convert_t* convert, Cxvariable_t* var, void* data)
+flattennum2str(register Flatten_t* flatten, Cxvariable_t* var, void* data)
 {
 	Cxvalue_t*	val;
 
-	if ((val = convertget(convert, var, data)) != &nullval)
+	if ((val = flattenget(flatten, var, data)) != &nullval)
 	{
-		if (cxnum2str(convert->cx, &var->format, (Cxinteger_t)val->number, &val->string.data))
+		if (cxnum2str(flatten->cx, &var->format, (Cxinteger_t)val->number, &val->string.data))
 			return &nullval;
 		val->string.size = strlen(val->string.data);
 	}
@@ -3851,18 +3862,18 @@ convertnum2str(register Convert_t* convert, Cxvariable_t* var, void* data)
 }
 
 /*
- * convertget() with cxstr2num()
+ * flattenget() with cxstr2num()
  */
 
 static Cxvalue_t*
-convertstr2num(register Convert_t* convert, Cxvariable_t* var, void* data)
+flattenstr2num(register Flatten_t* flatten, Cxvariable_t* var, void* data)
 {
 	Cxvalue_t*	val;
 	Cxunsigned_t	u;
 
-	if ((val = convertget(convert, var, data)) != &nullval)
+	if ((val = flattenget(flatten, var, data)) != &nullval)
 	{
-		if (cxstr2num(convert->cx, &var->format, val->string.data, val->string.size, &u))
+		if (cxstr2num(flatten->cx, &var->format, val->string.data, val->string.size, &u))
 			return &nullval;
 		val->number = (Cxinteger_t)u;
 	}
@@ -3874,24 +3885,24 @@ convertstr2num(register Convert_t* convert, Cxvariable_t* var, void* data)
  */
 
 static Cxvalue_t*
-convertnull(Convert_t* convert, Cxvariable_t* var, void* data)
+flattennull(Flatten_t* flatten, Cxvariable_t* var, void* data)
 {
 	return &nullval;
 }
 
 /*
- * flat query begin
+ * flatten query begin
  */
 
 static int
-convert_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
+flatten_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	char**		argv = (char**)data;
 	int		errors = error_info.errors;
 	int		emptyspace = 0;
 	char*		schema;
 	Dssmeth_t*	meth;
-	Convert_t*	convert;
+	Flatten_t*	flatten;
 	Field_t*	f;
 	Field_t*	g;
 	Vmalloc_t*	vm;
@@ -3900,7 +3911,7 @@ convert_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 
 	for (;;)
 	{
-		switch (optget(argv, convert_usage))
+		switch (optget(argv, flatten_usage))
 		{
 		case 'e':
 			emptyspace = 1;
@@ -3925,7 +3936,7 @@ convert_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_USAGE|4, "%s", optusage(NiL));
 		return -1;
 	}
-	if (!(vm = vmopen(Vmdcheap, Vmlast, 0)) || !(convert = vmnewof(vm, 0, Convert_t, 1, 0)))
+	if (!(vm = vmopen(Vmdcheap, Vmlast, 0)) || !(flatten = vmnewof(vm, 0, Flatten_t, 1, 0)))
 	{
 		if (vm)
 			vmclose(vm);
@@ -3933,42 +3944,44 @@ convert_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return -1;
 	}
+#if _HUH_2010_05_28
 	if (!strchr(schema, ':'))
 		schema = sfprints("%s:%s", *(char**)data, schema);
-	convert->vm = vm;
-	convert->emptyspace = emptyspace;
-	if (!(meth = dssmeth(schema, disc)) || !(convert->dss = dssopen(0, 0, disc, meth)))
+#endif
+	flatten->vm = vm;
+	flatten->emptyspace = emptyspace;
+	if (!(meth = dssmeth(schema, disc)) || !(flatten->dss = dssopen(0, 0, disc, meth)))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, 2, "%s: cannot open conversion method", schema);
 		goto bad;
 	}
-	convert->cx = convert->dss->cx;
-	if (!convert->cx->getf && !(convert->cx->getf = cxcallout(convert->cx, CX_GET, convert->cx->state->type_void, convert->cx->state->type_void, convert->cx->disc)))
+	flatten->cx = flatten->dss->cx;
+	if (!flatten->cx->getf && !(flatten->cx->getf = cxcallout(flatten->cx, CX_GET, flatten->cx->state->type_void, flatten->cx->state->type_void, flatten->cx->disc)))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, 3, "cx CX_GET callout must be defined");
 		goto bad;
 	}
-	convert->getf = convert->cx->getf;
-	convert->flat = (Flat_t*)convert->dss->meth->data;
+	flatten->getf = flatten->cx->getf;
+	flatten->flat = (Flat_t*)flatten->dss->meth->data;
 	offset = 0;
-	fixed = convert->flat->fixed;
-	for (f = convert->flat->fields; f; f = f->next)
+	fixed = flatten->flat->fixed;
+	for (f = flatten->flat->fields; f; f = f->next)
 	{
-		f->convertgetf = convertget;
-		if (!(f->convert = (Cxvariable_t*)dtmatch(cx->variables, f->variable.name)))
+		f->flattengetf = flattenget;
+		if (!(f->flatten = (Cxvariable_t*)dtmatch(cx->variables, f->variable.name)))
 		{
-			f->convertgetf = convertnull;
+			f->flattengetf = flattennull;
 			if (!cxisvoid(f->variable.type) && disc->errorf)
 				(*disc->errorf)(NiL, disc, 1, "%s: field not in source record -- default value will be output", f->variable.name);
 		}
-		else if (f->convert->format.map)
+		else if (f->flatten->format.map)
 		{
-			if (cxisnumber(f->variable.type) && cxisstring(f->convert->type))
-				f->convertgetf = convertstr2num;
-			else if (cxisstring(f->variable.type) && cxisnumber(f->convert->type))
-				f->convertgetf = convertnum2str;
+			if (cxisnumber(f->variable.type) && cxisstring(f->flatten->type))
+				f->flattengetf = flattenstr2num;
+			else if (cxisstring(f->variable.type) && cxisnumber(f->flatten->type))
+				f->flattengetf = flattennum2str;
 		}
 		if ((g = (Field_t*)dtmatch(cx->variables, f->variable.name)) && g->physical.format.code != f->physical.format.code && g->physical.format.code == CC_NATIVE)
 			f->pam = ccmap(g->physical.format.code, f->physical.format.code);
@@ -3980,35 +3993,35 @@ convert_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		}
 		offset += f->physical.format.width;
 	}
-	if (convert->flat->binary && (offset %= 8))
+	if (flatten->flat->binary && (offset %= 8))
 	{
 		offset = 8 - offset;
 		if (disc->errorf)
-			(*disc->errorf)(NiL, disc, 2, "%s: record has %u unused pad byte%s", convert->dss->meth->name, offset, offset == 1 ? "" : "s");
+			(*disc->errorf)(NiL, disc, 2, "%s: record has %u unused pad byte%s", flatten->dss->meth->name, offset, offset == 1 ? "" : "s");
 		goto bad;
 	}
-	if (!(convert->file = dssfopen(convert->dss, NiL, expr->op, DSS_FILE_WRITE, &flat_format)))
+	if (!(flatten->file = dssfopen(flatten->dss, NiL, expr->op, DSS_FILE_WRITE, &flat_format)))
 		goto bad;
-	expr->op = convert->file->io;
-	expr->data = convert;
+	expr->op = flatten->file->io;
+	expr->data = flatten;
 	return 0;
  bad:
-	if (convert->file)
-		dssfclose(convert->file);
-	if (convert->dss)
-		dssclose(convert->dss);
+	if (flatten->file)
+		dssfclose(flatten->file);
+	if (flatten->dss)
+		dssclose(flatten->dss);
 	vmclose(vm);
 	return -1;
 }
 
 /*
- * flat query action
+ * flatten query action
  */
 
 static int
-convert_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
+flatten_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
-	register Convert_t*	convert = (Convert_t*)expr->data;
+	register Flatten_t*	flatten = (Flatten_t*)expr->data;
 	register Field_t*	f;
 	register unsigned char*	s;
 	Cxvalue_t*		v;
@@ -4017,61 +4030,61 @@ convert_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	ssize_t			n;
 	int			q;
 
-	for (f = convert->flat->fields; f; f = f->next)
+	for (f = flatten->flat->fields; f; f = f->next)
 	{
-		v = (*f->convertgetf)(convert, f->convert, data);
-		while ((n = (*f->physical.type->externalf)(convert->cx, f->physical.type, NiL, &f->physical.format, v, convert->flat->valbuf, convert->flat->valsiz, disc)) > convert->flat->valsiz)
+		v = (*f->flattengetf)(flatten, f->flatten, data);
+		while ((n = (*f->physical.type->externalf)(flatten->cx, f->physical.type, NiL, &f->physical.format, v, flatten->flat->valbuf, flatten->flat->valsiz, disc)) > flatten->flat->valsiz)
 		{
 			n = roundof(n, 32);
-			if (!(convert->flat->valbuf = newof(convert->flat->valbuf, char, n, 0)))
+			if (!(flatten->flat->valbuf = newof(flatten->flat->valbuf, char, n, 0)))
 			{
 				if (disc->errorf)
 					(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 				return -1;
 			}
-			convert->flat->valsiz = n;
+			flatten->flat->valsiz = n;
 		}
 		if (n < 0)
 			return -1;
 		else if (n > 0)
 		{
 			if (f->pam)
-				ccmapcpy(f->pam, convert->flat->valbuf, convert->flat->valbuf, n);
+				ccmapcpy(f->pam, flatten->flat->valbuf, flatten->flat->valbuf, n);
 			if ((f->physical.format.flags & (CX_STRING|CX_BUFFER)) && f->physical.format.delimiter >= 0 && (f->physical.format.escape >= 0 || f->physical.format.quotebegin >= 0))
 			{
 				if (f->physical.format.flags & CX_QUOTEALL)
 				{
 					q = 1;
-					sfputc(convert->file->io, f->physical.format.quotebegin);
+					sfputc(flatten->file->io, f->physical.format.quotebegin);
 				}
 				else
 					q = 0;
-				for (e = (s = b = (unsigned char*)convert->flat->valbuf) + n; s < e; s++)
+				for (e = (s = b = (unsigned char*)flatten->flat->valbuf) + n; s < e; s++)
 					if (*s == f->physical.format.delimiter || *s == f->physical.format.escape || *s == f->physical.format.quotebegin || *s == f->physical.format.quoteend)
 					{
 						if (f->physical.format.escape >= 0)
 						{
-							sfwrite(convert->file->io, b, s - b);
-							sfputc(convert->file->io, f->physical.format.escape);
-							sfputc(convert->file->io, *s);
+							sfwrite(flatten->file->io, b, s - b);
+							sfputc(flatten->file->io, f->physical.format.escape);
+							sfputc(flatten->file->io, *s);
 						}
 						else if (*s == f->physical.format.delimiter)
 						{
 							if (q)
 								continue;
 							q = 1;
-							sfwrite(convert->file->io, b, s - b);
-							sfputc(convert->file->io, f->physical.format.quotebegin);
-							sfputc(convert->file->io, *s);
+							sfwrite(flatten->file->io, b, s - b);
+							sfputc(flatten->file->io, f->physical.format.quotebegin);
+							sfputc(flatten->file->io, *s);
 						}
 						else
 						{
-							sfwrite(convert->file->io, b, s - b + 1);
-							sfputc(convert->file->io, *s);
+							sfwrite(flatten->file->io, b, s - b + 1);
+							sfputc(flatten->file->io, *s);
 							if (!q)
 							{
 								q = 1;
-								sfputc(convert->file->io, *s);
+								sfputc(flatten->file->io, *s);
 							}
 						}
 						b = s + 1;
@@ -4079,56 +4092,58 @@ convert_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 				if (q && !(f->physical.format.flags & CX_QUOTEALL))
 				{
 					q = 0;
-					sfputc(convert->file->io, f->physical.format.quoteend);
+					sfputc(flatten->file->io, f->physical.format.quoteend);
 				}
-				sfwrite(convert->file->io, b, s - b);
+				sfwrite(flatten->file->io, b, s - b);
 				if (q)
-					sfputc(convert->file->io, f->physical.format.quoteend);
+					sfputc(flatten->file->io, f->physical.format.quoteend);
 			}
 			else
-				sfwrite(convert->file->io, convert->flat->valbuf, n);
+				sfwrite(flatten->file->io, flatten->flat->valbuf, n);
 		}
-		else if (convert->emptyspace && f->physical.format.delimiter >= 0)
-			sfputc(convert->file->io, ' ');
+		else if (flatten->emptyspace && f->physical.format.delimiter >= 0)
+			sfputc(flatten->file->io, ' ');
 		if (f->physical.format.delimiter >= 0)
-			sfputc(convert->file->io, f->physical.format.delimiter);
+			sfputc(flatten->file->io, f->physical.format.delimiter);
 	}
 	return 0;
 }
 
 /*
- * flat query end
+ * flatten query end
  */
 
 static int
-convert_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
+flatten_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
-	Convert_t*	convert = (Convert_t*)expr->data;
+	Flatten_t*	flatten = (Flatten_t*)expr->data;
 	int		r;
 
-	if (!convert)
+	if (!flatten)
 		return -1;
 	expr->data = 0;
 	r = 0;
-	if (dssfclose(convert->file))
+	if (dssfclose(flatten->file))
 		r = -1;
-	if (dssclose(convert->dss))
+	if (dssclose(flatten->dss))
 		r = -1;
-	vmclose(convert->vm);
+	vmclose(flatten->vm);
 	return r;
 }
 
 static Cxquery_t queries[] =
 {
-{ "flat",	"convert to flat schema format",
-		CXH, convert_beg, 0, convert_act, convert_end },
+{ "flatten",	"query to flatten input data to flat schema format",
+		CXH, flatten_beg, 0, flatten_act, flatten_end },
 {0}
 };
 
 Dsslib_t dss_lib_flat =
 {
 	"flat",
-	"flat method",
+	"flat method"
+	"[-1ls5Pp0?\n@(#)$Id: dss flat method (AT&T Research) 2010-05-28 $\n]"
+	USAGE_LICENSE,
 	CXH,
 	0,
 	&method,

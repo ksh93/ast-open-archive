@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*          Copyright (c) 1998-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -59,7 +59,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 		state.dll = dll;
 		if (ignore)
 			return 0;
-		if (!(dll->dll = dllplug(id, dll->name, NiL, RTLD_LAZY, path, sizeof(path))))
+		if (!(dll->dll = dllplugin(id, dll->name, NiL, PZ_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path))))
 		{
 			if (pz->disc && pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %s", dll->name, dlerror());

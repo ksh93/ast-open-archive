@@ -55,7 +55,9 @@ TEST 02 'long options'
 	EXEC	cmd "$usage" --method abc
 		OUTPUT - $'return=x option=-x name=--method arg=(null) num=1\nargument=1 value="abc"'
 	EXEC	cmd "$usage" -V -x --si 10k --size=1m
-		OUTPUT - $'return=V option=-V name=-V arg=(null) num=1\nreturn=x option=-x name=-x arg=(null) num=1\nreturn=z option=-z name=--size arg=10k num=10240\nreturn=z option=-z name=--size arg=1m num=1048576'
+		OUTPUT - $'return=V option=-V name=-V arg=(null) num=1\nreturn=x option=-x name=-x arg=(null) num=1\nreturn=z option=-z name=--size arg=10k num=10000\nreturn=z option=-z name=--size arg=1m num=1000000'
+	EXEC	cmd "$usage" -V -x --si 10ki --size=1mi
+		OUTPUT - $'return=V option=-V name=-V arg=(null) num=1\nreturn=x option=-x name=-x arg=(null) num=1\nreturn=z option=-z name=--size arg=10ki num=10240\nreturn=z option=-z name=--size arg=1mi num=1048576'
 	EXEC	cmd "$usage" --yes --no --noyes --no-yes --yes=1 --yes=0
 		OUTPUT - $'return=-10 option=-10 name=--yes arg=(null) num=1\nreturn=-20 option=-20 name=--no arg=(null) num=1\nreturn=-10 option=-10 name=--yes arg=(null) num=0\nreturn=-10 option=-10 name=--yes arg=(null) num=0\nreturn=-10 option=-10 name=--yes arg=(null) num=1\nreturn=-10 option=-10 name=--yes arg=(null) num=0'
 	EXEC	cmd "$usage" --vern
@@ -162,12 +164,19 @@ OPTIONS
                   in the item style. Otherwise print version=n where n>0 if
                   --??item is supported, 0 if not.
   --???ESC        Emit escape codes even if output is not a terminal.
+  --???MAN[=section]
+                  List the man(1) section title for section
+                  [the current command].
+  --???SECTION    List the man(1) section number for the current command.
   --???TEST       Massage the output for regression testing.'
 	EXEC	cmd "$usage" --???
 		OUTPUT - $'return=? option=-? name=--??? num=0'
 	EXEC	cmd "$usage" --??usage
 		OUTPUT - $'return=? option=-? name=--??usage num=0'
 		ERROR - $'[-?\\n@(#)testopt (AT&T Research) 1999-02-02\\n][-author?Glenn Fowler <gsf@research.att.com>][--dictionary?tests:opt][x:method?One of]:?[algorithm:oneof:ignorecase]{[+a?method a][+b?method b][+c?method c]}[\\n[y=10:yes?Yes.][20:no?No.]\\n][d:database?File database path.]:[path][z:size?Important size.]#[sizeX][V:vernum?List program version and exit.][v:verbose?Enable verbose trace.][n:show?Show but don\\\'t execute.]\\n\\npattern ...'
+	EXEC	head $'[-n?\n@(#)$Id: head (AT&T Research) 2010-04-22 $\n][-author?bozo]' --version
+		OUTPUT - $'return=? option=- name=--version num=0'
+		ERROR - $'  version         head (AT&T Research) 2010-04-22'
 
 TEST 03 'info callback'
 	usage=$'[+][x:method?One of \fmethods\f.]:?[algorithm][m:meta?Enable metachars.]\n\npattern ...'
@@ -771,7 +780,7 @@ getopts (AT&T Research) 1999-02-02'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <TITLE>getopts man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -1236,7 +1245,7 @@ TEST 10 'numeric options'
 		OUTPUT - $'return=m option=+m name=+4 arg=4 num=4'
 
 TEST 11 'find style!'
-	find=$'[-1p1][+NAME?\bfind\b - find files][13:amin?File was last accessed \aminutes\a minutes ago.]#[minutes][17:chop?Chop leading \b./\b from printed pathnames.]\n\n[ path ... ] [ option ]\n\n[+SEE ALSO?cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)]'
+	find=$'[-1p1?@(#)find (AT&T Research) 2010-04-22][+NAME?\bfind\b - find files][13:amin?File was last accessed \aminutes\a minutes ago.]#[minutes][17:chop?Chop leading \b./\b from printed pathnames.]\n\n[ path ... ] [ option ]\n\n[+SEE ALSO?cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)]'
 	EXEC	find "$find" -amin 1 -chop
 		OUTPUT - $'return=-13 option=-13 name=-amin arg=1 num=1\nreturn=-17 option=-17 name=-chop arg=(null) num=1'
 	EXEC	find "$find" -amin=1 --chop
@@ -1265,7 +1274,7 @@ TEST 11 'find style!'
 		ERROR - $'Usage: find [ options ] [ path ... ] [ option ]\nOPTIONS\n  -amin minutes   File was last accessed minutes minutes ago.\n  -chop           Chop leading ./ from printed pathnames.'
 	EXEC	find "$find" --man
 		OUTPUT - $'return=? option=- name=-man num=0'
-		ERROR - $'NAME\n  find - find files\n\nSYNOPSIS\n  find [ options ] [ path ... ] [ option ]\n\nOPTIONS\n  -amin minutes   File was last accessed minutes minutes ago.\n  -chop           Chop leading ./ from printed pathnames.\n\nSEE ALSO\n  cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)'
+		ERROR - $'NAME\n  find - find files\n\nSYNOPSIS\n  find [ options ] [ path ... ] [ option ]\n\nOPTIONS\n  -amin minutes   File was last accessed minutes minutes ago.\n  -chop           Chop leading ./ from printed pathnames.\n\nSEE ALSO\n  cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)\n\nIMPLEMENTATION\n  version         find (AT&T Research) 2010-04-22'
 	EXEC	find "$find" --nroff
 		OUTPUT - $'return=? option=- name=-nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
@@ -1343,7 +1352,7 @@ TEST 11 'find style!'
 .ft R
 .in -3n
 ..
-.TH FIND 1
+.TH FIND 1 2010-04-22
 .SH NAME
 \\fBfind\\fP \\- find files
 .SH SYNOPSIS
@@ -1354,7 +1363,10 @@ File was last accessed \\fIminutes\\fP minutes ago\\&.
 .OP - chop flag -
 Chop leading \\fB\\&./\\fP from printed pathnames\\&.
 .SH SEE\\ ALSO
-cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)'
+cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)
+.SH IMPLEMENTATION
+.H0 version
+find (AT&T Research) 2010\\-04\\-22'
 
 TEST 12 'dd style!'
 	dd=$'[-1p0][+NAME?\bdd\b - copy and convert file][10:if?Input file name.]:[file][11:conv?Conversion option.]:[conversion][+SEE ALSO?cp(1), pax(1), tr(1), seek(2)]'
@@ -1431,6 +1443,9 @@ TEST 14 'interface queries'
 		OUTPUT - $'return=? option=-? name=--???html num=0'
 	EXEC	command "$usage" --???man
 		OUTPUT - $'return=? option=-? name=--???man num=0'
+	EXEC	command "$usage" --???MAN=3S
+		OUTPUT - $'return=? option=-? name=--???MAN num=0'
+		ERROR - $'STANDARD I/O FUNCTIONS'
 
 TEST 15 'required vs. optional arguments'
 	usage=$'[-][r:required]:[value][o:optional]:?[value][2:aha]'
@@ -1453,7 +1468,7 @@ TEST 16 'detailed man'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <TITLE>ah man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -1762,14 +1777,14 @@ OPTIONS
 		EXIT 2
 
 TEST 24 'detailed html'
-	usage=$'[-][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-1999 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-proprietary.html][+NAME?\bdd\b - copy and convert file][10:if?Input file name (see \aintro\a(2)).]:[file\a (see \bstat\b(2))][11:conv?Conversion option \abegin[-end]]=value\a passed to \bmain\b().]:[conversion][+SEE ALSO?\bcp\b(1), \bpax\b(1), \btr\b(1), \bseek\b(2)]'
+	usage=$'[-][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-1999 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-proprietary.html][+NAME?\bdd\b - copy and convert file][10:if?Input file name (see \aintro\a(2)).]:[file\a (see \bstat\b(2))][11:conv?Conversion option \abegin[-end]]=value\a passed to \bmain\b().]:[conversion][+SEE ALSO?\bcp\b(1), \bpax\b(1), \btr\b(1), \bseek\b(2), \bdd::plugin\b(5P)]'
 	EXEC	test "$usage" --html
 		EXIT 2
 		OUTPUT - $'return=? option=- name=--html num=0'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <!--INTERNAL-->
 <TITLE>dd man document</TITLE>
 </HEAD>
@@ -1797,7 +1812,8 @@ TEST 24 'detailed html'
 <DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
 <DL compact>
 <DT><NOBR><A href="../man1/cp.html"><B>cp</B></A>(1),</NOBR> <NOBR><A href="../man1/pax.html"><B>pax</B></A>(1),</NOBR>
-<NOBR><A href="../man1/tr.html"><B>tr</B></A>(1),</NOBR> <NOBR><A href="../man2/seek.html"><B>seek</B></A>(2)</NOBR>
+<NOBR><A href="../man1/tr.html"><B>tr</B></A>(1),</NOBR> <NOBR><A href="../man2/seek.html"><B>seek</B></A>(2),</NOBR>
+<NOBR><A href="../man5P/dd-plugin.html"><B>dd::plugin</B></A>(5P)</NOBR>
 </DL>
 <DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
 
@@ -1918,7 +1934,7 @@ OPTIONS
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <TITLE>bar man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -2022,7 +2038,7 @@ IMPLEMENTATION
 TEST 30 'library interfaces'
 	USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-1999 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"
 	usage=$'
-[-1s3?@(#)sum (AT&T Research) 1999-12-11]'$USAGE_LICENSE$'
+[-1s3S?@(#)sum (AT&T Research) 1999-12-11]'$USAGE_LICENSE$'
 [+NAME?sum - checksum library]
 [+DESCRIPTION?\bsum\b is a checksum library.]
 [Sum_t*:sumopen(const char* \amethod\a)?Open a sum handle for \amethod\a.]
@@ -2039,11 +2055,11 @@ TEST 30 'library interfaces'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <TITLE>sum man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;SUM&nbsp;(&nbsp;3&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER LIBRARY</A><TH align=right>SUM&nbsp;(&nbsp;3&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;SUM&nbsp;(&nbsp;3S&nbsp;)&nbsp;<TH align=center><A href="." title="Index">STANDARD I/O FUNCTIONS</A><TH align=right>SUM&nbsp;(&nbsp;3S&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -2158,7 +2174,7 @@ href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 .ft R
 .in -3n
 ..
-.TH SUM 3
+.TH SUM 3S 1999-12-11
 .SH NAME
 sum \\- checksum library
 .SH SYNOPSIS
@@ -2640,7 +2656,7 @@ SpamCo'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <TITLE>eg man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -2693,8 +2709,56 @@ SpamCo'
 </DL></DL>
 </BODY>
 </HTML>'
+	usage=$'[-?\naha\n][-catalog?SpamCo][+NAME?eg - test example examples][Q:quote?Quote names according to \astyle\a:]:[style:=question][+EXAMPLES]{[+dss -x bgp \'(type==\"A\")??{write table > a}::{write cisco > b}\' mrt.dat?Write the announce records from \bmrt.dat\b to the file \ba\b in the \btable\b format and all other records to the file \bb\b in the \bcisco\b format.]}[+SEE ALSO?\begman\b(1), \bwalrus\b(8)]'
+	EXEC eg "$usage" --html
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<TITLE>eg man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;EG&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>EG&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
+<DT>eg - test example examples
+<P>
+</DL>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>eg</B> &#0091; <I>options</I> &#0093;
+<P>
+</DL>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD>Quote names according to <I>style
+</I>: The default value is <B>question</B>.
+</DL>
+<DT><H4><A name="EXAMPLES">EXAMPLES</A></H4>
+<DL compact>
+<DT><A name="dss -x bgp \'(type==&quot;A&quot;)?{write table &gt; a}:{write
+cisco &gt; b}\' mrt.dat"><B>dss -x bgp \'</B>(type==&quot;A&quot;)?{write table
+&gt; a}:{write cisco &gt; b}\' mrt.dat</A><DD>Write the announce records from <B>mrt.dat
+</B> to the file <B>a</B> in the <B>table</B> format and all other records to
+the file <B>b</B> in the <B>cisco</B> format.
+</DL>
+<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DL compact>
+<DT><NOBR><A href="../man1/egman.html"><B>egman</B></A>(1),</NOBR> <NOBR><A href="../man8/walrus.html"><B>walrus</B></A>(8)</NOBR>
+</DL>
+<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DL compact>
+<DT><A name="version"><B>version</B></A><DD>aha
+<DT><A name="catalog"><B>catalog</B></A><DD>SpamCo
+</DL></DL>
+</BODY>
+</HTML>'
 
-TEST 41 'cache exercizes'
+TEST 41 'cache exercises'
 	usage=$'[-1c][a:aaa?AAA][b:bbb?BBB]:[bv][c:ccc?CCC]:?[cv]'
 	EXEC typeset "$usage" -a -b1
 		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
@@ -2928,7 +2992,7 @@ TEST 46 'html escapism'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <TITLE>codex man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -3021,7 +3085,7 @@ OPTIONS
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
 <TITLE>make man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -3585,6 +3649,88 @@ SEE ALSO
 IMPLEMENTATION
   version         codex (AT&T Research) 2009-04-15'
 
+TEST 61 'man(1) section titles'
+
+	usage=$'[-1s1M][+NAME?section]'
+	EXEC section "$usage" '--???MAN'
+		OUTPUT - 'return=? option=-? name=--???MAN num=0'
+		ERROR - 'MAKE ASSERTION OPERATORS AND RULES'
+		EXIT 2
+	EXEC section "$usage" '--???MAN=5P'
+		OUTPUT - 'return=? option=-? name=--???MAN num=0'
+		ERROR - 'PLUGINS'
+	EXEC section "$usage" '--???MAN=5PU'
+		OUTPUT - 'return=? option=-? name=--???MAN num=0'
+		ERROR - 'UWIN PLUGINS'
+	EXEC section "$usage" '--???MAN=8U'
+		OUTPUT - 'return=? option=-? name=--???MAN num=0'
+		ERROR - 'UWIN ADMINISTRATIVE COMMANDS'
+
+TEST 62 'conformance conditionals'
+
+	usage=$'[-][a:all?ALL][(foo|ast)s:some?SOME][(foo|bar)n:never?NEVER][e:every?EVERY][(foo|bar)+?Specific text.]'
+	EXEC conformance "$usage" -a
+		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1'
+	EXEC conformance "$usage" --all
+		OUTPUT - 'return=a option=-a name=--all arg=(null) num=1'
+	EXEC conformance "$usage" -s
+		OUTPUT - 'return=s option=-s name=-s arg=(null) num=1'
+	EXEC conformance "$usage" --some
+		OUTPUT - 'return=s option=-s name=--some arg=(null) num=1'
+	EXEC conformance "$usage" -e
+		OUTPUT - 'return=e option=-e name=-e arg=(null) num=1'
+	EXEC conformance "$usage" --every
+		OUTPUT - 'return=e option=-e name=--every arg=(null) num=1'
+	EXEC conformance "$usage" -n
+		EXIT 1
+		OUTPUT - 'return=: option= name=-n num=0 str=[-][a:all?ALL][(foo|ast)s:some?SOME][(foo|bar)n:never?NEVER][e:every?EVERY][(foo|bar)+?Specific text.]'
+		ERROR - $'conformance: -n: unknown option'
+	EXEC conformance "$usage" --never
+		OUTPUT - 'return=: option= name=--never num=0 str=--never'
+		ERROR - 'conformance: --never: unknown option'
+	EXEC conformance "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'OPTIONS
+  -a, --all       ALL
+  -s, --some      [(foo|ast) conformance] SOME
+  -n, --never     [(foo|bar) conformance] NEVER
+  -e, --every     EVERY
+
+  [(foo|bar) conformance] Specific text.
+
+SYNOPSIS
+  conformance [ options ]'
+
+	EXEC conformance "$usage" --html
+		OUTPUT - $'return=? option=- name=--html num=0'
+		ERROR - '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<TITLE>conformance man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;CONFORMANCE&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>CONFORMANCE&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>-<B>a</B>, --<B>all</B><DD>ALL
+<DT>-<B>s</B>, --<B>some</B><DD>&#0091;(foo|ast) conformance&#0093; SOME
+<DT>-<B>n</B>, --<B>never</B><DD>&#0091;(foo|bar) conformance&#0093; NEVER
+<DT>-<B>e</B>, --<B>every</B><DD>EVERY
+<P>
+<DT>&#0091;(foo|bar) conformance&#0093; Specific text.
+<P>
+</DL>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>conformance</B> &#0091; <I>options</I> &#0093;
+</DL></DL>
+</BODY>
+</HTML>'
+
 # skip non-astsa (standalone ast) tests
 
 [[ $($COMMAND -+ astsa '[-]' '--???about' 2>/dev/null) == *catalog=libast* ]] || exit
@@ -4023,6 +4169,10 @@ id=xlate catalog=libast text="???\aitem\a"
 id=xlate catalog=libast text="If the next argument is \b--\b\aoption\a then list the \aoption\a output in the \aitem\a style. Otherwise print \bversion=\b\an\a where \an\a>0 if \b--??\b\aitem\a is supported, \b0\b if not."
 id=xlate catalog=libast text="???ESC"
 id=xlate catalog=libast text="Emit escape codes even if output is not a terminal."
+id=xlate catalog=libast text="???MAN[=\asection\a]"
+id=xlate catalog=libast text="List the \bman\b(1) section title for \asection\a [the current command]."
+id=xlate catalog=libast text="???SECTION"
+id=xlate catalog=libast text="List the \bman\b(1) section number for the current command."
 id=xlate catalog=libast text="???TEST"
 id=xlate catalog=libast text="Massage the output for regression testing."
 id=xlate catalog=libast text="SYNOPSIS"
@@ -4066,6 +4216,11 @@ BCGVBAF
                   va gur vgrz fglyr. Bgurejvfr cevag version=a jurer a>0 vs
                   --??vgrz vf fhccbegrq, 0 vs abg.
   --???RFP|???ESC Rzvg rfpncr pbqrf rira vs bhgchg vf abg n grezvany.
+  --???ZNA[=frpgvba]|???MAN[=section]
+                  Yvfg gur man(1) frpgvba gvgyr sbe frpgvba
+                  [gur pheerag pbzznaq].
+  --???FRPGVBA|???SECTION
+                  Yvfg gur man(1) frpgvba ahzore sbe gur pheerag pbzznaq.
   --???GRFG|???TEST
                   Znffntr gur bhgchg sbe erterffvba grfgvat.'
 	EXEC -+ xlate "$usage" --keys

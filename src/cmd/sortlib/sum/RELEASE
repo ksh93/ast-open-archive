@@ -1,3 +1,4 @@
+10-05-27 sortsum.c: hadle -t'multibyte'
 08-08-28 sortsum.c: add --regress to normalize arch dependent rounding
 08-05-08 sortsum.c,sort.tst: tweak default floating point rounding
 06-01-15 sortsum.c: fix var length field extension logic, add op=count

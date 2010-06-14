@@ -942,7 +942,7 @@ Paxformat_t	pax_calib_format =
 	PAX_DEFBUFFER,
 	PAX_DEFBLOCKS,
 	0,
-	PAXNEXT(pax_calib_next),
+	PAXNEXT(calib),
 	0,
 	calib_done,
 	calib_getprologue,
@@ -950,4 +950,4 @@ Paxformat_t	pax_calib_format =
 	calib_getdata,
 };
 
-PAXLIB(&pax_calib_format)
+PAXLIB(calib)

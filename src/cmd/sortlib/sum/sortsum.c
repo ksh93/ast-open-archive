@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,18 +24,18 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2008-08-28 $\n]"
+"[-1lp0s5P?\n@(#)$Id: sum (AT&T Research) 2010-05-27 $\n]"
 USAGE_LICENSE
-"[+NAME?sortsum - sort uniq summary discipline]"
-"[+DESCRIPTION?The \bsortsum\b \bsort\b(1) discipline applies "
+"[+PLUGIN?sum - sort uniq summary discipline]"
+"[+DESCRIPTION?The \bsum\b \bsort\b(1) discipline applies "
     "summarization operations to selected fields in records that compare "
     "equal. The discipline sets the \bsort\b \b--unique\b option. Summary "
     "fields in non-unique records are modified according to the operations "
     "specified in the \bop\b discipline option.]"
 "[l:library?Load the \bdss\b(1) type library \alibrary\a. Types are used "
     "by the \bop\b option. The \bnum_t\b library is loaded by default. \vdss "
-    "--info\v lists the information on all \bdss\b libraries and \vdss "
-    "--info\v \aname\a lists the information for the \aname\a "
+    "--plugin=man\v lists the information on all \bdss\b libraries and \vdss "
+    "--plugin=man\v \aname\a lists the information for the \aname\a "
     "library.]:[library]"
 "[o:op?A field summary operation. \aarg\a is a \bdss\b(1) type name for "
     "all but the \bset\b \aop\a, either from the \bnum_t\b library or from a "
@@ -64,12 +64,13 @@ USAGE_LICENSE
             "fixed width field starting at byte position 2 (counting from 1) "
             "and computes the sum of the integers in the 2 byte fixed width "
             "field starting at byte position 6.]"
-        "[+dlls -b dss | grep '_t$'?Lists the \bdss\b(1) type library "
-            "names.]"
-        "[+dss -i num_t?Lists the \bdss\b(1) \bnum_t\b type library "
-            "description.]"
+        "[+dlls --base dss | grep '_t$'?Lists the \bdss\b(1) type "
+            "library names.]"
+        "[+dss --plugin=man num_t?Lists the \bdss\b(1) \bnum_t\b type "
+            "library description in the \b--man\b style.]"
     "}"
 "[+SEE ALSO?\bdss\b(1), \bsort\b(1)]"
+"\n\n--library=sum[,option[=value]...]\n\n"
 ;
 
 #include <ast.h>
@@ -126,7 +127,7 @@ typedef struct State_s
 	Summary_t*	sum;
 	Sflong_t	records;
 	Recfmt_t	fmt;
-	int		tab;
+	unsigned char*	tab;
 	int		alt;
 	int		regress;
 	Buffer_t	tmp;
@@ -161,9 +162,11 @@ record(register State_t* state, register Rsobj_t* r, int op)
 	register unsigned char*		z;
 	register const unsigned char*	map;
 	unsigned char*			x;
+	unsigned char*			tab;
 	Buffer_t*			ext;
 	int				beg;
 	int				end;
+	int				t;
 	int				c;
 	size_t				count;
 	size_t				w;
@@ -176,11 +179,29 @@ record(register State_t* state, register Rsobj_t* r, int op)
 	e = s + r->datalen - (RECTYPE(state->fmt) == REC_delimited);
 	beg = end = 0;
 	count = 1;
+	tab = state->tab;
+	t = *tab++;
+	if (!*tab)
+		tab = 0;
 	for (sum = state->sum; sum; sum = sum->next)
 	{
 		while (beg < sum->beg.field)
 		{
-			while (s < e && *s++ != state->tab);
+		tab1:
+			while (s < e)
+				if (*s++ == t)
+				{
+					if (tab)
+						for (c = 0; (s + c) < e; c++)
+							if (!tab[c])
+							{
+								s += c;
+								break;
+							}
+							else if (tab[c] != s[c])
+								goto tab1;
+					break;
+				}
 			end = ++beg;
 		}
 		if (sum->beg.index < (e - s))
@@ -188,13 +209,38 @@ record(register State_t* state, register Rsobj_t* r, int op)
 			a = s + sum->beg.index;
 			while (end < sum->end.field)
 			{
-				while (s < e && *s++ != state->tab);
+			tab2:
+				while (s < e)
+					if (*s++ == t)
+					{
+						if (tab)
+							for (c = 0; (s + c) < e; c++)
+								if (!tab[c])
+								{
+									s += c;
+									break;
+								}
+								else if (tab[c] != s[c])
+									goto tab2;
+						break;
+					}
 				end++;
 			}
 			if (!sum->end.index)
 			{
-				while (s < e && *s != state->tab)
-					s++;
+			tab3:
+				while (s < e)
+					if (*s++ == t)
+					{
+						if (tab)
+							for (c = 0; (s + c) < e; c++)
+								if (!tab[c])
+									break;
+								else if (tab[c] != s[c])
+									goto tab3;
+						s--;
+						break;
+					}
 				z = s;
 			}
 			else if (sum->end.index <= (e - s))
@@ -379,7 +425,7 @@ rs_disc(Rskey_t* key, const char* options)
 	if (!(state = vmnewof(dss->vm, 0, State_t, 1, 0)))
 		error(ERROR_SYSTEM|3, "out of space");
 	state->dss = dss;
-	if (dssload("num_t", dss->disc))
+	if (!dssload("num_t", dss->disc))
 		goto drop;
 	debug = 0;
 	if (options)
@@ -394,7 +440,7 @@ rs_disc(Rskey_t* key, const char* options)
 				debug = 1;
 				continue;
 			case 'l':
-				if (dssload(opt_info.arg, dss->disc))
+				if (!dssload(opt_info.arg, dss->disc))
 					goto drop;
 				continue;
 			case 'o':
@@ -442,7 +488,7 @@ rs_disc(Rskey_t* key, const char* options)
 				else
 				{
 					error(2, "%s: invalid summary field position", s);
-					goto bad;
+					goto drop;
 				}
 				if (*s == '.')
 					n = 1;
@@ -451,7 +497,7 @@ rs_disc(Rskey_t* key, const char* options)
 				if ((pos->field = n - 1) < 0)
 				{
 					error(2, "%d: invalid summary field %s position", n, loc);
-					goto bad;
+					goto drop;
 				}
 				switch (*s)
 				{
@@ -460,7 +506,7 @@ rs_disc(Rskey_t* key, const char* options)
 					if ((pos->index = n - 1) < 0)
 					{
 						error(2, "%d: invalid summary field %s offset", n, loc);
-						goto bad;
+						goto drop;
 					}
 					if (*s == '.')
 					{
@@ -470,7 +516,7 @@ rs_disc(Rskey_t* key, const char* options)
 						if (n <= 0)
 						{
 							error(2, "%d: invalid summary field %s size", n, loc);
-							goto bad;
+							goto drop;
 						}
 						sum->end.field = sum->beg.field;
 						sum->end.index = sum->beg.index + n;
@@ -497,7 +543,7 @@ rs_disc(Rskey_t* key, const char* options)
 						break;
 					default:
 						error(2, "%s: invalid code set", s - 1);
-						goto bad;
+						goto drop;
 					}
 					switch (*s++)
 					{
@@ -527,7 +573,7 @@ rs_disc(Rskey_t* key, const char* options)
 					if (isalpha(*s))
 					{
 						error(2, "%s: invalid summary field attribute", s);
-						goto bad;
+						goto drop;
 					}
 					break;
 				}
@@ -562,13 +608,13 @@ rs_disc(Rskey_t* key, const char* options)
 				if (*s != ':' || !*++s)
 				{
 					error(2, "%s: summary field character value expected", t);
-					goto bad;
+					goto drop;
 				}
 				sum->set = chresc(s, &s);
 				break;
 			default:
 				error(2, "%s: invalid summary field operation", s - 1);
-				goto bad;
+				goto drop;
 			}
 			while (isalnum(*s))
 				s++;
@@ -586,7 +632,7 @@ rs_disc(Rskey_t* key, const char* options)
 			/*FALLTHROUGH*/
 		default:
 			error(2, "%s: invalid summary field specification", s);
-			goto bad;
+			goto drop;
 		}
 		while (*s == ':' || isspace(*s))
 			s++;
@@ -597,7 +643,7 @@ rs_disc(Rskey_t* key, const char* options)
 					if (sum->beg.field < 0)
 					{
 						error(2, "%s: field position expected", b);
-						goto bad;
+						goto drop;
 					}
 					if (!sum->type)
 						sum->type = cxattr(dss->cx, "integer", NiL, &sum->format, dss->cx->disc);
@@ -669,9 +715,9 @@ rs_disc(Rskey_t* key, const char* options)
 			sfprintf(sfstderr, "\n");
 		}
 	return &state->disc;
- bad:
-	error(ERROR_USAGE|4, "%s", optusage(NiL));
  drop:
 	dssclose(dss);
 	return 0;
 }
+
+SORTLIB(sum)

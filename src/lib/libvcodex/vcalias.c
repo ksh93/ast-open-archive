@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -152,7 +152,7 @@ char**	dflt;	/* list of default aliases */
 	if(!Alias)
 	{
 #if _PACKAGE_ast /* AST alias convention */
-		if(pathpath(file, ALIASES, "",  PATH_REGULAR) && (sf = sfopen(0, file, "")) )
+		if(pathpath(ALIASES, "",  PATH_REGULAR, file, sizeof(file)) && (sf = sfopen(0, file, "")) )
 		{	while((sp = sfgetr(sf, '\n', 1)) )
 				zipalias(sp);
 			sfclose(sf);

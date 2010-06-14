@@ -5,7 +5,7 @@
 .H 1 Introduction
 .BR nmake (1)
 is the standard software construction tool at AT&T and
-Lucent Technologies.
+Alcatel-Lucent.
 It is a descendent of the UNIX
 .BR make (1)
 and is not related to the
@@ -1524,10 +1524,10 @@ named
 .BR nmake :
 .VL 6
 .LI
-.B "AT&T nmake 5.0"
+.B "nmake (AT&T Research) 5.5 2010-03-11"
 This is the version maintained by the original author.
 .LI
-.B "Lucent nmake 3.5"
+.B "Alcatel-Lucent nmake 12"
 The the variant that split in 1995 when AT&T spun off Lucent.
 .LI
 .B "MicroSoft NMAKE"
@@ -1547,6 +1547,7 @@ Here are the known incompatibilities between the AT&T and Lucent
 variants.
 Bug fixes and backwards compatible enhancements to the AT&T variant
 are not listed.
+
 .VL 6
 .LI
 .B "output serialization"
@@ -1568,6 +1569,7 @@ Implemented with 3 new commands, one of which is a replacement wrapper for
 .B nmake
 itself.
 .LE
+
 .LI
 .B "probe file override"
 Allow a user to override the automatically generated probe files.
@@ -1615,6 +1617,7 @@ depending on the value of the
 .B localprobe
 variable.
 .LE
+
 .LI
 .B "Makerules options"
 .I --option=value
@@ -1641,10 +1644,22 @@ Lucent and AT&T
 The makerules variable form is supported for backwards compatibility.
 Warnings will eventually be enabled to encourage use of the
 makerules option form.
+.I "Not all incompatibilities are caught"
+the workaround is triggered by the
+.B .PROBE.INIT
+rule which is usually done early in the makefile input process.
+There may some instances where the
+.I --option=value
+form must be used, either on the command line or as
+.EX
+set --\fIoption=value\fP
+.EE
+in a makefile or global rules file.
 .LI
 .B Lucent
 Many makerules variable additions.
 .LE
+
 .LI
 .B ":MAKE: ordering"
 .VL 6
@@ -1675,6 +1690,7 @@ on entering a directory and
 .B $(recurse_end_message)
 on leaving a directory.
 .LE
+
 .LI
 .B .ACTIONWRAP
 .B $(.ACTIONWRAP)
@@ -1689,6 +1705,51 @@ Not implemented, pending a more general solution.
 Its not clear how to prevent
 .I all
 actions from being wrapped.
+.LE
+
+.LI
+.B "java support"
+Different views on how to integrate java dependency analysis.
+.VL 6
+.LI
+.B AT&T
+Based on the ast-jmake package which provides
+.BR jmake (1)
+and the
+.BR JAVA (1M)
+and
+.BR JAR (1M)
+assertion operators.
+Fully integrated with viewpathing and implicit prerequisite scanning
+in a manner similar to
+.BR cc (1)
+and implicit includes.
+.LI
+.B Lucent
+See the Alcatel-Lucent documentation.
+.LE
+
+.LI
+.B "XML build logs"
+A richer XML variant of
+.I MAM
+output.
+.VL 6
+.LI
+.B AT&T
+Not implemented, but a good idea for interopability.
+Would most likely be implemented by enhancing the
+.B --mam
+option.
+.LI
+.B Lucent
+Implemented by a using the command
+.B xmakelog
+instead of
+.BR nmake .
+Not clear from the documentation why a
+.B nmake
+option wouldn't do.
 .LE
 
 .H 1 Example

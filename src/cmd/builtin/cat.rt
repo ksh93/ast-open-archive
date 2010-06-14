@@ -42,3 +42,10 @@ do
 		EXEC $o $f
 	done
 done
+
+TEST '-v'
+
+	DATA i $'a\x{89}b\x{c9}c\tdIe'
+	DATA j -n X
+	EXEC -v i
+	EXEC -v j

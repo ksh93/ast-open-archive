@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,10 +24,10 @@
  */
 
 static const char compress_usage[] =
-"[-1l?\n@(#)$Id: dss compress query (AT&T Research) 2003-05-05 $\n]"
+"[-1ls5P?\n@(#)$Id: dss compress query (AT&T Research) 2003-05-05 $\n]"
 USAGE_LICENSE
-"[+NAME?\findex\f]"
-"[+DESCRIPTION?The \bdss\b \bcompress\b query compress the parent output"
+"[+PLUGIN?\findex\f]"
+"[+DESCRIPTION?The \bdss\b \bcompress\b query compresses the parent output"
 "	stream according to \amethod\a. If \amethod\a is omitted then"
 "	the method preferred compression, if specified, is used, otherwise"
 "	\bgzip\b is assumed. The methods are:]{"

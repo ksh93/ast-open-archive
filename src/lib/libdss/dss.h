@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,10 +26,27 @@
 #ifndef _DSS_H
 #define _DSS_H		1
 
+#define DSS_PLUGIN_VERSION	AST_PLUGIN_VERSION(DSS_VERSION)
+
 #define DSS_ID		"dss"
 #define DSS_VERSION	CX_VERSION
 
+#if __STDC__
+#define DSSLIB(m)	\
+	extern Dsslib_t	dss_lib_##m; \
+	Dsslib_t* dss_lib(const char* name, Dssdisc_t* disc) { return &dss_lib_##m; } \
+	unsigned long	plugin_version(void) { return DSS_PLUGIN_VERSION; }
+#else
+#define DSSLIB(m)	\
+	extern Dsslib_t	dss_lib_##m; \
+	Dsslib_t* dss_lib(name, disc) const char* name; Dssdisc_t* disc; { return &dss_lib_##m; } \
+	unsigned long	plugin_version() { return DSS_PLUGIN_VERSION; }
+#endif
+
 #define Dssdisc_t	Cxdisc_t
+#define Dssmeth_s	Cxmeth_s
+#define Dssmeth_t	Cxmeth_t
+#define Dsslib_t	Cxlib_t
 #define Dsslocation_f	Cxlocation_f
 #define Dsstype_t	Cxtype_t
 #define Dssvalue_t	Cxvalue_t
@@ -51,9 +68,10 @@
 
 #define DSS_APPEND	(CX_FLAGS<<0)		/* DSS_FILE_APPEND	*/
 #define DSS_FORCE	(CX_FLAGS<<1)		/* populate all fields	*/
+#define DSS_WRITE	(CX_FLAGS<<2)		/* {write} referenced	*/
 
-#define DSS_METH_FLAGS	(CX_FLAGS<<2)		/* first method flag	*/
-#define DSS_FLAGS	(DSS_METH_FLAGS<<6)	/* first caller flag	*/
+#define DSS_METH_FLAGS	(CX_FLAGS<<3)		/* first method flag	*/
+#define DSS_FLAGS	(DSS_METH_FLAGS<<8)	/* first caller flag	*/
 
 #define DSS_FILE_READ	(1<<0)			/* read mode		*/
 #define DSS_FILE_WRITE	(1<<1)			/* write mode		*/
@@ -64,8 +82,6 @@
 struct Dss_s; typedef struct Dss_s Dss_t;
 struct Dssfile_s; typedef struct Dssfile_s Dssfile_t;
 struct Dssformat_s; typedef struct Dssformat_s Dssformat_t;
-struct Dsslib_s; typedef struct Dsslib_s Dsslib_t;
-struct Dssmeth_s; typedef struct Dssmeth_s Dssmeth_t;
 struct Dssoptdisc_s; typedef struct Dssoptdisc_s Dssoptdisc_t;
 struct Dssrecord_s; typedef struct Dssrecord_s Dssrecord_t;
 struct Dssstate_s; typedef struct Dssstate_s Dssstate_t;
@@ -109,6 +125,7 @@ struct Dssfile_s			/* typed file handle		*/
 {
 	Sfoff_t		offset;		/* current record offset	*/
 	size_t		count;		/* current record count		*/
+	size_t		length;		/* current record length	*/
 	Dss_t*		dss;		/* dss handle			*/
 	Dssflags_t	flags;		/* DSS_FILE_* flags		*/
 	Sfio_t*		io;		/* io stream			*/
@@ -119,26 +136,6 @@ struct Dssfile_s			/* typed file handle		*/
 #ifdef _DSS_FILE_PRIVATE_
 	_DSS_FILE_PRIVATE_
 #endif
-};
-
-struct Dsslib_s				/* dss_lib() library info	*/
-{
-	_CX_NAME_HEADER_
-	const char**	libraries;	/* library list			*/
-	Dssmeth_t*	meth;		/* method			*/
-	Cxtype_t*	types;		/* type table			*/
-	Cxcallout_t*	callouts;	/* callout table		*/
-	Cxrecode_t*	recodes;	/* recode table			*/
-	Cxmap_t**	maps;		/* map table			*/
-	Cxquery_t*	queries;	/* query table			*/
-	Cxconstraint_t*	constraints;	/* constraint table		*/
-	Cxedit_t*	edits;		/* edit table			*/
-
-	void*		pad[8];		/* pad for future expansion	*/
-
-	/* the remaining are set by dsslib()				*/
-
-	const char*	path;		/* library path name		*/
 };
 
 struct Dssmeth_s			/* method			*/
@@ -210,7 +207,7 @@ extern Dsslib_t*	dss_lib(const char*, Dssdisc_t*);
 
 extern Dssstate_t*	dssstate(Dssdisc_t*);
 extern Dsslib_t*	dsslib(const char*, Dssflags_t, Dssdisc_t*);
-extern int		dssload(const char*, Dssdisc_t*);
+extern Dsslib_t*	dssload(const char*, Dssdisc_t*);
 extern int		dssadd(Dsslib_t*, Dssdisc_t*);
 
 extern Dssmeth_t*	dssmeth(const char*, Dssdisc_t*);

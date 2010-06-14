@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2006-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2006-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,10 +24,10 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortglean (AT&T Research) 2007-04-20 $\n]"
+"[-1lp0s5P?\n@(#)$Id: glean (AT&T Research) 2007-04-20 $\n]"
 USAGE_LICENSE
-"[+NAME?sortglean - glean minima and/or maxima from record stream]"
-"[+DESCRIPTION?The \bsortglean\b \bsort\b(1) discipline gleans minima "
+"[+PLUGIN?glean - glean minima and/or maxima from record stream]"
+"[+DESCRIPTION?The \bglean\b \bsort\b(1) discipline gleans minima "
     "and maxima from a record stream. Each record is categorized by the main "
     "sort key. If there is no main sort key then all records are in one "
     "category. If the \bmin\b key sorts less than the current category "
@@ -54,6 +54,7 @@ USAGE_LICENSE
             "field 4 (string), for each value of the catenation of fields 1 and 2.]"
     "}"
 "[+SEE ALSO?\bsort\b(1)]"
+"\n\n--library=glean[,option[=value]...]\n\n"
 ;
 
 #include <ast.h>
@@ -299,7 +300,7 @@ rs_disc(Rskey_t* key, const char* options)
 				{
 					if (!(f = vmnewof(vm, 0, Field_t, 1, 0)) || !(f->lim = rskeyopen(&state->kydisc)))
 						error(ERROR_SYSTEM|3, "out of space");
-					f->lim->tab = key->tab;
+					strcpy(f->lim->tab, key->tab);
 					f->lim->type = key->type;
 					f->mm = i;
 					f->index = state->fields++;
@@ -329,3 +330,5 @@ rs_disc(Rskey_t* key, const char* options)
 	vmclose(vm);
 	return 0;
 }
+
+SORTLIB(glean)

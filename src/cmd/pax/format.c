@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -310,8 +310,8 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
 	f->st->st_mtime = mtime;
 	f->st->st_uid = DELTA_LO(checksum);
 	f->st->st_gid = DELTA_HI(checksum);
-	putheader(ap, f);
-	puttrailer(ap, f);
+	if (putheader(ap, f))
+		puttrailer(ap, f);
 	if (np)
 		sfstrclose(np);
 }
@@ -562,6 +562,7 @@ getkeytime(Archive_t* ap, File_t* f, int index)
 
 	NoP(f);
 	op = &options[index];
+	message((-5, "getkeytime %s level=%d entry=%d:%d", op->name, op->level, op->entry, ap->entry));
 	if (op->level < 7)
 	{
 		if (op->entry == ap->entry)
@@ -572,6 +573,8 @@ getkeytime(Archive_t* ap, File_t* f, int index)
 			return;
 		tv.tv_sec = vp->number;
 		tv.tv_nsec = vp->fraction;
+		if (!tv.tv_sec && !tv.tv_nsec && index != OPT_mtime)
+			tvgetmtime(&tv, f->st);
 		switch (index)
 		{
 		case OPT_atime:
@@ -641,9 +644,9 @@ getheader(register Archive_t* ap, register File_t* f)
 	} while ((ap->checkdelta || ap->delta) && deltacheck(ap, f));
 	ap->entries++;
 	getkeysize(ap, f, OPT_size, &f->st->st_size);
+	getkeytime(ap, f, OPT_mtime);
 	getkeytime(ap, f, OPT_atime);
 	getkeytime(ap, f, OPT_ctime);
-	getkeytime(ap, f, OPT_mtime);
 	getkeyid(ap, f, OPT_gid, &f->st->st_gid, state.gid);
 	getkeyname(ap, f, OPT_gname, &f->gidname, &f->st->st_gid, state.gid);
 	getkeyname(ap, f, OPT_path, &f->name, NiL, 0);
@@ -657,7 +660,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	if (ap->flags & DOS)
 		undos(f);
 	f->type = X_ITYPE(f->st->st_mode);
-	s = pathcanon(f->name, 0);
+	s = pathcanon(f->name, 0, 0);
 	if (s > f->name + 1 && *--s == '/')
 	{
 		*s = 0;
@@ -673,7 +676,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	f->namesize = strlen(f->name) + 1;
 	if (f->linkpath)
 	{
-		pathcanon(f->linkpath, 0);
+		pathcanon(f->linkpath, 0, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
 			f->linkpath = map(ap, f->linkpath);
 		f->linkpathsize = strlen(f->linkpath) + 1;

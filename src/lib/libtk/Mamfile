@@ -1,8 +1,8 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_X11 ${INSTALLROOT}
-setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/X11R6/include
-setv PACKAGE_X11_LIB ${PACKAGE_X11}/lib64
+setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11
+setv PACKAGE_X11_LIB ${PACKAGE_X11}/lib
 setv PACKAGE_tcl_INCLUDE ${INSTALLROOT}/include/tcl
 setv PACKAGE_tcl_LIB ${INSTALLROOT}/lib
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
@@ -130,6 +130,8 @@ done ${INSTALLROOT}/include/ast/ast_std.h dontcare
 done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
 done ${INSTALLROOT}/include/ast/stdio.h dontcare
 make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/ast_api.h implicit
+done ${INSTALLROOT}/include/ast/ast_api.h dontcare
 make ${INSTALLROOT}/include/ast/vmalloc.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
@@ -140,9 +142,6 @@ prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done ${INSTALLROOT}/include/ast/sfio.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_version.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_version.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast.h dontcare
 done ${INSTALLROOT}/include/tcl/tcl.h dontcare

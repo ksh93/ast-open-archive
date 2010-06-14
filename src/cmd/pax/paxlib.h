@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -36,6 +36,8 @@
 #if _BLD_DEBUG
 #include <vmalloc.h>
 #endif
+
+#define PAX_PLUGIN_VERSION	AST_PLUGIN_VERSION(20100528L)
 
 #define PAX_IN		(1<<0)		/* copy in			*/
 #define PAX_OUT		(1<<1)		/* copy out			*/
@@ -241,14 +243,16 @@ struct Pax_s				/* global state			*/
 #ifdef _PAX_ARCHIVE_PRIVATE_
 
 #define PAXLIB(m)
-#define PAXNEXT(m)	m
+#define PAXNEXT(m)	pax_##m##_next
 
 #else
 
 #ifdef __STDC__
-#define PAXLIB(f)	extern Paxformat_t* pax_lib(Pax_t* pax) {return f;}
+#define PAXLIB(f)	extern Paxformat_t* pax_lib(Pax_t* pax) {return &pax_##f##_format;} \
+			unsigned long plugin_version(void) {return PAX_PLUGIN_VERSION;}
 #else
-#define PAXLIB(f)	extern Paxformat_t* pax_lib(pax) Pax_t* pax; {return f;}
+#define PAXLIB(f)	extern Paxformat_t* pax_lib(pax) Pax_t* pax; {return &pax_##f##_format;} \
+			unsigned long plugin_version() {return PAX_PLUGIN_VERSION;}
 #endif
 
 #define PAXNEXT(m)	0

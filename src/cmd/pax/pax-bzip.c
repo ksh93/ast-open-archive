@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -51,7 +51,7 @@ Format_t	pax_bzip_format =
 	0,
 	0,
 	0,
-	PAXNEXT(pax_bzip_next),
+	PAXNEXT(bzip),
 	&pax_bzip_data,
 	0,
 	bzip_getprologue,
@@ -68,4 +68,4 @@ Format_t	pax_bzip_format =
 	0
 };
 
-PAXLIB(&pax_bzip_format)
+PAXLIB(bzip)

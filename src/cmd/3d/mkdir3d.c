@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -53,6 +53,7 @@ mkdir3d(const char* path, mode_t mode)
 	register char*	cp;
 	register int	r;
 	char		buf[PATH_MAX + 1];
+	char		tmp[PATH_MAX + 1];
 #if FS
 	Mount_t*	mp;
 #endif
@@ -82,9 +83,42 @@ mkdir3d(const char* path, mode_t mode)
 		 * copy canonicalized pathname into buf
 		 */
 
-		if (*sp != '/') sp = state.path.name;
-		cp = buf;
-		while (*cp = *sp++) cp++;
+		if (*sp != '/')
+			sp = state.path.name;
+		for (cp = buf; *cp = *sp++; cp++);
+		if (!state.real)
+		{
+			/*
+			 * create intermediate dirs if they exist in lower view
+			 */
+
+			char*	a;
+			char*	b;
+			Path_t	save;
+			int	oerrno;
+
+			a = tmp;
+			b = buf;
+			while (*a++ = *b++);
+			if (b = strrchr(tmp, '/'))
+				*b = 0;
+			oerrno = errno;
+			save = state.path;
+			for (;;)
+				if (!pathnext(tmp, NiL, NiL) || ACCESS(tmp, F_OK))
+				{
+					state.path = save;
+					errno = oerrno;
+					return -1;
+				}
+			state.path = save;
+			errno = oerrno;
+		}
+
+		/*
+		 * ok to create intermediate dirs
+		 */
+
 		do
 		{
 			while (*--cp != '/');

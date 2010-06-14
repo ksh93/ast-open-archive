@@ -302,3 +302,8 @@ TEST 26 'compressed input/output'
 		OUTPUT - $'1\n2\n3\n4\n5\n6'
 	EXEC	-zI -m e.gz o.gz
 	EXEC	-zI -m o.gz e.gz
+
+TEST 27 'non-newline delimited variable length records'
+	EXEC	-n -Rd:
+		INPUT -n - $'1111:222:33:4:'
+		OUTPUT -n - $'4:33:222:1111:'

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-03-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -97,6 +97,8 @@ make ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_tty.h dontcare
 make ${PACKAGE_ast_INCLUDE}/tok.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -139,9 +141,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -845,7 +844,6 @@ exec - if	test ! -f share
 exec - then	{
 exec - 	rsh=`sed -e '/^#define CS_REMOTE_SHELL/!d' -e 's/.*"\(.*\)".*/\1/' FEATURE/lib`
 exec - 	echo "#!!! 1 to update this file: $INSTALLROOT/lib/cs/genshare -d ${INSTALLROOT}/share -r $rsh > share !!!"
-exec - 	genshare -d ${INSTALLROOT}/share -r $rsh
 exec - 	} > share
 exec - fi
 done share generated
@@ -862,7 +860,6 @@ exec - if	test ! -f local
 exec - then	{
 exec - 	rsh=`sed -e '/^#define CS_REMOTE_SHELL/!d' -e 's/.*"\(.*\)".*/\1/' FEATURE/lib`
 exec - 	echo "#!!! 1 to update this file: $INSTALLROOT/lib/cs/genlocal -r $rsh > local !!!"
-exec - 	ignore genlocal -f share -r $rsh local
 exec - 	} > local
 exec - fi
 done local generated

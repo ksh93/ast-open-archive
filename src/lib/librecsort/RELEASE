@@ -1,3 +1,5 @@
+10-05-25 rskey.c: locale-ize Rskey_t.tab and key_m_code()
+10-04-22 rskey.c: 'C' codeer => 'E' to make way for posix -C
 09-12-09 rskey.c: add h option for key_n_code (IEEE 1541-2002 scales)
 09-05-11 rskey.c: add collation mbxfrm() overflow panic (yes I know)
 09-05-11 rskey.c: fix mbxfrm() return value logic

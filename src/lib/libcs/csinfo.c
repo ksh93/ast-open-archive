@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*          Copyright (c) 1990-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -44,7 +44,7 @@ csinfo(register Cs_t* state, const char* file, int* line)
 		for (n = 0; n <= 1; n++)
 		{
 			sfsprintf(tmp, sizeof(tmp), "%s/%s", n ? csvar(state, CS_VAR_SHARE, 0) : CS_SVC_DIR, file);
-			if (pathpath(buf, tmp, "", PATH_REGULAR|PATH_READ))
+			if (pathpath(tmp, "", PATH_REGULAR|PATH_READ, buf, sizeof(buf)))
 			{
 				sp = tokline(buf, SF_READ, line);
 				break;

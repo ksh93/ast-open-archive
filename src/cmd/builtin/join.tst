@@ -395,9 +395,9 @@ TEST 22 VSC#8
 		INPUT b.dat $'four:this:is:line:four:file3\nthree:this:is:line:three::file3'
 		OUTPUT - $'three:three:file2:bozo'
 
-TEST 23 'multibyte UTF-8'
+TEST 23 'multibyte C.UTF-8'
 
-	EXPORT LC_CTYPE=de_DE.UTF-8
+	EXPORT LC_CTYPE=C.UTF-8
 
 	EXEC	-j1 1 -j2 2 -o 1.1 -t $'\342\202\254' a.dat b.dat
 		INPUT a.dat $'f1\342\202\254f2'

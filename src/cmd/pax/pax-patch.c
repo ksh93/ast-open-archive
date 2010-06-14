@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -35,7 +35,7 @@ Format_t	pax_patch_format =
 	0,
 	0,
 	0,
-	PAXNEXT(pax_patch_next),
+	PAXNEXT(patch),
 };
 
-PAXLIB(&pax_patch_format)
+PAXLIB(patch)

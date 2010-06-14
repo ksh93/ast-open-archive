@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,8 @@
 #include <ast.h>
 #include <error.h>
 
-#define CODEX_VERSION	20090704L
+#define CODEX_VERSION		20090704L
+#define CODEX_PLUGIN_VERSION	AST_PLUGIN_VERSION(CODEX_VERSION)
 
 #define CODEX_DECODE	0x0001		/* decode supported		*/
 #define CODEX_ENCODE	0x0002		/* encode supported		*/
@@ -127,14 +128,14 @@ struct Codexmeth_s			/* coder method			*/
 #include <codexlib.h>
 
 #define CODEXLIB(m)
-#define CODEXNEXT(m)	m
+#define CODEXNEXT(m)	codex_##m##_next
 
 #else
 
 #ifdef __STDC__
-#define CODEXLIB(m)	extern Codexmeth_t* codex_lib(const char* name) { return m; }
+#define CODEXLIB(m)	extern Codexmeth_t* codex_lib(const char* name) { return &codex_##m; } unsigned long plugin_version(void) { return CODEX_PLUGIN_VERSION; }
 #else
-#define CODEXLIB(m)	extern Codexmeth_t* codex_lib(name) char* name; { return m; }
+#define CODEXLIB(m)	extern Codexmeth_t* codex_lib(name) char* name; { return &codex_##m; } unsigned long plugin_version() { return CODEX_PLUGIN_VERSION; }
 #endif
 
 #define CODEXNEXT(m)	0

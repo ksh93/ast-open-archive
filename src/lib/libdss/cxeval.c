@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -38,6 +38,8 @@ cxbeg(Cx_t* cx, register Cxexpr_t* expr, const char* method)
 	Opt_t		opt;
 	int		r;
 	char*		oid;
+	char*		s;
+	char		id[64];
 
 	if (expr->begun)
 		return 0;
@@ -66,10 +68,13 @@ cxbeg(Cx_t* cx, register Cxexpr_t* expr, const char* method)
 		{
 		head:
 			oid = error_info.id;
-			error_info.id = expr->argv[0];
+			if (!(s = strchr(oid, ':')))
+				s = oid + strlen(oid);
+			sfsprintf(error_info.id = id, sizeof(id), "%-.*s::%s", s - oid, oid, expr->argv[0]);
 			opt = opt_info;
 			opt_info.index = 0;
 			cx->state->header = (Cxheader_t*)expr->query;
+			cx->expr = expr;
 			r = (*expr->query->beg)(cx, expr, expr->argv, cx->disc);
 			opt_info = opt;
 			error_info.id = oid;
@@ -100,8 +105,12 @@ cxend(Cx_t* cx, register Cxexpr_t* expr)
 			if (cxend(cx, expr->group))
 				return -1;
 		}
-		else if (expr->query->end && (*expr->query->end)(cx, expr, NiL, cx->disc))
-			return -1;
+		else if (expr->query->end)
+		{
+			cx->expr = expr;
+			if ((*expr->query->end)(cx, expr, NiL, cx->disc))
+				return -1;
+		}
 		if (expr->pass && cxend(cx, expr->pass))
 			return -1;
 		if (expr->fail && cxend(cx, expr->fail))
@@ -115,7 +124,7 @@ cxend(Cx_t* cx, register Cxexpr_t* expr)
  */
 
 static int
-execute(Cx_t* cx, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxdisc_t* disc)
+execute(Cx_t* cx, Cxexpr_t* expr, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxdisc_t* disc)
 {
 	register Cxoperand_t*	sp;
 	register Cxcallout_f	f;
@@ -124,7 +133,7 @@ execute(Cx_t* cx, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxd
 	Cxoperand_t		r;
 	int			i;
 
-	sp = cx->stack + 1;
+	sp = expr->stack + 1;
 	sp->type = (sp-1)->type = cx->state->type_void;
 	sp->refs = (sp-1)->refs = 0;
 	for (;;)
@@ -133,7 +142,7 @@ execute(Cx_t* cx, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxd
 		r.refs = 0;
 		cx->jump = 1;
 		if (cx->flags & CX_DEBUG)
-			cxcodetrace(cx, "eval", pc, pc - pe + 1);
+			cxcodetrace(cx, "eval", pc, pc - pe + 1, expr->stack, sp);
 		if ((i = (*pc->callout)(cx, pc, &r, sp-1, sp, data, disc)) < 0)
 		{
 			if (i < -1)
@@ -143,7 +152,7 @@ execute(Cx_t* cx, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxd
 		so = sp;
 		sp += pc->pp;
 		*sp = r;
-		if (cx->reclaim)
+		if (expr->reclaim)
 			while (--so > sp)
 				if (!so->refs && (f = cxcallout(cx, CX_DEL, so->type, cx->state->type_void, disc)) && (*f)(cx, pc, &r, NiL, so, data, disc))
 					break;
@@ -152,7 +161,7 @@ execute(Cx_t* cx, register Cxinstruction_t* pc, void* data, Cxoperand_t* rv, Cxd
 	if (cx->returnf && pc->op == CX_END && (pc-1)->op != CX_SET)
 	{
 		(*cx->returnf)(cx, pc, &r, sp-1, sp, data, disc);
-		if (cx->reclaim && !sp->refs && (f = cxcallout(cx, CX_DEL, sp->type, cx->state->type_void, disc)))
+		if (expr->reclaim && !sp->refs && (f = cxcallout(cx, CX_DEL, sp->type, cx->state->type_void, disc)))
 		{
 			(*f)(cx, pc, &r, NiL, sp, data, disc);
 			sp->type = cx->state->type_number;
@@ -177,11 +186,13 @@ eval(Cx_t* cx, register Cxexpr_t* expr, void* data, Cxoperand_t* rv)
 	do
 	{
 		expr->queried++;
-		if ((t = expr->group ? eval(cx, expr->group, data, rv) : expr->query->sel ? (*expr->query->sel)(cx, expr, data, cx->disc) : expr->query->prog ? execute(cx, expr->query->prog, data, rv, cx->disc) : 1) < 0)
+		cx->expr = expr;
+		if ((t = expr->group ? eval(cx, expr->group, data, rv) : expr->query->sel ? (*expr->query->sel)(cx, expr, data, cx->disc) : expr->query->prog ? execute(cx, expr, expr->query->prog, data, rv, cx->disc) : 1) < 0)
 			return t;
 		if (t)
 		{
 			expr->selected++;
+			cx->expr = expr;
 			if (expr->query->act && (t = (*expr->query->act)(cx, expr, data, cx->disc)) < 0)
 				return t;
 			if (expr->pass && (t = eval(cx, expr->pass, data, rv)) < 0)
@@ -204,8 +215,10 @@ cxeval(Cx_t* cx, register Cxexpr_t* expr, void* data, Cxoperand_t* rv)
 {
 	int	r;
 
-	vmclear(cx->em);
+	if (!cx->evaluating++)
+		vmclear(cx->em);
 	if ((r = eval(cx, expr, data, rv)) < -1)
 		r = -(r + 2);
+	cx->evaluating--;
 	return r;
 }

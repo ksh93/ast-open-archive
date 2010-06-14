@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1140,7 +1140,7 @@ block(int check)
 	for (;;)
 	{
 		state.waiting = 1;
-		if ((cojob = cowait(state.coshell, check ? (Cojob_t*)state.coshell : (Cojob_t*)0)) && (job = (Joblist_t*)cojob->local))
+		if ((cojob = cowait(state.coshell, check ? (Cojob_t*)state.coshell : (Cojob_t*)0, -1)) && (job = (Joblist_t*)cojob->local))
 			job->cojob = 0;
 		if (trap())
 		{

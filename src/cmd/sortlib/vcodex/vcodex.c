@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2005-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2005-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,10 +24,10 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortvcodex (AT&T Research) 2008-06-06 $\n]"
+"[-1lp0s5P?\n@(#)$Id: vcodex (AT&T Research) 2008-06-06 $\n]"
 USAGE_LICENSE
-"[+NAME?sortvcodex - sort io vcodex discipline library]"
-"[+DESCRIPTION?The \bsortvcodex\b \bsort\b(1) discipline encodes and/or "
+"[+PLUGIN?vcodex - sort io vcodex discipline library]"
+"[+DESCRIPTION?The \bvcodex\b \bsort\b(1) discipline encodes and/or "
     "decodes input, output and temporary file data. By default temporary and "
     "output encoding is the same as the encoding used on the first encoded "
     "input file. Output encoding is only applied to the standard output or "
@@ -47,6 +47,7 @@ USAGE_LICENSE
 "[v:verbose?Enable file and stream encoding messages on the standard "
     "error.]"
 "[+SEE ALSO?\bsort\b(1), \bvczip\b(1), \bvcodex\b(3)]"
+"\n\n--library=vcodex[,option[=value]...]\n\n"
 ;
 
 #include <ast.h>
@@ -328,3 +329,5 @@ rs_disc(Rskey_t* key, const char* options)
 	free(state);
 	return 0;
 }
+
+SORTLIB(vcodex)

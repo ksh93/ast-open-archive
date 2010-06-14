@@ -161,11 +161,11 @@ TEST 02 'archive format conversion'
 
 	EXEC --comment=force-pax -rf $data/y2k.dat -wf y2k.pax -x pax
 		OUTPUT -
-		ERROR - '401 blocks'
+		ERROR - '1145 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
-		ERROR - y2k.pax $'in pax format\n372 files, 401 blocks'
+		ERROR - y2k.pax $'in pax format\n372 files, 1145 blocks'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x oldtar
 		OUTPUT -
@@ -218,7 +218,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT mode.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	EXEC --nosummary $o --from=ascii -rf $data/mode.dat
 		OUTPUT -
@@ -236,7 +236,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT mode.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	DO chmod u+rw,go+r mode.dir/*
 
@@ -256,7 +256,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT mode.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	o=--preserve=ps
 
@@ -279,7 +279,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	EXEC --nosummary $o --from=ascii -rf $data/mode.dat
 		OUTPUT -
@@ -289,7 +289,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	DO chmod u+rw,go+r mode.dir/*
 
@@ -301,7 +301,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	ELSE 'system disables regular file chmod u+s'
 
@@ -321,7 +321,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep-s.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	EXEC --nosummary $o --from=ascii -rf $data/mode.dat
 		OUTPUT -
@@ -339,7 +339,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep-s.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	DO chmod u+rw,go+r mode.dir/*
 
@@ -359,7 +359,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep-s.lst
-		ERROR - mode.pax $'in pax format\n20 files, 38 blocks'
+		ERROR - mode.pax $'in pax format\n20 files, 78 blocks'
 
 	FI
 

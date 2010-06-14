@@ -40,9 +40,9 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2010-01-19 $\0\n"
+"] (AT&T Research) 2010-04-10 $\0\n"
 #else
-"\n@(#)$Id: 3d (AT&T Research) 2008-12-04 $\0\n"
+"\n@(#)$Id: 3d (AT&T Research) 2010-04-10 $\0\n"
 #endif
 ;
 
@@ -1314,7 +1314,7 @@ setpwd(register const char* s)
 		state.pwdsize = sizeof(state.pwdbuf) - 1;
 	strncpy(state.pwd, s, state.pwdsize);
 	state.pwd[state.pwdsize] = 0;
-	state.pwdsize = pathcanon(state.pwd, 0) - state.pwd;
+	state.pwdsize = pathcanon(state.pwd, sizeof(state.pwdbuf), 0) - state.pwd;
 	olev = state.level;
 	state.level = -1;
 	state.path.linkname = 0;

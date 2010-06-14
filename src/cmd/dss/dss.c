@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,12 +26,12 @@
  */
 
 #include <ast.h>
-#include <dss.h>
+#include <dsslib.h>
 #include <ctype.h>
 #include <error.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss (AT&T Research) 2003-03-27 $\n]"
+"[-?\n@(#)$Id: dss (AT&T Research) 2010-05-21 $\n]"
 USAGE_LICENSE
 "[+NAME?dss - scan a data stream and apply a select expression to each "
     "record]"
@@ -48,6 +48,12 @@ USAGE_LICENSE
     "operations on strings treat the right hand operand as a possibly "
     "field-specific matching pattern. \bstring\b field matching patterns are "
     "extended \bregex\b(3) regular expressions (\begrep\b(1) style.)]"
+"[+?Types, queries and functions are brought into scope by \b--library\b "
+    "references on the command line, library references within schema "
+    "definitions, or by explicit \alib\a::\aidentifier\a binding within "
+    "expressions. Variables and function return values within expressions "
+    "and \b{print}\b formats may be cast to another type using C style casts "
+    "(\alib\a::\atype\a) and (\atype\a).]"
 "[+?An expression of the form { \aquery\a [--\aoption\a...]] [\aarg\a...]] "
     "[> \aoutput\a]] } accesses the compiled \aquery\a defined in a "
     "\b--library\b dynamic library. { \aquery\a \b--man\b } lists the "
@@ -59,21 +65,26 @@ USAGE_LICENSE
     "records selected by query \aA\a and query \aC\a processes the records "
     "not selected by query \aA\a; query \aB\a may be omitted. \aA\a;\aB\a "
     "specifies that queries \aA\a and \aB\a process the same records.]"
-    "{\fvariables\f} [a:append?Open output files in append mode. This "
-    "disables file header output.]"
+"{\fformats and variables\f}"
+"[a:append?Open output files in append mode. This disables file header "
+    "output.]"
 "[d:debug?Enable debug tracing.]"
-"[i:info?List library information for each \afile\a operand in \b--man\b "
-    "style on standard error. The \aexpression\a operand is not specified in "
-    "this case. If no \afile\a operands are specified then the first "
-    "instance of each \bdss\b library installed on \b$PATH\b or a sibling "
-    "dir on \b$PATH\b is listed.]"
 "[I:include?Add \adir\a to the list of directories searched for include "
     "files. The default \b../lib/dss\b directories on \b$PATH\b are added to "
     "this list.]:[dir]"
 "[l:library?Load the dynamic library \aname\a. \bdss\b libraries may "
-    "define methods, types, maps or queries.]:[name]"
+    "define methods, types, maps, queries or functions.]:[name]"
 "[m:map?Numeric field value map XML file. \b--method=dss,man\b describes "
     "the \b<MAP>\b tag.]"
+"[P:plugins?List plugin information for each \afile\a operand in "
+    "--\astyle\a on the standard error. The \aexpression\a operand is not "
+    "specified in this case. If no \afile\a operands are specified then the "
+    "first instance of each \bdss\b plugin installed on \b$PATH\b or a "
+    "sibling dir on \b$PATH\b is listed. The special \astyle\a \blist\b "
+    "lists a line on the standard output for each plugin with the name, a "
+    "tab character, and plugin specific command line options parameterized "
+    "by \b${style}\b (suitable for \beval\b'ing in "
+    "\bsh\b(1).)]:[style:=list|man|html|nroff|usage]"
 "[q:quiet?Disable non-fatal warning messages.]"
 "[v:verbose?Enable verbose status messages.]"
 "[x:method?Set the record method. This option must be specified. The "
@@ -124,16 +135,49 @@ USAGE_LICENSE
 "\n [ expression ] [ file ... ]\n"
 "\n"
 
-"[+SEE ALSO?\bvczip\b(1), \bgzip\b(1), \bbzip2\b(1), \bpzip\b(1), \bcql\b(1)]"
+"[+SEE ALSO?\bvczip\b(1), \bgzip\b(1), \bbzip2\b(1), \bpzip\b(1), \bcql\b(1), \bdss::dss\b(5P)]"
 ;
+
+static void
+showplugin(register Dsslib_t* lib, const char* style, Sfio_t* sp, int* sep, Dssdisc_t* disc)
+{
+	register int		i;
+	register const char*	s;
+
+	if (*sep < 0)
+	{
+		if (lib->meth)
+			sfprintf(sfstdout, "%s\t--library=%s --method=%s,${style}\n", lib->meth->name, lib->name, lib->meth->name);
+		if (lib->queries)
+			for (i = 0; s = lib->queries[i].name; i++)
+			{
+				if (lib->meth && !streq(lib->meth->name, error_info.id))
+					sfprintf(sfstdout, "%s-", lib->meth->name);
+				else if (!streq(lib->name, error_info.id) && !streq(lib->name, s))
+					sfprintf(sfstdout, "%s-", lib->name);
+				sfprintf(sfstdout, "%s\t--library=%s --method=%s \"{%s --'${style}'}\" </dev/null\n", s, lib->name, error_info.id, s);
+			}
+	}
+	else
+	{
+		if (*sep)
+			sfputc(sfstderr, '\n');
+		else
+			*sep = 1;
+		dssoptlib(sp, lib, disc);
+		error(ERROR_USAGE, "%s", opthelp(sfstruse(sp), style));
+	}
+}
 
 int
 main(int argc, char** argv)
 {
-	int			info;
+	int			status;
+	int			sep;
 	char*			action;
 	char*			expression;
 	char*			file;
+	char*			plugins;
 	Sfio_t*			tmp;
 	Dss_t*			dss;
 	Dssdisc_t		disc;
@@ -143,6 +187,7 @@ main(int argc, char** argv)
 	Dssflags_t		flags;
 	Dssflags_t		test;
 	Dssoptdisc_t		optdisc;
+	char			style[32];
 
 	if (file = strrchr(*argv, '/'))
 		file++;
@@ -157,8 +202,9 @@ main(int argc, char** argv)
 	opt_info.disc = &optdisc.optdisc;
 	action = 0;
 	flags = 0;
-	info = 0;
 	meth = 0;
+	plugins = 0;
+	status = 0;
 	test = 0;
 	for (;;)
 	{
@@ -177,15 +223,12 @@ main(int argc, char** argv)
 			if (!(action = strdup(sfprints("{write %s}", fmtquote(opt_info.arg, "'", "'", strlen(opt_info.arg), FMT_ALWAYS|FMT_ESCAPED)))))
 				error(ERROR_SYSTEM|3, "out of space");
 			continue;
-		case 'i':
-			info = 1;
-			continue;
 		case 'I':
 			if (pathinclude(opt_info.arg))
 				error(ERROR_SYSTEM|3, "out of space");
 			continue;
 		case 'l':
-			if (dssload(opt_info.arg, &disc))
+			if (!dssload(opt_info.arg, &disc))
 				break;
 			continue;
 		case 'm':
@@ -208,6 +251,9 @@ main(int argc, char** argv)
 			if (!(meth = dssmeth(opt_info.arg, &disc)))
 				error(3, "%s: unknown method", opt_info.arg);
 			continue;
+		case 'P':
+			sfsprintf(plugins = style, sizeof(style), "?%s", opt_info.arg);
+			continue;
 		case 'T':
 			test = opt_info.num;
 			continue;
@@ -225,21 +271,18 @@ main(int argc, char** argv)
 	if (error_info.errors)
 		return 1;
 	argv += opt_info.index;
-	if (info)
+	if (plugins)
 	{
 		if (!(tmp = sfstropen()))
 			error(ERROR_SYSTEM|3, "out of space");
-		sfprintf(tmp, "[-1l]");
+		sep = -streq(plugins, "?list");
 		if (!*argv)
 			for (lib = dsslib(NiL, DSS_VERBOSE, &disc); lib; lib = (Dsslib_t*)dtnext(state->cx->libraries, lib))
-				dssoptlib(tmp, lib, &disc);
+				showplugin(lib, plugins, tmp, &sep, &disc);
 		else
 			while (file = *argv++)
 				if (lib = dsslib(file, DSS_VERBOSE, &disc))
-					dssoptlib(tmp, lib, &disc);
-		if (!(file = sfstruse(tmp)))
-			error(ERROR_SYSTEM|3, "out of space");
-		error(ERROR_USAGE|4, "%s", opthelp(file, "?"));
+					showplugin(lib, plugins, tmp, &sep, &disc);
 		sfclose(tmp);
 		return error_info.errors != 0;
 	}
@@ -248,8 +291,8 @@ main(int argc, char** argv)
 	if (!(dss = dssopen(flags, test, &disc, meth)))
 		return 1;
 	if (dssrun(dss, expression, NiL, action, argv))
-		info = 1;
+		status = 1;
 	if (dssclose(dss))
-		info = 1;
-	return info;
+		status = 1;
+	return status;
 }

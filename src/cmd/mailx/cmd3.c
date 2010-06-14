@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2008 The Regents of the University of California an*
+*Copyright (c) 1978-2010 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -365,7 +365,7 @@ cd(char** arglist)
 	}
 	if (chdir(cp) < 0) {
 #if _PACKAGE_ast
-		if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.path.path, state.var.cdpath, cp, NiL, 0)) {
+		if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.var.cdpath, cp, NiL, 0, state.path.path, sizeof(state.path.path))) {
 			cp = state.path.path;
 			show = 1;
 		}

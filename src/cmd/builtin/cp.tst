@@ -5,7 +5,7 @@ UNIT cp
 TEST 01 basics
 
 	EXEC	a
-		ERROR - 'cp: a: cannot copy [No such file or directory]'
+		ERROR - 'cp: a: not found'
 		EXIT 1
 
 	EXEC	a b

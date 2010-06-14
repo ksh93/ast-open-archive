@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1990-2007 AT&T Intellectual Property          *
+*          Copyright (c) 1990-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -183,7 +183,7 @@ init(void* handle, int fdmax)
 		s = state.buf;
 		for (n = 0;;)
 		{
-			if (pathpath(s, coshell[n], NiL, PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE))
+			if (pathpath(coshell[n], NiL, PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE, s, state.buflen))
 				break;
 			if (++n >= elementsof(coshell))
 				error(3, "shell not found");
@@ -194,7 +194,7 @@ init(void* handle, int fdmax)
 	 * parameterize the shell path name on state.home->type
 	 */
 
-	pathrepl(s, state.home->type, "%s");
+	pathrepl(s, 0, state.home->type, "%s");
 	if (!(state.sh = strdup(s)))
 		error(3, "out of space [shell path]");
 	message((-1, "parameterized shell path is %s", state.sh));

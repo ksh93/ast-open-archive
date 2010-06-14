@@ -29,13 +29,13 @@
 # .xx ref="URL\tMIME-TYPE"	head link hint
 
 command=mm2twiki
-version='mm2twiki (AT&T Research) 2009-05-08' # NOTE: repeated in USAGE
+version='mm2twiki (AT&T Research) 2010-05-28' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2twiki (at&t research) 2009-05-08 $
+@(#)$Id: mm2twiki (at&t research) 2010-05-28 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2twiki - convert mm/man subset to twiki markups]
@@ -1247,31 +1247,8 @@ do	getline || {
 				?*)	dl[++dls]=$4 ;;
 				esac
 				case $5 in
-				'')	case $2 in
-					1*)	sec="USER COMMANDS " ;;
-					2*)	sec="SYSTEM CALLS" ;;
-					3C)	sec="COMPATIBILITY FUNCTIONS" ;;
-					3F)	sec="FORTRAN LIBRARY ROUTINES" ;;
-					3K)	sec="KERNEL VM LIBRARY FUNCTIONS" ;;
-					3L)	sec="LIGHTWEIGHT PROCESSES LIBRARY" ;;
-					3M)	sec="MATHEMATICAL LIBRARY" ;;
-					3N)	sec="NETWORK FUNCTIONS" ;;
-					3R)	sec="RPC SERVICES LIBRARY" ;;
-					3S)	sec="STANDARD I/O FUNCTIONS" ;;
-					3V)	sec="SYSTEM V LIBRARY" ;;
-					3X)	sec="MISCELLANEOUS LIBRARY FUNCTIONS" ;;
-					3*)	sec="C LIBRARY FUNCTIONS" ;;
-					4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
-					4F)	sec="PROTOCOL FAMILIES" ;;
-					4P)	sec="PROTOCOLS" ;;
-					4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
-					5*)	sec="FILE FORMATS" ;;
-					6*)	sec="GAMES AND DEMOS" ;;
-					7*)	sec="PUBLIC FILES AND TABLES" ;;
-					8*)	sec="MAINTENANCE COMMANDS" ;;
-					L*)	sec="LOCAL COMMANDS" ;;
-					*)	sec="SECTION $2" ;;
-					esac
+				'')	sec=$(set --'???'MAN=$2 2>&1)
+					sec=$ver$msc$cmp$sec
 					;;
 				*)	sec=$5
 					;;

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,9 +24,9 @@
  */
 
 static const char write_usage[] =
-"[-1l?\n@(#)$Id: dss write query (AT&T Research) 2002-12-12 $\n]"
+"[-1ls5P?\n@(#)$Id: dss write query (AT&T Research) 2002-12-12 $\n]"
 USAGE_LICENSE
-"[+NAME?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b \bwrite\b query writes the"
 "	current record according to the method-specific \aformat\a."
 "	If \aformat\a is omitted then the input record format is assumed."
@@ -94,6 +94,13 @@ write_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	return dssfclose((Dssfile_t*)expr->data);
 }
 
+static int
+write_ref(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
+{
+	DSS(cx)->flags |= DSS_WRITE;
+	return 0;
+}
+
 #define QUERY_write \
 	{ \
 		"write", \
@@ -102,5 +109,7 @@ write_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		write_beg, \
 		0, \
 		write_act, \
-		write_end \
+		write_end, \
+		0, \
+		write_ref \
 	}

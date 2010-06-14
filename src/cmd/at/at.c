@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -318,7 +318,7 @@ main(int argc, char** argv)
 		op |= JOB;
 		if (file && !sfopen(sfstdin, file, "r"))
 			error(ERROR_SYSTEM|3, "%s: cannot read", file);
-		if (!fs3d(FS3D_TEST) || !(s = pathpath(buf, "3d", NiL, PATH_ABSOLUTE|PATH_EXECUTE)))
+		if (!fs3d(FS3D_TEST) || !(s = pathpath("3d", NiL, PATH_ABSOLUTE|PATH_EXECUTE, buf, sizeof(buf))))
 			s = pathshell();
 		if (op & MAIL)
 			sfputc(sp, AT_MAIL);

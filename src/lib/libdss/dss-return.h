@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,9 +24,9 @@
  */
 
 static const char return_usage[] =
-"[-1l?\n@(#)$Id: dss return query (AT&T Research) 2007-09-21 $\n]"
+"[-1ls5P?\n@(#)$Id: dss return query (AT&T Research) 2007-09-21 $\n]"
 USAGE_LICENSE
-"[+NAME?\findex\f]"
+"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b \breturn\b query returns from the current"
 "	record query.  If \astatus\a is omitted or \bskip\b the current"
 "	record is skipped, if \astatus\a is \bselect\b the current"

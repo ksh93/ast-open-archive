@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -53,7 +53,7 @@ static Attribute_t	attributes[] =
 	S("nul"),	CX_NUL,			0,	0,	-1,
 	S("float"),	CX_FLOAT,		0,	0,	-1,
 	S("double"),	CX_FLOAT,		0,	0,	-1,
-	S("long"),	CX_INTEGER,		0,	0,	-1,
+	S("long"),	CX_LONG|CX_INTEGER,	0,	0,	-1,
 	S("char"),	CX_INTEGER,		1,	0,	-1,
 	S("ascii"),	0,			0,	0,	CC_ASCII,
 	S("ebcdic"),	0,			0,	0,	CC_EBCDIC,

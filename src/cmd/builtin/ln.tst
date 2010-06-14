@@ -5,7 +5,7 @@ UNIT ln
 TEST 01 basics
 
 	EXEC	a b
-		ERROR - 'ln: a: cannot link [No such file or directory]'
+		ERROR - 'ln: a: not found'
 		EXIT 1
 
 	EXEC	a b
