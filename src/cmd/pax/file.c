@@ -669,6 +669,31 @@ openout(register Archive_t* ap, register File_t* f)
 }
 
 /*
+ * close an openin() fd, doing atime reset if necessary
+ */
+
+int
+closein(register Archive_t* ap, register File_t* f, int fd)
+{
+	register char*	s;
+	int		r;
+
+	r = 0;
+	if (close(fd))
+		r = -1;
+	if (state.resetacctime && f->type != X_IFLNK && !f->skip)
+	{
+		Tv_t	av;
+		Tv_t	mv;
+
+		tvgetatime(&av, f->st);
+		tvgetmtime(&mv, f->st);
+		settime(f->path, &av, &mv, NiL);
+	}
+	return r;
+}
+
+/*
  * close an openout() fd, doing the intermediate rename if needed
  */
 
@@ -1187,7 +1212,7 @@ setfile(register Archive_t* ap, register File_t* f)
 void
 settime(const char* name, Tv_t* ap, Tv_t* mp, Tv_t* cp)
 {
-	if (*name && tvtouch(name, ap, mp, cp, 1))
+	if (*name && tvtouch(name, ap, mp, cp, 0) && errno != ENOENT && errno != ENOTDIR)
 		error(1, "%s: cannot set times", name);
 }
 

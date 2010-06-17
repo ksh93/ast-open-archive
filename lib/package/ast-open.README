@@ -93,8 +93,8 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-06-10  --- Release ksh93t+  ---
-10-06-10  The next release this directory will be renamed ksh93t and will
+10-06-16  --- Release ksh93t+  ---
+10-06-16  The next release this directory will be renamed ksh93t and will
 	  install as ksh93t and ksh93u will become the default ksh.
 10-05-27  Rewrote the subshell code to avoid using pipes in many cases.
 10-05-24  Fixed a bug which cause an exception when both -s and -s were
@@ -2412,6 +2412,7 @@ All recorded changes follow.
 
 10-06-14 ug+s only for -p [eo]
 10-06-14 atime in archive by default for formats that support it
+10-06-14 add state.resetacctime to separate -t from state.acctime
 10-06-12 fix --exact to list matched directory hierarchies
 10-06-01 sync with ast api 20100601
 10-01-22 pax.c: fix -rw to 1 char dir name that dropped '/' separator
@@ -3305,6 +3306,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+10-06-17 Makerules.mk,Scanrules.mk: finally a general solution to -I- vs prefix-include?
 10-06-01 ast api 20100601
 10-06-01 Makerules.mk: :PACKAGE: --latest --api=YYYYMMDD|latest FOO:YYYYMMDD
 10-05-25 pkg-X11.mk: add CC.STDLIB.BASE checks for PACKAGE_X11_LIB
@@ -8375,6 +8377,7 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+10-06-16 ppsearch.c: try parent prefix if -I- include search fails
 10-06-01 sync with ast api 20100601
 09-02-02 pp.probe,probe.win32: check for compiler supplied __FUNCTION__
 09-02-02 ppop.c: include pp_default.h/probe at end of builtin script

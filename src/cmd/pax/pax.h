@@ -466,10 +466,11 @@ typedef struct Pattern_s
 	off_t		total;		/* newio() total io check	*/ \
 	char*		type;		/* archive type			*/ \
 	off_t		uncompressed;	/* uncompressed size estimate	*/ \
+	Hash_table_t*	update;		/* update info			*/ \
 	int		warnlinkhead;	/* invalid hard link header	*/
 
 #define _PAX_PRIVATE_ \
-	int		acctime;	/* reset file access times	*/ \
+	int		acctime;	/* preserve member access times	*/ \
 	int		append;		/* append -- must be 0 or 1 !!!	*/ \
 	Bio_t		backup;		/* backup() position		*/ \
 	long		blocksize;	/* explicit buffer size		*/ \
@@ -595,6 +596,7 @@ typedef struct Pattern_s
 	char*		trailer;	/* file trailer			*/ \
 	int		trailerlen;	/* file trailer length		*/ \
 	}		record;		/* record info			*/ \
+	int		resetacctime;	/* reset input file access times*/ \
 	Hash_table_t*	restore;	/* post proc restoration table	*/ \
 	Sfio_t*		rtty;		/* tty file read pointer	*/ \
 	int		scanned;	/* scanned for format libs	*/ \
@@ -646,7 +648,6 @@ extern Format_t*	formats;
 extern State_t		state;
 
 extern int		addlink(Archive_t*, File_t*);
-extern void		append(Archive_t*);
 extern int		apply(Archive_t*, File_t*, Filter_t*);
 extern long		asc_checksum(char*, int, unsigned long);
 extern void		backup(Archive_t*);
@@ -661,6 +662,7 @@ extern off_t		bseek(Archive_t*, off_t, int, int);
 extern int		bskip(Archive_t*);
 extern void		bunread(Archive_t*, void*, int);
 extern void		bwrite(Archive_t*, void*, off_t);
+extern int		closein(Archive_t*, File_t*, int);
 extern int		closeout(Archive_t*, File_t*, int);
 extern int		cmpftw(Ftw_t*, Ftw_t*);
 extern void		complete(Archive_t*, File_t*, size_t);

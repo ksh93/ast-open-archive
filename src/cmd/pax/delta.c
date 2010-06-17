@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -342,14 +342,14 @@ deltabase(register Archive_t* ap)
 			copyin(bp);
 			bp->size = bp->io->offset + bp->io->count;
 		}
-		if (!ap->delta->format)
-			ap->delta->format = getformat(FMT_DELTA, 1);
 		bp->checksum &= 0xffffffff;
 	}
+	if (state.update)
+		ap->delta->format = st.st_size ? bp->format : ap->format;
 	else if (!ap->delta->format)
 	{
 		ap->delta->format = getformat(FMT_DELTA, 1);
-		ap->delta->compress = 1;
+		ap->delta->compress = !st.st_size;
 	}
 }
 

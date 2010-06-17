@@ -370,7 +370,7 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 						strcpy(pp.path, fp->name);
 					else
 						sfsprintf(pp.path, PATH_MAX - 1, "%s/%s", dp->name, fp->name);
-					pathcanon(pp.path, 0, 0);
+					pathcanon(pp.path, PATH_MAX, 0);
 					if (!xp || !streq(xp->name, pp.path))
 					{
 						fp->bound[index] = xp = ppsetfile(pp.path);
@@ -418,7 +418,7 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 				strcpy(pp.path, fp->name);
 			else
 				sfsprintf(pp.path, PATH_MAX - 1, "%s/%s", dp->name, fp->name);
-			pathcanon(pp.path, 0, 0);
+			pathcanon(pp.path, PATH_MAX, 0);
 			if (!(flags & SEARCH_SKIP))
 			{
 				int		found;
@@ -597,17 +597,20 @@ ppsearch(char* file, int type, int flags)
 	register struct ppfile*	fp;
 	register char*		s;
 	register struct ppdirs*	dp;
+	char*			t;
 	struct oplist*		cp;
 	struct ppfile*		xp;
 	int			dospath;
 	int			chop;
 	int			fd;
 	int			index;
+	int			prefix;
 	char			name[MAXTOKEN + 1];
 
 	pp.include = 0;
 	fd = -1;
 	chop = 0;
+	prefix = pp.chop ? -1 : 0;
 	if (s = strchr(file, '\\'))
 	{
 		do *s++ = '/'; while (s = strchr(s, '\\'));
@@ -738,12 +741,14 @@ ppsearch(char* file, int type, int flags)
 			if (fd >= 0)
 			{
 				sfsprintf(name, sizeof(name) - 1, "%s/%s", pp.in->prefix, fp->name);
-				pathcanon(name, 0, 0);
+				pathcanon(name, sizeof(name), 0);
 				xp = ppsetfile(name);
 				if ((fd = search(xp, dp, type, flags)) >= 0)
 					return fd;
 			}
 		}
+		else if (!prefix)
+			prefix = 1;
 	}
 	if ((fd = search(fp, dp, type, flags)) < 0)
 	{
@@ -786,6 +791,22 @@ ppsearch(char* file, int type, int flags)
 				chop = 1;
 				type = T_STRING;
 				goto again;
+			}
+			if (prefix > 0)
+			{
+				prefix = -1;
+				if (error_info.file && *error_info.file && (s = strrchr(error_info.file + 1, '/')))
+				{
+					*s = 0;
+					if (t = strrchr(error_info.file + 1, '/'))
+					{
+						sfsprintf(name, sizeof(name), "%s/%s", t + 1, file);
+						file = ppsetfile(name)->name;
+					}
+					*s = '/';
+					if (t)
+						goto again;
+				}
 			}
 			if (!(pp.mode & GENDEPS))
 			{

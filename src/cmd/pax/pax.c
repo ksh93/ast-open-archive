@@ -1046,7 +1046,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 				state.record.trailerlen = 1;
 			break;
 		case OPT_reset_atime:
-			state.acctime = y;
+			state.resetacctime = y;
 			break;
 		case OPT_size:
 			break;
@@ -1552,10 +1552,10 @@ main(int argc, char** argv)
 		{
 			if (state.files)
 				state.ftwflags |= FTW_POST;
-			if (state.update)
-				state.append = 1;
 		}
-		if (state.append)
+		if (state.update)
+			ap->io->mode = O_RDWR|O_CREAT;
+		else if (state.append)
 			ap->io->mode = O_WRONLY|O_APPEND|O_CREAT;
 		ap->io->fd = 1;
 		if (!ap->name || streq(ap->name, "-"))
@@ -1566,10 +1566,15 @@ main(int argc, char** argv)
 			if (open(ap->name, ap->io->mode|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 1)
 				error(ERROR_SYSTEM|3, "%s: cannot write", ap->name);
 		}
+		if (fstat(ap->io->fd, &st))
+			error(ERROR_SYSTEM|3, "%s: cannot stat", ap->name);
+		if (S_ISREG(st.st_mode))
+		{
+			ap->io->seekable = 1;
+			ap->io->size = st.st_size;
+		}
 		if (!state.blocksize)
 		{
-			if (fstat(ap->io->fd, &st))
-				error(ERROR_SYSTEM|3, "%s: cannot stat", ap->name);
 			st.st_mode = modex(st.st_mode);
 			if (state.test & 0000040)
 				st.st_mode = X_IFCHR;
@@ -1602,7 +1607,9 @@ main(int argc, char** argv)
 			if (open(ap->name, ap->io->mode|O_BINARY))
 				error(ERROR_SYSTEM|3, "%s: cannot read", ap->name);
 		}
-		if (!fstat(ap->io->fd, &st) && S_ISREG(st.st_mode) && st.st_size > 0)
+		if (fstat(ap->io->fd, &st))
+			error(ERROR_SYSTEM|3, "%s: cannot stat", ap->name);
+		if (S_ISREG(st.st_mode))
 		{
 			ap->io->seekable = 1;
 			ap->io->size = st.st_size;
@@ -1633,7 +1640,7 @@ main(int argc, char** argv)
 	if (ap = state.in)
 	{
 		binit(ap);
-		if (state.append)
+		if (state.append && !state.out)
 		{
 			error(1, "append ignored for archive read");
 			state.append = 0;
@@ -1643,6 +1650,33 @@ main(int argc, char** argv)
 	{
 		if (!ap->format)
 			ap->format = state.format;
+		if (state.update)
+		{
+			if (ap->delta)
+			{
+				error(1, "update ignored for archive delta");
+				state.update = 0;
+			}
+			if (state.append)
+			{
+				error(1, "append ignored for archive update");
+				state.append = 0;
+			}
+			if (!ap->io->seekable)
+				error(3, "%s: update requires seekable archive", ap->name);
+			else if (!ap->io->size)
+				state.update = 0;
+			else
+			{
+				initdelta(ap, NiL);
+				ap->delta->base = initarchive(ap->name, O_RDONLY);
+			}
+		}
+		else if (state.append && ap->delta)
+		{
+			error(1, "append ignored for archive delta");
+			state.append = 0;
+		}
 		binit(ap);
 		if (ap->compress)
 		{

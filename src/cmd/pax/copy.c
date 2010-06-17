@@ -93,11 +93,7 @@ fileout(register Archive_t* ap, register File_t* f)
 	Buffer_t*		bp;
 
 	if (f->delta.op == DELTA_verify)
-	{
 		ap->selected--;
-		if (f->fd >= 0)
-			close(f->fd);
-	}
 	else if (putheader(ap, f))
 	{
 		if (!ap->format->putdata || !(*ap->format->putdata)(&state, ap, f, f->fd))
@@ -152,20 +148,11 @@ fileout(register Archive_t* ap, register File_t* f)
 					bput(ap, n);
 				}
 			}
-			if (f->fd >= 0)
-				close(f->fd);
 		}
 		puttrailer(ap, f);
 	}
-	if (state.acctime && f->type != X_IFLNK && !f->skip && !f->extended)
-	{
-		Tv_t	av;
-		Tv_t	mv;
-
-		tvgetatime(&av, f->st);
-		tvgetmtime(&mv, f->st);
-		settime(f->name, &av, &mv, NiL);
-	}
+	if (f->fd >= 0)
+		closein(ap, f, f->fd);
 }
 
 /*
@@ -388,7 +375,7 @@ copyinout(Ftw_t* ftw)
 				}
 				holedone(wfd);
 				closeout(state.out, f, wfd);
-				close(rfd);
+				closein(state.out, f, rfd);
 				setfile(state.out, f);
 				listentry(f);
 			}
@@ -459,7 +446,16 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 	if (ap)
 	{
 		deltabase(ap);
-		putprologue(ap);
+		if (ap->delta && ap->delta->format != ap->expected && ap->expected)
+			error(3, "%s: archive format %s does not match requested format %s", ap->name, ap->delta->format->name, ap->expected->name);
+		if (state.update)
+		{
+			ap->format = ap->delta->format;
+			ap->update = ap->delta->base->tab;
+			ap->delta = 0;
+		}
+		else
+			putprologue(ap);
 	}
 	if (state.files)
 		ftwalk((char*)state.files, copyfile, state.ftwflags|FTW_MULTIPLE, state.exact ? (Ftw_cmp_t)0 : cmpftw);
@@ -557,18 +553,4 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 		deltadelete(ap);
 		putepilogue(ap);
 	}
-}
-
-/*
- * position archive for appending
- */
-
-void
-append(register Archive_t* ap)
-{
-	if (state.update)
-		initdelta(ap, NiL);
-	ap->format = 0;
-	copyin(ap);
-	state.append = 0;
 }

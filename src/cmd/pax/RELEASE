@@ -1,5 +1,6 @@
 10-06-14 ug+s only for -p [eo]
 10-06-14 atime in archive by default for formats that support it
+10-06-14 add state.resetacctime to separate -t from state.acctime
 10-06-12 fix --exact to list matched directory hierarchies
 10-06-01 sync with ast api 20100601
 10-01-22 pax.c: fix -rw to 1 char dir name that dropped '/' separator
