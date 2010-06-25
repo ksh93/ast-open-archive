@@ -399,7 +399,7 @@ cpio_getepilogue(Pax_t* pax, register Archive_t* ap)
 }
 
 static int
-cpio_putprologue(Pax_t* pax, Archive_t* ap)
+cpio_putprologue(Pax_t* pax, Archive_t* ap, int append)
 {
 	return init(ap);
 }
@@ -798,7 +798,7 @@ Format_t	pax_asc_format =
 	0,
 	"s5r4 extended cpio character",
 	ASC,
-	ARCHIVE|IN|OUT,
+	ARCHIVE|IN|OUT|APPEND,
 	DEFBUFFER,
 	DEFBLOCKS,
 	4,
@@ -826,7 +826,7 @@ Format_t	pax_aschk_format =
 	0,
 	"s5r4 extended cpio character with checksum",
 	ASCHK,
-	ARCHIVE|IN|OUT,
+	ARCHIVE|IN|OUT|APPEND,
 	DEFBUFFER,
 	DEFBLOCKS,
 	4,
@@ -854,7 +854,7 @@ Format_t	pax_binary_format =
 	"binary-cpio",
 	"cpio binary with symlinks",
 	BINARY,
-	ARCHIVE|IN|OUT,
+	ARCHIVE|IN|OUT|APPEND,
 	DEFBUFFER,
 	DEFBLOCKS,
 	2,
@@ -883,7 +883,7 @@ Format_t	pax_cpio_format =
 	0,
 	"cpio character with symlinks",
 	CPIO,
-	ARCHIVE|IN|OUT,
+	ARCHIVE|IN|OUT|APPEND,
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,

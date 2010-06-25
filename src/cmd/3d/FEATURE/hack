@@ -1,7 +1,0 @@
-/* : : generated from /home/gsf/src/lib/libast/features/hack by iffe version 2007-04-04 : : */
-#ifndef _def_hack_3d
-#define _def_hack_3d	1
-#define _sys_types	1	/* #include <sys/types.h> ok */
-#define _LIB_dl	1	/* -ldl is a library */
-#define _LIB_ast	1	/* -last is a library */
-#endif

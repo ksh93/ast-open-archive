@@ -57,6 +57,7 @@ Option_t		options[] =
 	"time",
 	0,
 	OPT_HEADER|OPT_OPTIONAL,
+	4
 },
 {
 	"base",
@@ -703,6 +704,13 @@ Option_t		options[] =
 	OPT_HEADER,
 },
 {
+	"newer",
+	'N',
+	OPT_newer,
+	"Only copy archive members that are newer than the target files.\
+	Target file names are checked after \b--edit\b options are applied.",
+},
+{
 	"nlink",
 	0,
 	OPT_nlink,
@@ -1014,7 +1022,8 @@ Option_t		options[] =
 	"update",
 	'u',
 	OPT_update,
-	"Only copy archive members that are newer than the target files.",
+	"Only copy archive members that are newer than the target files.\
+	Target file names are checked before \b--edit\b options are applied.",
 },
 {
 	"verbose",

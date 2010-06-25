@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make pz
 make libpz.a archive
@@ -126,6 +126,8 @@ done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 make ${PACKAGE_ast_INCLUDE}/sfdcgzip.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
@@ -134,9 +136,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -170,7 +169,7 @@ done ${PACKAGE_ast_INCLUDE}/dt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done pzlib.h
 done pzopen.c
-meta pzopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzopen.c pzopen
+meta pzopen.o %.c>%.o pzopen.c pzopen
 prev pzopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzopen.c
 done pzopen.o generated
@@ -178,7 +177,7 @@ make pzhead.o
 make pzhead.c
 prev pzlib.h implicit
 done pzhead.c
-meta pzhead.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzhead.c pzhead
+meta pzhead.o %.c>%.o pzhead.c pzhead
 prev pzhead.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzhead.c
 done pzhead.o generated
@@ -186,7 +185,7 @@ make pzpart.o
 make pzpart.c
 prev pzlib.h implicit
 done pzpart.c
-meta pzpart.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzpart.c pzpart
+meta pzpart.o %.c>%.o pzpart.c pzpart
 prev pzpart.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzpart.c
 done pzpart.o generated
@@ -194,7 +193,7 @@ make pzdeflate.o
 make pzdeflate.c
 prev pzlib.h implicit
 done pzdeflate.c
-meta pzdeflate.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzdeflate.c pzdeflate
+meta pzdeflate.o %.c>%.o pzdeflate.c pzdeflate
 prev pzdeflate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzdeflate.c
 done pzdeflate.o generated
@@ -202,7 +201,7 @@ make pzinflate.o
 make pzinflate.c
 prev pzlib.h implicit
 done pzinflate.c
-meta pzinflate.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzinflate.c pzinflate
+meta pzinflate.o %.c>%.o pzinflate.c pzinflate
 prev pzinflate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzinflate.c
 done pzinflate.o generated
@@ -212,7 +211,7 @@ make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h
 prev pzlib.h implicit
 done pzlib.c
-meta pzlib.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzlib.c pzlib
+meta pzlib.o %.c>%.o pzlib.c pzlib
 prev pzlib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzlib.c
 done pzlib.o generated
@@ -220,7 +219,7 @@ make pzinit.o
 make pzinit.c
 prev pzlib.h implicit
 done pzinit.c
-meta pzinit.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzinit.c pzinit
+meta pzinit.o %.c>%.o pzinit.c pzinit
 prev pzinit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzinit.c
 done pzinit.o generated
@@ -228,7 +227,7 @@ make pzread.o
 make pzread.c
 prev pzlib.h implicit
 done pzread.c
-meta pzread.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzread.c pzread
+meta pzread.o %.c>%.o pzread.c pzread
 prev pzread.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzread.c
 done pzread.o generated
@@ -236,7 +235,7 @@ make pzwrite.o
 make pzwrite.c
 prev pzlib.h implicit
 done pzwrite.c
-meta pzwrite.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzwrite.c pzwrite
+meta pzwrite.o %.c>%.o pzwrite.c pzwrite
 prev pzwrite.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzwrite.c
 done pzwrite.o generated
@@ -244,7 +243,7 @@ make pzsync.o
 make pzsync.c
 prev pzlib.h implicit
 done pzsync.c
-meta pzsync.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzsync.c pzsync
+meta pzsync.o %.c>%.o pzsync.c pzsync
 prev pzsync.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzsync.c
 done pzsync.o generated
@@ -253,7 +252,7 @@ make pzsplit.c
 prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev pzlib.h implicit
 done pzsplit.c
-meta pzsplit.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzsplit.c pzsplit
+meta pzsplit.o %.c>%.o pzsplit.c pzsplit
 prev pzsplit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzsplit.c
 done pzsplit.o generated
@@ -261,7 +260,7 @@ make pzfixed.o
 make pzfixed.c
 prev pzlib.h implicit
 done pzfixed.c
-meta pzfixed.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzfixed.c pzfixed
+meta pzfixed.o %.c>%.o pzfixed.c pzfixed
 prev pzfixed.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -c pzfixed.c
 done pzfixed.o generated
@@ -269,7 +268,7 @@ make pzconvert.o
 make pzconvert.c
 prev pzlib.h implicit
 done pzconvert.c
-meta pzconvert.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/pzconvert.c pzconvert
+meta pzconvert.o %.c>%.o pzconvert.c pzconvert
 prev pzconvert.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpz]"\" -c pzconvert.c
 done pzconvert.o generated
@@ -281,7 +280,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
 prev pzlib.h implicit
 done sfdcpzip.c
-meta sfdcpzip.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/sfdcpzip.c sfdcpzip
+meta sfdcpzip.o %.c>%.o sfdcpzip.c sfdcpzip
 prev sfdcpzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c sfdcpzip.c
 done sfdcpzip.o generated
@@ -290,7 +289,7 @@ make sfdczip.c
 prev ${PACKAGE_ast_INCLUDE}/sfdcbzip.h implicit
 prev pzlib.h implicit
 done sfdczip.c
-meta sfdczip.o %.c>%.o ${PACKAGEROOT}/src/lib/libpz/sfdczip.c sfdczip
+meta sfdczip.o %.c>%.o sfdczip.c sfdczip
 prev sfdczip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c sfdczip.c
 done sfdczip.o generated

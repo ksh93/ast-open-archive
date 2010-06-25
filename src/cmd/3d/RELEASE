@@ -1,3 +1,4 @@
+10-06-01 sync with ast api 20100601
 10-04-10 mkdir3d.c: fix mkdir() intermediate dir logic
 10-01-19 3d.h: increase some path buffer sizes -- these need to be dynamic!
 09-05-15 dll_3d.h: handle dllopen => dlopen

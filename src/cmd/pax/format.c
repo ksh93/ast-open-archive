@@ -45,7 +45,7 @@ getprologue(register Archive_t* ap)
 	unsigned char		cvt[MAXUNREAD];
 
 	message((-6, "getprologue() volume=%d eof=%d", ap->volume, ap->io->eof));
-	if (ap->io->eof || state.volume && (ap->io->mode & O_ACCMODE) != O_RDONLY)
+	if (ap->io->eof || state.volume && (ap->io->mode & O_ACCMODE) == O_WRONLY)
 		return 0;
 	state.volume[0] = 0;
 	ap->entry = 0;
@@ -59,12 +59,12 @@ getprologue(register Archive_t* ap)
 	f->name = 0;
 	f->record.format = 0;
 	f->skip = 0;
-	ap->checkdelta = !ap->delta || !(ap->delta->format->flags & PSEUDO);
+	ap->checkdelta = !ap->delta || ap->delta->format && !(ap->delta->format->flags & PSEUDO);
 	f->delta.base = 0;
 	f->uncompressed = 0;
 	f->delta.checksum = 0;
 	f->delta.index = 0;
-	if (ap->io->mode != O_RDONLY)
+	if (state.append || state.update)
 		bsave(ap);
 
 	/*
@@ -194,7 +194,7 @@ getprologue(register Archive_t* ap)
 		if (skipped)
 			error(1, "%s: %I*d byte%s skipped before identifying %s format archive", ap->name, sizeof(skipped), skipped, skipped == 1 ? "" : "s", fp->name);
 	}
-	else if (!(fp->flags & ARCHIVE) || !fp->getprologue  || (*fp->getprologue)(&state, fp, ap, f, buf, sizeof(buf)) < 0)
+	else if (!(fp->flags & ARCHIVE) || !fp->getprologue  || (*fp->getprologue)(&state, fp, ap, f, buf, sizeof(buf)) <= 0)
 		error(3, "%s: %s: archive format mismatch", ap->name, fp->name);
 	if (!ap->format)
 		ap->format = fp;
@@ -265,7 +265,7 @@ setinfo(register Archive_t* ap, register File_t* f)
 {
 	long	n;
 
-	if (ap->delta)
+	if (ap->delta && ap->delta->format)
 	{
 		if (ap->delta->format->variant != DELTA_IGNORE && ap->entry > 1 && f->st->st_mtime)
 		{
@@ -310,8 +310,8 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
 	f->st->st_mtime = mtime;
 	f->st->st_uid = DELTA_LO(checksum);
 	f->st->st_gid = DELTA_HI(checksum);
-	putheader(ap, f);
-	puttrailer(ap, f);
+	if (putheader(ap, f))
+		puttrailer(ap, f);
 	if (np)
 		sfstrclose(np);
 }
@@ -321,7 +321,7 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
  */
 
 void
-putprologue(register Archive_t* ap)
+putprologue(register Archive_t* ap, int append)
 {
 	message((-6, "putprologue()"));
 	ap->section = SECTION_CONTROL;
@@ -333,7 +333,7 @@ putprologue(register Archive_t* ap)
 		if (!ap->convert[0].on)
 			convert(ap, SECTION_DATA, CC_NATIVE, CC_NATIVE);
 	}
-	if ((!ap->format->putprologue || (*ap->format->putprologue)(&state, ap) >= 0) && !(ap->format->flags & DELTAINFO) && ap->delta && !(ap->delta->format->flags & PSEUDO))
+	if ((!ap->format->putprologue || (*ap->format->putprologue)(&state, ap, append) >= 0) && !(ap->format->flags & DELTAINFO) && ap->delta && !(ap->delta->format->flags & PSEUDO))
 	{
 		if (ap->delta->base)
 			putinfo(ap, NiL, ap->delta->base->size, ap->delta->base->checksum);
@@ -346,7 +346,7 @@ putprologue(register Archive_t* ap)
  * read archive epilogue after all files have been copied
  */
 
-void
+int
 getepilogue(register Archive_t* ap)
 {
 	register char*	s;
@@ -360,65 +360,66 @@ getepilogue(register Archive_t* ap)
 	ap->section = SECTION_CONTROL;
 	if (ap->delta && ap->delta->epilogue < 0)
 		error(3, "%s: corrupt archive: missing epilogue", ap->name);
-	if (ap->io->mode != O_RDONLY)
-		backup(ap);
-	else
+	if (state.append || state.update)
 	{
-		if (!ap->format->getepilogue || !(*ap->format->getepilogue)(&state, ap))
-		{
-			/*
-			 * check for more volumes
-			 * volumes begin on BLOCKSIZE boundaries
-			 * separated by null byte filler
-			 */
-
-			if (ap->io->keep)
-			{
-				bskip(ap);
-				if (ap->io->eof)
-					ap->io->keep = 0;
-				else if (ap->io->keep > 0)
-					ap->io->keep--;
-				goto done;
-			}
-			x = 0;
-			z = 0;
-			i = 0;
-			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, buf, (off_t)0, (off_t)n, 0) > 0)
-				do
-				{
-					for (s = buf; s < buf + n && !*s; s++);
-					z += s - buf;
-					if (z >= BLOCKSIZE)
-						x = 1;
-					if (s < buf + n)
-					{
-						if (n == BLOCKSIZE)
-						{
-							if (!x && ap->format->event && (ap->format->events & PAX_EVENT_SKIP_JUNK))
-							{
-								if ((*ap->format->event)(&state, ap, NiL, buf, PAX_EVENT_SKIP_JUNK) > 0)
-									continue;
-								if (i)
-									error(1, "%s: %d junk block%s after volume %d", ap->name, i, i == 1 ? "" : "s", ap->volume);
-							}
-							bunread(ap, buf, BLOCKSIZE);
-							goto done;
-						}
-						if (ap->volume > 1)
-							error(1, "junk data after volume %d", ap->volume);
-						break;
-					}
-					n = BLOCKSIZE;
-					i++;
-				} while (bread(ap, buf, (off_t)0, n, 0) > 0);
-			bflushin(ap, 0);
-		}
-	done:
-		if (ap->format->done)
-			(*ap->format->done)(&state, ap);
-		ap->swapio = 0;
+		backup(ap);
+		return 0;
 	}
+	if (!ap->format->getepilogue || !(*ap->format->getepilogue)(&state, ap))
+	{
+		/*
+		 * check for more volumes
+		 * volumes begin on BLOCKSIZE boundaries
+		 * separated by null byte filler
+		 */
+
+		if (ap->io->keep)
+		{
+			bskip(ap);
+			if (ap->io->eof)
+				ap->io->keep = 0;
+			else if (ap->io->keep > 0)
+				ap->io->keep--;
+			goto done;
+		}
+		x = 0;
+		z = 0;
+		i = 0;
+		if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, buf, (off_t)0, (off_t)n, 0) > 0)
+			do
+			{
+				for (s = buf; s < buf + n && !*s; s++);
+				z += s - buf;
+				if (z >= BLOCKSIZE)
+					x = 1;
+				if (s < buf + n)
+				{
+					if (n == BLOCKSIZE)
+					{
+						if (!x && ap->format->event && (ap->format->events & PAX_EVENT_SKIP_JUNK))
+						{
+							if ((*ap->format->event)(&state, ap, NiL, buf, PAX_EVENT_SKIP_JUNK) > 0)
+								continue;
+							if (i)
+								error(1, "%s: %d junk block%s after volume %d", ap->name, i, i == 1 ? "" : "s", ap->volume);
+						}
+						bunread(ap, buf, BLOCKSIZE);
+						goto done;
+					}
+					if (ap->volume > 1)
+						error(1, "junk data after volume %d", ap->volume);
+					break;
+				}
+				n = BLOCKSIZE;
+				i++;
+			} while (bread(ap, buf, (off_t)0, n, 0) > 0);
+		bflushin(ap, 0);
+	}
+ done:
+	if (ap->format->done)
+		(*ap->format->done)(&state, ap);
+	ap->swapio = 0;
+	return 1;
 }
 
 /*
@@ -478,7 +479,7 @@ putepilogue(register Archive_t* ap)
 	else
 	{
 		ap->io->count = ap->io->offset = 0;
-		ap->io->next = ap->io->buffer;
+		ap->io->next = ap->io->buffer + ap->io->unread;
 	}
 	if (ap->format->done)
 		(*ap->format->done)(&state, ap);
@@ -562,6 +563,7 @@ getkeytime(Archive_t* ap, File_t* f, int index)
 
 	NoP(f);
 	op = &options[index];
+	message((-5, "getkeytime %s level=%d entry=%d:%d", op->name, op->level, op->entry, ap->entry));
 	if (op->level < 7)
 	{
 		if (op->entry == ap->entry)
@@ -572,6 +574,8 @@ getkeytime(Archive_t* ap, File_t* f, int index)
 			return;
 		tv.tv_sec = vp->number;
 		tv.tv_nsec = vp->fraction;
+		if (!tv.tv_sec && !tv.tv_nsec && index != OPT_mtime)
+			tvgetmtime(&tv, f->st);
 		switch (index)
 		{
 		case OPT_atime:
@@ -608,7 +612,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	ap->section = SECTION_CONTROL;
 	ap->sum++;
 	ap->entry++;
-	if (ap->io->mode != O_RDONLY)
+	if (state.append || state.update)
 		bsave(ap);
 	if (!ap->peek)
 	{
@@ -641,9 +645,9 @@ getheader(register Archive_t* ap, register File_t* f)
 	} while ((ap->checkdelta || ap->delta) && deltacheck(ap, f));
 	ap->entries++;
 	getkeysize(ap, f, OPT_size, &f->st->st_size);
+	getkeytime(ap, f, OPT_mtime);
 	getkeytime(ap, f, OPT_atime);
 	getkeytime(ap, f, OPT_ctime);
-	getkeytime(ap, f, OPT_mtime);
 	getkeyid(ap, f, OPT_gid, &f->st->st_gid, state.gid);
 	getkeyname(ap, f, OPT_gname, &f->gidname, &f->st->st_gid, state.gid);
 	getkeyname(ap, f, OPT_path, &f->name, NiL, 0);
@@ -657,7 +661,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	if (ap->flags & DOS)
 		undos(f);
 	f->type = X_ITYPE(f->st->st_mode);
-	s = pathcanon(f->name, 0);
+	s = pathcanon(f->name, 0, 0);
 	if (s > f->name + 1 && *--s == '/')
 	{
 		*s = 0;
@@ -673,7 +677,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	f->namesize = strlen(f->name) + 1;
 	if (f->linkpath)
 	{
-		pathcanon(f->linkpath, 0);
+		pathcanon(f->linkpath, 0, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
 			f->linkpath = map(ap, f->linkpath);
 		f->linkpathsize = strlen(f->linkpath) + 1;
@@ -739,7 +743,7 @@ putheader(register Archive_t* ap, register File_t* f)
 		state.complete = 0;
 		putepilogue(ap);
 		newio(ap, 0, 0);
-		putprologue(ap);
+		putprologue(ap, 0);
 		state.complete = 1;
 		if ((n = (*ap->format->putheader)(&state, ap, f)) <= 0)
 			return n;

@@ -7,18 +7,17 @@
 <TITLE> ast-open package </TITLE>
 <META name="author" content="gsf+dgk+kpv">
 </HEAD>
-<BODY bgcolor='#ffffff' >
+<BODY bgcolor=white link=slateblue vlink=teal >
 <TABLE border=0 align=center width=96%>
 <TBODY><TR><TD valign=top align=left>
-<!--INDEX--><!--/INDEX-->
 <P>
-<P><HR><CENTER><H3><A name="ast-open package">ast-open package</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ast-open package">ast-open package</A></H3></FONT></FONT></CENTER>
 The AT&amp;T Software Technology ast-open package from AT&amp;T Research
 contains all of the ast open source commands and libraries.
 Components in this package:
 <P>
 <P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>
-<TABLE align=center border=0 bordercolor='#ffffff' cellpadding=0 cellspacing=0 frame=void rules=none width=99% >
+<TABLE align=center border=0 bordercolor=white cellpadding=0 cellspacing=0 frame=void rules=none width=99% >
 <TBODY>
 <TR><TD align=left>
 <A href="#3d">3d</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;dsslib&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;pack&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#std">std</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libcodex&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;librecsort</TD></TR>
@@ -47,7 +46,7 @@ A recent
 	<A href="#release change log">release change log</A>
 is also included.
 <P>
-<P><HR><CENTER><H3><A name="3d">3d</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d">3d</A></H3></FONT></FONT></CENTER>
 <STRONG>3d</STRONG>
 is the historical name for
 <EM>n</EM><STRONG>DFS</STRONG><EM>,</EM>
@@ -164,16 +163,16 @@ cat /dev/tcp/hostname/inet.daytime
 </DIV>
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="at">at</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="at">at</A></H3></FONT></FONT></CENTER>
 The
 <STRONG>ast</STRONG>
 <STRONG>at</STRONG>
 command is a re-implementations of
-<NOBR><A href="../man/man1/at.html"><STRONG>at</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/at.html"><STRONG>at</STRONG></A>(1)</NOBR>
 and
-<NOBR><A href="../man/man1/crontab.html"><STRONG>crontab</STRONG></A>(1),</NOBR>
+<NOBR><A href="/~gsf/man/man1/crontab.html"><STRONG>crontab</STRONG></A>(1),</NOBR>
 including a
-<NOBR><A href="../man/man1/cs.html"><STRONG>cs</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/cs.html"><STRONG>cs</STRONG></A>(1)</NOBR>
 service \bat.svc\b for the \bat\b and \bcron\b daemons.
 On most systems the
 <STRONG>at</STRONG>
@@ -186,23 +185,23 @@ and
 because the \bat\b service executor \b$INSTALLROOT/lib/at/jobs/atx\b must be
 installed setuid \broot\b so the daemon can operate multi-user
 (enabling \broot\b privelege is always a manual operation with
-<NOBR><A href="../man/man1/package.html"><STRONG>package</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/package.html"><STRONG>package</STRONG></A>(1)</NOBR>
 packages.)
 <P>
-<P><HR><CENTER><H3><A name="builtin">builtin</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin">builtin</A></H3></FONT></FONT></CENTER>
 The
 <STRONG>ast</STRONG>
 <STRONG>builtin</STRONG>
 commands are stand-alone implementations of the section
 <STRONG>1</STRONG>
 command in
-<NOBR><A href="../man/man3/libcmd.html"><STRONG>libcmd</STRONG></A>(3).</NOBR>
+<NOBR><A href="/~gsf/man/man3/libcmd.html"><STRONG>libcmd</STRONG></A>(3).</NOBR>
 See the
-<NOBR><A href="../man/man1/ksh.html"><STRONG>ksh</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/ksh.html"><STRONG>ksh</STRONG></A>(1)</NOBR>
 <STRONG>builtin</STRONG>(1)
 command for information on loading command DLLs at runtime.
 <P>
-<P><HR><CENTER><H3><A name="coshell">coshell</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="coshell">coshell</A></H3></FONT></FONT></CENTER>
 <STRONG>coshell</STRONG>
 executes blocks of shell commands on lightly loaded hosts in the local network.
 There is one
@@ -281,22 +280,22 @@ generates static host information and
 <STRONG>ss</STRONG>
 lists the dynamic status of hosts on the local network.
 <P>
-<P><HR><CENTER><H3><A name="ie">ie</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ie">ie</A></H3></FONT></FONT></CENTER>
 <STRONG>ie</STRONG>
 executes a dynamically linked command with the
-<NOBR><A href="../man/man1/ksh.html"><STRONG>ksh</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/ksh.html"><STRONG>ksh</STRONG></A>(1)</NOBR>
 input line edit discipline pushed on the standard input.
 All child processes will also have input line editing enabled.
 <P>
 <STRONG>ie</STRONG>
 intercepts the
-<NOBR><A href="../man/man3/read.html"><STRONG>read</STRONG></A>(3)</NOBR>
+<NOBR><A href="/~gsf/man/man3/read.html"><STRONG>read</STRONG></A>(3)</NOBR>
 system call by preloading a DLL (shared library) at runtime,
 so it only works on architectures that support DLL preload.
 Statically-linked, set-uid or set-gid commands will not work with
 <STRONG>ie</STRONG>.
 <P>
-<P><HR><CENTER><H3><A name="ksh93">ksh93</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93">ksh93</A></H3></FONT></FONT></CENTER>
 KSH-93 is the most recent version of the KornShell Language
 described in
 "The KornShell Command and Programming Language,"
@@ -438,30 +437,30 @@ README file.  In addition, the "New KornShell Command and Programming
 Language," book is available from Prentice Hall.
 
 <P>
-<P><HR><CENTER><H3><A name="msgcc">msgcc</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="msgcc">msgcc</A></H3></FONT></FONT></CENTER>
 <STRONG>msgcc</STRONG>
 and
 <STRONG>msgcpp</STRONG>
 extract message text from C source for
-<NOBR><A href="../man/man1/gencat.html"><STRONG>gencat</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/gencat.html"><STRONG>gencat</STRONG></A>(1)</NOBR>
 message catalogs.
-<NOBR><A href="../man/man1/msggen.html"><STRONG>msggen</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/msggen.html"><STRONG>msggen</STRONG></A>(1)</NOBR>
 is a
-<NOBR><A href="../man/man1/gencat.html"><STRONG>gencat</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/gencat.html"><STRONG>gencat</STRONG></A>(1)</NOBR>
 replacement that generates machine independent binary message
 catalogs that are compatible with the
 <STRONG>ast</STRONG>
-<NOBR><A href="../man/man3/catgets.html"><STRONG>catgets</STRONG></A>(3)</NOBR>
+<NOBR><A href="/~gsf/man/man3/catgets.html"><STRONG>catgets</STRONG></A>(3)</NOBR>
 implementation.
 <STRONG>catgets</STRONG>
 also supports native message catalogs where available.
-<NOBR><A href="../man/man1/msgcvt.html"><STRONG>msgcvt</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/msgcvt.html"><STRONG>msgcvt</STRONG></A>(1)</NOBR>
 and
-<NOBR><A href="../man/man1/msgadmin.html"><STRONG>msgadmin</STRONG></A>(1)</NOBR>
+<NOBR><A href="/~gsf/man/man1/msgadmin.html"><STRONG>msgadmin</STRONG></A>(1)</NOBR>
 are administrative commands that support machine translation
 of C locale message catalogs.
 <P>
-<P><HR><CENTER><H3><A name="nmake">nmake</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake">nmake</A></H3></FONT></FONT></CENTER>
 <STRONG>nmake</STRONG>
 is the AT&amp;T
 <STRONG>nmake</STRONG>,
@@ -540,7 +539,7 @@ and there is no cheating (because all time stamp changes
 are detected, not just
 <EM>newer-than</EM>).
 <P>
-<P><HR><CENTER><H3><A name="pax">pax</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax">pax</A></H3></FONT></FONT></CENTER>
 <STRONG>pax</STRONG>
 is a POSIX 1003.2 conformant replacement for
 <STRONG>tar</STRONG>
@@ -599,7 +598,7 @@ and
 <STRONG>pax</STRONG>
 for handy backup control.
 <P>
-<P><HR><CENTER><H3><A name="proto">proto</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto">proto</A></H3></FONT></FONT></CENTER>
 <STRONG>proto</STRONG>
 converts ANSI C prototype constructs to constructs compatible
 with K&amp;R C, ANSI C, and C++.
@@ -639,7 +638,7 @@ This is how
 <STRONG>nmake</STRONG>
 compiles ANSI C source with K&amp;R compilers.
 <P>
-<P><HR><CENTER><H3><A name="pzip">pzip</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pzip">pzip</A></H3></FONT></FONT></CENTER>
 Fixed length record data is often viewed as a waste of space,
 too sparse for production use.
 Much effort is then put into optimizing
@@ -655,7 +654,7 @@ improvements of 2 to 3 times over
 <STRONG>gzip</STRONG>
 for a large class of data.
 <P>
-<P><HR><CENTER><H3><A name="sort">sort</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sort">sort</A></H3></FONT></FONT></CENTER>
 <STRONG>sort</STRONG>
 is a POSIX 1003.2 conformant implementation based on
 <STRONG>-lrecsort</STRONG>
@@ -666,7 +665,7 @@ discipline/method interface allows
 <STRONG>sort</STRONG>
 to double as a test harness for different sort algorithms.
 <P>
-<P><HR><CENTER><H3><A name="std">std</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std">std</A></H3></FONT></FONT></CENTER>
 The
 <STRONG>ast</STRONG>
 <STRONG>std</STRONG>
@@ -685,7 +684,7 @@ because the author either could not keep up with option proliferation or
 the commands must be installed with sufficient privelege to operate
 multi-user.
 <P>
-<P><HR><CENTER><H3><A name="tksh">tksh</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tksh">tksh</A></H3></FONT></FONT></CENTER>
 <EM>tksh</EM>
 is an implementation of the Tcl C library
 written on top of the library for the new KornShell
@@ -730,7 +729,7 @@ For the latest information vist the
 <EM>tksh</EM>
 <A href="http://www.cs.princeton.edu/~jlk/tksh" target=_top>home page</A>.
 <P>
-<P><HR><CENTER><H3><A name="tw">tw</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw">tw</A></H3></FONT></FONT></CENTER>
 <STRONG>tw</STRONG>
 is a combination of
 <STRONG>find</STRONG>
@@ -827,7 +826,7 @@ tw -e "mime == '*/exe'"
 lists all executable programs
 (<EM>a.out</EM>'s).
 <P>
-<P><HR><CENTER><H3><A name="warp">warp</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="warp">warp</A></H3></FONT></FONT></CENTER>
 <STRONG>warp</STRONG>
 executes a dynamically linked command in a different time frame.
 It intercepts time related system calls and modifies the times seen by
@@ -966,7 +965,7 @@ $ PS1='(warp) ' warp -f $(60*60*24) 2000-02-29/12:30:30
 </DIV>
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="tksh">tksh</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tksh">tksh</A></H3></FONT></FONT></CENTER>
 <EM>tksh</EM>
 is an implementation of the Tcl C library
 written on top of the library for the new KornShell
@@ -1011,21 +1010,156 @@ For the latest information vist the
 <EM>tksh</EM>
 <A href="http://www.cs.princeton.edu/~jlk/tksh" target=_top>home page</A>.
 <P>
-<P><HR><CENTER><H3><A name="release change log">release change log</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="release change log">release change log</A></H3></FONT></FONT></CENTER>
+<!--LABELS-->
+<B><FONT size=-1 face="verdana,arial,helvetica,geneva,sans-serif">
+<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey width=90%><TR>
+<TD align=center valign=center><A href="#ksh93 changes">ksh93</A></TD>
+<TD align=center valign=center><A href="#pax changes">pax</A></TD>
+<TD align=center valign=center><A href="#html changes">html</A></TD>
+<TD align=center valign=center><A href="#proto changes">proto</A></TD>
+<TD align=center valign=center><A href="#bzip changes">bzip</A></TD>
+<TD align=center valign=center><A href="#tests changes">tests</A></TD>
+<TD align=center valign=center><A href="#3d changes">3d</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#coshell changes">coshell</A></TD>
+<TD align=center valign=center><A href="#cpp changes">cpp</A></TD>
+<TD align=center valign=center><A href="#cs changes">cs</A></TD>
+<TD align=center valign=center><A href="#mam changes">mam</A></TD>
+<TD align=center valign=center><A href="#msgcc changes">msgcc</A></TD>
+<TD align=center valign=center><A href="#nmake changes">nmake</A></TD>
+<TD align=center valign=center><A href="#probe changes">probe</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#ss changes">ss</A></TD>
+<TD align=center valign=center><A href="#at changes">at</A></TD>
+<TD align=center valign=center><A href="#builtin changes">builtin</A></TD>
+<TD align=center valign=center><A href="#codex changes">codex</A></TD>
+<TD align=center valign=center><A href="#dss changes">dss</A></TD>
+<TD align=center valign=center><A href="#dsslib changes">dsslib</A></TD>
+<TD align=center valign=center><A href="#att changes">att</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#bgp changes">bgp</A></TD>
+<TD align=center valign=center><A href="#dibbler changes">dibbler</A></TD>
+<TD align=center valign=center><A href="#fix changes">fix</A></TD>
+<TD align=center valign=center><A href="#flat changes">flat</A></TD>
+<TD align=center valign=center><A href="#gdat changes">gdat</A></TD>
+<TD align=center valign=center><A href="#ip_t changes">ip_t</A></TD>
+<TD align=center valign=center><A href="#lookup changes">lookup</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#lsa changes">lsa</A></TD>
+<TD align=center valign=center><A href="#merge changes">merge</A></TD>
+<TD align=center valign=center><A href="#netflow changes">netflow</A></TD>
+<TD align=center valign=center><A href="#opaque changes">opaque</A></TD>
+<TD align=center valign=center><A href="#stats changes">stats</A></TD>
+<TD align=center valign=center><A href="#tests changes">tests</A></TD>
+<TD align=center valign=center><A href="#text changes">text</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#time_t changes">time_t</A></TD>
+<TD align=center valign=center><A href="#validate changes">validate</A></TD>
+<TD align=center valign=center><A href="#xml changes">xml</A></TD>
+<TD align=center valign=center><A href="#ie changes">ie</A></TD>
+<TD align=center valign=center><A href="#mailx changes">mailx</A></TD>
+<TD align=center valign=center><A href="#ncsl changes">ncsl</A></TD>
+<TD align=center valign=center><A href="#pack changes">pack</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#pzip changes">pzip</A></TD>
+<TD align=center valign=center><A href="#re changes">re</A></TD>
+<TD align=center valign=center><A href="#sort changes">sort</A></TD>
+<TD align=center valign=center><A href="#std changes">std</A></TD>
+<TD align=center valign=center><A href="#tksh changes">tksh</A></TD>
+<TD align=center valign=center><A href="#tw changes">tw</A></TD>
+<TD align=center valign=center><A href="#warp changes">warp</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#vczip changes">vczip</A></TD>
+<TD align=center valign=center><A href="#libast changes">libast</A></TD>
+<TD align=center valign=center><A href="#libardir changes">libardir</A></TD>
+<TD align=center valign=center><A href="#libcmd changes">libcmd</A></TD>
+<TD align=center valign=center><A href="#libdll changes">libdll</A></TD>
+<TD align=center valign=center><A href="#libexpr changes">libexpr</A></TD>
+<TD align=center valign=center><A href="#librecsort changes">librecsort</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#libsum changes">libsum</A></TD>
+<TD align=center valign=center><A href="#libuu changes">libuu</A></TD>
+<TD align=center valign=center><A href="#libvdelta changes">libvdelta</A></TD>
+<TD align=center valign=center><A href="#libbz changes">libbz</A></TD>
+<TD align=center valign=center><A href="#libz changes">libz</A></TD>
+<TD align=center valign=center><A href="#libcoshell changes">libcoshell</A></TD>
+<TD align=center valign=center><A href="#libcs changes">libcs</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#libmam changes">libmam</A></TD>
+<TD align=center valign=center><A href="#libpp changes">libpp</A></TD>
+<TD align=center valign=center><A href="#libcodex changes">libcodex</A></TD>
+<TD align=center valign=center><A href="#libdss changes">libdss</A></TD>
+<TD align=center valign=center><A href="#libpz changes">libpz</A></TD>
+<TD align=center valign=center><A href="#libtksh changes">libtksh</A></TD>
+<TD align=center valign=center><A href="#libtk changes">libtk</A></TD>
+</TR><TR>
+<TD align=center valign=center><A href="#libvcodex changes">libvcodex</A></TD>
+<TD align=center valign=center><A href="#libvgraph changes">libvgraph</A></TD>
+</TR></TABLE>
+</FONT></B>
+<!--/LABELS-->
 <PRE>
 
 All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="ksh93 changes">ksh93 changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-10-06-21  --- Release ksh93t+  ---
-10-06-21  The next release this directory will be renamed ksh93t and will
-	  install as ksh93t and ksh93u will become the default ksh.
-10-05-27  Rewrote the subshell code to avoid using pipes in many cases.
-10-05-24  Fixed a bug which cause an exception when both -s and -s were
+10-06-25  --- Release ksh93u-  ---
+10-06-25  A bug in which a large here document containing command substitutions
+	  of a dynamically loaded function that contained a here document
+	  could get truncated has been fixed.
+10-06-24  If after executing a script found in FPATH, if a function, builtin,
+	  or type name corresponding to that script is not defined, the shell
+	  now outputs an error message and returns value 126.
+10-06-23  Floating point functions that happened to return integer values
+	  were being treated as if the function returned integers so that
+	  integer division could be used instead of floating point division.
+10-06-22  Fixed a bug in earlier ksh93u in which an arithmetic assignment to a
+	  variable in the global scope would instead create a local variable if
+	  the variable had an attribute but did not have a value.
+10-06-18  Modified trap handling so that if the same signal is received when
+	  executing the handler, it is deferred until the handler completes.
+10-06-16  Fixed a bug in which ulimit -v was setting the the cpu limit
+	  on Linux.
+10-06-14 +The command 'typeset -T' now generates the list of type definitions
+	  in a format that can be used as input to the shell.
+10-06-09  Put in patch from Solaris for output quoting with %q.
+10-06-09 +Made changes to the NAMESPACE compile option so that it now seems
+	  to work.  With this option, namespace &lt;name&gt; { command;} will
+	  run command in the namespace .name so that all variables and
+	  functions created by command are accessable outside the name
+	  space via .name.var and .name.fun.  Variables and functions that
+	  are not in the namespace are not modifed when runnning command.
+10-06-07  Change most internal interfaces to take Sh_t* argument.
+10-06-03 +Types can be loaded on first reference by putting defintions in
+	  PFPATH.
+10-06-03 +The shell is now able to parse commands which use type statements
+	  before the typeset -T command to define the type executes.
+10-06-03  A bug in the quoting for name reference declarations which did
+	  not properly handle &#0091; and &#0093; in subscripts for associative arrays.
+10-06-02  A bug in which a discipline function defined by a type instance to
+	  override the default was not being registered has been fixed.
+10-06-02  A bug in which read -C of an associative array of compound variables
+	  was not working has been fixed.
+10-06-02  A bug in which the error message for an unset parameter with set -u
+	  did not contain the name of the variable has been fixed.
+10-06-01  A bug in typeset -m for moving an indexed array instance to a variable
+	  has been fixed.
+10-06-01  A bug in which caused memory to be freed twice when unset was called
+	  for an indexed array that had get or set disciplines has been fixed.
+10-06-01  A bug in which the %b format of printf was not preserving NUL bytes
+	  with &nbsp; has been fixed.
+10-06-01  A bug in the handling of name references to array variables in
+	  arithmetic expressions has been fixed.
+10-05-28  Fixed bugs in changing attributes for two dimensional arrays.
+10-05-28  Eliminated a few unreferenced variables and a reference to
+	  uninitialized memroy.
+10-05-27  Rewrote the subshell code to avoid using pipes an many cases.
+10-05-24  Fixed a bug which cause an exception when both -l and -s were
 	  specified with typeset -i.
 10-05-21  Inputting of three dimensional indexed arrays with ( ( (...)...)...) 
           was not working and has been fixed.
@@ -1033,6 +1167,13 @@ All recorded changes follow.
 	  reference could cause the value to display incorrectly has been fixed.
 10-05-21  A bug in which using $var inside ((...)) did not work when var was
 	  a hex float variable.
+10-05-20 +The compile option SHOPT_EDPREDICT has been added.  When this option
+	  is on, as you type a line beginning with a # the following characters
+	  are treated as a shell pattern and cause matching lines from the
+	  history file to be displayed as a numbered list as you type.
+	  You can scroll up and down this list or you can use &lt;ESC&gt;nTAB
+	  to make this the current line (n defaults to 1 of ommitted) or
+	  &lt;ESC&gt;n&lt;cr&gt; to execute.
 10-05-20  A bug which caused an exception when multiple levels of composite
 	  functions in arithemtic expressions has been fixed.
 10-05-19  &lt;&lt;&lt; with an empty string no longer gives an error.
@@ -1057,6 +1198,7 @@ All recorded changes follow.
 	  scope were not found has been fixed.
 10-04-30  Do not use socketpair() on systems that implement ioctl(I_PEEK)
 	  on pipes.
+10-04-29 +When the current job pool is set, coprocess are run in a job pool.
 10-04-28  A type defined with a member foo that is an associative array without
 	  elements followed by an expansion ${bar.foo&#0091;a&#0093;} and an assignment
 	  bar.foo&#0091;a&#0093;=b, no longer indicates that ${#bar.foo&#0091;@&#0093;} has 0 members.
@@ -1072,6 +1214,9 @@ All recorded changes follow.
 10-04-23  A bug in which ${t.var:=value}, where t is an instance of a type
 	  variable, could assign value to the type variable rather than to
 	  the type instance has been fixed.
+10-04-23 +Added &amp;| which can be used in place of | to have portions of a
+	  pipeline executed in the pool.
+10-04-22 +The .sh.pool variable was added for use with job pools.
 10-04-22  A bug in which a nested command substitution could hang if it
 	  generated too much data has been fixed.
 10-04-20  A bug which corrupted one byte of memory when read was called with
@@ -1082,10 +1227,16 @@ All recorded changes follow.
 	  an associative array has been fixed.
 10-04-15  A bug which caused scripts containing user defined math functions to
 	  fail to compile with shcomp has been fixed.
+10-04-15 +Job pools have been added with the SHOPT_COSHELL compilation option.
+	  A job pool allows a collection of background jobs to run either locally 
+	  or remotetly and to be managed as a unit.  The command '&amp; name ...'
+	  creates or uses a named job pool for subsequent background jobs.
+	  kill, wait, and jobs allow the pool name as operands.
 10-04-14  A bug in which a coprocess connection could terminate prematurely
 	  when running a nested subshell has been fixed.
-10-04-07  On Darwin on Mac/OS a bug has been fixed which generated an
-	  inappropriate error message when continuing a background job.
+10-04-12 +Enumeration constants can be used in arithmetic expressions with the
+	  ==, != and = operators when the left hand side is an enum variable
+	  and the right hand side is an enumeration constant.
 10-04-07  A bug in which setting the trap on CHLD to ignore could cause
 	  an incorrect exit status has been fixed.
 10-04-06  A bug in which LINENO was not incremented for a here-document when
@@ -1104,6 +1255,12 @@ All recorded changes follow.
 	  an exception has been fixed.
 10-03-30  A bug in the display of a compound variable containing an indexed
 	  array of compound variables has been fixed.
+10-03-24 +Arithmetic functions can be defined using the shell function syntax,
+	  'function .sh.math.name x y z{...}' , where name is the function name
+	  invoked within ((...)) and x y z are long double arguments passed
+	  as name references.  y and z are used for functions with two and
+	  three arguments respectively.  The value of the function is the value
+	  of the long double .sh.value variable when the function returns.
 10-03-24  A bug in which integer division was mistakenly used when the
 	  numerator was a binary operator with the first operand floating
 	  point and the second integer, e.g. (.1**3)/3, has been fixed.
@@ -1126,12 +1283,18 @@ All recorded changes follow.
 	  been fixed.
 10-03-16  A bug in the handling of process groups in monitor mode for
 	  command substitutions has been fixed.
+10-03-15  Fixed a bug in which read -u&#0091;fd&#0093; could cause the shell to core
+	  dump when fd was greater than open_max.
+10-03-15 +Modified the shell I/O so that the shell will not fail if the
+	  ulimit for open_max is increased as part of the script.
 10-03-12  A bug in which a here-document containing command substitutions
 	  that contained here-documents did not process correctly has been
 	  fixed.
 10-03-12  A bug in which the terminal is not restored to cannonical mode
 	  after read times out when in a multibyte locale with no edit mode
 	  enabled has been fixed.
+
+10-03-05  --- Release ksh93t+  ---
 10-03-05  A varibale unset memory leak has been fixed and tests/leaks.sh
 	  has been added to verify the fix.
 10-03-04  Documentation, comment, and disgnostic spelling typos corrected.
@@ -3338,9 +3501,15 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="pax changes">pax changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-21 align { --append --update } with posix
+10-06-14 ug+s only for -p &#0091;eo&#0093;
+10-06-14 atime in archive by default for formats that support it
+10-06-14 add state.resetacctime to separate -t from state.acctime
+10-06-12 fix --exact to list matched directory hierarchies
+10-06-01 sync with ast api 20100601
 10-01-22 pax.c: fix -rw to 1 char dir name that dropped '/' separator
 09-09-09 ax-tar.c: handle gnu tar octal overflow extensions for all octal fields
 08-12-31 pax.c,pax-vczip.c: add vczip compression format
@@ -3653,9 +3822,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="html changes">html changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 10-05-28 mm2*.sh: use --???MAN=nx for man section titles
 10-04-11 mm2html.sh: headings now internal anchors by default
 10-01-31 mm2html.sh: handle bsd mandoc
@@ -3759,7 +3929,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="proto changes">proto changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-01-20 changes.sh: avoid nmake variable expansions in sh!
@@ -3800,7 +3970,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="bzip changes">bzip changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bzip changes">bzip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 02-02-14 bzip2.c: fix uwin core dump
@@ -3811,7 +3981,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="tests changes">tests changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-05-28 date.dat,datey2k.dat: update for ast move to %Q? %K
@@ -3907,9 +4077,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="3d changes">3d changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 10-04-10 mkdir3d.c: fix mkdir() intermediate dir logic
 10-01-19 3d.h: increase some path buffer sizes -- these need to be dynamic!
 09-05-15 dll_3d.h: handle dllopen =&gt; dlopen
@@ -4059,9 +4230,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="coshell changes">coshell changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="coshell changes">coshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 08-04-08 event.c: use dbmlib.iffe
 07-10-23 main.c: avoid UOUT CO_SERIALIZE cswrite hangs via O_NONBLOCK
 07-09-25 handle CO_SERIALIZE
@@ -4158,7 +4330,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="cpp changes">cpp changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="cpp changes">cpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 09-01-06 cpp.tst: add macro definition overwrite test
@@ -4207,9 +4379,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="cs changes">cs changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="cs changes">cs changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 06-10-11 add sfstropen()/sfstruse() error checks
 06-06-11 cs.c: switch to csclient()
 02-10-02 tst.c: tmform() =&gt; fmttime()
@@ -4231,16 +4404,18 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="mam changes">mam changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mam changes">mam changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 04-02-29 self-document
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="msgcc changes">msgcc changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="msgcc changes">msgcc changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 06-11-15 msgcc.sh: date -f x =&gt; date +x for ast-base portability
 06-10-11 add sfstruse() error checks
 02-03-11 msgcc: fix merge replacement threshhold logic
@@ -4256,9 +4431,12 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="nmake changes">nmake changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-21 Makerules.mk: use CC.SUFFIX.DEBUG instead of .pdb
+10-06-17 Makerules.mk,Scanrules.mk: finally a general solution to -I- vs prefix-include?
+10-06-01 ast api 20100601
 10-06-01 Makerules.mk: :PACKAGE: --latest --api=YYYYMMDD|latest FOO:YYYYMMDD
 10-05-25 pkg-X11.mk: add CC.STDLIB.BASE checks for PACKAGE_X11_LIB
 10-04-15 command.c: update to latest cowait() api
@@ -5568,9 +5746,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="probe changes">probe changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="probe changes">probe changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 07-02-22 probe.c: fix double sfclose(fp)
 06-09-05 probe.c: add -f, --force
 02-10-30 probe.c: reset proc-&gt;rfd after sfnew() to avoid close() error
@@ -5585,9 +5764,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="ss changes">ss changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ss changes">ss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 04-07-22 ssd.c: access() =&gt; eaccess()
 03-07-29 ssd.c,features/cmd: add utmpx support
 99-05-18 ss: long options
@@ -5600,9 +5780,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="at changes">at changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="at changes">at changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 10-03-19 atd.c,atx.c: each job in separate session
 06-10-11 add sfstruse() error checks
 06-09-19 atd.c: sysconf() =&gt; astconf()
@@ -5640,9 +5821,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="builtin changes">builtin changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-21 pty.c: add 4 sec timeout for initial handshake -- fix me!!
 10-06-01 od.c: add -c locale checks (and undo some fmtesc() work), add ast -tC1
 10-04-12 pty: fix sfpoll() result read/write bug
 10-04-12 cat.rt: add -v tests
@@ -5776,7 +5958,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="codex changes">codex changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="codex changes">codex changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 09-04-15 codex.c: add --passfile=file
@@ -5788,7 +5970,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="dss changes">dss changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="dss changes">dss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-05-21 dss.c: add SEE ALSO \bdss::dss\b(5P) (after libast::optget() fix)
@@ -5821,7 +6003,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="dsslib changes">dsslib changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="dsslib changes">dsslib changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 02-11-22 */*.c: add unsigned =&gt; signed casts for msvc long long =&gt; double 
@@ -5830,7 +6012,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="att changes">att changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="att changes">att changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 08-08-11 dss.tst: %K.%6N for 18 digit long double limitation
@@ -5839,7 +6021,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="bgp changes">bgp changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-05-25 bgp-mrt.c: mark record type BGP4MP_ET==17 implemented -- doh
@@ -5881,7 +6063,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="dibbler changes">dibbler changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="dibbler changes">dibbler changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 06-10-11 dibbler.c: add sfstruse() error checks
@@ -5893,7 +6075,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="fix changes">fix changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="fix changes">fix changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-02-11 Vmbest =&gt; Vmlast
@@ -5902,7 +6084,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="flat changes">flat changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="flat changes">flat changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 08-08-30 flat.c: work around macos cc struct copy bug
@@ -5950,7 +6132,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="gdat changes">gdat changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="gdat changes">gdat changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-04-10 add html payload details -- this should have a general solution
@@ -5958,7 +6140,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="ip_t changes">ip_t changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-02-02 bgp.h: add rfc3107 BGP_labels
@@ -5998,14 +6180,14 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="lookup changes">lookup changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="lookup changes">lookup changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-04-20 first release
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="lsa changes">lsa changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="lsa changes">lsa changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 08-06-11 ospf_lsa.c: handle generic ip address type binding
@@ -6017,7 +6199,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="merge changes">merge changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="merge changes">merge changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-02-14 first release
@@ -6025,7 +6207,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="netflow changes">netflow changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="netflow changes">netflow changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 08-09-02 netflow.c,flowlib.h: add ipv6 support
@@ -6042,7 +6224,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="opaque changes">opaque changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="opaque changes">opaque changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-01-23 update for void* =&gt; Dssrecord_t*
@@ -6050,7 +6232,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="stats changes">stats changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="stats changes">stats changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-05-05 fix --print OVERFLOW key lookup to return 0/nil value
@@ -6064,14 +6246,14 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="tests changes">tests changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-09-22 first release
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="text changes">text changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="text changes">text changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 02-12-17 propagate -ldss changes
@@ -6079,7 +6261,16 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="validate changes">validate changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="time_t changes">time_t changes</A></H3></FONT></FONT></CENTER>
+<PRE>
+
+09-01-30 handle TMX_FLOAT (mvs.390)
+08-08-22 fix time_t =&gt; Time_t typo
+08-08-11 update timestamp_t logic to tmx*()
+
+</PRE>
+<P>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="validate changes">validate changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-04-05 avoid possible floating point underflow/overflow
@@ -6091,7 +6282,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="xml changes">xml changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="xml changes">xml changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-04-22 fix jsonident(), xmlread(), jsonread(), xmlwrite(), jsonwrite()
@@ -6101,7 +6292,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="ie changes">ie changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ie changes">ie changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 05-02-01 ie.sh: IFS may be unset and { ash bsh } don't on startup -- wow
@@ -6117,9 +6308,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="mailx changes">mailx changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mailx changes">mailx changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 09-06-09 names.c,vars.c: fix alias expansion cross-dictionary bug
 09-05-15 proc.c,quit.c: add buffer checks to filetemp()
 08-11-04 spam.c: fix 0-terminated overrun in usermatch() -- wow
@@ -6274,7 +6466,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="ncsl changes">ncsl changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ncsl changes">ncsl changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 99-09-01 add usage&#0091;&#0093;
@@ -6282,7 +6474,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="pack changes">pack changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pack changes">pack changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 2003-05-21 pack.tst: add
@@ -6292,7 +6484,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="pzip changes">pzip changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pzip changes">pzip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-07-17 pzip.c: update --split doc
@@ -6337,7 +6529,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="re changes">re changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-06-11 sed: drop space|semicolon separators warning
@@ -6508,7 +6700,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="sort changes">sort changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sort changes">sort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-05-25 main.c: handle mb -t
@@ -6584,9 +6776,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="std changes">std changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 10-05-25 ls.c: back off 09-07-02 logical|(meta)physical change
 10-02-09 ps.c: fix --tree --format=... =&gt;  instead of \_
 10-02-09 ps.c: ntpid not hex by default
@@ -6880,7 +7073,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="tksh changes">tksh changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tksh changes">tksh changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 05-06-14 uinit.c: trap "tkloop" only if it is defined
@@ -6892,9 +7085,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="tw changes">tw changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 10-04-05 find.c: vmclose() after all usage -- doh
 10-04-05 find.c: handle -exec|-xargs with multiple {}
 07-10-26 find.c: fix default -print w.r.t. -o
@@ -7000,7 +7194,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="warp changes">warp changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="warp changes">warp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 08-11-15 warp.c: fix time() _WIN32 intercept
@@ -7019,7 +7213,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="vczip changes">vczip changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="vczip changes">vczip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 09-10-01 vczip.c: make discipline data static -- it may be accessed after main() returns
@@ -7035,10 +7229,15 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libast changes">libast changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-25 misc/optget.c: avoid sfprints() call during initialization
+10-06-01 features/api, ast_api.h: formalized forwards/backwards api compatibility
+10-06-01 _AST_API=20100601: add size_t args for all path*() output buffers
 10-06-01 comp/setlocale.c: handle C.UTF-8 test locale
+10-06-01 include/mc.h: add size_t to mcfind() for result buffer (internal api)
+10-06-01 use strlcpy() instead of strncpy()
 10-05-28 include/ast_version.h: add AST_PLUGIN_VERSION for dllplugin()
 10-05-28 include/shcmd.h: add SH_PLUGIN_VERSION for dllplugin()
 10-05-28 misc/conformance.c: add conformance(3)
@@ -8691,7 +8890,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libardir changes">libardir changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libardir changes">libardir changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 03-09-17 ardir.c: rewind initial peek to open position in case its /dev/stdin
@@ -8707,11 +8906,12 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libcmd changes">libcmd changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-06-14 rm.c: fix -rfu logic
 10-06-12 paste.c: repeat after me: do not modify argv&#0091;i&#0093;
+10-06-01 sync with ast api 20100601
 10-05-09 tail.c: fix -0f bug that inially listed the entire file
 10-05-06 basename.c: add { -a,--all -s,--suffux=suffix } from BSD
 10-04-12 cat.c: fix -v bug that dumped core and make consistent with cmp --print-chars
@@ -9021,7 +9221,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libdll changes">libdll changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdll changes">libdll changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-05-28 dllplug.c: add dllplugin() with dllcheck() version check
@@ -9073,7 +9273,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libexpr changes">libexpr changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libexpr changes">libexpr changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 09-02-02 exgram.h: drop function ref in call() to avoid eval in exeval()
@@ -9127,7 +9327,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="librecsort changes">librecsort changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="librecsort changes">librecsort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-05-25 rskey.c: locale-ize Rskey_t.tab and key_m_code()
@@ -9211,7 +9411,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libsum changes">libsum changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libsum changes">libsum changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 09-09-28 sumlib.c: use simple (faster) method name match function
@@ -9232,7 +9432,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libuu changes">libuu changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libuu changes">libuu changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 09-09-24 uulib: add cat method for mail sevenbit|7bit encoding
@@ -9245,7 +9445,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libvdelta changes">libvdelta changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libvdelta changes">libvdelta changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 04-03-14 vdelta.h: #if !_DLL =&gt; #if !defined(_DLL) to handle empty value
@@ -9254,7 +9454,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libbz changes">libbz changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libbz changes">libbz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 09-04-15 bzlib.c: add bzfopen()
@@ -9268,7 +9468,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libz changes">libz changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libz changes">libz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 07-11-29 sfdcgzip.c: add seekf() for first buffer rewind
@@ -9309,9 +9509,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libcoshell changes">libcoshell changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcoshell changes">libcoshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 10-05-19 cokill.c: do cowait(co,co,0) to drain pending messages
 10-05-15 coshell.h,coopen.c: add CO_ORPHAN for PROC_ORPHAN
 10-05-11 coopen.c: add PROC_ORPHAN for CO_SHELL
@@ -9358,9 +9559,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libcs changes">libcs changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcs changes">libcs changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 10-04-12 Makefile: defer share and local generation to first use
 08-04-09 csopen.c: fix mkmount() path cleanup
 08-04-09 csopen.c: add debug=-1 mkmount() error message
@@ -9453,9 +9655,18 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libpp changes">libpp changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libmam changes">libmam changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
+
+</PRE>
+<P>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
+<PRE>
+
+10-06-16 ppsearch.c: try parent prefix if -I- include search fails
+10-06-01 sync with ast api 20100601
 09-02-02 pp.probe,probe.win32: check for compiler supplied __FUNCTION__
 09-02-02 ppop.c: include pp_default.h/probe at end of builtin script
 09-01-20 probe.win32: elide #pragma comment.*linker.*manifest
@@ -9908,7 +10119,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libcodex changes">libcodex changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcodex changes">libcodex changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-01-15 code-uu.c: add uu-base64-string to encode with no newline separators
@@ -9937,7 +10148,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libdss changes">libdss changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdss changes">libdss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 10-05-04 dssopt.c: check for '&#0091;' usage in description, drop &#0091;+PATH?...&#0093;
@@ -10147,7 +10358,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libpz changes">libpz changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpz changes">libpz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 06-12-18 pzline.c: move to separate plugin source dir
@@ -10225,9 +10436,10 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libtksh changes">libtksh changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libtksh changes">libtksh changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
 08-08-08  src/list.c,src/tcleval.c: add temporary sh_eval(p,0x8000) hack
 07-03-19  src/var.c: use nv_setref() to initialize references
 06-09-19  src/shcompat.c: sysconf() =&gt; astconf()
@@ -10337,9 +10549,17 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libvcodex changes">libvcodex changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libtk changes">libtk changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+10-06-01 sync with ast api 20100601
+
+</PRE>
+<P>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libvcodex changes">libvcodex changes</A></H3></FONT></FONT></CENTER>
+<PRE>
+
+10-06-01 sync with ast api 20100601
 09-08-19 vchufgroup.c: sync with kpv (new alg)
 09-06-22 sync with kpv, add vcgetfname(), vcwalkfname()
 09-03-12 vcstrip.c: add
@@ -10373,7 +10593,7 @@ All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><CENTER><H3><A name="libvgraph changes">libvgraph changes</A></H3></CENTER>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libvgraph changes">libvgraph changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 08-12-07 rename graph =&gt; vgraph
@@ -10386,7 +10606,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>June 24, 2010</TD>
+<TD align=right>June 26, 2010</TD>
 </TR>
 </TABLE>
 <P>

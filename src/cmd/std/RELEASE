@@ -1,3 +1,4 @@
+10-06-01 sync with ast api 20100601
 10-05-25 ls.c: back off 09-07-02 logical|(meta)physical change
 10-02-09 ps.c: fix --tree --format=... => \\_ instead of \_
 10-02-09 ps.c: ntpid not hex by default

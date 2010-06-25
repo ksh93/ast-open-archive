@@ -958,7 +958,7 @@ main(int argc, register char** argv)
 					error(ERROR_SYSTEM|3, "cannot determine pwd path");
 				else
 					sfsprintf(tmp, sizeof(tmp), "%s/%s", p, s);
-				pathcanon(tmp, PATH_PHYSICAL);
+				pathcanon(tmp, sizeof(tmp), PATH_PHYSICAL);
 				if (!(dp->name = strdup(tmp)))
 					error(ERROR_SYSTEM|3, "out of space [PATH_PHYSICAL]");
 			}

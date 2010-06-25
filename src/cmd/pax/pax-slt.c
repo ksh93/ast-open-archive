@@ -598,7 +598,7 @@ slt_backup(Pax_t* pax, Archive_t* ap)
 }
 
 static int
-slt_putprologue(Pax_t* pax, Archive_t* ap)
+slt_putprologue(Pax_t* pax, Archive_t* ap, int append)
 {
 	register Slt_t*	slt = (Slt_t*)ap->data;
 

@@ -1005,11 +1005,11 @@ relative(Sfio_t* xp, register char* s, register char* t)
 	if (*s != '/') sfprintf(tmp, "%s/", internal.pwd);
 	sfprintf(tmp, "%s/", s);
 	s = sfstruse(tmp);
-	pos = pathcanon(s, 0) - s + 1;
+	pos = pathcanon(s, 0, 0) - s + 1;
 	sfstrseek(tmp, pos, SEEK_SET);
 	if (*t != '/') sfprintf(tmp, "%s/", internal.pwd);
 	sfprintf(tmp, "%s/%c", t, 0);
-	pathcanon(v = t = sfstrseek(tmp, pos, SEEK_SET), 0);
+	pathcanon(v = t = sfstrseek(tmp, pos, SEEK_SET), 0, 0);
 	u = s = sfstrbase(tmp);
 	while (*s && *s == *t)
 		if (*s++ == '/')
@@ -2023,7 +2023,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 							sfprintf(internal.nam, "/%s", s);
 					}
 					t = sfstruse(internal.nam);
-					pathcanon(t, 0);
+					pathcanon(t, 0, 0);
 					if (!stat(t, &st))
 					{
 						if (sep)
@@ -2061,7 +2061,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			op++;
 		if ((t = strchr(op, ',')) || (t = strchr(op, ' ')))
 			*t++ = 0;
-		if (s = pathprobe(sfstrrsrv(xp, MAXNAME), NiL, op, t ? t : idname, s, 0))
+		if (s = pathprobe(op, t ? t : idname, s, 0, sfstrrsrv(xp, MAXNAME), MAXNAME, NiL, 0))
 		{
 			sfstrseek(xp, strlen(s), SEEK_CUR);
 			makerule(s)->dynamic |= D_built|D_global;
@@ -2102,7 +2102,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				{
 					sfprintf(internal.nam, "%s/%s", op, s);
 					s = sfstruse(internal.nam);
-					pathcanon(s, 0);
+					pathcanon(s, 0, 0);
 				}
 				if (*s++ != '.' || *s++ != '.' || *s && *s != '/')
 					c = 1;

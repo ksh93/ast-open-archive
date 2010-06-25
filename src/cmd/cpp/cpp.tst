@@ -26,6 +26,7 @@ function DATA
 		pmap2.c)print -r -- $'#pragma pp:mapinclude hosted <tst_usr.h> = "."\n#include <tst_std.h>\n#include <tst_usr.h>' > $f ;;
 		lcl/map.map) mkdir -p lcl && print -r -- $'hosted <tst_usr.h>="."' > $f ;;
 		lcl/tst_usr.h) mkdir -p lcl && print -r -- $'int lcl_tst_usr;' > $f ;;
+		pfx) mkdir -p std/pfx; print '#include <pfx/c.h>' > std/a.h; print '#include "d.h"' > std/pfx/c.h; print 'int d = 0;' > std/pfx/d.h; ;;
 		std/tst_std.h) mkdir -p std && print -r -- $'#include <tst_usr.h>' > $f ;;
 		std/tst_usr.h) mkdir -p std && print -r -- $'int std_tst_usr;' > $f ;;
 		nl1.c)	print -r -- $'#warning before\n#include "nl1.h"\n#warning after' > $f ;;
@@ -4790,3 +4791,25 @@ FOO(TEN)'
 BAR ONE
 BAR TWO
 BAR TEN'
+
+TEST 40 'implicit prefix include with -I-'
+
+	DO	DATA pfx
+
+	EXEC -Istd t.c
+		INPUT t.c '#include <a.h>'
+		OUTPUT - '# 1 "t.c"
+
+# 1 "std/a.h" 1
+
+# 1 "std/pfx/c.h" 1
+
+# 1 "std/pfx/d.h" 1
+int d = 0;
+# 2 "std/pfx/c.h" 2
+
+# 2 "std/a.h" 2
+
+# 2 "t.c" 2'
+
+	EXEC -I- -Istd t.c

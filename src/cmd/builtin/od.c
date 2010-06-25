@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2010-06-04 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2010-06-14 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files in various "
@@ -1239,11 +1239,16 @@ b_od(int argc, char** argv, void* context)
 		case 'U':
 		case 'x':
 		case 'X':
+			s = buf;
 			switch (n = opt_info.option[1])
 			{
+			case 'b':
+				*s++ = 'o';
+				*s++ = 'C';
+				break;
 			case 'c':
 			case 'C':
-				n = 'O';
+				*s++ = 'O';
 				break;
 			case 'D':
 				n = 'U';
@@ -1263,36 +1268,34 @@ b_od(int argc, char** argv, void* context)
 				n = 'D';
 				break;
 			}
-			s = buf;
-			if (isupper(n))
-				switch (*s++ = tolower(n))
-				{
-				case 'f':
-					*s++ = 'D';
-					break;
-				default:
-					*s++ = 'L';
-					break;
-				}
-			else
-				switch (*s++ = n)
-				{
-				case 'b':
-					*buf = 'o';
-					*s++ = 'C';
-					break;
-				case 'd':
-				case 'o':
-				case 's':
-				case 'u':
-				case 'x':
-					/* pronounce that! */
-					*s++ = 'S';
-					break;
-				case 'f':
-					*s++ = 'F';
-					break;
-				}
+			if (s == buf)
+			{
+				if (isupper(n))
+					switch (*s++ = tolower(n))
+					{
+					case 'f':
+						*s++ = 'D';
+						break;
+					default:
+						*s++ = 'L';
+						break;
+					}
+				else
+					switch (*s++ = n)
+					{
+					case 'd':
+					case 'o':
+					case 's':
+					case 'u':
+					case 'x':
+						/* pronounce that! */
+						*s++ = 'S';
+						break;
+					case 'f':
+						*s++ = 'F';
+						break;
+					}
+			}
 			*s = 0;
 			format(&state, buf);
 			state.style |= OLD;

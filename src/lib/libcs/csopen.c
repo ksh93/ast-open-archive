@@ -665,7 +665,7 @@ csopen(register Cs_t* state, const char* apath, int op)
 			sfsprintf(buf, sizeof(buf), "/dev/%s/%s/%s", type, csntoa(state, 0), serv);
 	}
 	path = buf;
-	pathcanon(path, 0);
+	pathcanon(path, 0, 0);
 	errno = ENOENT;
 	strcpy(state->path, path);
 	b = path;
@@ -997,10 +997,10 @@ csopen(register Cs_t* state, const char* apath, int op)
 	{
 		if (op & CS_OPEN_TRUST)
 		{
-			if (!pathaccess(b, csvar(state, CS_VAR_TRUST, 1), csvar(state, CS_VAR_SHARE, 1), NiL, PATH_EXECUTE))
+			if (!pathaccess(csvar(state, CS_VAR_TRUST, 1), csvar(state, CS_VAR_SHARE, 1), NiL, PATH_EXECUTE, b, sizeof(state->mount) - (b - state->mount)))
 				goto bad;
 		}
-		else if (!pathpath(b, csvar(state, CS_VAR_SHARE, 0), "", PATH_EXECUTE))
+		else if (!pathpath(csvar(state, CS_VAR_SHARE, 0), "", PATH_EXECUTE, b, sizeof(state->mount) - (b - state->mount)))
 			goto bad;
 		b += strlen(b);
 	}
@@ -1061,7 +1061,7 @@ csopen(register Cs_t* state, const char* apath, int op)
 	 */
 
 	sfsprintf(b, sizeof(state->mount) - (b - path), "%s/%s/%s/%s%s", CS_SVC_DIR, type, serv, serv, CS_SVC_SUFFIX);
-	if (!pathpath(tmp, b, "", PATH_ABSOLUTE|PATH_EXECUTE) || stat(tmp, &st))
+	if (!pathpath(b, "", PATH_ABSOLUTE|PATH_EXECUTE, tmp, sizeof(tmp)) || stat(tmp, &st))
 		op |= CS_OPEN_TEST;
 	else
 	{

@@ -136,7 +136,7 @@ alias(struct proc* pp, const char* name)
 
 	if (*name != '/' || *pp->fp->rule->name == '/' || !pp->pwd) return(0);
 	sfsprintf(buf, sizeof(buf), "%s/%s", pp->pwd, pp->fp->rule->name);
-	pathcanon(buf, 0);
+	pathcanon(buf, sizeof(buf), 0);
 	if (!streq(buf, name)) return(0);
 	putrule(pp, name, pp->fp->rule);
 	return(pp->fp->rule);

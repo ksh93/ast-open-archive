@@ -72,9 +72,9 @@ exists(int op, char* pred, register char* args)
 		{
 			while ((c = pplex()) == T_STRING)
 			{
-				if (pathaccess(pp.path, pp.token, file, NiL, 0))
+				if (pathaccess(pp.token, file, NiL, 0, pp.path, MAXTOKEN + 1))
 				{
-					pathcanon(pp.path, 0);
+					pathcanon(pp.path, 0, 0);
 					message((-2, "%s: %s found", pred, pp.path));
 					c = 1;
 					goto done;

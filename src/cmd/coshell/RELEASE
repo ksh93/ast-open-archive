@@ -1,3 +1,4 @@
+10-06-01 sync with ast api 20100601
 08-04-08 event.c: use dbmlib.iffe
 07-10-23 main.c: avoid UOUT CO_SERIALIZE cswrite hangs via O_NONBLOCK
 07-09-25 handle CO_SERIALIZE

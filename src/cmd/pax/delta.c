@@ -101,7 +101,7 @@ getdeltaheader(register Archive_t* ap, register File_t* f)
 
 	if (!(ap->format->flags & COMPRESSED))
 	{
-		if (ap->delta && (ap->delta->format->variant == DELTA_94 || ap->delta->format->variant == DELTA_IGNORE && state.delta2delta))
+		if (ap->delta && ap->delta->format && (ap->delta->format->variant == DELTA_94 || ap->delta->format->variant == DELTA_IGNORE && state.delta2delta))
 		{
 			ap->delta->index++;
 			if (ap->delta->tab && f->name && (f->delta.base = (Member_t*)hashget(ap->delta->tab, f->name)))
@@ -171,7 +171,7 @@ getdeltatrailer(register Archive_t* ap, register File_t* f)
 		}
 		if (!f->delta.base)
 		{
-			if (ap->parent && f->delta.op != DELTA_create)
+			if (ap->parent && ap->parent != ap && f->delta.op != DELTA_create)
 				error(2, "%s: %s: corrupt archive: not in base archive %s", ap->name, f->name, ap->parent->name);
 		}
 		else
@@ -307,10 +307,12 @@ void
 deltabase(register Archive_t* ap)
 {
 	register Archive_t*	bp;
+	Format_t*		fp;
 	struct stat		st;
 
-	if (!ap->delta)
+	if (!ap->delta || ap->delta->initialized)
 		return;
+	ap->delta->initialized = 1;
 	if (!(bp = ap->delta->base))
 		bp = ap->delta->base = initarchive("/dev/null", O_RDONLY);
 	binit(bp);
@@ -328,6 +330,8 @@ deltabase(register Archive_t* ap)
 		bp->io->seekable = 0;
 	if (st.st_size)
 	{
+		fp = bp->expected;
+		bp->expected = 0;
 		if (state.ordered)
 		{
 			if (!getprologue(bp))
@@ -337,19 +341,20 @@ deltabase(register Archive_t* ap)
 		}
 		else
 		{
-			if (lseek(bp->io->fd, (off_t)0, SEEK_SET) != 0)
+			if (!state.append && !state.update && lseek(bp->io->fd, (off_t)0, SEEK_SET) != 0)
 				error(ERROR_SYSTEM|3, "%s: %s: base archive must be seekable", ap->name, bp->name);
 			copyin(bp);
 			bp->size = bp->io->offset + bp->io->count;
 		}
-		if (!ap->delta->format)
-			ap->delta->format = getformat(FMT_DELTA, 1);
+		bp->expected = fp;
 		bp->checksum &= 0xffffffff;
 	}
+	if (state.append || state.update)
+		ap->delta->format = st.st_size ? bp->format : ap->format;
 	else if (!ap->delta->format)
 	{
 		ap->delta->format = getformat(FMT_DELTA, 1);
-		ap->delta->compress = 1;
+		ap->delta->compress = !st.st_size;
 	}
 }
 
@@ -366,7 +371,7 @@ deltaverify(Archive_t* ap)
 	register off_t		n;
 	Hash_position_t*	pos;
 
-	if (!state.delta.update && !state.list && ap->delta && (pos = hashscan(ap->delta->tab, 0)))
+	if (!state.delta.update && !state.list && ap->delta && ap->delta->base != ap && (pos = hashscan(ap->delta->tab, 0)))
 	{
 		message((-2, "verify untouched base files"));
 		while (hashnext(pos))
@@ -620,7 +625,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 	message((-1, "delta PASS%s", state.delta2delta ? " delta2delta" : ""));
 	deltabase(ip);
 	deltabase(op);
-	putprologue(op);
+	putprologue(op, 0);
 	f = &ip->file;
 	while (getprologue(ip))
 	{
@@ -752,7 +757,8 @@ deltapass(Archive_t* ip, Archive_t* op)
 			}
 			gettrailer(ip, f);
 		}
-		getepilogue(ip);
+		if (!getepilogue(ip))
+			break;
 	}
 	if (ip->delta && ip->delta->tab)
 	{

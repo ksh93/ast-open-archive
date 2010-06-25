@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -257,6 +257,15 @@ ewrite(int f, void* b, size_t n)
 
 #endif
 
+static char*
+bstatus(Bio_t* io)
+{
+	char*	s;
+
+	s = sfprints("<%p,%d,%d,%I*d,%d,%d>", io->buffer, io->unread, io->fill, sizeof(io->count), io->count, io->next - (io->buffer + io->unread), io->last - (io->buffer + io->unread));
+	return strcpy(fmtbuf(strlen(s) + 1), s);
+}
+
 /*
  * initialize buffered io
  */
@@ -267,11 +276,13 @@ binit(register Archive_t* ap)
 	unsigned long	n;
 	unsigned long	u;
 
+	if (ap->io->buffer)
+		return;
 	if (ap->delta)
 		ap->delta->hdr = ap->delta->hdrbuf;
 	ap->io->buffersize = state.buffersize;
 	n = 2 * state.buffersize;
-	if (ap->io->mode == O_RDONLY)
+	if ((ap->io->mode & O_ACCMODE) != O_WRONLY)
 		u = MAXUNREAD;
 	else if (!(ap->format->flags & OUT))
 		error(3, "%s: archive format not supported on output" , ap->format->name);
@@ -279,7 +290,9 @@ binit(register Archive_t* ap)
 		u = 0;
 	if (!(ap->io->buffer = newof(0, char, n, u)))
 		error(3, "%s: cannot allocate buffer", ap->name);
+	ap->io->unread = u;
 	ap->io->next = ap->io->last = ap->io->buffer + u;
+	message((-7, "binit(%s) %s", ap->name, bstatus(ap->io)));
 }
 
 /*
@@ -303,7 +316,7 @@ bskip(register Archive_t* ap)
 
 	if (ap->io->mode != O_RDONLY)
 	{
-		ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
+		ap->io->next = ap->io->last = ap->io->buffer + ap->io->unread;
 		ap->io->eof = 0;
 	}
 	while (skip)
@@ -382,6 +395,8 @@ bfill(register Archive_t* ap, int must)
 	message((-8, "read(%s,%d): %s", ap->name, c, show(ap->io->last, c)));
 	ap->io->eof = 0;
 	ap->io->last += c;
+	ap->io->fill++;
+	message((-7, "bfill(%s) %s", ap->name, bstatus(ap->io)));
 	return 0;
 }
 
@@ -428,6 +443,8 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 
 	if (ap->io->eof)
 		return -1;
+	if (ob)
+		message((-7, "bread(%s,%I*d,%I*d) %s", ap->name, sizeof(n), n, sizeof(m), m, bstatus(ap->io)));
 	if (m <= 0)
 		m = n;
 	b = s;
@@ -472,7 +489,7 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 					s += c;
 					r -= c;
 				}
-				ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
+				ap->io->next = ap->io->last = ap->io->buffer + ap->io->unread;
 				if (!ob && ap->sum <= 0 && ap->io->seekable && (z = r / BUFFERSIZE) && lseek(ap->io->fd, z *= BUFFERSIZE, SEEK_CUR) >= 0)
 				{
 					s += z;
@@ -502,9 +519,9 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 	}
 #if DEBUG
 	if (ob)
-		message((-7, "bread(%s,%I*d@%I*d): %s", ap->name, sizeof(r), r, sizeof(ap->io->count), ap->io->count, show(b, r)));
+		message((-7, "bread(%s,%I*d@%I*d) %s: %s", ap->name, sizeof(r), r, sizeof(ap->io->count), ap->io->count, bstatus(ap->io), show(b, r)));
 	else
-		message((-7, "bread(%s) skip(%I*d@%I*d)", ap->name, sizeof(r), r, sizeof(ap->io->count), ap->io->count));
+		message((-7, "bread(%s) skip(%I*d@%I*d) %s", ap->name, sizeof(r), r, sizeof(ap->io->count), ap->io->count, bstatus(ap->io)));
 #endif
 	return r;
 }
@@ -518,7 +535,9 @@ bunread(register Archive_t* ap, void* b, register int n)
 {
 	ap->io->eof = 0;
 	ap->io->count -= n;
-	if ((ap->io->next -= n) < ap->io->buffer + MAXUNREAD)
+	if (ap->io->next == (ap->io->buffer + ap->io->unread))
+		ap->io->last = ap->io->next + n;
+	else if ((ap->io->next -= n) < ap->io->buffer + ap->io->unread)
 	{
 		if (ap->io->next < ap->io->buffer)
 			error(PANIC, "bunread(%s,%d): too much pushback", ap->name, n);
@@ -526,7 +545,7 @@ bunread(register Archive_t* ap, void* b, register int n)
 			memcpy(ap->io->next, b, n);
 		REVERT(ap, ap->io->next, n);
 	}
-	message((-7, "bunread(%s,%d@%I*d): %s", ap->name, n, sizeof(ap->io->count), ap->io->count, show(ap->io->next, n)));
+	message((-7, "bunread(%s,%d@%I*d) %s: %s", ap->name, n, sizeof(ap->io->count), ap->io->count, bstatus(ap->io), show(ap->io->next, n)));
 }
 
 /*
@@ -544,7 +563,7 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 	size_t		m;
 	int		must;
 
-	if (ap->io->mode != O_RDONLY)
+	if ((ap->io->mode & O_ACCMODE) == O_WRONLY)
 	{
 		if (p)
 			*p = ap->io->last - ap->io->next;
@@ -578,7 +597,7 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 		j = ap->io->last - ap->io->buffer;
 		m = roundof(n, PAX_DEFBUFFER * PAX_BLOCK);
 		message((-8, "bget(%s,%I*d,%d): reallocate %u=>%d", ap->name, sizeof(n), n, must, ap->io->buffersize, m));
-		if (!(b = newof(ap->io->buffer, char, 2 * m, MAXUNREAD)))
+		if (!(b = newof(ap->io->buffer, char, 2 * m, ap->io->unread)))
 			error(3, "%s: cannot reallocate buffer", ap->name);
 		ap->io->buffersize = m;
 		if (b != ap->io->buffer)
@@ -594,11 +613,11 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 	ap->io->next += n;
 	while (ap->io->next > ap->io->last)
 	{
-		if (ap->io->last > ap->io->buffer + MAXUNREAD + ap->io->buffersize)
+		if (ap->io->last > ap->io->buffer + ap->io->unread + ap->io->buffersize)
 		{
                         i = ap->io->last - b;
 			j = roundof(i, IOALIGN) - i;
-                        t = ap->io->next = ap->io->buffer + MAXUNREAD + j;
+                        t = ap->io->next = ap->io->buffer + ap->io->unread + j;
                         ap->io->last = t + i;
                         if (m = b - t)
 			{
@@ -625,6 +644,21 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 	return b;
 }
 
+#ifndef bsave
+
+/*
+ * save current position for possible backup()
+ */
+
+void
+bsave(register Archive_t* ap)
+{
+	state.backup = *ap->io;
+	message((-7, "bsave(%s,@%I*d)", ap->name, sizeof(ap->io->count), ap->io->count));
+}
+
+#endif
+
 /*
  * back up input to bsave()'d position and prime output buffer
  */
@@ -634,6 +668,7 @@ backup(register Archive_t* ap)
 {
 	register off_t	n;
 	register off_t	m;
+	off_t		b;
 #ifdef MTIOCTOP
 	struct mtop	mt;
 #endif
@@ -642,41 +677,33 @@ backup(register Archive_t* ap)
 		(*ap->format->backup)(&state, ap);
 	else
 	{
-		m = ap->io->next - (ap->io->buffer + MAXUNREAD);
-		if ((n = ap->io->count - m) > state.backup.count)
+		message((-7, "backup(%s) old %s new %s", ap->name, bstatus(&state.backup), bstatus(ap->io)));
+		if (ap->io->fill == state.backup.fill)
 		{
-			message((-1, "backup(%s): reread %I*d", ap->name, sizeof(n), n + m));
-			m = state.backup.last - (state.backup.buffer + MAXUNREAD);
-			if (lseek(ap->io->fd, (off_t)(-(n + m)), SEEK_CUR) == -1)
+			/*
+			 * same buffer window
+			 */
+
+			m = ap->io->last - (ap->io->buffer + ap->io->unread);
+			if ((n = lseek(ap->io->fd, -m, SEEK_CUR)) == -1)
 			{
 #ifdef MTIOCTOP
 				mt.mt_op = MTBSR;
-				mt.mt_count = 2;
+				mt.mt_count = 1;
 				if (ioctl(ap->io->fd, MTIOCTOP, &mt))
 					goto bad;
 #else
 				goto bad;
 #endif
 			}
-			if (read(ap->io->fd, ap->io->buffer + MAXUNREAD, m) != m)
-				goto bad;
+			message((-7, "backup(%s) %I*d => %I*d", ap->name, sizeof(m), m, sizeof(n), n));
+			ap->io->count = state.backup.count;
+			ap->io->next = state.backup.next;
 		}
 		else
-			m = ap->io->last - (ap->io->buffer + MAXUNREAD);
-		message((-1, "backup(%s): %I*d", ap->name, sizeof(m), m));
-		if ((m = lseek(ap->io->fd, -m, SEEK_CUR)) == -1)
-		{
-#ifdef MTIOCTOP
-			mt.mt_op = MTBSR;
-			mt.mt_count = 1;
-			if (ioctl(ap->io->fd, MTIOCTOP, &mt))
-				goto bad;
-#else
-			goto bad;
-#endif
-		}
-		if (state.backup.next < state.backup.last)
-			bwrite(ap, ap->io->buffer + MAXUNREAD, state.backup.next - (state.backup.buffer + MAXUNREAD));
+			error(PANIC, "%s: backup over intervening hard read not implemented yet", ap->name);
+		ap->io->last = ap->io->buffer + ap->io->unread + state.blocksize;
+		message((-7, "backup(%s) %s", ap->name, bstatus(ap->io)));
 	}
 	return;
  bad:
@@ -691,7 +718,7 @@ void
 bflushin(register Archive_t* ap, int hard)
 {
 	ap->io->count += ap->io->last - ap->io->next;
-	ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
+	ap->io->next = ap->io->last = ap->io->buffer + ap->io->unread;
 	if (hard && !ap->io->eof)
 	{
 		while (read(ap->io->fd, ap->io->next, ap->io->buffersize) > 0);
@@ -717,7 +744,7 @@ bseek(register Archive_t* ap, off_t pos, int op, int hard)
 	}
 	else
 	{
-		l = ap->io->next - (ap->io->buffer + MAXUNREAD);
+		l = ap->io->next - (ap->io->buffer + ap->io->unread);
 		u = ap->io->last - ap->io->next;
 		if (op == SEEK_CUR)
 		{
@@ -739,7 +766,7 @@ bseek(register Archive_t* ap, off_t pos, int op, int hard)
 			return ap->io->count = pos;
 		}
 	}
-	ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
+	ap->io->next = ap->io->last = ap->io->buffer + ap->io->unread;
 	message((-8, "lseek(%s,%I*d,%d)", ap->name, sizeof(pos), pos + ap->io->offset, op));
 	if ((u = lseek(ap->io->fd, ap->io->offset + pos, op)) < 0 && (op != SEEK_SET || (u = pos - ap->io->count) < 0 || u > 0 && bread(ap, NiL, u, u, 1) != u || !(u += ap->io->count + ap->io->offset)))
 		return -1;
@@ -758,11 +785,12 @@ bflushout(register Archive_t* ap)
 	register int	n;
 	register int	c;
 
-	if (n = ap->io->next - ap->io->buffer)
+	if (n = ap->io->next - (ap->io->buffer + ap->io->unread))
 	{
-		ap->io->next = ap->io->buffer;
+		ap->io->next = ap->io->buffer + ap->io->unread;
 		while ((c = write(ap->io->fd, ap->io->next, n)) != n)
 		{
+			message((-8, "write(%s,%d): %s", ap->name, c, show(ap->io->next, c)));
 			if (c <= 0)
 				newio(ap, c, n);
 			else
@@ -771,8 +799,10 @@ bflushout(register Archive_t* ap)
 				n -= c;
 			}
 		}
-		ap->io->next = ap->io->buffer;
+		message((-8, "write(%s,%d): %s", ap->name, c, show(ap->io->next, c)));
+		ap->io->next = ap->io->buffer + ap->io->unread;
 	}
+	message((-7, "bflushout(%s) %s", ap->name, bstatus(ap->io)));
 }
 
 /*
@@ -845,7 +875,7 @@ bwrite(register Archive_t* ap, void* ab, register off_t n)
 #endif
 		for (;;)
 		{
-			if ((c = ap->io->buffer + state.blocksize - ap->io->next) <= n)
+			if ((c = ap->io->buffer + ap->io->unread + state.blocksize - ap->io->next) <= n)
 			{
 				if (c)
 				{
@@ -853,20 +883,20 @@ bwrite(register Archive_t* ap, void* ab, register off_t n)
 					n -= c;
 					b += c;
 				}
-				ap->io->next = ap->io->buffer;
+				ap->io->next = ap->io->buffer + ap->io->unread;
 				while ((c = write(ap->io->fd, ap->io->next, state.blocksize)) != state.blocksize)
 				{
 					if (c <= 0)
 						newio(ap, c, n);
 					else
 					{
-						memcpy(state.tmp.buffer, ap->io->buffer + c, state.blocksize - c);
-						memcpy(ap->io->buffer, state.tmp.buffer, state.blocksize - c);
-						ap->io->next = ap->io->buffer + state.blocksize - c;
+						memcpy(state.tmp.buffer, ap->io->buffer + ap->io->unread + c, state.blocksize - c);
+						memcpy(ap->io->buffer + ap->io->unread, state.tmp.buffer, state.blocksize - c);
+						ap->io->next = ap->io->buffer + ap->io->unread + state.blocksize - c;
 						break;
 					}
 				}
-				message((-8, "write(%s,%ld): %s", ap->name, c, show(ap->io->buffer, c)));
+				message((-8, "write(%s,%ld): %s", ap->name, c, show(ap->io->buffer + ap->io->unread, c)));
 			}
 			else
 			{
@@ -895,9 +925,9 @@ bput(register Archive_t* ap, register off_t n)
 		ap->memsum = memsum(ap->io->next, n, ap->memsum);
 	if (state.checksum.sum && SECTION(ap) == SECTION_DATA)
 		sumblock(state.checksum.sum, ap->io->next, n);
-	if ((ap->io->next += n) > ap->io->buffer + state.blocksize)
+	if ((ap->io->next += n) > ap->io->buffer + ap->io->unread + state.blocksize)
 	{
-		n = (ap->io->next - ap->io->buffer) - state.blocksize;
+		n = (ap->io->next - (ap->io->buffer + ap->io->unread)) - state.blocksize;
 		ap->io->count -= n;
 
 		/*
@@ -905,7 +935,7 @@ bput(register Archive_t* ap, register off_t n)
 		 */
 
 		ap->raw++;
-		bwrite(ap, ap->io->next = ap->io->buffer + state.blocksize, n);
+		bwrite(ap, ap->io->next = ap->io->buffer + ap->io->unread + state.blocksize, n);
 		ap->raw--;
 	}
 }
@@ -1187,5 +1217,5 @@ newio(register Archive_t* ap, int c, int n)
 	else
 		ap->part++;
 	if (ap->format->putprologue)
-		(*ap->format->putprologue)(&state, ap);
+		(*ap->format->putprologue)(&state, ap, 0);
 }

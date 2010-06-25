@@ -49,7 +49,8 @@ copyin(register Archive_t* ap)
 				ap->info->checksum = ap->memsum;
 			gettrailer(ap, f);
 		}
-		getepilogue(ap);
+		if (!getepilogue(ap))
+			break;
 	}
 	deltaverify(ap);
 }
@@ -93,14 +94,9 @@ fileout(register Archive_t* ap, register File_t* f)
 	Buffer_t*		bp;
 
 	if (f->delta.op == DELTA_verify)
-	{
 		ap->selected--;
-		if (f->fd >= 0)
-			close(f->fd);
-	}
-	else
+	else if (putheader(ap, f))
 	{
-		putheader(ap, f);
 		if (!ap->format->putdata || !(*ap->format->putdata)(&state, ap, f, f->fd))
 		{
 			err = 0;
@@ -153,20 +149,11 @@ fileout(register Archive_t* ap, register File_t* f)
 					bput(ap, n);
 				}
 			}
-			if (f->fd >= 0)
-				close(f->fd);
 		}
 		puttrailer(ap, f);
 	}
-	if (state.acctime && f->type != X_IFLNK && !f->skip && !f->extended)
-	{
-		Tv_t	av;
-		Tv_t	mv;
-
-		tvgetatime(&av, f->st);
-		tvgetmtime(&mv, f->st);
-		settime(f->name, &av, &mv, NiL);
-	}
+	if (f->fd >= 0)
+		closein(ap, f, f->fd);
 }
 
 /*
@@ -184,6 +171,8 @@ filein(register Archive_t* ap, register File_t* f)
 	long		checksum;
 	Filter_t*	fp;
 	Proc_t*		pp;
+	Tv_t		t1;
+	Tv_t		t2;
 	struct stat	st;
 
 	if (f->skip)
@@ -281,7 +270,7 @@ filein(register Archive_t* ap, register File_t* f)
 			error(3, "%s: base archive mismatch [%s#%d]", f->name, __FILE__, __LINE__);
 		if ((*state.statf)(f->name, &st))
 			error(2, "%s: not copied from base archive", f->name);
-		else if (st.st_size != f->delta.base->size || state.modtime && st.st_mtime != f->st->st_mtime)
+		else if (st.st_size != f->delta.base->size || state.modtime && tvcmp(tvmtime(&t1, &st), tvmtime(&t2, f->st)))
 			error(1, "%s: changed from base archive", f->name);
 		break;
 	case DELTA_delete:
@@ -389,7 +378,7 @@ copyinout(Ftw_t* ftw)
 				}
 				holedone(wfd);
 				closeout(state.out, f, wfd);
-				close(rfd);
+				closein(state.out, f, rfd);
 				setfile(state.out, f);
 				listentry(f);
 			}
@@ -460,7 +449,20 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 	if (ap)
 	{
 		deltabase(ap);
-		putprologue(ap);
+		if (ap->delta && ap->delta->format != ap->expected && ap->expected)
+			error(3, "%s: archive format %s does not match requested format %s", ap->name, ap->delta->format->name, ap->expected->name);
+		if (state.append || state.update)
+		{
+			ap->format = ap->delta->format;
+			if (!(ap->format->flags & APPEND))
+				error(3, "%s: archive format %s does support append/update", ap->name, ap->format->name);
+			if (state.update)
+				ap->update = ap->delta->tab;
+			ap->delta = 0;
+			ap->parent = 0;
+			ap->volume--;
+		}
+		putprologue(ap, state.append || state.update);
 	}
 	if (state.files)
 		ftwalk((char*)state.files, copyfile, state.ftwflags|FTW_MULTIPLE, state.exact ? (Ftw_cmp_t)0 : cmpftw);
@@ -558,18 +560,4 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 		deltadelete(ap);
 		putepilogue(ap);
 	}
-}
-
-/*
- * position archive for appending
- */
-
-void
-append(register Archive_t* ap)
-{
-	if (state.update)
-		initdelta(ap, NiL);
-	ap->format = 0;
-	copyin(ap);
-	state.append = 0;
 }

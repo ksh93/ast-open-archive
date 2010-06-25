@@ -324,19 +324,19 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 					if (state->documentroot.size)
 					{
 						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s%s", state->documentroot.data, (flags & SECURE) ? "/secure" : "", s);
-						pathcanon(s = state->buf, 0);
+						pathcanon(s = state->buf, sizeof(state->buf), 0);
 					}
 					else if (state->root.size)
 					{
 						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s", state->root.data, (flags & SECURE) ? "/secure" : "", s);
-						pathcanon(s = state->buf, 0);
+						pathcanon(s = state->buf, sizeof(state->buf), 0);
 					}
 				}
 			}
 			else if (prefix)
 			{
 				sfsprintf(state->buf, sizeof(state->buf) - 1, "%-.*s%s", prefix, path, s);
-				pathcanon(s = state->buf, 0);
+				pathcanon(s = state->buf, sizeof(state->buf), 0);
 			}
 			else if (flags & SECURE)
 			{

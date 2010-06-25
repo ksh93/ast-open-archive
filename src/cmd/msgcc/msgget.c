@@ -90,7 +90,7 @@ main(int argc, char** argv)
 		loc = 0;
 	if (cat = strchr(cmd, ':'))
 		*cat++ = 0;
-	if (!mcfind(path, loc, cmd, LC_MESSAGES, 0) && (!cat || !mcfind(path, loc, cat, LC_MESSAGES, 0)))
+	if (!mcfind(loc, cmd, LC_MESSAGES, 0, path, sizeof(path)) && (!cat || !mcfind(loc, cat, LC_MESSAGES, 0, path, sizeof(path))))
 	{
 		if (cat)
 			*--cat = ':';

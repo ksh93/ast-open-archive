@@ -64,7 +64,8 @@ typedef struct Tarheader_s Tarheader_t;
 #define PANIC		ERROR_PANIC|ERROR_SOURCE,__FILE__,__LINE__
 
 #define bcount(ap)	((ap)->io->last-(ap)->io->next)
-#define bsave(ap)	(state.backup=(*(ap)->io))
+#define bsave(ap)	(state.backup=(*(ap)->io),error(-7, "bsave(%s,@%I*d)", ap->name, sizeof(ap->io->count), ap->io->count))
+#define tvmtime(t,s)	(tvgetmtime(t,s),t)
 
 #define BUFFER_FD_MAX	(-2)
 #define BUFFER_FD_MIN	(-3)
@@ -132,6 +133,7 @@ typedef struct Tarheader_s Tarheader_t;
 #define SLASHDIR	PAX_SLASHDIR	/* trailing slash => directory	*/
 #define STANDARD	PAX_STANDARD	/* the standard format		*/
 #define SUM		PAX_SUM		/* inline member checksum	*/
+#define APPEND		PAX_APPEND	/* archive append		*/
 
 #define SETIDS		(1<<0)		/* set explicit uid and gid	*/
 
@@ -229,9 +231,11 @@ struct Member_s; typedef struct Member_s Member_t;
 	off_t		expand;		/* add to count at end		*/ \
 	off_t		offset;		/* volume offset		*/ \
 	off_t		size;		/* total size if seekable	*/ \
+	unsigned int	fill;		/* bsave fill serial		*/ \
 	int		skip;		/* volume skip			*/ \
 	int		keep;		/* volume keep after skip	*/ \
 	int		mode;		/* open() O_* mode		*/ \
+	int		unread;		/* max unread size		*/ \
 	unsigned int	all:1;		/* read all volumes		*/ \
 	unsigned int	blocked:1;	/* blocked device io		*/ \
 	unsigned int	blok:1;		/* BLOK io file			*/ \
@@ -374,6 +378,7 @@ typedef struct Delta_s			/* delta archive info		*/
 	int		compress;	/* delta source is /dev/null	*/
 	int		epilogue;	/* epilogue hit			*/
 	int		index;		/* member index			*/
+	int		initialized;	/* delta base initialized	*/
 	Format_t*	format;		/* delta format			*/
 	char*		hdr;		/* header pointer		*/
 	char		hdrbuf[64];	/* header buffer		*/
@@ -401,6 +406,13 @@ struct Filter_s
 	char**		argv;		/* command argv			*/
 	char**		patharg;	/* file arg in argv		*/
 };
+
+typedef struct Pattern_s
+{
+	char*		pattern;
+	unsigned char	directory;
+	unsigned char	matched;
+} Pattern_t;
 
 #define _PAX_ARCHIVE_PRIVATE_ \
 	unsigned long	checksum;	/* running checksum		*/ \
@@ -459,10 +471,11 @@ struct Filter_s
 	off_t		total;		/* newio() total io check	*/ \
 	char*		type;		/* archive type			*/ \
 	off_t		uncompressed;	/* uncompressed size estimate	*/ \
+	Hash_table_t*	update;		/* update info			*/ \
 	int		warnlinkhead;	/* invalid hard link header	*/
 
 #define _PAX_PRIVATE_ \
-	int		acctime;	/* reset file access times	*/ \
+	int		acctime;	/* preserve member access times	*/ \
 	int		append;		/* append -- must be 0 or 1 !!!	*/ \
 	Bio_t		backup;		/* backup() position		*/ \
 	long		blocksize;	/* explicit buffer size		*/ \
@@ -565,7 +578,8 @@ struct Filter_s
 	int		owner;		/* set owner info		*/ \
 	Archive_t*	out;		/* output archive info		*/ \
 	int		pass;		/* archive to archive		*/ \
-	char**		patterns;	/* name match patterns		*/ \
+	Pattern_t*	pattern;	/* current name match pattern	*/ \
+	Pattern_t*	patterns;	/* name match patterns		*/ \
 	char*		peekfile;	/* stdin file list peek		*/ \
 	int		peeklen;	/* peekfile length		*/ \
 	char		pwd[PATH_MAX];	/* full path of .		*/ \
@@ -587,6 +601,7 @@ struct Filter_s
 	char*		trailer;	/* file trailer			*/ \
 	int		trailerlen;	/* file trailer length		*/ \
 	}		record;		/* record info			*/ \
+	int		resetacctime;	/* reset input file access times*/ \
 	Hash_table_t*	restore;	/* post proc restoration table	*/ \
 	Sfio_t*		rtty;		/* tty file read pointer	*/ \
 	int		scanned;	/* scanned for format libs	*/ \
@@ -638,7 +653,6 @@ extern Format_t*	formats;
 extern State_t		state;
 
 extern int		addlink(Archive_t*, File_t*);
-extern void		append(Archive_t*);
 extern int		apply(Archive_t*, File_t*, Filter_t*);
 extern long		asc_checksum(char*, int, unsigned long);
 extern void		backup(Archive_t*);
@@ -653,6 +667,7 @@ extern off_t		bseek(Archive_t*, off_t, int, int);
 extern int		bskip(Archive_t*);
 extern void		bunread(Archive_t*, void*, int);
 extern void		bwrite(Archive_t*, void*, off_t);
+extern int		closein(Archive_t*, File_t*, int);
 extern int		closeout(Archive_t*, File_t*, int);
 extern int		cmpftw(Ftw_t*, Ftw_t*);
 extern void		complete(Archive_t*, File_t*, size_t);
@@ -668,7 +683,7 @@ extern void		deltaout(Archive_t*, Archive_t*, File_t*);
 extern void		deltapass(Archive_t*, Archive_t*);
 extern void		deltaset(Archive_t*, char*);
 extern void		deltaverify(Archive_t*);
-extern int		dirprefix(char*, char*);
+extern int		dirprefix(char*, char*, int);
 extern void		filein(Archive_t*, File_t*);
 extern void		fileout(Archive_t*, File_t*);
 extern void		fileskip(Archive_t*, File_t*);
@@ -677,7 +692,7 @@ extern void		finish(int);
 extern Archive_t*	getarchive(int);
 extern void		getdeltaheader(Archive_t*, File_t*);
 extern void		getdeltatrailer(Archive_t*, File_t*);
-extern void		getepilogue(Archive_t*);
+extern int		getepilogue(Archive_t*);
 extern int		getfile(Archive_t*, File_t*, Ftw_t*);
 extern Format_t*	getformat(char*, int);
 extern int		getheader(Archive_t*, File_t*);
@@ -688,7 +703,7 @@ extern ssize_t		holewrite(int, void*, size_t);
 extern Archive_t*	initarchive(const char*, int);
 extern void		initdelta(Archive_t*, Format_t*);
 extern void		initfile(Archive_t*, File_t*, struct stat*, char*, int);
-extern char**		initmatch(char**);
+extern void		initmatch(char**);
 extern void		interactive(void);
 extern void		listentry(File_t*);
 extern int		listprintf(Sfio_t*, Archive_t*, File_t*, const char*);
@@ -710,7 +725,7 @@ extern void		putepilogue(Archive_t*);
 extern int		putheader(Archive_t*, File_t*);
 extern void		putinfo(Archive_t*, char*, unsigned long, unsigned long);
 extern void		putkey(Archive_t*, Sfio_t*, Option_t*, const char*, Sfulong_t);
-extern void		putprologue(Archive_t*);
+extern void		putprologue(Archive_t*, int);
 extern void		puttrailer(Archive_t*, File_t*);
 extern char*		release(void);
 extern int		restore(const char*, char*, void*);

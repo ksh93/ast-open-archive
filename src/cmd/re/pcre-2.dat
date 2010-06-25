@@ -1,4 +1,4 @@
-: converted from the pcre testdata/testinput2 2001-06-15
+: converted from the pcre testdata/testinput2 2010-06-20
 
 E	abc	abc	(0,3)
 E	SAME	defabc	(3,6)
@@ -86,12 +86,12 @@ Em	<.*?>	abc<def>ghi<klm>nop	(3,8)
 E	<.**>	abc<def>ghi<klm>nop	(3,16)
 Em	<.**>	abc<def>ghi<klm>nop	(3,8)
 Em	<.*>	abc<def>ghi<klm>nop	(3,8)
-E	<.*>(?U)	abc<def>ghi<klm>nop	(3,16)
-E	(?U)<.*>	abc<def>ghi<klm>nop	(3,8)
+Ev	<.*>(?U)	abc<def>ghi<klm>nop	(3,16)
+Ev	(?U)<.*>	abc<def>ghi<klm>nop	(3,8)
 E	<.*>(?-g)	abc<def>ghi<klm>nop	(3,16)
 E	(?-g)<.*>	abc<def>ghi<klm>nop	(3,8)
 Em	={3,}	abc========def	(3,6)
-E	(?U)={3,}?	abc========def	(3,11)
+Ev	(?U)={3,}?	abc========def	(3,11)
 E	(?<!foo|bar)baz	baz	(0,3)
 E	SAME	foobaz	NOMATCH
 E	SAME	barbaz	NOMATCH
@@ -139,7 +139,7 @@ En	a$	a	(0,1)
 En$	SAME	a\n	(0,1)
 En$	SAME	\\Za\n	(2,3)
 En$	SAME	\\Za	(2,3)
-E$	^((a+)(?U)([ab]+)(?-U)([bc]+)(\\w*))	aaaaabbbbbcccccdef	(0,18)(0,18)(0,5)(5,6)(6,15)(15,18)
+E$v	^((a+)(?U)([ab]+)(?-U)([bc]+)(\\w*))	aaaaabbbbbcccccdef	(0,18)(0,18)(0,5)(5,6)(6,15)(15,18)
 En	(?>^abc)	abc	(0,3)
 En$	SAME	def\nabc	(4,7)
 En$	SAME	defabc	NOMATCH

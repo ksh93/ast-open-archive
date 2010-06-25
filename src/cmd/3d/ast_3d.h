@@ -44,7 +44,6 @@
 #define hashsize	_3d_hashsize
 #define hashwalk	_3d_hashwalk
 #define pathbin		_3d_pathbin
-#define pathcat		_3d_pathcat
 #define pathcheck	_3d_pathcheck
 #define pathshell	_3d_pathshell
 #define pathtemp	_3d_pathtemp

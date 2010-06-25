@@ -244,7 +244,7 @@ pathreal(const char* apath, register int type, struct stat* st)
 	if (type & P_DOTDOT)
 		strcpy(sp, "/..");
 	sp = state.path.name;
-	if (!(ip = pathcanon(sp + safe_dir, 0)))
+	if (!(ip = pathcanon(sp + safe_dir, sizeof(state.path.name) - safe_dir, 0)))
 	{
 		errno = ENOENT;
 		return 0;

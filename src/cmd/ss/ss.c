@@ -221,7 +221,7 @@ main(int argc, char** argv)
 	if (state.keys)
 		while (!(state.keys & SORT))
 			state.keys >>= SHIFT;
-	if (!pathpath(buf, CS_STAT_DIR, argv[0], PATH_EXECUTE))
+	if (!pathpath(CS_STAT_DIR, argv[0], PATH_EXECUTE, buf, sizeof(buf)))
 		error(3, "%s: cannot find data directory", CS_STAT_DIR);
 	if (!(state.next = state.base = newof(0, Sys_t*, n = 64, 0)))
 		error(3, "out of space [vec %d]", n);

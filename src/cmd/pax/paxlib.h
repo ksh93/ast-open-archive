@@ -57,6 +57,7 @@
 #define PAX_STANDARD	(1L<<15)	/* the standard format		*/
 #define PAX_SUM		(1L<<16)	/* inline member checksum	*/
 #define PAX_DELTAIO	(1L<<17)	/* separate delta io		*/
+#define PAX_APPEND	(1L<<18)	/* archive append		*/
 
 #define PAX_FORMAT	(1L<<24)	/* first format specific flag	*/
 
@@ -140,7 +141,7 @@ struct Paxformat_s			/* format info			*/
 	int		(*getdata)(Pax_t*, Paxarchive_t*, Paxfile_t*, int);
 	int		(*gettrailer)(Pax_t*, Paxarchive_t*, Paxfile_t*);
 	int		(*getepilogue)(Pax_t*, Paxarchive_t*);
-	int		(*putprologue)(Pax_t*, Paxarchive_t*);
+	int		(*putprologue)(Pax_t*, Paxarchive_t*, int);
 	int		(*putheader)(Pax_t*, Paxarchive_t*, Paxfile_t*);
 	int		(*putdata)(Pax_t*, Paxarchive_t*, Paxfile_t*, int);
 	int		(*puttrailer)(Pax_t*, Paxarchive_t*, Paxfile_t*);

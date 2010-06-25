@@ -172,7 +172,7 @@ vdb_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 }
 
 static int
-vdb_putprologue(Pax_t* pax, register Archive_t* ap)
+vdb_putprologue(Pax_t* pax, register Archive_t* ap, int append)
 {
 	register Vdb_t*	vdb = (Vdb_t*)ap->data;
 
@@ -182,6 +182,8 @@ vdb_putprologue(Pax_t* pax, register Archive_t* ap)
 			nospace();
 		ap->data = vdb;
 	}
+	if (append)
+		return 0;
 	sfprintf(vdb->directory, "%c%s%c%s\n", VDB_DELIMITER, VDB_MAGIC, VDB_DELIMITER, state.volume);
 	paxwrite(pax, ap, sfstrbase(vdb->directory), sfstrtell(vdb->directory));
 	sfstrseek(vdb->directory, 0, SEEK_SET);

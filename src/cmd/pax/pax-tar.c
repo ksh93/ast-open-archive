@@ -60,6 +60,7 @@ putkey(Archive_t* ap, Sfio_t* sp, Option_t* op, const char* value, Sfulong_t num
 		n = sfprintf(ap->tmp.key, "%I*u", sizeof(number), number);
 		sfstrseek(ap->tmp.key, 0, SEEK_SET);
 	}
+	error(-5, "putkey %s=%s", op->name, value ? value : sfstrseek(ap->tmp.key, 0, SEEK_CUR));
 	n += strlen(op->name) + 3 + ((op->flags & OPT_VENDOR) ? sizeof(VENDOR) : 0);
 	o = 0;
 	for (;;)
@@ -345,7 +346,8 @@ extend(Archive_t* ap, File_t* f, int type)
 	case EXTTYPE:
 		sp = ap->tmp.extended;
 		fmt = state.header.extended;
-		lev = alt = 7;
+		lev = 7;
+		alt = 4;
 		break;
 	case GLBTYPE:
 		sp = ap->tmp.global;
@@ -389,7 +391,7 @@ extend(Archive_t* ap, File_t* f, int type)
 							tvgetctime(&tv, f->st);
 							break;
 						}
-						if (!tv.tv_nsec)
+						if (!tv.tv_nsec && op->index == OPT_mtime)
 							continue;
 						s = num + sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
 						while (*(s - 1) == '0')
@@ -747,7 +749,7 @@ tar_done(Pax_t* pax, register Archive_t* ap)
 }
 
 static int
-tar_putprologue(Pax_t* pax, register Archive_t* ap)
+tar_putprologue(Pax_t* pax, register Archive_t* ap, int append)
 {
 	if (!(ap->data = newof(0, Tar_t, 1, 0)))
 		nospace();
@@ -947,7 +949,7 @@ tar_event(Pax_t* pax, Archive_t* ap, File_t* f, void* data, unsigned long event)
 }
 
 static int
-pax_putprologue(Pax_t* pax, register Archive_t* ap)
+pax_putprologue(Pax_t* pax, register Archive_t* ap, int append)
 {
 	Format_t*		fp;
 	Hash_position_t*	hp;
@@ -956,6 +958,8 @@ pax_putprologue(Pax_t* pax, register Archive_t* ap)
 
 	if (!(ap->data = newof(0, Tar_t, 1, 0)) || !(ap->tmp.global = sfstropen()) || !(ap->tmp.extended = sfstropen()) || !(ap->tmp.key = sfstropen()))
 		nospace();
+	if (append)
+		return 0;
 	if (hp = hashscan(state.options, 0))
 	{
 		while (hashnext(hp))
@@ -990,7 +994,7 @@ Format_t	pax_tar_format =
 	0,
 	"pre-POSIX tar with symlinks",
 	OLD,
-	ARCHIVE|LINKTYPE|SLASHDIR|IN|OUT,
+	ARCHIVE|LINKTYPE|SLASHDIR|IN|OUT|APPEND,
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
@@ -1021,7 +1025,7 @@ Format_t	pax_pax_format =
 	0,
 	"POSIX 1003.1-2001 extended ustar",
 	PAX,
-	ARCHIVE|DELTAINFO|LINKTYPE|SLASHDIR|STANDARD|SUM|IN|OUT,
+	ARCHIVE|DELTAINFO|LINKTYPE|SLASHDIR|STANDARD|SUM|IN|OUT|APPEND,
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
@@ -1052,7 +1056,7 @@ Format_t	pax_ustar_format =
 	"tar",
 	"POSIX 1003.1-1988 tar",
 	TAR,
-	ARCHIVE|LINKTYPE|SLASHDIR|IN|OUT,
+	ARCHIVE|LINKTYPE|SLASHDIR|IN|OUT|APPEND,
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,

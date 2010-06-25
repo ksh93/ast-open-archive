@@ -22,14 +22,15 @@
 #include <dirent.h>
 #include <tm.h>
 
-char* getrdir(rp, buf)
+char* getrdir(rp, buf, bufsize)
 	register char*	rp;
 	char*		buf;
+	int		bufsize;
 {
 	register char*	s;
 
 	strcpy(buf, rp);
-	if (!(s = pathcanon(buf, PATH_PHYSICAL|PATH_EXISTS)))
+	if (!(s = pathcanon(buf, bufsize, PATH_PHYSICAL|PATH_EXISTS)))
 		return 0;
 	*s++ = '/';
 	strcpy(s, REPL_DIR);
@@ -51,7 +52,7 @@ int replica_creat(path, sf)
 	int			cnt = 0;
 	struct stat		st;
 
-	if (((rd = getrdir(path, dirbuf)) == NULL) || (dir = opendir(rd)) == NULL)
+	if (((rd = getrdir(path, dirbuf, sizeof(dirbuf))) == NULL) || (dir = opendir(rd)) == NULL)
 		return (-1);
 
 	e = rd + sizeof(dirbuf);
@@ -116,7 +117,7 @@ int replica(path, df, tp)
 	struct stat		st;
 
 
-	if (((rd = getrdir(path, dirbuf)) == NULL) || (dir = opendir(rd)) == NULL)
+	if (((rd = getrdir(path, dirbuf, sizeof(dirbuf))) == NULL) || (dir = opendir(rd)) == NULL)
 		return (-1);
 
 	e = rd + sizeof(dirbuf) - 1;

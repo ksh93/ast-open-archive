@@ -300,7 +300,7 @@ ccflags(register char* s, struct var* v)
 				*u = n;
 			break;
 		case 'I':
-			pathcanon(s += 2, 0);
+			pathcanon(s += 2, 0, 0);
 			if (s[0] && (s[0] != '.' || s[1]) && !omitted(s))
 				initdir(s, ".h");
 			break;
@@ -345,7 +345,7 @@ initrule(const char* as, char* ar, void* handle)
 	if (!(x = newof(0, struct local, 1, 0)))
 		error(3, "out of space");
 	r->local.pointer = (char*)x;
-	pathcanon(r->name, 0);
+	pathcanon(r->name, 0, 0);
 	s = r->name + strlen(r->name);
 	if (s >= r->name + 2 && *(s -= 2) == '.')
 		x->suffix = s + 1;

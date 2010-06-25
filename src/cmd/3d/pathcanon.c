@@ -34,7 +34,7 @@
 #include "3d.h"
 
 char*
-pathcanon(char* path, int phys)
+pathcanon(char* path, size_t size, int phys)
 {
 	register char*	sp;
 	register char*	dp = path;
@@ -44,6 +44,7 @@ pathcanon(char* path, int phys)
 	long		visits = 0;
 
 	message((-6, "patcanon: ++ %s%s", path, phys ? " [PHYSICAL]" : ""));
+	if (!size) size = strlen(dp) + 1;
 #if PRESERVE_LEADING_SLASH_SLASH
 	if (*dp == '/' && *(dp + 1) == '/')
 		path = ++dp;

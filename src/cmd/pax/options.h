@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -110,51 +110,52 @@
 #define OPT_mode		70
 #define OPT_mtime		71
 #define OPT_name		72
-#define OPT_nlink		73
-#define OPT_options		74
-#define OPT_ordered		75
-#define OPT_owner		76
-#define OPT_passphrase		77
-#define OPT_path		78
-#define OPT_physical		79
-#define OPT_pid			80
-#define OPT_preserve		81
-#define OPT_read		82
-#define OPT_record_charset	83
-#define OPT_record_delimiter	84
-#define OPT_record_format	85
-#define OPT_record_header	86
-#define OPT_record_line		87
-#define OPT_record_match	88
-#define OPT_record_pad		89
-#define OPT_record_size		90
-#define OPT_record_trailer	91
-#define OPT_release		92
-#define OPT_reset_atime		93
-#define OPT_sequence		94
-#define OPT_size		95
-#define OPT_strict		96
-#define OPT_summary		97
-#define OPT_symlink		98
-#define OPT_sync		99
-#define OPT_tape		100
-#define OPT_test		101
-#define OPT_testdate		102
-#define OPT_times		103
-#define OPT_tmp			104
-#define OPT_to			105
-#define OPT_typeflag		106
-#define OPT_uid			107
-#define OPT_uname		108
-#define OPT_unblocked		109
-#define OPT_uncompressed	110
-#define OPT_update		111
-#define OPT_verbose		112
-#define OPT_verify		113
-#define OPT_version		114
-#define OPT_warn		115
-#define OPT_write		116
-#define OPT_yes			117
+#define OPT_newer		73
+#define OPT_nlink		74
+#define OPT_options		75
+#define OPT_ordered		76
+#define OPT_owner		77
+#define OPT_passphrase		78
+#define OPT_path		79
+#define OPT_physical		80
+#define OPT_pid			81
+#define OPT_preserve		82
+#define OPT_read		83
+#define OPT_record_charset	84
+#define OPT_record_delimiter	85
+#define OPT_record_format	86
+#define OPT_record_header	87
+#define OPT_record_line		88
+#define OPT_record_match	89
+#define OPT_record_pad		90
+#define OPT_record_size		91
+#define OPT_record_trailer	92
+#define OPT_release		93
+#define OPT_reset_atime		94
+#define OPT_sequence		95
+#define OPT_size		96
+#define OPT_strict		97
+#define OPT_summary		98
+#define OPT_symlink		99
+#define OPT_sync		100
+#define OPT_tape		101
+#define OPT_test		102
+#define OPT_testdate		103
+#define OPT_times		104
+#define OPT_tmp			105
+#define OPT_to			106
+#define OPT_typeflag		107
+#define OPT_uid			108
+#define OPT_uname		109
+#define OPT_unblocked		110
+#define OPT_uncompressed	111
+#define OPT_update		112
+#define OPT_verbose		113
+#define OPT_verify		114
+#define OPT_version		115
+#define OPT_warn		116
+#define OPT_write		117
+#define OPT_yes			118
 
 typedef struct Option_s
 {

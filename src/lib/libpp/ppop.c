@@ -177,7 +177,7 @@ ppmapinclude(char* file, register char* s)
 			}
 			if (!token)
 				break;
-			pathcanon(pp.token, 0);
+			pathcanon(pp.token, 0, 0);
 			fp = ppsetfile(pp.token);
 			if (mp)
 			{
@@ -385,7 +385,7 @@ ppop(int op, ...)
 		}
 		else if (!pp.c)
 		{
-			if (!*p || stat((pathcanon(p, 0), p), &st))
+			if (!*p || stat((pathcanon(p, 0, 0), p), &st))
 				pp.c = c;
 			else
 			{
@@ -552,7 +552,7 @@ ppop(int op, ...)
 		}
 		else if (!pp.hosted)
 		{
-			if (!*p || stat((pathcanon(p, 0), p), &st))
+			if (!*p || stat((pathcanon(p, 0, 0), p), &st))
 				pp.hosted = 1;
 			else
 			{
@@ -582,7 +582,7 @@ ppop(int op, ...)
 	case PP_IGNORE:
 		if (p = va_arg(ap, char*))
 		{
-			pathcanon(p, 0);
+			pathcanon(p, 0, 0);
 			ppsetfile(p)->guard = INC_IGNORE;
 			message((-3, "%s: ignore", p));
 		}
@@ -595,7 +595,7 @@ ppop(int op, ...)
 	case PP_INCLUDE:
 		if ((p = va_arg(ap, char*)) && *p)
 		{
-			pathcanon(p, 0);
+			pathcanon(p, 0, 0);
 			if (stat(p, &st))
 				break;
 			for (dp = pp.stddirs; dp = dp->next;)
@@ -838,7 +838,7 @@ ppop(int op, ...)
 				if (ppsearch(pp.ppdefault, T_STRING, SEARCH_EXISTS) < 0)
 				{
 					free(pp.ppdefault);
-					if (!(pp.ppdefault = pathprobe(pp.path, NiL, "C", pp.pass, pp.probe ? pp.probe : PPPROBE, 0)))
+					if (!(pp.ppdefault = pathprobe("C", pp.pass, pp.probe ? pp.probe : PPPROBE, 0, pp.path, MAXTOKEN + 1, NiL, 0)))
 						error(1, "cannot determine default definitions for %s", pp.probe ? pp.probe : PPPROBE);
 				}
 				if (pp.probe)
@@ -1103,7 +1103,7 @@ ppop(int op, ...)
 				error_info.file = 0;
 				if (*p)
 				{
-					pathcanon(p, 0);
+					pathcanon(p, 0, 0);
 					p = ppsetfile(p)->name;
 				}
 			}
@@ -1529,7 +1529,7 @@ ppop(int op, ...)
 				else
 					dp->type &= ~TYPE_VENDOR;
 		}
-		else if (!stat((pathcanon(p, 0), p), &st))
+		else if (!stat((pathcanon(p, 0, 0), p), &st))
 		{
 			c = 0;
 			for (dp = pp.firstdir; dp; dp = dp->next)

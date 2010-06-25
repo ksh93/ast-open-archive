@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make nmake
 make archive.o
@@ -90,6 +90,8 @@ done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -101,9 +103,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -175,7 +174,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done make.h
 done archive.c
-meta archive.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/archive.c archive
+meta archive.o %.c>%.o archive.c archive
 prev archive.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c archive.c
 done archive.o generated
@@ -185,7 +184,7 @@ make options.h implicit
 done options.h
 prev make.h implicit
 done bind.c
-meta bind.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/bind.c bind
+meta bind.o %.c>%.o bind.c bind
 prev bind.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c bind.c
 done bind.o generated
@@ -195,7 +194,7 @@ make ${PACKAGE_ast_INCLUDE}/sig.h implicit
 done ${PACKAGE_ast_INCLUDE}/sig.h
 prev make.h implicit
 done command.c
-meta command.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/command.c command
+meta command.o %.c>%.o command.c command
 prev command.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c command.c
 done command.o generated
@@ -203,7 +202,7 @@ make dump.o
 make dump.c
 prev make.h implicit
 done dump.c
-meta dump.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/dump.c dump
+meta dump.o %.c>%.o dump.c dump
 prev dump.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dump.c
 done dump.o generated
@@ -219,7 +218,7 @@ make expand.h implicit
 done expand.h
 prev make.h implicit
 done expand.c
-meta expand.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/expand.c expand
+meta expand.o %.c>%.o expand.c expand
 prev expand.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expand.c
 done expand.o generated
@@ -240,7 +239,7 @@ prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev options.h implicit
 prev make.h implicit
 done main.c
-meta main.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/main.c main
+meta main.o %.c>%.o main.c main
 prev main.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
 done main.o generated
@@ -248,7 +247,7 @@ make make.o
 make make.c
 prev make.h implicit
 done make.c
-meta make.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/make.c make
+meta make.o %.c>%.o make.c make
 prev make.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c make.c
 done make.o generated
@@ -256,7 +255,7 @@ make mam.o
 make mam.c
 prev make.h implicit
 done mam.c
-meta mam.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/mam.c mam
+meta mam.o %.c>%.o mam.c mam
 prev mam.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c mam.c
 done mam.o generated
@@ -264,7 +263,7 @@ make metarule.o
 make metarule.c
 prev make.h implicit
 done metarule.c
-meta metarule.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/metarule.c metarule
+meta metarule.o %.c>%.o metarule.c metarule
 prev metarule.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c metarule.c
 done metarule.o generated
@@ -272,7 +271,7 @@ make misc.o
 make misc.c
 prev make.h implicit
 done misc.c
-meta misc.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/misc.c misc
+meta misc.o %.c>%.o misc.c misc
 prev misc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c misc.c
 done misc.o generated
@@ -287,7 +286,7 @@ done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev options.h implicit
 prev make.h implicit
 done object.c
-meta object.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/object.c object
+meta object.o %.c>%.o object.c object
 prev object.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c object.c
 done object.o generated
@@ -296,7 +295,7 @@ make option.c
 prev options.h implicit
 prev make.h implicit
 done option.c
-meta option.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/option.c option
+meta option.o %.c>%.o option.c option
 prev option.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
@@ -306,7 +305,7 @@ prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev options.h implicit
 prev make.h implicit
 done parse.c
-meta parse.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/parse.c parse
+meta parse.o %.c>%.o parse.c parse
 prev parse.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c parse.c
 done parse.o generated
@@ -314,7 +313,7 @@ make read.o
 make read.c
 prev make.h implicit
 done read.c
-meta read.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/read.c read
+meta read.o %.c>%.o read.c read
 prev read.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c read.c
 done read.o generated
@@ -323,7 +322,7 @@ make rule.c
 prev options.h implicit
 prev make.h implicit
 done rule.c
-meta rule.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/rule.c rule
+meta rule.o %.c>%.o rule.c rule
 prev rule.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c rule.c
 done rule.o generated
@@ -332,7 +331,7 @@ make scan.c
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev make.h implicit
 done scan.c
-meta scan.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/scan.c scan
+meta scan.o %.c>%.o scan.c scan
 prev scan.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c scan.c
 done scan.o generated
@@ -341,7 +340,7 @@ make state.c
 prev options.h implicit
 prev make.h implicit
 done state.c
-meta state.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/state.c state
+meta state.o %.c>%.o state.c state
 prev state.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c state.c
 done state.o generated
@@ -350,7 +349,7 @@ make trap.c
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev make.h implicit
 done trap.c
-meta trap.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/trap.c trap
+meta trap.o %.c>%.o trap.c trap
 prev trap.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c trap.c
 done trap.o generated
@@ -359,16 +358,16 @@ make variable.c
 prev options.h implicit
 prev make.h implicit
 done variable.c
-meta variable.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/variable.c variable
+meta variable.o %.c>%.o variable.c variable
 prev variable.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D__OBSOLETE__=20090101 -D_PACKAGE_ast -c variable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D__OBSOLETE__=20100101 -D_PACKAGE_ast -c variable.c
 done variable.o generated
 make version.o
 make version.c
 done version.c
-meta version.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/version.c version
+meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.5 2010-04-15 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.5 2010-06-01 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -378,7 +377,7 @@ done nmake generated
 make ppcc
 make ppcc.sh
 done ppcc.sh
-meta ppcc %.sh>% ${PACKAGEROOT}/src/cmd/nmake/ppcc.sh ppcc
+meta ppcc %.sh>% ppcc.sh ppcc
 prev ppcc.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -603,7 +602,7 @@ done ${INSTALLROOT}/lib/make virtual
 make ${INSTALLROOT}/lib/make/makerules.mo
 prev ${INSTALLROOT}/lib/make
 make Makerules.mo
-meta Makerules.mo %.mk>%.mo ${PACKAGEROOT}/src/cmd/nmake/Makerules.mk Makerules
+meta Makerules.mo %.mk>%.mo Makerules.mk Makerules
 prev Makerules.mk
 exec - ${NMAKE} ${NMAKEFLAGS} --base --compile --file=Makerules.mk
 done Makerules.mo generated
@@ -612,99 +611,150 @@ done ${INSTALLROOT}/lib/make/makerules.mo virtual
 done install virtual
 make test
 make test.assert
-make assert.tst
-done assert.tst virtual
+make tests/assert.tst
+make tests/cc.def implicit
+make tests/test.def implicit
+done tests/test.def
+done tests/cc.def
+done tests/assert.tst
+exec - regress  tests/assert.tst
 done test.assert virtual
 make test.assign
-make assign.tst
-done assign.tst virtual
+make tests/assign.tst
+prev tests/test.def implicit
+done tests/assign.tst
+exec - regress  tests/assign.tst
 done test.assign virtual
 make test.attribute
-make attribute.tst
-done attribute.tst virtual
+make tests/attribute.tst
+prev tests/cc.def implicit
+done tests/attribute.tst
+exec - regress  tests/attribute.tst
 done test.attribute virtual
 make test.automatic
-make automatic.tst
-done automatic.tst virtual
+make tests/automatic.tst
+prev tests/test.def implicit
+done tests/automatic.tst
+exec - regress  tests/automatic.tst
 done test.automatic virtual
 make test.baserules
-make baserules.tst
-done baserules.tst virtual
+make tests/baserules.tst
+prev tests/test.def implicit
+done tests/baserules.tst
+exec - regress  tests/baserules.tst
 done test.baserules virtual
 make test.common
-make common.tst
-done common.tst virtual
+make tests/common.tst
+prev tests/cc.def implicit
+done tests/common.tst
+exec - regress  tests/common.tst
 done test.common virtual
 make test.diagnostics
-make diagnostics.tst
-done diagnostics.tst virtual
+make tests/diagnostics.tst
+prev tests/test.def implicit
+done tests/diagnostics.tst
+exec - regress  tests/diagnostics.tst
 done test.diagnostics virtual
 make test.edit
-make edit.tst
-done edit.tst virtual
+make tests/edit.tst
+prev tests/test.def implicit
+done tests/edit.tst
+exec - regress  tests/edit.tst
 done test.edit virtual
 make test.immediate
-make immediate.tst
-done immediate.tst virtual
+make tests/immediate.tst
+prev tests/test.def implicit
+done tests/immediate.tst
+exec - regress  tests/immediate.tst
 done test.immediate virtual
 make test.implicit
-make implicit.tst
-done implicit.tst virtual
+make tests/implicit.tst
+prev tests/cc.def implicit
+done tests/implicit.tst
+exec - regress  tests/implicit.tst
 done test.implicit virtual
 make test.internal
-make internal.tst
-done internal.tst virtual
+make tests/internal.tst
+prev tests/test.def implicit
+done tests/internal.tst
+exec - regress  tests/internal.tst
 done test.internal virtual
 make test.interrupt
-make interrupt.tst
-done interrupt.tst virtual
+make tests/interrupt.tst
+prev tests/test.def implicit
+done tests/interrupt.tst
+exec - regress  tests/interrupt.tst
 done test.interrupt virtual
 make test.metarule
-make metarule.tst
-done metarule.tst virtual
+make tests/metarule.tst
+prev tests/cc.def implicit
+done tests/metarule.tst
+exec - regress  tests/metarule.tst
 done test.metarule virtual
 make test.option
-make option.tst
-done option.tst virtual
+make tests/option.tst
+prev tests/cc.def implicit
+done tests/option.tst
+exec - regress  tests/option.tst
 done test.option virtual
 make test.panic
-make panic.tst
-done panic.tst virtual
+make tests/panic.tst
+prev tests/test.def implicit
+done tests/panic.tst
+exec - regress  tests/panic.tst
 done test.panic virtual
 make test.prereq
-make prereq.tst
-done prereq.tst virtual
+make tests/prereq.tst
+prev tests/cc.def implicit
+done tests/prereq.tst
+exec - regress  tests/prereq.tst
 done test.prereq virtual
 make test.quoting
-make quoting.tst
-done quoting.tst virtual
+make tests/quoting.tst
+prev tests/test.def implicit
+done tests/quoting.tst
+exec - regress  tests/quoting.tst
 done test.quoting virtual
 make test.recurse
-make recurse.tst
-done recurse.tst virtual
+make tests/recurse.tst
+prev tests/test.def implicit
+done tests/recurse.tst
+exec - regress  tests/recurse.tst
 done test.recurse virtual
 make test.scan
-make scan.tst
-done scan.tst virtual
+make tests/scan.tst
+prev tests/cc.def implicit
+done tests/scan.tst
+exec - regress  tests/scan.tst
 done test.scan virtual
 make test.shell
-make shell.tst
-done shell.tst virtual
+make tests/shell.tst
+prev tests/test.def implicit
+done tests/shell.tst
+exec - regress  tests/shell.tst
 done test.shell virtual
 make test.state
-make state.tst
-done state.tst virtual
+make tests/state.tst
+prev tests/cc.def implicit
+done tests/state.tst
+exec - regress  tests/state.tst
 done test.state virtual
 make test.statement
-make statement.tst
-done statement.tst virtual
+make tests/statement.tst
+prev tests/cc.def implicit
+done tests/statement.tst
+exec - regress  tests/statement.tst
 done test.statement virtual
 make test.syntax
-make syntax.tst
-done syntax.tst virtual
+make tests/syntax.tst
+prev tests/test.def implicit
+done tests/syntax.tst
+exec - regress  tests/syntax.tst
 done test.syntax virtual
 make test.view
-make view.tst
-done view.tst virtual
+make tests/view.tst
+prev tests/cc.def implicit
+done tests/view.tst
+exec - regress  tests/view.tst
 done test.view virtual
 done test dontcare virtual

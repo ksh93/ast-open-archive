@@ -149,6 +149,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 	register Archive_t*	bp;
 	register Member_t*	d;
 	int			linked = 0;
+	Tv_t			t;
 
 	ap->info = 0;
 	if (f->skip || f->namesize <= 1 || f->linkpath && !*f->linkpath)
@@ -196,7 +197,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 		if (!state.ordered)
 			return 0;
 	}
-	if (!match(f->path) || state.verify && f->type != X_IFDIR && !verify(ap, f, NiL))
+	if (!match(f->path) || ap->update && (d = (Member_t*)hashget(ap->update, f->name)) && tvcmp(&d->mtime, tvmtime(&t, f->st)) >= 0 || state.verify && f->type != X_IFDIR && !verify(ap, f, NiL))
 		return 0;
 	ap->selected++;
 	if (!linked)
@@ -334,7 +335,7 @@ verify(Archive_t* ap, register File_t* f, register char* prompt)
 			break;
 		/*FALLTHROUGH*/
 	default:
-		f->namesize = pathcanon(f->name = name, 0) - name + 1;
+		f->namesize = pathcanon(f->name = name, 0, 0) - name + 1;
 		break;
 	}
 	return 1;
@@ -895,15 +896,29 @@ listentry(register File_t* f)
  * prepare patterns for match()
  */
 
-char**
-initmatch(char** p)
+void
+initmatch(char** v)
 {
+	register char*	s;
 	register char**	a;
+	Pattern_t*	p;
+	size_t		n;
+	size_t		m;
 
-	a = p;
+	m = 0;
+	a = v;
 	while (*a)
-		pathcanon(*a++, 0);
-	return p;
+		m += strlen(*a++) + 1;
+	n = a - v + 1;
+	if (!(p = newof(0, Pattern_t, n, m)))
+		nospace();
+	state.pattern = state.patterns = p;
+	s = (char*)(p + n);
+	for (a = v; *a; a++, p++)
+	{
+		s = strcopy(p->pattern = s, *a) + 1;
+		pathcanon(p->pattern, s - p->pattern, 0);
+	}
 }
 
 /*
@@ -913,31 +928,40 @@ initmatch(char** p)
 int
 match(register char* s)
 {
-	register char**	p;
-	register char*	t;
-	int		n;
+	register Pattern_t*	p;
+	register char*		t;
+	int			n;
 
-	if (!(p = state.patterns))
+	if (!(p = state.pattern))
 		return state.matchsense;
 	if (state.exact)
 	{
-		n = 0;
-		while (t = *p++)
-			if (*t)
+		for (n = 0; p->pattern; p++)
+			if (!p->matched || p->directory)
 			{
-				if (streq(s, t))
+				if (state.descend && dirprefix(p->pattern, s, p->directory))
 				{
-					*--p = "";
+					state.pattern = p;
+					p->directory = p->matched = 1;
 					return 1;
 				}
-				n = 1;
+				else if (p->directory)
+					p->directory = 0;
+				else if (strmatch(s, p->pattern))
+				{
+					state.pattern = p;
+					p->matched = 1;
+					return 1;
+				}
+				else
+					n = 1;
 			}
 		if (!n)
 			finish(0);
 	}
 	else
-		while (t = *p++)
-			if (state.descend && dirprefix(t, s) || strmatch(s, t))
+		for (; p->pattern; p++)
+			if (state.descend && dirprefix(p->pattern, s, 0) || strmatch(s, p->pattern))
 				return state.matchsense;
 	return !state.matchsense;
 }
@@ -947,16 +971,16 @@ match(register char* s)
  */
 
 int
-dirprefix(register char* p, register char* s)
+dirprefix(register char* p, register char* s, int proper)
 {
 	if (*p == '.' && !*(p + 1) && *s != '/' && (*s != '.' || *(s + 1) != '.' || *(s + 2) && *(s + 2) != '/'))
-		return 1;
+		return !proper;
 	if (*p == '/' && !*(p + 1))
 		return *s == '/';
 	while (*p)
 		if (*p++ != *s++)
 			return 0;
-	return !*s || *s == '/';
+	return *s == '/' || !proper && !*s;
 }
 
 /*
@@ -1019,7 +1043,7 @@ complete(Archive_t* ap, register File_t* f, size_t header)
 			state.complete = 0;
 			putepilogue(ap);
 			newio(ap, 0, 0);
-			putprologue(ap);
+			putprologue(ap, 0);
 			state.complete = 1;
 		}
 	}
@@ -1036,9 +1060,9 @@ undoable(Archive_t* ap, Format_t* fp)
 	register Compress_format_t*	cp = (Compress_format_t*)fp->data;
 	char				buf[PATH_MAX];
 
-	if (!pathpath(buf, cp->undo[0], NiL, PATH_EXECUTE))
+	if (!pathpath(cp->undo[0], NiL, PATH_EXECUTE, buf, sizeof(buf)))
 	{
-		if (!cp->undotoo[0] || !pathpath(buf, cp->undotoo[0], NiL, PATH_EXECUTE))
+		if (!cp->undotoo[0] || !pathpath(cp->undotoo[0], NiL, PATH_EXECUTE, buf, sizeof(buf)))
 			error(3, "%s: %s: command required to read compressed archive", ap->name, cp->undo[0]);
 		cp->undo[0] = cp->undotoo[0];
 		cp->undotoo[0] = 0;

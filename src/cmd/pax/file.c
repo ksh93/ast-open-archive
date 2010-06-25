@@ -192,7 +192,7 @@ missdir(register Archive_t* ap, register File_t* f)
 	struct stat	st1;
 
 	s = f->name;
-	pathcanon(s, 0);
+	pathcanon(s, 0, 0);
 	if (t = strchr(*s == '/' ? s + 1 : s, '/'))
 	{
 		if (!state.mkdir)
@@ -259,7 +259,7 @@ openout(register Archive_t* ap, register File_t* f)
 	int		perm;
 	struct stat	st;
 
-	pathcanon(f->name, 0);
+	pathcanon(f->name, 0, 0);
 
 	/*
 	 * if not found and state.update then check down the view
@@ -669,6 +669,31 @@ openout(register Archive_t* ap, register File_t* f)
 }
 
 /*
+ * close an openin() fd, doing atime reset if necessary
+ */
+
+int
+closein(register Archive_t* ap, register File_t* f, int fd)
+{
+	register char*	s;
+	int		r;
+
+	r = 0;
+	if (close(fd))
+		r = -1;
+	if (state.resetacctime && f->type != X_IFLNK && !f->skip)
+	{
+		Tv_t	av;
+		Tv_t	mv;
+
+		tvgetatime(&av, f->st);
+		tvgetmtime(&mv, f->st);
+		settime(f->path, &av, &mv, NiL);
+	}
+	return r;
+}
+
+/*
  * close an openout() fd, doing the intermediate rename if needed
  */
 
@@ -765,10 +790,10 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	if (ap->delta)
 		ap->delta->hdr = ap->delta->hdrbuf;
 	name = stash(&ap->path.name, name, ftw->pathlen);
-	pathcanon(name, 0);
+	pathcanon(name, 0, 0);
 	f->path = stash(&ap->path.path, name, ftw->pathlen);
 	f->name = map(ap, name);
-	if (state.files && state.operation == (IN|OUT) && dirprefix(state.destination, name))
+	if (state.files && state.operation == (IN|OUT) && dirprefix(state.destination, name, 0))
 		return 0;
 	f->namesize = strlen(f->name) + 1;
 	ap->st = ftw->statb;
@@ -789,7 +814,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 			return 0;
 		}
 		f->linktype = SOFTLINK;
-		pathcanon(f->linkpath, 0);
+		pathcanon(f->linkpath, 0, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
 			f->linkpath = map(ap, f->linkpath);
 		if (streq(f->path, f->linkpath))
@@ -1073,7 +1098,7 @@ getarchive(int op)
 
 	app = (op & OUT) ? &state.out : &state.in;
 	if (!*app)
-		*app = initarchive(NiL, (op & OUT) ? (state.append ? (O_WRONLY|O_APPEND|O_CREAT) : (O_CREAT|O_TRUNC|O_WRONLY)) : O_RDONLY);
+		*app = initarchive(NiL, (op & OUT) ? (state.append ? (O_WRONLY|O_CREAT) : (O_WRONLY|O_CREAT|O_TRUNC)) : O_RDONLY);
 	return *app;
 }
 
@@ -1170,7 +1195,8 @@ setfile(register Archive_t* ap, register File_t* f)
 		break;
 	}
 	p = &post;
-	tvgetatime(&p->atime, f->st);
+	if (state.acctime)
+		tvgetatime(&p->atime, f->st);
 	tvgetmtime(&p->mtime, f->st);
 	p->uid = f->st->st_uid;
 	p->gid = f->st->st_gid;
@@ -1186,7 +1212,7 @@ setfile(register Archive_t* ap, register File_t* f)
 void
 settime(const char* name, Tv_t* ap, Tv_t* mp, Tv_t* cp)
 {
-	if (*name && tvtouch(name, ap, mp, cp, 1))
+	if (*name && tvtouch(name, ap, mp, cp, 0) && errno != ENOENT && errno != ENOTDIR)
 		error(1, "%s: cannot set times", name);
 }
 
@@ -1227,7 +1253,7 @@ restore(register const char* name, char* ap, void* handle)
 		}
 	}
 	if (state.modtime)
-		settime(name, &p->atime, &p->mtime, NiL);
+		settime(name, state.acctime ? &p->atime : NiL, &p->mtime, NiL);
 	return 0;
 }
 
@@ -1238,8 +1264,27 @@ restore(register const char* name, char* ap, void* handle)
 int
 prune(register Archive_t* ap, register File_t* f, register struct stat* st)
 {
-	if (st->st_mode == f->st->st_mode && (ap->delta && f->st->st_mtime == st->st_mtime || state.update && (unsigned long)f->st->st_mtime <= (unsigned long)st->st_mtime))
-		return 1;
+	Tv_t		t1;
+	Tv_t		t2;
+	struct stat	so;
+
+	if (state.update < 0 && !streq(f->name, f->path))
+	{
+		if ((*state.statf)(f->path, &so))
+			return 0;
+		st = &so;
+	}
+	if (st->st_mode == f->st->st_mode)
+	{
+		if (ap->delta && !tvcmp(tvmtime(&t1, f->st), tvmtime(&t2, st)))
+			return 1;
+		if (state.update && tvcmp(tvmtime(&t1, f->st), tvmtime(&t2, st)) <= 0)
+		{
+			if (state.exact)
+				state.pattern->matched = 0;
+			return 1;
+		}
+	}
 	return 0;
 }
 
@@ -1327,7 +1372,7 @@ seekable(Archive_t* ap)
 		error(ERROR_SYSTEM|1, "%s: cannot remove seekable temporary %s", ap->name, state.tmp.file);
 	ap->io->seekable = 1;
 	z = 0;
-	s = ap->io->buffer + MAXUNREAD;
+	s = ap->io->buffer + ap->io->unread;
 	m = ap->io->last - s;
 	do
 	{
