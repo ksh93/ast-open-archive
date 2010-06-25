@@ -308,9 +308,9 @@ main(int argc, char** argv)
 
 	NoP(argc);
 	error_info.id = CS_STAT_DAEMON;
-	if (!pathpath(error_info.id, argv[0], PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE, cmd, sizeof(cmd)))
+	if (!pathpath(cmd, error_info.id, argv[0], PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE))
 		error(ERROR_SYSTEM|3, "cannot locate daemon executable");
-	if (!pathpath(CS_STAT_DIR, argv[0], PATH_EXECUTE, buf, sizeof(buf)))
+	if (!pathpath(buf, CS_STAT_DIR, argv[0], PATH_EXECUTE))
 		error(3, "%s: cannot locate data directory", CS_STAT_DIR);
 	if (stat(buf, &st))
 		error(ERROR_SYSTEM|3, "%s: stat error", buf);
@@ -336,7 +336,7 @@ main(int argc, char** argv)
 		{
 			strcpy(tmp, s);
 			if (s = csattr(data, "type"))
-				pathrepl(cmd, sizeof(cmd), tmp, s);
+				pathrepl(cmd, tmp, s);
 		}
 
 		/*

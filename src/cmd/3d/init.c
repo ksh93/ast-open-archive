@@ -1314,7 +1314,7 @@ setpwd(register const char* s)
 		state.pwdsize = sizeof(state.pwdbuf) - 1;
 	strncpy(state.pwd, s, state.pwdsize);
 	state.pwd[state.pwdsize] = 0;
-	state.pwdsize = pathcanon(state.pwd, sizeof(state.pwdbuf), 0) - state.pwd;
+	state.pwdsize = pathcanon(state.pwd, 0) - state.pwd;
 	olev = state.level;
 	state.level = -1;
 	state.path.linkname = 0;

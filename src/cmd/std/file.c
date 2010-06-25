@@ -155,7 +155,7 @@ type(Magic_t* mp, char* file, const char* pattern, register Magicdisc_t* disc)
 	s = magictype(mp, fp, file, sp);
 	if (fp)
 		sfclose(fp);
-	e = pathcanon(file, 0, 0);
+	e = pathcanon(file, 0);
 	if (!pattern)
 	{
 		sfprintf(sfstdout, "%s:\t%s%s\n", file, e - file > 6 ? "" : "\t", s);

@@ -365,7 +365,7 @@ cd(char** arglist)
 	}
 	if (chdir(cp) < 0) {
 #if _PACKAGE_ast
-		if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.var.cdpath, cp, NiL, 0, state.path.path, sizeof(state.path.path))) {
+		if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.path.path, state.var.cdpath, cp, NiL, 0)) {
 			cp = state.path.path;
 			show = 1;
 		}

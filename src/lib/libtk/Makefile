@@ -40,7 +40,7 @@ $(LIB) $(TK_VERSION) :LIBRARY: \
 
 $(INCLUDEDIR) :INSTALLPROTO: tk.h
 
-:: README RELEASE ToDo changes license.terms tkAppInit.c
+:: README ToDo changes license.terms tkAppInit.c
 
 /* Generated with: ksh gen library '/$(ID)$(TK_VERSION)' */
 

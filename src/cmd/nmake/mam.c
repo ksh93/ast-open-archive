@@ -108,7 +108,7 @@ mamname(register Rule_t* r)
 			sfprintf(internal.nam, "%s/", internal.pwd);
 		sfprintf(internal.nam, "%s", a);
 		a = sfstruse(internal.nam);
-		pathcanon(a, 0, 0);
+		pathcanon(a, 0);
 		if (!strncmp(a, state.mam.root, state.mam.rootlen) && *(a + state.mam.rootlen) == '/')
 			a += state.mam.rootlen + 1;
 	}

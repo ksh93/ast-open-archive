@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make vgraph
 make libvgraph.a archive
@@ -121,7 +121,7 @@ done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
 done vgraph.h dontcare
 done grhdr.h
 done graph.c
-meta graph.o %.c>%.o graph.c graph
+meta graph.o %.c>%.o ${PACKAGEROOT}/src/lib/libvgraph/graph.c graph
 prev graph.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c graph.c
 done graph.o generated
@@ -136,7 +136,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 prev grhdr.h implicit
 done grbranching.c
-meta grbranching.o %.c>%.o grbranching.c grbranching
+meta grbranching.o %.c>%.o ${PACKAGEROOT}/src/lib/libvgraph/grbranching.c grbranching
 prev grbranching.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grbranching.c
 done grbranching.o generated
@@ -144,7 +144,7 @@ make grfold.o
 make grfold.c
 prev grhdr.h implicit
 done grfold.c
-meta grfold.o %.c>%.o grfold.c grfold
+meta grfold.o %.c>%.o ${PACKAGEROOT}/src/lib/libvgraph/grfold.c grfold
 prev grfold.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grfold.c
 done grfold.o generated
@@ -152,7 +152,7 @@ make grsearch.o
 make grsearch.c
 prev grhdr.h implicit
 done grsearch.c
-meta grsearch.o %.c>%.o grsearch.c grsearch
+meta grsearch.o %.c>%.o ${PACKAGEROOT}/src/lib/libvgraph/grsearch.c grsearch
 prev grsearch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grsearch.c
 done grsearch.o generated

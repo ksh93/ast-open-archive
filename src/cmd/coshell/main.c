@@ -183,7 +183,7 @@ init(void* handle, int fdmax)
 		s = state.buf;
 		for (n = 0;;)
 		{
-			if (pathpath(coshell[n], NiL, PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE, s, state.buflen))
+			if (pathpath(s, coshell[n], NiL, PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE))
 				break;
 			if (++n >= elementsof(coshell))
 				error(3, "shell not found");
@@ -194,7 +194,7 @@ init(void* handle, int fdmax)
 	 * parameterize the shell path name on state.home->type
 	 */
 
-	pathrepl(s, 0, state.home->type, "%s");
+	pathrepl(s, state.home->type, "%s");
 	if (!(state.sh = strdup(s)))
 		error(3, "out of space [shell path]");
 	message((-1, "parameterized shell path is %s", state.sh));

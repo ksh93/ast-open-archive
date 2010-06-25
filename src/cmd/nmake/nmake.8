@@ -1,0 +1,189 @@
+\"
+\" G. S. Fowler
+\" AT&T Bell Laboratories
+\"
+\" @(#)nmake.8 (gsf@research.att.com) 06/22/88
+\"
+.ds nM nmake\"	`make' someday
+.ds uM NMAKE\"	upper case \*(nM
+.ds oM make\"	`omake' someday
+.fp 5 CW
+.de Af
+.ds ;G \\*(;G\\f\\$1\\$3\\f\\$2
+.if !\\$4 .Af \\$2 \\$1 "\\$4" "\\$5" "\\$6" "\\$7" "\\$8" "\\$9"
+..
+.de aF
+.ie \\$3 .ft \\$1
+.el \{\
+.ds ;G \&
+.nr ;G \\n(.f
+.Af "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7" "\\$8" "\\$9"
+\\*(;G
+.ft \\n(;G \}
+..
+.de L
+.aF 5 \\n(.f "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7"
+..
+.de LR
+.aF 5 1 "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7"
+..
+.de RL
+.aF 1 5 "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH \*(uM 8
+.SH NAME
+\*(nM \- \*(nM installation and administration
+.SH DESCRIPTION
+Implementation changes are listed in the 
+.I \*(nM
+source directory in the files RELEASE and HISTORY.
+Major features are listed in FEATURES.
+The documentation is still rough -- it will get better.
+.SS Installation
+An
+.I \*(nM
+installation requires:
+.EX
+$INSTALLROOT/
+	bin/
+		nmake
+	include/
+		ppdefault.h
+	lib/
+		cpp
+		make/
+			Makeinit.mk
+			@
+			_make_
+			ccinfo
+			ignore
+			makecc
+			makerules.mo
+			maketype
+			silent
+.EE
+@, _make_, ignore and silent are not needed if you are
+running
+.IR ksh .
+The best way to install
+.I \*(nM
+in a new hierarchy is
+.EX
+NEWROOT=\fInew-root\fP
+cd $INSTALLROOT/src/cmd	# as defined for \*(nM bootstrap
+$INSTALLROOT/bin/nmake install INSTALLROOT=$NEWROOT
+.EE
+If all users run
+.I ksh
+then the
+.B $INSTALLROOT
+hierarchy may be moved to
+.B $NEWROOT
+without recompilation.
+In this case
+.RI non- ksh
+users must first export
+.B ROOT_nmake=$NEWROOT
+and
+.BR ROOT_cpp=$NEWROOT .
+.EE
+.SS Base Rule Changes
+If your
+.I \*(nM
+installation requires base rule
+.RB ( Makerules.mk )
+modifications you have several alternatives.
+First, the base rules
+(and the
+.I \*(nM
+engine, for that matter) are highly paramaterized
+on make variables.
+The base rule definitions may be overridden by defining new
+values in the environment, in makefiles, on the command line,
+in global makefiles, or by the file
+.B Localrules.mk .
+The last lines of
+.B Makerules.mk
+are
+.EX
+#if exists("Localrules.mk")
+#include "Localrules.mk"
+#endif
+.EE
+.B Localrules.mk
+is not distributed with
+.IR \*(nM .
+This allows you to
+safely augment the base rules by creating the file
+.EX
+$INSTALLROOT/src/cmd/nmake/Localrules.mk
+.EE
+You can also redefine any of the base rule assertions by judicious
+use of .CLEAR and .INSERT, but be careful to preserve the base rule
+interface so that non-local makefiles are not broken.
+To install local base rule changes
+.EX
+cd $INSTALLROOT/src/cmd/nmake
+# create Localrules.mk
+$INSTALLROOT/bin/nmake install
+.EE
+You are also free to change
+.B Makerules.mk
+itself, although you'll run into merge problems when
+.I \*(nM
+updates need to be incorporated.
+In this case just change the `create Localrules.mk' step above to
+`edit Makerules.mk' to install the changes.
+.PP
+Finally, if the changes are significantly different from
+.BR Makerules.mk ,
+create a new set of base rules
+.RI ( makerules
+is the default and
+.I genrules
+is an experimental alternative).
+Follow the naming convention
+.I *rules
+(e.g.,
+.IR altrules )
+and install
+.EX
+cd $INSTALLROOT/src/cmd/nmake
+# create Altrules.mk
+$INSTALLROOT/bin/nmake install ALTRULES=Altrules.mk
+.EE
+The
+.B install
+command line target copies
+.B Altrules.mo
+to
+.B $INSTALLROOT/lib/make/altrules.mo
+(base name converted to lower case).
+Any makefile requiring
+.I altrules
+should have as its first line
+.EX
+#rules "altrules"
+.EE
+If your alternate base rules really catch on then notify the
+.I \*(nM
+contact for possible inclusion in the
+.I \*(nM
+software distribution.
+.SH "SEE ALSO"
+\*(nM(1)

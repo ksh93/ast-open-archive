@@ -366,7 +366,7 @@ main(int argc, char** argv)
 			*(processor + n) = 0;
 		}
 		v = processor;
-		if (!(processor = pathpath(processor, NiL, PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE, cmd, sizeof(cmd))))
+		if (!(processor = pathpath(cmd, processor, NiL, PATH_ABSOLUTE|PATH_REGULAR|PATH_EXECUTE)))
 			error(3, "%s: processor not found", v);
 		if (s)
 			strcpy(processor + strlen(processor), s);
@@ -375,7 +375,7 @@ main(int argc, char** argv)
 	if (path = getpreroot(NiL, processor))
 		setpreroot(NiL, path);
 #endif
-	if (!(path = pathprobe(language, tool, processor, (options & TEST) ? -3 : -2, NiL, 0, attributes, sizeof(attributes))))
+	if (!(path = pathprobe(NiL, attributes, language, tool, processor, (options & TEST) ? -3 : -2)))
 		error(3, "cannot generate probe key");
 	if (stat(path, &ps))
 	{
@@ -422,7 +422,7 @@ main(int argc, char** argv)
 		*(script + n) = 0;
 		if (suid >= 0)
 			strcpy(base, key);
-		else if (!(path = pathprobe(language, tool, processor, -1, NiL, 0, attributes, sizeof(attributes))))
+		else if (!(path = pathprobe(NiL, attributes, language, tool, processor, -1)))
 			error(3, "cannot generate probe key");
 		else
 		{

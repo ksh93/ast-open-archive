@@ -342,14 +342,14 @@ deltabase(register Archive_t* ap)
 			copyin(bp);
 			bp->size = bp->io->offset + bp->io->count;
 		}
+		if (!ap->delta->format)
+			ap->delta->format = getformat(FMT_DELTA, 1);
 		bp->checksum &= 0xffffffff;
 	}
-	if (state.update)
-		ap->delta->format = st.st_size ? bp->format : ap->format;
 	else if (!ap->delta->format)
 	{
 		ap->delta->format = getformat(FMT_DELTA, 1);
-		ap->delta->compress = !st.st_size;
+		ap->delta->compress = 1;
 	}
 }
 

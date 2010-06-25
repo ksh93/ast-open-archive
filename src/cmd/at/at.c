@@ -318,7 +318,7 @@ main(int argc, char** argv)
 		op |= JOB;
 		if (file && !sfopen(sfstdin, file, "r"))
 			error(ERROR_SYSTEM|3, "%s: cannot read", file);
-		if (!fs3d(FS3D_TEST) || !(s = pathpath("3d", NiL, PATH_ABSOLUTE|PATH_EXECUTE, buf, sizeof(buf))))
+		if (!fs3d(FS3D_TEST) || !(s = pathpath(buf, "3d", NiL, PATH_ABSOLUTE|PATH_EXECUTE)))
 			s = pathshell();
 		if (op & MAIL)
 			sfputc(sp, AT_MAIL);

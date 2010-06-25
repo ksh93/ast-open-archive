@@ -228,7 +228,7 @@ makerule(register char* name)
 			return r;
 		if (((n = nametype(name, NiL)) & NAME_path) && (table.rule->flags & HASH_ALLOCATE))
 		{
-			pathcanon(name, 0, 0);
+			pathcanon(name, 0);
 			if (r = getrule(name))
 				return r;
 		}
@@ -1633,7 +1633,7 @@ view(register char* s, register char* d, List_t* p)
 
 	if (!d)
 		d = s;
-	i = pathcanon(d, 0, 0) - d;
+	i = pathcanon(d, 0) - d;
 	if (i > 2 && d[i - 1] == '/')
 		d[--i] = 0;
 	r = makerule(d);
@@ -1652,7 +1652,7 @@ view(register char* s, register char* d, List_t* p)
 			p = p->next = cons(r, NiL);
 			if (s != d)
 			{
-				i = pathcanon(s, 0, 0) - s;
+				i = pathcanon(s, 0) - s;
 				if (i > 2 && s[i - 1] == '/')
 					s[--i] = 0;
 				r = makerule(s);
@@ -1746,7 +1746,7 @@ initview(void)
 					sfprintf(internal.tmp, "%s/", internal.pwd);
 				sfputr(internal.tmp, s, -1);
 				t = sfstruse(internal.tmp);
-				s = pathcanon(t, 0, 0);
+				s = pathcanon(t, 0);
 				if (*(s - 1) == '/')
 					*--s = 0;
 				n = s - t;
@@ -1823,7 +1823,7 @@ initview(void)
 			tok = tokopen(s, 1);
 			while (s = tokread(tok))
 			{
-				pathcanon(s, 0, 0);
+				pathcanon(s, 0);
 				if (!n || *s != '.' || *(s + 1) != '.' || *(s + 2) && *(s + 2) != '/')
 					p = view(s, NiL, p);
 				else for (c = 0; c <= n; c++)

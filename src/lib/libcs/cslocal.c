@@ -59,7 +59,7 @@ initiate(Cs_t* state, const char* svc, char* cmd)
 	if ((fun = signal(SIGCHLD, child)) == SIG_DFL) signal(SIGCHLD, fun);
 	else if (children) children++;
 #endif
-	pathcanon(cmd, 0, 0);
+	pathcanon(cmd, 0);
 	av[0] = cmd;
 	av[1] = (char*)svc;
 	av[2] = 0;
@@ -136,7 +136,7 @@ cslocal(register Cs_t* state, const char* path)
 	p = pathbin();
 	for (;;)
 	{
-		p = pathcat(p, ':', "../lib/cs/fdp", cmd, exe, PATH_MAX + 1);
+		p = pathcat(exe, p, ':', "../lib/cs/fdp", cmd);
 		if (!eaccess(exe, X_OK) && !stat(exe, &st)) break;
 		if (!p)
 		{

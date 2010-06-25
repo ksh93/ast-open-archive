@@ -65,6 +65,6 @@ resolvepath(const char* file, char* path, size_t size)
 		s = path + strlen(path);
 		*s++ = '/';
 	}
-	strlcpy(s, file, size - (s - path));
-	return (s = pathcanon(path, size, PATH_PHYSICAL|PATH_DOTDOT|PATH_EXISTS)) ? (s - path) : -1;
+	strcpy(s, file);
+	return pathcanon(path, PATH_PHYSICAL|PATH_DOTDOT|PATH_EXISTS) ? strlen(path) : -1;
 }

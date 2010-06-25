@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
@@ -37,8 +37,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make pzip
 make pzip.o
@@ -46,8 +46,6 @@ make pzip.c
 make ${INSTALLROOT}/include/ast/sfdcbzip.h implicit
 make ${INSTALLROOT}/include/ast/sfdisc.h implicit
 make ${INSTALLROOT}/include/ast/ast.h implicit
-make ${INSTALLROOT}/include/ast/ast_api.h implicit
-done ${INSTALLROOT}/include/ast/ast_api.h dontcare
 make ${INSTALLROOT}/include/ast/vmalloc.h implicit
 make ${INSTALLROOT}/include/ast/ast_common.h implicit
 make ${INSTALLROOT}/include/ast/ast_map.h implicit
@@ -100,6 +98,9 @@ prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done ${INSTALLROOT}/include/ast/sfio.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -130,7 +131,7 @@ prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/error.h
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done pzip.c
-meta pzip.o %.c>%.o pzip.c pzip
+meta pzip.o %.c>%.o ${PACKAGEROOT}/src/cmd/pzip/pzip.c pzip
 prev pzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pzip]"\" -c pzip.c
 done pzip.o generated
@@ -152,7 +153,7 @@ prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/endian.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done pop.c
-meta pop.o %.c>%.o pop.c pop
+meta pop.o %.c>%.o ${PACKAGEROOT}/src/cmd/pzip/pop.c pop
 prev pop.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pzip]"\" -c pop.c
 done pop.o generated
@@ -165,7 +166,7 @@ make ${INSTALLROOT}/include/ast/tsp.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/tsp.h dontcare
 make FEATURE/local implicit
-meta FEATURE/local features/%>FEATURE/% features/local local
+meta FEATURE/local features/%>FEATURE/% ${PACKAGEROOT}/src/cmd/pzip/features/local local
 make features/local
 done features/local
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libpz} ${mam_libast}  : run features/local
@@ -201,7 +202,7 @@ done ${INSTALLROOT}/include/ast/ls.h
 prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done pin.c
-meta pin.o %.c>%.o pin.c pin
+meta pin.o %.c>%.o ${PACKAGEROOT}/src/cmd/pzip/pin.c pin
 prev pin.c
 setv LICENSE -DLICENSE="since=1998,author=gsf+alb"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Adam Buchsbaum <alb@adambuchsbaum.com>][-copyright?Copyright (c) 1998-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pzip]"\" -c pin.c
@@ -217,7 +218,7 @@ prev ${INSTALLROOT}/include/ast/tok.h implicit
 prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done rectify.c
-meta rectify.o %.c>%.o rectify.c rectify
+meta rectify.o %.c>%.o ${PACKAGEROOT}/src/cmd/pzip/rectify.c rectify
 prev rectify.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pzip]"\" -c rectify.c
 done rectify.o generated
@@ -230,7 +231,7 @@ prev ${INSTALLROOT}/include/ast/sfdcgzip.h implicit
 prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done funzip.c
-meta funzip.o %.c>%.o funzip.c funzip
+meta funzip.o %.c>%.o ${PACKAGEROOT}/src/cmd/pzip/funzip.c funzip
 prev funzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pzip]"\" -D_PACKAGE_ast -c funzip.c
 done funzip.o generated

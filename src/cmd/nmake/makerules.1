@@ -1,0 +1,876 @@
+.\"
+.\" G. S. Fowler
+.\" AT&T Bell Laboratories
+.\"
+.\" this file uses the *roff -man macros
+.\"
+.ds nM nmake
+.ds uM NMAKE
+.ds oM make
+.fp 5 CW
+.de Af
+.ds ;G \\*(;G\\f\\$1\\$3\\f\\$2
+.if !\\$4 .Af \\$2 \\$1 "\\$4" "\\$5" "\\$6" "\\$7" "\\$8" "\\$9"
+..
+.de aF
+.ie \\$3 .ft \\$1
+.el \{\
+.ds ;G \&
+.nr ;G \\n(.f
+.Af "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7" "\\$8" "\\$9"
+\\*(;G
+.ft \\n(;G \}
+..
+.de L
+.aF 5 \\n(.f "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7"
+..
+.de LR
+.aF 5 1 "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7"
+..
+.de RL
+.aF 1 5 "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6" "\\$7"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH MAKERULES 1
+.SH NAME
+makerules \- default \*(nM base rules
+.SH SYNOPSIS
+rules "makerules"
+.SH DESCRIPTION
+.I makerules
+are the default
+.I \*(nM
+base rules.
+The
+.I \*(nM
+engine is described in 
+.BR \*(nM (1).
+.PP
+Base rules define the local
+.I \*(nM
+operating environment.
+Base rules files are like normal 
+.I \*(nM
+makefiles in most respects, with the
+exception that they are explicitly written to be shared among a
+varied group of users.
+.I makerules
+defines a collection of options, operators, common target atoms, metarules
+and variables suitable for the UNIX programming environment.
+.SS Operators
+In the following descriptions,
+.I lhs
+and
+.I rhs
+are the lists of atoms appearing on the left and the right side of the
+operator, and
+.I action
+is the action following the operator.
+.TP
+.B ::
+The main source dependency operator.
+.I lhs
+is a single command or archive target that is built from the source files in
+.IR rhs .
+If the 
+.I lhs 
+is an archive then
+.BI "$(LIBDIR) :INSTALLDIR: " lhs
+is asserted, otherwise
+.BI "$(BINDIR) :INSTALLDIR: " lhs
+is asserted (see \fBDirectories\fP).  If the 
+.I lhs 
+is not given, then the 
+.I rhs
+is appended to the list of files for the save-oriented common actions, such
+as \fBcpio\fP, \fBtar\fP, etc. (see \fBCommon Actions\fP).
+.TP
+.B :ALL:
+Causes the
+.I rhs
+targets and all
+.B ::
+targets 
+to be made when no command line targets are specified.
+.TP
+.B :COMMAND:
+The
+.I lhs
+is a variable whose value is the result
+of shell command substitution on the action
+with respect to prerequisites on the
+.IR rhs .
+.TP
+.B :COPY:
+The
+.I lhs
+is a copy of the
+.I rhs
+file.
+.TP
+.B :FUNCTION:
+The
+.I lhs
+is a functional variable, whose value is determined by the action during the 
+execution time.  For example,
+.EX
+.in 1.5i
+a :FUNCTION: b
+.in
+.in 2i
+action
+.in
+.EE
+.in 1i
+is the same as
+.in
+.EX
+.in 1.5i
+a : b .SPECIAL .FUNCTION
+.in
+.in 2i
+action
+.in
+.EE
+.TP
+.B :INSTALL:
+If the
+.I lhs
+is omitted then the
+.I rhs
+is added to the list of targets made by the
+.B install
+common action.
+Otherwise the
+.I lhs
+is installed by the
+.B install
+common action by copying the file on the
+.IR rhs .
+If the 
+.I rhs
+is omitted then the 
+.I lhs
+is installed from the file named by the base and suffix of the
+.I lhs
+file name.
+If both the
+.I lhs
+and
+.I rhs
+are omitted and an
+.I action
+is specified then this overrides the default install action.
+The default install action saves old install targets in
+.IR target \.old.
+.TP
+.B :INSTALLDIR:
+The files in the 
+.I rhs
+are installed into the directory on the
+.I lhs
+by the 
+.B install
+common action.
+.TP
+.B :INSTALLMAP:
+The files which match the edit operation specified on the 
+\fIrhs\fR are installed in the directory specified on the \fIlhs\fR.
+For example, 
+.br
+.ti +5
+\f5$(FORMDIR) :INSTALLMAP: A=.SQLFORM:T=G\fR
+.br
+will install all generated files with the user-defined 
+attribute \f5.SQLFORM\fR in \f5$(FORMDIR)\fR.
+.TP
+.B :INSTALLPROTO:
+This assertion operator installs $(PROTO) output of 
+.I rhs
+into 
+.I lhs
+directory by the \fBinstall\fP common action.  The program $(PROTO) 
+converts a prototyped C file to a single 
+file that is compatible with the ANSI, K&R and C++ dialects of C.
+.I rhs
+files must have \f5#pragma prototyped\fP as the first line and must be
+valid ANSI C.
+.TP
+.B :JOINT:
+The
+.I action
+jointly builds all targets on the
+.I lhs
+with respect to prerequisites on the
+.IR rhs .
+.TP
+.B :LIBRARY:
+This operator creates a library from the specified source files.
+The syntax is:
+.br
+.ti +5
+\fIname\fR [ \fImajor.minor\fR [\fIrequired-libraries\fR]] :LIBRARY: \fIsource\fR
+.br
+where \fIname\fR is the name of the library (e.g., x for libx.a), 
+\fImajor.minor\fR is the version number for shared libraries if the compiler
+of the specific machine supports it, 
+\fIrequired-libraries\fR are the libraries that have to be linked in
+conjunction with the current target library, if there are any 
+(see \fB.REQUIRE.\fP\fIpattern\fP of \fInmake\fP(1)), and \fIsource\fR is 
+the list of source files.  If \fIrequired-libraries\fR are specified,
+\fInmake\fP will generate a file \f5$(LIBDIR)/lib/\fP\fIname\fR, containing
+the names of the \fIrequired-libraries\fR for the target library.
+For example, 
+.EX
+.in 1.5i
+cs 1.0 nsl socket :LIBRARY: standalone.c
+.in
+.EE
+.in 1i
+Here \f5cs\fP is \fIname\fR, \f51.0\fP is \fImajor.minor\fR, \f5nsl socket\fP
+are \fIrequired-libraries\fR, and \f5standalone.c\fP is \fIsource\fR. 
+$(CCFLAGS) controls the file name of the archive.  If $(CCFLAGS) 
+is set to -g, then the library is named lib\fIname\fR-g.a (e.g., libx-g.a).
+If $(CCFLAGS) is set to -p, then the library is named lib\fIname\fR-p.a 
+(e.g., libx-p.a).  If $(CCFLAGS) is set to -pg, then the library is 
+named lib\fIname\fR-pg.a (e.g., libx-pg.a).  If $(CC.PIC) is in 
+$(CCFLAGS), then both lib\fIname\fR.a and 
+lib\fIname\fR.so.\fImajor\fR.\fIminor\fR
+are created.  
+.B :LIBRARY:
+makes .a only by default, even if CCFLAGS+=$$(CC.PIC) is on.  The
+.B all
+or 
+.B install
+common actions also generate the shared library (.so on SVR4).
+.TP
+.B :LINK:
+The
+.I lhs
+files are hard links to the
+.I rhs
+file.
+Works properly with the
+.B install
+common action.
+.TP
+.B :MAKE:
+If the 
+.I rhs
+is a directory then a recursive
+.I \*(nM
+is run in that directory.
+If 
+.I rhs
+is not specified then a recursive 
+.I \*(nM
+is run in all subdirectories containing a makefile from the list
+.BR "$(MAKEFILES:/:/ /G)" .
+The \fIlhs\fP can be specified as label targets.
+.TP
+.B :PACKAGE:
+Facilitates locating the include files and libraries of certain packages.
+It can also be used with the \f3PACKAGE\fP\f2_ID\fP, 
+\f3PACKAGE\fP\f2_ID_\fP\f3INCLUDE\fP, and \f3PACKAGE\fP\f2_ID_\fP\f3LIB\fP 
+environment variables that add to the list of directories to be searched for 
+include files and libraries.
+For example, if one owns and builds the \f2X11\fP tools and libraries, which 
+are installed in 
+\f2/usr/add-on/X11\fP, an 
+.I \*(nM
+makefile with
+.EX
+.in 1.5i
+:PACKAGE: X11
+.in
+.EE
+.in 1i
+will search for include files by adding \f2-I/usr/add-on/X11/include\fP and for
+libraries by adding \f2-L/usr/add-on/X11/lib\fP and \f2-lX11\fP to the linker
+options (see \fIcc\fP(1) and \fIld\fP(1)).  Other \f2X11\fP 
+versions, e.g. \f2/home/my/X11\fP, can be accessed by exporting the 
+\f3PACKAGE\fP\f2_ID\fP[_\fBINCLUDE\fP|_\fBLIB\fP] environment variable:
+.in
+.EX
+.in 1.5i
+export PACKAGE_X11=/home/my/X11
+.in
+.EE
+.in 1i
+.B :PACKAGE:
+and \f3PACKAGE\fP\f2_ID\fP[_\fBINCLUDE\fP|_\fBLIB\fP] eliminate the need for 
+many \f5.SOURCE.a\fP and \f5.SOURCE.h\fP makefile assertions.
+.sp .25
+Note, \fB:PACKAGE:\fP changes \fBINCLUDEDIR\fP to be \f5$(INSTALLROOT)/include/\fP\fIID\fP by default.  If one uses a third party software package, one should
+specify it as
+.EX
+.in 1.5i
+:PACKAGE: - X11
+.in
+.EE
+.in 1i
+The "\f5\-\fP" at the beginning of the \fIrhs\fP inhibits the \fBINCLUDEDIR\fP
+redefinition.
+.sp .25
+\fB:PACKAGE:\fP can be multiply defined, but the most recent \fB:PACKAGE:\fP
+assertion takes the highest precedence.  A "\f5\+\fP" in the \fIrhs\fP will
+append the package at the end of the package list, which means
+it will take the lowest precedence.
+.TP
+.B :READONLY:
+The
+.I rhs
+compilation is to place tables and/or data in a readonly text object section.
+Only the parse and pattern tables are placed in readonly for 
+.BR yacc (1)
+and
+.BR lex (1) 
+files.
+.B :READONLY:
+will become a no-op when enough C compilers properly implement 
+.BR const .
+.TP
+.B :SAVE:
+The
+.I rhs
+files are generated but are still to be saved by the
+.I save-oriented
+common actions
+.RB ( cpio ,
+.BR pax ,
+etc.).
+.TP
+.B :cc:
+The \fIrhs\fR files are compiled using \fB$(cc)\fR instead of \fB$(CC)\fR.
+This is useful for compiling C and C++ modules from the same makefile.
+.SS "Common Actions"
+.I makerules
+defines several common command line actions.
+In the following,
+.I main-target
+is the name of the target in the first
+.B ::
+assertion.
+.TP
+.B all
+Make all
+.B ::
+targets.
+.TP
+.B cc\-
+This common action assumes the existence of one or more \fBcc\-\fP\fIopt\fP 
+subdirectories, where \fIopt\fP is any valid \fBCCFLAGS\fP value
+(ex. \fIg\fP, \fIp\fP, \fIpg\fP, etc.).  When nmake is invoked with the
+\fBcc\-\fP or \fBcc\-\fP\fIopt\fP common action, it will build the executables 
+for each of these compiler options or the specific one specified by \fIopt\fP 
+and place them in the corresponding directory. 
+.TP
+.B ciadag
+Generates a
+.BR dag (1)
+input call graph file based on information generated by
+.BR ciadb .
+.TP
+.B ciadb
+Generates the database files for the C information abstractor
+.BR cia (1).
+.TP
+.B clean
+All generated intermediate files are removed.
+Command and archive files are retained. 
+.TP
+.B clobber
+All generated files, except the output of the
+.BR cpio ,
+.B pax
+and
+.B tar
+common actions, are removed.
+.TP
+.B clobber.install
+Removes all of the files installed by the 
+.B install 
+common action.
+.TP
+.B cpio
+All source files are copied to the
+.BR cpio (1)
+archive named
+.IR main-target .cpio.
+.TP
+.B ctags
+.BR ctags (1)
+is run on all C-related source files.
+.TP
+.B grind
+The
+.B grindex
+common action and
+.BR vgrind (1)
+are run on all C-related source files.
+The output is sent to
+.BR $(LPR) .
+.TP
+.B grindex
+A
+.BR vgrind (1)
+index file is made in the file
+.B index
+and is sent to
+.BR $(LPR) .
+.TP
+.B install
+All
+.BR :: ,
+.BR :INSTALL: ,
+.BR :INSTALLDIR: ,
+.B :INSTALLPROTO:
+and 
+.B :INSTALLMAP:
+target files are installed in the directory hierarchy rooted at
+.BR $(INSTALLROOT) 
+(see \fBDirectories\fP).
+.TP
+.B lint
+.BR lint (1)
+is run on all C-related source files.
+The proper 
+.B \-D
+and
+.B \-I
+options are propagated to
+.IR lint .
+.TP
+.B list.generated
+Lists the files which have been generated.
+.TP
+.B list.install
+Lists the full path names of all files to be installed under
+\fB$(INSTALLROOT)\fR by the 
+.B install 
+common action.
+.TP
+.B list.source
+Lists the source files.
+.TP
+.B list.symbols
+Lists the sorted archive symbol names.
+.TP
+.B official
+All source files in the top view of the viewpath
+are moved down to the next view.
+.TP
+.B pax
+All source files are copied to the
+.BR pax (1)
+archive named
+.IR main-target .pax.
+.TP
+.B print
+All source files are sent to
+.B $(LPR)
+via
+.BR $(PR) .
+.TP
+.B recurse
+When using \fB:MAKE:\fR, certain common actions (such as \fBclean\fR, 
+\fBclobber\fR, \fBofficial\fR) are non-recursive by default.
+When \fBrecurse\fR is asserted before a common action, recursion
+is forced (e.g., \fInmake recurse clobber\fR).
+.TP
+.B shar
+All source files are copied to the
+.BR shar (1)
+archive named
+.IR main-target .shar.
+.TP
+.B tar
+All source files are copied to the
+.BR tar (1)
+archive named
+.IR main-target .tar.
+.TP
+.B ucpio
+All source files modified since the last 
+.B ucpio
+are copied to the
+.BR cpio (1)
+archive named
+.IR main-target .cpio.
+.TP
+.B uprint
+All source files modified since the last 
+.B uprint
+are sent to
+.B $(LPR)
+via
+.BR $(PR) .
+.TP
+.B utar
+All source files modified since the last 
+.B utar
+are copied to the
+.BR tar (1)
+archive named
+.IR main-target .tar.
+.SS Languages
+.I makerules
+imposes the use of the new C preprocessor for all C compilations
+by overloading CCFLAGS with the proper incantations.
+In some cases the shell script wrapper
+.B $(CCC)
+will be run for compilers that have
+.I cpp
+built in.
+This ensures that "..." include files follow the
+.I "local files override non-local files"
+rule.
+The native C preprocessor can be made the default by placing
+.B nativepp=1
+in an nmake alias or by exporting
+.B nativepp=1
+in the environment.
+Doing this, however, may defeat some or all of the benefits of the
+.B .SOURCE*
+binding rules and/or viewpathing where "..." include files are concerned.
+Setting
+.B nativepp=-1
+inhibits the warning message about overriding the nmake C preprocessor.
+.P
+Metarules perform common language file transformations.
+\fInmake\fP can be used to manufacture software applications written in a
+variety of languages: C, C++, assembler, FORTRAN, yacc, and so on.
+The language support is:
+.BR " *.c -> *.o, *.y -> { *.c, *.h }" ,
+etc.
+.SS Scan Rules
+.I makerules 
+supplies the following default scanning strategies:
+.TP
+.BI .SCAN ".x\|\|\s-1[dynamic\|attribute]\s+1"
+Marks an atom (when bound to a file) to be scanned
+for implicit prerequisites using the
+.I .x
+scan strategy.
+.BI .ATTRIBUTE .pattern " : .SCAN" .x
+is asserted for each of the strategies listed below.
+.RS
+.TP
+.B .SCAN.c
+Scans for
+.B C
+.B #include
+file prerequisites and candidate state variable references.
+Include statements requiring macro substitutions are not recognized.
+"..." include files are bound using the directories of
+.B .SOURCE
+first and then the directories of
+.BR .SOURCE.h .
+This is the opposite of the default directory binding order.
+<...> include files are bound using only the directories of
+.BR .SOURCE.h .
+"..." include files are assigned the
+.B .LCL.INCLUDE
+attribute and <...> include files are assigned the
+.B .STD.INCLUDE
+attribute.
+.B .LCL.INCLUDE
+takes precedence if a file appears as both "..." and <...>.
+.sp .25
+To support popular C coding style,
+if an including file is included as
+"\fIprefix\fP/\fIincluder\fP" then a file "\fIincludee\fP" included by
+"\fIprefix\fP/\fIincluder\fP" is first
+bound using "\fIprefix\fP/\fIincludee\fP",
+and, if that fails, is next bound using "\fIincludee\fP".
+.TP
+.B .SCAN.f
+.B FORTRAN
+.B include
+and
+.B INCLUDE
+file prerequisites.
+.TP
+.B .SCAN.F
+A combination of the \fB\.SCAN\.c\fP, \fB\.SCAN\.f\fP, and 
+.B .SCAN.sql
+strategies.
+.TP
+.B .SCAN.r
+.B RATFOR
+.B include
+and
+.B INCLUDE
+file prerequisites.
+Include statements requiring macro substitutions are not recognized.
+.TP
+.B .SCAN.m4
+.BR m4 (1)
+.BR include(...) ,
+.BR sinclude(...) ,
+and
+.BR INCLUDE(...)
+file prerequisites.
+The
+.B INCLUDE(...)
+form also handles
+.B S
+(statistical analysis package)
+source file prerequisites.
+Include statements resulting from macro substitutions are not recognized.
+.TP
+.B .SCAN.mk
+\fInmake\fP \fBinclude\fP file prerequisites.
+.TP
+.B .SCAN.nroff
+.BR nroff (1)
+and
+.BR troff (1)
+.B .so
+file prerequisites.
+Only
+.BI .so " file"
+starting at the beginning of a line is recognized.
+.B .so
+statements requiring macro substitutions are not recognized.
+.TP
+.B .SCAN.sh
+Scans for candidate state variable references, i.e., those state variables 
+initialized with the \f5==\fP operator.
+.TP
+.B .SCAN.sql
+SQL include file prerequisites of the form 
+\fBEXEC SQL include\fR \fIfilename\fR or 
+\fB## include\fR \fIfilename\fR, where \fIfilename\fR is
+\fB"\fR\fIfilename\fR\fB"\fR, 
+\fIfilename\fR\fB;\fR, or
+\fIfilename\fR.
+SQL include file prerequisites can also be of the form 
+\fB$ include\fP\fI filename\fP, where \fIfilename\fP is 
+\fB<\fP\fIfilename\fP\fB>\fP, \fB"\fP\fIfilename\fP\fB"\fP, 
+\fB\'\fP\fIfilename\fP\fB\'\fP, \fIfilename\fR\fB;\fR, or \fIfilename\fR.
+.SS Directories
+Common directories are named by variables.
+The directory hierarchy is modeled after
+.B /usr
+in System V.
+.TP
+.B "INSTALLROOT = $(HOME)"
+The root installation directory used by the
+.B :INSTALL:
+operator and
+.B install
+common action.
+.TP
+.B "BINDIR = $(INSTALLROOT)/bin"
+The installation directory for generated commands.
+.TP
+.B "ETCDIR = $(INSTALLROOT)/etc"
+The installation directory used for generated miscellaneous system files.
+.TP
+.B "FUNDIR = $(INSTALLROOT)/fun"
+The installation directory used for \fBksh\fI functions.
+.TP
+.B "INCLUDEDIR = $(INSTALLROOT)/include"
+The installation directory for generated header files.
+.TP
+.B "LIBDIR = $(INSTALLROOT)/lib"
+The installation directory for generated libraries and data files.
+.TP
+.B "MANDIR = $(INSTALLROOT)/man/man"
+The installation directory prefix for
+.BR man (1)
+pages.
+.BI *. nnn
+man page files are installed in the
+.BI $(MANDIR) nnn
+directory.
+.TP
+.B "SHAREDIR = $(INSTALLROOT)/share"
+The installation directory accessed by all hosts of the local network.
+.TP
+.B "TMPDIR = /usr/tmp"
+The temporary file directory.
+.SS Commands
+Each command referenced by the base rules has a corresponding command
+and option variable.
+For a command
+.I cmd
+the command is named by
+.BR $(CMD) ,
+the options are named by
+.B $(CMDFLAGS)
+and the command is executed by expanding
+.BR "$(CMD) $(CMDFLAGS) " arguments.
+.P
+.SS "Base Rule Variables"
+The following variables are defined and used by the base rule operators
+and common targets.
+.B $MAKE_OPTIONS 
+can be used to set these variables in the environment.
+.TP
+.B ancestor
+This variable may be used to specify how many directory levels up
+from the current directory to look for include and archive directories
+(eg. ancestor=2 is equivalent to .SOURCE.h : ..\|/\|include ..\|/\|..\|/\|include
+and .SOURCE.a : ..\|/\|lib ..\|/\|..\|/\|lib).
+.TP
+.B ancestor_list, ancestor_source
+Determine \fIlib\fP and \fIinclude\fP directories used with
+\fBancestor\fP.  The default value of \fBancestor_list\fP includes the
+default search directories (i.e. \fIinclude, lib\fP):
+.EX
+ancestor_list = $(ancestor_source) .SOURCE.a lib .SOURCE.h include
+.EE
+.in 1i
+The default for \fBancestor_source\fP is null.
+\fBancestor_list\fP can be redefined to any list of \f5.SOURCE.x search_dir_name_for.x\fP pairs.
+For example, to search for headers only in the directory called \fIhdrs\fP
+and search for libraries only in the directory called \fILIB\fP using the 
+ancestor concept, one would redefine \fBancestor_list\fP to be:
+.EX
+.in 1.5i
+ancestor_list = .SOURCE.h hdrs .SOURCE.a LIB
+.in 
+.EE
+.in 1i
+To keep the default directories in the search path, one would redefine
+\fBancestor_source\fP only.
+.TP
+.B cctype
+.br
+\fB$(CC)\fP is normally used to determine the probe configuration file 
+to be used.
+.B $(cctype) 
+may be used to specify that another C compiler's probe file
+is to be loaded instead.
+.TP
+.B cleanignore
+Shell pattern for files that should not be deleted by \fBclean\fP common action.
+.TP
+.B clobber
+.br
+If
+.B $(clobber)
+is non-null the default install action will not move old install target to
+.IR target .old.
+.TP
+.B compare
+If 
+.B $(compare)
+is 0, then the default install action will not do a \fIcmp -s\fR
+before installing the target file.
+.TP
+.B force_shared
+If this variable is set, it will cause the re-link of \f5a.out\fPs with 
+shared libraries (if it is not set, shared libraries time stamps are 
+ignored).
+.TP
+.B link
+.br
+For install targets where the basename matches the pattern in 
+\fB$(link)\fR, the \fBinstall\fR action will attempt to link instead
+of copy (e.g., link=lib*).
+.TP
+.B nativepp
+If
+.B $(nativepp)
+is non-null, then the native C preprocessor will be used for compiling C source.
+The default
+.I \*(nM
+C preprocessor provides viewpath support.
+.TP
+.B output
+.br
+This variable may be used to override the default common action output
+file base name.
+.TP
+.B physical
+This variable is \fI3D\fP File System related (see \fI3d\fP(1)).  When 
+\fBphysical\fP is set, it will limit the recursion to directories which 
+physically exist.
+.TP
+.B prefixinclude
+This variable is used to support C \f5#include "file.h"\fP compatibility.
+With \fBprefixinclude=1\fP (default), the following scenario is valid:
+.EX
+.ta .5i 2i
+	\fBContents of main.c\fP	#include "subdir/file1.h"
+	\fBContents of file1.h\fP	#include "file2.h"
+	\fBContents of makefile\fP	.SOURCE.h: dir
+	\f1Both\fP file1.h \f1and\fP file2.h \f1are located in dir/subdir.\fP
+.ta
+.EE
+.in 1i
+\fInmake\fP (invoked from the above \f5dir\fP level) looks first in 
+\f5dir/subdir\fP to find \f5file2.h\fP.  If \f5file2.h\fP is not found in 
+\f5dir/subdir\fP, the 
+default search rules are used.  Note, you do not need to specify 
+\f5dir/subdir\fP as a searching directory for \f5.SOURCE.h\fP to find 
+\f5file2.h\fP, \f5subdir\fP prefix is inherited from the including file 
+\f5file1.h\fP.
+With \fBprefixinclude=0\fP, \fInmake\fP relies exclusively on the default search
+rules. (In this case you need to specify \f5.SOURCE.h: dir dir/subdir\fP to 
+find \f5file2.h\fP.) 
+.in
+.TP
+.B preserve
+When set to non-null value, the \fBinstall\fP common action will rename
+old install target to \fIfilename.#inode\fP.  This is useful for installing
+executables that may be currently running.
+.TP
+.B instrument
+.br
+This variable supports software packages such as \fIpurify\fP, \fIsentinel\fP,
+and \fIinsight\fP.
+When \fBinstrument\fP is set to one of these packages, \fInmake\fP links
+with the package.
+.TP
+.B recurse
+.br
+This variable specifies the maximum number of recursive makes 
+that may be done concurrently when using the 
+.B :MAKE:
+operator.  The default is 1.  Note that the \fBNPROC\fP environment 
+variable or the \fBjobs\fP command line option determine an upper 
+bound for \fBrecurse\fP, meaning that if they are set to a value
+less than \fB$(recurse)\fP, the number of concurrent makes will
+be bound by this value.
+.TP
+.B save
+.br
+This variable may be set to a list of files that should be saved
+by the save common actions (in addition to the normal list of source files). 
+.TP
+.B select
+.br
+This variable can be set to a string of edit operators that are 
+applied to the list of source files before the save common actions 
+execute (e.g., select=N!=*.c will prevent any .c files from being saved).
+.TP
+.B tmp
+.br
+This variable is set to \f5$COTEMP\fP value (see \fInmake\fP(1)).
+.TP
+.B viewverify
+If 
+.B $(viewverify)
+is non-null, and 
+there are no views, then an error is issued with a severity level of
+.B $(viewverify).
+.SH "SEE ALSO"
+.BR \*(nM (1)

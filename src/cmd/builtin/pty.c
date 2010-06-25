@@ -21,7 +21,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)pty (AT&T Research) 2010-04-12\n]"
+"[-?\n@(#)pty (AT&T Research) 2010-06-21\n]"
 USAGE_LICENSE
 "[+NAME?pty - create pseudo terminal and run command]"
 "[+DESCRIPTION?\bpty\b creates a pseudo pty and then runs \bcommand\b "
@@ -211,6 +211,12 @@ mkpty(int* master, int* slave)
 #if !_lib_openpty
 	char*		sname;
 #endif
+	/*
+	 * some systems hang hard during the handshake
+	 * if you know why then please let us know
+	 */
+
+	alarm(4);
 	if (tcgetattr(STDERR_FILENO, &tty) >= 0)
 		ttyp = &tty;
 	else
@@ -266,6 +272,7 @@ mkpty(int* master, int* slave)
 #endif
 	fcntl(*master, F_SETFD, FD_CLOEXEC);
 	fcntl(*slave, F_SETFD, FD_CLOEXEC);
+	alarm(0);
 	return 0;
 }
 
@@ -989,6 +996,8 @@ b_pty(int argc, char* argv[], void* context)
 		break;
 	}
 	argv += opt_info.index;
+	if (!argv[0])
+		error(ERROR_exit(1), "command must be specified");
 	if (mkpty(&master, &slave) < 0)
 		error(ERROR_system(1), "unable to create pty");
 	if (!(mp = sfnew(NiL, 0, SF_UNBOUND, master, SF_READ|SF_WRITE)))

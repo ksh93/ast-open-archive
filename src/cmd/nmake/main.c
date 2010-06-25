@@ -80,7 +80,7 @@
  *                      .               .
  *   1995             (3.2)             .	AT&T Bell Labs
  *                      .               .
- *   1996             (3.3)             .	AT&T Research (Lucent split)
+ *   1996             (3.3)             .	AT&T Research
  *                      .               .
  *   1997             (3.4)             .	AT&T Research
  *                      .               .
@@ -411,7 +411,7 @@ main(int argc, char** argv)
 	hashclear(table.var, HASH_ALLOCATE);
 	setvar(external.make, argv[0], V_import);
 	t = "lib/make";
-	setvar(external.lib, strdup((s = pathpath(t, argv[0], PATH_EXECUTE, buf, SF_BUFSIZE)) ? s : t), V_import);
+	setvar(external.lib, strdup((s = pathpath(buf, t, argv[0], PATH_EXECUTE)) ? s : t), V_import);
 	setvar(external.pwd, internal.pwd, V_import);
 	setvar(external.version, version, V_import);
 	hashset(table.var, HASH_ALLOCATE);

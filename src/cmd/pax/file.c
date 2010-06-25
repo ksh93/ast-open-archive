@@ -192,7 +192,7 @@ missdir(register Archive_t* ap, register File_t* f)
 	struct stat	st1;
 
 	s = f->name;
-	pathcanon(s, 0, 0);
+	pathcanon(s, 0);
 	if (t = strchr(*s == '/' ? s + 1 : s, '/'))
 	{
 		if (!state.mkdir)
@@ -259,7 +259,7 @@ openout(register Archive_t* ap, register File_t* f)
 	int		perm;
 	struct stat	st;
 
-	pathcanon(f->name, 0, 0);
+	pathcanon(f->name, 0);
 
 	/*
 	 * if not found and state.update then check down the view
@@ -669,31 +669,6 @@ openout(register Archive_t* ap, register File_t* f)
 }
 
 /*
- * close an openin() fd, doing atime reset if necessary
- */
-
-int
-closein(register Archive_t* ap, register File_t* f, int fd)
-{
-	register char*	s;
-	int		r;
-
-	r = 0;
-	if (close(fd))
-		r = -1;
-	if (state.resetacctime && f->type != X_IFLNK && !f->skip)
-	{
-		Tv_t	av;
-		Tv_t	mv;
-
-		tvgetatime(&av, f->st);
-		tvgetmtime(&mv, f->st);
-		settime(f->path, &av, &mv, NiL);
-	}
-	return r;
-}
-
-/*
  * close an openout() fd, doing the intermediate rename if needed
  */
 
@@ -790,10 +765,10 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	if (ap->delta)
 		ap->delta->hdr = ap->delta->hdrbuf;
 	name = stash(&ap->path.name, name, ftw->pathlen);
-	pathcanon(name, 0, 0);
+	pathcanon(name, 0);
 	f->path = stash(&ap->path.path, name, ftw->pathlen);
 	f->name = map(ap, name);
-	if (state.files && state.operation == (IN|OUT) && dirprefix(state.destination, name, 0))
+	if (state.files && state.operation == (IN|OUT) && dirprefix(state.destination, name))
 		return 0;
 	f->namesize = strlen(f->name) + 1;
 	ap->st = ftw->statb;
@@ -814,7 +789,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 			return 0;
 		}
 		f->linktype = SOFTLINK;
-		pathcanon(f->linkpath, 0, 0);
+		pathcanon(f->linkpath, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
 			f->linkpath = map(ap, f->linkpath);
 		if (streq(f->path, f->linkpath))
@@ -1195,8 +1170,7 @@ setfile(register Archive_t* ap, register File_t* f)
 		break;
 	}
 	p = &post;
-	if (state.acctime)
-		tvgetatime(&p->atime, f->st);
+	tvgetatime(&p->atime, f->st);
 	tvgetmtime(&p->mtime, f->st);
 	p->uid = f->st->st_uid;
 	p->gid = f->st->st_gid;
@@ -1212,7 +1186,7 @@ setfile(register Archive_t* ap, register File_t* f)
 void
 settime(const char* name, Tv_t* ap, Tv_t* mp, Tv_t* cp)
 {
-	if (*name && tvtouch(name, ap, mp, cp, 0) && errno != ENOENT && errno != ENOTDIR)
+	if (*name && tvtouch(name, ap, mp, cp, 1))
 		error(1, "%s: cannot set times", name);
 }
 
@@ -1253,7 +1227,7 @@ restore(register const char* name, char* ap, void* handle)
 		}
 	}
 	if (state.modtime)
-		settime(name, state.acctime ? &p->atime : NiL, &p->mtime, NiL);
+		settime(name, &p->atime, &p->mtime, NiL);
 	return 0;
 }
 
@@ -1264,17 +1238,8 @@ restore(register const char* name, char* ap, void* handle)
 int
 prune(register Archive_t* ap, register File_t* f, register struct stat* st)
 {
-	if (st->st_mode == f->st->st_mode)
-	{
-		if (ap->delta && f->st->st_mtime == st->st_mtime)
-			return 1;
-		if (state.update && (unsigned long)f->st->st_mtime <= (unsigned long)st->st_mtime)
-		{
-			if (state.exact)
-				state.pattern->matched = 0;
-			return 1;
-		}
-	}
+	if (st->st_mode == f->st->st_mode && (ap->delta && f->st->st_mtime == st->st_mtime || state.update && (unsigned long)f->st->st_mtime <= (unsigned long)st->st_mtime))
+		return 1;
 	return 0;
 }
 

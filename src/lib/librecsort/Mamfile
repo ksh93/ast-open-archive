@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make recsort
 make librecsort.a archive
@@ -119,19 +119,20 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 done recsort.h dontcare
 make FEATURE/recsort implicit
-meta FEATURE/recsort features/%>FEATURE/% features/recsort recsort
+meta FEATURE/recsort features/%>FEATURE/% ${PACKAGEROOT}/src/lib/librecsort/features/recsort recsort
 make features/recsort
 done features/recsort
 prev recsort.req
@@ -147,7 +148,7 @@ done ${PACKAGE_ast_INCLUDE}/recfmt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done rshdr.h
 done rsclear.c
-meta rsclear.o %.c>%.o rsclear.c rsclear
+meta rsclear.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsclear.c rsclear
 prev rsclear.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsclear.c
 done rsclear.o generated
@@ -155,7 +156,7 @@ make rsclose.o
 make rsclose.c
 prev rshdr.h implicit
 done rsclose.c
-meta rsclose.o %.c>%.o rsclose.c rsclose
+meta rsclose.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsclose.c rsclose
 prev rsclose.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsclose.c
 done rsclose.o generated
@@ -163,7 +164,7 @@ make rsdisc.o
 make rsdisc.c
 prev rshdr.h implicit
 done rsdisc.c
-meta rsdisc.o %.c>%.o rsdisc.c rsdisc
+meta rsdisc.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsdisc.c rsdisc
 prev rsdisc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsdisc.c
 done rsdisc.o generated
@@ -171,7 +172,7 @@ make rsnotify.o
 make rsnotify.c
 prev rshdr.h implicit
 done rsnotify.c
-meta rsnotify.o %.c>%.o rsnotify.c rsnotify
+meta rsnotify.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsnotify.c rsnotify
 prev rsnotify.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsnotify.c
 done rsnotify.o generated
@@ -179,7 +180,7 @@ make rslist.o
 make rslist.c
 prev rshdr.h implicit
 done rslist.c
-meta rslist.o %.c>%.o rslist.c rslist
+meta rslist.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rslist.c rslist
 prev rslist.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rslist.c
 done rslist.o generated
@@ -203,7 +204,7 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done rskeyhdr.h
 done rslib.c
-meta rslib.o %.c>%.o rslib.c rslib
+meta rslib.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rslib.c rslib
 prev rslib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rslib.c
 done rslib.o generated
@@ -211,7 +212,7 @@ make rsmerge.o
 make rsmerge.c
 prev rshdr.h implicit
 done rsmerge.c
-meta rsmerge.o %.c>%.o rsmerge.c rsmerge
+meta rsmerge.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsmerge.c rsmerge
 prev rsmerge.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rsmerge.c
 done rsmerge.o generated
@@ -219,7 +220,7 @@ make rsmethod.o
 make rsmethod.c
 prev rshdr.h implicit
 done rsmethod.c
-meta rsmethod.o %.c>%.o rsmethod.c rsmethod
+meta rsmethod.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsmethod.c rsmethod
 prev rsmethod.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsmethod.c
 done rsmethod.o generated
@@ -227,7 +228,7 @@ make rsopen.o
 make rsopen.c
 prev rshdr.h implicit
 done rsopen.c
-meta rsopen.o %.c>%.o rsopen.c rsopen
+meta rsopen.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsopen.c rsopen
 prev rsopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsopen.c
 done rsopen.o generated
@@ -235,7 +236,7 @@ make rsprocess.o
 make rsprocess.c
 prev rshdr.h implicit
 done rsprocess.c
-meta rsprocess.o %.c>%.o rsprocess.c rsprocess
+meta rsprocess.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsprocess.c rsprocess
 prev rsprocess.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rsprocess.c
 done rsprocess.o generated
@@ -243,7 +244,7 @@ make rswrite.o
 make rswrite.c
 prev rshdr.h implicit
 done rswrite.c
-meta rswrite.o %.c>%.o rswrite.c rswrite
+meta rswrite.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rswrite.c rswrite
 prev rswrite.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rswrite.c
 done rswrite.o generated
@@ -251,7 +252,7 @@ make rs-radix.o
 make rs-radix.c
 prev rshdr.h implicit
 done rs-radix.c
-meta rs-radix.o %.c>%.o rs-radix.c rs-radix
+meta rs-radix.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rs-radix.c rs-radix
 prev rs-radix.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-radix.c
 done rs-radix.o generated
@@ -259,7 +260,7 @@ make rs-rasp.o
 make rs-rasp.c
 prev rshdr.h implicit
 done rs-rasp.c
-meta rs-rasp.o %.c>%.o rs-rasp.c rs-rasp
+meta rs-rasp.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rs-rasp.c rs-rasp
 prev rs-rasp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-rasp.c
 done rs-rasp.o generated
@@ -267,7 +268,7 @@ make rs-splay.o
 make rs-splay.c
 prev rshdr.h implicit
 done rs-splay.c
-meta rs-splay.o %.c>%.o rs-splay.c rs-splay
+meta rs-splay.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rs-splay.c rs-splay
 prev rs-splay.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-splay.c
 done rs-splay.o generated
@@ -275,7 +276,7 @@ make rs-verify.o
 make rs-verify.c
 prev rshdr.h implicit
 done rs-verify.c
-meta rs-verify.o %.c>%.o rs-verify.c rs-verify
+meta rs-verify.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rs-verify.c rs-verify
 prev rs-verify.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-verify.c
 done rs-verify.o generated
@@ -283,7 +284,7 @@ make rs-copy.o
 make rs-copy.c
 prev rshdr.h implicit
 done rs-copy.c
-meta rs-copy.o %.c>%.o rs-copy.c rs-copy
+meta rs-copy.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rs-copy.c rs-copy
 prev rs-copy.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-copy.c
 done rs-copy.o generated
@@ -291,7 +292,7 @@ make rskeyopen.o
 make rskeyopen.c
 prev rskeyhdr.h implicit
 done rskeyopen.c
-meta rskeyopen.o %.c>%.o rskeyopen.c rskeyopen
+meta rskeyopen.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rskeyopen.c rskeyopen
 prev rskeyopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeyopen.c
 done rskeyopen.o generated
@@ -313,7 +314,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tm.h
 prev rskeyhdr.h implicit
 done rskey.c
-meta rskey.o %.c>%.o rskey.c rskey
+meta rskey.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rskey.c rskey
 prev rskey.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rskey.c
 done rskey.o generated
@@ -321,7 +322,7 @@ make rskeymeth.o
 make rskeymeth.c
 prev rskeyhdr.h implicit
 done rskeymeth.c
-meta rskeymeth.o %.c>%.o rskeymeth.c rskeymeth
+meta rskeymeth.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rskeymeth.c rskeymeth
 prev rskeymeth.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeymeth.c
 done rskeymeth.o generated
@@ -329,7 +330,7 @@ make rskeydump.o
 make rskeydump.c
 prev rskeyhdr.h implicit
 done rskeydump.c
-meta rskeydump.o %.c>%.o rskeydump.c rskeydump
+meta rskeydump.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rskeydump.c rskeydump
 prev rskeydump.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeydump.c
 done rskeydump.o generated
@@ -337,7 +338,7 @@ make rsfile.o
 make rsfile.c
 prev rshdr.h implicit
 done rsfile.c
-meta rsfile.o %.c>%.o rsfile.c rsfile
+meta rsfile.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rsfile.c rsfile
 prev rsfile.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsfile.c
 done rsfile.o generated
@@ -345,7 +346,7 @@ make rstemp.o
 make rstemp.c
 prev rshdr.h implicit
 done rstemp.c
-meta rstemp.o %.c>%.o rstemp.c rstemp
+meta rstemp.o %.c>%.o ${PACKAGEROOT}/src/lib/librecsort/rstemp.c rstemp
 prev rstemp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rstemp.c
 done rstemp.o generated

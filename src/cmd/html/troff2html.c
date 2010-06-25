@@ -1150,7 +1150,7 @@ find(char* name, char** found, int verbose)
 		{
 			sfprintf(state.tmp, pathdirs[i], name);
 			path = use(state.tmp);
-			if (pathpath(path, "", PATH_REGULAR|PATH_READ, buf + 1, sizeof(buf) - 1) && (sp = sfopen(NiL, buf + 1, "r")))
+			if (pathpath(buf + 1, path, "", PATH_REGULAR|PATH_READ) && (sp = sfopen(NiL, buf + 1, "r")))
 			{
 				*(path = buf) = '/';
 				goto hit;
@@ -1177,7 +1177,7 @@ find(char* name, char** found, int verbose)
 					{
 						sfprintf(state.tmp, "lib/html/%s%s", s, x);
 						path = use(state.tmp);
-						if (pathpath(path, "", PATH_REGULAR|PATH_READ, buf + 1, sizeof(buf) - 1) && (sp = sfopen(NiL, buf + 1, "r")))
+						if (pathpath(buf + 1, path, "", PATH_REGULAR|PATH_READ) && (sp = sfopen(NiL, buf + 1, "r")))
 						{
 							*(path = buf) = '/';
 							goto hit;

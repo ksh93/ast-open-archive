@@ -1470,7 +1470,7 @@ ppcontrol(void)
 			case T_STRING:
 				s = error_info.file;
 				if (*(p = pp.token))
-					pathcanon(p, 0, 0);
+					pathcanon(p, 0);
 				fp = ppsetfile(p);
 				error_info.file = fp->name;
 				if (error_info.line == 1)

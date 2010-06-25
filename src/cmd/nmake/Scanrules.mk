@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2010-06-17 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2008-04-01 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -56,15 +56,6 @@
 	end
 	return $(%%)
 
-.PREFIX.SOURCE. : .FUNCTION
-	if ! "$(-prefix-include)" && ! "$(-target-context)"
-		local P S
-		P := $(!$(%):A=.PFX.INCLUDE)
-		if S = "$(P:P=U:D)"
-			return $(P:P=D:X=$(S):T>FD:U)
-		end
-	end
-
 .SOURCE.%.LCL.INCLUDE : .FORCE $$(*.SOURCE.c) $$(*.SOURCE) $$(*.SOURCE.h)
 
 .SOURCE.%.STD.INCLUDE : .FORCE $$(*.SOURCE.h)
@@ -80,7 +71,7 @@
 	B| \# if|
 	E| \# endif|
 	I| \# include <%>|A.STD.INCLUDE|R$$(%:P=U:D:S:N=.:?$$$(%)??):.TERMINAL|
-	I| \# include "%"|A.LCL.INCLUDE|R$$(%:P=U:D:S:N=.:?$$$(%)??):.TERMINAL|M$$(.PREFIX.INCLUDE.)|
+	I| \# include "%"|A.LCL.INCLUDE|R$$(%:P=U:D:S:N=.:?$$$(%)??):.TERMINAL|$(-prefix-include:+M$$$(.PREFIX.INCLUDE.))|
 	I| \# pragma library "%"|A.VIRTUAL|A.ACCEPT|M.LIBRARY.$$(%)|
 
 $("$(.SUFFIX.c) $(.SUFFIX.C) .h .S":/^/.ATTRIBUTE.%/) : .SCAN.c

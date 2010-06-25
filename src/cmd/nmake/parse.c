@@ -497,7 +497,7 @@ directive(register char* s)
 					error_info.file = pp->name;
 				else
 				{
-					pathcanon(error_info.file = t, 0, 0);
+					pathcanon(error_info.file = t, 0);
 					state.init++;
 					r = makerule(t);
 					state.init--;

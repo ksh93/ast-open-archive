@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2010-06-14 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2010-01-22 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -430,7 +430,6 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			vp = &op->perm;
 			break;
 		}
-		message((-5, "option: %c %s level=%d:%d", type ? type : '-', op->name, op->level, c));
 		if (op->level > c)
 			continue;
 		if (y && (op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER)
@@ -451,7 +450,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 		}
 		else
 			vp = 0;
-		message((-4, "option: %c %s%s%-.1s=%s entry=%d:%d level=%d:%d number=%I*u", type ? type : '-', y ? "" : "no", op->name, &opt_info.assignment, v, op->entry, ap ? ap->entry : 0, op->level, c, sizeof(opt_info.number), opt_info.number));
+		message((-4, "option: %s%s%-.1s=%s type=%c entry=%d level=%d number=%I*u", y ? "" : "no", op->name, &opt_info.assignment, v, type ? type : '-', op->entry, op->level, sizeof(opt_info.number), opt_info.number));
 		switch (op->index)
 		{
 		case OPT_action:
@@ -747,7 +746,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 							s = "vczip";
 						if (!(fp = getformat(s, 0)))
 						{
-							if (!pathpath("lib/pax", opt.arg0, PATH_EXECUTE, tmp1, sizeof(tmp1)) || sfsprintf(tmp2, sizeof(tmp2) - 1, "%s/%s.fmt", tmp1, s) <= 0 || !(sp = sfopen(NiL, tmp2, "r")))
+							if (!pathpath(tmp1, "lib/pax", opt.arg0, PATH_EXECUTE) || sfsprintf(tmp2, sizeof(tmp2) - 1, "%s/%s.fmt", tmp1, s) <= 0 || !(sp = sfopen(NiL, tmp2, "r")))
 								error(3, "%s: unknown archive format", s);
 							while (e = sfgetr(sp, '\n', 1))
 								if (*e != '#')
@@ -984,7 +983,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 					state.owner = 1;
 					continue;
 				case 'p':
-					state.modemask &= (S_ISUID|S_ISGID);
+					state.modemask = 0;
 					state.chmod = 1;
 					continue;
 				case 's':
@@ -1046,7 +1045,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 				state.record.trailerlen = 1;
 			break;
 		case OPT_reset_atime:
-			state.resetacctime = y;
+			state.acctime = y;
 			break;
 		case OPT_size:
 			break;
@@ -1116,8 +1115,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 				state.testdate = ~0;
 			break;
 		case OPT_times:
-			if (y)
-				setoptions("atime:= ctime:= mtime:=", NiL, usage, ap, type);
+			setoptions("atime:= ctime:= mtime:=", NiL, usage, ap, type);
 			line += opt_info.offset;
 			break;
 		case OPT_unblocked:
@@ -1415,7 +1413,6 @@ main(int argc, char** argv)
 	umask(state.modemask = umask(0));
 	state.modemask |= S_ISUID|S_ISGID;
 	state.ftwflags = ftwflags()|FTW_DOT;
-	state.acctime = 1;
 	state.buffersize = DEFBUFFER * DEFBLOCKS;
 	state.clobber = 1;
 	state.delta.buffersize = DELTA_WINDOW >> 1;
@@ -1552,10 +1549,10 @@ main(int argc, char** argv)
 		{
 			if (state.files)
 				state.ftwflags |= FTW_POST;
+			if (state.update)
+				state.append = 1;
 		}
-		if (state.update)
-			ap->io->mode = O_RDWR|O_CREAT;
-		else if (state.append)
+		if (state.append)
 			ap->io->mode = O_WRONLY|O_APPEND|O_CREAT;
 		ap->io->fd = 1;
 		if (!ap->name || streq(ap->name, "-"))
@@ -1566,15 +1563,10 @@ main(int argc, char** argv)
 			if (open(ap->name, ap->io->mode|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 1)
 				error(ERROR_SYSTEM|3, "%s: cannot write", ap->name);
 		}
-		if (fstat(ap->io->fd, &st))
-			error(ERROR_SYSTEM|3, "%s: cannot stat", ap->name);
-		if (S_ISREG(st.st_mode))
-		{
-			ap->io->seekable = 1;
-			ap->io->size = st.st_size;
-		}
 		if (!state.blocksize)
 		{
+			if (fstat(ap->io->fd, &st))
+				error(ERROR_SYSTEM|3, "%s: cannot stat", ap->name);
 			st.st_mode = modex(st.st_mode);
 			if (state.test & 0000040)
 				st.st_mode = X_IFCHR;
@@ -1607,9 +1599,7 @@ main(int argc, char** argv)
 			if (open(ap->name, ap->io->mode|O_BINARY))
 				error(ERROR_SYSTEM|3, "%s: cannot read", ap->name);
 		}
-		if (fstat(ap->io->fd, &st))
-			error(ERROR_SYSTEM|3, "%s: cannot stat", ap->name);
-		if (S_ISREG(st.st_mode))
+		if (!fstat(ap->io->fd, &st) && S_ISREG(st.st_mode) && st.st_size > 0)
 		{
 			ap->io->seekable = 1;
 			ap->io->size = st.st_size;
@@ -1640,7 +1630,7 @@ main(int argc, char** argv)
 	if (ap = state.in)
 	{
 		binit(ap);
-		if (state.append && !state.out)
+		if (state.append)
 		{
 			error(1, "append ignored for archive read");
 			state.append = 0;
@@ -1650,33 +1640,6 @@ main(int argc, char** argv)
 	{
 		if (!ap->format)
 			ap->format = state.format;
-		if (state.update)
-		{
-			if (ap->delta)
-			{
-				error(1, "update ignored for archive delta");
-				state.update = 0;
-			}
-			if (state.append)
-			{
-				error(1, "append ignored for archive update");
-				state.append = 0;
-			}
-			if (!ap->io->seekable)
-				error(3, "%s: update requires seekable archive", ap->name);
-			else if (!ap->io->size)
-				state.update = 0;
-			else
-			{
-				initdelta(ap, NiL);
-				ap->delta->base = initarchive(ap->name, O_RDONLY);
-			}
-		}
-		else if (state.append && ap->delta)
-		{
-			error(1, "append ignored for archive delta");
-			state.append = 0;
-		}
 		binit(ap);
 		if (ap->compress)
 		{
@@ -1766,7 +1729,7 @@ main(int argc, char** argv)
 	case IN:
 		if (*argv)
 		{
-			initmatch(argv);
+			state.patterns = initmatch(argv);
 			if (state.exact)
 				state.matchsense = 1;
 		}
@@ -1778,9 +1741,12 @@ main(int argc, char** argv)
 			state.pwd[state.pwdlen++] = '/';
 		copyin(state.in);
 		if (state.exact)
-			for (state.pattern = state.patterns; state.pattern->pattern; state.pattern++)
-				if (!state.pattern->matched)
-					error(2, "%s: %s: file not found in archive", state.in->name, state.pattern->pattern);
+		{
+			argv = state.patterns;
+			while (s = *argv++)
+				if (*s)
+					error(2, "%s: %s: file not found in archive", state.in->name, s);
+		}
 		break;
 
 	case OUT:
@@ -1796,7 +1762,7 @@ main(int argc, char** argv)
 		{
 			state.pass = 1;
 			if (*argv)
-				initmatch(argv);
+				state.patterns = initmatch(argv);
 			deltapass(getarchive(IN), getarchive(OUT));
 		}
 		else
@@ -1817,7 +1783,7 @@ main(int argc, char** argv)
 			 * initialize destination dir
 			 */
 
-			pathcanon(state.destination, 0, 0);
+			pathcanon(state.destination, 0);
 			if (stat(state.destination, &st) || !S_ISDIR(st.st_mode))
 				error(3, "%s: destination must be a directory", state.destination);
 			state.dev = st.st_dev;

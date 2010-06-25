@@ -44,7 +44,7 @@ csinfo(register Cs_t* state, const char* file, int* line)
 		for (n = 0; n <= 1; n++)
 		{
 			sfsprintf(tmp, sizeof(tmp), "%s/%s", n ? csvar(state, CS_VAR_SHARE, 0) : CS_SVC_DIR, file);
-			if (pathpath(tmp, "", PATH_REGULAR|PATH_READ, buf, sizeof(buf)))
+			if (pathpath(buf, tmp, "", PATH_REGULAR|PATH_READ))
 			{
 				sp = tokline(buf, SF_READ, line);
 				break;

@@ -126,7 +126,7 @@ csdaemon(register Cs_t* state, int fds)
 	 * no command-relative relative root searching
 	 */
 
-	pathpath(NiL, "", 0, NiL, 0);
+	pathpath(NiL, NiL, "", 0);
 
 	/*
 	 * we ignored a lot of errors to get here

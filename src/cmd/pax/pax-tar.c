@@ -60,7 +60,6 @@ putkey(Archive_t* ap, Sfio_t* sp, Option_t* op, const char* value, Sfulong_t num
 		n = sfprintf(ap->tmp.key, "%I*u", sizeof(number), number);
 		sfstrseek(ap->tmp.key, 0, SEEK_SET);
 	}
-	error(-5, "putkey %s=%s", op->name, value ? value : sfstrseek(ap->tmp.key, 0, SEEK_CUR));
 	n += strlen(op->name) + 3 + ((op->flags & OPT_VENDOR) ? sizeof(VENDOR) : 0);
 	o = 0;
 	for (;;)
@@ -346,8 +345,7 @@ extend(Archive_t* ap, File_t* f, int type)
 	case EXTTYPE:
 		sp = ap->tmp.extended;
 		fmt = state.header.extended;
-		lev = 7;
-		alt = 4;
+		lev = alt = 7;
 		break;
 	case GLBTYPE:
 		sp = ap->tmp.global;
@@ -391,7 +389,7 @@ extend(Archive_t* ap, File_t* f, int type)
 							tvgetctime(&tv, f->st);
 							break;
 						}
-						if (!tv.tv_nsec && op->index == OPT_mtime)
+						if (!tv.tv_nsec)
 							continue;
 						s = num + sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
 						while (*(s - 1) == '0')

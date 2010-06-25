@@ -34,7 +34,7 @@ initiate(register Cs_t* state, const char* name, char* buf)
 {
 	char*	av[3];
 
-	if (!pathpath(CS_STAT_DAEMON, "", PATH_REGULAR|PATH_EXECUTE, buf, PATH_MAX))
+	if (!pathpath(buf, CS_STAT_DAEMON, "", PATH_REGULAR|PATH_EXECUTE))
 	{
 		messagef((state->id, NiL, -1, "stat: %s: %s: cannot find stat daemon", name, CS_STAT_DAEMON));
 		return -1;
@@ -69,7 +69,7 @@ csstat(register Cs_t* state, const char* name, register Csstat_t* sp)
 		if (!init)
 		{
 			init = 1;
-			if (pathpath(CS_STAT_DIR, "", PATH_EXECUTE, buf, sizeof(buf)))
+			if (pathpath(buf, CS_STAT_DIR, "", PATH_EXECUTE))
 				dir = strdup(buf);
 		}
 		if (!dir)

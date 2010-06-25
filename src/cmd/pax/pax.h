@@ -402,13 +402,6 @@ struct Filter_s
 	char**		patharg;	/* file arg in argv		*/
 };
 
-typedef struct Pattern_s
-{
-	char*		pattern;
-	unsigned char	directory;
-	unsigned char	matched;
-} Pattern_t;
-
 #define _PAX_ARCHIVE_PRIVATE_ \
 	unsigned long	checksum;	/* running checksum		*/ \
 	int		checkdelta;	/* getprologue delta check	*/ \
@@ -466,11 +459,10 @@ typedef struct Pattern_s
 	off_t		total;		/* newio() total io check	*/ \
 	char*		type;		/* archive type			*/ \
 	off_t		uncompressed;	/* uncompressed size estimate	*/ \
-	Hash_table_t*	update;		/* update info			*/ \
 	int		warnlinkhead;	/* invalid hard link header	*/
 
 #define _PAX_PRIVATE_ \
-	int		acctime;	/* preserve member access times	*/ \
+	int		acctime;	/* reset file access times	*/ \
 	int		append;		/* append -- must be 0 or 1 !!!	*/ \
 	Bio_t		backup;		/* backup() position		*/ \
 	long		blocksize;	/* explicit buffer size		*/ \
@@ -573,8 +565,7 @@ typedef struct Pattern_s
 	int		owner;		/* set owner info		*/ \
 	Archive_t*	out;		/* output archive info		*/ \
 	int		pass;		/* archive to archive		*/ \
-	Pattern_t*	pattern;	/* current name match pattern	*/ \
-	Pattern_t*	patterns;	/* name match patterns		*/ \
+	char**		patterns;	/* name match patterns		*/ \
 	char*		peekfile;	/* stdin file list peek		*/ \
 	int		peeklen;	/* peekfile length		*/ \
 	char		pwd[PATH_MAX];	/* full path of .		*/ \
@@ -596,7 +587,6 @@ typedef struct Pattern_s
 	char*		trailer;	/* file trailer			*/ \
 	int		trailerlen;	/* file trailer length		*/ \
 	}		record;		/* record info			*/ \
-	int		resetacctime;	/* reset input file access times*/ \
 	Hash_table_t*	restore;	/* post proc restoration table	*/ \
 	Sfio_t*		rtty;		/* tty file read pointer	*/ \
 	int		scanned;	/* scanned for format libs	*/ \
@@ -648,6 +638,7 @@ extern Format_t*	formats;
 extern State_t		state;
 
 extern int		addlink(Archive_t*, File_t*);
+extern void		append(Archive_t*);
 extern int		apply(Archive_t*, File_t*, Filter_t*);
 extern long		asc_checksum(char*, int, unsigned long);
 extern void		backup(Archive_t*);
@@ -662,7 +653,6 @@ extern off_t		bseek(Archive_t*, off_t, int, int);
 extern int		bskip(Archive_t*);
 extern void		bunread(Archive_t*, void*, int);
 extern void		bwrite(Archive_t*, void*, off_t);
-extern int		closein(Archive_t*, File_t*, int);
 extern int		closeout(Archive_t*, File_t*, int);
 extern int		cmpftw(Ftw_t*, Ftw_t*);
 extern void		complete(Archive_t*, File_t*, size_t);
@@ -678,7 +668,7 @@ extern void		deltaout(Archive_t*, Archive_t*, File_t*);
 extern void		deltapass(Archive_t*, Archive_t*);
 extern void		deltaset(Archive_t*, char*);
 extern void		deltaverify(Archive_t*);
-extern int		dirprefix(char*, char*, int);
+extern int		dirprefix(char*, char*);
 extern void		filein(Archive_t*, File_t*);
 extern void		fileout(Archive_t*, File_t*);
 extern void		fileskip(Archive_t*, File_t*);
@@ -698,7 +688,7 @@ extern ssize_t		holewrite(int, void*, size_t);
 extern Archive_t*	initarchive(const char*, int);
 extern void		initdelta(Archive_t*, Format_t*);
 extern void		initfile(Archive_t*, File_t*, struct stat*, char*, int);
-extern void		initmatch(char**);
+extern char**		initmatch(char**);
 extern void		interactive(void);
 extern void		listentry(File_t*);
 extern int		listprintf(Sfio_t*, Archive_t*, File_t*, const char*);

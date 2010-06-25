@@ -71,7 +71,7 @@ chdir3d(const char* path)
 #if 0
 		state.path.level = 0;
 #endif
-		if ((sp = pathcanon(buf, sizeof(buf), 0)) && *(sp - 1) == '.' && *(sp - 2) == '/')
+		if ((sp = pathcanon(buf, 0)) && *(sp - 1) == '.' && *(sp - 2) == '/')
 			*(sp -= 2) = 0;
 		state.pwdsize = strcopy(state.pwd, buf) - state.pwd;
 		memcpy(state.envpwd + sizeof(var_pwd) - 1, state.pwd, state.pwdsize);

@@ -393,7 +393,7 @@ update(register State_t* state)
 	sfprintf(state->tmp, "%s/%s/%s", state->pwd, state->pwd, AT_QUEUE_FILE);
 	if (!(path = sfstruse(state->tmp)))
 		error(ERROR_SYSTEM|3, "out of space");
-	pathcanon(path, 0, 0);
+	pathcanon(path, 0);
 	if (sp = sfopen(NiL, path, "r"))
 	{
 		error(0, "scan %s queue list", path);
@@ -421,7 +421,7 @@ update(register State_t* state)
 		sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_ALLOW_FILE);
 		if (!(path = sfstruse(state->tmp)))
 			error(ERROR_SYSTEM|3, "out of space");
-		pathcanon(path, 0, 0);
+		pathcanon(path, 0);
 		if (sp = sfopen(NiL, path, "r"))
 			permit = 1;
 		else
@@ -430,7 +430,7 @@ update(register State_t* state)
 			sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_DENY_FILE);
 			if (!(path = sfstruse(state->tmp)))
 				error(ERROR_SYSTEM|3, "out of space");
-			pathcanon(path, 0, 0);
+			pathcanon(path, 0);
 			sp = sfopen(NiL, path, "r");
 		}
 
@@ -1093,7 +1093,7 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 		sfprintf(state->tmp, "%s/%s", state->pwd, AT_LOG_FILE);
 		if (!(s = sfstruse(state->tmp)))
 			error(ERROR_SYSTEM|3, "out of space");
-		pathcanon(s, 0, 0);
+		pathcanon(s, 0);
 		error(ERROR_OUTPUT|0, con->fd, "%s", s);
 		break;
 	case AT_QUIT:
@@ -1347,7 +1347,7 @@ init(const char* path)
 	*ap++ = state->con[0].id.uid = geteuid();
 	*ap++ = 0;
 	s = state->buf;
-	if (!pathpath(AT_JOB_DIR, "", PATH_ABSOLUTE|PATH_EXECUTE, s, state->bufsiz) || lstat(s, &ds) || !AT_DIR_OK(&ds))
+	if (!pathpath(s, AT_JOB_DIR, "", PATH_ABSOLUTE|PATH_EXECUTE) || lstat(s, &ds) || !AT_DIR_OK(&ds))
 		error(ERROR_SYSTEM|3, "%s: job directory not found", AT_JOB_DIR);
 	if (ds.st_uid != state->admin[0])
 		error(ERROR_SYSTEM|3, "%s: job directory uid %d != effective uid %d", s, ds.st_uid, state->admin[0]);
@@ -1376,7 +1376,7 @@ init(const char* path)
 	if (hs.st_uid != state->admin[0])
 		error(AT_STRICT, "%s: directory owner %s does not match daemon %s", s, fmtuid(hs.st_uid), fmtuid(state->admin[0]));
 	sfsprintf(s, state->bufsiz, "%s/%s", state->pwd, AT_EXEC_FILE);
-	pathcanon(s, 0, 0);
+	pathcanon(s, 0);
 	if (lstat(s, &xs))
 		error(ERROR_SYSTEM|3, "%s: job exec command not found", s);
 	if (!S_ISREG(xs.st_mode))

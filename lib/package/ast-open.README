@@ -93,8 +93,8 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-06-16  --- Release ksh93t+  ---
-10-06-16  The next release this directory will be renamed ksh93t and will
+10-06-21  --- Release ksh93t+  ---
+10-06-21  The next release this directory will be renamed ksh93t and will
 	  install as ksh93t and ksh93u will become the default ksh.
 10-05-27  Rewrote the subshell code to avoid using pipes in many cases.
 10-05-24  Fixed a bug which cause an exception when both -s and -s were
@@ -2410,11 +2410,6 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
-10-06-14 ug+s only for -p [eo]
-10-06-14 atime in archive by default for formats that support it
-10-06-14 add state.resetacctime to separate -t from state.acctime
-10-06-12 fix --exact to list matched directory hierarchies
-10-06-01 sync with ast api 20100601
 10-01-22 pax.c: fix -rw to 1 char dir name that dropped '/' separator
 09-09-09 ax-tar.c: handle gnu tar octal overflow extensions for all octal fields
 08-12-31 pax.c,pax-vczip.c: add vczip compression format
@@ -2727,7 +2722,6 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
-10-06-01 sync with ast api 20100601
 10-05-28 mm2*.sh: use --???MAN=nx for man section titles
 10-04-11 mm2html.sh: headings now internal anchors by default
 10-01-31 mm2html.sh: handle bsd mandoc
@@ -2970,7 +2964,6 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
-10-06-01 sync with ast api 20100601
 10-04-10 mkdir3d.c: fix mkdir() intermediate dir logic
 10-01-19 3d.h: increase some path buffer sizes -- these need to be dynamic!
 09-05-15 dll_3d.h: handle dllopen => dlopen
@@ -3120,7 +3113,6 @@ All recorded changes follow.
 
 :::::::: coshell ::::::::
 
-10-06-01 sync with ast api 20100601
 08-04-08 event.c: use dbmlib.iffe
 07-10-23 main.c: avoid UOUT CO_SERIALIZE cswrite hangs via O_NONBLOCK
 07-09-25 handle CO_SERIALIZE
@@ -3263,7 +3255,6 @@ All recorded changes follow.
 
 :::::::: cs ::::::::
 
-10-06-01 sync with ast api 20100601
 06-10-11 add sfstropen()/sfstruse() error checks
 06-06-11 cs.c: switch to csclient()
 02-10-02 tst.c: tmform() => fmttime()
@@ -3285,12 +3276,10 @@ All recorded changes follow.
 
 :::::::: mam ::::::::
 
-10-06-01 sync with ast api 20100601
 04-02-29 self-document
 
 :::::::: msgcc ::::::::
 
-10-06-01 sync with ast api 20100601
 06-11-15 msgcc.sh: date -f x => date +x for ast-base portability
 06-10-11 add sfstruse() error checks
 02-03-11 msgcc: fix merge replacement threshhold logic
@@ -3306,8 +3295,6 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
-10-06-17 Makerules.mk,Scanrules.mk: finally a general solution to -I- vs prefix-include?
-10-06-01 ast api 20100601
 10-06-01 Makerules.mk: :PACKAGE: --latest --api=YYYYMMDD|latest FOO:YYYYMMDD
 10-05-25 pkg-X11.mk: add CC.STDLIB.BASE checks for PACKAGE_X11_LIB
 10-04-15 command.c: update to latest cowait() api
@@ -4617,7 +4604,6 @@ All recorded changes follow.
 
 :::::::: probe ::::::::
 
-10-06-01 sync with ast api 20100601
 07-02-22 probe.c: fix double sfclose(fp)
 06-09-05 probe.c: add -f, --force
 02-10-30 probe.c: reset proc->rfd after sfnew() to avoid close() error
@@ -4632,7 +4618,6 @@ All recorded changes follow.
 
 :::::::: ss ::::::::
 
-10-06-01 sync with ast api 20100601
 04-07-22 ssd.c: access() => eaccess()
 03-07-29 ssd.c,features/cmd: add utmpx support
 99-05-18 ss: long options
@@ -4645,7 +4630,6 @@ All recorded changes follow.
 
 :::::::: at ::::::::
 
-10-06-01 sync with ast api 20100601
 10-03-19 atd.c,atx.c: each job in separate session
 06-10-11 add sfstruse() error checks
 06-09-19 atd.c: sysconf() => astconf()
@@ -5063,12 +5047,6 @@ All recorded changes follow.
 02-12-17 propagate -ldss changes
 02-11-01 a rudimentary alternative to the flat method
 
-:::::::: time_t ::::::::
-
-09-01-30 handle TMX_FLOAT (mvs.390)
-08-08-22 fix time_t => Time_t typo
-08-08-11 update timestamp_t logic to tmx*()
-
 :::::::: validate ::::::::
 
 03-04-05 avoid possible floating point underflow/overflow
@@ -5100,7 +5078,6 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
-10-06-01 sync with ast api 20100601
 09-06-09 names.c,vars.c: fix alias expansion cross-dictionary bug
 09-05-15 proc.c,quit.c: add buffer checks to filetemp()
 08-11-04 spam.c: fix 0-terminated overrun in usermatch() -- wow
@@ -5550,7 +5527,6 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
-10-06-01 sync with ast api 20100601
 10-05-25 ls.c: back off 09-07-02 logical|(meta)physical change
 10-02-09 ps.c: fix --tree --format=... => \\_ instead of \_
 10-02-09 ps.c: ntpid not hex by default
@@ -5853,7 +5829,6 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
-10-06-01 sync with ast api 20100601
 10-04-05 find.c: vmclose() after all usage -- doh
 10-04-05 find.c: handle -exec|-xargs with multiple {}
 07-10-26 find.c: fix default -print w.r.t. -o
@@ -5988,11 +5963,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
-10-06-01 features/api, ast_api.h: formalized forwards/backwards api compatibility
-10-06-01 _AST_API=20100601: add size_t args for all path*() output buffers
 10-06-01 comp/setlocale.c: handle C.UTF-8 test locale
-10-06-01 include/mc.h: add size_t to mcfind() for result buffer (internal api)
-10-06-01 use strlcpy() instead of strncpy()
 10-05-28 include/ast_version.h: add AST_PLUGIN_VERSION for dllplugin()
 10-05-28 include/shcmd.h: add SH_PLUGIN_VERSION for dllplugin()
 10-05-28 misc/conformance.c: add conformance(3)
@@ -8233,7 +8204,6 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
-10-06-01 sync with ast api 20100601
 10-05-19 cokill.c: do cowait(co,co,0) to drain pending messages
 10-05-15 coshell.h,coopen.c: add CO_ORPHAN for PROC_ORPHAN
 10-05-11 coopen.c: add PROC_ORPHAN for CO_SHELL
@@ -8280,7 +8250,6 @@ All recorded changes follow.
 
 :::::::: libcs ::::::::
 
-10-06-01 sync with ast api 20100601
 10-04-12 Makefile: defer share and local generation to first use
 08-04-09 csopen.c: fix mkmount() path cleanup
 08-04-09 csopen.c: add debug=-1 mkmount() error message
@@ -8371,14 +8340,8 @@ All recorded changes follow.
 95-03-19 bsd4.4 stole devname(), so use devpath() in cspath()
 94-12-15 csinfo("-",0) gets standard info
 
-:::::::: libmam ::::::::
-
-10-06-01 sync with ast api 20100601
-
 :::::::: libpp ::::::::
 
-10-06-16 ppsearch.c: try parent prefix if -I- include search fails
-10-06-01 sync with ast api 20100601
 09-02-02 pp.probe,probe.win32: check for compiler supplied __FUNCTION__
 09-02-02 ppop.c: include pp_default.h/probe at end of builtin script
 09-01-20 probe.win32: elide #pragma comment.*linker.*manifest
@@ -9139,7 +9102,6 @@ All recorded changes follow.
 
 :::::::: libtksh ::::::::
 
-10-06-01 sync with ast api 20100601
 08-08-08  src/list.c,src/tcleval.c: add temporary sh_eval(p,0x8000) hack
 07-03-19  src/var.c: use nv_setref() to initialize references
 06-09-19  src/shcompat.c: sysconf() => astconf()
@@ -9247,13 +9209,8 @@ All recorded changes follow.
 
 96-01-25  --- Release 1.0b1 ---
 
-:::::::: libtk ::::::::
-
-10-06-01 sync with ast api 20100601
-
 :::::::: libvcodex ::::::::
 
-10-06-01 sync with ast api 20100601
 09-08-19 vchufgroup.c: sync with kpv (new alg)
 09-06-22 sync with kpv, add vcgetfname(), vcwalkfname()
 09-03-12 vcstrip.c: add

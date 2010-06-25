@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make coshell.svc
 make main.o
@@ -60,8 +60,6 @@ done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -102,6 +100,9 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -160,7 +161,7 @@ done ${PACKAGE_ast_INCLUDE}/cs.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done service.h
 done main.c
-meta main.o %.c>%.o main.c main
+meta main.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/main.c main
 prev main.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DPATHCHECK=CO_ID -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?coshell]"\" -D_PACKAGE_ast -DDEBUG -c main.c
 done main.o generated
@@ -168,7 +169,7 @@ make job.o
 make job.c
 prev service.h implicit
 done job.c
-meta job.o %.c>%.o job.c job
+meta job.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/job.c job
 prev job.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c job.c
 done job.o generated
@@ -176,7 +177,7 @@ make schedule.o
 make schedule.c
 prev service.h implicit
 done schedule.c
-meta schedule.o %.c>%.o schedule.c schedule
+meta schedule.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/schedule.c schedule
 prev schedule.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c schedule.c
 done schedule.o generated
@@ -188,7 +189,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/proc.h
 prev service.h implicit
 done shell.c
-meta shell.o %.c>%.o shell.c shell
+meta shell.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/shell.c shell
 prev shell.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c shell.c
 done shell.o generated
@@ -196,7 +197,7 @@ make command.o
 make command.c
 prev service.h implicit
 done command.c
-meta command.o %.c>%.o command.c command
+meta command.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/command.c command
 prev command.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c command.c
 done command.o generated
@@ -207,14 +208,14 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashkey.h
 prev service.h implicit
 done misc.c
-meta misc.o %.c>%.o misc.c misc
+meta misc.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/misc.c misc
 prev misc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c misc.c
 done misc.o generated
 make init.o
 make init.c
 done init.c
-meta init.o %.c>%.o init.c init
+meta init.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/init.c init
 prev init.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -c init.c
 done init.o generated
@@ -255,7 +256,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/cdt.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done event.c
-meta event.o %.c>%.o event.c event
+meta event.o %.c>%.o ${PACKAGEROOT}/src/cmd/coshell/event.c event
 prev event.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?coshell]"\" -c event.c
 done event.o generated

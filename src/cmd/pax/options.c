@@ -57,7 +57,6 @@ Option_t		options[] =
 	"time",
 	0,
 	OPT_HEADER|OPT_OPTIONAL,
-	4
 },
 {
 	"base",

@@ -201,7 +201,7 @@ char *TkshLibDir(void)
 
 	if (!libDir && !(libDir = getenv(LIB_DIR_ENV)) || !*libDir)
 	{
-		if (!(libDir = pathpath(LIB_DIR, "", PATH_EXECUTE|PATH_READ, buf, sizeof(buf))))
+		if (!(libDir = pathpath(buf, LIB_DIR, "", PATH_EXECUTE|PATH_READ)))
 			sfsprintf(buf, sizeof(buf), "/usr/local/%s", LIB_DIR);
 		if (!(libDir = strdup(buf)))
 			libDir = TKSH_LIBRARY;

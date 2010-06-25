@@ -1,4 +1,3 @@
-10-06-01 sync with ast api 20100601
 06-10-11 add sfstropen()/sfstruse() error checks
 06-06-11 cs.c: switch to csclient()
 02-10-02 tst.c: tmform() => fmttime()

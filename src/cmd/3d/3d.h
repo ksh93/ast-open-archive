@@ -76,6 +76,7 @@ __STDPP__directive pragma pp:nohide strmode
 
 #include "lib_3d.h"
 
+#include <ast.h>
 #include <ls.h>
 #include <sig.h>
 #include <times.h>
@@ -553,8 +554,7 @@ extern int		mapget(Map_t*, char*, int);
 extern int		mapinit(const char*, int);
 extern int		mapset(Table_t*, const char*, int, const char*, int);
 extern int		nosys(void);
-extern char*		pathcanon(char*, size_t, int);
-extern char*		pathcat(const char*, int, const char*, const char*, char*, size_t);
+extern char*		pathcanon(char*, int);
 extern char*		pathreal(const char*, int, struct stat*);
 extern ssize_t		peek(int, void*, size_t);
 extern Map_t*		search(Table_t*, const char*, int, const char*, int);
