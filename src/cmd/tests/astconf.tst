@@ -1,5 +1,7 @@
 UNIT $SHELL
 
+unset _AST_FEATURES
+
 export PATH=/opt/ast/bin:$PATH
 
 TEST 01 synthesized getconf
@@ -12,6 +14,14 @@ TEST 01 synthesized getconf
 			getconf PATH_RESOLVE - 0
 			print :\$_AST_FEATURES:"'
 		OUTPUT - $'::\n:PATH_RESOLVE - metaphysical:\n:PATH_RESOLVE - 0:'
+
+	EXEC -c '
+		_AST_FEATURES="CONFORMANCE = standard" $SHELL -c "
+			getconf CONFORMANCE
+			getconf PATH_RESOLVE
+			getconf UNIVERSE
+			print :\$_AST_FEATURES:"'
+		OUTPUT - $'standard\nphysical\natt\n:CONFORMANCE = standard:'
 
 	EXEC -c '
 		_AST_FEATURES="PATH_RESOLVE - logical" $SHELL -c "

@@ -3384,6 +3384,7 @@ All recorded changes follow.
 :::::::: nmake ::::::::
 
 10-06-21 Makerules.mk: use CC.SUFFIX.DEBUG instead of .pdb
+10-06-21 Makerules.mk: add "idxxx ... id=id :LIBRARY: ..." to preserve _BLD_id==1
 10-06-17 Makerules.mk,Scanrules.mk: finally a general solution to -I- vs prefix-include?
 10-06-01 ast api 20100601
 10-06-01 Makerules.mk: :PACKAGE: --latest --api=YYYYMMDD|latest FOO:YYYYMMDD
@@ -6067,6 +6068,10 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-06-29 string/strtoi.h: strton() multiplier 1 => power of two suffix
+10-06-28 features/wchar: handle systems that require __va_list => va_list
+10-06-28 comp/conf.tab: another PID_MAX tweak -- default to 99999 for most
+10-06-28 port/astconf.c: lone "CONFORMANCE = standard" => all defaults standard
 10-06-25 misc/optget.c: avoid sfprints() call during initialization
 10-06-01 features/api, ast_api.h: formalized forwards/backwards api compatibility
 10-06-01 _AST_API=20100601: add size_t args for all path*() output buffers
@@ -8458,6 +8463,7 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+10-06-29 ppargs.c: ignore -H<number> (hpux /opt/langtools/lbin/cpp.ansi)
 10-06-16 ppsearch.c: try parent prefix if -I- include search fails
 10-06-01 sync with ast api 20100601
 09-02-02 pp.probe,probe.win32: check for compiler supplied __FUNCTION__

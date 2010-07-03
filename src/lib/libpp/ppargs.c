@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1986-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1986-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -138,7 +138,9 @@ USAGE_LICENSE
 "	compatibility.]:[assertion]"
 "[E:preprocess?Ignored for compatibility with ancient compilers.]"
 "[H:include-reference?Emit \b#include\b file paths on the standard error,"
-"	one per line, indented to show nesting.]"
+"	one per line, indented to show nesting. If the optional \asize\a"
+"	argument is specified then the entire \b-H\b option is"
+"	ignored.]#?[size]"
 "[T?If not \bgcc\b(1) then truncate identifiers to \alength\a"
 "	characters for compatibility with old AT&T (I guess only Lucent needs"
 "	them now) compilers.]#?[length]"
@@ -426,7 +428,8 @@ ppargs(char** argv, int last)
 				ppop(PP_ASSERT, opt_info.arg);
 			break;
 		case 'H':
-			ppop(PP_INCREF, ppincref);
+			if (!opt_info.arg)
+				ppop(PP_INCREF, ppincref);
 			break;
 		case 'T':
 			if (!(pp.arg_style & STYLE_gnu))

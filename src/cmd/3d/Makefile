@@ -33,7 +33,7 @@ FS = 0
 VCS = 0
 end
 
-$(ID)$(VARIANTID) $(VERSION) :LIBRARY: README RELEASE PROMO.mm \
+$(ID)$(VARIANTID) $(VERSION) id=$(ID) :LIBRARY: README RELEASE PROMO.mm \
 	3d.h lib_3d.h dir_3d.h \
 	init.c \
 	bio.c copy.c error.c execv.c fs.c lib.c map.c \
@@ -88,7 +88,7 @@ NAME3D = lib_3d.h std_3d.h vcs_3d.h
 	.SOURCE.c : $(L:X=. $(>))
 	.SOURCE.features/% : $(L)
 
--last :lib: comp dir hash misc path port string
+-last :lib: comp dir hash misc path port string tm
 
 -lcs :lib:
 

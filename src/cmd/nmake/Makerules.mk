@@ -2052,8 +2052,10 @@ RECURSEROOT = .
  */
 
 ":LIBRARY:" : .MAKE .OPERATOR .PROBE.INIT
-	local A B L N P R S T V X
+	local A B L M N P R S T V X
 	P := $(.PACKAGE.plugin)
+	B := $(<:O=1)
+	M := $(B)
 	for T $(<:O>1)
 		if T == "+([-+.0-9])"
 			V := $(T)
@@ -2064,6 +2066,8 @@ RECURSEROOT = .
 				.DLL.TOP. = 1
 			end
 			.ALL : .$(B)
+		elif T == "id=*"
+			M := $(T:/id=//)
 		elif T == "plugin=*"
 			P := $(T:/plugin=//)
 		elif T == "shared=*"
@@ -2083,7 +2087,6 @@ RECURSEROOT = .
 	elif ! VERSION
 		VERSION := $(V)
 	end
-	B := $(<:O=1)
 	if "$(B:A=.TARGET)"
 		T := .ALL
 	else
@@ -2181,7 +2184,7 @@ RECURSEROOT = .
 		end
 	end
 	eval
-	_BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G) == 1
+	_BLD_$(M:B:S:/[^a-zA-Z0-9_]/_/G) == 1
 	end
 	.LIBRARY.ONLY. += _BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G)=
 	$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
@@ -2472,9 +2475,9 @@ RECURSEROOT = .
 				$(I:V) :INSTALLDIR: $(D)
 			end
 			if ! "$(.INSTALL.$(S))" && ! "$(.INSTALL.$(X))"
-				$$(LIBDIR)/$(L) :INSTALL: $(S)
+				$(LIBDIR)/$(L) :INSTALL: $(S)
 				if G
-					$$(LIBDIR)/$(G:B:S) :INSTALL: $(G)
+					$(LIBDIR)/$(G:B:S) :INSTALL: $(G)
 				end
 			end
 		end
@@ -4532,7 +4535,7 @@ test : .SPECIAL .DONTCARE .ONOBJECT $$("check":A=.TARGET:A!=.ARCHIVE|.COMMAND|.O
 
 .CC- .VARIANTS : .ONOBJECT $$(*.SOURCE:L<=cc-*:$$(-variants:+N=$$(-variants))) $$(.VARIANTS.:$$(-variants:+N=$$(-variants)))
 
-.CC-INSTALL : .ONOBJECT .ALL $$(*.INSTALL:N=*-*$$(CC.SUFFIX.ARCHIVE))
+.CC-INSTALL : .ONOBJECT .ALL $$(CC.LIB.TYPE:+$$$(*.INSTALL:N=*$$$(CC.LIB.TYPE)$$$(CC.SUFFIX.ARCHIVE)))
 
 .CC.LD.RUNPATH. : .FUNCTION
 	if "$(LDRUNPATH)" && CC.LD.RUNPATH && "$(CC.DIALECT:N=DYNAMIC)" && ( "$(CCLDFLAGS:V:N=$(CC.DYNAMIC)|$\(CC.DYNAMIC\))" || ! "$(CCLDFLAGS:V:N=$(CC.STATIC)|$\(CC.STATIC\))" )

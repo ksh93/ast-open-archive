@@ -1,4 +1,5 @@
 10-06-21 Makerules.mk: use CC.SUFFIX.DEBUG instead of .pdb
+10-06-21 Makerules.mk: add "idxxx ... id=id :LIBRARY: ..." to preserve _BLD_id==1
 10-06-17 Makerules.mk,Scanrules.mk: finally a general solution to -I- vs prefix-include?
 10-06-01 ast api 20100601
 10-06-01 Makerules.mk: :PACKAGE: --latest --api=YYYYMMDD|latest FOO:YYYYMMDD

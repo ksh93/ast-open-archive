@@ -417,6 +417,17 @@ done ../../lib/libast/FEATURE/eaccess dontcare
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/eaccess.c dontcare
+make ../../lib/libast/tm/tvgettime.c implicit
+make FEATURE/tvlib implicit
+meta FEATURE/tvlib features/%>FEATURE/% ../../lib/libast/features/tvlib tvlib
+make ../../lib/libast/features/tvlib
+done ../../lib/libast/features/tvlib
+prev 3d.req
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast}  : run ../../lib/libast/features/tvlib
+done FEATURE/tvlib dontcare generated
+prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
+prev ${PACKAGE_ast_INCLUDE}/tv.h implicit
+done ../../lib/libast/tm/tvgettime.c dontcare
 make ../../lib/libast/string/fmterror.c implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/string/fmterror.c dontcare
@@ -504,7 +515,7 @@ prev 3d.h implicit
 done ast.c
 meta ast.o %.c>%.o ast.c ast
 prev ast.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -D_PACKAGE_ast -D_BLD_3d -DFS -DDEBUG -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libast/tm -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -D_PACKAGE_ast -D_BLD_3d -DFS -DDEBUG -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
 done ast.o generated
 make cs.o
 make cs.c
