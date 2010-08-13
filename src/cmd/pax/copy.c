@@ -361,6 +361,50 @@ copyinout(Ftw_t* ftw)
 		{
 			if ((rfd = openin(state.out, f)) >= 0)
 			{
+#if defined(SEEK_DATA) && defined(SEEK_HOLE)
+				off_t		data;
+				off_t		hole;
+				int		more;
+
+				data = 0;
+				more = 1;
+				while (more)
+				{
+					if ((hole = lseek(rfd, data, SEEK_HOLE)) < data)
+					{
+						hole = lseek(rfd, 0, SEEK_END);
+						more = 0;
+					}
+					while ((c = hole - data) > 0)
+					{
+						if (c > state.buffersize)
+							c = state.buffersize;
+						if (lseek(rfd, data, SEEK_SET) != data || (n = read(rfd, state.tmp.buffer, (size_t)c)) <= 0)
+						{
+							error(ERROR_SYSTEM|2, "%s: read error", f->name);
+							more = 0;
+							break;
+						}
+						if (lseek(wfd, data, SEEK_SET) != data || write(wfd, state.tmp.buffer, n) != n)
+						{
+							error(ERROR_SYSTEM|2, "%s: write error", f->name);
+							more = 0;
+							break;
+						}
+						state.out->io->count += n;
+						data += n;
+					}
+					if (!more)
+						break;
+					if ((data = lseek(rfd, hole, SEEK_DATA)) < hole)
+					{
+						if ((data = lseek(rfd, -1, SEEK_END)) < 0 || lseek(wfd, data, SEEK_SET) != data || write(wfd, "", 1) != 1)
+							error(ERROR_SYSTEM|2, "%s: write error", f->name);
+						state.out->io->count += 1;
+						break;
+					}
+				}
+#else
 				holeinit(wfd);
 				for (c = f->st->st_size; c > 0; c -= n)
 				{
@@ -377,6 +421,7 @@ copyinout(Ftw_t* ftw)
 					state.out->io->count += n;
 				}
 				holedone(wfd);
+#endif
 				closeout(state.out, f, wfd);
 				closein(state.out, f, rfd);
 				setfile(state.out, f);

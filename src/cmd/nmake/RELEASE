@@ -1,3 +1,5 @@
+10-08-11 mam.c: fix joint target make-done imbalance
+10-07-17 option.c: expand external.old for execve() -- doh
 10-06-21 Makerules.mk: use CC.SUFFIX.DEBUG instead of .pdb
 10-06-21 Makerules.mk: add "idxxx ... id=id :LIBRARY: ..." to preserve _BLD_id==1
 10-06-17 Makerules.mk,Scanrules.mk: finally a general solution to -I- vs prefix-include?

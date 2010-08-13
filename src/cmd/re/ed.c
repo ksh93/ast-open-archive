@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -373,7 +373,7 @@ init(void)
 	ed.redisc.re_errorf = errorf;
 	ed.re.re_disc = &ed.redisc;
 	ed.reflags = REG_DISCIPLINE|REG_DELIMITED;
-	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
+	if (!conformance("standard", 0))
 		ed.reflags |= REG_LENIENT;
 	ed.verbose = 1;
 	for (c = 0; c < elementsof(signals); c++)

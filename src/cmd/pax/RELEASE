@@ -1,3 +1,7 @@
+10-08-11 use conformance("standard",0) test
+10-08-09 fix extended header size key precedence/performance
+10-08-09 use { SEEK_DATA SEEK_HOLE } for -rw if available
+10-08-08 disable SOKTYPE
 10-06-21 align { --append --update } with posix
 10-06-14 ug+s only for -p [eo]
 10-06-14 atime in archive by default for formats that support it

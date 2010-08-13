@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2005 AT&T Corp.                  *
+*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -206,6 +206,37 @@ portopen(Ardir_t* ar, char* buf, size_t n)
 }
 
 /*
+ * hpux 32 bit uid/gid workaround
+ */
+
+static int
+ar_uid_gid(Ardir_t* ar, char* b, long* p)
+{
+	int	i;
+	long	n;
+
+	if (b[5] != ' ')
+	{
+		n = 0;
+		for (i = 0; i < 5; i++)
+		{
+			n <<= 6;
+			n |= b[i] - ' ';
+		}
+		n <<= 2;
+		n |= b[i] - '@';
+		*p = n;
+		error(-1, "AHA ar_uid_gid '%s'  =>  %lu\n", b, n);
+	}
+	else if (sfsscanf(b, "%ld", p) != 1)
+	{
+		ar->error = EINVAL;
+		return -1;
+	}
+	return 0;
+}
+
+/*
  * nextf
  */
 
@@ -247,17 +278,11 @@ portnext(Ardir_t* ar)
 	ar->dirent.name[sizeof(state->header.ar_name)] = 0;
 	if (state->names && (*ar->dirent.name == TERM_port || *ar->dirent.name == ' '))
 		ar->dirent.name = state->names + strtol(ar->dirent.name + 1, NiL, 10);
-	if (sfsscanf(state->header.ar_uid, "%ld", &n) != 1)
-	{
-		ar->error = EINVAL;
+	if (ar_uid_gid(ar, state->header.ar_uid, &n))
 		return 0;
-	}
 	ar->dirent.uid = n;
-	if (sfsscanf(state->header.ar_gid, "%ld", &n) != 1)
-	{
-		ar->error = EINVAL;
+	if (ar_uid_gid(ar, state->header.ar_gid, &n))
 		return 0;
-	}
 	ar->dirent.gid = n;
 	if (sfsscanf(state->header.ar_mode, "%lo", &n) != 1)
 	{

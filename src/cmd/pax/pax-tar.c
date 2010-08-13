@@ -25,6 +25,8 @@
 
 #include "format.h"
 
+#undef	SOKTYPE
+
 #define PAX		1
 #define OLD		2
 #define TAR		3
@@ -60,7 +62,7 @@ putkey(Archive_t* ap, Sfio_t* sp, Option_t* op, const char* value, Sfulong_t num
 		n = sfprintf(ap->tmp.key, "%I*u", sizeof(number), number);
 		sfstrseek(ap->tmp.key, 0, SEEK_SET);
 	}
-	error(-5, "putkey %s=%s", op->name, value ? value : sfstrseek(ap->tmp.key, 0, SEEK_CUR));
+	message((-5, "putkey %s=%s", op->name, value ? value : sfstrseek(ap->tmp.key, 0, SEEK_CUR)));
 	n += strlen(op->name) + 3 + ((op->flags & OPT_VENDOR) ? sizeof(VENDOR) : 0);
 	o = 0;
 	for (;;)
@@ -428,8 +430,9 @@ extend(Archive_t* ap, File_t* f, int type)
 #if _typ_int64_t
 					if (type == GLBTYPE)
 						continue;
-					if (!(f->st->st_size >> 32))
+					if (!(f->st->st_size >> 32) && !(state.test & 1))
 						continue;
+					state.test &= ~1;
 					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_size), f->st->st_size);
 					break;
 #else
@@ -653,13 +656,11 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		ap->format = &pax_pax_format;
 		if (f->st->st_size > 0)
 		{
-			if (s = paxget(pax, ap, f->st->st_size, NiL))
-			{
-				s[f->st->st_size - 1] = 0;
-				setoptions(s, NiL, state.usage, ap, tar->header.typeflag);
-			}
-			else
+			ap->section = SECTION_DATA;
+			if (!(s = paxget(pax, ap, f->st->st_size, NiL)))
 				error(3, "invalid %s format '%c' extended header", ap->format->name, tar->header.typeflag);
+			s[f->st->st_size - 1] = 0;
+			setoptions(s, f->st->st_size, NiL, state.usage, ap, tar->header.typeflag);
 		}
 		ap->sum -= 2;
 		f->extended = tar->header.typeflag;
@@ -846,10 +847,12 @@ tar_putheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			case X_IFIFO:
 				tar->header.typeflag = FIFOTYPE;
 				break;
+#ifdef SOKTYPE
 			case X_IFSOCK:
 				tar->header.typeflag = SOKTYPE;
 				i = 1;
 				break;
+#endif
 			default:
 				if (!f->skip && !f->delta.op)
 					error(1, "%s: %s: unknown file type %07o -- regular file assumed", ap->name, f->name, f->type);

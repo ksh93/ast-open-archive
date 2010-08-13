@@ -131,7 +131,7 @@ mampush(Sfio_t* sp, register Rule_t* r, Flags_t flags)
 		return 0;
 	pop = !(r->dynamic & D_built) || (flags & P_force);
 	if (pop && (r->property & (P_joint|P_target)) == (P_joint|P_target) && r->prereqs->rule->prereqs->rule == r)
-		mampush(sp, r->prereqs->rule, flags|P_joint|P_virtual);
+		pop = mampush(sp, r->prereqs->rule, flags|P_joint|P_virtual);
 	sfprintf(sp, "%s%s %s%s%s%s%s\n"
 		, state.mam.label
 		, pop ? "make" : "prev"
@@ -175,7 +175,8 @@ mampop(Sfio_t* sp, register Rule_t* r, Flags_t flags)
 		for (p = r->prereqs->rule->prereqs; p = p->next;)
 			if (mampush(sp, p->rule, flags))
 				mampop(sp, p->rule, flags|P_joint);
-		mampop(sp, r->prereqs->rule, flags|P_virtual);
+		mampop(sp, r->prereqs->rule, flags|P_joint|P_virtual);
+		r->property |= P_target;
 	}
 }
 

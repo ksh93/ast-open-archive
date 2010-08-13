@@ -1,3 +1,6 @@
+10-08-11 ed,grep,sed: use conformance("standard",0) test
+10-08-11 sed: align y \\ \n \c \? logic with standard
+10-07-31 grep: add --recursive,-r for the linux for dummies crowd -- barf
 10-06-11 sed: drop space|semicolon separators warning
 10-06-11 sed: fix G to always emit newline
 10-06-11 sed: change 'l' command max line size to 72

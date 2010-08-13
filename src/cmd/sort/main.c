@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-n?\n@(#)$Id: sort (AT&T Research) 2010-05-25 $\n]"
+"[-n?\n@(#)$Id: sort (AT&T Research) 2010-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and "
@@ -866,7 +866,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		return -1;
 	z = key->insize = 2 * INMAX;
 #if 0
-	if (!strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
+	if (conformance(0, 0))
 #endif
 	key->type |= RS_DATA;
 	if ((n = strtol(astconf("PAGESIZE", NiL, NiL), &t, 0)) > 0 && !*t)

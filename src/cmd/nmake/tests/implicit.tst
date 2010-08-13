@@ -23,7 +23,7 @@ foo.c : [current] .SCAN.c must=1 regular scanned EXISTS
 ()foo.c : [recent] .SCAN.c event=[current] compiled scanned state
  prerequisites: hdr/foo.h==foo.h 
 
-hdr/foo.h==foo.h : [current] .LCL.INCLUDE .SCAN.c must=1 regular scanned EXISTS
+hdr/foo.h==foo.h : [current] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c must=1 terminal regular scanned EXISTS
 
 ()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] implicit compiled scanned state
  prerequisites: bar.h 
@@ -47,9 +47,9 @@ foo.c : [recent] .SCAN.c regular scanned EXISTS
 ()foo.c : [recent] .SCAN.c event=[recent] compiled scanned state
  prerequisites: hdr/foo.h==foo.h 
 
-hdr/foo.h==foo.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
+hdr/foo.h==foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c terminal regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [recent] regular EXISTS
@@ -151,7 +151,7 @@ foo.c : [current] .SCAN.c must=1 regular scanned EXISTS
 ()foo.c : [recent] .SCAN.c event=[current] compiled scanned state
  prerequisites: foo.h 
 
-foo.h : [current] .LCL.INCLUDE .SCAN.c must=1 regular scanned EXISTS
+foo.h : [current] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c must=1 terminal regular scanned EXISTS
 
 ()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[current] implicit compiled scanned state
  prerequisites: bar.h 
@@ -175,9 +175,9 @@ foo.c : [recent] .SCAN.c regular scanned EXISTS
 ()foo.c : [recent] .SCAN.c event=[recent] compiled scanned state
  prerequisites: foo.h 
 
-foo.h : [recent] .LCL.INCLUDE .SCAN.c regular scanned EXISTS
+foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c terminal regular scanned EXISTS
 
-()foo.h : [recent] .LCL.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
+()foo.h : [recent] .LCL.INCLUDE .PFX.INCLUDE .SCAN.c event=[recent] implicit compiled scanned state
  prerequisites: bar.h 
 
 uhdr/bar.G==bar.G : [recent] regular EXISTS

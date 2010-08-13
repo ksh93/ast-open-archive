@@ -49,7 +49,7 @@ scan(void)
 		while (dle = dllsread(dls))
 			if (dll = dlopen(dle->path, RTLD_LAZY))
 			{
-				if (dllcheck(dll, dle->path, PAX_PLUGIN_VERSION) &&
+				if (dllcheck(dll, dle->path, PAX_PLUGIN_VERSION, NiL) &&
 				    (init = (Paxlib_f)dlllook(dll, "pax_lib")) &&
 				    (lp = (*init)(&state)))
 					fp = fp->next = lp;

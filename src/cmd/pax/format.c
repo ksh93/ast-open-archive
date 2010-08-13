@@ -544,9 +544,15 @@ getkeysize(Archive_t* ap, File_t* f, int index, off_t* zp)
 	if (op->level < 7)
 	{
 		if (op->entry == ap->entry)
-			*zp = strtoll(op->temp.string, NiL, 10);
+		{
+			if (op->temp.string)
+				*zp = strtoll(op->temp.string, NiL, 10);
+		}
 		else if (op->level > 0)
-			*zp = strtoll(op->perm.string, NiL, 10);
+		{
+			if (op->perm.string)
+				*zp = strtoll(op->perm.string, NiL, 10);
+		}
 	}
 }
 

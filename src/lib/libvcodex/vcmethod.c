@@ -204,7 +204,7 @@ int	portable; /* name is in portable format	*/
 			buf2[i] = map[((unsigned char*)name)[i]];
 		name = buf2;
 	}
-	if (dll = dllplugin(VC_ID, name, NIL(char*), VCODEX_PLUGIN_VERSION, RTLD_LAZY, buf1, sizeof(buf1)))
+	if (dll = dllplugin(VC_ID, name, NIL(char*), VCODEX_PLUGIN_VERSION, NiL, RTLD_LAZY, buf1, sizeof(buf1)))
 		return plugin(dll, buf1);
 #endif
 

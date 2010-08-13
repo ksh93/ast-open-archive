@@ -93,7 +93,50 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-06-25  --- Release ksh93u-  ---
+10-08-11  --- Release ksh93u  ---
+10-08-11  Restored sh_fmtq() quoting to not quote NAME= in NAME=VALUE.
+10-08-09 +Modified the expansion of message strings, $"...", so that they
+	  are expanded each time they are referenced rather than expanding
+	  them when the script is compiled or read in.
+10-08-06 +The process id for jobs in job pools is now of the form poolname.n
+	  where n is the jobid in that pool.  Commands that accept job names
+	  or numbers now understand names in this format.
+10-08-05  A bug in which an assignment from within an arithmetic expression
+	  inside a function would create a local variable has been fixed.
+10-08-04  A bug in the expanding of variables whose names contain multibyte
+	  characters has been fixed.
+10-08-04  A bug which caused an exception when processing scripts compiled
+	  with shcomp -n has been fixed.
+10-08-02  Tests using very small buffer sizes uncovered a number of bug most
+	  connected with here documents which have been fixed.
+10-07-27  The format modifier , used for digit grouping with d and f formats
+	  has been documented.
+10-07-26  cd '' now produces and error rather than changing to the current
+	  directory.
+10-07-26  A bug in multi-byte locales which the last character of a
+	  multi-byte character is a \ or pattern character which could occur
+	  when the character was the last character of a command substitution
+	  has been fixed.
+10-07-23  Another bug in the processing of ${var:offset;len} in multi-byte
+	  locales when len is larger than the number of characters has been
+	  fixed.
+10-07-23  Many coding changes have been made to eliminate most of the uses
+	  of global variables in the shell code.
+10-07-22  Fixed a bug in which discipline functions were not being invoked
+	  when it was invoked as ref.discipline where ref was a name reference
+	  to an array instance.
+10-07-22  Fixed a bug in which discipline functions were not being invoked it
+	  was invoked on a two dimensional array, i.e., arr[5][9].discipline.
+10-07-19  Fixed a buffering problem which occured when running a script with
+	  ssh and the parent ssh process is killed.
+10-07-14  Modifed the parser to treat ((...)) inside [[...]] as ( (...) ) to
+	  that it is a nested (...).
+10-07-09  A bug in the handling of process substitution inside command
+	  substitution as part of a pipeline has been fixed.
+10-07-07  A bug in the output for compound variables containing
+	  multi-dimensional arrays has been fixed.
+10-07-06  ksh now recovers from changes made by bash to the history file without
+	  loosing history commands.
 10-06-25  A bug in which a large here document containing command substitutions
 	  of a dynamically loaded function that contained a here document
 	  could get truncated has been fixed.
@@ -2486,6 +2529,10 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+10-08-11 use conformance("standard",0) test
+10-08-09 fix extended header size key precedence/performance
+10-08-09 use { SEEK_DATA SEEK_HOLE } for -rw if available
+10-08-08 disable SOKTYPE
 10-06-21 align { --append --update } with posix
 10-06-14 ug+s only for -p [eo]
 10-06-14 atime in archive by default for formats that support it
@@ -3383,6 +3430,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+10-08-11 mam.c: fix joint target make-done imbalance
+10-07-17 option.c: expand external.old for execve() -- doh
 10-06-21 Makerules.mk: use CC.SUFFIX.DEBUG instead of .pdb
 10-06-21 Makerules.mk: add "idxxx ... id=id :LIBRARY: ..." to preserve _BLD_id==1
 10-06-17 Makerules.mk,Scanrules.mk: finally a general solution to -I- vs prefix-include?
@@ -4762,6 +4811,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+10-08-04 dlls.c: add -l to list plugin version stamps
 10-06-21 pty.c: add 4 sec timeout for initial handshake -- fix me!!
 10-06-01 od.c: add -c locale checks (and undo some fmtesc() work), add ast -tC1
 10-04-12 pty: fix sfpoll() result read/write bug
@@ -5389,6 +5439,9 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+10-08-11 ed,grep,sed: use conformance("standard",0) test
+10-08-11 sed: align y \\ \n \c \? logic with standard
+10-07-31 grep: add --recursive,-r for the linux for dummies crowd -- barf
 10-06-11 sed: drop space|semicolon separators warning
 10-06-11 sed: fix G to always emit newline
 10-06-11 sed: change 'l' command max line size to 72
@@ -5557,6 +5610,7 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+10-08-11 main.c: use conformance(0,0) for "standard"
 10-05-25 main.c: handle mb -t
 10-05-11 main.c: add -p,--plugins=style -- common to all command swith plugins
 10-04-22 main.c: -C => -E, add posix --silent-check, -C
@@ -5630,6 +5684,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+10-08-11 df.c: use conformance("standard",0) test
 10-06-01 sync with ast api 20100601
 10-05-25 ls.c: back off 09-07-02 logical|(meta)physical change
 10-02-09 ps.c: fix --tree --format=... => \\_ instead of \_
@@ -6068,6 +6123,14 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-08-11 misc/conformance.c: conformance(0,0) => "standard"
+10-08-11 misc/conformance.c: check ast_env_serial for dynamic astconf() changes
+10-08-11 port/lcgen.c: remember to fudge Table_t.count for synthesized entries
+10-08-04 include/ast.h,comp/setlocale.c: add { debug C.UTF-8 } mbalpha() mbwidth()
+10-08-02 misc/translate.c: add NLSPATH message cache check 
+10-07-29 string/fmtint.c: fix nasty bug that rendered "1000" as "1"
+10-07-27 setlocale,lsgen,localeconv: handle C vs C_EU decimal thousands sep
+10-07-26 misc/optget.c: fix interaction with nested plugin/builtin calls
 10-06-29 string/strtoi.h: strton() multiplier 1 => power of two suffix
 10-06-28 features/wchar: handle systems that require __va_list => va_list
 10-06-28 comp/conf.tab: another PID_MAX tweak -- default to 99999 for most
@@ -7743,6 +7806,9 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+10-08-11 cp.c,expr.c: use conformance("standard",0) test
+10-08-11 cut.c: use mbnsize() instead of mblen() (for ast C.UTF-8)
+10-07-28 chgrp.c,chmod.c,cksum.c: fts_path for diagnostics, not fts_accpath!
 10-06-14 rm.c: fix -rfu logic
 10-06-12 paste.c: repeat after me: do not modify argv[i]
 10-06-01 sync with ast api 20100601
@@ -8055,6 +8121,7 @@ All recorded changes follow.
 
 :::::::: libdll ::::::::
 
+10-08-02 dllplug.c: fix local path dllcheck() call
 10-05-28 dllplug.c: add dllplugin() with dllcheck() version check
 10-05-28 dllcheck.c: add dllcheck() to do plugin_version() checks
 10-05-28 dllerror.c: add dllerror(int retain) for dll*() and dl*() messages
@@ -8319,6 +8386,7 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+10-08-11 coinit.c: force _BLD_DLL for environ intercept
 10-06-01 sync with ast api 20100601
 10-05-19 cokill.c: do cowait(co,co,0) to drain pending messages
 10-05-15 coshell.h,coopen.c: add CO_ORPHAN for PROC_ORPHAN

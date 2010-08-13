@@ -480,6 +480,7 @@ yc(Text *script, Text *t)
 			}
 			x += (p-o)+1;
 		}
+		x = roundof(x, sizeof(word));
 		m++;
 		assure(script, (m+1)*sizeof(unsigned char*)+x);
 		w = (unsigned char**)script->w;
@@ -494,13 +495,9 @@ yc(Text *script, Text *t)
 		while((pb=p), (pc = mbchar(p))!=delim) {
 			if(pc=='\\') {
 				pb = p;
-				if((qc = mbchar(p))=='n') {
-					if(reflags & REG_LENIENT)
-						pc = '\n';
-					else
-						p = pb-1;
-				}
-				else if(pc==delim)
+				if((qc = mbchar(p))=='n')
+					pc = '\n';
+				else if(qc==delim || qc=='\\')
 					pc = qc;
 				else
 					p = pb-1;
@@ -512,13 +509,9 @@ yc(Text *script, Text *t)
 				syntax("string lengths differ");
 			if(qc=='\\') {
 				qb = q;
-				if((qc = mbchar(q))=='n') {
-					if(reflags & REG_LENIENT)
-						*qb = '\n';
-					else
-						q = qb-1;
-				}
-				else if(qc!=delim)
+				if((qc = mbchar(q))=='n')
+					*qb = '\n';
+				else if(qc!=delim && qc!='\\')
 					q = qb-1;
 			}
 			i = q-qb;
@@ -555,9 +548,9 @@ yc(Text *script, Text *t)
 		}
 		for(p=t->w; (pc = *p++) != delim; ) {
 			if(pc=='\\') {
-				if(*p==delim)
+				if(*p==delim || *p=='\\')
 					pc = *p++;
-				else if(*p=='n' && (reflags & REG_LENIENT)) {
+				else if(*p=='n') {
 					p++;
 					pc = '\n';
 				}
@@ -567,9 +560,9 @@ yc(Text *script, Text *t)
 			if(qc==delim)
 				syntax("string lengths differ");
 			if(qc=='\\') {
-				if(*q==delim)
+				if(*q==delim || *q=='\\')
 					qc = *q++;
-				else if(*q=='n' && (reflags & REG_LENIENT)) {
+				else if(*q=='n') {
 					q++;
 					qc = '\n';
 				}

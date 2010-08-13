@@ -164,16 +164,16 @@ TEST 02 'ast ascii <=> ebcdic conversion'
 
 TEST 03 'record report'
 	DO	DATA k
-	EXEC	if=1k.dat of=t.dat bs=1k count=1
+	EXEC	if=1k.dat of=t.dat bs=1ki count=1
 		SAME t.dat 1k.dat
 		ERROR - $'1+0 records in\n1+0 records out'
-	EXEC	if=2k.dat of=t.dat bs=2k count=1
+	EXEC	if=2k.dat of=t.dat bs=2ki count=1
 		SAME t.dat 2k.dat
-	EXEC	if=4k.dat of=t.dat bs=4k count=1
+	EXEC	if=4k.dat of=t.dat bs=4ki count=1
 		SAME t.dat 4k.dat
-	EXEC	if=8k.dat of=t.dat bs=8k count=1
+	EXEC	if=8k.dat of=t.dat bs=8ki count=1
 		SAME t.dat 8k.dat
-	EXEC	if=1024k.dat of=t.dat bs=1024k count=1
+	EXEC	if=1024k.dat of=t.dat bs=1024ki count=1
 		SAME t.dat 1024k.dat
 	EXEC	if=1k.dat of=t.dat bs=1000
 		SAME t.dat 1k.dat

@@ -415,7 +415,7 @@ dsslib(const char* name, Dssflags_t flags, Dssdisc_t* disc)
 
 		test[order] = (char*)name;
 		test[!order] = base;
-		if (!(dll = dllplugin(id, test[0], NiL, DSS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path))) && (streq(test[0], test[1]) || !(dll = dllplugin(id, test[1], NiL, DSS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path)))))
+		if (!(dll = dllplugin(id, test[0], NiL, DSS_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path))) && (streq(test[0], test[1]) || !(dll = dllplugin(id, test[1], NiL, DSS_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path)))))
 		{
 			if ((flags & DSS_VERBOSE) && disc->errorf)
 				(*disc->errorf)(NiL, disc, 2, "%s: library not found", name);

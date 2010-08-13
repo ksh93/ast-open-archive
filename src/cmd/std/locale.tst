@@ -29,9 +29,9 @@ TEST 03 styles
 	EXEC TEST=sr_SP.MS-1251
 	EXEC TEST='sr_SP.m$-1251'
 	EXEC TEST='Spanish (Modern Sort)_Spain.1252'
-		OUTPUT - $'es@modern'
+		OUTPUT - $'es_ES@modern'
 	EXEC TEST='Spanish - Traditional Sort_Spain.1252'
-		OUTPUT - $'es'
+		OUTPUT - $'es_ES'
 
 TEST 04 primaries
 	EXEC TEST=chinese
@@ -42,8 +42,8 @@ TEST 04 primaries
 	EXEC TEST=united-kingdom
 	EXEC TEST=england
 	EXEC TEST=french
-		OUTPUT - $'fr'
+		OUTPUT - $'fr_FR'
 	EXEC TEST=france
 	EXEC TEST=spanish
-		OUTPUT - $'es'
+		OUTPUT - $'es_ES'
 	EXEC TEST=spain

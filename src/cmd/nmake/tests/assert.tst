@@ -723,7 +723,7 @@ hello()
 		OUTPUT - $'making color.
 making color.h
 making ColorSM.h'
-		ERROR - $'+ [ color.sm != \'\' ]
+		ERROR - $'+ [ color.sm \'!=\' \'\' ]
 + smgen -k -s printf color.sm
 + cc -O -I. -c color.c
 + cc -O -I. -c traffic.c
@@ -739,7 +739,7 @@ making ColorSM.h'
 		OUTPUT - $'color.c is up-to-date
 color.h is up-to-date
 making ColorSM.h'
-		ERROR - $'+ [ color.sm != \'\' ]
+		ERROR - $'+ [ color.sm \'!=\' \'\' ]
 + smgen -k -s printf color.sm
 + cc -O -I. -c color.c
 + cc -O -I. -c traffic.c
@@ -1150,9 +1150,9 @@ b.o a.o :JOINT: fun.c
 		INPUT fun.c $'int FUN() { return 0; }'
 		ERROR - $'+ echo \'\' -ltst
 + 1> tst.req
-+ cc -DFUN=b -c fun.c
++ cc \'-DFUN=b\' -c fun.c
 + mv fun.o b.o
-+ cc -DFUN=a -c fun.c
++ cc \'-DFUN=a\' -c fun.c
 + mv fun.o a.o
 + ar cr libtst.a b.o a.o
 + ignore ranlib libtst.a

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: df (AT&T Research) 2008-01-26 $\n]"
+"[-?\n@(#)$Id: df (AT&T Research) 2010-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -803,7 +803,7 @@ main(int argc, register char** argv)
 		error(ERROR_SYSTEM|3, "out of space");
 	stresc(format);
 	if (state.posix < 0)
-		state.posix = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
+		state.posix = !!conformance("standard", 0);
 	if (state.block < 0)
 	{
 		if (state.posix)

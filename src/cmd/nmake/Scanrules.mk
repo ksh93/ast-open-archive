@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2010-06-17 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2010-07-22 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -60,7 +60,7 @@
 	if ! "$(-prefix-include)" && ! "$(-target-context)"
 		local P S
 		P := $(!$(%):A=.PFX.INCLUDE)
-		if S = "$(P:P=U:D)"
+		if S = "$(P:P=U:D:U:N!=.)"
 			return $(P:P=D:X=$(S):T>FD:U)
 		end
 	end

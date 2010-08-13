@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2010-06-21 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2010-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -64,7 +64,7 @@ USAGE_LICENSE
 "	A directory \apathname\a argument refers to the files and (recursively)"
 "	subdirectories of that directory.  If no \apathname\a arguments are"
 "	given then the standard input is read to get a list of pathnames to"
-"	copy, one pathname per line.  In this case only those pathnames"
+"	copy, one pathname per l, lineine.  In this case only those pathnames"
 "	appearing on the standard input are copied.  \adirectory\a must exist"
 "	before the copy.]"
 "[+?\bpax\b (\b-r\b and \b-w\b omitted) reads the standard input that is"
@@ -360,11 +360,12 @@ filter(Archive_t* ap, File_t* f)
  */
 
 void
-setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
+setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int type)
 {
 	intmax_t	n;
 	int		c;
 	int		y;
+	int		assignment;
 	int		cvt;
 	int		index;
 	int		offset;
@@ -374,6 +375,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 	char*		s;
 	char*		v;
 	char*		o;
+	char*		end;
 	Filter_t*	xp;
 	Format_t*	fp;
 	Option_t*	op;
@@ -385,22 +387,107 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 	cvt = 0;
 	index = opt_info.index;
 	offset = opt_info.offset;
-	while (c = line ? optstr(line, usage) : optget(argv, usage))
+	if (line && hdr)
+		end = line + hdr;
+	for (;;)
 	{
-		if (c > 0)
+		if (hdr)
+		{
+			if (!*line)
+				break;
+			while (isspace(*line))
+				line++;
+			s = line;
+			y = 0;
+			while ((c = *line++) >= '0' && c <= '9')
+				y = y * 10 + (c - '0');
+			if ((e = (s + y - 1)) > end)
+				e = end;
+			else
+				*e++ = 0;
+			while (isspace(*line))
+				line++;
+			o = line;
+			assignment = 0;
+			for (;;)
+			{
+				switch (*line++)
+				{
+				case 0:
+					line--;
+					break;
+				case '=':
+					*(line - 1) = 0;
+					break;
+				case ':':
+					if (*line == '=')
+					{
+						*(line - 1) = 0;
+						line++;
+						assignment = 1;
+						break;
+					}
+					continue;
+				default:
+					continue;
+				}
+				break;
+			}
+			v = line;
+			line = e;
+			y = 1;
+			if (!(op = (Option_t*)hashget(state.options, o)))
+			{
+				s = o;
+				if (strneq(o, VENDOR ".", sizeof(VENDOR)))
+				{
+					o += sizeof(VENDOR);
+					op = (Option_t*)hashget(state.options, o);
+				}
+				if (!op && *o == 'n' && *(o + 1) == 'o')
+				{
+					o += 2;
+					y = 0;
+					op = (Option_t*)hashget(state.options, o);
+				}
+				if (!op)
+				{
+					if (islower(*s) && !strchr(s, '.'))
+						error(2, "%s: unknown option", s);
+					continue;
+				}
+			}
+			if (!y)
+				n = 0;
+			else if (!(op->flags & OPT_NUMBER))
+				n = 1;
+			else
+			{
+				n = strtonll(v, &e, NiL, 0);
+				if (*e)
+					error(2, "%s: %s: invalid numeric option value", op->name, v);
+			}
+		}
+		else if (!(c = line ? optstr(line, usage) : optget(argv, usage)))
+			break;
+		else if (c > 0)
 		{
 			if (c == '?')
 				error(ERROR_USAGE|4, "%s", opt_info.arg);
-			if (c == ':' && (!type || islower(*opt_info.name) && !strmatch(opt_info.name, "+([0-9])|*.*")))
+			if (c == ':' && (!type || islower(*opt_info.name) && !strchr(opt_info.name, '.')))
 				error(2, "%s", opt_info.arg);
 			continue;
 		}
-		y = (n = opt_info.number) != 0;
-		if (!(v = opt_info.arg))
-			v = "";
-		else if (!n)
-			y = 1;
-		op = options - c;
+		else
+		{
+			assignment = opt_info.assignment == ':';
+			y = (n = opt_info.number) != 0;
+			if (!(v = opt_info.arg))
+				v = "";
+			else if (!n)
+				y = 1;
+			op = options - c;
+		}
 
 		/*
 		 * option precedence levels
@@ -418,18 +505,19 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 		switch (type)
 		{
 		case EXTTYPE:
-			c = (opt_info.assignment == ':') ? 5 : 4;
+			c = 4;
 			vp = &op->temp;
 			break;
 		case GLBTYPE:
-			c = (opt_info.assignment == ':') ? 2 : 1;
+			c = 1;
 			vp = &op->perm;
 			break;
 		default:
-			c = (opt_info.assignment == ':') ? 7 : 3;
+			c = 3;
 			vp = &op->perm;
 			break;
 		}
+		c += assignment;
 		message((-5, "option: %c %s level=%d:%d", type ? type : '-', op->name, op->level, c));
 		if (op->level > c)
 			continue;
@@ -451,7 +539,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 		}
 		else
 			vp = 0;
-		message((-4, "option: %c %s%s%-.1s=%s entry=%d:%d level=%d:%d number=%I*u", type ? type : '-', y ? "" : "no", op->name, &opt_info.assignment, v, op->entry, ap ? ap->entry : 0, op->level, c, sizeof(opt_info.number), opt_info.number));
+		message((-4, "option: %c %s%s%s=%s entry=%d:%d level=%d:%d number=%I*u", type ? type : '-', y ? "" : "no", op->name, assignment ? ":" : "", v, op->entry, ap ? ap->entry : 0, op->level, c, sizeof(n), n));
 		switch (op->index)
 		{
 		case OPT_action:
@@ -611,15 +699,15 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			break;
 		case OPT_delta_base_checksum:
 			if (ap && ap->delta)
-				ap->delta->checksum = opt_info.number;
+				ap->delta->checksum = n;
 			break;
 		case OPT_delta_base_size:
 			if (ap && ap->delta)
-				ap->delta->size = opt_info.number;
+				ap->delta->size = n;
 			break;
 		case OPT_delta_checksum:
 			if (ap)
-				ap->file.delta.checksum = opt_info.number;
+				ap->file.delta.checksum = n;
 			break;
 		case OPT_delta_compress:
 			if (ap && ap->delta)
@@ -630,7 +718,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			{
 				if (type == GLBTYPE)
 				{
-					if (ap->delta && (c = opt_info.number - ap->delta->index - 1))
+					if (ap->delta && (c = n - ap->delta->index - 1))
 					{
 						if (c > 0)
 							error(2, "%s: corrupt archive: %d missing file%s", ap->name, c, c == 1 ? "" : "s");
@@ -639,24 +727,24 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 					}
 				}
 				else
-					ap->file.delta.index = opt_info.number;
+					ap->file.delta.index = n;
 			}
 			break;
 		case OPT_delta_method:
 			if (ap)
 			{
-				if (!(fp = getformat(opt_info.arg, 0)) || !(fp->flags & DELTA))
-					error(3, "%s: %s: delta method not supported", ap->name, opt_info.arg);
+				if (!(fp = getformat(v, 0)) || !(fp->flags & DELTA))
+					error(3, "%s: %s: delta method not supported", ap->name, v);
 				initdelta(ap, fp);
 			}
 			break;
 		case OPT_delta_op:
 			if (ap && ap->delta)
-				ap->file.delta.op = opt_info.number;
+				ap->file.delta.op = line ? *v : n;
 			break;
 		case OPT_delta_ordered:
 			if (ap && ap->delta)
-				ap->delta->ordered = opt_info.number;
+				ap->delta->ordered = n;
 			break;
 		case OPT_delta_update:
 			state.delta.update = y;
@@ -752,8 +840,9 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 							while (e = sfgetr(sp, '\n', 1))
 								if (*e != '#')
 								{
-									setoptions(e, NiL, state.usage, ap, type);
-									line += opt_info.offset;
+									setoptions(e, sfvalue(sp), NiL, state.usage, ap, type);
+									if (line && !hdr)
+										line += opt_info.offset;
 								}
 							sfclose(sp);
 						}
@@ -804,7 +893,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			break;
 		case OPT_header:
 			v = y ? strdup(v) : (char*)0;
-			if (opt_info.assignment == ':')
+			if (assignment)
 				state.header.extended = v;
 			else
 				state.header.global = v;
@@ -812,7 +901,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 		case OPT_ignore:
 			if (y && *v)
 			{
-				if (opt_info.assignment == ':')
+				if (assignment)
 					sfprintf(opt.ignore_ext, "%s(%s)", sfstrtell(opt.ignore_ext) ? "|" : "", v);
 				else
 					sfprintf(opt.ignore_all, "%s(%s)", sfstrtell(opt.ignore_all) ? "|" : "", v);
@@ -825,8 +914,34 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			state.intermediate = y;
 			break;
 		case OPT_invalid:
-			switch (opt_info.num)
+			if (line)
 			{
+				n = 0;
+				y = strlen(v);
+				s = op->details;
+				while (s = strchr(s, '['))
+				{
+					c = *++s;
+					o = ++s;
+					for (;;)
+					{
+						if (strneq(v, o, y))
+						{
+							s = "";
+							n = c;
+							break;
+						}
+						if (!(o = strchr(o, '|')))
+							break;
+						o++;
+					}
+				}
+			}
+			switch (n)
+			{
+			case 'b':
+				state.header.invalid = INVALID_binary;
+				break;
 			case 'i':
 				state.header.invalid = INVALID_ignore;
 				break;
@@ -839,6 +954,9 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			case 'u':
 				state.header.invalid = INVALID_UTF8;
 				break;
+			default:
+				error(2, "%s: %s: unknown option value", op->name, v);
+				break;
 			}
 			break;
 		case OPT_invert:
@@ -850,7 +968,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 		case OPT_label:
 			if (*state.volume)
 			{
-				if (opt_info.assignment == ':')
+				if (assignment)
 					sfsprintf(tmp1, sizeof(tmp1), "%s %s", v, state.volume);
 				else
 					sfsprintf(tmp1, sizeof(tmp1), "%s %s", state.volume, v);
@@ -938,8 +1056,9 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 		case OPT_options:
 			if (v)
 			{
-				setoptions(v, NiL, usage, ap, type);
-				line += opt_info.offset;
+				setoptions(v, 0, NiL, usage, ap, type);
+				if (line && !hdr)
+					line += opt_info.offset;
 			}
 			break;
 		case OPT_ordered:
@@ -1120,8 +1239,11 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			break;
 		case OPT_times:
 			if (y)
-				setoptions("atime:= ctime:= mtime:=", NiL, usage, ap, type);
-			line += opt_info.offset;
+			{
+				setoptions("atime:= ctime:= mtime:=", 0, NiL, usage, ap, type);
+				if (line && !hdr)
+					line += opt_info.offset;
+			}
 			break;
 		case OPT_unblocked:
 			if (!*v)
@@ -1141,7 +1263,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 				}
 			break;
 		case OPT_uncompressed:
-			ap->file.uncompressed = opt_info.number;
+			ap->file.uncompressed = n;
 			break;
 		case OPT_update:
 			state.update = -y;
@@ -1176,7 +1298,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			break;
 		}
 	}
-	if (!argv)
+	if (line && !hdr)
 	{
 		opt_info.index = index;
 		opt_info.offset = offset;
@@ -1411,7 +1533,7 @@ main(int argc, char** argv)
 	setlocale(LC_ALL, "");
 	paxinit(&state, error_info.id = "pax");
 	optinit(&optdisc, optinfo);
-	state.strict = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
+	state.strict = !!conformance("standard", 0);
 	state.gid = getegid();
 	state.uid = geteuid();
 	state.pid = getpid();
@@ -1495,7 +1617,7 @@ main(int argc, char** argv)
 	if (!(state.usage = sfstruse(state.tmp.str)))
 		nospace();
 	opt.arg0 = argv[0];
-	setoptions(NiL, argv, state.usage, NiL, 0);
+	setoptions(NiL, 0, argv, state.usage, NiL, 0);
 	argv += opt_info.index;
 	argc -= opt_info.index;
 	if (error_info.errors)

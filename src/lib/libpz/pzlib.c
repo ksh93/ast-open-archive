@@ -59,7 +59,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 		state.dll = dll;
 		if (ignore)
 			return 0;
-		if (!(dll->dll = dllplugin(id, dll->name, NiL, PZ_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path))))
+		if (!(dll->dll = dllplugin(id, dll->name, NiL, PZ_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path))))
 		{
 			if (pz->disc && pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %s", dll->name, dlerror());

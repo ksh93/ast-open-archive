@@ -49,7 +49,7 @@ int		flags;
 
 	for (s = (char*)lib; *s && *s != ',' && *s != '\t' && *s != '\r' && *s != '\n'; s++);
 	sfsprintf(path, sizeof(path), "%-.*s", s - (char*)lib, lib);
-	if (!(dll = dllplugin("sort", path, NiL, RS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path))))
+	if (!(dll = dllplugin("sort", path, NiL, RS_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path))))
 	{
 		if (!(flags & RS_IGNORE) && kp->keydisc->errorf)
 			(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: library not found", path);

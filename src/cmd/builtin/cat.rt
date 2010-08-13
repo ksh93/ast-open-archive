@@ -45,6 +45,7 @@ done
 
 TEST '-v'
 
+	DO getconf UNIVERSE = att
 	DATA i $'a\x{89}b\x{c9}c\tdIe'
 	DATA j -n X
 	EXEC -v i

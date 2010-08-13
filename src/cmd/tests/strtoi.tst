@@ -1202,10 +1202,10 @@ strntoull  2 "1b" "" 1 OK
 strntoull  1 "1b" "b" 1 OK
 
 strtol    "1k" "k" 1 OK
-strton    "1k" "" 1024 OK 0
+strton    "1k" "" 1000 OK 0
 strtoul   "1k" "k" 1 OK
 strtoll   "1k" "k" 1 OK
-strtonll  "1k" "" 1024 OK 0
+strtonll  "1k" "" 1000 OK 0
 strtoull  "1k" "k" 1 OK
 strntol     2 "1k" "" 1 OK
 strntol     1 "1k" "k" 1 OK
@@ -1221,10 +1221,10 @@ strntoull  2 "1k" "" 1 OK
 strntoull  1 "1k" "k" 1 OK
 
 strtol    "1m" "m" 1 OK
-strton    "1m" "" 1048576 OK 0
+strton    "1m" "" 1000000 OK 0
 strtoul   "1m" "m" 1 OK
 strtoll   "1m" "m" 1 OK
-strtonll  "1m" "" 1048576 OK 0
+strtonll  "1m" "" 1000000 OK 0
 strtoull  "1m" "m" 1 OK
 strntol     2 "1m" "" 1 OK
 strntol     1 "1m" "m" 1 OK
@@ -1240,10 +1240,10 @@ strntoull  2 "1m" "" 1 OK
 strntoull  1 "1m" "m" 1 OK
 
 strtol    "1g" "g" 1 OK
-strton    "1g" "" 1073741824 OK 0
+strton    "1g" "" 1000000000 OK 0
 strtoul   "1g" "g" 1 OK
 strtoll   "1g" "g" 1 OK
-strtonll  "1g" "" 1073741824 OK 0
+strtonll  "1g" "" 1000000000 OK 0
 strtoull  "1g" "g" 1 OK
 strntol     2 "1g" "" 1 OK
 strntol     1 "1g" "g" 1 OK
@@ -1259,10 +1259,10 @@ strntoull  2 "1g" "" 1 OK
 strntoull  1 "1g" "g" 1 OK
 
 strtol    "1t" "t" 1 OK
-strton    "1t" "" 1099511627776 OK 0
+strton    "1t" "" 1000000000000 OK 0
 strtoul   "1t" "t" 1 OK
 strtoll   "1t" "t" 1 OK
-strtonll  "1t" "" 1099511627776 OK 0
+strtonll  "1t" "" 1000000000000 OK 0
 strtoull  "1t" "t" 1 OK
 strntol     2 "1t" "" 1 OK
 strntol     1 "1t" "t" 1 OK
@@ -1278,10 +1278,10 @@ strntoull  2 "1t" "" 1 OK
 strntoull  1 "1t" "t" 1 OK
 
 strtol    "1p" "p" 1 OK
-strton    "1p" "" 1125899906842624 OK 0
+strton    "1p" "" 1000000000000000 OK 0
 strtoul   "1p" "p" 1 OK
 strtoll   "1p" "p" 1 OK
-strtonll  "1p" "" 1125899906842624 OK 0
+strtonll  "1p" "" 1000000000000000 OK 0
 strtoull  "1p" "p" 1 OK
 strntol     2 "1p" "" 1 OK
 strntol     1 "1p" "p" 1 OK
@@ -1297,10 +1297,10 @@ strntoull  2 "1p" "" 1 OK
 strntoull  1 "1p" "p" 1 OK
 
 strtol    "1e" "e" 1 OK
-strton    "1e" "" 1152921504606846976 OK 0
+strton    "1e" "" 1000000000000000000 OK 0
 strtoul   "1e" "e" 1 OK
 strtoll   "1e" "e" 1 OK
-strtonll  "1e" "" 1152921504606846976 OK 0
+strtonll  "1e" "" 1000000000000000000 OK 0
 strtoull  "1e" "e" 1 OK
 strntol     2 "1e" "" 1 OK
 strntol     1 "1e" "e" 1 OK
@@ -1466,6 +1466,292 @@ strntonll  6 "1.234k" "k" 123 OK 0
 strntonll  5 "1.234k" "4k" 123 OK 0
 strntoull  6 "1.234k" ".234k" 1 OK
 strntoull  5 "1.234k" ".234k" 1 OK'
+
+	EXEC 1b 1ki 1mi 1gi 1ti 1pi 1ei 1. 1.2 1.23 1.234 1.ki 1.2ki 1.23ki 1.234ki
+		OUTPUT - $'strtol    "1b" "b" 1 OK
+strton    "1b" "" 512 OK 0
+strtoul   "1b" "b" 1 OK
+strtoll   "1b" "b" 1 OK
+strtonll  "1b" "" 512 OK 0
+strtoull  "1b" "b" 1 OK
+strntol     2 "1b" "" 1 OK
+strntol     1 "1b" "b" 1 OK
+strnton     2 "1b" "" 1 OK 0
+strnton     1 "1b" "b" 1 OK 0
+strntoul    2 "1b" "" 1 OK
+strntoul    1 "1b" "b" 1 OK
+strntoll    2 "1b" "" 1 OK
+strntoll    1 "1b" "b" 1 OK
+strntonll  2 "1b" "" 1 OK 0
+strntonll  1 "1b" "b" 1 OK 0
+strntoull  2 "1b" "" 1 OK
+strntoull  1 "1b" "b" 1 OK
+
+strtol    "1ki" "ki" 1 OK
+strton    "1ki" "" 1024 OK 0
+strtoul   "1ki" "ki" 1 OK
+strtoll   "1ki" "ki" 1 OK
+strtonll  "1ki" "" 1024 OK 0
+strtoull  "1ki" "ki" 1 OK
+strntol     3 "1ki" "ki" 1 OK
+strntol     2 "1ki" "i" 1 OK
+strnton     3 "1ki" "" 1024 OK 0
+strnton     2 "1ki" "i" 1 OK 0
+strntoul    3 "1ki" "ki" 1 OK
+strntoul    2 "1ki" "i" 1 OK
+strntoll    3 "1ki" "ki" 1 OK
+strntoll    2 "1ki" "i" 1 OK
+strntonll  3 "1ki" "" 1024 OK 0
+strntonll  2 "1ki" "i" 1 OK 0
+strntoull  3 "1ki" "ki" 1 OK
+strntoull  2 "1ki" "i" 1 OK
+
+strtol    "1mi" "mi" 1 OK
+strton    "1mi" "" 1048576 OK 0
+strtoul   "1mi" "mi" 1 OK
+strtoll   "1mi" "mi" 1 OK
+strtonll  "1mi" "" 1048576 OK 0
+strtoull  "1mi" "mi" 1 OK
+strntol     3 "1mi" "mi" 1 OK
+strntol     2 "1mi" "i" 1 OK
+strnton     3 "1mi" "" 1048576 OK 0
+strnton     2 "1mi" "i" 1 OK 0
+strntoul    3 "1mi" "mi" 1 OK
+strntoul    2 "1mi" "i" 1 OK
+strntoll    3 "1mi" "mi" 1 OK
+strntoll    2 "1mi" "i" 1 OK
+strntonll  3 "1mi" "" 1048576 OK 0
+strntonll  2 "1mi" "i" 1 OK 0
+strntoull  3 "1mi" "mi" 1 OK
+strntoull  2 "1mi" "i" 1 OK
+
+strtol    "1gi" "gi" 1 OK
+strton    "1gi" "" 1073741824 OK 0
+strtoul   "1gi" "gi" 1 OK
+strtoll   "1gi" "gi" 1 OK
+strtonll  "1gi" "" 1073741824 OK 0
+strtoull  "1gi" "gi" 1 OK
+strntol     3 "1gi" "gi" 1 OK
+strntol     2 "1gi" "i" 1 OK
+strnton     3 "1gi" "" 1073741824 OK 0
+strnton     2 "1gi" "i" 1 OK 0
+strntoul    3 "1gi" "gi" 1 OK
+strntoul    2 "1gi" "i" 1 OK
+strntoll    3 "1gi" "gi" 1 OK
+strntoll    2 "1gi" "i" 1 OK
+strntonll  3 "1gi" "" 1073741824 OK 0
+strntonll  2 "1gi" "i" 1 OK 0
+strntoull  3 "1gi" "gi" 1 OK
+strntoull  2 "1gi" "i" 1 OK
+
+strtol    "1ti" "ti" 1 OK
+strton    "1ti" "" 1099511627776 OK 0
+strtoul   "1ti" "ti" 1 OK
+strtoll   "1ti" "ti" 1 OK
+strtonll  "1ti" "" 1099511627776 OK 0
+strtoull  "1ti" "ti" 1 OK
+strntol     3 "1ti" "ti" 1 OK
+strntol     2 "1ti" "i" 1 OK
+strnton     3 "1ti" "" 1099511627776 OK 0
+strnton     2 "1ti" "i" 1 OK 0
+strntoul    3 "1ti" "ti" 1 OK
+strntoul    2 "1ti" "i" 1 OK
+strntoll    3 "1ti" "ti" 1 OK
+strntoll    2 "1ti" "i" 1 OK
+strntonll  3 "1ti" "" 1099511627776 OK 0
+strntonll  2 "1ti" "i" 1 OK 0
+strntoull  3 "1ti" "ti" 1 OK
+strntoull  2 "1ti" "i" 1 OK
+
+strtol    "1pi" "pi" 1 OK
+strton    "1pi" "" 1125899906842624 OK 0
+strtoul   "1pi" "pi" 1 OK
+strtoll   "1pi" "pi" 1 OK
+strtonll  "1pi" "" 1125899906842624 OK 0
+strtoull  "1pi" "pi" 1 OK
+strntol     3 "1pi" "pi" 1 OK
+strntol     2 "1pi" "i" 1 OK
+strnton     3 "1pi" "" 1125899906842624 OK 0
+strnton     2 "1pi" "i" 1 OK 0
+strntoul    3 "1pi" "pi" 1 OK
+strntoul    2 "1pi" "i" 1 OK
+strntoll    3 "1pi" "pi" 1 OK
+strntoll    2 "1pi" "i" 1 OK
+strntonll  3 "1pi" "" 1125899906842624 OK 0
+strntonll  2 "1pi" "i" 1 OK 0
+strntoull  3 "1pi" "pi" 1 OK
+strntoull  2 "1pi" "i" 1 OK
+
+strtol    "1ei" "ei" 1 OK
+strton    "1ei" "" 1152921504606846976 OK 0
+strtoul   "1ei" "ei" 1 OK
+strtoll   "1ei" "ei" 1 OK
+strtonll  "1ei" "" 1152921504606846976 OK 0
+strtoull  "1ei" "ei" 1 OK
+strntol     3 "1ei" "ei" 1 OK
+strntol     2 "1ei" "i" 1 OK
+strnton     3 "1ei" "" 1152921504606846976 OK 0
+strnton     2 "1ei" "i" 1 OK 0
+strntoul    3 "1ei" "ei" 1 OK
+strntoul    2 "1ei" "i" 1 OK
+strntoll    3 "1ei" "ei" 1 OK
+strntoll    2 "1ei" "i" 1 OK
+strntonll  3 "1ei" "" 1152921504606846976 OK 0
+strntonll  2 "1ei" "i" 1 OK 0
+strntoull  3 "1ei" "ei" 1 OK
+strntoull  2 "1ei" "i" 1 OK
+
+strtol    "1." "." 1 OK
+strton    "1." "" 100 OK 0
+strtoul   "1." "." 1 OK
+strtoll   "1." "." 1 OK
+strtonll  "1." "" 100 OK 0
+strtoull  "1." "." 1 OK
+strntol     2 "1." "" 1 OK
+strntol     1 "1." "." 1 OK
+strnton     2 "1." "" 1 OK 0
+strnton     1 "1." "." 1 OK 0
+strntoul    2 "1." "" 1 OK
+strntoul    1 "1." "." 1 OK
+strntoll    2 "1." "" 1 OK
+strntoll    1 "1." "." 1 OK
+strntonll  2 "1." "" 1 OK 0
+strntonll  1 "1." "." 1 OK 0
+strntoull  2 "1." "" 1 OK
+strntoull  1 "1." "." 1 OK
+
+strtol    "1.2" ".2" 1 OK
+strton    "1.2" "" 120 OK 0
+strtoul   "1.2" ".2" 1 OK
+strtoll   "1.2" ".2" 1 OK
+strtonll  "1.2" "" 120 OK 0
+strtoull  "1.2" ".2" 1 OK
+strntol     3 "1.2" ".2" 1 OK
+strntol     2 "1.2" "2" 1 OK
+strnton     3 "1.2" "2" 120 OK 0
+strnton     2 "1.2" "2" 1 OK 0
+strntoul    3 "1.2" ".2" 1 OK
+strntoul    2 "1.2" "2" 1 OK
+strntoll    3 "1.2" ".2" 1 OK
+strntoll    2 "1.2" "2" 1 OK
+strntonll  3 "1.2" "2" 120 OK 0
+strntonll  2 "1.2" "2" 1 OK 0
+strntoull  3 "1.2" ".2" 1 OK
+strntoull  2 "1.2" "2" 1 OK
+
+strtol    "1.23" ".23" 1 OK
+strton    "1.23" "" 123 OK 0
+strtoul   "1.23" ".23" 1 OK
+strtoll   "1.23" ".23" 1 OK
+strtonll  "1.23" "" 123 OK 0
+strtoull  "1.23" ".23" 1 OK
+strntol     4 "1.23" ".23" 1 OK
+strntol     3 "1.23" ".23" 1 OK
+strnton     4 "1.23" "3" 123 OK 0
+strnton     3 "1.23" "23" 120 OK 0
+strntoul    4 "1.23" ".23" 1 OK
+strntoul    3 "1.23" ".23" 1 OK
+strntoll    4 "1.23" ".23" 1 OK
+strntoll    3 "1.23" ".23" 1 OK
+strntonll  4 "1.23" "3" 123 OK 0
+strntonll  3 "1.23" "23" 120 OK 0
+strntoull  4 "1.23" ".23" 1 OK
+strntoull  3 "1.23" ".23" 1 OK
+
+strtol    "1.234" ".234" 1 OK
+strton    "1.234" "" 123 OK 0
+strtoul   "1.234" ".234" 1 OK
+strtoll   "1.234" ".234" 1 OK
+strtonll  "1.234" "" 123 OK 0
+strtoull  "1.234" ".234" 1 OK
+strntol     5 "1.234" ".234" 1 OK
+strntol     4 "1.234" ".234" 1 OK
+strnton     5 "1.234" "4" 123 OK 0
+strnton     4 "1.234" "34" 123 OK 0
+strntoul    5 "1.234" ".234" 1 OK
+strntoul    4 "1.234" ".234" 1 OK
+strntoll    5 "1.234" ".234" 1 OK
+strntoll    4 "1.234" ".234" 1 OK
+strntonll  5 "1.234" "4" 123 OK 0
+strntonll  4 "1.234" "34" 123 OK 0
+strntoull  5 "1.234" ".234" 1 OK
+strntoull  4 "1.234" ".234" 1 OK
+
+strtol    "1.ki" ".ki" 1 OK
+strton    "1.ki" "ki" 100 OK 0
+strtoul   "1.ki" ".ki" 1 OK
+strtoll   "1.ki" ".ki" 1 OK
+strtonll  "1.ki" "ki" 100 OK 0
+strtoull  "1.ki" ".ki" 1 OK
+strntol     4 "1.ki" ".ki" 1 OK
+strntol     3 "1.ki" ".ki" 1 OK
+strnton     4 "1.ki" "ki" 100 OK 0
+strnton     3 "1.ki" "ki" 100 OK 0
+strntoul    4 "1.ki" ".ki" 1 OK
+strntoul    3 "1.ki" ".ki" 1 OK
+strntoll    4 "1.ki" ".ki" 1 OK
+strntoll    3 "1.ki" ".ki" 1 OK
+strntonll  4 "1.ki" "ki" 100 OK 0
+strntonll  3 "1.ki" "ki" 100 OK 0
+strntoull  4 "1.ki" ".ki" 1 OK
+strntoull  3 "1.ki" ".ki" 1 OK
+
+strtol    "1.2ki" ".2ki" 1 OK
+strton    "1.2ki" "ki" 120 OK 0
+strtoul   "1.2ki" ".2ki" 1 OK
+strtoll   "1.2ki" ".2ki" 1 OK
+strtonll  "1.2ki" "ki" 120 OK 0
+strtoull  "1.2ki" ".2ki" 1 OK
+strntol     5 "1.2ki" ".2ki" 1 OK
+strntol     4 "1.2ki" ".2ki" 1 OK
+strnton     5 "1.2ki" "ki" 120 OK 0
+strnton     4 "1.2ki" "ki" 120 OK 0
+strntoul    5 "1.2ki" ".2ki" 1 OK
+strntoul    4 "1.2ki" ".2ki" 1 OK
+strntoll    5 "1.2ki" ".2ki" 1 OK
+strntoll    4 "1.2ki" ".2ki" 1 OK
+strntonll  5 "1.2ki" "ki" 120 OK 0
+strntonll  4 "1.2ki" "ki" 120 OK 0
+strntoull  5 "1.2ki" ".2ki" 1 OK
+strntoull  4 "1.2ki" ".2ki" 1 OK
+
+strtol    "1.23ki" ".23ki" 1 OK
+strton    "1.23ki" "ki" 123 OK 0
+strtoul   "1.23ki" ".23ki" 1 OK
+strtoll   "1.23ki" ".23ki" 1 OK
+strtonll  "1.23ki" "ki" 123 OK 0
+strtoull  "1.23ki" ".23ki" 1 OK
+strntol     6 "1.23ki" ".23ki" 1 OK
+strntol     5 "1.23ki" ".23ki" 1 OK
+strnton     6 "1.23ki" "ki" 123 OK 0
+strnton     5 "1.23ki" "ki" 123 OK 0
+strntoul    6 "1.23ki" ".23ki" 1 OK
+strntoul    5 "1.23ki" ".23ki" 1 OK
+strntoll    6 "1.23ki" ".23ki" 1 OK
+strntoll    5 "1.23ki" ".23ki" 1 OK
+strntonll  6 "1.23ki" "ki" 123 OK 0
+strntonll  5 "1.23ki" "ki" 123 OK 0
+strntoull  6 "1.23ki" ".23ki" 1 OK
+strntoull  5 "1.23ki" ".23ki" 1 OK
+
+strtol    "1.234ki" ".234ki" 1 OK
+strton    "1.234ki" "ki" 123 OK 0
+strtoul   "1.234ki" ".234ki" 1 OK
+strtoll   "1.234ki" ".234ki" 1 OK
+strtonll  "1.234ki" "ki" 123 OK 0
+strtoull  "1.234ki" ".234ki" 1 OK
+strntol     7 "1.234ki" ".234ki" 1 OK
+strntol     6 "1.234ki" ".234ki" 1 OK
+strnton     7 "1.234ki" "ki" 123 OK 0
+strnton     6 "1.234ki" "ki" 123 OK 0
+strntoul    7 "1.234ki" ".234ki" 1 OK
+strntoul    6 "1.234ki" ".234ki" 1 OK
+strntoll    7 "1.234ki" ".234ki" 1 OK
+strntoll    6 "1.234ki" ".234ki" 1 OK
+strntonll  7 "1.234ki" "ki" 123 OK 0
+strntonll  6 "1.234ki" "ki" 123 OK 0
+strntoull  7 "1.234ki" ".234ki" 1 OK
+strntoull  6 "1.234ki" ".234ki" 1 OK'
 
 ;; 32/64)
 
@@ -2669,10 +2955,10 @@ strntoull  2 "1b" "" 1 OK
 strntoull  1 "1b" "b" 1 OK
 
 strtol    "1k" "k" 1 OK
-strton    "1k" "" 1024 OK 0
+strton    "1k" "" 1000 OK 0
 strtoul   "1k" "k" 1 OK
 strtoll   "1k" "k" 1 OK
-strtonll  "1k" "" 1024 OK 0
+strtonll  "1k" "" 1000 OK 0
 strtoull  "1k" "k" 1 OK
 strntol     2 "1k" "" 1 OK
 strntol     1 "1k" "k" 1 OK
@@ -2688,10 +2974,10 @@ strntoull  2 "1k" "" 1 OK
 strntoull  1 "1k" "k" 1 OK
 
 strtol    "1m" "m" 1 OK
-strton    "1m" "" 1048576 OK 0
+strton    "1m" "" 1000000 OK 0
 strtoul   "1m" "m" 1 OK
 strtoll   "1m" "m" 1 OK
-strtonll  "1m" "" 1048576 OK 0
+strtonll  "1m" "" 1000000 OK 0
 strtoull  "1m" "m" 1 OK
 strntol     2 "1m" "" 1 OK
 strntol     1 "1m" "m" 1 OK
@@ -2707,10 +2993,10 @@ strntoull  2 "1m" "" 1 OK
 strntoull  1 "1m" "m" 1 OK
 
 strtol    "1g" "g" 1 OK
-strton    "1g" "" 1073741824 OK 0
+strton    "1g" "" 1000000000 OK 0
 strtoul   "1g" "g" 1 OK
 strtoll   "1g" "g" 1 OK
-strtonll  "1g" "" 1073741824 OK 0
+strtonll  "1g" "" 1000000000 OK 0
 strtoull  "1g" "g" 1 OK
 strntol     2 "1g" "" 1 OK
 strntol     1 "1g" "g" 1 OK
@@ -2729,7 +3015,7 @@ strtol    "1t" "t" 1 OK
 strton    "1t" "" 2147483647 ERANGE 0
 strtoul   "1t" "t" 1 OK
 strtoll   "1t" "t" 1 OK
-strtonll  "1t" "" 1099511627776 OK 0
+strtonll  "1t" "" 1000000000000 OK 0
 strtoull  "1t" "t" 1 OK
 strntol     2 "1t" "" 1 OK
 strntol     1 "1t" "t" 1 OK
@@ -2748,7 +3034,7 @@ strtol    "1p" "p" 1 OK
 strton    "1p" "" 2147483647 ERANGE 0
 strtoul   "1p" "p" 1 OK
 strtoll   "1p" "p" 1 OK
-strtonll  "1p" "" 1125899906842624 OK 0
+strtonll  "1p" "" 1000000000000000 OK 0
 strtoull  "1p" "p" 1 OK
 strntol     2 "1p" "" 1 OK
 strntol     1 "1p" "p" 1 OK
@@ -2767,7 +3053,7 @@ strtol    "1e" "e" 1 OK
 strton    "1e" "" 2147483647 ERANGE 0
 strtoul   "1e" "e" 1 OK
 strtoll   "1e" "e" 1 OK
-strtonll  "1e" "" 1152921504606846976 OK 0
+strtonll  "1e" "" 1000000000000000000 OK 0
 strtoull  "1e" "e" 1 OK
 strntol     2 "1e" "" 1 OK
 strntol     1 "1e" "e" 1 OK

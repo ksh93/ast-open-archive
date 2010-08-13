@@ -212,7 +212,7 @@ TEST 18 'eof combinations'
 
 TEST 19 'transliterate'
 	EXEC -f script
-		INPUT script $'y/abc/ABC/\ny:/\\\\:.:\\/.\\::'
+		INPUT script $'y/abc/ABC/\ny:/\\\\\\:.:\\/.\\::'
 		INPUT - $'abcABCabcdef\n1/:2.'
 		OUTPUT - $'ABCABCABCdef\n1\\.2:'
 	EXEC -f script

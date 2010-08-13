@@ -1430,7 +1430,7 @@ load(Ss_t* ss, const char* usr, const char* fun, const char* lib, Ssdisc_t* disc
 	static const char*	sys[] = { "syncsort", "sort" };
 
 	for (i = 0; i < elementsof(sys); i++)
-		if (dll = dllplugin(sys[i], lib, NiL, RS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path)))
+		if (dll = dllplugin(sys[i], lib, NiL, RS_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path)))
 			break;
 	if (!dll)
 	{
@@ -1449,7 +1449,7 @@ load(Ss_t* ss, const char* usr, const char* fun, const char* lib, Ssdisc_t* disc
 				if (*t)
 				{
 					for (i = 0; i < elementsof(sys); i++)
-						if (dll = dllplugin(sys[i], t, NiL, RS_PLUGIN_VERSION, RTLD_LAZY, path, sizeof(path)))
+						if (dll = dllplugin(sys[i], t, NiL, RS_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path)))
 							break;
 					if (dll)
 						break;

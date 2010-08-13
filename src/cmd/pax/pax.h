@@ -190,10 +190,11 @@ typedef struct Tarheader_s Tarheader_t;
 #define HEADER_GLOBAL		"@PaxGlobals/%(sequence)s"
 #define HEADER_GLOBAL_STD	"%(tmp)s/GlobalHead/%(entry)s"
 
-#define INVALID_ignore		0	/* silently ignore		*/
-#define INVALID_prompt		1	/* prompt for new name		*/
-#define INVALID_translate	2	/* translate and/or truncate	*/
-#define INVALID_UTF8		3	/* convert to UTF8		*/
+#define INVALID_binary		0	/* binary for unencodable data	*/
+#define INVALID_ignore		1	/* silently ignore		*/
+#define INVALID_prompt		2	/* prompt for new name		*/
+#define INVALID_translate	3	/* translate and/or truncate	*/
+#define INVALID_UTF8		4	/* convert to UTF8		*/
 
 #define NOLINK		PAX_NOLINK	/* not a link			*/
 #define HARDLINK	PAX_HARDLINK	/* hard link to previous entry	*/
@@ -735,7 +736,7 @@ extern void		setdeltaheader(Archive_t*, File_t*);
 extern void		setfile(Archive_t*, File_t*);
 extern void		setidnames(File_t*);
 extern void		setinfo(Archive_t*, File_t*);
-extern void		setoptions(char*, char**, char*, Archive_t*, int);
+extern void		setoptions(char*, size_t, char**, char*, Archive_t*, int);
 extern void		settime(const char*, Tv_t*, Tv_t*, Tv_t*);
 extern char*		stash(Value_t*, const char*, size_t);
 extern char*		strlower(char*);

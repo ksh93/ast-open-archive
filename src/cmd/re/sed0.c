@@ -22,7 +22,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Research) 2010-06-11 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Research) 2010-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"
@@ -260,7 +260,7 @@ main(int argc, char **argv)
 	static Text script;
 	static Text data;
 	error_info.id = "sed";
-	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
+	if (!conformance("standard", 0))
 		reflags = REG_LENIENT;
 	map = ccmap(CC_NATIVE, CC_ASCII);
 	while (c = optget(argv, usage))

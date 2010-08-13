@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2006-06-14 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2010-07-31 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -71,6 +71,9 @@ USAGE_LICENSE
 "[N:name?Set the standard input file name prefix to"
 "	\aname\a.]:[name:=empty]"
 "[q:quiet|silent?Do not print matching lines.]"
+"[r|R:recursive?Recursively process all files in each named directory. "
+    "Use \btw -e\b \aexpression\a \bgrep ...\b to control the directory "
+    "traversal.]"
 "[S:strict?Enable strict \apattern\a interpretation with diagnostics.]"
 "[s:suppress|no-messages?Suppress error and warning messages.]"
 "[t:total?Only print a single matching line count for all files.]"
@@ -84,7 +87,7 @@ USAGE_LICENSE
 "[+DIAGNOSTICS?Exit status 0 if matches were found, 1 if no matches were found,"
 "	where \b-v\b invertes the exit status. Exit status 2 for other"
 "	errors that are accompanied by a message on the standard error.]"
-"[+SEE ALSO?\bed\b(1), \bsed\b(1), \bperl\b(1), \bregex\b(3)]"
+"[+SEE ALSO?\bed\b(1), \bsed\b(1), \bperl\b(1), \btw\b(1), \bregex\b(3)]"
 "[+CAVEATS?Some expressions of necessity require exponential space"
 "	and/or time.]"
 "[+BUGS?Some expressions may use sub-optimal algorithms. For example,"
@@ -95,6 +98,7 @@ USAGE_LICENSE
 #include <ctype.h>
 #include <ccode.h>
 #include <error.h>
+#include <fts.h>
 #include <regex.h>
 
 #ifndef EISDIR
@@ -607,12 +611,17 @@ main(int argc, char** argv)
 	char*	s;
 	char*	h;
 	Sfio_t*	f;
+	int	flags;
+	int	old = 0;
+	FTS*	fts;
+	FTSENT*	ent;
 
 	NoP(argc);
+	flags = fts_flags() | FTS_TOP | FTS_NOPOSTORDER | FTS_NOSEEDOTDIR;
 	state.match = 1;
 	state.options = REG_FIRST|REG_NOSUB|REG_NULL;
 	h = 0;
-	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
+	if (!conformance("standard", 0))
 		state.options |= REG_LENIENT;
 	if (s = strrchr(argv[0], '/'))
 		s++;
@@ -740,6 +749,12 @@ main(int argc, char** argv)
 		case 'q':
 			state.query = 1;
 			break;
+		case 'r':
+			if (opt_info.num)
+				flags &= ~FTS_TOP;
+			else
+				old = 1;
+			break;
 		case 's':
 			state.suppress = opt_info.num;
 			break;
@@ -795,7 +810,7 @@ main(int argc, char** argv)
 		state.prefix = h ? 1 : 0;
 		execute(sfstdin, h);
 	}
-	else
+	else if (old) /* just in case the fts logic is incompatible */
 	{
 		if (state.prefix > 1)
 			state.prefix = 0;
@@ -817,6 +832,45 @@ main(int argc, char** argv)
 					error(ERROR_SYSTEM|2, "%s: cannot open", s);
 			}
 		}
+	}
+	else
+	{
+		if (state.prefix > 1)
+			state.prefix = 0;
+		else if (!(flags & FTS_TOP) || argv[1])
+			state.prefix = 1;
+		if (!(fts = fts_open(argv, flags, NiL)))
+			error(ERROR_SYSTEM|3, "%s: not found", argv[0]);
+		while (ent = fts_read(fts))
+			switch (ent->fts_info)
+			{
+			case FTS_F:
+				if (f = sfopen(NiL, ent->fts_accpath, "r"))
+				{
+					execute(f, ent->fts_path);
+					sfclose(f);
+					if (state.query && state.any)
+						goto quit;
+					break;
+				}
+				/*FALLTHROUGH*/
+			case FTS_NS:
+				state.notfound = 1;
+				if (!state.suppress)
+					error(ERROR_SYSTEM|2, "%s: cannot open", ent->fts_path);
+				break;
+			case FTS_DC:
+				error(ERROR_WARNING|1, "%s: directory causes cycle", ent->fts_path);
+				break;
+			case FTS_DNR:
+				error(ERROR_SYSTEM|2, "%s: cannot read directory", ent->fts_path);
+				break;
+			case FTS_DNX:
+				error(ERROR_SYSTEM|2, "%s: cannot search directory", ent->fts_path);
+				break;
+			}
+ quit:
+		fts_close(fts);
 	}
 	if ((state.count & 2) && !state.query && !state.list)
 	{

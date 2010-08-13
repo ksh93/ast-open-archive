@@ -132,6 +132,7 @@ USAGE_LICENSE
 #include <vmalloc.h>
 
 #if _hdr_wctype
+#include <wchar.h>
 #include <wctype.h>
 #else
 #define iswcntrl(w)	iscntrl(w)

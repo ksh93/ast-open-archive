@@ -24,11 +24,11 @@ app :: a.c b.c c.c'
 		ERROR - $'+ cd one
 + nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..
-+ : -DCODE=2
++ : \'-DCODE=2\'
 + 1> a.o
-+ : -DCODE=2
++ : \'-DCODE=2\'
 + 1> b.o
-+ : -DCODE=2
++ : \'-DCODE=2\'
 + 1> c.o
 + :
 + 1> app'
@@ -42,11 +42,11 @@ app :: a.c b.c c.c'
 
 	EXEC	--nojobs two code=0
 		ERROR - $'+ nmake --nojobs -f main.mk CODE==0
-+ : -DCODE=0
++ : \'-DCODE=0\'
 + 1> a.o
-+ : -DCODE=0
++ : \'-DCODE=0\'
 + 1> b.o
-+ : -DCODE=0
++ : \'-DCODE=0\'
 + 1> c.o
 + :
 + 1> app'
@@ -59,11 +59,11 @@ app :: a.c b.c c.c'
 		ERROR - $'+ cd one
 + nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..
-+ : -DCODE=2
++ : \'-DCODE=2\'
 + 1> a.o
-+ : -DCODE=2
++ : \'-DCODE=2\'
 + 1> b.o
-+ : -DCODE=2
++ : \'-DCODE=2\'
 + 1> c.o
 + :
 + 1> app'

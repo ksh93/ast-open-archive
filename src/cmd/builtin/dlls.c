@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1992-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1992-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dlls (AT&T Research) 2006-06-24 $\n]"
+"[-?\n@(#)$Id: dlls (AT&T Research) 2010-08-04 $\n]"
 USAGE_LICENSE
 "[+NAME?dlls - list dlls and shared libraries on $PATH]"
 "[+DESCRIPTION?\bdlls\b lists the base name and full path, one per line, of"
@@ -49,6 +49,9 @@ USAGE_LICENSE
 "[c:containing?Only list libraries containing at least one of the \asymbol\a"
 "	operands.]"
 "[i:info?List native dll naming and location information.]"
+"[l:long?List the base name, plugin YYYYMMDD version stamp, and full "
+    "path for each shared library. Libraries with no plugin version stamp "
+    "have version stamp 00000000.]"
 "[p:path?List the \adll\a or \ashared library\a path names.]"
 
 "\n\n"
@@ -61,10 +64,11 @@ USAGE_LICENSE
 #include <cmd.h>
 #include <dlldefs.h>
 
-#define LIST_BASE	0x1
-#define LIST_INFO	0x2
-#define LIST_ONLY	0x4
-#define LIST_PATH	0x8
+#define LIST_BASE	0x01
+#define LIST_INFO	0x02
+#define LIST_LONG	0x04
+#define LIST_ONLY	0x10
+#define LIST_PATH	0x20
 
 int
 b_dlls(int argc, char** argv, void* context)
@@ -73,6 +77,7 @@ b_dlls(int argc, char** argv, void* context)
 	int		r;
 	int		flags;
 	int		only;
+	unsigned long	ver;
 	char**		syms;
 	char*		arg[3];
 	void*		dll;
@@ -98,6 +103,9 @@ b_dlls(int argc, char** argv, void* context)
 			continue;
 		case 'i':
 			flags |= LIST_INFO;
+			continue;
+		case 'l':
+			flags |= LIST_LONG;
 			continue;
 		case 'p':
 			flags |= LIST_PATH;
@@ -138,8 +146,8 @@ b_dlls(int argc, char** argv, void* context)
 		sfputc(sfstdout, '\n');
 	}
 	else if (!(flags & (LIST_BASE|LIST_PATH)))
-		flags = LIST_BASE|LIST_PATH;
-	if (flags &= (LIST_BASE|LIST_PATH))
+		flags |= LIST_BASE|LIST_PATH;
+	if (flags &= (LIST_BASE|LIST_PATH|LIST_LONG))
 	{
 		for (i = 0; i < elementsof(arg); i++)
 			if (arg[i] = *argv)
@@ -156,21 +164,33 @@ b_dlls(int argc, char** argv, void* context)
 					r = 0;
 					if (!only)
 					{
+						if (!(flags & LIST_LONG))
+							dll = 0;
+						else if (dll = dlopen(dle->path, RTLD_LAZY))
+							ver = dllversion(dll, NiL);
+						else
+							ver = 0;
 						switch (flags)
 						{
 						case LIST_BASE:
 							sfprintf(sfstdout, "%s\n", dle->name);
 							break;
-						case LIST_PATH:
-							sfprintf(sfstdout, "%s\n", dle->path);
+						case LIST_BASE|LIST_LONG:
+							sfprintf(sfstdout, "%14s %08lu\n", dle->name, ver);
+							break;
+						case LIST_PATH|LIST_LONG:
+							sfprintf(sfstdout, "%08lu %s\n", ver, dle->path);
+							break;
+						case LIST_BASE|LIST_PATH:
+							sfprintf(sfstdout, "%14s %s\n", dle->name, dle->path);
 							break;
 						default:
-							sfprintf(sfstdout, "%14s %s\n", dle->name, dle->path);
+							sfprintf(sfstdout, "%14s %08lu %s\n", dle->name, ver, dle->path);
 							break;
 						}
 						if (*(syms = argv))
 						{
-							if (dll = dlopen(dle->path, RTLD_LAZY))
+							if (dll || (dll = dlopen(dle->path, RTLD_LAZY)))
 							{
 								do
 								{

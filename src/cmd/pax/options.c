@@ -92,8 +92,9 @@ Option_t		options[] =
 	"charset",
 	0,
 	OPT_charset,
-	"Data character set name.",
-	"name",
+	"Data character set name. The character set names are:",
+	"charset",
+	"\fcharsets\f",
 	0,
 	OPT_HEADER,
 },
@@ -440,8 +441,8 @@ Option_t		options[] =
 	OPT_from,
 	"File data input character set name.\
 	Only files that have no control characters in the first 256 bytes\
-	are converted. The character set names are:",
-	"name",
+	are converted. See \b--charset\b for supported character set names.",
+	"charset",
 	"\fcharsets\f",
 },
 {
@@ -464,8 +465,19 @@ Option_t		options[] =
 	"gname",
 	0,
 	OPT_gname,
-	"Group name. The default is the group name of the invoking process..",
+	"Group name. The default is the group name of the invoking process.",
 	"group",
+	0,
+	OPT_HEADER,
+},
+{
+	"hdrcharset",
+	0,
+	OPT_hdrcharset,
+	"The name of the character set used to encode text fields in pax extended\
+	header record text fields. See \b--charset\b for supported character\
+	set names.",
+	"charset",
 	0,
 	OPT_HEADER,
 },
@@ -529,7 +541,8 @@ Option_t		options[] =
 	OPT_invalid,
 	"Invalid path action:",
 	"action",
-	"[i:bypass|ignore?Silently ignore.]\
+	"[b:binary?hdrcharset=BINARY extended header record for unencodable data.]\
+	[i:bypass|ignore?Silently ignore.]\
 	[p:rename|prompt?Prompt for new name.]\
 	[t:write|translate?Automatically translate and/or truncate\
 		to local specifications.]\
@@ -890,7 +903,7 @@ Option_t		options[] =
 	"size",
 	0,
 	OPT_HEADER|OPT_OPTIONAL,
-	7
+	4
 },
 {
 	"strict",
@@ -969,7 +982,7 @@ Option_t		options[] =
 	"to",
 	0,
 	OPT_to,
-	"Output character set. See \b--from\b above for supported\
+	"Output character set. See \b--charset\b for supported\
 	character set names.",
 	"name",
 },

@@ -1,3 +1,4 @@
+10-08-04 dlls.c: add -l to list plugin version stamps
 10-06-21 pty.c: add 4 sec timeout for initial handshake -- fix me!!
 10-06-01 od.c: add -c locale checks (and undo some fmtesc() work), add ast -tC1
 10-04-12 pty: fix sfpoll() result read/write bug

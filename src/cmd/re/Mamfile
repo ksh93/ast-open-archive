@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -139,6 +139,12 @@ make grep
 make grep.o
 make grep.c
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
+make ${PACKAGE_ast_INCLUDE}/fts.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/fts.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit

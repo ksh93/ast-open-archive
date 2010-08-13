@@ -4796,20 +4796,20 @@ TEST 40 'implicit prefix include with -I-'
 
 	DO	DATA pfx
 
-	EXEC -Istd t.c
+	EXEC -I-D -Istd t.c
 		INPUT t.c '#include <a.h>'
 		OUTPUT - '# 1 "t.c"
 
-# 1 "std/a.h" 1
+# 1 "std/a.h"
 
-# 1 "std/pfx/c.h" 1
+# 1 "std/pfx/c.h"
 
-# 1 "std/pfx/d.h" 1
+# 1 "std/pfx/d.h"
 int d = 0;
-# 2 "std/pfx/c.h" 2
+# 2 "std/pfx/c.h"
 
-# 2 "std/a.h" 2
+# 2 "std/a.h"
 
-# 2 "t.c" 2'
+# 2 "t.c"'
 
-	EXEC -I- -Istd t.c
+	EXEC -I-D -I- -Istd t.c

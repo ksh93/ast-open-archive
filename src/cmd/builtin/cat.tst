@@ -1578,6 +1578,8 @@ TEST 01 basics
 
 TEST 02 -v
 
+	DO getconf UNIVERSE = att
+
 	EXEC	-v i
 		INPUT -n -
 		INPUT i $'a\211b\311c\tdIe'

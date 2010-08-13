@@ -1894,6 +1894,9 @@ punt(int old)
 	vec = sfstropen();
 	if (old)
 	{
+		expand(internal.tmp, getval(external.old, VAL_PRIMARY));
+		putptr(vec, strdup(sfstruse(internal.tmp)));
+
 		/*
 		 * this chunk must track external.old options
 		 */
@@ -1937,7 +1940,6 @@ punt(int old)
 			sfputc(internal.tmp, 'e');
 		if (state.ruledump)
 			sfputc(internal.tmp, 'r');
-		putptr(vec, getval(external.old, VAL_PRIMARY));
 		s = sfstruse(internal.tmp);
 		if (s[1])
 			putptr(vec, strdup(s));

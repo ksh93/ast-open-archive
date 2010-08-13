@@ -7,7 +7,7 @@ ptvsa : astsa testptv
 include astsa.omk
 
 CC = cc
-CFLAGS = -O -I. -D_PACKAGE_astsa -DIV64=0 -DUSAGE_LICENSE='"[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2008 AT&T Knowledge Ventures][-license?http://www.research.att.com/sw/license/ast-special.html][--catalog?dss]"'
+CFLAGS = -O -I. -D_PACKAGE_astsa -DIV64=0 -DUSAGE_LICENSE='"[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Knowledge Ventures][-license?http://www.research.att.com/sw/license/ast-special.html][--catalog?dss]"'
 
 testptv : testptv.o libptvsa.a libastsa.a
 	$(CC) $(CFLAGS) -o testptv $?

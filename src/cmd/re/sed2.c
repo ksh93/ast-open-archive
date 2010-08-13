@@ -450,7 +450,7 @@ le(Text *script, unsigned char *pc, Text *data)
 				goto hit;
 			}
 		if(!isprint(*s))
-			b += sfsprintf(b, CHMAX+1, "\\%3.3o", *s);
+			b += sfsprintf((char*)b, CHMAX+1, "\\%3.3o", *s);
 		else
 			*b++ = *s;
 	hit:

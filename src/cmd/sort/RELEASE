@@ -1,3 +1,4 @@
+10-08-11 main.c: use conformance(0,0) for "standard"
 10-05-25 main.c: handle mb -t
 10-05-11 main.c: add -p,--plugins=style -- common to all command swith plugins
 10-04-22 main.c: -C => -E, add posix --silent-check, -C

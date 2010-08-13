@@ -260,10 +260,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\n'
 
 	EXEC	-n -b 1-2 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237'
 
 	EXEC	-n -b 1-2 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\n'
 
 	EXEC	-b 1-3 b.dat
 		OUTPUT - $'\303\237\342'
@@ -272,10 +272,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\n'
 
 	EXEC	-n -b 1-3 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237'
 
 	EXEC	-n -b 1-3 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\n'
 
 	EXEC	-b 1-4 b.dat
 		OUTPUT - $'\303\237\342\202'
@@ -284,10 +284,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\n'
 
 	EXEC	-n -b 1-4 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237'
 
 	EXEC	-n -b 1-4 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\n'
 
 	EXEC	-b 1-5 b.dat
 		OUTPUT - $'\303\237\342\202\254'
@@ -296,10 +296,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\n'
 
 	EXEC	-n -b 1-5 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254'
 
 	EXEC	-n -b 1-5 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\n'
 
 	EXEC	-b 1-6 b.dat
 		OUTPUT - $'\303\237\342\202\254\342'
@@ -308,10 +308,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\n'
 
 	EXEC	-n -b 1-6 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254'
 
 	EXEC	-n -b 1-6 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\n'
 
 	EXEC	-b 1-7 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202'
@@ -320,10 +320,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\n'
 
 	EXEC	-n -b 1-7 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254'
 
 	EXEC	-n -b 1-7 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\n'
 
 	EXEC	-b 1-8 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254'
@@ -332,10 +332,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254\n'
 
 	EXEC	-n -b 1-8 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254'
 
 	EXEC	-n -b 1-8 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254\n'
 
 	EXEC	-b 1-9 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f'
@@ -344,10 +344,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f\n'
 
 	EXEC	-n -b 1-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f'
 
 	EXEC	-n -b 1-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f\n'
 
 	EXEC	-b 1-10 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2'
@@ -356,10 +356,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-n -b 1-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 1-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 1-11 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342'
@@ -368,10 +368,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\n'
 
 	EXEC	-n -b 1-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 1-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 1-12 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202'
@@ -380,10 +380,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\n'
 
 	EXEC	-n -b 1-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 1-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 1-13 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254'
@@ -392,10 +392,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-n -b 1-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 1-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 1-14 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303'
@@ -404,10 +404,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 1-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 1-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 1-15 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274'
@@ -416,10 +416,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 1-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 1-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 1-16 b.dat
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274'
@@ -428,10 +428,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 1-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 1-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 2-3 b.dat
 		OUTPUT - $'\237\342'
@@ -440,10 +440,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\n'
 
 	EXEC	-n -b 2-3 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237'
 
 	EXEC	-n -b 2-3 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\n'
 
 	EXEC	-b 2-4 b.dat
 		OUTPUT - $'\237\342\202'
@@ -452,10 +452,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\n'
 
 	EXEC	-n -b 2-4 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237'
 
 	EXEC	-n -b 2-4 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\n'
 
 	EXEC	-b 2-5 b.dat
 		OUTPUT - $'\237\342\202\254'
@@ -464,10 +464,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\n'
 
 	EXEC	-n -b 2-5 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254'
 
 	EXEC	-n -b 2-5 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\n'
 
 	EXEC	-b 2-6 b.dat
 		OUTPUT - $'\237\342\202\254\342'
@@ -476,10 +476,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\n'
 
 	EXEC	-n -b 2-6 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254'
 
 	EXEC	-n -b 2-6 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\n'
 
 	EXEC	-b 2-7 b.dat
 		OUTPUT - $'\237\342\202\254\342\202'
@@ -488,10 +488,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\n'
 
 	EXEC	-n -b 2-7 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254'
 
 	EXEC	-n -b 2-7 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\n'
 
 	EXEC	-b 2-8 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254'
@@ -500,10 +500,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254\n'
 
 	EXEC	-n -b 2-8 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254'
 
 	EXEC	-n -b 2-8 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254\n'
 
 	EXEC	-b 2-9 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f'
@@ -512,10 +512,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f\n'
 
 	EXEC	-n -b 2-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f'
 
 	EXEC	-n -b 2-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f\n'
 
 	EXEC	-b 2-10 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f2'
@@ -524,10 +524,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-n -b 2-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 2-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 2-11 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342'
@@ -536,10 +536,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\n'
 
 	EXEC	-n -b 2-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 2-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 2-12 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202'
@@ -548,10 +548,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\n'
 
 	EXEC	-n -b 2-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 2-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 2-13 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254'
@@ -560,10 +560,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-n -b 2-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 2-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 2-14 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254\303'
@@ -572,10 +572,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 2-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 2-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 2-15 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254\303\274'
@@ -584,10 +584,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 2-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 2-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 2-16 b.dat
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254\303\274'
@@ -596,10 +596,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 2-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 2-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\237\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 3-4 b.dat
 		OUTPUT - $'\342\202'
@@ -620,10 +620,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-n -b 3-5 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 3-5 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 3-6 b.dat
 		OUTPUT - $'\342\202\254\342'
@@ -632,10 +632,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\n'
 
 	EXEC	-n -b 3-6 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 3-6 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 3-7 b.dat
 		OUTPUT - $'\342\202\254\342\202'
@@ -644,10 +644,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\n'
 
 	EXEC	-n -b 3-7 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 3-7 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 3-8 b.dat
 		OUTPUT - $'\342\202\254\342\202\254'
@@ -656,10 +656,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254\n'
 
 	EXEC	-n -b 3-8 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254'
 
 	EXEC	-n -b 3-8 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254\n'
 
 	EXEC	-b 3-9 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f'
@@ -668,10 +668,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f\n'
 
 	EXEC	-n -b 3-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f'
 
 	EXEC	-n -b 3-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f\n'
 
 	EXEC	-b 3-10 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f2'
@@ -680,10 +680,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-n -b 3-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 3-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 3-11 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f2\342'
@@ -692,10 +692,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f2\342\n'
 
 	EXEC	-n -b 3-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 3-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 3-12 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202'
@@ -704,10 +704,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\n'
 
 	EXEC	-n -b 3-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 3-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 3-13 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254'
@@ -716,10 +716,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-n -b 3-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 3-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 3-14 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303'
@@ -728,10 +728,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 3-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 3-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 3-15 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
@@ -740,10 +740,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 3-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 3-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 3-16 b.dat
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
@@ -752,10 +752,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 3-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 3-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 4-5 b.dat
 		OUTPUT - $'\202\254'
@@ -764,10 +764,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\n'
 
 	EXEC	-n -b 4-5 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 4-5 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 4-6 b.dat
 		OUTPUT - $'\202\254\342'
@@ -776,10 +776,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\n'
 
 	EXEC	-n -b 4-6 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 4-6 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 4-7 b.dat
 		OUTPUT - $'\202\254\342\202'
@@ -788,10 +788,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\n'
 
 	EXEC	-n -b 4-7 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 4-7 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 4-8 b.dat
 		OUTPUT - $'\202\254\342\202\254'
@@ -800,10 +800,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254\n'
 
 	EXEC	-n -b 4-8 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254'
 
 	EXEC	-n -b 4-8 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254\n'
 
 	EXEC	-b 4-9 b.dat
 		OUTPUT - $'\202\254\342\202\254f'
@@ -812,10 +812,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f\n'
 
 	EXEC	-n -b 4-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f'
 
 	EXEC	-n -b 4-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f\n'
 
 	EXEC	-b 4-10 b.dat
 		OUTPUT - $'\202\254\342\202\254f2'
@@ -824,10 +824,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f2\n'
 
 	EXEC	-n -b 4-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 4-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 4-11 b.dat
 		OUTPUT - $'\202\254\342\202\254f2\342'
@@ -836,10 +836,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f2\342\n'
 
 	EXEC	-n -b 4-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 4-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 4-12 b.dat
 		OUTPUT - $'\202\254\342\202\254f2\342\202'
@@ -848,10 +848,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f2\342\202\n'
 
 	EXEC	-n -b 4-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 4-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 4-13 b.dat
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254'
@@ -860,10 +860,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-n -b 4-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 4-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 4-14 b.dat
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254\303'
@@ -872,10 +872,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 4-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 4-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 4-15 b.dat
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254\303\274'
@@ -884,10 +884,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 4-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 4-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 4-16 b.dat
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254\303\274'
@@ -896,10 +896,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 4-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 4-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 5-6 b.dat
 		OUTPUT - $'\254\342'
@@ -908,10 +908,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\n'
 
 	EXEC	-n -b 5-6 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 5-6 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 5-7 b.dat
 		OUTPUT - $'\254\342\202'
@@ -920,10 +920,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\n'
 
 	EXEC	-n -b 5-7 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 5-7 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 5-8 b.dat
 		OUTPUT - $'\254\342\202\254'
@@ -932,10 +932,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254\n'
 
 	EXEC	-n -b 5-8 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254'
 
 	EXEC	-n -b 5-8 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254\n'
 
 	EXEC	-b 5-9 b.dat
 		OUTPUT - $'\254\342\202\254f'
@@ -944,10 +944,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f\n'
 
 	EXEC	-n -b 5-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f'
 
 	EXEC	-n -b 5-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f\n'
 
 	EXEC	-b 5-10 b.dat
 		OUTPUT - $'\254\342\202\254f2'
@@ -956,10 +956,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f2\n'
 
 	EXEC	-n -b 5-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 5-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 5-11 b.dat
 		OUTPUT - $'\254\342\202\254f2\342'
@@ -968,10 +968,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f2\342\n'
 
 	EXEC	-n -b 5-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 5-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 5-12 b.dat
 		OUTPUT - $'\254\342\202\254f2\342\202'
@@ -980,10 +980,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f2\342\202\n'
 
 	EXEC	-n -b 5-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2'
 
 	EXEC	-n -b 5-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\n'
 
 	EXEC	-b 5-13 b.dat
 		OUTPUT - $'\254\342\202\254f2\342\202\254'
@@ -992,10 +992,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-n -b 5-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 5-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 5-14 b.dat
 		OUTPUT - $'\254\342\202\254f2\342\202\254\303'
@@ -1004,10 +1004,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 5-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 5-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 5-15 b.dat
 		OUTPUT - $'\254\342\202\254f2\342\202\254\303\274'
@@ -1016,10 +1016,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 5-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 5-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 5-16 b.dat
 		OUTPUT - $'\254\342\202\254f2\342\202\254\303\274'
@@ -1028,10 +1028,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 5-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 5-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 6-7 b.dat
 		OUTPUT - $'\342\202'
@@ -1052,10 +1052,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-n -b 6-8 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 6-8 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 6-9 b.dat
 		OUTPUT - $'\342\202\254f'
@@ -1064,10 +1064,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f\n'
 
 	EXEC	-n -b 6-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f'
 
 	EXEC	-n -b 6-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f\n'
 
 	EXEC	-b 6-10 b.dat
 		OUTPUT - $'\342\202\254f2'
@@ -1076,10 +1076,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-n -b 6-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 6-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 6-11 b.dat
 		OUTPUT - $'\342\202\254f2\342'
@@ -1088,10 +1088,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f2\342\n'
 
 	EXEC	-n -b 6-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 6-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 6-12 b.dat
 		OUTPUT - $'\342\202\254f2\342\202'
@@ -1100,10 +1100,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f2\342\202\n'
 
 	EXEC	-n -b 6-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 6-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 6-13 b.dat
 		OUTPUT - $'\342\202\254f2\342\202\254'
@@ -1112,10 +1112,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f2\342\202\254\n'
 
 	EXEC	-n -b 6-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 6-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 6-14 b.dat
 		OUTPUT - $'\342\202\254f2\342\202\254\303'
@@ -1124,10 +1124,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 6-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 6-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 6-15 b.dat
 		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
@@ -1136,10 +1136,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 6-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 6-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 6-16 b.dat
 		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
@@ -1148,10 +1148,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 6-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 6-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 7-8 b.dat
 		OUTPUT - $'\202\254'
@@ -1160,10 +1160,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\n'
 
 	EXEC	-n -b 7-8 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 7-8 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 7-9 b.dat
 		OUTPUT - $'\202\254f'
@@ -1172,10 +1172,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f\n'
 
 	EXEC	-n -b 7-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f'
 
 	EXEC	-n -b 7-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f\n'
 
 	EXEC	-b 7-10 b.dat
 		OUTPUT - $'\202\254f2'
@@ -1184,10 +1184,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f2\n'
 
 	EXEC	-n -b 7-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 7-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 7-11 b.dat
 		OUTPUT - $'\202\254f2\342'
@@ -1196,10 +1196,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f2\342\n'
 
 	EXEC	-n -b 7-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 7-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 7-12 b.dat
 		OUTPUT - $'\202\254f2\342\202'
@@ -1208,10 +1208,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f2\342\202\n'
 
 	EXEC	-n -b 7-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 7-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 7-13 b.dat
 		OUTPUT - $'\202\254f2\342\202\254'
@@ -1220,10 +1220,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f2\342\202\254\n'
 
 	EXEC	-n -b 7-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 7-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 7-14 b.dat
 		OUTPUT - $'\202\254f2\342\202\254\303'
@@ -1232,10 +1232,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 7-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 7-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 7-15 b.dat
 		OUTPUT - $'\202\254f2\342\202\254\303\274'
@@ -1244,10 +1244,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 7-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 7-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 7-16 b.dat
 		OUTPUT - $'\202\254f2\342\202\254\303\274'
@@ -1256,10 +1256,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 7-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 7-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 8-9 b.dat
 		OUTPUT - $'\254f'
@@ -1268,10 +1268,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f\n'
 
 	EXEC	-n -b 8-9 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f'
 
 	EXEC	-n -b 8-9 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f\n'
 
 	EXEC	-b 8-10 b.dat
 		OUTPUT - $'\254f2'
@@ -1280,10 +1280,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f2\n'
 
 	EXEC	-n -b 8-10 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 8-10 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 8-11 b.dat
 		OUTPUT - $'\254f2\342'
@@ -1292,10 +1292,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f2\342\n'
 
 	EXEC	-n -b 8-11 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 8-11 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 8-12 b.dat
 		OUTPUT - $'\254f2\342\202'
@@ -1304,10 +1304,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f2\342\202\n'
 
 	EXEC	-n -b 8-12 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2'
 
 	EXEC	-n -b 8-12 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\n'
 
 	EXEC	-b 8-13 b.dat
 		OUTPUT - $'\254f2\342\202\254'
@@ -1316,10 +1316,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f2\342\202\254\n'
 
 	EXEC	-n -b 8-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 8-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 8-14 b.dat
 		OUTPUT - $'\254f2\342\202\254\303'
@@ -1328,10 +1328,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f2\342\202\254\303\n'
 
 	EXEC	-n -b 8-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254'
 
 	EXEC	-n -b 8-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\n'
 
 	EXEC	-b 8-15 b.dat
 		OUTPUT - $'\254f2\342\202\254\303\274'
@@ -1340,10 +1340,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 8-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 8-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 8-16 b.dat
 		OUTPUT - $'\254f2\342\202\254\303\274'
@@ -1352,10 +1352,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 8-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274'
 
 	EXEC	-n -b 8-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254f2\342\202\254\303\274\n'
 
 	EXEC	-b 9-10 b.dat
 		OUTPUT - f2
@@ -1400,10 +1400,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'f2\342\202\254\n'
 
 	EXEC	-n -b 9-13 b.dat
-		OUTPUT - f2
+		OUTPUT - $'f2\342\202\254'
 
 	EXEC	-n -b 9-13 c.dat
-		OUTPUT - $'f2\n'
+		OUTPUT - $'f2\342\202\254\n'
 
 	EXEC	-b 9-14 b.dat
 		OUTPUT - $'f2\342\202\254\303'
@@ -1412,10 +1412,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'f2\342\202\254\303\n'
 
 	EXEC	-n -b 9-14 b.dat
-		OUTPUT - f2
+		OUTPUT - $'f2\342\202\254'
 
 	EXEC	-n -b 9-14 c.dat
-		OUTPUT - $'f2\n'
+		OUTPUT - $'f2\342\202\254\n'
 
 	EXEC	-b 9-15 b.dat
 		OUTPUT - $'f2\342\202\254\303\274'
@@ -1424,10 +1424,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 9-15 b.dat
-		OUTPUT - f2
+		OUTPUT - $'f2\342\202\254\303\274'
 
 	EXEC	-n -b 9-15 c.dat
-		OUTPUT - $'f2\n'
+		OUTPUT - $'f2\342\202\254\303\274\n'
 
 	EXEC	-b 9-16 b.dat
 		OUTPUT - $'f2\342\202\254\303\274'
@@ -1436,10 +1436,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'f2\342\202\254\303\274\n'
 
 	EXEC	-n -b 9-16 b.dat
-		OUTPUT -n - f2
+		OUTPUT - $'f2\342\202\254\303\274'
 
 	EXEC	-n -b 9-16 c.dat
-		OUTPUT - f2
+		OUTPUT - $'f2\342\202\254\303\274\n'
 
 	EXEC	-b 10-11 b.dat
 		OUTPUT - $'2\342'
@@ -1472,10 +1472,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'2\342\202\254\n'
 
 	EXEC	-n -b 10-13 b.dat
-		OUTPUT - 2
+		OUTPUT - $'2\342\202\254'
 
 	EXEC	-n -b 10-13 c.dat
-		OUTPUT - $'2\n'
+		OUTPUT - $'2\342\202\254\n'
 
 	EXEC	-b 10-14 b.dat
 		OUTPUT - $'2\342\202\254\303'
@@ -1484,10 +1484,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'2\342\202\254\303\n'
 
 	EXEC	-n -b 10-14 b.dat
-		OUTPUT - 2
+		OUTPUT - $'2\342\202\254'
 
 	EXEC	-n -b 10-14 c.dat
-		OUTPUT - $'2\n'
+		OUTPUT - $'2\342\202\254\n'
 
 	EXEC	-b 10-15 b.dat
 		OUTPUT - $'2\342\202\254\303\274'
@@ -1496,10 +1496,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'2\342\202\254\303\274\n'
 
 	EXEC	-n -b 10-15 b.dat
-		OUTPUT - 2
+		OUTPUT - $'2\342\202\254\303\274'
 
 	EXEC	-n -b 10-15 c.dat
-		OUTPUT - $'2\n'
+		OUTPUT - $'2\342\202\254\303\274\n'
 
 	EXEC	-b 10-16 b.dat
 		OUTPUT - $'2\342\202\254\303\274'
@@ -1508,10 +1508,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'2\342\202\254\303\274\n'
 
 	EXEC	-n -b 10-16 b.dat
-		OUTPUT -n - 2
+		OUTPUT - $'2\342\202\254\303\274'
 
 	EXEC	-n -b 10-16 c.dat
-		OUTPUT - 2
+		OUTPUT - $'2\342\202\254\303\274\n'
 
 	EXEC	-b 11-12 b.dat
 		OUTPUT - $'\342\202'
@@ -1532,10 +1532,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-n -b 11-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 11-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 11-14 b.dat
 		OUTPUT - $'\342\202\254\303'
@@ -1544,10 +1544,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\303\n'
 
 	EXEC	-n -b 11-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 11-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 11-15 b.dat
 		OUTPUT - $'\342\202\254\303\274'
@@ -1556,10 +1556,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-n -b 11-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\303\274'
 
 	EXEC	-n -b 11-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-b 11-16 b.dat
 		OUTPUT - $'\342\202\254\303\274'
@@ -1568,10 +1568,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-n -b 11-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\303\274'
 
 	EXEC	-n -b 11-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-b 12-13 b.dat
 		OUTPUT - $'\202\254'
@@ -1580,10 +1580,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\n'
 
 	EXEC	-n -b 12-13 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 12-13 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 12-14 b.dat
 		OUTPUT - $'\202\254\303'
@@ -1592,10 +1592,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\303\n'
 
 	EXEC	-n -b 12-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 12-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 12-15 b.dat
 		OUTPUT - $'\202\254\303\274'
@@ -1604,10 +1604,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\303\274\n'
 
 	EXEC	-n -b 12-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\303\274'
 
 	EXEC	-n -b 12-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-b 12-16 b.dat
 		OUTPUT - $'\202\254\303\274'
@@ -1616,10 +1616,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\202\254\303\274\n'
 
 	EXEC	-n -b 12-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\303\274'
 
 	EXEC	-n -b 12-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-b 13-14 b.dat
 		OUTPUT - $'\254\303'
@@ -1628,10 +1628,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\303\n'
 
 	EXEC	-n -b 13-14 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254'
 
 	EXEC	-n -b 13-14 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\n'
 
 	EXEC	-b 13-15 b.dat
 		OUTPUT - $'\254\303\274'
@@ -1640,10 +1640,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\303\274\n'
 
 	EXEC	-n -b 13-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\303\274'
 
 	EXEC	-n -b 13-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-b 13-16 b.dat
 		OUTPUT - $'\254\303\274'
@@ -1652,10 +1652,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\254\303\274\n'
 
 	EXEC	-n -b 13-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\342\202\254\303\274'
 
 	EXEC	-n -b 13-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\342\202\254\303\274\n'
 
 	EXEC	-b 14-15 b.dat
 		OUTPUT - $'\303\274'
@@ -1664,10 +1664,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\274\n'
 
 	EXEC	-n -b 14-15 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\274'
 
 	EXEC	-n -b 14-15 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\274\n'
 
 	EXEC	-b 14-16 b.dat
 		OUTPUT - $'\303\274'
@@ -1676,10 +1676,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\303\274\n'
 
 	EXEC	-n -b 14-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\274'
 
 	EXEC	-n -b 14-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\274\n'
 
 	EXEC	-b 15-16 b.dat
 		OUTPUT - $'\274'
@@ -1688,10 +1688,10 @@ EXPORT LC_CTYPE=C.UTF-8
 		OUTPUT - $'\274\n'
 
 	EXEC	-n -b 15-16 b.dat
-		OUTPUT -n - $'\n'
+		OUTPUT - $'\303\274'
 
 	EXEC	-n -b 15-16 c.dat
-		OUTPUT - $'\n'
+		OUTPUT - $'\303\274\n'
 
 TEST 12 'multibyte euc'
 
