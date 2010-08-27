@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-24
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -224,9 +224,11 @@ done ${PACKAGE_ast_INCLUDE}/align.h dontcare
 done exlib.h dontcare
 done exgram.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done exparse.c generated
+make joint.exparse.y joint
+prev exparse.c
 prev exparse.h
 done joint.exparse.y generated virtual
+done exparse.c generated
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exparse.c
 done exparse.o generated
 make excc.o
@@ -270,7 +272,7 @@ prev exparse.h
 exec - {
 exec - echo 'static const char* exop[] = {'
 exec - echo '	"MINTOKEN",'
-exec - sed -e '1,/MINTOKEN/d' -e '/MAXTOKEN/,$d' -e '/^[ 	]*#[ 	]*define[ 	][ 	]*[A-Z]/!d' -e 's/^[ 	]*#[ 	]*define[ 	]*\([A-Z0-9_]*\).*/	"\1",/'
+exec - sed -e '1,/MINTOKEN/d' -e '/MAXTOKEN/,$d' -e 's/^[ 	]*//' -e 's/^#[ 	]*define[ 	]*//' -e 's/[= 	].*//' -e 's/.*/	"&",/'
 exec - echo '	"MAXTOKEN",'
 exec - echo '};'
 exec - } < exparse.h > exop.h

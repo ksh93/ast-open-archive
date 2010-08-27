@@ -810,12 +810,23 @@ init(void)
  */
 
 void
-compile(char* s)
+compile(char* s, int file)
 {
+	Sfio_t*		sp;
+
 	if (!state.program)
 		init();
 	state.compiled = 0;
-	if (excomp(state.program, NiL, 0, s, NiL))
+	if (file)
+	{
+		if (!(sp = sfopen(NiL, s, "r")))
+			error(3|ERROR_SYSTEM, "%s: cannot read", s);
+		else if (excomp(state.program, s, 1, NiL, sp))
+			error(3, "%s: expression compile error", s);
+		else
+			sfclose(sp);
+	}
+	else if (excomp(state.program, NiL, 0, s, NiL))
 		error(3, "expression compile error");
 	state.compiled = 1;
 	if (error_info.trace)

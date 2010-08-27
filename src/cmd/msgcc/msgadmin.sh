@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 2000-2005 AT&T Corp.                  #
+#          Copyright (c) 2000-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -31,7 +31,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 [+NAME?'$command$' - message catalog file administration]
 [+DESCRIPTION?\b'$command$'\b administers message catalog files. If no \afile\a
 	operands are specified then all message files in the local
-	\b$INSTALLROOT\b source tree are operated on. Exaclty one of
+	\b$INSTALLROOT\b source tree are operated on. Exactly one of
 	\b--generate\b, \b--remove\b, \b--translate\b, or \b--verify\b
 	must be specified.]
 [D:debug?Passed to \btranslate\b(1).]

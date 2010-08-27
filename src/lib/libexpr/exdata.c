@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -25,7 +25,7 @@
  * expression library readonly tables
  */
 
-static const char id[] = "\n@(#)$Id: libexpr (AT&T Research) 2009-02-02 $\0\n";
+static const char id[] = "\n@(#)$Id: libexpr (AT&T Research) 2010-08-18 $\0\n";
 
 #include <exlib.h>
 
@@ -59,6 +59,7 @@ Exid_t		exbuiltin[] =
 	EXID("scanf",	SCANF,		SCANF,		INTEGER,0),
 	EXID("sscanf",	SSCANF,		SSCANF,		INTEGER,0),
 	EXID("sprintf",	SPRINTF,	SPRINTF,	STRING,	0),
+	EXID("static",	STATIC,		STATIC,		0,	0),
 	EXID("switch",	SWITCH,		SWITCH,		0,	0),
 	EXID("unsigned",DECLARE,	UNSIGNED,	UNSIGNED,0),
 	EXID("void",	DECLARE,	VOID,		0,	0),

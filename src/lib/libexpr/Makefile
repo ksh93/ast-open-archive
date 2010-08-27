@@ -21,7 +21,7 @@ exop.h : exparse.h
 	{
 	echo 'static const char* exop[] = {'
 	echo '	"MINTOKEN",'
-	$(SED) -e '1,/MINTOKEN/d' -e '/MAXTOKEN/,$d' -e '/^[ 	]*#[ 	]*define[ 	][ 	]*[A-Z]/!d' -e 's/^[ 	]*#[ 	]*define[ 	]*\([A-Z0-9_]*\).*/	"\1",/'
+	$(SED) -e '1,/MINTOKEN/d' -e '/MAXTOKEN/,$d' -e 's/^[ 	]*//' -e 's/^#[ 	]*define[ 	]*//' -e 's/[= 	].*//' -e 's/.*/	"&",/'
 	echo '	"MAXTOKEN",'
 	echo '};'
 	} < $(*) > $(<)

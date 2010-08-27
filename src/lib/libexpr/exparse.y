@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,8 +24,6 @@
  * AT&T Research
  *
  * expression library grammar and compiler
- *
- * NOTE: procedure arguments not implemented yet
  */
 
 #include <ast.h>
@@ -57,6 +55,7 @@
 %token	FLOATING
 %token	STRING
 %token	VOID
+%token	STATIC
 
 %token	ADDRESS
 %token	BREAK
@@ -140,6 +139,7 @@
 %type <id>		SCANF		SSCANF		scan
 %type <floating>	FLOATING
 %type <integer>		INTEGER		UNSIGNED	array
+%type <integer>		static
 %type <string>		STRING
 
 %token	MAXTOKEN
@@ -185,12 +185,15 @@ action		:	LABEL ':' {
 				$1->lex = PROCEDURE;
 				expr.procedure = $1->value = exnewnode(expr.program, PROCEDURE, 1, $1->type, NiL, NiL);
 				expr.procedure->type = INTEGER;
-				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-					exnospace();
-				disc->key = offsetof(Exid_t, name);
-				if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
-					exnospace();
-				expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
+				if (expr.assigned || !streq($1->name, "begin"))
+				{
+					if (!(disc = newof(0, Dtdisc_t, 1, 0)))
+						exnospace();
+					disc->key = offsetof(Exid_t, name);
+					if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
+						exnospace();
+					expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
+				}
 			} statement_list
 		{
 			expr.procedure = 0;
@@ -198,6 +201,7 @@ action		:	LABEL ':' {
 			{
 				expr.program->symbols = expr.program->frame->view;
 				dtview(expr.program->frame, NiL);
+				expr.program->frame = 0;
 			}
 			if ($4 && $4->op == S2B)
 			{
@@ -239,9 +243,10 @@ statement	:	'{' statement_list '}'
 		{
 			$$ = ($1 && $1->type == STRING) ? exnewnode(expr.program, S2B, 1, INTEGER, $1, NiL) : $1;
 		}
-		|	DECLARE {expr.declare=$1->type;} dcl_list ';'
+		|	static {expr.instatic=$1;} DECLARE {expr.declare=$3->type;} dcl_list ';'
 		{
-			$$ = $3;
+			$$ = $5;
+			expr.declare = 0;
 		}
 		|	IF '(' expr ')' statement else_opt
 		{
@@ -297,6 +302,7 @@ statement	:	'{' statement_list '}'
 				free(sw->base);
 			if (sw != &swstate)
 				free(sw);
+			expr.declare = 0;
 		}
 		|	BREAK expr_opt ';'
 		{
@@ -419,6 +425,16 @@ case_item	:	CASE constant ':'
 		}
 		;
 
+static	:	/* empty */
+		{
+			$$ = 0;
+		}
+		|	STATIC
+		{
+			$$ = 1;
+		}
+		;
+
 dcl_list	:	dcl_item
 		|	dcl_list ',' dcl_item
 		{
@@ -470,6 +486,11 @@ dcl_item	:	reference NAME {expr.id=$2;} array initialize
 					$5->data.operand.left = exnewnode(expr.program, DYNAMIC, 0, $2->type, NiL, NiL);
 					$5->data.operand.left->data.variable.symbol = $2;
 					$$ = $5;
+					if (!expr.program->frame && !expr.program->errors)
+					{
+						expr.assigned++;
+						exeval(expr.program, $$, NiL);
+					}
 				}
 				else if (!$4)
 					$2->value->data.value = exzero($2->type);
@@ -989,6 +1010,7 @@ formal_item	:	DECLARE {expr.declare=$1->type;} name
 			$3->lex = DYNAMIC;
 			$3->value = exnewnode(expr.program, 0, 0, 0, NiL, NiL);
 			expr.procedure->data.procedure.arity++;
+			expr.declare = 0;
 		}
 		;
 
@@ -1034,19 +1056,24 @@ initialize	:	assign
 				register Dtdisc_t*	disc;
 
 				if (expr.procedure)
-					exerror("no nested function definitions");
+					exerror("%s: nested function definitions not supported", expr.id->name);
 				expr.procedure = exnewnode(expr.program, PROCEDURE, 1, expr.declare, NiL, NiL);
-				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-					exnospace();
-				disc->key = offsetof(Exid_t, name);
-				if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
-					exnospace();
-				expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
-				expr.program->formals = 1;
+				if (expr.assigned || !streq(expr.id->name, "begin"))
+				{
+					if (!(disc = newof(0, Dtdisc_t, 1, 0)))
+						exnospace();
+					disc->key = offsetof(Exid_t, name);
+					if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
+						exnospace();
+					expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
+					expr.program->formals = 1;
+				}
+				expr.declare = 0;
 			} formals {
-				expr.program->formals = 0;
 				expr.id->lex = PROCEDURE;
-				expr.id->type = expr.declare;
+				expr.id->type = expr.procedure->type;
+				expr.program->formals = 0;
+				expr.declare = 0;
 			} ')' '{' statement_list '}'
 		{
 			$$ = expr.procedure;
@@ -1055,6 +1082,7 @@ initialize	:	assign
 			{
 				expr.program->symbols = expr.program->frame->view;
 				dtview(expr.program->frame, NiL);
+				expr.program->frame = 0;
 			}
 			$$->data.operand.left = $3;
 			$$->data.operand.right = excast(expr.program, $7, $$->type, NiL, 0);

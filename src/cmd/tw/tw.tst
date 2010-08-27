@@ -479,3 +479,28 @@ i=3 a="abc" p="pdq" x="xyz"'
 			i = sscanf(s,"%d %g", &n, &n);
 			printf("i=%d n=%d f=%g\n", i, n, f);'
 		ERROR - 'tw: scanf: n: floating variable address argument expected'
+
+TEST 07 'function and variable scoping'
+
+	EXEC 	-n \
+		-e 'static int i = 1; int foo() { return i++; }' \
+		-e 'static int i = 11; int bar() { return i++; }' \
+		-e 'int end() { int i; for (i = 0; i < 8; i++) printf("%2d %2d\n", foo(), bar()); }'
+		OUTPUT - $' 1 11\n 2 12\n 3 13\n 4 14\n 5 15\n 6 16\n 7 17\n 8 18'
+
+	EXEC 	-n \
+		-e 'int i = 1; int foo() { return i++; }' \
+		-e 'int bar() { return i++; }' \
+		-e 'int end() { for (i = 0; i < 8; i++) printf("%2d %2d\n", foo(), bar()); }'
+		OUTPUT - $' 0  1\n 3  4\n 6  7'
+
+	EXEC 	-n \
+		-e 'int i = 1; int foo() { return i++; }' \
+		-e 'int bar() { return i++; }' \
+		-e 'int end() { int i; for (i = 0; i < 8; i++) printf("%2d %2d\n", foo(), bar()); }'
+		OUTPUT - $' 1  2\n 3  4\n 5  6\n 7  8\n 9 10\n11 12\n13 14\n15 16'
+
+	EXEC 	-n \
+		-e 'int i = 1; int foo() { return i++; }' \
+		-e 'int bar() { return i++; }' \
+		-e 'int end() { int j; for (j = 0; j < 8; j++) printf("%2d %2d\n", foo(), bar()); }'

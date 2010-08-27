@@ -93,7 +93,25 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-08-11  --- Release ksh93u  ---
+10-08-25  --- Release ksh93u  ---
+10-08-25  Fixed a couple of bugs related to job pools. 
+10-08-24 +[[ -e /dev/xxx/ ]] can be used to check whether special files of
+	  those names are handled by the shell.
+10-08-24  A bug in the running of a compiled dot script in which only the
+	  first command was executed has been fixed.
+10-08-23  A bug which sometimes caused a core dump with a confgire script
+	  has been fixed.
+10-08-20  A bug in command substitution which caused a configure script to
+	  hang has been fixed.
+10-08-19  Eliminated unnecessary ; from output of compound variable with
+	  typeset -p.
+10-08-17  Fixed a bug in command substitution in which under certain
+	  circumstances a file whose size is a power of 2 plus one, and the last
+	  character was not a new-line, could cause memory corruption.
+10-08-13 +Added static discipline functions to type similar to C++ static
+	  class functions.
+10-08-11  A bug in time when applied to a pipeline in which the shell did
+	  not wait for all elements of the pipeline to complete has been fixed.
 10-08-11  Restored sh_fmtq() quoting to not quote NAME= in NAME=VALUE.
 10-08-09 +Modified the expansion of message strings, $"...", so that they
 	  are expanded each time they are referenced rather than expanding
@@ -2529,6 +2547,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+10-08-22 format.c: archive update requires (ap->io->mode & O_RDWR)
 10-08-11 use conformance("standard",0) test
 10-08-09 fix extended header size key precedence/performance
 10-08-09 use { SEEK_DATA SEEK_HOLE } for -rw if available
@@ -2955,6 +2974,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+10-08-22 sear.sh: ratz+sear now requires -ladvapi32
 10-01-20 changes.sh: avoid nmake variable expansions in sh!
 09-03-02 Makefile: eliminate master src paths from ../INIT/proto.c
 09-01-15 sear.sh: update for msvcrt.dll link
@@ -3430,7 +3450,9 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
-10-08-11 mam.c: fix joint target make-done imbalance
+10-08-24 bind.c: glob_diropen() gs->name absolute path
+10-08-23 bind.c: drop GLOB_NOCHECK so *.notthere => empty
+10-08-15 mam.c: fix joint target make-done imbalance
 10-07-17 option.c: expand external.old for execve() -- doh
 10-06-21 Makerules.mk: use CC.SUFFIX.DEBUG instead of .pdb
 10-06-21 Makerules.mk: add "idxxx ... id=id :LIBRARY: ..." to preserve _BLD_id==1
@@ -5988,6 +6010,9 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+10-08-18 tw.tst: add expr scope tests
+10-08-18 find.c: document -exec command ... {} +
+10-08-15 tw.h,tw.c,expr.c: add file arg to compile() for --file=expr-file
 10-06-01 sync with ast api 20100601
 10-04-05 find.c: vmclose() after all usage -- doh
 10-04-05 find.c: handle -exec|-xargs with multiple {}
@@ -6123,6 +6148,9 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-08-25 port/lc.c: add features/locale check for canonical UTF-8 spelling
+10-08-20 include/ast.h: add export plugin_version() prototype
+10-08-20 comp/conf.tab: add SF_BUFSIZE
 10-08-11 misc/conformance.c: conformance(0,0) => "standard"
 10-08-11 misc/conformance.c: check ast_env_serial for dynamic astconf() changes
 10-08-11 port/lcgen.c: remember to fudge Table_t.count for synthesized entries
@@ -8171,6 +8199,7 @@ All recorded changes follow.
 
 :::::::: libexpr ::::::::
 
+10-08-18 add static, global and function level variable scopes
 09-02-02 exgram.h: drop function ref in call() to avoid eval in exeval()
 06-10-11 add exstash() and exnospace() for sfstruse()/vmstrdup() errs
 05-10-25 exeval.c: fix I2F unsigned cast

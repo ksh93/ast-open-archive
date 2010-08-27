@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2010-04-05 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2010-08-18 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -289,12 +289,16 @@ static const Args_t	commands[] =
 "empty",	EMPTY,		Unary|Stat,	0,	0,	0,
 	"A directory with size 0 or with no entries other than . or .., or a"
 	" regular file with size 0.",
-"exec",		EXEC,		Exec,		1,	"command ... \\;", 0,
+"exec",		EXEC,		Exec,		1,	"command ... ; | command ... {} +", 0,
 	"Execute \acommand ...\a; true if 0 exit status is returned."
-	" Arguments up to \\; are taken as arguments to \acommand\a."
-	" The string `{}' is globally replaced by the current filename"
-	" in \acommand ...\a. The command is executed in the directory"
-	" from which \bfind\b was executed.",
+	" Arguments up to \b;\b are taken as arguments to \acommand\a."
+	" The string `{}' in \acommand ...\a is globally replaced by "
+	" the current filename. The command is executed in the directory"
+	" from which \bfind\b was executed. The second form gathers"
+	" pathnames until \bARG_MAX\b is reached, replaces {} preceding"
+	" \b+\b with the list of pathnames, one pathname per argument,"
+	" and executes \acommand\a ... \apathname\a ..., possibly multiple"
+	" times, until all pathnames are exhausted.",
 "false",	CFALSE,		Unary,		0,	0,	0,
 	"Always false.",
 "fast",		FAST,		Str,		0,	"pattern",	0,

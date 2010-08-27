@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-24
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -367,7 +367,7 @@ make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.5 2010-08-11 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.5 2010-08-24 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -434,7 +434,7 @@ make nmake.1.body
 done nmake.1.body
 make nmake.1.tail
 done nmake.1.tail
-exec - nmake --nroff 2>&1 | sed -e '/itself/r nmake.1.body' -e '/fBsh/r nmake.1.tail' > nmake.1
+exec - nmake --nroff 2>&1 | sed -e '/itself/r nmake.1.body ' -e '/fBsh/r nmake.1.tail ' > nmake.1
 done nmake.1 generated
 exec - test '' = 'nmake.1' || ${STDCMP} 2>/dev/null -s nmake.1 ${INSTALLROOT}/man/man1/nmake.1 || { ${STDMV} ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; ${STDCP} nmake.1 ${INSTALLROOT}/man/man1/nmake.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/nmake.1 generated

@@ -1,4 +1,6 @@
-10-08-11 mam.c: fix joint target make-done imbalance
+10-08-24 bind.c: glob_diropen() gs->name absolute path
+10-08-23 bind.c: drop GLOB_NOCHECK so *.notthere => empty
+10-08-15 mam.c: fix joint target make-done imbalance
 10-07-17 option.c: expand external.old for execve() -- doh
 10-06-21 Makerules.mk: use CC.SUFFIX.DEBUG instead of .pdb
 10-06-21 Makerules.mk: add "idxxx ... id=id :LIBRARY: ..." to preserve _BLD_id==1

@@ -406,6 +406,22 @@ typedef struct Globstate_s
 	Hash_table_t*	overlay;
 } Globstate_t;
 
+#if 0
+
+static void*
+trace_opendir(const char* dir, int line)
+{
+	void*	p;
+
+	p = opendir(dir);
+	error(-1, "AHA#%d opendir %s = %p", line, dir, p);
+	return p;
+}
+
+#define opendir(f)	trace_opendir(f,__LINE__)
+
+#endif
+
 /*
  * glob() diropen for 2d views
  */
@@ -441,7 +457,9 @@ glob_diropen(glob_t* gp, const char* path)
 	if (*path != '/')
 		while (gs->view++ < state.maxview)
 		{
-			if (gs->root)
+			if (*gs->name == '/')
+				sfprintf(internal.nam, "%s", gs->name);
+			else if (gs->root)
 				sfprintf(internal.nam, "%s/%s", state.view[gs->view].root, gs->name);
 			else
 			{
@@ -590,7 +608,7 @@ globv(register glob_t* gp, char* s)
 
 	static char*		nope[1];
 
-	f = GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STARSTAR;
+	f = GLOB_AUGMENTED|GLOB_DISC|GLOB_STARSTAR;
 	if (!gp)
 	{
 		gp = &gl;
@@ -609,7 +627,7 @@ globv(register glob_t* gp, char* s)
 	}
 	if (i = glob(s, f, 0, gp))
 	{
-		if (!trap())
+		if (i != GLOB_NOMATCH && !trap())
 			error(2, "glob() internal error %d", i);
 		return nope;
 	}

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -79,9 +79,9 @@
 
 #define EX_NAMELEN	32		/* default Exid_t.name length	*/
 
-#define EXID(n,l,i,t,f)	{{0},(l),(i),(t),(f),0,{0},n}
+#define EXID(n,l,i,t,f)	{{0},(l),(i),(t),(f),0,{0},0,n}
 
-#define DELETE		BREAK		/* exexpr() delete `type'	*/
+#define DELETE		MINTOKEN		/* exexpr() delete `type'	*/
 
 #define INTEGRAL(t)	((t)>=CHAR&&(t)<=UNSIGNED)
 
@@ -116,7 +116,7 @@ struct Exnode_s; typedef struct Exnode_s Exnode_t;
 struct Expr_s; typedef struct Expr_s Expr_t;
 struct Exref_s; typedef struct Exref_s Exref_t;
 
-typedef struct				/* user defined member type	*/
+typedef struct Exlocal_s		/* user defined member type	*/
 {
 	Sflong_t	number;
 	char*		pointer;
@@ -131,6 +131,7 @@ typedef struct Exid_s			/* id symbol table info		*/
 	long		flags;		/* user defined flags		*/
 	Exnode_t*	value;		/* value			*/
 	Exlocal_t	local;		/* user defined local stuff	*/
+	long		isstatic;	/* static			*/
 	char		name[EX_NAMELEN];/* symbol name			*/
 } Exid_t;
 
@@ -141,7 +142,7 @@ struct Exref_s				/* . reference list		*/
 	Exnode_t*	index;		/* optional reference index	*/
 };
 
-typedef struct				/* sized buffer			*/
+typedef struct Exbuf_s			/* sized buffer			*/
 {
 	unsigned long	size;		/* buffer size			*/
 	char*		data;		/* buffer data			*/

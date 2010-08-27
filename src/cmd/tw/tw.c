@@ -35,7 +35,7 @@
 #define SNAPSHOT_DELIM	"|"
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Research) 2007-08-17 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Research) 2010-08-15 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the "
@@ -125,6 +125,9 @@ USAGE_LICENSE
     "}"
 "[C:chop?Chop leading \b./\b from printed pathnames. This is implied by "
     "\b--logical\b.]"
+"[E:file?Compile \b--expr\b expressions from \afile\a. Multiple "
+    "\b--file\b options may be specified. See EXPRESSIONS below for "
+    "details.]:[file]"
 "[F:codes?Set the \blocate\b(1) fast find codes database "
     "\apath\a.]:[path]"
 "[G:generate?Generate a \aformat\a \blocate\b(1) database of the visited "
@@ -714,7 +717,7 @@ main(int argc, register char** argv)
 			lastdir->name = opt_info.arg;
 			continue;
 		case 'e':
-			compile(opt_info.arg);
+			compile(opt_info.arg, 0);
 			continue;
 		case 'f':
 			state.pattern = opt_info.arg;
@@ -793,13 +796,16 @@ main(int argc, register char** argv)
 			}
 			if (!(state.snapshot.tmp = sfstropen()))
 				error(ERROR_SYSTEM|3, "out of space");
-			compile("sort:name;");
+			compile("sort:name;", 0);
 			continue;
 		case 'C':
 			state.ftwflags |= FTW_NOSEEDOTDIR;
 			continue;
 		case 'D':
 			error_info.trace = -opt_info.num;
+			continue;
+		case 'E':
+			compile(opt_info.arg, 1);
 			continue;
 		case 'F':
 			codes = opt_info.arg;
@@ -936,7 +942,7 @@ main(int argc, register char** argv)
 			if (disc.flags & FIND_TYPE)
 			{
 				state.act = ACT_CODETYPE;
-				compile("_tw_init:mime;");
+				compile("_tw_init:mime;", 0);
 				state.magicdisc.flags |= MAGIC_MIME;
 			}
 			else
@@ -945,7 +951,7 @@ main(int argc, register char** argv)
 			state.pattern = 0;
 			state.sort = order;
 			if (!state.program)
-				compile("1");
+				compile("1", 0);
 			if (!(state.sortkey = newof(0, Exnode_t, 1, 0)) || !(state.sortkey->data.variable.symbol = (Exid_t*)dtmatch(state.program->symbols, "name")))
 				error(ERROR_SYSTEM|3, "out of space");
 			state.sortkey->op = ID;

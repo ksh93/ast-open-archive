@@ -1,3 +1,4 @@
+10-08-22 sear.sh: ratz+sear now requires -ladvapi32
 10-01-20 changes.sh: avoid nmake variable expansions in sh!
 09-03-02 Makefile: eliminate master src paths from ../INIT/proto.c
 09-01-15 sear.sh: update for msvcrt.dll link

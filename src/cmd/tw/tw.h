@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -198,7 +198,7 @@ typedef struct				/* program state		*/
 
 extern State_t		state;
 
-extern void		compile(char*);
+extern void		compile(char*, int);
 extern long		eval(Exnode_t*, Ftw_t*);
 extern long		getnum(Exid_t*, Ftw_t*);
 extern ssize_t		print(Sfio_t*, Ftw_t*, const char*);

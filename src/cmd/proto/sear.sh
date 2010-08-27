@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1990-2009 AT&T Intellectual Property          #
+#          Copyright (c) 1990-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -32,7 +32,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2009-01-15 $
+@(#)$Id: sear (AT&T Labs Research) 2010-08-22 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -161,13 +161,14 @@ obj=${src##*/}
 obj=${obj%.*}.o
 trap 'rm -f "$obj" $tmp.*' 0 1 2 3
 res=$tmp.res
+libs=-ladvapi32
 typeset -H host_ico=$ico host_rc=$tmp.rc host_res=$tmp.res
 print -r "sear ICON \"${host_ico//\\/\\\\}\"" > $tmp.rc
 if	! rc -x -r -fo"$host_res" "$host_rc"
 then	exit 1
 fi
 if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
-	! ${cc/-Bstatic/} --mt-output="$out.manifest" --mt-name="${out%.*}" --mt-administrator -o "$out" "$obj" "$res"
+	! ${cc/-Bstatic/} --mt-output="$out.manifest" --mt-name="${out%.*}" --mt-administrator -o "$out" "$obj" "$res" $libs
 then	exit 1
 fi
 if	[[ -f "$out.manifest" ]]
@@ -177,7 +178,7 @@ then	mv "$out.manifest" "${out%.*}.manifest"
 	w
 	q
 	!
-	if	! $cc --mt-input="${out%.*}.manifest" -o "$out" "$obj" "$res"
+	if	! $cc --mt-input="${out%.*}.manifest" -o "$out" "$obj" "$res" $libs
 	then	exit 1
 	fi
 	mt="--mt-input=${out%.*}.manifest --mt-delete"
@@ -185,7 +186,7 @@ else	mt=
 fi
 size=$(wc -c < "$out")
 if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
-	! $cc $mt -o "$out" "$obj" "$res"
+	! $cc $mt -o "$out" "$obj" "$res" $libs
 then	exit 1
 fi
 if	[[ -f "$out.manifest" ]]

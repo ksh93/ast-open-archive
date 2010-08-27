@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -136,14 +136,14 @@ typedef struct Switch_s			/* switch parse state		*/
 	int		type;		/* switch test type		*/
 } Switch_t;
 
-typedef struct				/* associative array bucket	*/
+typedef struct Exassoc_s		/* associative array bucket	*/
 {
 	Dtlink_t	link;		/* table link			*/
 	Extype_t	value;		/* value			*/
 	char		name[1];	/* index name			*/
 } Exassoc_t;
 
-typedef struct				/* ex global state		*/
+typedef struct Exstate_s		/* ex global state		*/
 {
 	Exid_t*		id;		/* current declaration id	*/
 	int		declare;	/* current declaration type	*/
@@ -153,6 +153,9 @@ typedef struct				/* ex global state		*/
 	Expr_t*		program;	/* current program		*/
 	Exnode_t*	procedure;	/* current procedure		*/
 	Exref_t*	refs;		/* . reference list		*/
+	int		assigned;	/* declaration assignment	*/
+	int		instatic;	/* static declaration		*/
+	int		statics;	/* static used			*/
 	Switch_t*	swstate;	/* switch parse state		*/
 	char		nullstring[1];	/* ""				*/
 } Exstate_t;

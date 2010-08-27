@@ -1,3 +1,4 @@
+10-08-18 add static, global and function level variable scopes
 09-02-02 exgram.h: drop function ref in call() to avoid eval in exeval()
 06-10-11 add exstash() and exnospace() for sfstruse()/vmstrdup() errs
 05-10-25 exeval.c: fix I2F unsigned cast

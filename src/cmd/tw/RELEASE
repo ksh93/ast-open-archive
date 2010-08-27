@@ -1,3 +1,6 @@
+10-08-18 tw.tst: add expr scope tests
+10-08-18 find.c: document -exec command ... {} +
+10-08-15 tw.h,tw.c,expr.c: add file arg to compile() for --file=expr-file
 10-06-01 sync with ast api 20100601
 10-04-05 find.c: vmclose() after all usage -- doh
 10-04-05 find.c: handle -exec|-xargs with multiple {}

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,7 +26,7 @@
  * sometimes free stuff can cost a lot
  */
 
-#if defined(MINTOKEN) && !defined(_EXGRAM_H)
+#if !defined(_EXGRAM_H) && ( defined(MINTOKEN) || defined(YYTOKENTYPE) )
 #define _EXGRAM_H
 
 #if !defined(_EXPARSE_H)
@@ -686,6 +686,7 @@ expop(register Expr_t* p)
 int
 excomp(register Expr_t* p, const char* name, int line, const char* sp, Sfio_t* fp)
 {
+	Exid_t*	v;
 	int	eof;
 
 	p->more = 0;
@@ -697,11 +698,23 @@ excomp(register Expr_t* p, const char* name, int line, const char* sp, Sfio_t* f
 	}
 	else if (expush(p, name, line, sp, fp))
 		return -1;
-	else p->input->unit = line >= 0;
+	else
+		p->input->unit = line >= 0;
 	exparse();
 	p->input->unit = 0;
 	expop(p);
 	p->eof = eof;
+	if (expr.statics)
+	{
+		for (v = (Exid_t*)dtfirst(p->symbols); v; v = (Exid_t*)dtnext(p->symbols, v))
+			if (v->isstatic)
+			{
+				dtdelete(p->symbols, v);
+				if (!--expr.statics)
+					break;
+			}
+		expr.statics = 0;
+	}
 	return 0;
 }
 
