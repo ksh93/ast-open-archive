@@ -265,7 +265,7 @@ Option_t		options[] =
 },
 {
 	"delta.update",
-	'U',
+	0,
 	OPT_delta_update,
 	"Only update files in the delta -- do not update files in the base that are not in the delta.",
 	0,
@@ -316,6 +316,14 @@ Option_t		options[] =
 	0,
 	0,
 	OPT_READONLY,
+},
+{
+	"different",
+	'U',
+	OPT_different,
+	"Only copy archive members that have different modify time, mode, or size\
+	than the target files.  Target file names are checked after \b--edit\b\
+	options are applied.",
 },
 {
 	"dir",

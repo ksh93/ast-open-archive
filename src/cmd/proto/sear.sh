@@ -20,6 +20,8 @@
 : self extracting archive generator for ratz
 
 COMMAND=sear
+
+args=
 cc="ncc -O -Y-Os"
 cmd="dir"
 dyn=-D_DLL
@@ -32,7 +34,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2010-08-22 $
+@(#)$Id: sear (AT&T Labs Research) 2010-09-10 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -51,6 +53,8 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
     \bratz\b(1) executables, so any \bratz\b option may be used on a
     \bsear\b file. This allows \bsear\b file contents to be examined and
     extracted without executing any embedded installation scripts.]
+[a:args|arguments?The arguments appended to the \bCMD.EXE\b command
+    string after the runtime sear operands are appended.]:[args]
 [b:bootstrap?Bootstrap-sepcific link.]
 [c:cc?The C compiler command and flags are set to \acc\a.]:[cc:='$cc$']
 [i:icon?The resource icon is set to
@@ -88,6 +92,8 @@ usage()
 
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
+	a)	args=-D_SEAR_ARGS="\"$OPTARG\""
+		;;
 	b)	dyn=
 		;;
 	c)	cc=$OPTARG
@@ -167,7 +173,7 @@ print -r "sear ICON \"${host_ico//\\/\\\\}\"" > $tmp.rc
 if	! rc -x -r -fo"$host_res" "$host_rc"
 then	exit 1
 fi
-if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
+if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" "$args" -c "$src" ||
 	! ${cc/-Bstatic/} --mt-output="$out.manifest" --mt-name="${out%.*}" --mt-administrator -o "$out" "$obj" "$res" $libs
 then	exit 1
 fi
@@ -185,7 +191,7 @@ then	mv "$out.manifest" "${out%.*}.manifest"
 else	mt=
 fi
 size=$(wc -c < "$out")
-if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
+if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" "$args" -c "$src" ||
 	! $cc $mt -o "$out" "$obj" "$res" $libs
 then	exit 1
 fi

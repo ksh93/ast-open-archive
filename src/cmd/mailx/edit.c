@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2010 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -197,7 +197,7 @@ run_editor(register FILE* fp, off_t size, struct header* hp, int type, int reado
 	 */
 	if (!(ep = fileopen(state.tmp.edit, "Ea+")))
 		goto ret2;
-	if (editheaders && headset(&pp, NiL, ep, hp, NiL, editheaders)) {
+	if (editheaders && headset(&pp, NiL, ep, hp, NiL, editheaders|GTO|GMETOO)) {
 		while (headget(&pp));
 		remove(state.tmp.edit);
 		if (!(ep = fileopen(state.tmp.edit, "EMa+")))

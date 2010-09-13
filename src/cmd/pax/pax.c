@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2010-08-22 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2010-09-01 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -204,7 +204,7 @@ substitute(Map_t** lastmap, register char* s)
 				s += mp->re.re_npat;
 		}
 		if (c)
-			regfatal(&mp->re, 3, c);
+			regfatal(&mp->re, 4, c);
 		for (;;)
 		{
 			switch (*s++)
@@ -266,7 +266,7 @@ action(const char* command, int pattern)
 		if (!(re = newof(0, regex_t, 1, 0)))
 			nospace();
 		if (c = regcomp(re, s, REG_SHELL|REG_AUGMENTED|REG_DELIMITED|REG_LENIENT|REG_NULL|REG_LEFT|REG_RIGHT))
-			regfatal(re, 3, c);
+			regfatal(re, 4, c);
 		s += re->re_npat;
 	}
 	else
@@ -754,6 +754,11 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 		case OPT_descend:
 			state.descend = y;
 			break;
+		case OPT_different:
+		case OPT_newer:
+		case OPT_update:
+			state.update = y ? op->index : 0;
+			break;
 		case OPT_dots:
 			state.drop = y;
 			break;
@@ -1050,9 +1055,6 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 			if (vp)
 				goto settime;
 			break;
-		case OPT_newer:
-			state.update = y;
-			break;
 		case OPT_options:
 			if (v)
 			{
@@ -1264,9 +1266,6 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 			break;
 		case OPT_uncompressed:
 			ap->file.uncompressed = n;
-			break;
-		case OPT_update:
-			state.update = -y;
 			break;
 		case OPT_verbose:
 			state.verbose = y;
@@ -1943,7 +1942,7 @@ main(int argc, char** argv)
 			if (state.pwdlen = strlen(state.pwd))
 				state.pwd[state.pwdlen++] = '/';
 			if (state.update < 0)
-				state.update = 1;
+				state.update = OPT_newer;
 			getarchive(OUT);
 			state.out->format = &rw;
 			copy(NiL, copyinout);

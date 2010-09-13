@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2010-08-18 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2010-09-01 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -1583,7 +1583,7 @@ execute(State_t* state, FTSENT* ent)
 			else if (val == REG_NOMATCH)
 				val = 0;
 			else
-				regfatal(np->second.re, 3, val);
+				regfatal(np->second.re, 4, val);
 			break;
 		case PRINT:
 			sfputr(np->first.fp, ent->fts_path, np->second.i);

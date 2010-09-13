@@ -1,3 +1,4 @@
+10-09-01 find.c: RE errors => exit(2)
 10-08-18 tw.tst: add expr scope tests
 10-08-18 find.c: document -exec command ... {} +
 10-08-15 tw.h,tw.c,expr.c: add file arg to compile() for --file=expr-file

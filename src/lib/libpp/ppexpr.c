@@ -127,7 +127,7 @@ compare(char* pred, char* args, int match)
 	if (!match)
 		c = strcmp(tmp, pp.token);
 	else if ((c = regcomp(&re, pp.token, REG_AUGMENTED|REG_LENIENT|REG_NULL)) || (c = regexec(&re, tmp, NiL, 0, 0)) && c != REG_NOMATCH)
-		regfatal(&re, 3, c);
+		regfatal(&re, 4, c);
 	else
 	{
 		c = !c;

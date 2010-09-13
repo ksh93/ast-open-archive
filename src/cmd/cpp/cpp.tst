@@ -3640,8 +3640,7 @@ TEST 23 'empty macro actuals'
 0 : F[ ];
 1 : F[ 1];
 2 : F[ 1];'
-		ERROR - $'cpp: line 2: warning: f: 1 actual argument expected
-cpp: line 4: warning: f: 1 actual argument expected'
+		ERROR - $'cpp: line 4: warning: f: 1 actual argument expected'
 	EXEC -I-D
 		INPUT - $'#define f(a,b) F[a][b]
 0 : f();

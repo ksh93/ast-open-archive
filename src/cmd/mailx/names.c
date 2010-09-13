@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2009 The Regents of the University of California an*
+*Copyright (c) 1978-2010 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -145,7 +145,7 @@ headclear(struct header* hp, unsigned long flags)
 		hp->h_clear &= ~GMISC;
 		hp->h_misc.head = hp->h_misc.tail = 0;
 	}
-	if (flags &= GNAME) {
+	if (flags &= (GNAME|GMETOO)) {
 		hp->h_clear &= ~(flags|GFIRST);
 		hp->h_first = 0;
 		dictwalk(&hp->h_names, clear, &flags);

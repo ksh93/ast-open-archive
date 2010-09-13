@@ -3677,6 +3677,9 @@ PACKAGES : .SPECIAL .FUNCTION
 		A := $(T)
 	end
 	B := $(T:B:S)
+	if B == "-"
+		B := $(.GENSYM. X)
+	end
 	eval
 		.FILES.$(B) = $(P:V:N=[!-.]*|.[!A-Z]*)
 		.RHS.$(B) = $(P:V)

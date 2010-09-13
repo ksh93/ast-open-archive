@@ -47,7 +47,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2010-05-09 $
+@(#)$Id: mm2html (AT&T Research) 2010-09-07 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man/mandoc subset to html]
@@ -287,7 +287,7 @@ do	case $OPT in
 		;;
 	h)	case $OPTARG in
 		*\?*)	. ${OPTARG%%\?*} || exit 1
-			eval "html=( ${OPTARG#*\?} )"
+			eval "html+=( ${OPTARG#*\?} )"
 			;;
 		*)	. $OPTARG || exit 1
 			;;
@@ -295,7 +295,7 @@ do	case $OPT in
 		;;
 	l)	case $OPTARG in
 		*\?*)	. ${OPTARG%%\?*} || exit 1
-			eval "license=( ${OPTARG#*\?} )"
+			eval "license+=( ${OPTARG#*\?} )"
 			;;
 		*)	. $OPTARG || exit 1
 			;;
@@ -1141,7 +1141,9 @@ function heading
 		txt=$*
 		txt=${txt%%*([-,.])}
 		txt=${txt//'&nbsp;'/' '}
+		txt=${txt//'&amp;'/!!!AMP!!!}
 		txt=${txt//\&+([^\;])\;/}
+		txt=${txt//!!!AMP!!!/'&amp;'}
 		print -nr -- "<A name=\"$txt\">$txt</A>"
 		if	(( labels >= 0 && count < mark ))
 		then	last_level=$count

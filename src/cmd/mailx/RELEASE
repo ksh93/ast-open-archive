@@ -1,3 +1,4 @@
+10-09-08 fix edited To: in message to override command line recipients
 10-06-01 sync with ast api 20100601
 09-06-09 names.c,vars.c: fix alias expansion cross-dictionary bug
 09-05-15 proc.c,quit.c: add buffer checks to filetemp()

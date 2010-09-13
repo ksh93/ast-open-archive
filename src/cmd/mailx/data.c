@@ -10,7 +10,7 @@
 static const char	id[] = STAMP;
 
 static const char	terms[] = "\n\
-@(#)Copyright (c) 1980, 1993, 1996 - 2009\n\
+@(#)Copyright (c) 1980, 1993, 1996 - 2010\n\
 \tThe Regents of the University of California. All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\

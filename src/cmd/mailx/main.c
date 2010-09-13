@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*Copyright (c) 1978-2010 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -87,7 +87,7 @@ USAGE_LICENSE
 "	and sends messages from text on the standard input. Receive mode"
 "	provides both an interactive command language and non-interactive"
 "	command line actions. Receive mode, on startup, reads commands and"
-"	variable settings from the file \b$HOME/.mailxrc\b, if it exists.]"
+"	variable settings from the file \b$HOME/.mailrc\b, if it exists.]"
 "[+?\bmailx\b provides commands for saving, deleting and responding to"
 "	messages. Message composition supports editing, reviewing and"
 "	other modifications as the message is entered.]"

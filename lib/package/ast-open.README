@@ -93,7 +93,33 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-08-25  --- Release ksh93u  ---
+10-09-13  --- Release ksh93u  ---
+10-09-13  A bug which occured when both xtrace and showme options where
+	  specified in which the xtrace option disabled showme has been fixed.
+10-09-13  A bug in which creating a reference to an array variable with any
+	  elements could cause subsequent array elements to be treated as
+	  compound variables has been fixed.
+10-09-09  A bug which caused ((c.ar[x][y])) to be treated as a syntax error
+	  has been fixed.
+10-09-08  A bug in the processing of references to multidimensional arrays
+	  in arithmetic expressions has been fixed.
+10-09-08  A bug in the handling of multi-dimensional arrays which caused
+	  the number of elements in each dimension to be incorrect has
+	  been fixed.
+10-09-07  The change for messages on 10-08-09 did not handle message in
+	  assignments and this has been fixed.
+10-09-07  A bug in the indentation of compound variables in arrays when
+	  output with print -v has been fixed.
+10-09-07  A rare bug with indexed arrays when assigned a null string that could
+	  cause a core dump has been fixed.
+10-09-03  A number of changes were made for jobs pools.
+10-08-31  typeset -p was modified to output name references after other
+	  variables so that the output could be used as input.
+10-08-31  A bug with typeset -p in which variables with attributes but
+	  without attributes were not displayed correctly has been fixed.
+10-08-27 +When running a subshell, the current pool is unset.
+10-08-27  A bug in which jobs started from within for or while lists in
+	  interactive shells could generate completion messages has been fixed.
 10-08-25  Fixed a couple of bugs related to job pools. 
 10-08-24 +[[ -e /dev/xxx/ ]] can be used to check whether special files of
 	  those names are handled by the shell.
@@ -2547,6 +2573,8 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+10-09-01 pax.c: RE errors => exit(2)
+10-08-27 add -U, --different to update files with different <mtime,size,mode>
 10-08-22 format.c: archive update requires (ap->io->mode & O_RDWR)
 10-08-11 use conformance("standard",0) test
 10-08-09 fix extended header size key precedence/performance
@@ -2870,6 +2898,7 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+10-09-07 use += to append to compond values
 10-06-01 sync with ast api 20100601
 10-05-28 mm2*.sh: use --???MAN=nx for man section titles
 10-04-11 mm2html.sh: headings now internal anchors by default
@@ -2974,6 +3003,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+10-09-10 sear.sh: add --args=args
 10-08-22 sear.sh: ratz+sear now requires -ladvapi32
 10-01-20 changes.sh: avoid nmake variable expansions in sh!
 09-03-02 Makefile: eliminate master src paths from ../INIT/proto.c
@@ -4833,6 +4863,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+10-09-08 tr.c: handle tr abc '[%*]xyz'
 10-08-04 dlls.c: add -l to list plugin version stamps
 10-06-21 pty.c: add 4 sec timeout for initial handshake -- fix me!!
 10-06-01 od.c: add -c locale checks (and undo some fmtesc() work), add ast -tC1
@@ -5252,6 +5283,7 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+10-09-08 fix edited To: in message to override command line recipients
 10-06-01 sync with ast api 20100601
 09-06-09 names.c,vars.c: fix alias expansion cross-dictionary bug
 09-05-15 proc.c,quit.c: add buffer checks to filetemp()
@@ -5461,6 +5493,7 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+10-09-01 grep.c: RE errors => exit(2)
 10-08-11 ed,grep,sed: use conformance("standard",0) test
 10-08-11 sed: align y \\ \n \c \? logic with standard
 10-07-31 grep: add --recursive,-r for the linux for dummies crowd -- barf
@@ -6010,6 +6043,7 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+10-09-01 find.c: RE errors => exit(2)
 10-08-18 tw.tst: add expr scope tests
 10-08-18 find.c: document -exec command ... {} +
 10-08-15 tw.h,tw.c,expr.c: add file arg to compile() for --file=expr-file
@@ -6148,6 +6182,8 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-09-08 add features/sizeof => ast_sizeof.h
+10-08-31 comp/getopt[l].c: export functions for dlls
 10-08-25 port/lc.c: add features/locale check for canonical UTF-8 spelling
 10-08-20 include/ast.h: add export plugin_version() prototype
 10-08-20 comp/conf.tab: add SF_BUFSIZE
@@ -8560,6 +8596,8 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+10-09-01 RE errors => exit(2)
+10-09-01 ppcall.c: no disgnostic for 0 actual args for 1 formal arg
 10-06-29 ppargs.c: ignore -H<number> (hpux /opt/langtools/lbin/cpp.ansi)
 10-06-16 ppsearch.c: try parent prefix if -I- include search fails
 10-06-01 sync with ast api 20100601

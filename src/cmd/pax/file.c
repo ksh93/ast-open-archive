@@ -1267,8 +1267,9 @@ prune(register Archive_t* ap, register File_t* f, register struct stat* st)
 	Tv_t		t1;
 	Tv_t		t2;
 	struct stat	so;
+	int		c;
 
-	if (state.update < 0 && !streq(f->name, f->path))
+	if (state.update == OPT_update && !streq(f->name, f->path))
 	{
 		if ((*state.statf)(f->path, &so))
 			return 0;
@@ -1278,7 +1279,7 @@ prune(register Archive_t* ap, register File_t* f, register struct stat* st)
 	{
 		if (ap->delta && !tvcmp(tvmtime(&t1, f->st), tvmtime(&t2, st)))
 			return 1;
-		if (state.update && tvcmp(tvmtime(&t1, f->st), tvmtime(&t2, st)) <= 0)
+		if (state.update && (!(c = tvcmp(tvmtime(&t1, f->st), tvmtime(&t2, st))) || state.update != OPT_different && c < 0))
 		{
 			if (state.exact)
 				state.pattern->matched = 0;

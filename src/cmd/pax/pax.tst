@@ -1243,3 +1243,39 @@ TEST 16 'skip over >2Gb member'
 		OUTPUT - $'2004-08-06+11:08:56 -rw-r--r-- 2814840497 begin
 2004-08-06+11:10:07 -rw-r--r--        4 end
 2004-08-06+11:10:04 -rw-r--r--        7 middle'
+
+TEST 17 '--update, --newer and --different'
+
+	EXEC --nosummary -rvf $data/file-02.pax
+		ERROR - file
+
+	PROG cat file
+		OUTPUT - 02
+		ERROR -
+
+	EXEC --nosummary -rvf $data/file-02.pax
+		OUTPUT -
+		ERROR - file
+
+	EXEC --nosummary -ruvf $data/file-02.pax
+		OUTPUT -
+		ERROR -
+
+	EXEC --nosummary -rUvf $data/file-02.pax
+
+	EXEC --nosummary -ruvf $data/file-01.pax
+
+	EXEC --nosummary -ruvf $data/file-03.pax
+		ERROR - file
+
+	PROG cat file
+		OUTPUT - 03
+		ERROR -
+
+	EXEC --nosummary -rUvf $data/file-02.pax
+		OUTPUT -
+		ERROR - file
+
+	PROG cat file
+		OUTPUT - 02
+		ERROR -

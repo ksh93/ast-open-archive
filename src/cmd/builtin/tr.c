@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1992-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1992-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Research) 2009-01-12 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Research) 2010-09-08 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"
@@ -232,7 +232,8 @@ nextchar(register Tr_t* tr)
 				c = nextchar(tr);
 				if (*tr->next == '*')
 				{
-					if (!(tr->count = (int)strtol((char*)tr->next + 1, (char**)&tr->next, 0)))
+					e = tr->next + 1;
+					if (!(tr->count = (int)strtol((char*)tr->next + 1, (char**)&tr->next, 0)) && tr->next == e)
 					{
 						if (tr->type == 0)
 							return -2;
@@ -259,6 +260,8 @@ nextchar(register Tr_t* tr)
 					}
 					else if (tr->count > (1<<CHAR_BIT))
 						tr->count = (1<<CHAR_BIT);
+					if (!tr->count)
+						goto next;
 					tr->count--;
 					tr->level--;
 				}

@@ -1,3 +1,4 @@
+10-09-01 grep.c: RE errors => exit(2)
 10-08-11 ed,grep,sed: use conformance("standard",0) test
 10-08-11 sed: align y \\ \n \c \? logic with standard
 10-07-31 grep: add --recursive,-r for the linux for dummies crowd -- barf

@@ -533,7 +533,7 @@ ppcontrol(void)
 			}
 		}
 		else if (i1 != REG_NOMATCH)
-			regfatal(&map->re, 3, i1);
+			regfatal(&map->re, 4, i1);
 	c = '\n';
 	if (map = var.best)
 	{
@@ -552,13 +552,13 @@ ppcontrol(void)
 				{
 					n++;
 					if (i0 = regsubexec(&edit->re, p, elementsof(match), match))
-						regfatal(&edit->re, 3, i0);
+						regfatal(&edit->re, 4, i0);
 					p = edit->re.re_sub->re_buf;
 					if (edit->re.re_sub->re_flags & REG_SUB_STOP)
 						break;
 				}
 				else if (i0 != REG_NOMATCH)
-					regfatal(&edit->re, 3, i0);
+					regfatal(&edit->re, 4, i0);
 			if (n && *p)
 			{
 				p1 = s = oldof(0, char, 0, strlen(p) + 32);
@@ -1903,7 +1903,7 @@ ppcontrol(void)
 	 */
 	
 	if (i0 = regcomp(&map->re, s, REG_AUGMENTED|REG_DELIMITED|REG_LENIENT|REG_NULL))
-		regfatal(&map->re, 3, i0);
+		regfatal(&map->re, 4, i0);
 	if (*(s += map->re.re_npat))
 	{
 		error(2, "%s: invalid characters after pattern: %s ", p3, s);
@@ -1929,7 +1929,7 @@ ppcontrol(void)
 		if (!(i0 = regcomp(&edit->re, s, REG_AUGMENTED|REG_DELIMITED|REG_LENIENT|REG_NULL)) && !(i0 = regsubcomp(&edit->re, s += edit->re.re_npat, NiL, 0, 0)))
 			s += edit->re.re_npat;
 		if (i0)
-			regfatal(&edit->re, 3, i0);
+			regfatal(&edit->re, 4, i0);
 		if (*s)
 		{
 			error(2, "%s: invalid characters after substitution: %s ", p3, s);

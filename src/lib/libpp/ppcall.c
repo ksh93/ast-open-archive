@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1986-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1986-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -405,9 +405,8 @@ ppcall(register struct ppsymbol* sym, int tok)
 			{
 				if (p > mp->arg[0] && ++m || (sym->flags & SYM_VARIADIC))
 					c++;
-				if (c != mac->arity && !(sym->flags & SYM_EMPTY))
+				if (c != (n = mac->arity) && (c > 0 || n > 1) && !(sym->flags & SYM_EMPTY))
 				{
-					n = mac->arity;
 					if (!(sym->flags & SYM_VARIADIC))
 						error(1, "%s: %d actual argument%s expected", sym->name, n, n == 1 ? "" : "s");
 					else if (c < --n)
