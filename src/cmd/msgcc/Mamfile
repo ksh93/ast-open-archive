@@ -34,13 +34,13 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make msgadmin
 make msgadmin.sh
 done msgadmin.sh
-meta msgadmin %.sh>% msgadmin.sh msgadmin
+meta msgadmin %.sh>% ${PACKAGEROOT}/src/cmd/msgcc/msgadmin.sh msgadmin
 prev msgadmin.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -162,7 +162,7 @@ done ${PACKAGE_ast_INCLUDE}/pp.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msgcpp.c
-meta msgcpp.o %.c>%.o msgcpp.c msgcpp
+meta msgcpp.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msgcpp.c msgcpp
 prev msgcpp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msgcpp.c
 done msgcpp.o generated
@@ -173,7 +173,7 @@ done msgcpp generated
 make msgcc
 make msgcc.sh
 done msgcc.sh
-meta msgcc %.sh>% msgcc.sh msgcc
+meta msgcc %.sh>% ${PACKAGEROOT}/src/cmd/msgcc/msgcc.sh msgcc
 prev msgcc.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -214,7 +214,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msgcvt.c
-meta msgcvt.o %.c>%.o msgcvt.c msgcvt
+meta msgcvt.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msgcvt.c msgcvt
 prev msgcvt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msgcvt.c
 done msgcvt.o generated
@@ -231,7 +231,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msggen.c
-meta msggen.o %.c>%.o msggen.c msggen
+meta msggen.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msggen.c msggen
 prev msggen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msggen.c
 done msggen.o generated
@@ -244,7 +244,7 @@ prev ${PACKAGE_ast_INCLUDE}/mc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msgget.c
-meta msgget.o %.c>%.o msgget.c msgget
+meta msgget.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msgget.c msgget
 prev msgget.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?msgcc]"\" -c msgget.c
 done msgget.o generated

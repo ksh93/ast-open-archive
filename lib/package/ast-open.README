@@ -5246,12 +5246,6 @@ All recorded changes follow.
 02-12-17 propagate -ldss changes
 02-11-01 a rudimentary alternative to the flat method
 
-:::::::: time_t ::::::::
-
-09-01-30 handle TMX_FLOAT (mvs.390)
-08-08-22 fix time_t => Time_t typo
-08-08-11 update timestamp_t logic to tmx*()
-
 :::::::: validate ::::::::
 
 03-04-05 avoid possible floating point underflow/overflow
@@ -6182,6 +6176,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-09-14 comp/conf.sh: const int conf_elements, prefix_elements;
 10-09-08 add features/sizeof => ast_sizeof.h
 10-08-31 comp/getopt[l].c: export functions for dlls
 10-08-25 port/lc.c: add features/locale check for canonical UTF-8 spelling

@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make stats
 make libdssstats.a archive
@@ -150,7 +150,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done stats.c
-meta stats.o %.c>%.o stats.c stats
+meta stats.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/stats/stats.c stats
 prev stats.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssstats]"\" -D_PACKAGE_ast -c stats.c
 done stats.o generated
@@ -158,7 +158,7 @@ make lib.o
 make lib.c
 prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
-meta lib.o %.c>%.o lib.c lib
+meta lib.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/stats/lib.c lib
 prev lib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated

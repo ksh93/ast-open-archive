@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make ppsym
 make ppsym.o
@@ -99,7 +99,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h
 done ppsym.c
-meta ppsym.o %.c>%.o ppsym.c ppsym
+meta ppsym.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppsym.c ppsym
 prev ppsym.c
 setv _BLD_pp -U_BLD_pp
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsym.c
@@ -147,7 +147,7 @@ make ppdef.h implicit
 make gentab
 make gentab.sh
 done gentab.sh
-meta gentab %.sh>% gentab.sh gentab
+meta gentab %.sh>% ${PACKAGEROOT}/src/lib/libpp/gentab.sh gentab
 prev gentab.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -211,7 +211,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done pplib.h
 done ppargs.c
-meta ppargs.o %.c>%.o ppargs.c ppargs
+meta ppargs.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppargs.c ppargs
 prev ppargs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpp]"\" -c ppargs.c
 done ppargs.o generated
@@ -225,7 +225,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/times.h
 prev pplib.h implicit
 done ppbuiltin.c
-meta ppbuiltin.o %.c>%.o ppbuiltin.c ppbuiltin
+meta ppbuiltin.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppbuiltin.c ppbuiltin
 prev ppbuiltin.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppbuiltin.c
 done ppbuiltin.o generated
@@ -233,7 +233,7 @@ make ppcall.o
 make ppcall.c
 prev pplib.h implicit
 done ppcall.c
-meta ppcall.o %.c>%.o ppcall.c ppcall
+meta ppcall.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppcall.c ppcall
 prev ppcall.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcall.c
 done ppcall.o generated
@@ -241,7 +241,7 @@ make ppcomment.o
 make ppcomment.c
 prev pplib.h implicit
 done ppcomment.c
-meta ppcomment.o %.c>%.o ppcomment.c ppcomment
+meta ppcomment.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppcomment.c ppcomment
 prev ppcomment.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcomment.c
 done ppcomment.o generated
@@ -249,7 +249,7 @@ make ppcontext.o
 make ppcontext.c
 prev pplib.h implicit
 done ppcontext.c
-meta ppcontext.o %.c>%.o ppcontext.c ppcontext
+meta ppcontext.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppcontext.c ppcontext
 prev ppcontext.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcontext.c
 done ppcontext.o generated
@@ -258,7 +258,7 @@ make ppcontrol.c
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev pplib.h implicit
 done ppcontrol.c
-meta ppcontrol.o %.c>%.o ppcontrol.c ppcontrol
+meta ppcontrol.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppcontrol.c ppcontrol
 prev ppcontrol.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcontrol.c
 done ppcontrol.o generated
@@ -283,7 +283,7 @@ done ppfsm.h
 prev pplib.h implicit
 done pplex.c
 done ppcpp.c
-meta ppcpp.o %.c>%.o ppcpp.c ppcpp
+meta ppcpp.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppcpp.c ppcpp
 prev ppcpp.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcpp.c
 done ppcpp.o generated
@@ -291,7 +291,7 @@ make ppdata.o
 make ppdata.c
 prev pplib.h implicit
 done ppdata.c
-meta ppdata.o %.c>%.o ppdata.c ppdata
+meta ppdata.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppdata.c ppdata
 prev ppdata.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppdata.c
 done ppdata.o generated
@@ -299,7 +299,7 @@ make pperror.o
 make pperror.c
 prev pplib.h implicit
 done pperror.c
-meta pperror.o %.c>%.o pperror.c pperror
+meta pperror.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/pperror.c pperror
 prev pperror.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pperror.c
 done pperror.o generated
@@ -308,7 +308,7 @@ make ppexpr.c
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev pplib.h implicit
 done ppexpr.c
-meta ppexpr.o %.c>%.o ppexpr.c ppexpr
+meta ppexpr.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppexpr.c ppexpr
 prev ppexpr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppexpr.c
 done ppexpr.o generated
@@ -317,7 +317,7 @@ make ppfsm.c
 prev ppfsm.h implicit
 prev pplib.h implicit
 done ppfsm.c
-meta ppfsm.o %.c>%.o ppfsm.c ppfsm
+meta ppfsm.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppfsm.c ppfsm
 prev ppfsm.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppfsm.c
 done ppfsm.o generated
@@ -325,7 +325,7 @@ make ppincref.o
 make ppincref.c
 prev pplib.h implicit
 done ppincref.c
-meta ppincref.o %.c>%.o ppincref.c ppincref
+meta ppincref.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppincref.c ppincref
 prev ppincref.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppincref.c
 done ppincref.o generated
@@ -336,7 +336,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/path/pathnative.c
 prev pplib.h implicit
 done ppinput.c
-meta ppinput.o %.c>%.o ppinput.c ppinput
+meta ppinput.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppinput.c ppinput
 prev ppinput.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppinput.c
 done ppinput.o generated
@@ -345,13 +345,13 @@ make ppkey.c
 prev ppkey.h implicit
 prev pplib.h implicit
 done ppkey.c
-meta ppkey.o %.c>%.o ppkey.c ppkey
+meta ppkey.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppkey.c ppkey
 prev ppkey.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppkey.c
 done ppkey.o generated
 make pplex.o
 prev pplex.c
-meta pplex.o %.c>%.o pplex.c pplex
+meta pplex.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/pplex.c pplex
 prev pplex.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pplex.c
 done pplex.o generated
@@ -359,7 +359,7 @@ make ppline.o
 make ppline.c
 prev pplib.h implicit
 done ppline.c
-meta ppline.o %.c>%.o ppline.c ppline
+meta ppline.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppline.c ppline
 prev ppline.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppline.c
 done ppline.o generated
@@ -367,7 +367,7 @@ make ppmacref.o
 make ppmacref.c
 prev pplib.h implicit
 done ppmacref.c
-meta ppmacref.o %.c>%.o ppmacref.c ppmacref
+meta ppmacref.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppmacref.c ppmacref
 prev ppmacref.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppmacref.c
 done ppmacref.o generated
@@ -375,7 +375,7 @@ make ppmisc.o
 make ppmisc.c
 prev pplib.h implicit
 done ppmisc.c
-meta ppmisc.o %.c>%.o ppmisc.c ppmisc
+meta ppmisc.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppmisc.c ppmisc
 prev ppmisc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppmisc.c
 done ppmisc.o generated
@@ -391,7 +391,7 @@ exec - ${INSTALLROOT}/src/lib/libpp/gentab -t pp.tab > pptab.h
 done pptab.h generated
 prev pplib.h implicit
 done ppop.c
-meta ppop.o %.c>%.o ppop.c ppop
+meta ppop.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppop.c ppop
 prev ppop.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppop.c
 done ppop.o generated
@@ -399,7 +399,7 @@ make pppragma.o
 make pppragma.c
 prev pplib.h implicit
 done pppragma.c
-meta pppragma.o %.c>%.o pppragma.c pppragma
+meta pppragma.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/pppragma.c pppragma
 prev pppragma.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pppragma.c
 done pppragma.o generated
@@ -407,7 +407,7 @@ make ppprintf.o
 make ppprintf.c
 prev pplib.h implicit
 done ppprintf.c
-meta ppprintf.o %.c>%.o ppprintf.c ppprintf
+meta ppprintf.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppprintf.c ppprintf
 prev ppprintf.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppprintf.c
 done ppprintf.o generated
@@ -423,7 +423,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashkey.h dontcare
 prev ppfsm.c implicit
 done ppproto.c
-meta ppproto.o %.c>%.o ppproto.c ppproto
+meta ppproto.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppproto.c ppproto
 prev ppproto.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppproto.c
 done ppproto.o generated
@@ -435,7 +435,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/vdb.h dontcare
 prev pplib.h implicit
 done ppsearch.c
-meta ppsearch.o %.c>%.o ppsearch.c ppsearch
+meta ppsearch.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/ppsearch.c ppsearch
 prev ppsearch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsearch.c
 done ppsearch.o generated
@@ -539,7 +539,7 @@ done ppdebug.h dontcare generated
 prev ppfsm.h implicit
 prev pplib.h implicit
 done pptrace.c
-meta pptrace.o %.c>%.o pptrace.c pptrace
+meta pptrace.o %.c>%.o ${PACKAGEROOT}/src/lib/libpp/pptrace.c pptrace
 prev pptrace.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pptrace.c
 done pptrace.o generated
@@ -604,7 +604,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/ppkey.h generated
 make ${PACKAGE_ast_INCLUDE}/pp.yacc
 make pp.yacc
-meta pp.yacc %.h>%.yacc pp.h pp
+meta pp.yacc %.h>%.yacc ${PACKAGEROOT}/src/lib/libpp/pp.h pp
 prev pp.h
 prev pp.h
 exec - rm -f pp.yacc
@@ -645,7 +645,7 @@ exec - test '' = 'pp.yacc' || ${STDCMP} 2>/dev/null -s pp.yacc ${PACKAGE_ast_INC
 done ${PACKAGE_ast_INCLUDE}/pp.yacc generated
 make ${PACKAGE_ast_INCLUDE}/ppkey.yacc
 make ppkey.yacc
-meta ppkey.yacc %.h>%.yacc ppkey.h ppkey
+meta ppkey.yacc %.h>%.yacc ${PACKAGEROOT}/src/lib/libpp/ppkey.h ppkey
 prev ppkey.h
 prev pp.h
 exec - rm -f ppkey.yacc

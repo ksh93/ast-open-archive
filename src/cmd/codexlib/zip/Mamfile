@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make zip
 make libcodexzip.a archive
@@ -113,7 +113,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/codex.h dontcare
 done zip.h
 done zip.c
-meta zip.o %.c>%.o zip.c zip
+meta zip.o %.c>%.o ${PACKAGEROOT}/src/cmd/codexlib/zip/zip.c zip
 prev zip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c zip.c
 done zip.o generated
@@ -124,7 +124,7 @@ prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev zip.h implicit
 done huff.h
 done huff.c
-meta huff.o %.c>%.o huff.c huff
+meta huff.o %.c>%.o ${PACKAGEROOT}/src/cmd/codexlib/zip/huff.c huff
 prev huff.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huff.c
 done huff.o generated
@@ -132,7 +132,7 @@ make shrink.o
 make shrink.c
 prev zip.h implicit
 done shrink.c
-meta shrink.o %.c>%.o shrink.c shrink
+meta shrink.o %.c>%.o ${PACKAGEROOT}/src/cmd/codexlib/zip/shrink.c shrink
 prev shrink.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c shrink.c
 done shrink.o generated
@@ -140,7 +140,7 @@ make reduce.o
 make reduce.c
 prev zip.h implicit
 done reduce.c
-meta reduce.o %.c>%.o reduce.c reduce
+meta reduce.o %.c>%.o ${PACKAGEROOT}/src/cmd/codexlib/zip/reduce.c reduce
 prev reduce.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c reduce.c
 done reduce.o generated
@@ -149,7 +149,7 @@ make implode.c
 prev huff.h implicit
 prev zip.h implicit
 done implode.c
-meta implode.o %.c>%.o implode.c implode
+meta implode.o %.c>%.o ${PACKAGEROOT}/src/cmd/codexlib/zip/implode.c implode
 prev implode.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c implode.c
 done implode.o generated
@@ -158,7 +158,7 @@ make deflate.c
 prev huff.h implicit
 prev zip.h implicit
 done deflate.c
-meta deflate.o %.c>%.o deflate.c deflate
+meta deflate.o %.c>%.o ${PACKAGEROOT}/src/cmd/codexlib/zip/deflate.c deflate
 prev deflate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c deflate.c
 done deflate.o generated

@@ -41,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2010-05-09' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2010-09-10' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2010-09-07 $
+@(#)$Id: mm2html (AT&T Research) 2010-09-10 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man/mandoc subset to html]
@@ -1560,16 +1560,23 @@ do	getline || {
 			list[lists]=UL
 			print -r -- "<UL type=$i>"
 			;;
-		.BP)	unset parm
+		.BP)	center=0
+			unset parm
 			while	[[ $1 == *=* ]]
-			do	eval parm="( ${1%%=*}='${1#*=}' )"
+			do	if	[[ $1 == align=center ]]
+				then	center=1
+				else	eval parm+="( ${1%%=*}='${1#*=}' )"
+				fi
 				shift
 			done
 			unset oparm
 			oparm=$parm
 			i=$1
 			if	[[ $i == *.@(gif|png) ]]
-			then	for i
+			then	if	(( center ))
+				then	print "<CENTER>"
+				fi
+				for i
 				do	f=
 					for d in "${dirs[@]}"
 					do	if	[[ -f "$d$i" ]]
@@ -1597,6 +1604,9 @@ do	getline || {
 					fi
 					print -r -- "<IMG src=\"$i\"" ${parm/'('@(*)')'/\1}">"
 				done
+				if	(( center ))
+				then	print "</CENTER>"
+				fi
 			else	i=${i%.*}.gif
 				case $frame in
 				?*)	[[ -f $frame-$i ]] && i=$frame-$i ;;

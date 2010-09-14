@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make z
 make libz.a archive
@@ -120,7 +120,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done zconf.h dontcare
 done zlib.h
 done adler32.c
-meta adler32.o %.c>%.o adler32.c adler32
+meta adler32.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/adler32.c adler32
 prev adler32.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c adler32.c
 done adler32.o generated
@@ -128,7 +128,7 @@ make compress.o
 make compress.c
 prev zlib.h implicit
 done compress.c
-meta compress.o %.c>%.o compress.c compress
+meta compress.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/compress.c compress
 prev compress.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c compress.c
 done compress.o generated
@@ -152,7 +152,7 @@ prev zlib.h implicit
 done zutil.h
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 done crc32.c
-meta crc32.o %.c>%.o crc32.c crc32
+meta crc32.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/crc32.c crc32
 prev crc32.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c crc32.c
 done crc32.o generated
@@ -162,7 +162,7 @@ make deflate.h implicit
 prev zutil.h implicit
 done deflate.h
 done deflate.c
-meta deflate.o %.c>%.o deflate.c deflate
+meta deflate.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/deflate.c deflate
 prev deflate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c deflate.c
 done deflate.o generated
@@ -186,7 +186,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 done gzio.c
-meta gzio.o %.c>%.o gzio.c gzio
+meta gzio.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/gzio.c gzio
 prev gzio.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c gzio.c
 done gzio.o generated
@@ -202,7 +202,7 @@ make inftrees.h implicit
 done inftrees.h
 prev zutil.h implicit
 done infback.c
-meta infback.o %.c>%.o infback.c infback
+meta infback.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/infback.c infback
 prev infback.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c infback.c
 done infback.o generated
@@ -213,7 +213,7 @@ prev inflate.h implicit
 prev inftrees.h implicit
 prev zutil.h implicit
 done inffast.c
-meta inffast.o %.c>%.o inffast.c inffast
+meta inffast.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/inffast.c inffast
 prev inffast.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c inffast.c
 done inffast.o generated
@@ -226,7 +226,7 @@ prev inflate.h implicit
 prev inftrees.h implicit
 prev zutil.h implicit
 done inflate.c
-meta inflate.o %.c>%.o inflate.c inflate
+meta inflate.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/inflate.c inflate
 prev inflate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c inflate.c
 done inflate.o generated
@@ -235,7 +235,7 @@ make inftrees.c
 prev inftrees.h implicit
 prev zutil.h implicit
 done inftrees.c
-meta inftrees.o %.c>%.o inftrees.c inftrees
+meta inftrees.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/inftrees.c inftrees
 prev inftrees.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c inftrees.c
 done inftrees.o generated
@@ -247,7 +247,7 @@ done trees.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev deflate.h implicit
 done trees.c
-meta trees.o %.c>%.o trees.c trees
+meta trees.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/trees.c trees
 prev trees.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c trees.c
 done trees.o generated
@@ -255,7 +255,7 @@ make uncompr.o
 make uncompr.c
 prev zlib.h implicit
 done uncompr.c
-meta uncompr.o %.c>%.o uncompr.c uncompr
+meta uncompr.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/uncompr.c uncompr
 prev uncompr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c uncompr.c
 done uncompr.o generated
@@ -263,7 +263,7 @@ make zutil.o
 make zutil.c
 prev zutil.h implicit
 done zutil.c
-meta zutil.o %.c>%.o zutil.c zutil
+meta zutil.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/zutil.c zutil
 prev zutil.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c zutil.c
 done zutil.o generated
@@ -281,7 +281,7 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done sfdcgzip.c
-meta sfdcgzip.o %.c>%.o sfdcgzip.c sfdcgzip
+meta sfdcgzip.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/sfdcgzip.c sfdcgzip
 prev sfdcgzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c sfdcgzip.c
 done sfdcgzip.o generated
@@ -291,7 +291,7 @@ prev sfdcgzip.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 done sfdclzw.c
-meta sfdclzw.o %.c>%.o sfdclzw.c sfdclzw
+meta sfdclzw.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/sfdclzw.c sfdclzw
 prev sfdclzw.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c sfdclzw.c
 done sfdclzw.o generated
@@ -370,7 +370,7 @@ make example.c
 prev zlib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 done example.c
-meta example.o %.c>%.o example.c example
+meta example.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/example.c example
 prev example.c
 setv _BLD_z -U_BLD_z
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c example.c
@@ -389,7 +389,7 @@ done io.h dontcare virtual
 prev zlib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 done minigzip.c
-meta minigzip.o %.c>%.o minigzip.c minigzip
+meta minigzip.o %.c>%.o ${PACKAGEROOT}/src/lib/libz/minigzip.c minigzip
 prev minigzip.c
 setv _BLD_z -U_BLD_z
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c minigzip.c
