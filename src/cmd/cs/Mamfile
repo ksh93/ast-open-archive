@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make cs
 make cs.o
@@ -165,7 +165,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/coshell.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cs.c
-meta cs.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/cs.c cs
+meta cs.o %.c>%.o cs.c cs
 prev cs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c cs.c
 done cs.o generated
@@ -184,7 +184,7 @@ prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/css.h
 done css.c
-meta css.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/css.c css
+meta css.o %.c>%.o css.c css
 prev css.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c css.c
 done css.o generated
@@ -202,7 +202,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cat.c
-meta cat.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/cat.c cat
+meta cat.o %.c>%.o cat.c cat
 prev cat.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cat.c
 done cat.o generated
@@ -215,7 +215,7 @@ make ndbm.h implicit
 done ndbm.h dontcare virtual
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 make FEATURE/ndbm implicit
-meta FEATURE/ndbm features/%>FEATURE/% ${PACKAGEROOT}/src/cmd/cs/features/ndbm ndbm
+meta FEATURE/ndbm features/%>FEATURE/% features/ndbm ndbm
 make features/ndbm
 done features/ndbm
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/ndbm
@@ -224,7 +224,7 @@ prev ${PACKAGE_ast_INCLUDE}/tok.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done dbm.c
-meta dbm.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/dbm.c dbm
+meta dbm.o %.c>%.o dbm.c dbm
 prev dbm.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c dbm.c
 done dbm.o generated
@@ -244,7 +244,7 @@ done ${PACKAGE_ast_INCLUDE}/hashkey.h
 prev ${PACKAGE_ast_INCLUDE}/msg.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 done fs_env.c
-meta fs_env.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/fs_env.c fs_env
+meta fs_env.o %.c>%.o fs_env.c fs_env
 prev fs_env.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c fs_env.c
 done fs_env.o generated
@@ -258,7 +258,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
 prev ${PACKAGE_ast_INCLUDE}/css.h implicit
 done mbb.c
-meta mbb.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/mbb.c mbb
+meta mbb.o %.c>%.o mbb.c mbb
 prev mbb.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c mbb.c
 done mbb.o generated
@@ -272,7 +272,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/hashkey.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 done nam.c
-meta nam.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/nam.c nam
+meta nam.o %.c>%.o nam.c nam
 prev nam.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c nam.c
 done nam.o generated
@@ -287,7 +287,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done pid.c
-meta pid.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/pid.c pid
+meta pid.o %.c>%.o pid.c pid
 prev pid.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pid.c
 done pid.o generated
@@ -305,7 +305,7 @@ done ${PACKAGE_ast_INCLUDE}/wait.h
 prev ${PACKAGE_ast_INCLUDE}/proc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 done rsh.c
-meta rsh.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/rsh.c rsh
+meta rsh.o %.c>%.o rsh.c rsh
 prev rsh.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c rsh.c
 done rsh.o generated
@@ -318,7 +318,7 @@ prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 done tst-old.c
-meta tst-old.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/tst-old.c tst-old
+meta tst-old.o %.c>%.o tst-old.c tst-old
 prev tst-old.c
 exec - ${CC} -g -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tst-old.c
 done tst-old.o generated
@@ -331,7 +331,7 @@ prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/css.h implicit
 done tst.c
-meta tst.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/tst.c tst
+meta tst.o %.c>%.o tst.c tst
 prev tst.c
 exec - ${CC} -g -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tst.c
 done tst.o generated
@@ -343,7 +343,7 @@ make 6263.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/css.h implicit
 done 6263.c
-meta 6263.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/6263.c 6263
+meta 6263.o %.c>%.o 6263.c 6263
 prev 6263.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c 6263.c
 done 6263.o generated
@@ -366,7 +366,7 @@ prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vcs_src/mnt_imount.h
 done vcs_src/mnt_imount.c
-meta mnt_imount.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/mnt_imount.c mnt_imount
+meta mnt_imount.o %.c>%.o vcs_src/mnt_imount.c mnt_imount
 prev vcs_src/mnt_imount.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_imount.c
 done mnt_imount.o generated
@@ -374,7 +374,7 @@ make mnt_list.o
 make vcs_src/mnt_list.c
 prev vcs_src/mnt_imount.h implicit
 done vcs_src/mnt_list.c
-meta mnt_list.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/mnt_list.c mnt_list
+meta mnt_list.o %.c>%.o vcs_src/mnt_list.c mnt_list
 prev vcs_src/mnt_list.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_list.c
 done mnt_list.o generated
@@ -382,7 +382,7 @@ make mnt_mount.o
 make vcs_src/mnt_mount.c
 prev vcs_src/mnt_imount.h implicit
 done vcs_src/mnt_mount.c
-meta mnt_mount.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/mnt_mount.c mnt_mount
+meta mnt_mount.o %.c>%.o vcs_src/mnt_mount.c mnt_mount
 prev vcs_src/mnt_mount.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_mount.c
 done mnt_mount.o generated
@@ -390,7 +390,7 @@ make mnt_mtab.o
 make vcs_src/mnt_mtab.c
 prev vcs_src/mnt_imount.h implicit
 done vcs_src/mnt_mtab.c
-meta mnt_mtab.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/mnt_mtab.c mnt_mtab
+meta mnt_mtab.o %.c>%.o vcs_src/mnt_mtab.c mnt_mtab
 prev vcs_src/mnt_mtab.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_mtab.c
 done mnt_mtab.o generated
@@ -398,7 +398,7 @@ make mnt_touch.o
 make vcs_src/mnt_touch.c
 prev vcs_src/mnt_imount.h implicit
 done vcs_src/mnt_touch.c
-meta mnt_touch.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/mnt_touch.c mnt_touch
+meta mnt_touch.o %.c>%.o vcs_src/mnt_touch.c mnt_touch
 prev vcs_src/mnt_touch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_touch.c
 done mnt_touch.o generated
@@ -406,7 +406,7 @@ make mnt_umount.o
 make vcs_src/mnt_umount.c
 prev vcs_src/mnt_imount.h implicit
 done vcs_src/mnt_umount.c
-meta mnt_umount.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/mnt_umount.c mnt_umount
+meta mnt_umount.o %.c>%.o vcs_src/mnt_umount.c mnt_umount
 prev vcs_src/mnt_umount.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_umount.c
 done mnt_umount.o generated
@@ -414,7 +414,7 @@ make mnt_vcs.o
 make vcs_src/mnt_vcs.c
 prev vcs_src/mnt_imount.h implicit
 done vcs_src/mnt_vcs.c
-meta mnt_vcs.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/mnt_vcs.c mnt_vcs
+meta mnt_vcs.o %.c>%.o vcs_src/mnt_vcs.c mnt_vcs
 prev vcs_src/mnt_vcs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/mnt_vcs.c
 done mnt_vcs.o generated
@@ -437,7 +437,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 done vcs_src/ifs_agent.h
 done vcs_src/vcs.c
-meta vcs.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs.c vcs
+meta vcs.o %.c>%.o vcs_src/vcs.c vcs
 prev vcs_src/vcs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs.c
 done vcs.o generated
@@ -446,7 +446,7 @@ make vcs_src/ifs_agent.c
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_agent.c
-meta ifs_agent.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_agent.c ifs_agent
+meta ifs_agent.o %.c>%.o vcs_src/ifs_agent.c ifs_agent
 prev vcs_src/ifs_agent.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_agent.c
 done ifs_agent.o generated
@@ -456,7 +456,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_network.c
-meta ifs_network.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_network.c ifs_network
+meta ifs_network.o %.c>%.o vcs_src/ifs_network.c ifs_network
 prev vcs_src/ifs_network.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_network.c
 done ifs_network.o generated
@@ -465,7 +465,7 @@ make vcs_src/ifs_func.c
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_func.c
-meta ifs_func.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_func.c ifs_func
+meta ifs_func.o %.c>%.o vcs_src/ifs_func.c ifs_func
 prev vcs_src/ifs_func.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_func.c
 done ifs_func.o generated
@@ -474,7 +474,7 @@ make vcs_src/ifs_ftp.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_ftp.c
-meta ifs_ftp.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_ftp.c ifs_ftp
+meta ifs_ftp.o %.c>%.o vcs_src/ifs_ftp.c ifs_ftp
 prev vcs_src/ifs_ftp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_ftp.c
 done ifs_ftp.o generated
@@ -483,7 +483,7 @@ make vcs_src/ifs_gopher.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_gopher.c
-meta ifs_gopher.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_gopher.c ifs_gopher
+meta ifs_gopher.o %.c>%.o vcs_src/ifs_gopher.c ifs_gopher
 prev vcs_src/ifs_gopher.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_gopher.c
 done ifs_gopher.o generated
@@ -492,7 +492,7 @@ make vcs_src/ifs_http.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_http.c
-meta ifs_http.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_http.c ifs_http
+meta ifs_http.o %.c>%.o vcs_src/ifs_http.c ifs_http
 prev vcs_src/ifs_http.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_http.c
 done ifs_http.o generated
@@ -501,7 +501,7 @@ make vcs_src/ifs_news.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_news.c
-meta ifs_news.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_news.c ifs_news
+meta ifs_news.o %.c>%.o vcs_src/ifs_news.c ifs_news
 prev vcs_src/ifs_news.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_news.c
 done ifs_news.o generated
@@ -510,7 +510,7 @@ make vcs_src/ifs_rsh.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev vcs_src/ifs_agent.h implicit
 done vcs_src/ifs_rsh.c
-meta ifs_rsh.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/ifs_rsh.c ifs_rsh
+meta ifs_rsh.o %.c>%.o vcs_src/ifs_rsh.c ifs_rsh
 prev vcs_src/ifs_rsh.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/ifs_rsh.c
 done ifs_rsh.o generated
@@ -523,7 +523,7 @@ done vcs_src/vcs_rscs.h
 done vcs_src/vcs_cmd.h
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_rscs.c
-meta vcs_rscs.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_rscs.c vcs_rscs
+meta vcs_rscs.o %.c>%.o vcs_src/vcs_rscs.c vcs_rscs
 prev vcs_src/vcs_rscs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_rscs.c
 done vcs_rscs.o generated
@@ -532,7 +532,7 @@ make vcs_src/vcs_checkout.c
 prev vcs_src/vcs_rscs.h implicit
 prev vcs_src/vcs_cmd.h implicit
 done vcs_src/vcs_checkout.c
-meta vcs_checkout.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_checkout.c vcs_checkout
+meta vcs_checkout.o %.c>%.o vcs_src/vcs_checkout.c vcs_checkout
 prev vcs_src/vcs_checkout.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_checkout.c
 done vcs_checkout.o generated
@@ -540,7 +540,7 @@ make vcs_attr.o
 make vcs_src/vcs_attr.c
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_attr.c
-meta vcs_attr.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_attr.c vcs_attr
+meta vcs_attr.o %.c>%.o vcs_src/vcs_attr.c vcs_attr
 prev vcs_src/vcs_attr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_attr.c
 done vcs_attr.o generated
@@ -548,7 +548,7 @@ make vcs_dir.o
 make vcs_src/vcs_dir.c
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_dir.c
-meta vcs_dir.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_dir.c vcs_dir
+meta vcs_dir.o %.c>%.o vcs_src/vcs_dir.c vcs_dir
 prev vcs_src/vcs_dir.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_dir.c
 done vcs_dir.o generated
@@ -556,7 +556,7 @@ make vcs_tag.o
 make vcs_src/vcs_tag.c
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_tag.c
-meta vcs_tag.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_tag.c vcs_tag
+meta vcs_tag.o %.c>%.o vcs_src/vcs_tag.c vcs_tag
 prev vcs_src/vcs_tag.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_tag.c
 done vcs_tag.o generated
@@ -564,7 +564,7 @@ make vcs_misc.o
 make vcs_src/vcs_misc.c
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_misc.c
-meta vcs_misc.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_misc.c vcs_misc
+meta vcs_misc.o %.c>%.o vcs_src/vcs_misc.c vcs_misc
 prev vcs_src/vcs_misc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_misc.c
 done vcs_misc.o generated
@@ -572,7 +572,7 @@ make vcs_message.o
 make vcs_src/vcs_message.c
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_message.c
-meta vcs_message.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_message.c vcs_message
+meta vcs_message.o %.c>%.o vcs_src/vcs_message.c vcs_message
 prev vcs_src/vcs_message.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_message.c
 done vcs_message.o generated
@@ -582,7 +582,7 @@ prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_search.c
-meta vcs_search.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_search.c vcs_search
+meta vcs_search.o %.c>%.o vcs_src/vcs_search.c vcs_search
 prev vcs_src/vcs_search.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_search.c
 done vcs_search.o generated
@@ -591,7 +591,7 @@ make vcs_src/vcs_marker.c
 prev vcs_src/vcs_cmd.h implicit
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_marker.c
-meta vcs_marker.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_marker.c vcs_marker
+meta vcs_marker.o %.c>%.o vcs_src/vcs_marker.c vcs_marker
 prev vcs_src/vcs_marker.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_marker.c
 done vcs_marker.o generated
@@ -607,7 +607,7 @@ make vcs_src/vcs_replica.h implicit
 done vcs_src/vcs_replica.h
 prev vcs_src/vcs_rscs.h implicit
 done vcs_src/vcs_replica.c
-meta vcs_replica.o %.c>%.o ${PACKAGEROOT}/src/cmd/cs/vcs_src/vcs_replica.c vcs_replica
+meta vcs_replica.o %.c>%.o vcs_src/vcs_replica.c vcs_replica
 prev vcs_src/vcs_replica.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivcs_src -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vcs_src/vcs_replica.c
 done vcs_replica.o generated

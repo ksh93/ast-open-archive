@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make glean
 make libsortglean.a archive
@@ -124,7 +124,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/debug.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done glean.c
-meta glean.o %.c>%.o ${PACKAGEROOT}/src/cmd/sortlib/glean/glean.c glean
+meta glean.o %.c>%.o glean.c glean
 prev glean.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2006-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortglean]"\" -c glean.c
 done glean.o generated
@@ -136,7 +136,7 @@ done install virtual
 make test
 make test.sort
 make sort.tst
-meta sort.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/sortlib/glean/sort.rt sort
+meta sort.tst %.rt>%.tst sort.rt sort
 make sort.rt
 done sort.rt
 exec - if	[[ "1" || "sort.rt" -nt "sort.tst" ]]

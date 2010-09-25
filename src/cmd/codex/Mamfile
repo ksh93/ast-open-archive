@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make codex
 make codex.o
@@ -113,7 +113,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/codex.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done codex.c
-meta codex.o %.c>%.o ${PACKAGEROOT}/src/cmd/codex/codex.c codex
+meta codex.o %.c>%.o codex.c codex
 prev codex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?codex]"\" -c codex.c
 done codex.o generated

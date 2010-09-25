@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2010-06-14 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2010-10-15 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files in various "
@@ -962,7 +962,7 @@ od(State_t* state, char** files)
 					break;
 				}
 			}
-		state->eob = s + n;
+		state->eob = (unsigned char*)s + n;
 		if (state->count)
 		{
 			if (state->total >= state->count)
@@ -996,7 +996,7 @@ od(State_t* state, char** files)
 				while (m--)
 					*span++ = 0;
 			}
-			state->eob = span;
+			state->eob = (unsigned char*)span;
 			if ((m = span - state->span) > state->block)
 				m = state->block;
 			if (block(state, sfstdout, state->span, state->span + m, state->offset, tmp, sizeof(tmp)))

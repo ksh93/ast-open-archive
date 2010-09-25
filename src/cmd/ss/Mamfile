@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ss
 make ss.o
@@ -133,7 +133,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cs.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ss.c
-meta ss.o %.c>%.o ${PACKAGEROOT}/src/cmd/ss/ss.c ss
+meta ss.o %.c>%.o ss.c ss
 prev ss.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?ss]"\" -c ss.c
 done ss.o generated
@@ -145,7 +145,7 @@ make ssd
 make ssd.o
 make ssd.c
 make FEATURE/cmd implicit
-meta FEATURE/cmd features/%>FEATURE/% ${PACKAGEROOT}/src/cmd/ss/features/cmd cmd
+meta FEATURE/cmd features/%>FEATURE/% features/cmd cmd
 make features/cmd
 done features/cmd
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/cmd
@@ -165,7 +165,7 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ssd.c
-meta ssd.o %.c>%.o ${PACKAGEROOT}/src/cmd/ss/ssd.c ssd
+meta ssd.o %.c>%.o ssd.c ssd
 prev ssd.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ssd.c
 done ssd.o generated

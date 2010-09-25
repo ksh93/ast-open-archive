@@ -300,7 +300,7 @@ rs_disc(Rskey_t* key, const char* options)
 				{
 					if (!(f = vmnewof(vm, 0, Field_t, 1, 0)) || !(f->lim = rskeyopen(&state->kydisc)))
 						error(ERROR_SYSTEM|3, "out of space");
-					strcpy(f->lim->tab, key->tab);
+					strcpy((char*)f->lim->tab, (char*)key->tab);
 					f->lim->type = key->type;
 					f->mm = i;
 					f->index = state->fields++;

@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make sync
 make libsortsync.a archive
@@ -132,7 +132,7 @@ done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sync.c
-meta sync.o %.c>%.o ${PACKAGEROOT}/src/cmd/sortlib/sync/sync.c sync
+meta sync.o %.c>%.o sync.c sync
 prev sync.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortsync]"\" -c sync.c
 done sync.o generated
@@ -152,7 +152,7 @@ prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ss.c
-meta ss.o %.c>%.o ${PACKAGEROOT}/src/cmd/sortlib/sync/ss.c ss
+meta ss.o %.c>%.o ss.c ss
 prev ss.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ss.c
 done ss.o generated
@@ -165,7 +165,7 @@ make test.o
 make test.c
 prev ss.h implicit
 done test.c
-meta test.o %.c>%.o ${PACKAGEROOT}/src/cmd/sortlib/sync/test.c test
+meta test.o %.c>%.o test.c test
 prev test.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c test.c
 done test.o generated

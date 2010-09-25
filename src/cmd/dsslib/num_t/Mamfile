@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make num_t
 make libdssnum_t.a archive
@@ -179,7 +179,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done num_t.c
-meta num_t.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/num_t/num_t.c num_t
+meta num_t.o %.c>%.o num_t.c num_t
 prev num_t.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssnum_t]"\" -D_PACKAGE_ast -c num_t.c
 done num_t.o generated
@@ -187,7 +187,7 @@ make lib.o
 make lib.c
 prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
-meta lib.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/num_t/lib.c lib
+meta lib.o %.c>%.o lib.c lib
 prev lib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated

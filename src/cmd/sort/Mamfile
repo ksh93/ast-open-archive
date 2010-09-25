@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make sort
 make main.o
@@ -157,7 +157,7 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done main.c
-meta main.o %.c>%.o ${PACKAGEROOT}/src/cmd/sort/main.c main
+meta main.o %.c>%.o main.c main
 prev main.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sort]"\" -c main.c
 done main.o generated
@@ -166,7 +166,7 @@ make sfopen.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sfopen.c
-meta sfopen.o %.c>%.o ${PACKAGEROOT}/src/cmd/sort/sfopen.c sfopen
+meta sfopen.o %.c>%.o sfopen.c sfopen
 prev sfopen.c
 setv LICENSE -DLICENSE="since=2005,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sfopen.c
@@ -199,7 +199,7 @@ make test.script
 make testsort
 make testsort.sh
 done testsort.sh
-meta testsort %.sh>% ${PACKAGEROOT}/src/cmd/sort/testsort.sh testsort
+meta testsort %.sh>% testsort.sh testsort
 prev testsort.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)

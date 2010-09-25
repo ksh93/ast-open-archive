@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make vczip
 make vczip.o
@@ -144,7 +144,7 @@ done ${PACKAGE_ast_INCLUDE}/ccode.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vczip.c
-meta vczip.o %.c>%.o ${PACKAGEROOT}/src/cmd/vczip/vczip.c vczip
+meta vczip.o %.c>%.o vczip.c vczip
 prev vczip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?vczip]"\" -c vczip.c
 done vczip.o generated

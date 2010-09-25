@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make edit
 make libedit.a archive
@@ -100,7 +100,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
 make sh_config.h implicit
 make FEATURE/ielib implicit
-meta FEATURE/ielib features/%>FEATURE/% ${PACKAGEROOT}/src/cmd/ie/features/ielib ielib
+meta FEATURE/ielib features/%>FEATURE/% features/ielib ielib
 make features/ielib
 done features/ielib
 prev edit.req
@@ -109,13 +109,13 @@ bind -last
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast}  : run features/ielib
 done FEATURE/ielib dontcare generated
 make FEATURE/options implicit
-meta FEATURE/options features/%.sh>FEATURE/% ${PACKAGEROOT}/src/cmd/ie/features/options.sh options
+meta FEATURE/options features/%.sh>FEATURE/% features/options.sh options
 make features/options.sh
 make OPTIONS implicit
 done OPTIONS
 done features/options.sh dontcare
 prev edit.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast}  : run features/options.sh ${PACKAGEROOT}/src/cmd/ie/OPTIONS
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast}  : run features/options.sh OPTIONS
 done FEATURE/options dontcare generated
 done sh_config.h
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -168,7 +168,7 @@ done ${PACKAGE_ast_INCLUDE}/error.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done io.h
 done editlib.c
-meta editlib.o %.c>%.o ${PACKAGEROOT}/src/cmd/ie/editlib.c editlib
+meta editlib.o %.c>%.o editlib.c editlib
 prev editlib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DLDYNAMIC -DESH -DVSH -D_PACKAGE_ast -c editlib.c
 done editlib.o generated
@@ -181,7 +181,7 @@ prev io.h implicit
 make defs.h implicit
 done defs.h dontcare virtual
 done vi.c
-meta vi.o %.c>%.o ${PACKAGEROOT}/src/cmd/ie/vi.c vi
+meta vi.o %.c>%.o vi.c vi
 prev vi.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c vi.c
 done vi.o generated
@@ -193,7 +193,7 @@ prev history.h implicit
 prev io.h implicit
 prev defs.h implicit
 done emacs.c
-meta emacs.o %.c>%.o ${PACKAGEROOT}/src/cmd/ie/emacs.c emacs
+meta emacs.o %.c>%.o emacs.c emacs
 prev emacs.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c emacs.c
 done emacs.o generated
@@ -217,7 +217,7 @@ make builtins.h implicit
 done builtins.h dontcare virtual
 prev defs.h implicit
 done history.c
-meta history.o %.c>%.o ${PACKAGEROOT}/src/cmd/ie/history.c history
+meta history.o %.c>%.o history.c history
 prev history.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DVSH -DESH -D_PACKAGE_ast -c history.c
 done history.o generated
@@ -233,7 +233,7 @@ prev builtins.h implicit
 prev terminal.h implicit
 prev defs.h implicit
 done edit.c
-meta edit.o %.c>%.o ${PACKAGEROOT}/src/cmd/ie/edit.c edit
+meta edit.o %.c>%.o edit.c edit
 prev edit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c edit.c
 done edit.o generated
@@ -245,7 +245,7 @@ prev libedit.a archive
 make ie
 make ie.sh
 done ie.sh
-meta ie %.sh>% ${PACKAGEROOT}/src/cmd/ie/ie.sh ie
+meta ie %.sh>% ie.sh ie
 prev ie.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
