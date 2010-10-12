@@ -1,3 +1,6 @@
+10-10-04 pax.c,misc.c: fix --meter off-by-one bugs for long paths
+10-10-04 pax.c: add #updated files to --update --verbose summary
+10-10-04 pax.c: --meter implies --verbose summary
 10-09-01 pax.c: RE errors => exit(2)
 10-08-27 add -U, --different to update files with different <mtime,size,mode>
 10-08-22 format.c: archive update requires (ap->io->mode & O_RDWR)

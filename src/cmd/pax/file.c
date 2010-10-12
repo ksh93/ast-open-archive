@@ -1133,6 +1133,7 @@ setfile(register Archive_t* ap, register File_t* f)
 
 	if (f->skip || f->extended)
 		return;
+	ap->updated++;
 	switch (f->type)
 	{
 	case X_IFLNK:

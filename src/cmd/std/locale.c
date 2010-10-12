@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1067,7 +1067,7 @@ main(int argc, char** argv)
 		{
 			sfprintf(sfstdout, "%s", name);
 			sfsprintf(col, sizeof(col), ".%s.]", name);
-			if ((i = regcollate(col, NiL, buf, sizeof(buf))) < 0)
+			if ((i = regcollate(col, NiL, buf, sizeof(buf), NiL)) < 0)
 			{
 				sfprintf(sfstdout, "\tERROR\n");
 				continue;

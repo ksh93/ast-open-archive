@@ -358,6 +358,7 @@ getepilogue(register Archive_t* ap)
 
 	message((-6, "getepilogue()"));
 	ap->section = SECTION_CONTROL;
+	state.updated = ap->updated;
 	if (ap->delta && ap->delta->epilogue < 0)
 		error(3, "%s: corrupt archive: missing epilogue", ap->name);
 	if (state.append || state.update && (ap->io->mode & O_RDWR))

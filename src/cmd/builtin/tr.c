@@ -137,6 +137,7 @@ nextchar(register Tr_t* tr)
 	int		q;
 	unsigned char*	e;
 	regclass_t	f;
+	wchar_t		wc;
 	char		buf[32];
 
 	/*
@@ -211,7 +212,7 @@ nextchar(register Tr_t* tr)
 			return nextchar(tr);
 		case '.':
 		case '=':
-			if ((q = regcollate((char*)tr->next, (char**)&e, buf, sizeof(buf))) >= 0)
+			if ((q = regcollate((char*)tr->next, (char**)&e, buf, sizeof(buf), &wc)) >= 0)
 			{
 				tr->next = e;
 				c = q ? buf[0] : 0;

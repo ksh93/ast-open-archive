@@ -166,8 +166,6 @@ E	a2b		ab		NOMATCH
 BE	a[bc]		ac		(0,2)
 BE	a[-]		a-		(0,2)
 BE	a[[.-.]]	a-		(0,2)
-BE	a[[.zero.]]	a0		(0,2)
-BE	a[[.zero.]-9]	a2		(0,2)
 BE	a[0-[.9.]]	a2		(0,2)
 BE	a[[=x=]]	ax		(0,2)
 BE	a[[=x=]]	ay		NOMATCH

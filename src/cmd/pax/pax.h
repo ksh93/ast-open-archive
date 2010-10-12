@@ -90,6 +90,7 @@ typedef struct Tarheader_s Tarheader_t;
 #define SECTION(p)	(p)->section
 
 #define METER_parts	20
+#define METER_width	(METER_parts + 7)
 
 #define NOW		time(NiL)
 
@@ -473,6 +474,7 @@ typedef struct Pattern_s
 	char*		type;		/* archive type			*/ \
 	off_t		uncompressed;	/* uncompressed size estimate	*/ \
 	Hash_table_t*	update;		/* update info			*/ \
+	size_t		updated;	/* number of updated members	*/ \
 	int		warnlinkhead;	/* invalid hard link header	*/
 
 #define _PAX_PRIVATE_ \
@@ -624,6 +626,7 @@ typedef struct Pattern_s
 	Sfio_t*		str;		/* temporary string stream	*/ \
 	}		tmp;		/* temporary stuff		*/ \
 	int		update;		/* copy file only if newer	*/ \
+	size_t		updated;	/* total of updated members	*/ \
 	char*		usage;		/* optget() usage string	*/ \
 	char		volume[64];	/* volume id			*/ \
 	int		warnmkdir;	/* --mkdir hint issued		*/ \

@@ -819,6 +819,7 @@ listentry(register File_t* f)
 	int	j;
 	int	k;
 	char*	s;
+	char*	e;
 	char	bar[METER_parts + 1];
 
 	if (!f->extended && !f->skip && (state.drop || state.list || state.meter.on || state.verbose))
@@ -841,22 +842,25 @@ listentry(register File_t* f)
 				return;
 			}
 			n = state.in->io->count > 1024 ? 10 : 0;
-			if ((p = ((state.in->io->count >> n) * 100) / (state.meter.size >> n)) > 100)
-				p = 100;
+			if ((p = ((state.in->io->count >> n) * 100) / (state.meter.size >> n)) >= 100)
+				p = 99;
 			n = listprintf(state.meter.tmp, state.in, f, state.listformat);
 			if (!(s = sfstruse(state.meter.tmp)))
 				nospace();
 			if (state.meter.fancy)
 			{
-				if (n > (state.meter.width - METER_parts - 1))
+				if (n > (state.meter.width - METER_width))
 				{
-					s += n - (state.meter.width - METER_parts - 1);
-					n = state.meter.width - METER_parts - 1;
+					e = "*";
+					s += n - (state.meter.width - METER_width) + 1;
+					n = state.meter.width - METER_width;
 				}
-				j = n + METER_parts + 2;
+				else
+					e = "";
+				j = n + METER_width;
 				if (!state.meter.last)
-					state.meter.last = j + 5;
-				if ((k = state.meter.last - j - 5) < 0)
+					state.meter.last = j;
+				if ((k = state.meter.last - j) < 0)
 					k = 0;
 				if ((i = (p / (100 / METER_parts))) >= sizeof(bar))
 					i = sizeof(bar) - 1;
@@ -866,7 +870,7 @@ listentry(register File_t* f)
 				while (n < elementsof(bar) - 1)
 					bar[n++] = ' ';
 				bar[n] = 0;
-				state.meter.last = sfprintf(sfstderr, "%02d%% |%s| %s%*s", p, bar, s, k, "\r");
+				state.meter.last = sfprintf(sfstderr, "%02d%% |%s| %s%s%*s\r", p, bar, e, s, k, "") - k - 1;
 			}
 			else
 				sfprintf(sfstderr, "%02d%% %s\n", p, s);

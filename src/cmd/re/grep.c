@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2010-09-01 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2010-09-28 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -46,6 +46,7 @@ USAGE_LICENSE
 "[A:approximate-regexp?\bagrep\b mode: approximate regular expression \apatterns\a (not implemented.)]"
 
 "[C:context?Set the matched line context \abefore\a and \aafter\a count."
+"	If ,\aafter\a is omitted then it is set to \abefore\a."
 "	By default only matched lines are printed.]:?"
 "		[before[,after]]:=2,2]"
 "[c:count?Only print a matching line count for each file.]"
@@ -156,6 +157,8 @@ static struct State_s			/* program state		*/
 	int		posnum;		/* number of match positions	*/
 
 	int		any;		/* if any pattern hit		*/
+	int		after;		/* # lines to list after match	*/
+	int		before;		/* # lines to list before match	*/
 	int		list;		/* list files with hits		*/
 	int		notfound;	/* some input file not found	*/
 	int		options;	/* regex options		*/
@@ -218,7 +221,7 @@ addre(List_t* p, char* s)
 	if (!p->head)
 	{
 		p->head = p->tail = x;
-		if (state.number || !regrecord(&x->re))
+		if (state.number || state.before || state.after || !regrecord(&x->re))
 			state.byline = 1;
 	}
 	else if (state.label || regcomb(&p->tail->re, &x->re))
@@ -657,6 +660,17 @@ main(int argc, char** argv)
 	while (c = optget(argv, usage))
 		switch (c)
 		{
+		case 'C':
+			if (opt_info.arg)
+			{
+				state.before = (int)strtol(opt_info.arg, &s, 0);
+				state.after = (*s == ',') ? (int)strtol(s + 1, &s, 0) : state.before;
+				if (*s)
+					error(3, "%s: invalid context line count", s);
+			}
+			else
+				state.before = state.after = 2;
+			break;
 		case 'E':
 			state.options |= REG_EXTENDED;
 			break;

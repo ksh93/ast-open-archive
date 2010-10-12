@@ -170,8 +170,6 @@ E	[^--Z]+	---AFD*(&,ml---	(6,12)
 Ei	[^--Z]+	---AFD*(&,ml---	(6,10)
 B	[[.foo.]]	foo	ECOLLATE
 B	[[=foo=]]	foo	ECOLLATE
-B	[[.bar.]]	|	(0,1)
-B	[[=bar=]]	|	(0,1)
 
 }
 

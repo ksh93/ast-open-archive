@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2010-09-01 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2010-10-04 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -234,7 +234,7 @@ meterror(int fd, const void* buf, size_t n)
 {
 	if (state.meter.last)
 	{
-		sfprintf(sfstderr, "%*s", state.meter.last, "\r");
+		sfprintf(sfstderr, "%*s\r", state.meter.last, "");
 		state.meter.last = 0;
 	}
 	return write(fd, buf, n);
@@ -1043,8 +1043,8 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 				{
 					error_info.write = meterror;
 					astwinsize(1, NiL, &state.meter.width);
-					if (state.meter.width < 2 * (METER_parts + 1))
-						state.meter.width = 2 * (METER_parts + 1);
+					if (state.meter.width < 2 * (METER_width + 1))
+						state.meter.width = 2 * (METER_width + 1);
 				}
 			}
 			break;
@@ -1960,8 +1960,11 @@ void
 finish(int code)
 {
 	register Archive_t*	ap;
+	size_t			x = state.buffersize / 4;
 	register char*		x1 = &state.tmp.buffer[0];
-	register char*		x2 = &state.tmp.buffer[state.buffersize / 2];
+	register char*		x2 = x1 + x;
+	register char*		x3 = x2 + x;
+	register char*		x4 = x3 + x;
 	register off_t		n;
 
 	while (state.proc)
@@ -1979,7 +1982,7 @@ finish(int code)
 	sfsync(sfstdout);
 	if (state.meter.last)
 	{
-		sfprintf(sfstderr, "%*s", state.meter.last, "\r");
+		sfprintf(sfstderr, "%*s\r", state.meter.last, "");
 		state.meter.last = 0;
 	}
 	else if (state.dropcount)
@@ -1995,18 +1998,25 @@ finish(int code)
 		if (ap->entries)
 		{
 			if (ap->volume > 1)
-				sfsprintf(x1, state.tmp.buffersize / 2, ", %d volumes", ap->volume);
+				sfsprintf(x1, x, ", %d volumes", ap->volume);
 			else
 				*x1 = 0;
 			if (ap->volume > 0 && ap->part > ap->volume)
-				sfsprintf(x2, state.tmp.buffersize / 2, ", %d parts", ap->part - ap->volume + 1);
+				sfsprintf(x2, x, ", %d parts", ap->part - ap->volume + 1);
 			else
 				*x2 = 0;
 			n = (n + BLOCKSIZE - 1) / BLOCKSIZE;
-			if (state.verbose)
-				sfprintf(sfstderr, "%d file%s, %I*d block%s%s%s\n", ap->selected, ap->selected == 1 ? "" : "s", sizeof(n), n, n == 1 ? "" : "s", x1, x2);
+			if (state.verbose || state.meter.on)
+			{
+				sfsprintf(x3, x, "%I*u file%s, ", sizeof(ap->selected), ap->selected, ap->selected == 1 ? "" : "s");
+				if (state.update)
+					sfsprintf(x4, x, "%I*u updated, ", sizeof(ap->updated), ap->updated);
+				else
+					*x4 = 0;
+			}
 			else
-				sfprintf(sfstderr, "%I*d block%s%s%s\n", sizeof(n), n, n == 1 ? "" : "s", x1, x2);
+				*x3 = *x4 = 0;
+			sfprintf(sfstderr, "%s%s%I*d block%s%s%s\n", x3, x4, sizeof(n), n, n == 1 ? "" : "s", x1, x2);
 		}
 	}
 	sfsync(sfstderr);

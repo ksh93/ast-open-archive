@@ -1962,7 +1962,7 @@ identifiers(register Table_t* tab, register const char* s, int flags, Tagdisc_t*
 				return -1;
 			case '.':
 			case '=':
-				if (regcollate(s, &e, &m, 1) == 1)
+				if (regcollate(s, &e, &m, 1, NiL) == 1)
 				{
 					s = (const char*)e;
 					tab->id[m] |= flags;

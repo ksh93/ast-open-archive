@@ -93,70 +93,6 @@ Ei$	\xC3\x89i	\xC3\xA9i	(0,3)
 Ei$	\xC3\xA9i	\xC3\x89i	(0,3)
 Ei$	\xC3\xA9i	\xC3\xA9i	(0,3)
 
-E$	[[.latin-small-letter-a-with-diaeresis-above.]]	\xC3\xA4	ECOLLATE
-E$	[[.LATIN-SMALL-LETTER-A-WITH-DIAERESIS-ABOVE.]]	\xC3\xA4	ECOLLATE
-E$	[[.a-dot-box.]]					\xC3\xA4	ECOLLATE
-E$	[[.A-DOT-BOX.]]					\xC3\xA4	ECOLLATE
-
-S$	[[.latin-small-letter-a-with-diaeresis-above.]]	\xC3\xA4	NOMATCH
-S$	[[.LATIN-SMALL-LETTER-A-WITH-DIAERESIS-ABOVE.]]	\xC3\xA4	NOMATCH
-S$	[[.a-dot-box.]]					\xC3\xA4	NOMATCH
-S$	[[.A-DOT-BOX.]]					\xC3\x84	NOMATCH
-
-S	[[.latin-small-letter-a-with-diaeresis-above.]]	a		NOMATCH
-S	[[.LATIN-SMALL-LETTER-A-WITH-DIAERESIS-ABOVE.]]	A		NOMATCH
-S	[[.a-dot-box.]]					a		NOMATCH
-S	[[.A-DOT-BOX.]]					A		NOMATCH
-
-ES$	[[.latin-small-letter-a-with-diaeresis.]]	\xC3\xA4	(0,2)
-ES$	[[.LATIN-SMALL-LETTER-A-WITH-DIAERESIS.]]	\xC3\xA4	(0,2)
-ES$	[[.small-letter-a-with-diaeresis.]]		\xC3\xA4	(0,2)
-ES$	[[.latin-small-a-with-diaeresis.]]		\xC3\xA4	(0,2)
-ES$	[[.small-latin-letter-a-diaeresis.]]		\xC3\xA4	(0,2)
-ES$	[[.lc-a-diaeresis.]]				\xC3\xA4	(0,2)
-ES$	[[.a-diaeresis.]]				\xC3\xA4	(0,2)
-
-ES$	[[.latin-capital-letter-a-with-diaeresis.]]	\xC3\x84	(0,2)
-ES$	[[.LATIN-CAPITAL-LETTER-A-WITH-DIAERESIS.]]	\xC3\x84	(0,2)
-ES$	[[.capital-letter-a-with-diaeresis.]]		\xC3\x84	(0,2)
-ES$	[[.latin-capital-a-with-diaeresis.]]		\xC3\x84	(0,2)
-ES$	[[.capital-latin-letter-a-diaeresis.]]		\xC3\x84	(0,2)
-ES$	[[.uc-a-diaeresis.]]				\xC3\x84	(0,2)
-ES$	[[.A-diaeresis.]]				\xC3\x84	(0,2)
-
-ES$	[[.a-diaeresis.]]				\xC3\xA4	(0,2)
-ES$	[[.small-a-diaeresis.]]				\xC3\xA4	(0,2)
-ES$	[[.small-A-diaeresis.]]				\xC3\xA4	(0,2)
-ES$	[[.A-DIAERESIS.]]				\xC3\xA4	NOMATCH
-ES$	[[.a-diaeresis.]]				\xC3\x84	NOMATCH
-
-ES$	[[.A-diaeresis.]]				\xC3\x84	(0,2)
-ES$	[[.capital-A-diaeresis.]]			\xC3\x84	(0,2)
-ES$	[[.capital-a-diaeresis.]]			\xC3\x84	(0,2)
-ES$	[[.A-diaeresis.]]				\xC3\xA4	NOMATCH
-
-ESi$	[[.a-diaeresis.]]				\xC3\xA4	(0,2)
-ESi$	[[.small-a-diaeresis.]]				\xC3\xA4	(0,2)
-ESi$	[[.small-A-diaeresis.]]				\xC3\xA4	(0,2)
-ESi$	[[.A-DIAERESIS.]]				\xC3\xA4	(0,2)
-ESi$	[[.a-diaeresis.]]				\xC3\xA4	(0,2)
-
-ESi$	[[.A-diaeresis.]]				\xC3\xA4	(0,2)
-ESi$	[[.capital-A-diaeresis.]]			\xC3\xA4	(0,2)
-ESi$	[[.capital-a-diaeresis.]]			\xC3\xA4	(0,2)
-ESi$	[[.A-diaeresis.]]				\xC3\xA4	(0,2)
-
-ESi$	[[.a-diaeresis.]]				\xC3\x84	(0,2)
-ESi$	[[.small-a-diaeresis.]]				\xC3\x84	(0,2)
-ESi$	[[.small-A-diaeresis.]]				\xC3\x84	(0,2)
-ESi$	[[.A-DIAERESIS.]]				\xC3\x84	(0,2)
-ESi$	[[.a-diaeresis.]]				\xC3\x84	(0,2)
-
-ESi$	[[.A-diaeresis.]]				\xC3\x84	(0,2)
-ESi$	[[.capital-A-diaeresis.]]			\xC3\x84	(0,2)
-ESi$	[[.capital-a-diaeresis.]]			\xC3\x84	(0,2)
-ESi$	[[.A-diaeresis.]]				\xC3\x84	(0,2)
-
 ES$	k[[=o=]]r		ist-k\xC3\xB6rperlich	(4,8)
 ES$	k[[=o=]]r		ist-k\xC3\x96rperlich	(4,8)
 ES$	k[[=o=]]r		ist-korperlich		(4,7)
@@ -221,11 +157,11 @@ ESi$	K[[=\xC3\x96=]]R	IST-KoRPERLICH		(4,7)
 
 }
 
-# Espanol locale -- ligature tests
+# Espanol locale -- collation element tests
 
 {C	es_ES
 
-{S	[[.ch.]]	ch	(0,2)		locale does not support [[.ch.]] ligature
+{S	[[.ch.]]	ch	(0,2)		locale does not support [[.ch.]] collation element
 
 E	[[.Ch.]]	Ch	ECOLLATE
 S	[[.Ch.]]	Ch	NOMATCH
