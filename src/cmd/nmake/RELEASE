@@ -1,3 +1,5 @@
+10-10-20 Makerules.mk: fix .SHARED.LIST. to honor top level .MULTIPLE
+10-10-20 msgcat.mk: ksh -D strings => raw string
 10-08-24 bind.c: glob_diropen() gs->name absolute path
 10-08-23 bind.c: drop GLOB_NOCHECK so *.notthere => empty
 10-08-15 mam.c: fix joint target make-done imbalance

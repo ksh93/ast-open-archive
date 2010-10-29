@@ -93,7 +93,31 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-10-10  --- Release ksh93u  ---
+10-10-26  --- Release ksh93u  ---
+10-10-26  Fix a bug where terminal interrupt was ignored while in vi/emacs
+	  edit search mode.
+10-10-26  Fix $'a\0b'c to expand to 'ac'.
+10-10-26  Provide user defined round() if not in <math.h>.
+10-10-26  Fix bug where $((undefined_function(1))) dumped core.
+10-10-22  Provide user defined iszero() if not in <math.h>.
+10-10-22  Fixed a bug with BGX compile option that could cause the shell to
+	  hang.
+10-10-22  Fixed a bug with user define math function on systems for which
+	  char is unsigned.
+10-10-21  A bug in which function autoloaded in a function leaves a file open
+	  has been fixed.
+10-10-20  Modified the behavior of set -u so that the shell terminates when
+	  when var is unset with ${var op string} when op is #, % or /.
+10-10-20  Fixed a bug with the AUDIT option in which the audit file was not
+	  not close-on-exec.
+10-10-20 +Made a number of changes and fixes for the NAMESPACE compile option
+	  which as added on 10-06-09 but some problems still remain.
+10-10-15  Fixed a bug in which arithmetic functions (added on 10-03-24) did
+	  not work when the function definition was in the same compound
+	  command in which the function was referenced.
+10-10-13  A bug in which creating an associative array of compound variables
+	  with no members as an element of a compound variable did not work
+	  has been fixed.
 10-10-08  A bug in which killing the last command in a function defined
 	  with function name, terminated the calling script has been fixed. 
 10-10-08  A bug which could cause a core dump if IFS is unset inside a function
@@ -2611,6 +2635,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+10-10-10 file.c: don't prune state.update dirs based on time -- doh
 10-10-04 pax.c,misc.c: fix --meter off-by-one bugs for long paths
 10-10-04 pax.c: add #updated files to --update --verbose summary
 10-10-04 pax.c: --meter implies --verbose summary
@@ -2632,7 +2657,7 @@ All recorded changes follow.
 08-12-31 pax.c,pax-vczip.c: add vczip compression format
 08-05-08 pax.tst: handle systems with privileged chmod +t / mkfifo
 08-05-01 pax-tar.c: handle sfsprintf() '\0'
-07-12-11 delta2patch.sh: dro pax -v, add pax --nosummary
+07-12-11 delta2patch.sh: drop pax -v, add pax --nosummary
 07-12-06 delta2patch.sh: add
 07-09-21 format.c: add sumprint() default scale arg
 07-05-01 pax-tar.c,options.c: fix pax extended header for >=2**32 size
@@ -3044,6 +3069,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+10-10-10 sear.sh: retain .exe suffix in sear -- its dos on the other side!
 10-09-10 sear.sh: add --args=args
 10-08-22 sear.sh: ratz+sear now requires -ladvapi32
 10-01-20 changes.sh: avoid nmake variable expansions in sh!
@@ -3505,6 +3531,7 @@ All recorded changes follow.
 
 :::::::: msgcc ::::::::
 
+10-10-20 msgcc.sh: add raw type (like str) for ksh -D style strings
 10-06-01 sync with ast api 20100601
 06-11-15 msgcc.sh: date -f x => date +x for ast-base portability
 06-10-11 add sfstruse() error checks
@@ -3521,6 +3548,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+10-10-20 Makerules.mk: fix .SHARED.LIST. to honor top level .MULTIPLE
+10-10-20 msgcat.mk: ksh -D strings => raw string
 10-08-24 bind.c: glob_diropen() gs->name absolute path
 10-08-23 bind.c: drop GLOB_NOCHECK so *.notthere => empty
 10-08-15 mam.c: fix joint target make-done imbalance
@@ -4904,6 +4933,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+10-10-19 od.c: speed up inner loop
 10-09-15 od.c: fix (unsigned char*) (char*) mismatches
 10-09-08 tr.c: handle tr abc '[%*]xyz'
 10-08-04 dlls.c: add -l to list plugin version stamps
@@ -6224,6 +6254,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-10-20 misc/translate.c: change debug translation to drop " in (a,b,c,"d")
 10-10-10 misc/glob.c: drop ancient D_FILENO(d)!=0 test and trust readdir()
 10-10-06 misc/translate.c: fix "debug" locale logic
 10-10-04 misc/magic.c: fix magic() skip check to honor the continuation
@@ -7923,6 +7954,9 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+10-10-20 cp: add --timestamps (preserv timestamps and permissions)
+10-10-20 ln: fix 'cannot replace existing file' logic
+10-10-10 cp,mv: add --remove-destination
 10-08-11 cp.c,expr.c: use conformance("standard",0) test
 10-08-11 cut.c: use mbnsize() instead of mblen() (for ast C.UTF-8)
 10-07-28 chgrp.c,chmod.c,cksum.c: fts_path for diagnostics, not fts_accpath!
@@ -8238,6 +8272,10 @@ All recorded changes follow.
 
 :::::::: libdll ::::::::
 
+10-10-20 dllscan.c: version arg "-" => 0
+10-10-19 dllplug.c: fix bug that wiped out dlopen() error message
+10-10-19 dllplug.c: un-localize lookup names (happens with cut and paste)
+10-10-19 dllscan.c: still no code for implicit libs missed by dlopen()
 10-08-02 dllplug.c: fix local path dllcheck() call
 10-05-28 dllplug.c: add dllplugin() with dllcheck() version check
 10-05-28 dllcheck.c: add dllcheck() to do plugin_version() checks

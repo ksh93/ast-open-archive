@@ -257,6 +257,10 @@ openout(register Archive_t* ap, register File_t* f)
 	register int	fd;
 	int		exists;
 	int		perm;
+	int		c;
+	Tv_t		t1;
+	Tv_t		t2;
+	size_t		updated;
 	struct stat	st;
 
 	pathcanon(f->name, 0, 0);
@@ -429,8 +433,6 @@ openout(register Archive_t* ap, register File_t* f)
 			return -2;
 		}
 	}
-	if (prune(ap, f, &st))
-		return -1;
 	switch (f->type)
 	{
 	case X_IFDIR:
@@ -452,18 +454,25 @@ openout(register Archive_t* ap, register File_t* f)
 			error(ERROR_SYSTEM|2, "%s: cannot create directory", f->name);
 			return -1;
 		}
+		updated = ap->updated;
 		setfile(ap, f);
-		if (!exists || f->chmod)
+		if (!exists || f->chmod || state.update && ((c = tvcmp(tvmtime(&t1, f->st), tvmtime(&t2, &st))) > 0 || state.update == OPT_different && c))
 		{
 			listentry(f);
 			fd = -1;
 		}
-		else if (state.update && exists)
-			fd = -1;
 		else
-			fd = -2;
+		{
+			ap->updated = updated;
+			if (state.update)
+				fd = -1;
+			else
+				fd = -2;
+		}
 		return fd;
 	case X_IFLNK:
+		if (exists && prune(ap, f, &st))
+			return -1;
 		if (!*f->linkpath)
 			return -2;
 		if (streq(f->name, f->linkpath))
@@ -498,8 +507,14 @@ openout(register Archive_t* ap, register File_t* f)
 	case X_IFBLK:
 	case X_IFCHR:
 	case X_IFIFO:
+		if (exists && (prune(ap, f, &st) || state.update && f->st->st_dev != st.st_dev))
+			return -1;
 		if (!(ap->format->flags & KEEPSIZE))
 			f->st->st_size = 0;
+		break;
+	case X_IFREG:
+		if (exists && prune(ap, f, &st))
+			return -1;
 		break;
 	}
 	if (!addlink(ap, f))
@@ -675,7 +690,6 @@ openout(register Archive_t* ap, register File_t* f)
 int
 closein(register Archive_t* ap, register File_t* f, int fd)
 {
-	register char*	s;
 	int		r;
 
 	r = 0;
@@ -1129,14 +1143,15 @@ void
 setfile(register Archive_t* ap, register File_t* f)
 {
 	register Post_t*	p;
+	int			updated;
 	Post_t			post;
 
 	if (f->skip || f->extended)
 		return;
-	ap->updated++;
 	switch (f->type)
 	{
 	case X_IFLNK:
+		updated = 0;
 #if _lib_lchown
 		if (state.owner)
 		{
@@ -1171,6 +1186,7 @@ setfile(register Archive_t* ap, register File_t* f)
 			}
 		}
 #endif
+		ap->updated += updated;
 		return;
 	case X_IFDIR:
 		if (f->chmod || state.acctime || state.modtime || state.owner || (f->perm & S_IRWXU) != S_IRWXU)
@@ -1191,10 +1207,12 @@ setfile(register Archive_t* ap, register File_t* f)
 			else
 				p->chmod = f->chmod;
 			hashput(state.restore, f->name, p);
+			ap->updated++;
 			return;
 		}
 		break;
 	}
+	ap->updated++;
 	p = &post;
 	if (state.acctime)
 		tvgetatime(&p->atime, f->st);
@@ -1270,7 +1288,7 @@ prune(register Archive_t* ap, register File_t* f, register struct stat* st)
 	struct stat	so;
 	int		c;
 
-	if (state.update == OPT_update && !streq(f->name, f->path))
+	if (state.operation != (IN|OUT) && state.update == OPT_update && !streq(f->name, f->path))
 	{
 		if ((*state.statf)(f->path, &so))
 			return 0;

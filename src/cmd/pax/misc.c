@@ -149,6 +149,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 	register Archive_t*	bp;
 	register Member_t*	d;
 	int			linked = 0;
+	int			c;
 	Tv_t			t;
 
 	ap->info = 0;
@@ -197,8 +198,24 @@ selectfile(register Archive_t* ap, register File_t* f)
 		if (!state.ordered)
 			return 0;
 	}
-	if (!match(f->path) || ap->update && (d = (Member_t*)hashget(ap->update, f->name)) && tvcmp(&d->mtime, tvmtime(&t, f->st)) >= 0 || state.verify && f->type != X_IFDIR && !verify(ap, f, NiL))
+	if (!match(f->path))
 		return 0;
+	if (f->type != X_IFDIR)
+	{
+		if (ap->update && (d = (Member_t*)hashget(ap->update, f->name)))
+		{
+			if (f->type != X_IFREG && d->dev != f->st->st_dev)
+				/* keep */;
+			else if (!(c = tvcmp(&d->mtime, tvmtime(&t, f->st))))
+				return 0;
+			else if (state.update != OPT_different && c > 0)
+				return 0;
+			else
+				return 0;
+		}
+		if (state.verify && !verify(ap, f, NiL))
+			return 0;
+	}
 	ap->selected++;
 	if (!linked)
 	{

@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2010-10-15 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2010-10-19 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files in various "
@@ -130,6 +130,7 @@ USAGE_LICENSE
 #include <ctype.h>
 #include <iconv.h>
 #include <vmalloc.h>
+#include <ast_float.h>
 
 #if _hdr_wctype
 #include <wchar.h>
@@ -159,18 +160,31 @@ USAGE_LICENSE
 #endif
 
 struct State_s; typedef struct State_s State_t;
+struct Format_s; typedef struct Format_s Format_t;
 
-typedef char* (*Format_f)(State_t*, unsigned char*, char*, size_t);
+typedef void (*Format_f)(State_t*, Format_t*, Sfio_t*, unsigned char*);
+
+typedef union Mem_u
+{
+	char			m_char[sizeof(intmax_t) + sizeof(double_max)];
+	float			m_float;
+	double			m_double;
+#if _typ_long_double
+	long double		m_long_double;
+#endif
+} Mem_t;
 
 typedef struct Size_s
 {
 	char*		desc;
-	char		name;
-	char		map;
-	char		dflt;
-	char		prec;
+	int		name;
+	int		map;
+	int		dflt;
 	const char*	qual;
-	char		size;
+	int		size;
+	int		prefix;
+	int		digits;
+	int		exponent;
 } Size_t;
 
 typedef struct Type_s
@@ -184,7 +198,7 @@ typedef struct Type_s
 	char		width[5];
 } Type_t;
 
-typedef struct Format_s
+struct Format_s
 {
 	struct Format_s*next;
 	const Type_t*	type;
@@ -192,13 +206,14 @@ typedef struct Format_s
 	char		form[16];
 	struct
 	{
-	short		external;
-	short		internal;
+	int		external;
+	int		internal;
 	}		size;
-	short		fp;
-	short		width;
-	short		us;
-} Format_t;
+	int		fp;
+	int		width;
+	int		us;
+	int		per;
+};
 
 struct State_s
 {
@@ -249,99 +264,118 @@ struct State_s
 
 static const Size_t	csize[] =
 {
-"char",		'C',	0,	1,	0,	0,	1,
+"char",		'C',	0,	1,	0,	1,0,0,0,
 0
 };
 
 static const Size_t	isize[] =
 {
-"char",		'C',	0,	0,	0,	0,	1,
-"short",	'S',	0,	0,	0,	0,	sizeof(short),
-"int",		'I',	0,	1,	0,	0,	sizeof(int),
-"long",		'L',	0,	0,	0,	"l",	sizeof(long),
-"long long",	'D',	0,	0,	0,
+"char",		'C',	0,	0,	0,	1,0,0,0,
+"short",	'S',	0,	0,	0,	sizeof(short),0,0,0,
+"int",		'I',	0,	1,	0,	sizeof(int),0,0,0,
+"long",		'L',	0,	0,	"l",	sizeof(long),0,0,0,
+"long long",	'D',	0,	0,
 #ifdef _ast_int8_t
-						"ll",	sizeof(int64_t),
+					"ll",	sizeof(int64_t),0,0,0,
 #else
-						0,	sizeof(long),
+					0,	sizeof(long),0,0,0,
 #endif
 	0
 };
 
 static const Size_t	fsize[] =
 {
-"float",	'F',	'e',	0,	8,	0,	sizeof(float),
-"double",	'D',	'e',	1,	16,	0,	sizeof(double),
+"float",	'F',	'e',	0,	0,	sizeof(float),3,FLT_DIG,FLT_MAX_10_EXP,
+"double",	'D',	'e',	1,	0,	sizeof(double),3,DBL_DIG,DBL_MAX_10_EXP,
 "long double",	'L',	'e',	0,
 #if _typ_long_double
-					34,	"L",	sizeof(long double),
+					"L",	sizeof(long double),3,LDBL_DIG,LDBL_MAX_10_EXP,
 #else
-					16,	0,	sizeof(double),
+					0,	sizeof(double),3,DBL_DIG,DBL_MAX_10_EXP,
 #endif
 0
 };
 
-static char*
-aform(State_t* state, unsigned char* u, char* buf, size_t siz)
+static const Size_t	asize[] =
 {
-	register char		c = *u;
+"float",	'F',	'a',	0,	0,	sizeof(float),5,FLT_DIG,FLT_MAX_EXP,
+"double",	'D',	'a',	1,	0,	sizeof(double),5,DBL_DIG,DBL_MAX_EXP,
+"long double",	'L',	'a',	0,
+#if _typ_long_double
+					"L",	sizeof(long double),5,LDBL_DIG,LDBL_MAX_EXP,
+#else
+					0,	sizeof(double),5,DBL_DIG,DBL_MAX_EXP,
+#endif
+0
+};
 
-	static const char	anames[] = "nulsohstxetxeoteqnackbel bs ht nl vt ff cr so sidledc1dc2dc3dc4naksynetbcan emsubesc fs gs rs us sp";
+static void
+aform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	register int		c = *u;
 
-	if ((c &= 0177) == 0177)
-		return "del";
-	if (c <= 040)
-		sfsprintf(buf, siz, "%3.3s", anames + 3 * c);
-	else
-	{
-		buf[0] = c;
-		buf[1] = 0;
-	}
-	return buf;
+	static const char	anames[] =
+		"nulsohstxetxeotenqackbel bs ht nl vt ff cr so si"
+		"dledc1dc2dc3dc4naksynetbcan emsubesc fs gs rs us"
+		" sp  !  \"  #  $  %  &  '  (  )  *  +  ,  -  .  /"
+		"  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?"
+		"  @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O"
+		"  P  Q  R  S  T  U  V  W  X  Y  Z  [  \\  ]  ^  _"
+		"  `  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o"
+		"  p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~del";
+
+	c = 3 * (c & 0177);
+	sfputc(op, anames[c]);
+	sfputc(op, anames[c+1]);
+	sfputc(op, anames[c+2]);
 }
 
-static char*
-bform(State_t* state, unsigned char* u, char* buf, size_t siz)
+static void
+bform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 {
-	sfsprintf(buf, siz, "%08..2u", *u);
-	return buf;
+	sfprintf(op, "%08..2u", *u);
 }
 
-static char*
-cform(State_t* state, unsigned char* u, char* buf, size_t siz)
+static void
+cform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 {
 	unsigned char*	v;
 	char*		s;
 	wchar_t		w;
 	int		i;
 	int		j;
+	char		buf[2];
 
 	if (state->mb)
 	{
 		state->mb--;
-		return "**";
+		sfputc(op, ' ');
+		sfputc(op, '*');
+		sfputc(op, '*');
+		return;
 	}
-	switch (buf[0] = *u)
+	switch (*u)
 	{
 	case 0:
-		return "\\0";
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		sfputc(op, '0');
+		return;
 	case '\\':
-		return "\\";
+		sfputc(op, ' ');
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		return;
 	}
-	v = u;
+	buf[0] = *(v = u);
 	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
 	{
-		if (i >= siz)
-			i = siz - 1;
 		state->mb = i - 1;
-		s = buf;
 		for (j = 3 - mbwidth(w); j > 0; j--)
-			*s++ = ' ';
+			sfputc(op, ' ');
 		while (i--)
-			*s++ = *v++;
-		i = state->mb;
-		*s = 0;
-		return buf;
+			sfputc(op, *v++);
+		return;
 	}
 	buf[1] = 0;
 	s = fmtesc(buf);
@@ -350,131 +384,178 @@ cform(State_t* state, unsigned char* u, char* buf, size_t siz)
 	 * posix shalls are sometimes an impediment to progress
 	 */
 
-	if (*s == '\\')
-		switch (*(s + 1))
-		{
-		case 'a':
-		case 'b':
-		case 'f':
-		case 'n':
-		case 'r':
-		case 't':
-		case 'v':
-			break;
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-			s++;
-			break;
-		default:
-			sfsprintf(s = buf, siz, "%03o", *v);
-			break;
-		}
-	return s;
+	if (*s != '\\')
+	{
+		sfputc(op, ' ');
+		sfputc(op, ' ');
+		sfputc(op, *s);
+		return;
+	}
+	switch (*(s + 1))
+	{
+	case 'a':
+	case 'b':
+	case 'f':
+	case 'n':
+	case 'r':
+	case 't':
+	case 'v':
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		sfputc(op, *(s + 1));
+		return;
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+		sfputc(op, *++s);
+		sfputc(op, *++s);
+		sfputc(op, *++s);
+		return;
+	}
+	sfprintf(op, "%03o", *v);
 }
 
-static char*
-Cform(State_t* state, unsigned char* u, char* buf, size_t siz)
+static void
+Cform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 {
 	unsigned char*	v;
 	char*		s;
 	wchar_t		w;
 	int		i;
 	int		j;
+	char		buf[2];
 
 	if (state->mb)
 	{
 		state->mb--;
-		return "**";
+		sfputc(op, ' ');
+		sfputc(op, '*');
+		sfputc(op, '*');
+		return;
 	}
-	switch (buf[0] = *u)
+	switch (*u)
 	{
 	case 0:
-		return "\\0";
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		sfputc(op, '0');
+		return;
 	case '\\':
-		return "\\";
+		sfputc(op, ' ');
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		return;
 	}
-	v = u;
+	buf[0] = *(v = u);
 	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
 	{
-		if (i >= siz)
-			i = siz - 1;
 		state->mb = i - 1;
-		s = buf;
 		for (j = 3 - mbwidth(w); j > 0; j--)
-			*s++ = ' ';
+			sfputc(op, ' ');
 		while (i--)
-			*s++ = *v++;
-		i = state->mb;
-		*s = 0;
-		return buf;
+			sfputc(op, *v++);
+		return;
 	}
 	buf[1] = 0;
 	s = fmtesc(buf);
-	if (*s == '\\' && !isalpha(*(s + 1)))
-		s++;
-	return s;
+	if (*s != '\\')
+	{
+		sfputc(op, ' ');
+		sfputc(op, ' ');
+		sfputc(op, *s);
+		return;
+	}
+	if (isdigit(*(s + 1)))
+	{
+		sfputc(op, *++s);
+		sfputc(op, *++s);
+		sfputc(op, *++s);
+		return;
+	}
+	sfputc(op, ' ');
+	sfputc(op, '\\');
+	sfputc(op, *(s + 1));
 }
 
-static char*
-mform(State_t* state, unsigned char* u, char* buf, size_t siz)
+static void
+mform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 {
-	register char*	s;
+	register char*		s;
+	char			buf[2];
 
 	switch (buf[0] = ccmapchr(state->map, *u))
 	{
 	case 0:
-		return "00";
+		sfputc(op, '0');
+		sfputc(op, '0');
+		return;
 	case '\\':
-		return "\\";
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		return;
 	}
 	buf[1] = 0;
 	s = fmtesc(buf);
-	if (*s == '\\' && isdigit(*(s + 1)))
-		sfsprintf(s, 4, "%02lx", strtol(s + 1, NiL, 8));
-	return s;
+	if (*s != '\\')
+	{
+		sfputc(op, ' ');
+		sfputc(op, *s);
+		return;
+	}
+	if (isdigit(*(s + 1)))
+		sfprintf(op, "%02lx", strtol(s + 1, NiL, 8));
+	else
+	{
+		sfputc(op, '\\');
+		sfputc(op, *(s + 1));
+	}
 }
 
-static char*
-Oform(State_t* state, unsigned char* u, char* buf, size_t siz)
+static void
+Oform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 {
 	unsigned char*	v;
 	char*		s;
 	wchar_t		w;
 	int		i;
 	int		j;
+	char		buf[2];
 
 	if (state->mb)
 	{
 		state->mb--;
-		return "**";
+		sfputc(op, ' ');
+		sfputc(op, '*');
+		sfputc(op, '*');
+		return;
 	}
-	switch (buf[0] = *u)
+	switch (*u)
 	{
 	case 0:
-		return "\\0";
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		sfputc(op, '0');
+		return;
 	case '\\':
-		return "\\";
+		sfputc(op, ' ');
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		return;
 	}
-	v = u;
+	buf[0] = *(v = u);
 	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
 	{
-		if (i >= siz)
-			i = siz - 1;
 		state->mb = i - 1;
-		s = buf;
 		for (j = 3 - mbwidth(w); j > 0; j--)
-			*s++ = ' ';
+			sfputc(op, ' ');
 		while (i--)
-			*s++ = *v++;
-		i = state->mb;
-		*s = 0;
-		return buf;
+			sfputc(op, *v++);
+		return;
 	}
 	buf[1] = 0;
 	s = fmtesc(buf);
@@ -483,30 +564,38 @@ Oform(State_t* state, unsigned char* u, char* buf, size_t siz)
 	 * posix shalls are sometimes an impediment to progress
 	 */
 
-	if (*s == '\\')
-		switch (*(s + 1))
-		{
-		case 'b':
-		case 'f':
-		case 'n':
-		case 'r':
-		case 't':
-			break;
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-			s++;
-			break;
-		default:
-			sfsprintf(s = buf, siz, "%03o", *v);
-			break;
-		}
-	return s;
+	if (*s != '\\')
+	{
+		sfputc(op, ' ');
+		sfputc(op, ' ');
+		sfputc(op, *s);
+		return;
+	}
+	switch (*(s + 1))
+	{
+	case 'b':
+	case 'f':
+	case 'n':
+	case 'r':
+	case 't':
+		sfputc(op, ' ');
+		sfputc(op, '\\');
+		sfputc(op, *(s + 1));
+		return;
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+		sfputc(op, *++s);
+		sfputc(op, *++s);
+		sfputc(op, *++s);
+		return;
+	}
+	sfprintf(op, "%03o", *v);
 }
 
 static const Type_t	type[] =
@@ -516,8 +605,12 @@ static const Type_t	type[] =
 	'a',	0,	0,	aform,	csize,	 3,  0,  0,  0,  0
 },
 {
+	"hexadecimal floating point",
+	'A',	0,	0,	0,	asize,	 0,  0,  0,  0,  0
+},
+{
 	"binary character",
-	'b',	0,	0,	bform,	csize,	 8, 0,  0,  0,  0
+	'b',	0,	0,	bform,	csize,	 8,  0,  0,  0,  0
 },
 {
 	"locale character or backslash escape (\\a \\b \\f \\n \\r \\t \\v)",
@@ -533,7 +626,7 @@ static const Type_t	type[] =
 },
 {
 	"floating point",
-	'f',	0,	0,	0,	fsize,	 9,  9, 15, 24, 42
+	'f',	0,	0,	0,	fsize,	 0,  0,  0,  0,  0
 },
 {
 	"\b--map\b mapped character or hexadecimal value if not printable",
@@ -561,6 +654,85 @@ static const Type_t	type[] =
 },
 };
 
+static void
+form_int8(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, *u);
+}
+
+static void
+form_int16(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, (int16_t)swapget(state->swap, u, fp->size.external));
+}
+
+static void
+form_int32(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, (int32_t)swapget(state->swap, u, fp->size.external));
+}
+
+static void
+form_intmax(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, (intmax_t)swapget(state->swap, u, fp->size.external));
+}
+
+static void
+form_uint8(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, *u);
+}
+
+static void
+form_uint16(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, (uint16_t)swapget(state->swap, u, fp->size.external));
+}
+
+static void
+form_uint32(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, (uint32_t)swapget(state->swap, u, fp->size.external));
+}
+
+static void
+form_uintmax(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	sfprintf(op, fp->form, (uintmax_t)swapget(state->swap, u, fp->size.external));
+}
+
+static void
+form_float(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	Mem_t	mem;
+
+	swapmem(state->swap ^ int_swap, u, mem.m_char, fp->size.internal);
+	sfprintf(op, fp->form, mem.m_float);
+}
+
+static void
+form_double(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	Mem_t	mem;
+
+	swapmem(state->swap ^ int_swap, u, mem.m_char, fp->size.internal);
+	sfprintf(op, fp->form, mem.m_double);
+}
+
+#if _typ_long_double
+
+static void
+form_long_double(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
+{
+	Mem_t	mem;
+
+	swapmem(state->swap ^ int_swap, u, mem.m_char, fp->size.internal);
+	sfprintf(op, fp->form, mem.m_long_double);
+}
+
+#endif
+
 /*
  * add format type t to the format list
  */
@@ -573,10 +745,14 @@ format(State_t* state, register char* t)
 	register const Size_t*	zp;
 	register Format_t*	fp;
 	const Size_t*		xp;
+	uintmax_t		m;
+	int			prec;
+	int			base;
 	int			n;
 	int			i;
 	char*			e;
 	char*			s;
+	char			dig[256];
 
 	while (c = *t++)
 	{
@@ -620,7 +796,7 @@ format(State_t* state, register char* t)
 					error(2, "%c: invalid size for type %c", c, tp->name);
 					return;
 				}
-				if (!(zp = xp) || tp->size == fsize)
+				if (!(zp = xp) || zp->exponent)
 				{
 					error(2, "%d: invalid size for type %c", n, tp->name);
 					return;
@@ -662,18 +838,34 @@ format(State_t* state, register char* t)
 		else
 			state->form = state->last = fp;
 		fp->type = tp;
-		fp->fp = tp->size == fsize;
 		fp->us = tp->name != 'd';
 		fp->size.internal = zp->size;
 		fp->size.external = n ? n : zp->size;
 		if (state->size < fp->size.external)
 			state->size = fp->size.external;
-		fp->width = tp->width[i = WIDTHINDEX(fp->size.internal)];
-		if (n > 1 && (n & (n - 1)))
+		if (zp->exponent)
 		{
-			c = (1 << i) - n;
-			n = (1 << i) - (1 << (i - 1));
-			fp->width -= ((fp->width - tp->width[i - 1] + n - 1) / n) * c;
+			if (zp->map == 'a')
+			{
+				for (m = 0, i = zp->digits; i-- > 0; m = m * 10 + 9);
+				prec = sfsprintf(dig, sizeof(dig), "%I*x", sizeof(m), m);
+			}
+			else
+				prec = zp->digits;
+			base = sfsprintf(dig, sizeof(dig), "%u", zp->exponent);
+			fp->width = zp->prefix + prec + base + 2;
+		}
+		else
+		{
+			fp->width = tp->width[i = WIDTHINDEX(fp->size.internal)];
+			if (n > 1 && (n & (n - 1)))
+			{
+				c = (1 << i) - n;
+				n = (1 << i) - (1 << (i - 1));
+				fp->width -= ((fp->width - tp->width[i - 1] + n - 1) / n) * c;
+			}
+			prec = 0;
+			base = 0;
 		}
 		if (!(fp->fun = tp->fun))
 		{
@@ -683,12 +875,58 @@ format(State_t* state, register char* t)
 				while (*e = *s++)
 					e++;
 			e += sfsprintf(e, sizeof(fp->form) - (e - fp->form), "%d", fp->width);
-			if (c = zp->prec)
-				e += sfsprintf(e, sizeof(fp->form) - (e - fp->form), ".%d", c);
+			if (prec)
+				e += sfsprintf(e, sizeof(fp->form) - (e - fp->form), ".%d", prec);
+			if (base)
+				e += sfsprintf(e, sizeof(fp->form) - (e - fp->form), "%s.%d", prec ? "" : ".", base);
 			if (s = (char*)zp->qual)
 				while (*e = *s++)
 					e++;
 			*e = zp->map ? zp->map : tp->name;
+			if (zp->exponent)
+			{
+#if _typ_long_double
+				if (fp->size.internal == sizeof(long double))
+					fp->fun = form_long_double;
+				else
+#endif
+				if (fp->size.internal == sizeof(double))
+					fp->fun = form_double;
+				else
+					fp->fun = form_float;
+			}
+			else if (fp->us)
+				switch (fp->size.internal)
+				{
+				case 1:
+					fp->fun = form_uint8;
+					break;
+				case 2:
+					fp->fun = form_uint16;
+					break;
+				case 4:
+					fp->fun = form_uint32;
+					break;
+				default:
+					fp->fun = form_uintmax;
+					break;
+				}
+			else
+				switch (fp->size.internal)
+				{
+				case 1:
+					fp->fun = form_int8;
+					break;
+				case 2:
+					fp->fun = form_int16;
+					break;
+				case 4:
+					fp->fun = form_int32;
+					break;
+				default:
+					fp->fun = form_intmax;
+					break;
+				}
 		}
 	}
 }
@@ -770,22 +1008,12 @@ init(State_t* state, char*** p)
 }
 
 static int
-block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base, char* buf, size_t siz)
+block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base)
 {
 	register Format_t*	fp;
 	register unsigned char*	u;
-	register char*		f;
+	register ssize_t	z;
 	unsigned long		n;
-	intmax_t		x;
-	union
-	{
-	char			m_char[sizeof(intmax_t) + sizeof(double_max)];
-	float			m_float;
-	double			m_double;
-#if _typ_long_double
-	long double		m_long_double;
-#endif
-	}			mem;
 
 	if (!state->verbose)
 	{
@@ -812,62 +1040,10 @@ block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base, char* buf, 
 		u = (unsigned char*)bp;
 		for (;;)
 		{
-			if (fp->fun)
-				f = (*fp->fun)(state, u, buf, siz);
-			else
-			{
-				f = buf;
-				if (fp->fp)
-				{
-					swapmem(state->swap ^ int_swap, u, mem.m_char, fp->size.internal);
-#if _typ_long_double
-					if (fp->size.internal == sizeof(long double))
-						sfsprintf(f, siz, fp->form, mem.m_long_double);
-					else
-#endif
-					if (fp->size.internal == sizeof(double))
-						sfsprintf(f, siz, fp->form, mem.m_double);
-					else
-						sfsprintf(f, siz, fp->form, mem.m_float);
-				}
-				else
-				{
-					x = swapget(state->swap, u, fp->size.external);
-					if (fp->us)
-						switch (fp->size.internal)
-						{
-						case 1:
-							sfsprintf(f, siz, fp->form, (uint8_t)x);
-							break;
-						case 2:
-							sfsprintf(f, siz, fp->form, (uint16_t)x);
-							break;
-						case 4:
-							sfsprintf(f, siz, fp->form, (uint32_t)x);
-							break;
-						default:
-							sfsprintf(f, siz, fp->form, (uintmax_t)x);
-							break;
-						}
-					else
-						switch (fp->size.internal)
-						{
-						case 1:
-							sfsprintf(f, siz, fp->form, (int8_t)x);
-							break;
-						case 2:
-							sfsprintf(f, siz, fp->form, (int16_t)x);
-							break;
-						case 4:
-							sfsprintf(f, siz, fp->form, (int32_t)x);
-							break;
-						default:
-							sfsprintf(f, siz, fp->form, (intmax_t)x);
-							break;
-						}
-				}
-			}
-			sfprintf(op, "%*s", state->width * fp->size.external / state->size, f);
+			z = fp->per - fp->width;
+			while (z-- > 0)
+				sfputc(op, ' ');
+			(*fp->fun)(state, fp, op, u);
 			if ((u += fp->size.external) < (unsigned char*)ep)
 				sfputc(op, ' ');
 			else
@@ -912,8 +1088,6 @@ block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base, char* buf, 
 				sfputc(op, '\n');
 				break;
 			}
-			if (sferror(op))
-				return -1;
 		}
 		if (sferror(op))
 			return -1;
@@ -933,7 +1107,6 @@ od(State_t* state, char** files)
 	size_t		n;
 	size_t		m;
 	ssize_t		r;
-	char		tmp[256];
 
 	if (!(ip = init(state, &files)))
 		return 0;
@@ -999,7 +1172,7 @@ od(State_t* state, char** files)
 			state->eob = (unsigned char*)span;
 			if ((m = span - state->span) > state->block)
 				m = state->block;
-			if (block(state, sfstdout, state->span, state->span + m, state->offset, tmp, sizeof(tmp)))
+			if (block(state, sfstdout, state->span, state->span + m, state->offset))
 				goto bad;
 			state->offset += m;
 			if (!state->verbose)
@@ -1051,7 +1224,7 @@ od(State_t* state, char** files)
 			{
 				do
 				{
-					if (block(state, sfstdout, s, s + state->block, state->offset, tmp, sizeof(tmp)))
+					if (block(state, sfstdout, s, s + state->block, state->offset))
 						goto bad;
 					state->offset += state->block;
 					state->dup.data = s;
@@ -1346,6 +1519,8 @@ b_od(int argc, char** argv, void* context)
 	for (fp = state.form; fp; fp = fp->next)
 		if ((n = (state.size / fp->size.external) * (fp->width + 1) - 1) > state.width)
 			state.width = n;
+	for (fp = state.form; fp; fp = fp->next)
+		fp->per = state.width * fp->size.external / state.size;
 	n = LINE_LENGTH - state.printable;
 	if (*state.base)
 		n -= (BASE_WIDTH + 1);

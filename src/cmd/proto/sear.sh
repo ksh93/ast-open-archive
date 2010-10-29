@@ -34,7 +34,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2010-09-10 $
+@(#)$Id: sear (AT&T Labs Research) 2010-10-10 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -198,4 +198,5 @@ fi
 if	[[ -f "$out.manifest" ]]
 then	rm -f "$out.manifest"
 fi
+files=0
 pax -x tgz -w "$@" >> "$out"

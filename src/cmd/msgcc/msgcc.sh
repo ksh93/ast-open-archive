@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#           Copyright (c) 2000-2006 AT&T Knowledge Ventures            #
+#          Copyright (c) 2000-2010 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                      by AT&T Knowledge Ventures                      #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -28,7 +28,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $__command__"
 	USAGE=$'
 [-?
-@(#)$Id: msgcc (AT&T Labs Research) 2002-09-15 $
+@(#)$Id: msgcc (AT&T Labs Research) 2010-10-20 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?msgcc - C language message catalog compiler]
@@ -52,12 +52,12 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 		an unused message number.]
 	[+set=\anumber\a?Set the message set number to \anumber\a. The default
 		is \b1\b.]
-	[+similar=\anumber\a?The message text similarity measure thresshold.
+	[+similar=\anumber\a?The message text similarity measure threshold.
 		The similarity measure between \aold\a and \anew\a message
 		text is 100*(2*gzip(\aold\a+\anew\a)/(gzip(\aold\a)+gzip(\anew\a))-1),
 		where gzip(\ax\a) is the size of text \ax\a when compressed by
-		\bgzip\b(1). The default threshhold is '$__similar__$'. A
-		threshhold of \b0\b turns off message replacement, but unused
+		\bgzip\b(1). The default threshold is '$__similar__$'. A
+		threshold of \b0\b turns off message replacement, but unused
 		old messages are still deleted. Use \b-M-preserve\b to preserve
 		all old messages.]
 	[+verbose?Trace similar message replacements on the standard error.]
@@ -170,8 +170,12 @@ do	case $# in
 	esac
 	shift
 done
-__cmdv__[__cmds__]=${__out__%.msg}
-(( __cmds__++ ))
+__arg__=${__out__##*/}
+__arg__=${__arg__%.msg}
+if	[[ -x $__arg__ ]]
+then	__cmdv__[__cmds__]=$__arg__
+	(( __cmds__++ ))
+fi
 
 # generate the .mso files
 
@@ -249,6 +253,7 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 	print -r -- '$set'" $__set__"
 	print -r -- '$quote "'
 	sort -u "${__objv__[@]}" | {
+		__raw__=
 		while	read -r __line__
 		do	__op__=${__line__%% *}
 			__line__=${__line__#* }
@@ -264,6 +269,8 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 				eval $__a1__='$'__a2__
 				;;
 			str)	print -r -- "$__line__"
+				;;
+			raw)	__raw__=$__raw__$'\n'$__line__
 				;;
 			var)	__a1__=${__line__%% *}
 				__a2__=${__line__#* }
@@ -289,10 +296,13 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 		for (( __i__=0; __i__ < __cmds__; __i__++ ))
 		do	keys ${__cmdv__[__i__]}
 		done
+		[[ $__raw__ ]] && print -r "${__raw__#?}" | sed -e 's/^"//' -e 's/"$//' -e 's/\\/&&/g' -e 's/"/\\"/g' -e 's/.*/$RAW$"&"/'
 	} | {
 		__num__=1
 		while	read -r __line__
 		do	case $__line__ in
+			'$RAW$'*)
+				;;
 			'$'[\ \	]*)
 				print -r -- "$__line__"
 				continue
@@ -301,30 +311,32 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 				continue
 				;;
 			*[[:alpha:]][[:alpha:]]*)
-				__line__=${__line__#*'"'}
-				__line__=${__line__%'"'}
-				if	[[ $__line__ ]]
-				then	if	[[ ${__index__["$__line__"]} ]]
-					then	if [[ ! $__preserve__ ]]
-						then	__num__=${__index__["$__line__"]}
-							__keep__[$__num__]=1
-						fi
-					else	while	 [[ ${__text__[$__num__]} ]]
-						do	(( __num__++ ))
-						done
-						if	(( __max__ < __num__ ))
-						then	(( __max__=__num__ ))
-						fi
-						if	[[ ! $__preserve__ ]]
-						then	 __keep__[$__num__]=1
-						fi
-						__text__[$__num__]=$__line__
-						__index__["$__line__"]=$__num__
-						(( __num__++ ))
-					fi
-				fi
+				;;
+			*)	continue
 				;;
 			esac
+			__line__=${__line__#*'"'}
+			__line__=${__line__%'"'}
+			if	[[ $__line__ ]]
+			then	if	[[ ${__index__["$__line__"]} ]]
+				then	if [[ ! $__preserve__ ]]
+					then	__num__=${__index__["$__line__"]}
+						__keep__[$__num__]=1
+					fi
+				else	while	 [[ ${__text__[$__num__]} ]]
+					do	(( __num__++ ))
+					done
+					if	(( __max__ < __num__ ))
+					then	(( __max__=__num__ ))
+					fi
+					if	[[ ! $__preserve__ ]]
+					then	 __keep__[$__num__]=1
+					fi
+					__text__[$__num__]=$__line__
+					__index__["$__line__"]=$__num__
+					(( __num__++ ))
+				fi
+			fi
 		done
 		if	(( __max__ < __num__ ))
 		then	(( __max__=__num__ ))

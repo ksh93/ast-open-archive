@@ -1,3 +1,4 @@
+10-10-20 msgcc.sh: add raw type (like str) for ksh -D style strings
 10-06-01 sync with ast api 20100601
 06-11-15 msgcc.sh: date -f x => date +x for ast-base portability
 06-10-11 add sfstruse() error checks

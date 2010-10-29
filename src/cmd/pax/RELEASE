@@ -1,3 +1,4 @@
+10-10-10 file.c: don't prune state.update dirs based on time -- doh
 10-10-04 pax.c,misc.c: fix --meter off-by-one bugs for long paths
 10-10-04 pax.c: add #updated files to --update --verbose summary
 10-10-04 pax.c: --meter implies --verbose summary
@@ -19,7 +20,7 @@
 08-12-31 pax.c,pax-vczip.c: add vczip compression format
 08-05-08 pax.tst: handle systems with privileged chmod +t / mkfifo
 08-05-01 pax-tar.c: handle sfsprintf() '\0'
-07-12-11 delta2patch.sh: dro pax -v, add pax --nosummary
+07-12-11 delta2patch.sh: drop pax -v, add pax --nosummary
 07-12-06 delta2patch.sh: add
 07-09-21 format.c: add sumprint() default scale arg
 07-05-01 pax-tar.c,options.c: fix pax extended header for >=2**32 size

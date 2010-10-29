@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-06-21 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-10-20 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2326,17 +2326,24 @@ RECURSEROOT = .
 			T += $(L)
 		end
 	end
+	N = 0
 	for L $(A:H=O)
-		if L == "+l*"
-			if ! "$(T:N=$(L))" && ! "$(R:N=$(L))"
-				D := $(L:/+/-/)
-				if "$(R:N=$(D))" || ! "$(-all-static)" && "$(CC.STDLIB:N=$(D:T=F:P=D))" && "$(.PACKAGE.$(L:/+l//).library)" != "+l"
-					L := $(D)
+		if L == "}"
+			let N = N + 1
+		elif L == "{"
+			let N = N - 1
+		else
+			if L == "+l*"
+				if ! "$(T:N=$(L))" && ! "$(R:N=$(L))"
+					D := $(L:/+/-/)
+					if "$(R:N=$(D))" || ! "$(-all-static)" && "$(CC.STDLIB:N=$(D:T=F:P=D))" && "$(.PACKAGE.$(L:/+l//).library)" != "+l"
+						L := $(D)
+					end
 				end
 			end
-		end
-		if L != "$(M)" || ! "$(R:N=$(L))"
-			R += $(L)
+			if L != "$(M)" || ! "$(R:N=$(L))" || N <= 1 && "$(T:N=$(L))"
+				R += $(L)
+			end
 		end
 	end
 	return $(S:T=F) $(R:H=O:T=F)

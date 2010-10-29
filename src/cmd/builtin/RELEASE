@@ -1,3 +1,4 @@
+10-10-19 od.c: speed up inner loop
 10-09-15 od.c: fix (unsigned char*) (char*) mismatches
 10-09-08 tr.c: handle tr abc '[%*]xyz'
 10-08-04 dlls.c: add -l to list plugin version stamps

@@ -14,12 +14,22 @@ TEST 01 basics
 		ERROR -
 		EXIT 0
 
+	EXEC	a b
+		ERROR - 'ln: b: cannot replace existing file'
+		EXIT 1
+
+	EXEC	-f a b
+		ERROR -
+		EXIT 0
+
 	EXEC	-s c d
 
 	EXEC	-s c d
-		INPUT c ccc
 		ERROR - 'ln: d: cannot replace existing file'
 		EXIT 1
+
+	EXEC	-s c d
+		INPUT c ccc
 
 	EXEC	-f -s c d
 		OUTPUT d ccc

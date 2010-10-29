@@ -1,9 +1,14 @@
 /*
- * win32 specific makerules
+ * win32 specific makerules 2010-10-10
  */
 
 .INSTALL.libast.a = .
 .INSTALL.libast-g.a = .
+
+MKADMIN = $(ETCDIR)/mkadmin
+MKADMINFLAGS =
+
+(MKADMIN) (MKADMINFLAGS) : .PARAMETER
 
 PACKAGE_LOCAL =
 

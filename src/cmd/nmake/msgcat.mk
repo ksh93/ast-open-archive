@@ -81,7 +81,7 @@ $(MSGCATDIR)/%.mso : %.cpp (MSGCC) (MSGCCFLAGS)
 	$(MSGCC) $(MSGCCFLAGS) $(CPPFLAGS) -c $(>) -o $(<)
 
 $(MSGCATDIR)/%.mso : %.sh
-	$(SHELL) -D $(>) | sed -e 's,^,str ,' > $(<)
+	$(SHELL) -D $(>) | sed -e 's,^,raw ,' > $(<)
 
 $(MSGCATDIR)/%.mso : %.key
 	if	test -x $(>)
