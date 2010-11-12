@@ -291,7 +291,7 @@ BZ_EXTERN void BZ_API(bzReadClose) (
 BZ_EXTERN void BZ_API(bzReadGetUnused) ( 
       int*    bzerror, 
       BZFILE* b, 
-      void**  unused,  
+      void*   vUnused,  
       int*    nUnused 
    );
 

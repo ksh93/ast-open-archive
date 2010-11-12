@@ -357,7 +357,8 @@ Tk_NameOfColor(colorPtr)
 
     if ((tkColPtr->magic == COLOR_MAGIC)
 	    && (tkColPtr->tablePtr == &nameTable)) {
-	return ((NameKey *) tkColPtr->hashPtr->key.words)->name;
+        void *ptr = tkColPtr->hashPtr->key.words;
+	return ((NameKey *) ptr)->name;
     }
     sprintf(string, "#%04x%04x%04x", colorPtr->red, colorPtr->green,
 	    colorPtr->blue);

@@ -93,7 +93,22 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-10-26  --- Release ksh93u  ---
+10-11-12  --- Release ksh93u  ---
+10-11-12  The sequences \< and \> are now preserved after patterns contaning
+	  ~(E) in ${var/pattern/string} expansions.
+10-11-11  A bug in typeset -m when the variables were compound arrary instances
+	  has been fixed.
+10-11-10  A bug in output of a compound variable with types containing types
+	  has been fixed.
+10-11-10  Fixed ``name=value export [-p]'' to list environment.
+10-11-09  shtests resets SIGPIPE to SIG_DFL for all tests.
+10-11-09  Fixed a bug in expansion of $"..." when used in assignments.
+10-11-09  Fixed a getaddrinfo() memory leak that didn't call freeaddrinfo()
+	  after an interrupt.
+10-11-08  Modified the behavior of set -u so that the shell terminates with
+	  error message when when var is unset with ${!var} and ${#var}.
+10-11-02  Fix a bug in which a signal received while in a subshell could be
+	  ignored.
 10-10-26  Fix a bug where terminal interrupt was ignored while in vi/emacs
 	  edit search mode.
 10-10-26  Fix $'a\0b'c to expand to 'ac'.
@@ -3548,6 +3563,9 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+10-11-12 Makerules.mk: add .MAM.STATE.VARS. for FOO=BAR => -DFOO=BAR in mamake!
+10-11-12 command.c: fix .AFTER .FORCE .REPEAT infinite loop -- wow
+10-11-10 object.c: fix old_header.version puns for strict-aliasing
 10-10-20 Makerules.mk: fix .SHARED.LIST. to honor top level .MULTIPLE
 10-10-20 msgcat.mk: ksh -D strings => raw string
 10-08-24 bind.c: glob_diropen() gs->name absolute path
@@ -4933,6 +4951,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+10-11-03 od.c: use is[w]print() for printable char check
 10-10-19 od.c: speed up inner loop
 10-09-15 od.c: fix (unsigned char*) (char*) mismatches
 10-09-08 tr.c: handle tr abc '[%*]xyz'
@@ -5176,6 +5195,7 @@ All recorded changes follow.
 
 :::::::: flat ::::::::
 
+10-11-12 flat.c: eliminate strict-aliasing puns
 08-08-30 flat.c: work around macos cc struct copy bug
 07-06-05 flat.c: <COUNT>*</> => <COUNT>0</> => 0 or more
 07-01-17 flat.c: don't sfsetbuf() on an active stream!
@@ -6254,6 +6274,8 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-11-12 tm/tmlocale.c: ast TM_* extensions default to C locale
+10-11-10 regex/regnexec.c,vmalloc/vmstat.c: eliminate strict-aliasing puns
 10-10-20 misc/translate.c: change debug translation to drop " in (a,b,c,"d")
 10-10-10 misc/glob.c: drop ancient D_FILENO(d)!=0 test and trust readdir()
 10-10-06 misc/translate.c: fix "debug" locale logic
@@ -8493,6 +8515,7 @@ All recorded changes follow.
 
 :::::::: libbz ::::::::
 
+10-11-08 bzlib.[ch]: change bzReadGetUnused 3rd arg to void* for strict aliasing
 09-04-15 bzlib.c: add bzfopen()
 03-05-13 sfdcbzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
 02-02-14 blocksort.c: drop -O for msvc
@@ -9562,6 +9585,7 @@ All recorded changes follow.
 
 :::::::: libtk ::::::::
 
+10-11-12 eliminate strict-aliasing puns
 10-06-01 sync with ast api 20100601
 
 :::::::: libvcodex ::::::::

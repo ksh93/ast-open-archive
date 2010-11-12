@@ -1230,9 +1230,10 @@ int BZ_API(bzRead)
 void BZ_API(bzReadGetUnused) 
                      ( int*    bzerror, 
                        BZFILE* b, 
-                       void**  unused, 
+                       void*   vUnused, 
                        int*    nUnused )
 {
+   void** unused = (void*)vUnused;
    bzFile* bzf = (bzFile*)b;
    if (bzf == NULL)
       { BZ_SETERR(BZ_PARAM_ERROR); return; };

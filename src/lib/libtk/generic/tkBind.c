@@ -2777,7 +2777,11 @@ HandleEventGenerate(interp, tkwin, argc, argv)
     unsigned long eventMask;
     int count, i, state, flags, synch;
     Tcl_QueuePosition pos;
-    XEvent event;    
+    union
+    {
+    XEvent		E;    
+    XVirtualEvent	V;
+    } event;
 
     tkwin = Tk_NameToWindow(interp, argv[0], tkwin);
     if (tkwin == NULL) {
@@ -2804,15 +2808,15 @@ HandleEventGenerate(interp, tkwin, argc, argv)
     }
 
     memset((VOID *) &event, 0, sizeof(event));
-    event.xany.type = pat.eventType;
-    event.xany.serial = NextRequest(Tk_Display(tkwin));
-    event.xany.send_event = False;
-    event.xany.window = Tk_WindowId(tkwin);
-    event.xany.display = Tk_Display(tkwin);
+    event.E.xany.type = pat.eventType;
+    event.E.xany.serial = NextRequest(Tk_Display(tkwin));
+    event.E.xany.send_event = False;
+    event.E.xany.window = Tk_WindowId(tkwin);
+    event.E.xany.display = Tk_Display(tkwin);
 
-    flags = flagArray[event.xany.type];
+    flags = flagArray[event.E.xany.type];
     if (flags & (KEY_BUTTON_MOTION_VIRTUAL)) {
-	event.xkey.state = pat.needMods;
+	event.E.xkey.state = pat.needMods;
 	if (flags & KEY) {
 	    /*
 	     * When mapping from a keysym to a keycode, need information about
@@ -2822,34 +2826,34 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 	     */
 
 	    if (pat.detail.keySym == NoSymbol) {
-	        event.xkey.keycode = 0;
+	        event.E.xkey.keycode = 0;
 	    } else {
-		event.xkey.keycode = XKeysymToKeycode(event.xany.display,
+		event.E.xkey.keycode = XKeysymToKeycode(event.E.xany.display,
 			pat.detail.keySym);
 	    }
-	    if (event.xkey.keycode != 0) {
+	    if (event.E.xkey.keycode != 0) {
 		for (state = 0; state < 4; state++) {
-		    if (XKeycodeToKeysym(event.xany.display,
-			    event.xkey.keycode, state) == pat.detail.keySym) {
+		    if (XKeycodeToKeysym(event.E.xany.display,
+			    event.E.xkey.keycode, state) == pat.detail.keySym) {
 			if (state & 1) {
-			    event.xkey.state |= ShiftMask;
+			    event.E.xkey.state |= ShiftMask;
 			}
 			if (state & 2) {
 			    TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr; 
-			    event.xkey.state |= dispPtr->modeModMask;
+			    event.E.xkey.state |= dispPtr->modeModMask;
 			}
 			break;
 		    }
 		}
 	    }
 	} else if (flags & BUTTON) {
-	    event.xbutton.button = pat.detail.button;
+	    event.E.xbutton.button = pat.detail.button;
 	} else if (flags & VIRTUAL) {
-	    ((XVirtualEvent *) &event)->name = pat.detail.name;
+	    event.V.name = pat.detail.name;
 	}
     }
     if (flags & (CREATE|DESTROY|UNMAP|MAP|REPARENT|CONFIG|GRAVITY|CIRC)) {
-	event.xcreatewindow.window = event.xany.window;
+	event.E.xcreatewindow.window = event.E.xany.window;
     }
 
     /*
@@ -2896,7 +2900,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & CONFIG) {
-		event.xconfigure.above = number;
+		event.E.xconfigure.above = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2905,7 +2909,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & (CREATE|CONFIG)) {
-		event.xcreatewindow.border_width = number;
+		event.E.xcreatewindow.border_width = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2914,7 +2918,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & BUTTON) {
-	        event.xbutton.button = number;
+	        event.E.xbutton.button = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2923,7 +2927,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & EXPOSE) {
-		event.xexpose.count = number;
+		event.E.xexpose.count = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2933,9 +2937,9 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & FOCUS) {
-		event.xfocus.detail = number;
+		event.E.xfocus.detail = number;
 	    } else if (flags & CROSSING) {
-		event.xcrossing.detail = number;
+		event.E.xcrossing.detail = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2944,7 +2948,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & CROSSING) {
-		event.xcrossing.focus = number;
+		event.E.xcrossing.focus = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2953,9 +2957,9 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & EXPOSE) {
-		 event.xexpose.height = number;
+		 event.E.xexpose.height = number;
 	    } else if (flags & CONFIG) {
-		event.xconfigure.height = number;
+		event.E.xconfigure.height = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2964,7 +2968,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & KEY) {
-	        event.xkey.keycode = number;
+	        event.E.xkey.keycode = number;
 	    } else {
 		goto badopt;
 	    }
@@ -2982,27 +2986,27 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 	     * get back the original keysym.  
 	     */
 
-	    number = XKeysymToKeycode(event.xany.display, keysym);
+	    number = XKeysymToKeycode(event.E.xany.display, keysym);
 	    if (number == 0) {
 		Tcl_AppendResult(interp, "no keycode for keysym \"", value,
 			"\"", (char *) NULL);
 		return TCL_ERROR;
 	    }
 	    for (state = 0; state < 4; state++) {
-		if (XKeycodeToKeysym(event.xany.display, (unsigned) number,
+		if (XKeycodeToKeysym(event.E.xany.display, (unsigned) number,
 			state) == keysym) {
 		    if (state & 1) {
-			event.xkey.state |= ShiftMask;
+			event.E.xkey.state |= ShiftMask;
 		    }
 		    if (state & 2) {
 			TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr; 
-			event.xkey.state |= dispPtr->modeModMask;
+			event.E.xkey.state |= dispPtr->modeModMask;
 		    }
 		    break;
 		}
 	    }	    
 	    if (flags & KEY) {
-		event.xkey.keycode = number;
+		event.E.xkey.keycode = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3012,9 +3016,9 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & CROSSING) {
-		event.xcrossing.mode = number;
+		event.E.xcrossing.mode = number;
 	    } else if (flags & FOCUS) {
-		event.xfocus.mode = number;
+		event.E.xfocus.mode = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3023,13 +3027,13 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & CREATE) {
-		event.xcreatewindow.override_redirect = number;
+		event.E.xcreatewindow.override_redirect = number;
 	    } else if (flags & MAP) {
-		event.xmap.override_redirect = number;
+		event.E.xmap.override_redirect = number;
 	    } else if (flags & REPARENT) {
-		event.xreparent.override_redirect = number;
+		event.E.xreparent.override_redirect = number;
 	    } else if (flags & CONFIG) {
-		event.xconfigure.override_redirect = number;
+		event.E.xconfigure.override_redirect = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3039,7 +3043,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & CIRC) {
-		event.xcirculate.place = number;
+		event.E.xcirculate.place = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3054,7 +3058,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {
-		event.xkey.root = number;
+		event.E.xkey.root = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3063,7 +3067,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {
-		event.xkey.x_root = number;
+		event.E.xkey.x_root = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3072,7 +3076,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {
-		event.xkey.y_root = number;
+		event.E.xkey.y_root = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3080,28 +3084,28 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 	    if (Tcl_GetBoolean(interp, value, &number) != TCL_OK) {
 		return TCL_ERROR;
 	    }
-	    event.xany.send_event = number;
+	    event.E.xany.send_event = number;
 	} else if (strcmp(field, "-serial") == 0) {
 	    if (Tcl_GetInt(interp, value, &number) != TCL_OK) {
 		return TCL_ERROR;
 	    }
-	    event.xany.serial = number;
+	    event.E.xany.serial = number;
 	} else if (strcmp(field, "-state") == 0) {
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {
 		if (Tcl_GetInt(interp, value, &number) != TCL_OK) {
 		    return TCL_ERROR;
 		}
 		if (flags & (KEY_BUTTON_MOTION_VIRTUAL)) {
-		    event.xkey.state = number;
+		    event.E.xkey.state = number;
 		} else {
-		    event.xcrossing.state = number;
+		    event.E.xcrossing.state = number;
 		}
 	    } else if (flags & VISIBILITY) {
 		number = TkFindStateNum(interp, field, visNotify, value);
 		if (number < 0) {
 		    return TCL_ERROR;
 		}
-		event.xvisibility.state = number;
+		event.E.xvisibility.state = number;
 	    } else {
 		goto badopt;
 	    }	    
@@ -3116,7 +3120,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {
-		event.xkey.subwindow = number;
+		event.E.xkey.subwindow = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3125,9 +3129,9 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {
-		event.xkey.time = (Time) number;
+		event.E.xkey.time = (Time) number;
 	    } else if (flags & PROP) {
-		event.xproperty.time = (Time) number;
+		event.E.xproperty.time = (Time) number;
 	    } else {
 		goto badopt;
 	    }
@@ -3136,9 +3140,9 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (flags & EXPOSE) {
-		event.xexpose.width = number;
+		event.E.xexpose.width = number;
 	    } else if (flags & (CREATE|CONFIG)) {
-		event.xcreatewindow.width = number;
+		event.E.xcreatewindow.width = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3154,7 +3158,7 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 	    }
 	    if (flags & (CREATE|DESTROY|UNMAP|MAP|REPARENT|CONFIG
 		    |GRAVITY|CIRC)) {
-		event.xcreatewindow.window = number;
+		event.E.xcreatewindow.window = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3166,14 +3170,14 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 	    Tk_GetRootCoords(tkwin, &rootX, &rootY);
 	    rootX += number;
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {	
-		event.xkey.x = number;
-		event.xkey.x_root = rootX;
+		event.E.xkey.x = number;
+		event.E.xkey.x_root = rootX;
 	    } else if (flags & EXPOSE) {
-		event.xexpose.x = number;
+		event.E.xexpose.x = number;
 	    } else if (flags & (CREATE|CONFIG|GRAVITY)) { 
-		event.xcreatewindow.x = number;
+		event.E.xcreatewindow.x = number;
 	    } else if (flags & REPARENT) {		
-		event.xreparent.x = number;
+		event.E.xreparent.x = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3185,14 +3189,14 @@ HandleEventGenerate(interp, tkwin, argc, argv)
 	    Tk_GetRootCoords(tkwin, &rootX, &rootY);
 	    rootY += number;
 	    if (flags & (KEY_BUTTON_MOTION_VIRTUAL|CROSSING)) {
-		event.xkey.y = number;
-		event.xkey.y_root = rootY;
+		event.E.xkey.y = number;
+		event.E.xkey.y_root = rootY;
 	    } else if (flags & EXPOSE) {
-		event.xexpose.y = number;
+		event.E.xexpose.y = number;
 	    } else if (flags & (CREATE|CONFIG|GRAVITY)) {
-		event.xcreatewindow.y = number;
+		event.E.xcreatewindow.y = number;
 	    } else if (flags & REPARENT) {
-		event.xreparent.y = number;
+		event.E.xreparent.y = number;
 	    } else {
 		goto badopt;
 	    }
@@ -3205,9 +3209,9 @@ HandleEventGenerate(interp, tkwin, argc, argv)
     }
 
     if (synch != 0) {
-	Tk_HandleEvent(&event);
+	Tk_HandleEvent(&event.E);
     } else {
-	Tk_QueueWindowEvent(&event, pos);
+	Tk_QueueWindowEvent(&event.E, pos);
     }
     return TCL_OK;
 }

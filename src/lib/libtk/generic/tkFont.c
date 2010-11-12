@@ -233,6 +233,7 @@ Tk_NameOfFontStruct(fontStructPtr)
 {
     Tcl_HashEntry *fontHashPtr;
     TkFont *fontPtr;
+    void *ptr;
     static char string[20];
 
     if (!initialized) {
@@ -245,7 +246,8 @@ Tk_NameOfFontStruct(fontStructPtr)
 	goto printid;
     }
     fontPtr = (TkFont *) Tcl_GetHashValue(fontHashPtr);
-    return ((NameKey *) fontPtr->nameHashPtr->key.words)->name;
+    ptr = fontPtr->nameHashPtr->key.words;
+    return ((NameKey *) ptr)->name;
 }
 
 /*

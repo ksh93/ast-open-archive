@@ -464,8 +464,9 @@ Tk_NameOf3DBorder(border)
     Tk_3DBorder border;		/* Token for border. */
 {
     Border *borderPtr = (Border *) border;
+    void *ptr = borderPtr->hashPtr->key.words;
 
-    return ((BorderKey *) borderPtr->hashPtr->key.words)->colorName;
+    return ((BorderKey *) ptr)->colorName;
 }
 
 /*

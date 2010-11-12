@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-11-12
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -287,7 +287,7 @@ prev exlib.h implicit
 done exeval.c
 meta exeval.o %.c>%.o exeval.c exeval
 prev exeval.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exeval.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}   -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exeval.c
 done exeval.o generated
 make exexpr.o
 make exexpr.c

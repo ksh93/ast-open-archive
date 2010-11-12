@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-11-12
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -274,7 +274,7 @@ prev pax.h implicit
 done delta.c
 meta delta.o %.c>%.o delta.c delta
 prev delta.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c delta.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}   -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c delta.c
 done delta.o generated
 make file.o
 make file.c

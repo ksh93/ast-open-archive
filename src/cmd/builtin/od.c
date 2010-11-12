@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2010-10-19 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2010-11-03 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files in various "
@@ -136,7 +136,7 @@ USAGE_LICENSE
 #include <wchar.h>
 #include <wctype.h>
 #else
-#define iswcntrl(w)	iscntrl(w)
+#define iswprint(w)	isprint(w)
 #endif
 
 #define NEW		(1<<0)
@@ -368,7 +368,7 @@ cform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 		return;
 	}
 	buf[0] = *(v = u);
-	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
+	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswprint(w))
 	{
 		state->mb = i - 1;
 		for (j = 3 - mbwidth(w); j > 0; j--)
@@ -452,7 +452,7 @@ Cform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 		return;
 	}
 	buf[0] = *(v = u);
-	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
+	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswprint(w))
 	{
 		state->mb = i - 1;
 		for (j = 3 - mbwidth(w); j > 0; j--)
@@ -548,7 +548,7 @@ Oform(State_t* state, Format_t* fp, Sfio_t* op, unsigned char* u)
 		return;
 	}
 	buf[0] = *(v = u);
-	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswcntrl(w))
+	if ((w = mbnchar(u, state->eob - u)) > 0 && (i = u - v) > 1 && !iswprint(w))
 	{
 		state->mb = i - 1;
 		for (j = 3 - mbwidth(w); j > 0; j--)
@@ -1065,7 +1065,7 @@ block(State_t* state, Sfio_t* op, char* bp, char* ep, intmax_t base)
 								state->mbp--;
 								sfputc(op, '.');
 							}
-							else if ((v = u) && (w = mbnchar(v, state->eob - u)) > 0 && (c = v - u) > 1 && !iswcntrl(w))
+							else if ((v = u) && (w = mbnchar(v, state->eob - u)) > 0 && (c = v - u) > 1 && !iswprint(w))
 							{
 								sfwrite(op, u, c);
 								state->mbp = c - 1;

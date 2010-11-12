@@ -35,11 +35,11 @@
 #endif
 
 #define AFTER		0		/* done -- making after prereqs	*/
-#define BEFORE		01		/* done -- before after prereqs	*/
-#define BLOCKED		02		/* waiting for prereqs		*/
-#define INTERMEDIATE	03		/* waiting for parent cancel	*/
-#define READY		04		/* job ready to run		*/
-#define RUNNING		05		/* job action sent to coshell	*/
+#define BEFORE		001		/* done -- before after prereqs	*/
+#define BLOCKED		002		/* waiting for prereqs		*/
+#define INTERMEDIATE	003		/* waiting for parent cancel	*/
+#define READY		004		/* job ready to run		*/
+#define RUNNING		005		/* job action sent to coshell	*/
 
 #define PUSHED		010		/* currently push'd		*/
 #define STATUS		(~PUSHED)	/* status mask			*/
@@ -908,7 +908,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 			{
 				if ((a = p->rule)->dynamic & D_alias)
 					a = makerule(a->name);
-				if (a->status == MAKING && !a->semaphore)
+				if (!a->semaphore && a->status == MAKING)
 				{
 					job->status = AFTER;
 					return !state.coshell || cojobs(state.coshell) < state.jobs;
@@ -942,6 +942,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 	 */
 
 	discard(job);
+ again:
 	jammed = 0;
 	if (job = jobs.firstjob)
 		for (;;)
@@ -1018,7 +1019,10 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 						}
 					}
 					else if (!state.coshell || cojobs(state.coshell) < state.jobs)
+					{
 						execute(job);
+						goto again;
+					}
 				}
 				break;
 			case RUNNING:

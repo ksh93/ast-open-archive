@@ -318,6 +318,7 @@ Tk_NameOfBitmap(display, bitmap)
     IdKey idKey;
     Tcl_HashEntry *idHashPtr;
     TkBitmap *bitmapPtr;
+    void *ptr;
 
     if (!initialized) {
 	unknown:
@@ -331,7 +332,8 @@ Tk_NameOfBitmap(display, bitmap)
 	goto unknown;
     }
     bitmapPtr = (TkBitmap *) Tcl_GetHashValue(idHashPtr);
-    return ((NameKey *) bitmapPtr->hashPtr->key.words)->name;
+    ptr = bitmapPtr->hashPtr->key.words;
+    return ((NameKey *) ptr)->name;
 }
 
 /*

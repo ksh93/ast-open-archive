@@ -1,3 +1,4 @@
+10-11-08 bzlib.[ch]: change bzReadGetUnused 3rd arg to void* for strict aliasing
 09-04-15 bzlib.c: add bzfopen()
 03-05-13 sfdcbzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
 02-02-14 blocksort.c: drop -O for msvc

@@ -1409,28 +1409,37 @@ flatfopen(Dssfile_t* file, Dssdisc_t* disc)
 				sfwrite(file->io, flat->magic->string, flat->magic->length);
 			else
 			{
-				char	tmp[sizeof(intmax_t)];
+				union
+				{
+					uint8_t		u1;
+					uint16_t	u2;
+					uint32_t	u4;
+#if _typ_int64_t
+					uint64_t	u8;
+#endif
+					char		buf[sizeof(intmax_t)];
+				}	num;
 
 				switch (flat->magic->length)
 				{
 				case 1:
-					*((int8_t*)tmp) = flat->magic->number;
+					num.u1 = flat->magic->number;
 					break;
 				case 2:
-					*((int16_t*)tmp) = flat->magic->number;
+					num.u2 = flat->magic->number;
 					break;
 				case 4:
-					*((int32_t*)tmp) = flat->magic->number;
+					num.u4 = flat->magic->number;
 					break;
 #if _typ_int64_t
 				case 8:
-					*((int64_t*)tmp) = flat->magic->number;
+					num.u8 = flat->magic->number;
 					break;
 #endif
 				}
 				if (flat->magic->swap > 0)
-					swapmem(flat->magic->swap, tmp, tmp, flat->magic->length);
-				sfwrite(file->io, tmp, flat->magic->length);
+					swapmem(flat->magic->swap, num.buf, num.buf, flat->magic->length);
+				sfwrite(file->io, num.buf, flat->magic->length);
 			}
 			i = flat->magic->size - flat->magic->length;
 		}
@@ -4142,7 +4151,7 @@ Dsslib_t dss_lib_flat =
 {
 	"flat",
 	"flat method"
-	"[-1ls5Pp0?\n@(#)$Id: dss flat method (AT&T Research) 2010-05-28 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss flat method (AT&T Research) 2010-11-12 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	0,

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-11-12
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -158,7 +158,7 @@ done ${PACKAGE_ast_INCLUDE}/paxlib.h
 done rar.c
 meta rar.o %.c>%.o rar.c rar
 prev rar.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c rar.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}   -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c rar.c
 done rar.o generated
 exec - ${AR} -cr libpaxrar.a rar.o
 exec - (ranlib libpaxrar.a) >/dev/null 2>&1 || true

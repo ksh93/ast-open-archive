@@ -811,7 +811,7 @@ TEST 12 '-l prereq libs'
 		INPUT foo.req $' -lfoo -lbar'
 		INPUT bar.req $' -lbar -lfoo'
 		OUTPUT - $'+ cc -O   -c baz.c
-+ cc  -O   -o baz baz.o libfoo.a libbar.a'
++ cc  -O   -o baz baz.o libfoo.a libfoo.a libbar.a'
 
 TEST 13 'nested : scope'
 

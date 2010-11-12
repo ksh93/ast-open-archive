@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-08-24
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2010-11-12
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -246,7 +246,7 @@ prev pplib.h implicit
 done ppcall.c
 meta ppcall.o %.c>%.o ppcall.c ppcall
 prev ppcall.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcall.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${DEBUG+-DDEBUG=${DEBUG}} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcall.c
 done ppcall.o generated
 make ppcomment.o
 make ppcomment.c
@@ -296,7 +296,7 @@ done pplex.c
 done ppcpp.c
 meta ppcpp.o %.c>%.o ppcpp.c ppcpp
 prev ppcpp.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcpp.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${DEBUG+-DDEBUG=${DEBUG}} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcpp.c
 done ppcpp.o generated
 make ppdata.o
 make ppdata.c
@@ -330,7 +330,7 @@ prev pplib.h implicit
 done ppfsm.c
 meta ppfsm.o %.c>%.o ppfsm.c ppfsm
 prev ppfsm.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppfsm.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${DEBUG+-DDEBUG=${DEBUG}} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppfsm.c
 done ppfsm.o generated
 make ppincref.o
 make ppincref.c
@@ -364,7 +364,7 @@ make pplex.o
 prev pplex.c
 meta pplex.o %.c>%.o pplex.c pplex
 prev pplex.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pplex.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${DEBUG+-DDEBUG=${DEBUG}} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pplex.c
 done pplex.o generated
 make ppline.o
 make ppline.c

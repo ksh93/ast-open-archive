@@ -283,11 +283,12 @@ Tk_NameOfCursor(display, cursor)
     IdKey idKey;
     Tcl_HashEntry *idHashPtr;
     TkCursor *cursorPtr;
+    void *ptr;
     static char string[20];
 
     if (!initialized) {
 	printid:
-	sprintf(string, "cursor id 0x%x", (unsigned int) cursor);
+	sprintf(string, "cursor id %p", cursor);
 	return string;
     }
     idKey.display = display;
@@ -300,7 +301,8 @@ Tk_NameOfCursor(display, cursor)
     if (cursorPtr->otherTable != &nameTable) {
 	goto printid;
     }
-    return ((NameKey *) cursorPtr->hashPtr->key.words)->name;
+    ptr = cursorPtr->hashPtr->key.words;
+    return ((NameKey *) ptr)->name;
 }
 
 /*

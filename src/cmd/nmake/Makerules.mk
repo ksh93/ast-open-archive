@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-10-20 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-11-12 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1389,7 +1389,7 @@ DAGGERFLAGS =
 .NOOPTIMIZE.c .CC.NOOPTIMIZE /* drop .CC.* in 2004 */ : .MAKE .LOCAL
 	CCFLAGS := $(.MAM.CC.FLAGS|CCFLAGS:VP:N!=-O*|$(CC.OPTIMIZE)|$\(CC.OPTIMIZE\))
 	if "$(-mam)"
-		CCFLAGS := ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} $(<:A=.NOPROTECT.c:+${mam_cc_NOPROTECT})
+		CCFLAGS := ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} $(<:A=.NOPROTECT.c:+${mam_cc_NOPROTECT}) $$(.MAM.STATE.VARS. $(<))
 	elif "$(-debug-symbols)"
 		CCFLAGS := $(CC.DEBUG) $(CCFLAGS:VP:N!=-g|$(CC.DEBUG)|$\(CC.DEBUG\))
 	end
@@ -4476,6 +4476,15 @@ PACKAGES : .SPECIAL .FUNCTION
 	if "$(%)" == "-l+([a-zA-Z0-9_])" && "$(-mam:N=*,port*)"
 		return $(%:/-l\(.*\)/${mam_lib\1}/)
 	end
+
+.MAM.STATE.VARS. : .FUNCTION
+	local V R
+	for V $(?$(%):T=S:A!=.PARAMETER:T=U)
+		if ! "$($(V))"
+			R += $(V:/.*/${&+-D&=${&}})
+		end
+	end
+	return $(R)
 
 /*
  * common actions

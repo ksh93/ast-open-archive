@@ -186,7 +186,11 @@ struct OLD_list_s; typedef struct OLD_list_s OLD_list_t;
 typedef struct OLD_header_s		/* old make object file header	*/
 {
 	long		magic;		/* magic number			*/
-	char		version[32];	/* compiler/loader version	*/
+	union
+	{
+	char		string[32];	/* old was string		*/
+	long		number;		/* older was number		*/
+	}		version;	/* compiler/loader version	*/
 	unsigned char	null;		/* 0 byte for long version's	*/
 	unsigned char	sequence;	/* different still compatible	*/
 	unsigned char	sizes[10];	/* misc size checks		*/
@@ -1540,18 +1544,18 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		}
 		if ((st.st_size - sizeof(old_trailer)) & (OLD_ALIGN - 1))
 			goto badversion;
-		strcpy(old_stamp.version, OLD_VERSION);
+		strcpy(old_stamp.version.string, OLD_VERSION);
 		if (memcmp(((char*)&old_header) + sizeof(old_header.magic), ((char*)&old_stamp) + sizeof(old_stamp.magic), sizeof(old_header) - sizeof(old_header.magic)))
 		{
-			strcpy(old_stamp.version, OLD_VERSION_2);
+			strcpy(old_stamp.version.string, OLD_VERSION_2);
 			if (memcmp(((char*)&old_header) + sizeof(old_header.magic), ((char*)&old_stamp) + sizeof(old_stamp.magic), sizeof(old_header) - sizeof(old_header.magic)))
 				goto badversion;
 			sequence = 2;
 		}
-		if (s = strrchr(old_stamp.version, ' '))
+		if (s = strrchr(old_stamp.version.string, ' '))
 			s++;
 		else
-			s = old_stamp.version;
+			s = old_stamp.version.string;
 		strncopy(ident, s, sizeof(ident));
 		if (old_trailer.magic != old_header.magic || old_trailer.size != st.st_size)
 			goto badmagic;
@@ -2331,18 +2335,18 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	}
 	return 1;
  badversion:
-	if (strncmp(old_header.version, old_stamp.version, sizeof(old_header.version)))
+	if (strncmp(old_header.version.string, old_stamp.version.string, sizeof(old_header.version.string)))
 	{
 		/*
 		 * old old versions were only numbers
 		 */
 
-		if (!isalpha(*old_header.version))
-			sfsprintf(old_header.version, sizeof(old_header.version), "%d", *((long*)old_header.version));
-		error(1, "%s: old format (%s) incompatible with make loader (%s)", objfile, old_header.version, old_stamp.version);
+		if (!isalpha(*old_header.version.string))
+			sfsprintf(old_header.version.string, sizeof(old_header.version.string), "%d", old_header.version.number);
+		error(1, "%s: old format (%s) incompatible with make loader (%s)", objfile, old_header.version.string, old_stamp.version.string);
 	}
 	else
-		error(1, "%s: old format (%s) generated on an incompatible architecture", objfile, old_header.version);
+		error(1, "%s: old format (%s) generated on an incompatible architecture", objfile, old_header.version.string);
 	return 0;
  badio:
 	error(ERROR_SYSTEM|2, "%s: object file io error", objfile);
