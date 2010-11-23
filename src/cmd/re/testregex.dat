@@ -1,4 +1,4 @@
-: X/Open regex tests 2009-12-11
+: X/Open regex tests 2010-11-22
 
 # basic sanity
 
@@ -928,16 +928,32 @@ S	tea[ea-c]up	teacup			(0,6)
 S	[a-fh-z]*	jack			(0,4)
 S	\i\**		i*hello			(0,7)
 S	[a-z\\]		\			(0,1)
+S	[a-z\]		\			NOMATCH
+S	[a-z\]		[a-z\]			(0,6)
 S	[a-z&_]		b			(0,1)
-S	[\]]		]			NOMATCH
+S	[\]]		]			(0,1)
+S	[\]]		\]			(1,2)
 Sv	[\]]		]			(0,1)
+S	a[.]b		a.b			(0,3)
+S	a[.\]b		a.b			NOMATCH
+S	a[.\]b		a[.\]b			(0,6)
+S	a[.\\]b		a.b			(0,3)
+S	[*]		*			(0,1)
+S	[\*]*		*			(0,1)
+S	[\*]*		\*\			(1,3)
+S	[\\\]\[\*@_]	@			(0,1)
+S	[\\\]\[\*@_]	\[*@_]			(0,1)
+S	[\\\]\[\*@_\]	\[*@_]			NOMATCH
+S	[]\[*@_]	@			(0,1)
 S	\i?*		itch			(0,4)
 S	\i?*		it			(0,2)
 S	?*?*?t		test			(0,4)
 S	?*?*?*?*	test			(0,4)
 S	*\]*\**\?*\[	]this*is?atest[		(0,15)
 S	[a-\\]*		at			(0,2)
+S	[a-\]*		at			NOMATCH
 S	[a-d\\-/]	c			(0,1)
+S	[a-d\-/]	c			(0,1)
 S	*t?l*his	bright-land-hip-and-his	(0,23)
 S	test		test			(0,4)
 S	\		test			NOMATCH
@@ -1001,18 +1017,22 @@ S	?*[]		hello			NOMATCH
 S	[]		]			NOMATCH
 S	[]		[]			(0,2)
 S	[		[			(0,1)
-S	[\[-\]		[			(0,1)
+S	[\[-\]		[			NOMATCH
 Sv	[\[-\]		[			NOMATCH
-S	[\[-\]]		[			NOMATCH
+S	[\[-\]]		[			(0,1)
+S	[\[-\]]		[]			(0,1)
 Sv	[\[-\]]		[			(0,1)
-S	[\[-\]]		]			NOMATCH
+S	[\[-\]]		]			(0,1)
 Sv	[\[-\]]		]			(0,1)
 S	[a		atest			NOMATCH
 S	[a		[a			(0,2)
 S	[a-		atest			NOMATCH
 S	[a-z		atest			NOMATCH
 S	[a-fh-z		jack			NOMATCH
-S	[a-fh-z\]	jack			(0,1)
+S	[a-fh-z\]	jack			NOMATCH
+S	[a-fh-z\\]	jack			(0,1)
+S	[a-fh-z\]*	jack\			NOMATCH
+S	[a-fh-z\\]*	jack\			(0,5)
 Sv	[a-fh-z\]	jack			NOMATCH
 S	[a-e\		atest			NOMATCH
 S	[a-\		atest			NOMATCH
@@ -1511,10 +1531,12 @@ K	@(a\Gz)			a\Gz		NOMATCH
 K	@(a\\Gz)		a\Gz		(0,4)(0,4)
 K	@(a\\Gz)		a\\Gz		NOMATCH
 
-K	a[\t]z			atz		(0,3)
-K	a[\t]z			a\z		(0,3)
+K	a[\t]z			atz		NOMATCH
+K	a[\t]z			a\z		NOMATCH
+K	a[\t]z			a\tz		NOMATCH
 K	a[\\t]z			atz		(0,3)
 K	a[\\t]z			a\z		(0,3)
+K	a[\\t]z			a\tz		NOMATCH
 
 Kv	a[\t]z			atz		NOMATCH
 Kv	a[\t]z			a\z		NOMATCH
@@ -1527,8 +1549,8 @@ K	@(a[\\t]z)		a\z		(0,3)(0,3)
 K	@(a[\\t]z)		atz		(0,3)(0,3)
 K	@(a[\\t]z)		a\tz		NOMATCH
 
-K	a[\E]z			aEz		(0,3)
-K	a[\E]z			a\z		(0,3)
+K	a[\E]z			aEz		NOMATCH
+K	a[\E]z			a\z		NOMATCH
 K	a[\\E]z			aEz		(0,3)
 K	a[\\E]z			a\z		(0,3)
 
@@ -1544,7 +1566,7 @@ K	@(a[\\E]z)		aEz		(0,3)(0,3)
 K	@(a[\\E]z)		a\Ez		NOMATCH
 
 K	a[\g]z			agz		(0,3)
-K	a[\g]z			a\z		(0,3)
+K	a[\g]z			a\z		NOMATCH
 K	a[\\g]z			agz		(0,3)
 K	a[\\g]z			a\z		(0,3)
 
@@ -1560,7 +1582,7 @@ K	@(a[\\g]z)		agz		(0,3)(0,3)
 K	@(a[\\g]z)		a\gz		NOMATCH
 
 K	a[\G]z			aGz		(0,3)
-K	a[\G]z			a\z		(0,3)
+K	a[\G]z			a\z		NOMATCH
 K	a[\\G]z			aGz		(0,3)
 K	a[\\G]z			a\z		(0,3)
 
@@ -1644,9 +1666,9 @@ K$	@(a\\\\Gz)		a\\Gz		(0,4)(0,4)
 K$	a[\t]z			atz		NOMATCH
 K$	a[\t]z			a\\z		NOMATCH
 K$	a[\t]z			a\tz		(0,3)
-K$	a[\\t]z			atz		(0,3)
-K$	a[\\t]z			a\\z		(0,3)
-K$	a[\\t]z			a\tz		NOMATCH
+K$	a[\\t]z			atz		NOMATCH
+K$	a[\\t]z			a\\z		NOMATCH
+K$	a[\\t]z			a\tz		(0,3)
 K$	a[\\\\t]z		atz		(0,3)
 K$	a[\\\\t]z		a\\z		(0,3)
 K$	a[\\\\t]z		a\tz		NOMATCH
@@ -1674,9 +1696,9 @@ K$	@(a[\\\\t]z)		a\tz		NOMATCH
 K$	a[\E]z			aEz		NOMATCH
 K$	a[\E]z			a\\z		NOMATCH
 K$	a[\E]z			a\Ez		(0,3)
-K$	a[\\E]z			aEz		(0,3)
-K$	a[\\E]z			a\\z		(0,3)
-K$	a[\\E]z			a\Ez		NOMATCH
+K$	a[\\E]z			aEz		NOMATCH
+K$	a[\\E]z			a\\z		NOMATCH
+K$	a[\\E]z			a\Ez		(0,3)
 K$	a[\\\\E]z		aEz		(0,3)
 K$	a[\\\\E]z		a\\z		(0,3)
 K$	a[\\\\E]z		a\Ez		NOMATCH
@@ -1702,7 +1724,7 @@ K$	@(a[\\\\E]z)		a\\Ez		NOMATCH
 K$	@(a[\\\\E]z)		a\Ez		NOMATCH
 
 K$	a[\\g]z			agz		(0,3)
-K$	a[\\g]z			a\\z		(0,3)
+K$	a[\\g]z			a\\z		NOMATCH
 K$	a[\\\\g]z		agz		(0,3)
 K$	a[\\\\g]z		a\\z		(0,3)
 
@@ -1717,7 +1739,7 @@ K$	@(a[\\\\g]z)		agz		(0,3)(0,3)
 K$	@(a[\\\\g]z)		a\\gz		NOMATCH
 
 K$	a[\\G]z			aGz		(0,3)
-K$	a[\\G]z			a\\z		(0,3)
+K$	a[\\\\G]z		a\\z		(0,3)
 K$	a[\\\\G]z		aGz		(0,3)
 K$	a[\\\\G]z		a\\z		(0,3)
 

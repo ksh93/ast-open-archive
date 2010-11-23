@@ -93,7 +93,40 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-11-12  --- Release ksh93u  ---
+10-11-22  --- Release ksh93u  ---
+10-11-22  The handling of \ inside [...] for for shell and ~(E) patterns has
+	  been fixed.
+10-11-22  A patch was made to pfsh to handle an error case.
+10-11-22 +Modified types defined in namespace so that they do not clash with
+	  types in other namespaces.  Types can be referenced using
+	  .namespace.typename.
+10-11-22  A bug which caused functions addressed as .namespace.funct to not
+	  work has been fixed.
+10-11-22  A bug in which if nr was a name reference to an unset associative
+	  array subscript, then ${!nr} did not output the subscript correctly
+	  has been fixed.
+10-11-18  A bug in which shcomp -n was not processing double quotes correctly
+	  has been fixed.
+10-11-18  Fixed a bug in which typeset -T foo; typeset -T could cause a
+	  core dump.
+10-11-17  Fixed a bug in which the error message for set -u could come out
+	  garbeled.
+10-11-17  Modified the parser so that typeset -a var=(...) no longer checks
+	  the first index for aliases and reserved words.
+10-11-17  A bug in which a subshell command consisted of only a for or until
+	  command has been fixed.
+10-11-16  Fixed a bug in which typeset -u would display namespace variables
+	  as well as upper case variables.
+10-11-16  A bug which could cause a core dump when unsetting a type variable
+	  when there are references to type elements has been fixed.
+10-11-15  A bug which could cause a core dump when unsetting a compound
+	  array variable when there are references to array subscripts has
+	  been fixed.
+10-11-15  A bug in which using typeset -m to move an indexed array instance
+	  to another array could cause the array to display incorrectly has
+	  been fixed.
+10-11-12  A bug in which the unset discipline function for a type is called
+	  when the type is initialized has been fixed.
 10-11-12  The sequences \< and \> are now preserved after patterns contaning
 	  ~(E) in ${var/pattern/string} expansions.
 10-11-11  A bug in typeset -m when the variables were compound arrary instances
@@ -5585,6 +5618,7 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+10-11-22 testregex.dat: add more [...\...] tests
 10-09-01 grep.c: RE errors => exit(2)
 10-08-11 ed,grep,sed: use conformance("standard",0) test
 10-08-11 sed: align y \\ \n \c \? logic with standard
@@ -6274,6 +6308,10 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-11-20 glob.c: handle modes switches across /
+10-11-19 regcomp.c: REG_SHELL => REG_CLASS_ESCAPE
+10-11-16 vmalloc.h: add VMFL tracing to vmstrdup()
+10-11-16 ast.h: simplify VMDEBUG _BLD_DEBUG and VMFL logic
 10-11-12 tm/tmlocale.c: ast TM_* extensions default to C locale
 10-11-10 regex/regnexec.c,vmalloc/vmstat.c: eliminate strict-aliasing puns
 10-10-20 misc/translate.c: change debug translation to drop " in (a,b,c,"d")

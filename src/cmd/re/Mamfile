@@ -306,7 +306,7 @@ prev testglob.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testglob.c
 done testglob.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testglob testglob.o ${mam_libast}
-done testglob virtual
+done testglob generated
 make testglob.dat
 done testglob.dat
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
@@ -326,7 +326,7 @@ prev testfmt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testfmt.c
 done testfmt.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testfmt testfmt.o ${mam_libast}
-done testfmt virtual
+done testfmt generated
 make testfmt.dat
 done testfmt.dat
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
@@ -348,7 +348,7 @@ prev testfnmatch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testfnmatch.c
 done testfnmatch.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testfnmatch testfnmatch.o ${mam_libast}
-done testfnmatch virtual
+done testfnmatch generated
 make testfnmatch.dat
 done testfnmatch.dat
 make testregex.dat
@@ -372,7 +372,7 @@ prev testmatch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testmatch.c
 done testmatch.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testmatch testmatch.o ${mam_libast}
-done testmatch virtual
+done testmatch generated
 prev testregex.dat
 prev locale.dat
 prev testmatch.dat
@@ -396,7 +396,7 @@ prev testregex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testregex.c
 done testregex.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testregex testregex.o ${mam_libast}
-done testregex virtual
+done testregex generated
 prev testregex.dat
 prev locale.dat
 prev testmatch.dat

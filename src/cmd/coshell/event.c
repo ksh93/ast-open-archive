@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1990-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -560,7 +560,7 @@ request(State_t* state, Connection_t* con, int id, int index, char** a, unsigned
 			regerror(i, &re, buf, sizeof(buf));
 			log(state, con, 'E', "%s: %s", s, buf);
 		}
-		else if (regstat(&re)->re_flags & REG_LITERAL)
+		else if (regstat(&re)->re_info & REG_LITERAL)
 		{
 			if (!EVENT(s))
 			{
