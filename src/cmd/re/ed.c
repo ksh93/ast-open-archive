@@ -373,7 +373,7 @@ init(void)
 	ed.redisc.re_errorf = errorf;
 	ed.re.re_disc = &ed.redisc;
 	ed.reflags = REG_DISCIPLINE|REG_DELIMITED;
-	if (!conformance("standard", 0))
+	if (!conformance(0, 0))
 		ed.reflags |= REG_LENIENT;
 	ed.verbose = 1;
 	for (c = 0; c < elementsof(signals); c++)

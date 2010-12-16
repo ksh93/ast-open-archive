@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -30,7 +30,7 @@
 
 #include <ast.h>
 
-#define PSS_VERSION		20030201L
+#define PSS_VERSION		20101201L
 
 #define PSS_ALL			(1<<0)		/* match all		*/
 #define PSS_ATTACHED		(1<<1)		/* match attached	*/
@@ -105,6 +105,7 @@ typedef struct Pssent_s
 	char*		args;
 	char*		command;
 	char*		sched;
+	char*		ttyname;
 
 	Pss_dev_t	tty;
 
@@ -170,7 +171,7 @@ typedef struct Pssmeth_s
 	int		(*partf)(Pss_t*, Pssent_t*);
 	int		(*fullf)(Pss_t*, Pssent_t*);
 	Pss_dev_t	(*ttydevf)(Pss_t*, const char*);
-	char*		(*ttynamef)(Pss_t*, Pss_dev_t);
+	char*		(*ttynamef)(Pss_t*, Pssent_t*);
 	Pss_dev_t	(*ttymapf)(Pss_t*, Pss_dev_t);
 	int		(*donef)(Pss_t*);
 } Pssmeth_t;
@@ -195,6 +196,6 @@ extern int		pssclose(Pss_t*);
 
 extern int		pssttyadd(Pss_t*, const char*, Pss_dev_t);
 extern Pss_dev_t	pssttydev(Pss_t*, const char*);
-extern char*		pssttyname(Pss_t*, Pss_dev_t);
+extern char*		pssttyname(Pss_t*, Pssent_t*);
 
 #endif

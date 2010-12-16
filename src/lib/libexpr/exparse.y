@@ -185,11 +185,11 @@ action		:	LABEL ':' {
 				$1->lex = PROCEDURE;
 				expr.procedure = $1->value = exnewnode(expr.program, PROCEDURE, 1, $1->type, NiL, NiL);
 				expr.procedure->type = INTEGER;
-				if (expr.assigned || !streq($1->name, "begin"))
+				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
+					exnospace();
+				disc->key = offsetof(Exid_t, name);
+				if (expr.assigned && !streq($1->name, "begin"))
 				{
-					if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-						exnospace();
-					disc->key = offsetof(Exid_t, name);
 					if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
 						exnospace();
 					expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
@@ -1058,11 +1058,11 @@ initialize	:	assign
 				if (expr.procedure)
 					exerror("%s: nested function definitions not supported", expr.id->name);
 				expr.procedure = exnewnode(expr.program, PROCEDURE, 1, expr.declare, NiL, NiL);
-				if (expr.assigned || !streq(expr.id->name, "begin"))
+				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
+					exnospace();
+				disc->key = offsetof(Exid_t, name);
+				if (expr.assigned && !streq(expr.id->name, "begin"))
 				{
-					if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-						exnospace();
-					disc->key = offsetof(Exid_t, name);
 					if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
 						exnospace();
 					expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;

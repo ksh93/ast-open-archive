@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,7 +25,7 @@
  * process status stream implementation
  */
 
-static const char id[] = "\n@(#)$Id: pss library (AT&T Research) 2007-03-19 $\0\n";
+static const char id[] = "\n@(#)$Id: pss library (AT&T Research) 2010-12-01 $\0\n";
 
 static const char lib[] = "std:pss";
 
@@ -245,6 +245,8 @@ psssave(register Pss_t* pss, register Pssent_t* pe)
 		pe->command = vmstrdup(pss->vm, pe->command);
 	if ((fields & PSS_sched) && pe->sched)
 		pe->sched = vmstrdup(pss->vm, pe->sched);
+	if ((fields & PSS_tty) && pe->ttyname)
+		pe->ttyname = vmstrdup(pss->vm, pe->ttyname);
 	pss->ent = 0;
 	return pe;
 }
@@ -385,17 +387,17 @@ pssttydev(register Pss_t* pss, const char* name)
  */
 
 char*
-pssttyname(register Pss_t* pss, Pss_dev_t dev)
+pssttyname(register Pss_t* pss, Pssent_t* pe)
 {
 	register Tty_t*	tty;
+	Pss_dev_t	dev;
 	char*		s;
 
-	if (pss->meth->ttynamef)
-	{
-		if (s = (*pss->meth->ttynamef)(pss, dev))
-			return s;
-		dev = PSS_NODEV;
-	}
+	if (pss->meth->ttynamef && (s = (*pss->meth->ttynamef)(pss, pe)))
+		return s;
+	if (pe->ttyname)
+		return pe->ttyname;
+	dev = pe->tty;
 	if (dev == PSS_NODEV)
 		return "?";
 	if (tty = (Tty_t*)dtmatch(pss->ttybydev, &dev))

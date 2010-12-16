@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -170,13 +170,13 @@ cygwin_full(register Pss_t* pss, register Pssent_t* pe)
 }
 
 static char*
-cygwin_ttyname(Pss_t* pss, Pss_dev_t dev)
+cygwin_ttyname(Pss_t* pss, register Pssent_t* pe)
 {
-	if (dev < 0)
+	if (pe->tty < 0)
 		return "?";
-	if (dev == (Pss_dev_t)TTY_CONSOLE)
+	if (pe->tty == (Pss_dev_t)TTY_CONSOLE)
 		return "con";
-	sfsprintf(pss->buf, sizeof(pss->buf), "%I*d", sizeof(dev), dev);
+	sfsprintf(pss->buf, sizeof(pss->buf), "%I*d", sizeof(pe->tty), pe->tty);
 	return pss->buf;
 }
 

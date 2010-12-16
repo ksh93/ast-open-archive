@@ -504,3 +504,42 @@ TEST 07 'function and variable scoping'
 		-e 'int i = 1; int foo() { return i++; }' \
 		-e 'int bar() { return i++; }' \
 		-e 'int end() { int j; for (j = 0; j < 8; j++) printf("%2d %2d\n", foo(), bar()); }'
+
+TEST 08 'function declaration order'
+
+	EXEC 	-e '
+        		action: return 0;
+        		begin: printf("begin\n");
+        		select: type == REG; 
+		'
+		OUTPUT - begin
+
+	EXEC	-e '
+        		action: return;
+        		select: type == REG; 
+        		begin: printf("begin\n");
+		'
+
+	EXEC	-e '
+        		begin: printf("begin\n");
+        		action: return;
+        		select: type == REG; 
+		'
+
+	EXEC	-e '
+        		begin: printf("begin\n");
+        		select: type == REG; 
+        		action: return;
+		'
+
+	EXEC	-e '
+        		select: type == REG; 
+        		action: return;
+        		begin: printf("begin\n");
+		'
+
+	EXEC	-e '
+        		select: type == REG; 
+        		begin: printf("begin\n");
+        		action: return;
+		'

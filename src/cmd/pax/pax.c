@@ -1532,7 +1532,7 @@ main(int argc, char** argv)
 	setlocale(LC_ALL, "");
 	paxinit(&state, error_info.id = "pax");
 	optinit(&optdisc, optinfo);
-	state.strict = !!conformance("standard", 0);
+	state.strict = !!conformance(0, 0);
 	state.gid = getegid();
 	state.uid = geteuid();
 	state.pid = getpid();

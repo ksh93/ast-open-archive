@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2010-09-28 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2010-12-10 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -489,10 +489,12 @@ execute(Sfio_t* input, char* name)
 					}
 				}
 				*t = '\n';
+				if (!(len = t - span))
+					len++;
 				x = state.re.head;
 				do
 				{
-					if ((result = regrexec(&x->re, span, t - span, state.posnum, state.pos, state.options, '\n', (void*)x, record)) < 0)
+					if ((result = regrexec(&x->re, span, len, state.posnum, state.pos, state.options, '\n', (void*)x, record)) < 0)
 						goto done;
 					if (result && result != REG_NOMATCH)
 						regfatal(&x->re, 4, result);
@@ -516,10 +518,14 @@ execute(Sfio_t* input, char* name)
 			while (t > s)
 				if (*--t == '\n')
 				{
+					len = t - s;
+					if (!len || t > s && *(t - 1) == '\n')
+						len++;
 					x = state.re.head;
 					do
 					{
-						if ((result = regrexec(&x->re, s, t - s, state.posnum, state.pos, state.options, '\n', (void*)x, record)) < 0)
+						error(-1, "AHA#%d [%d] %-.*s", __LINE__, len, len, s);
+						if ((result = regrexec(&x->re, s, len, state.posnum, state.pos, state.options, '\n', (void*)x, record)) < 0)
 							goto done;
 						if (result && result != REG_NOMATCH)
 							regfatal(&x->re, 4, result);
@@ -624,7 +630,7 @@ main(int argc, char** argv)
 	state.match = 1;
 	state.options = REG_FIRST|REG_NOSUB|REG_NULL;
 	h = 0;
-	if (!conformance("standard", 0))
+	if (!conformance(0, 0))
 		state.options |= REG_LENIENT;
 	if (s = strrchr(argv[0], '/'))
 		s++;

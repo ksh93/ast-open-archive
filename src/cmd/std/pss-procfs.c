@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -203,7 +203,7 @@ procfs_part(register Pss_t* pss, register Pssent_t* pe)
 				error(1, "%lu: scan count %d, expected %d", (unsigned long)pss->pid, n, _PS_scan_count);
 		}
 #ifdef _PS_scan_fix
-		_PS_scan_fix(pr);
+		_PS_scan_fix(pr, pe);
 #endif
 		pr->pr_uid = st.st_uid;
 		pr->pr_gid = st.st_gid;
@@ -362,7 +362,7 @@ procfs_full(register Pss_t* pss, register Pssent_t* pe)
 static Pssmeth_t procfs_method =
 {
 	"/proc",
-	"[-version?@(#)$Id: pss /proc (AT&T Research) 2007-11-15 $\n]"
+	"[-version?@(#)$Id: pss /proc (AT&T Research) 2010-12-01 $\n]"
 	"[-author?Glenn Fowler <gsf@research.att.com>]",
 	PSS_all,
 	procfs_init,

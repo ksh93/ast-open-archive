@@ -260,7 +260,7 @@ main(int argc, char **argv)
 	static Text script;
 	static Text data;
 	error_info.id = "sed";
-	if (!conformance("standard", 0))
+	if (!conformance(0, 0))
 		reflags = REG_LENIENT;
 	map = ccmap(CC_NATIVE, CC_ASCII);
 	while (c = optget(argv, usage))

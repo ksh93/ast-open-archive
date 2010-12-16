@@ -999,11 +999,11 @@ case 4:
 				exvsp[-1].id->lex = PROCEDURE;
 				expr.procedure = exvsp[-1].id->value = exnewnode(expr.program, PROCEDURE, 1, exvsp[-1].id->type, NiL, NiL);
 				expr.procedure->type = INTEGER;
-				if (expr.assigned || !streq(exvsp[-1].id->name, "begin"))
+				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
+					exnospace();
+				disc->key = offsetof(Exid_t, name);
+				if (expr.assigned && !streq(exvsp[-1].id->name, "begin"))
 				{
-					if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-						exnospace();
-					disc->key = offsetof(Exid_t, name);
 					if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
 						exnospace();
 					expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
@@ -2011,11 +2011,11 @@ case 115:
 				if (expr.procedure)
 					exerror("%s: nested function definitions not supported", expr.id->name);
 				expr.procedure = exnewnode(expr.program, PROCEDURE, 1, expr.declare, NiL, NiL);
-				if (expr.assigned || !streq(expr.id->name, "begin"))
+				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
+					exnospace();
+				disc->key = offsetof(Exid_t, name);
+				if (expr.assigned && !streq(expr.id->name, "begin"))
 				{
-					if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-						exnospace();
-					disc->key = offsetof(Exid_t, name);
 					if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
 						exnospace();
 					expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;

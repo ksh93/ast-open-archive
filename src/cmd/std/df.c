@@ -803,7 +803,7 @@ main(int argc, register char** argv)
 		error(ERROR_SYSTEM|3, "out of space");
 	stresc(format);
 	if (state.posix < 0)
-		state.posix = !!conformance("standard", 0);
+		state.posix = !!conformance(0, 0);
 	if (state.block < 0)
 	{
 		if (state.posix)

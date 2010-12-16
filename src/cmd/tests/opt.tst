@@ -4660,52 +4660,52 @@ IMPLEMENTATION
   ls [ (libast,3,709) ]
 
 (libast,3,333)
-  -Q, --(debug,ls,SpamCo,"quote")|quote=(debug,ls,SpamCo,"style:=question")
-                  (debug,ls,SpamCo,"Quote names according to style:")
-                    (debug,ls,SpamCo,"C")
-                          (debug,ls,SpamCo,"C "..." style.")
-                    (debug,ls,SpamCo,"escape")
-                          (debug,ls,SpamCo,"\ escape if necessary.")
-                    (debug,ls,SpamCo,"always")
-                          (debug,ls,SpamCo,"Always shell style.")
-                    (debug,ls,SpamCo,"shell")
-                          (debug,ls,SpamCo,"Shell quote if necessary.")
-                    (debug,ls,SpamCo,"question|huh")
-                          (debug,ls,SpamCo,"Replace unknown chars with ?.")
-                  (debug,ls,SpamCo,"(libast,3,400) question.")
-  -x,
-  --(debug,ls,SpamCo,"exec|run")|exec|run[=(debug,ls,SpamCo,"action:=default")]
-                  (debug,ls,SpamCo,"Just do it.") (libast,3,401) (libast,3,400)
+  -Q, --(debug,ls,SpamCo,quote)|quote=(debug,ls,SpamCo,style:=question)
+                  (debug,ls,SpamCo,Quote names according to style:)
+                    (debug,ls,SpamCo,C)
+                          (debug,ls,SpamCo,C "..." style.)
+                    (debug,ls,SpamCo,escape)
+                          (debug,ls,SpamCo,\ escape if necessary.)
+                    (debug,ls,SpamCo,always)
+                          (debug,ls,SpamCo,Always shell style.)
+                    (debug,ls,SpamCo,shell)
+                          (debug,ls,SpamCo,Shell quote if necessary.)
+                    (debug,ls,SpamCo,question|huh)
+                          (debug,ls,SpamCo,Replace unknown chars with ?.)
+                  (debug,ls,SpamCo,(libast,3,400) question.)
+  -x, --(debug,ls,SpamCo,exec|run)|exec|run[=(debug,ls,SpamCo,action:=default)]
+                  (debug,ls,SpamCo,Just do it.) (libast,3,401) (libast,3,400)
                   default.
 
 (libast,3,238)
-  (libast,3,812)  (debug,ls,SpamCo,"aha ")
-  (libast,3,499)  (debug,ls,SpamCo,"SpamCo")'
+  (libast,3,812)  (debug,ls,SpamCo,aha )
+  (libast,3,499)  (debug,ls,SpamCo,SpamCo)'
+
 	usage=$'[-][+NAME?small]\n\nfile\n\n[+SEE?\btbig\b(1)]'
 	EXEC small "$usage" --man
 		EXIT 2
 		OUTPUT - $'return=? option=- name=--man num=0'
-		ERROR - $'(libast,3,325)
-  (debug,small,libast,"small")
+		ERROR - '(libast,3,325)
+  (debug,small,libast,small)
 
 (libast,3,372)
-  small [ (libast,3,709) ] (debug,small,libast,"file")
+  small [ (libast,3,709) ] (debug,small,libast,file)
 
-(debug,small,libast,"SEE")
-  (debug,small,libast,"tbig(1)")'
+(debug,small,libast,SEE)
+  (debug,small,libast,tbig(1))'
+
 	usage=$'[-][Y:layout?Listing layout \akey\a:]:[key]{\n[a:across|horizontal?Multi-column across the page.][1:single-column?One column down the page.]\n}'
 	EXEC ls "$usage" --man
-		ERROR - $'(libast,3,372)
+		ERROR - '(libast,3,372)
   ls [ (libast,3,709) ]
 
 (libast,3,333)
-  -Y, --(debug,ls,libast,"layout")|layout=(debug,ls,libast,"key")
-                  (debug,ls,libast,"Listing layout key:")
-                    (debug,ls,libast,"across|horizontal")
-                          (debug,ls,libast,"Multi-column across the page.")
-                    (debug,ls,libast,"single-column")
-                          (debug,ls,libast,"One column down the page.")'
-
+  -Y, --(debug,ls,libast,layout)|layout=(debug,ls,libast,key)
+                  (debug,ls,libast,Listing layout key:)
+                    (debug,ls,libast,across|horizontal)
+                          (debug,ls,libast,Multi-column across the page.)
+                    (debug,ls,libast,single-column)
+                          (debug,ls,libast,One column down the page.)'
 	ELSE '$INSTALLROOT/share/lib/local/C/LC_MESSAGES/libast not installed'
 
 	EXEC ls "$usage" --man

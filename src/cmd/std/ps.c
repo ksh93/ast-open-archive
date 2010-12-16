@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2010-02-09 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2010-12-01 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -760,7 +760,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		case KEY_tty:
 			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			s = pssttyname(state.pss, pp->ps->tty);
+			s = pssttyname(state.pss, pp->ps);
 			if (kp->prec && (i = strlen(s) - kp->prec) > 0)
 			{
 				if (s[0] == 'p' && s[1] == 't')
@@ -946,7 +946,7 @@ ps(Ps_t* pp)
 		case KEY_tty:
 			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			s = pssttyname(state.pss, pr->tty);
+			s = pssttyname(state.pss, pr);
 			if (kp->prec && (i = strlen(s) - kp->prec) > 0)
 			{
 				if (s[0] == 'p' && s[1] == 't')

@@ -3916,6 +3916,26 @@ TEST 02 'BRE, ERE, -x, -v, -e sanity'
 		OUTPUT - $'abc\ndefdef'
 	EXEC	-E -e $'(abc)\n(def)\\1'
 	EXEC	-E -e $'(abc)|(def)\\2'
+	EXEC	-v 1
+		INPUT - $'a\n'
+		OUTPUT - $'a\n'
+	EXEC	-v 12
+	EXEC	-v 123
+	EXEC	-v 1234
+	EXEC	-v 123
+		INPUT -n - $'x\n\nx'
+		OUTPUT - $'x\n\nx'
+	EXEC	-v 123
+		INPUT - $'x\n\nx'
+	EXEC	-v 123
+		INPUT - $'x\n\nx\n'
+		OUTPUT - $'x\n\nx\n'
+	EXEC	-v 1
+		INPUT - $''
+		OUTPUT - $''
+	EXEC	-v 12
+	EXEC	-v 123
+	EXEC	-v 1234
 
 TEST 03 'data chars except \0 \n'
 

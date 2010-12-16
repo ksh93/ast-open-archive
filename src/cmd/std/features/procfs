@@ -22,7 +22,8 @@ tst	lib_info note{ info(2) kernel table api }end link{
 tst	run{
 	if	test -d /proc
 	then	if	test "$_hdr_asm_param" = 1 -a -r /proc/self/stat
-		then	cat <<!
+		then	self=self
+			cat <<!
 	/*
 	 * linux style /proc
 	 */
@@ -146,7 +147,8 @@ tst	run{
 	#define PR_CTIME(p)	((((p)->pr_cutime+(p)->pr_cstime))/HZ)
 !
 		elif	test -r /proc/curproc/status
-		then	cat <<!
+		then	self=curproc
+			cat <<!
 	/*
 	 * bsd style /proc
 	 */
@@ -209,6 +211,7 @@ tst	run{
 		long		pr_tty_major;
 		long		pr_tty_minor;
 		char		pr_flag_str[64];
+		char		pr_tty_str[64];
 		long		pr_long_ignore;
 	};
 
@@ -222,17 +225,16 @@ tst	run{
 	#define pr_sname	pr_state
 	#define pr_start	pr_starttime
 	#define pr_ttydev	pr_tty
-	
-	#define _PS_scan_format	"%s %ld %ld %ld %ld %ld,%ld %s %lu,%lu %lu,%lu %lu,%lu"
-	#define _PS_scan_count	14
+
+	#define _PS_scan_format	"%s %ld %ld %ld %ld %s %s %lu,%lu %lu,%lu %lu,%lu"
+	#define _PS_scan_count	13
 	#define _PS_scan_args(p) \
 			(p)->pr_comm, \
 			&(p)->pr_pid, \
 			&(p)->pr_ppid, \
 			&(p)->pr_pgrp, \
 			&(p)->pr_session, \
-			&(p)->pr_tty_major, \
-			&(p)->pr_tty_minor, \
+			(p)->pr_tty_str, \
 			(p)->pr_flag_str, \
 			&(p)->pr_start, \
 			&(p)->pr_long_ignore, \
@@ -240,16 +242,45 @@ tst	run{
 			&(p)->pr_long_ignore, \
 			&(p)->pr_stime, \
 			&(p)->pr_long_ignore
-	#define _PS_scan_fix(p) { \
-			(p)->pr_tty = ((p)->pr_tty_major == -1 || (p)->pr_tty_minor == -1) ? PRNODEV : ((p)->pr_tty_major << 8) | (p)->pr_tty_minor; \
-			}
-	
+	#define _PS_scan_fix(p,e) { \
+			char*	s = (p)->pr_tty_str; \
+			char*	t; \
+			(p)->pr_tty_major = strtol(s, &t, 0); \
+			if (*t++ == ',') \
+			{ \
+				(p)->pr_tty_minor = strtol(t, &t, 0); \
+				(p)->pr_tty = ((p)->pr_tty_major == -1 || (p)->pr_tty_minor == -1) ? PRNODEV : ((p)->pr_tty_major << 8) | (p)->pr_tty_minor; \
+				(p)->pr_tty_str[0] = 0; \
+			} \
+			else if (!(p)->pr_tty_str[0] || (p)->pr_tty_str[0] == '-' && !(p)->pr_tty_str[1]) \
+			{ \
+			_fix_nodev: \
+				(p)->pr_tty = PRNODEV; \
+				(p)->pr_tty_major = -1; \
+				(p)->pr_tty_minor = -1; \
+				(p)->pr_tty_str[0] = '?'; \
+				(p)->pr_tty_str[1] = 0; \
+			} \
+			else \
+			{ \
+				struct stat	st; \
+				char		tmp[256]; \
+				sfsprintf(tmp, sizeof(tmp), "/dev/%s", (p)->pr_tty_str); \
+				if (stat(tmp, &st)) \
+					goto _fix_nodev; \
+				(p)->pr_tty = st.st_rdev; \
+				(e)->ttyname = (p)->pr_tty_str + (((p)->pr_tty_str[0] == 't' && (p)->pr_tty_str[1] == 't' && (p)->pr_tty_str[2] == 'y') ? 3 : 0); \
+				(p)->pr_tty_major = (p)->pr_tty_minor = 0; \
+			} \
+		}
+
 	#define PR_HZ		1
 	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))
 	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))
 !
 		elif	test "$_sys_procfs" = 1 -a -r /proc/$$/psinfo
-		then	cat <<!
+		then	self=$$
+			cat <<!
 	/*
 	 * solaris/unixware style /proc
 	 */
@@ -290,7 +321,8 @@ tst	run{
 	#define PR_START(p)	((p)->pr_start.tv_sec)
 !
 		elif	test -d /proc/pinfo -o -e /proc/$$ -o -d /proc/$$ # uwin access() workaround
-		then	if	test -d /proc/pinfo
+		then	self=self
+			if	test -d /proc/pinfo
 			then	dir=/proc/pinfo
 			else	dir=/proc
 			fi
@@ -311,8 +343,11 @@ tst	run{
 !
 		fi
 	fi
-	if	test -r /proc/self/cmdline
-	then	echo '#define _PS_args	"cmdline"'
+	if	test -r /proc/$self/cmdline
+	then	cat <<!
+
+	#define _PS_args	"cmdline"
+!
 	fi
 }end
 

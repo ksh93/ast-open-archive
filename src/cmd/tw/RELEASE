@@ -1,3 +1,4 @@
+10-11-30 tw.tst: add "begin" scope tests
 10-09-01 find.c: RE errors => exit(2)
 10-08-18 tw.tst: add expr scope tests
 10-08-18 find.c: document -exec command ... {} +
