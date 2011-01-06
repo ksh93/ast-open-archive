@@ -188,7 +188,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done html.c
 meta html.o %.c>%.o html.c html
 prev html.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dsshtml]"\" -D_PACKAGE_ast -c html.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2010-2011 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dsshtml]"\" -D_PACKAGE_ast -c html.c
 done html.o generated
 make lib.o
 make lib.c

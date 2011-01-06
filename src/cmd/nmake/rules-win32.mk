@@ -1,5 +1,5 @@
 /*
- * win32 specific makerules 2010-10-10
+ * win32 specific makerules 2011-01-04
  */
 
 .INSTALL.libast.a = .
@@ -42,7 +42,10 @@ SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 	echo .data READ WRITE
 	echo
 	echo EXPORTS
-	cat $(>)
+	case $(HOSTTYPE) in
+	*-64)	sed 's/^;64;\(.*\);\(.*\);$/\1/' $(>) ;;
+	*)	sed 's/^;64;\(.*\);\(.*\);$/\2/' $(>) ;;
+	esac
 	} > $(<)
 
 /*

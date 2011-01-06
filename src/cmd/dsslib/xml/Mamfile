@@ -160,7 +160,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done xml.c
 meta xml.o %.c>%.o xml.c xml
 prev xml.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssxml]"\" -D_PACKAGE_ast -c xml.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2010-2011 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssxml]"\" -D_PACKAGE_ast -c xml.c
 done xml.o generated
 make lib.o
 make lib.c

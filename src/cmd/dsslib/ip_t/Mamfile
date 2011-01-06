@@ -212,7 +212,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done ip_t.c
 meta ip_t.o %.c>%.o ip_t.c ip_t
 prev ip_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssip_t]"\" -D_BLD_pt -D_PACKAGE_ast -c ip_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2011 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssip_t]"\" -D_BLD_pt -D_PACKAGE_ast -c ip_t.c
 done ip_t.o generated
 make lib.o
 make lib.c
@@ -712,7 +712,7 @@ done testiv.c
 meta testiv.o %.c>%.o testiv.c testiv
 prev testiv.c
 setv _BLD_ip_t -U_BLD_ip_t
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_pt -c testiv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2011 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_pt -c testiv.c
 done testiv.o generated
 prev libdssip_t.a archive
 bind -ldssip_t

@@ -160,7 +160,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done merge.c
 meta merge.o %.c>%.o merge.c merge
 prev merge.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssmerge]"\" -D_PACKAGE_ast -c merge.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2011 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssmerge]"\" -D_PACKAGE_ast -c merge.c
 done merge.o generated
 make lib.o
 make lib.c

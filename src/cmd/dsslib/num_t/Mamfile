@@ -192,7 +192,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done num_t.c
 meta num_t.o %.c>%.o num_t.c num_t
 prev num_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2010 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssnum_t]"\" -D_PACKAGE_ast -c num_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2011 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dssnum_t]"\" -D_PACKAGE_ast -c num_t.c
 done num_t.o generated
 make lib.o
 make lib.c

@@ -93,8 +93,16 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-10-12-21  --- Release ksh93u  ---
-10-12-21  Use MS_3D in b_vpath() for setting win32 WoW mount defaults.
+11-01-02  --- Release ksh93u  ---
+11-01-02  Fixed bugs with typeset -l/-u/-M and arrays.
+10-12-28  Fixed a bug with typeset -l/-u/-M values in arithmetric expressions.
+10-12-26  Fixed a time parsing bug in sleep and localeconv() initialization.
+10-12-23  Prevented the shell from generating a core dump when it sends itself
+	  a termination signal because the last command terminated with that
+	  signal.  This prevents a core dump to be overwritten by the shell.
+10-12-22  A bug in the expansion of  ${A[@]} ${B[@]}, introduced in 10-12-01
+	   when A="" B=B has been fixed.
+10-12-21 +Use MS_3D in b_vpath() for setting win32 WoW mount defaults.
 10-12-17  A bug in the expansion of ${var:i:j} which caused a core dump when
 	  i > ${#var} has been fixed.
 10-12-16 +sleep now treats . as decimal point even in locales that use comma.
@@ -3625,6 +3633,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+11-01-04 rules-win32.mk: add 32/64 conditionals for c++ mangle compatibility
 10-11-12 Makerules.mk: add .MAM.STATE.VARS. for FOO=BAR => -DFOO=BAR in mamake!
 10-11-12 command.c: fix .AFTER .FORCE .REPEAT infinite loop -- wow
 10-11-10 object.c: fix old_header.version puns for strict-aliasing
@@ -6340,6 +6349,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+10-12-24 sfstrtof.h: fix thousand grouping bug that did not check last group
 10-12-21 pathkey.c: add win32 { /32 /64 } preroot to hash
 10-12-09 pathprog.c: handle intermediate path != '* and fix invalid pathpath() call
 10-12-01 astconf.c: fix look.standard undefined variable reference
@@ -8056,6 +8066,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+11-01-03 chgrp.c: --symlink => --physical
 10-12-10 rm.c: fix not-writable logic
 10-12-01 tee.c: add iterrupt logic for slow open(1) -- needs to be generalized
 10-11-30 chgrp.c: add -N,--numeric to bypass name lookup

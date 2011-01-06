@@ -266,7 +266,7 @@ prev mailx.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Kurt Shoens (UCB)][-author?gsf][-copyright?Copyright (c) 1978-2010 The Regents of the University of California and AT&T][-license?http://www.opensource.org/licenses/bsd-license][--catalog?mailx]"\" -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Kurt Shoens (UCB)][-author?gsf][-copyright?Copyright (c) 1978-2011 The Regents of the University of California and AT&T][-license?http://www.opensource.org/licenses/bsd-license][--catalog?mailx]"\" -D_PACKAGE_ast -c main.c
 done main.o generated
 make misc.o
 make misc.c
