@@ -1,6 +1,6 @@
-.TH LIBPTV 3
+.TH PTV 3
 .SH NAME
-\fBlibptv\fR \- arbitrary size longest prefix matching by intervals
+\fBlibptv\fR \- arbitrary size prefix matching by intervals
 .de Tp
 .fl
 .ne 2
@@ -26,8 +26,21 @@
 .Ce
 .SH DESCRIPTION
 \fIlibptv\fP provides a set of functions to create and maintain
-collections of prefix tables for arbitrary size unsigned big-endian integers.
+collections of unlabelled prefix tables for arbitrary size unsigned big-endian integers.
 IPV6 addresses are modeled as 16 byte unsigned big-endian integers.
+Unlabelled prefixes are treated as intervals.
+Adjoining intervals are merged.
+An address matches the set of prefixes if it is contained on one of the intervals.
+Information on which prefix matches a particular address is not provided by the library.
+See
+.BR iv (3)
+for longest prefix matching on arbitary size unsigned big-endian integers.
+.P
+.B ptv
+provides functions that apply set operations on collections of prefix tables.
+These functions support questions like: does prefix table \fIP\fP match address \fIA\fP;
+does the union of prefix tables \fIP\fP and \fIQ\fP match address \fIA\fP;
+what set of addresses are matched by the intersection of prefix tables \fIP\fP and \fIQ\fP.
 .Ss "TYPES"
 .Ss "  Ptv_t"
 Prefix table handle containing these public members:
@@ -98,7 +111,7 @@ for the prefix \fCaddr\fP limited to \fCbits\fP bits.
 \fIlibptv\fP uses the CDT library for container data types and \fIfv(3)\fP for manipulating
 arbitrary size unsigned big-endian integers.
 .SH "SEE ALSO"
-\fIcdt(3)\fP, \fIfv(3)\fP.
+\fBiv\fP(3), \fBcdt\fP(3), \fBfv\fP(3).
 .SH AUTHOR
 .nf
 Glenn Fowler <gsf@research.att.com>
