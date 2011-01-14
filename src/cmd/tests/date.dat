@@ -738,5 +738,16 @@ NIL	%_z		-0400
 
 SET			NOW			2009-12-01+00:00:00
 
+last month first day	NULL			Sun Nov  1 00:00:00 EDT 2009
+last month final day	NULL			Mon Nov 30 00:00:00 EST 2009
+this month first day	NULL			Tue Dec  1 00:00:00 EST 2009
+this month final day	NULL			Thu Dec 31 00:00:00 EST 2009
 next month first day	NULL			Fri Jan  1 00:00:00 EST 2010
 next month final day	NULL			Sun Jan 31 00:00:00 EST 2010
+
+last month first sun	NULL			Sun Nov  1 00:00:00 EDT 2009
+last month final sun	NULL			Sun Nov 29 00:00:00 EST 2009
+this month first sun	NULL			Sun Dec  6 00:00:00 EST 2009
+this month final sun	NULL			Sun Dec 27 00:00:00 EST 2009
+next month first sun	NULL			Sun Jan  3 00:00:00 EST 2010
+next month final sun	NULL			Sun Jan 31 00:00:00 EST 2010

@@ -1,3 +1,4 @@
+11-01-11 Makerules.mk: handle .INSTALL.COMMON - - -
 11-01-04 rules-win32.mk: add 32/64 conditionals for c++ mangle compatibility
 10-11-12 Makerules.mk: add .MAM.STATE.VARS. for FOO=BAR => -DFOO=BAR in mamake!
 10-11-12 command.c: fix .AFTER .FORCE .REPEAT infinite loop -- wow

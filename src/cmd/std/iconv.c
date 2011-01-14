@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: iconv (AT&T Research) 2000-05-09 $\n]"
+"[-?\n@(#)$Id: iconv (AT&T Research) 2011-01-11 $\n]"
 USAGE_LICENSE
 "[+NAME?iconv - codeset conversion]"
 "[+DESCRIPTION?\biconv\b converts the encoding of characters in the \afile\a"
@@ -46,9 +46,17 @@ USAGE_LICENSE
 "	standard(s) provide no support for listing the known codesets, the"
 "	above list may be incomplete.]"
 
+"[a:all?List all conversion errors. By default (and \b--omit\b is not "
+    "specified) \biconv\b stops after the first error.]"
+"[c:omit?Omit invalid input characters from the output. Invalid input "
+    "characters still affect the exit status.]"
 "[e:errors?Do not ignore conversion errors.]"
 "[f:from?The input codeset is set to \acodeset\a.]:[codeset:=native]"
-"[i:ignore?Ignore conversion errors. This is the default.]"
+"[i:ignore?Ignore conversion errors.]"
+"[l:list?List all known codesets on the standard output.]"
+"[s:silent?Suppress invalid character diagnostics. Invalid input "
+    "characters still affect the exit status. If \b--all\b is also specified "
+    "then non-zero invalid character counts are listed.]"
 "[t:to?The output codeset is set to \acodeset\a.]:[codeset:=native]"
 
 "\n"
@@ -103,6 +111,26 @@ optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 	return 0;
 }
 
+static int
+listall(void)
+{
+	
+	register iconv_list_t*	ic;
+	register const char*	p;
+	register int		c;
+
+	sfprintf(sfstdout, "Patterns:\n\n");
+	for (ic = iconv_list(NiL); ic; ic = iconv_list(ic))
+		sfprintf(sfstdout, "  %s -- %s\n", ic->match, ic->desc);
+	p = "/usr/bin/iconv";
+	if (!access(p, X_OK) || !access(p += 4, X_OK))
+	{
+		sfprintf(sfstdout, "\n");
+		execl(p, "iconv", "-l", 0);
+	}
+	return 0;
+}
+
 int
 main(int argc, register char** argv)
 {
@@ -110,15 +138,18 @@ main(int argc, register char** argv)
 	char*		from;
 	char*		to;
 	iconv_t		cvt;
-	size_t		errors;
+	int		all;
+	int		fail;
 	int		ignore;
+	int		list;
 	Sfio_t*		ip;
 	Optdisc_t	od;
+	Iconv_disc_t	id;
 
 	NoP(argc);
 	error_info.id = "iconv";
 	from = to = "native";
-	ignore = 1;
+	all = ignore = list = 0;
 	setlocale(LC_ALL, "");
 
 	/*
@@ -126,6 +157,8 @@ main(int argc, register char** argv)
 	 */
 
 	optinit(&od, optinfo);
+	iconv_init(&id, errorf);
+	id.flags |= ICONV_FATAL;
 
 	/*
 	 * grab the options
@@ -135,6 +168,14 @@ main(int argc, register char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'a':
+			all = 1;
+			id.flags &= ~ICONV_FATAL;
+			continue;
+		case 'c':
+			id.flags |= ICONV_OMIT;
+			id.flags &= ~ICONV_FATAL;
+			continue;
 		case 'e':
 			ignore = 0;
 			continue;
@@ -143,6 +184,12 @@ main(int argc, register char** argv)
 			continue;
 		case 'i':
 			ignore = 1;
+			continue;
+		case 'l':
+			list = 1;
+			continue;
+		case 's':
+			id.errorf = 0;
 			continue;
 		case 't':
 			to = opt_info.arg;
@@ -159,6 +206,8 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
+	if (list)
+		return listall();
 	if ((cvt = iconv_open(to, from)) == (iconv_t)(-1))
 	{
 		if ((cvt = iconv_open(to, "utf-8")) == (iconv_t)(-1))
@@ -169,6 +218,7 @@ main(int argc, register char** argv)
 		iconv_close(cvt);
 		error(3, "cannot convert from %s to %s", from, to);
 	}
+	fail = 0;
 	if (file = *argv)
 		argv++;
 	do
@@ -183,21 +233,26 @@ main(int argc, register char** argv)
 			error(ERROR_SYSTEM|2, "%s: cannot open", file);
 			continue;
 		}
-		errors = 0;
-		iconv_move(cvt, ip, sfstdout, SF_UNBOUND, &errors);
-		if (!sfeof(ip) || sferror(ip))
+		id.errors = 0;
+		iconv_move(cvt, ip, sfstdout, SF_UNBOUND, &id);
+		if (!id.errors && (!sfeof(ip) || sferror(ip)))
 			error(ERROR_SYSTEM|2, "%s: conversion read error", file);
-		if (!ignore)
+		if (id.errors)
 		{
-			if (errors == 1)
-				error(2, "%s: %d character conversion error", file, errors);
-			else if (errors)
-				error(2, "%s: %d character conversion errors", file, errors);
+			if (ignore || !id.errors)
+				fail = 1;
+			else if (!id.errorf && all)
+			{
+				if (id.errors == 1)
+					error(2, "%s: %d character conversion error", file, id.errors);
+				else if (id.errors)
+					error(2, "%s: %d character conversion errors", file, id.errors);
+			}
 		}
 		if (ip != sfstdin)
 			sfclose(ip);
 	} while (file = *argv++);
 	if (sfsync(sfstdout))
 		error(ERROR_SYSTEM|3, "conversion write error");
-	return error_info.errors != 0;
+	return error_info.errors != 0 || fail;
 }

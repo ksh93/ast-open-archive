@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2010-11-12 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-01-11 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1896,7 +1896,7 @@ RECURSEROOT = .
 		if O = "$(>:N=*=*)"
 			$(O) : .SPECIAL .VIRTUAL .DONTCARE
 		end
-		if T = "$(>:N=-*)"
+		if T = "$(>:N=-*:N!=-)"
 			error 1 use {user,group,mode}=... instead of -{u,g,m}...
 			T := $(T:/-u/user=/:/-g/group=/:/-m/mode=/)
 			$(T) : .SPECIAL .VIRTUAL .DONTCARE
@@ -1959,7 +1959,7 @@ RECURSEROOT = .
 	if O = "$(>:N=*=*)"
 		$(O) : .SPECIAL .VIRTUAL .DONTCARE
 	end
-	if T = "$(>:N=-*)"
+	if T = "$(>:N=-*:N!=-)"
 		error 1 use {user,group,mode}=... instead of -{u,g,m}...
 		T := $(T:/-u/user=/:/-g/group=/:/-m/mode=/)
 		$(T) : .SPECIAL .VIRTUAL .DONTCARE
@@ -3716,11 +3716,11 @@ PACKAGES : .SPECIAL .FUNCTION
 				end
 			end
 		end
-		if T1 && T1 != "." && T1 != "$(A:V:D)"
+		if A != "-*" && T1 && T1 != "." && T1 != "$(A:V:D)"
 			$(T1:V) :INSTALLDIR: $(A)
 		end
 		for T2 $(P:V:N=*.[[:digit:]]*([[:alpha:]]))
-			if ! "$(*$(A):V:N=$(T2:V))"
+			if A == "-*" || ! "$(*$(A):V:N=$(T2:V))"
 				$$(MANDIR)$(T2:V:/.*\.//) :INSTALLDIR: $(T2:V)
 			end
 		end

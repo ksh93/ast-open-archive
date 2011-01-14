@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,7 +26,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Research) 2009-01-20 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Research) 2011-01-11 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -167,6 +167,7 @@ typedef struct
 	Operand_t	ucase;
 	Operand_t	unblock;
 
+	Iconv_disc_t	iconv;
 	Io_t		in;
 	Io_t		out;
 	char*		buffer;
@@ -450,9 +451,9 @@ main(int argc, char** argv)
 	int			i;
 	char*			cb;
 	size_t			cc;
-	size_t			ce;
 	Sfio_t*			sp;
 	Sflong_t		c;
+	Sflong_t		d;
 	Sflong_t		m;
 	Sflong_t		n;
 	Sflong_t		r;
@@ -462,6 +463,7 @@ main(int argc, char** argv)
 
 	setlocale(LC_ALL, "");
 	error_info.id = "dd";
+	iconv_init(&state.iconv, errorf);
 	state.from.value.string = state.to.value.string = "";
 	if (!(sp = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space");
@@ -751,6 +753,18 @@ main(int argc, char** argv)
 				error(ERROR_SYSTEM|3, "%s: seek 0 fill write error", state.ofn.value.string);
 		}
 	}
+	if (state.silent.value.number)
+		state.iconv.errorf = 0;
+	if (state.conv.value.number & NOERROR)
+	{
+		state.iconv.errorf = 0;
+		if (state.conv.value.number & SYNC)
+			state.iconv.fill = 0;
+		else
+			state.iconv.flags |= ICONV_OMIT;
+	}
+	else
+		state.iconv.flags |= ICONV_FATAL;
 	memset(&disc, 0, sizeof(disc));
 	disc.writef = output;
 	sfdisc(state.out.fp, &disc);
@@ -794,7 +808,6 @@ main(int argc, char** argv)
 		{
 			b = sfreserve(state.in.fp, SF_UNBOUND, 0);
 			m = sfvalue(state.in.fp);
-			error(-2, "AHA#%d complete=%llu r=%lld m=%lld c=%lld", __LINE__, state.in.complete, r, m, c);
 			if (!b)
 			{
 				if (!m)
@@ -804,7 +817,6 @@ main(int argc, char** argv)
 			}
 			while (state.in.complete != r)
 			{
-				error(-1, "AHA#%d complete=%lld r=%lld m=%lld c=%lld", __LINE__, state.in.complete, r, m, c);
 				s = b;
 				if (m >= c)
 				{
@@ -835,16 +847,16 @@ main(int argc, char** argv)
 				{
 					cb = s;
 					cc = n;
-					ce = 0;
-					n = iconv_write(state.cvt, state.tmp, &cb, &cc, &ce);
+					state.iconv.errors = 0;
+					if ((d = iconv_write(state.cvt, state.tmp, &cb, &cc, &state.iconv)) < 0)
+						d = 0;
 					if (!(s = sfstruse(state.tmp)))
 						error(ERROR_SYSTEM|3, "out of space");
-					if (ce && !state.silent.value.number)
+					m -= n - d;
+					if (state.iconv.errors && (state.iconv.flags & ICONV_FATAL))
 					{
-						if (ce == 1)
-							error(ERROR_SYSTEM|2, "%s: %d conversion error", state.ofn.value.string, ce);
-						else
-							error(ERROR_SYSTEM|2, "%s: %d conversion errors", state.ofn.value.string, ce);
+						m -= n;
+						n = 0;
 					}
 				}
 				switch (f & (LCASE|UCASE))
