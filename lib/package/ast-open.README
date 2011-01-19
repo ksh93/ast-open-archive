@@ -93,7 +93,11 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-11-01-13  --- Release ksh93u  ---
+11-01-18  --- Release ksh93u  ---
+11-01-18  The .sh.match variable now shows elements that do not match as
+	  as not set rather than an empty string.
+11-01-18  A bug with typeset -m of an array into an element of an indexed
+	  array has been fixed.
 11-01-13  A bug in handling of arrays of compound variables inside ((...)) which
 	  reported a syntax error been fixed.
 11-01-10  A bug in arithmetic assignment operators of the form op= for array
@@ -3642,6 +3646,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+11-01-18 Makerules.mk: handle sh patterns on rhs of :MAKE:
 11-01-11 Makerules.mk: handle .INSTALL.COMMON - - -
 11-01-04 rules-win32.mk: add 32/64 conditionals for c++ mangle compatibility
 10-11-12 Makerules.mk: add .MAM.STATE.VARS. for FOO=BAR => -DFOO=BAR in mamake!

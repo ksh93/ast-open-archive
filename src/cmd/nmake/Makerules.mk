@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-01-11 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-01-18 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1535,7 +1535,19 @@ RECURSEROOT = .
 	if ! "$(-recurse)"
 		return
 	end
-	if ! ( D = "$(%)" )
+	if ( D = "$(%)" )
+		.X. : .CLEAR
+		for N $(D)
+			if N == "-"
+				.X. : $(N)
+			elif "$(N:T=F=D)"
+				.X. : $(N)
+			else
+				.X. : $(".":L=$(N):T=F=D)
+			end
+		end
+		D := $(~.X.)
+	else
 		D = .
 	end
 	if "$(-recurse)" == "*prereqs*"

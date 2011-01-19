@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1990-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1990-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -32,7 +32,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Research) 2006-05-09 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Research) 2011-01-18 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -289,7 +289,9 @@ proto(char* file, char* license, char* options, char* package, char* copy, char*
 {
 	char*		b;
 	char*		e;
+	char*		p;
 	int		n;
+	int		m;
 	int		x;
 	int		fd;
 	char		buf[1024];
@@ -357,12 +359,23 @@ proto(char* file, char* license, char* options, char* package, char* copy, char*
 		if (file && (flags & PROTO_VERBOSE))
 			proto_error(b, 0, "convert to", file);
 		while ((n = pppread(b)) > 0)
-			if (write(fd, b, n) != n)
+		{
+			p = b;
+			for (;;)
 			{
-				proto_error(b, 2, "write error", NiL);
-				flags |= PROTO_ERROR;
-				break;
+				if ((m = write(fd, p, n)) <= 0)
+				{
+					proto_error(b, 2, "write error", NiL);
+					flags |= PROTO_ERROR;
+					break;
+				}
+				if ((n -= m) <= 0)
+					break;
+				p += m;
 			}
+			if (m < 0)
+				break;
+		}
 		if (fd > 1)
 			close(fd);
 		if (file && (flags & PROTO_REPLACE))
