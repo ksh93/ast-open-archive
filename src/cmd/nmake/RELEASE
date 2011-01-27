@@ -1,3 +1,5 @@
+11-01-21 expand.c: fix active() non-terminating loop for joint targets
+11-01-21 Makerules.mk: add "::" (.OPTIONS.$(<)) : .PARAMETER
 11-01-18 Makerules.mk: handle sh patterns on rhs of :MAKE:
 11-01-11 Makerules.mk: handle .INSTALL.COMMON - - -
 11-01-04 rules-win32.mk: add 32/64 conditionals for c++ mangle compatibility

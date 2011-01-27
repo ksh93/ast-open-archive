@@ -177,11 +177,6 @@ Then, the subinterval [5,10] of [1,10] will be overwritten with the value of [5,
 
 .SH "IMPLEMENTATION NOTES"
 .PP
-The current implementation defines \f5Ivpoint_t\fP as an unsigned 32-bit integer type.
-On machines capable of handling 64-bit integers, the macro token \f5IV64\fP
-in the header \f5interval.h\fP can be set to a non-zero value
-to define \f5Ivpoint_t\fP as a 64-bit integer type.
-.PP
 \fIlibiv\fP uses the CDT library for container data types and \fIfv(3)\fP for manipulating
 arbitrary size unsigned big-endian integers.
 .PP

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -2879,12 +2879,13 @@ static int
 active(Rule_t* r, register Frame_t* fp)
 {
 	register Frame_t*	ap;
+	register Frame_t*	pp;
 
-	for (ap = state.frame; ap; ap = ap->parent)
+	for (pp = 0, ap = state.frame; ap && ap != pp; pp = ap, ap = ap->parent)
 		if (fp == ap)
 			return 1;
-	error(1, "%s: parentage not in active frame", r->name);
-	dumprule(sfstderr, r);
+	if (!(r->property & P_joint))
+		error(1, "%s: parentage not in active frame", r->name);
 	return 0;
 }
 

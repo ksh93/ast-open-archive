@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-01-18 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-01-21 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1731,6 +1731,7 @@ RECURSEROOT = .
 		if T1 = "$(T3:A=.IMPLICIT)"
 			$(T1) : .SPECIAL $(TA:V:Q)
 			if "$(.OPTIONS.$(<))"
+				(.OPTIONS.$(<)) : .PARAMETER
 				$(T1) : .SPECIAL (.OPTIONS.$(<))
 			end
 		end
@@ -2734,6 +2735,7 @@ RECURSEROOT = .
  * .PACKAGE. is the ordered package list used to alter
  * .SOURCE.h, INCLUDEDIR, LDLIBRARIES and ancestor
  * .PACKAGE.build is the package list to build against
+ * $(PACKAGE_<package>_BIN) explicit bin dir for <package>
  * $(PACKAGE_<package>_INCLUDE) explicit include for <package>
  * $(PACKAGE_<package>_LIB) explicit lib dir for <package>
  * $(PACKAGE_<package>) root dir for include|lib for <package>
@@ -2796,6 +2798,7 @@ RECURSEROOT = .
 /*
  * initialize the package args
  * on return the following are set if found for package $(P)
+ *	PACKAGE_$(P)_BIN	package bin dir
  *	PACKAGE_$(P)_INCLUDE	package include dir
  *	PACKAGE_$(P)_LIB	package lib dir
  *	.PACKAGE.$(P).found	1 if at least one package lib or header found
@@ -2809,7 +2812,7 @@ RECURSEROOT = .
 
 .PACKAGE.INIT. : .FUNCTION .PROBE.INIT
 	local T1 T2 T3 T4 T5 T6 T7
-	local B D G H I K L N P Q T V W X Y Z IP LP LPL LPV PFX SFX FOUND
+	local B D E G H I K L N P Q T V W X Y Z EP IP LP LPL LPV PFX SFX FOUND
 	if ! .PACKAGE.GLOBAL.
 		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(INSTALLROOT:T=F:P=L=*) $(CC.STDLIB:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
 		.PACKAGE.GLOBAL. := $(.PACKAGE.GLOBAL.:N!=$(PACKAGE_IGNORE):T=F:U)
@@ -2827,6 +2830,17 @@ RECURSEROOT = .
 			continue
 		end
 		FOUND = 0
+		E := $(PACKAGE_$(P)_BIN)
+		EP := $(.PACKAGE.$(P).bin)
+		if EP == "/*"
+			if ! E
+				E := $(EP)
+			end
+			EP =
+		end
+		if ! EP
+			EP = bin
+		end
 		I := $(PACKAGE_$(P)_INCLUDE)
 		IP := $(.PACKAGE.$(P).include)
 		if IP == "/*"
@@ -3049,14 +3063,22 @@ RECURSEROOT = .
 					if ! FOUND && "$(PACKAGE_$(P)_VERSION)"
 						PACKAGE_$(P)_VERSION :=
 						PACKAGE_$(P) :=
+						PACKAGE_$(P)_BIN :=
 						PACKAGE_$(P)_INCLUDE :=
 						PACKAGE_$(P)_LIB :=
 						return $(.PACKAGE.INIT. $(P))
 					end
 				end
 			end
-			error -1 PACKAGE_$(P)=$(PACKAGE_$(P)) PACKAGE_$(P)_INCLUDE=$(PACKAGE_$(P)_INCLUDE) PACKAGE_$(P)_LIB=$(PACKAGE_$(P)_LIB)
 		end
+		if FOUND && ! "$(PACKAGE_$(P)_BIN)"
+			if EP == "-"
+				PACKAGE_$(P)_BIN :=
+			else
+				PACKAGE_$(P)_BIN := $(PACKAGE_$(P)_LIB:D:B=$(EP))
+			end
+		end
+		error -1 PACKAGE_$(P)=$(PACKAGE_$(P)) PACKAGE_$(P)_BIN=$(PACKAGE_$(P)_BIN) PACKAGE_$(P)_INCLUDE=$(PACKAGE_$(P)_INCLUDE) PACKAGE_$(P)_LIB=$(PACKAGE_$(P)_LIB)
 		.PACKAGE.$(P).found := $(FOUND)
 	end
 	return $(P)
