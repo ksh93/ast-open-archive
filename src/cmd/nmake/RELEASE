@@ -1,3 +1,4 @@
+11-01-31 Makerules.mk: fix mam %.req to check for $INSTALLROOT/lib/lib/%
 11-01-21 expand.c: fix active() non-terminating loop for joint targets
 11-01-21 Makerules.mk: add "::" (.OPTIONS.$(<)) : .PARAMETER
 11-01-18 Makerules.mk: handle sh patterns on rhs of :MAKE:

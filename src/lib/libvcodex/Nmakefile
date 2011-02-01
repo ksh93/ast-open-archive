@@ -32,7 +32,7 @@ vclib.h : vchdr.h
 src = $(*$(*$(*vcodex)):N=*.c:T=F)
 
 vcmethods.h : (src) $$(-mam:+$$(src))
-	set -- $( $(SED) -e '/\<VCLIB(/!d' -e 's/.*\<VCLIB(\(.*\)).*/\1/' $($(~:O=1)) )
+	set -- `$(SED) -e '/VCLIB(/!d' -e 's/.*VCLIB(\(.*\)).*/\1/' $($(~:O=1))`
 	{
 	echo "/*"
 	echo " * list of default public -lvcodex methods"

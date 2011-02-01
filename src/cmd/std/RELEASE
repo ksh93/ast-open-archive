@@ -1,3 +1,4 @@
+11-01-28 file.c: add -a, --all to list all magic table matches
 11-01-11 dd.c,iconv.c: convert Iconv_disc_t* for iconv_move() and iconv_write()
 11-01-11 iconv.c: add posix { -c,--omit -l,--list -s,--silent }
 10-12-01 ps*: update freebsd procfs logic

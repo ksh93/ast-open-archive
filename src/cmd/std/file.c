@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: file (AT&T Research) 2004-10-11 $\n]"
+"[-?\n@(#)$Id: file (AT&T Research) 2011-01-28 $\n]"
 USAGE_LICENSE
 "[+NAME?file - determine file type]"
 "[+DESCRIPTION?\bfile\b tests and attempts to classify each \afile\a argument."
@@ -43,6 +43,7 @@ USAGE_LICENSE
 "	applications. Failed matches usually result in the less informative"
 "	\bascii text\b or \bbinary data\b.]"
 
+"[a:all?List all mabgic table matches.]"
 "[c:mime?List the \bmime\b(1) classification for each \afile\a. Although the"
 "	default descriptions are fairly consistent, use \b--mime\b for"
 "	precise classification matching.]"
@@ -191,6 +192,9 @@ main(int argc, register char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'a':
+			disc.flags |= MAGIC_ALL;
+			continue;
 		case 'c':
 			disc.flags |= MAGIC_MIME;
 			continue;

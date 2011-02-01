@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2011-01-21
+info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2011-01-31
 setv INSTALLROOT ../../..
 setv PACKAGE_X11 ${INSTALLROOT}
 setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11
@@ -60,6 +60,8 @@ done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
 make ${INSTALLROOT}/include/ast/ast_std.h implicit
 make ${INSTALLROOT}/include/ast/regex.h implicit
 make ${INSTALLROOT}/include/ast/ast_wchar.h implicit
+make ${INSTALLROOT}/include/ast/wctype.h implicit
+make ${INSTALLROOT}/include/ast/ast_wctype.h implicit
 make ${INSTALLROOT}/include/ast/endian.h implicit
 make ${INSTALLROOT}/include/ast/bytesex.h implicit
 make ${INSTALLROOT}/include/ast/ast_common.h implicit
@@ -69,7 +71,10 @@ prev ${INSTALLROOT}/include/ast/endian.h implicit
 done ${INSTALLROOT}/include/ast/ast_common.h dontcare
 done ${INSTALLROOT}/include/ast/bytesex.h dontcare
 done ${INSTALLROOT}/include/ast/endian.h dontcare
+done ${INSTALLROOT}/include/ast/ast_wctype.h dontcare
+done ${INSTALLROOT}/include/ast/wctype.h dontcare
 prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/wctype.h implicit
 prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 done ${INSTALLROOT}/include/ast/ast_wchar.h dontcare
