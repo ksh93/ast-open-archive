@@ -1057,51 +1057,52 @@ For the latest information vist the
 <TD align=center valign=center><A href="#lsa changes">lsa</A></TD>
 <TD align=center valign=center><A href="#merge changes">merge</A></TD>
 <TD align=center valign=center><A href="#netflow changes">netflow</A></TD>
+<TD align=center valign=center><A href="#num_t changes">num_t</A></TD>
 <TD align=center valign=center><A href="#opaque changes">opaque</A></TD>
 <TD align=center valign=center><A href="#stats changes">stats</A></TD>
 <TD align=center valign=center><A href="#tests changes">tests</A></TD>
-<TD align=center valign=center><A href="#text changes">text</A></TD>
 </TR><TR>
+<TD align=center valign=center><A href="#text changes">text</A></TD>
 <TD align=center valign=center><A href="#time_t changes">time_t</A></TD>
 <TD align=center valign=center><A href="#validate changes">validate</A></TD>
 <TD align=center valign=center><A href="#xml changes">xml</A></TD>
 <TD align=center valign=center><A href="#ie changes">ie</A></TD>
 <TD align=center valign=center><A href="#mailx changes">mailx</A></TD>
 <TD align=center valign=center><A href="#ncsl changes">ncsl</A></TD>
-<TD align=center valign=center><A href="#pack changes">pack</A></TD>
 </TR><TR>
+<TD align=center valign=center><A href="#pack changes">pack</A></TD>
 <TD align=center valign=center><A href="#pzip changes">pzip</A></TD>
 <TD align=center valign=center><A href="#re changes">re</A></TD>
 <TD align=center valign=center><A href="#sort changes">sort</A></TD>
 <TD align=center valign=center><A href="#std changes">std</A></TD>
 <TD align=center valign=center><A href="#tksh changes">tksh</A></TD>
 <TD align=center valign=center><A href="#tw changes">tw</A></TD>
-<TD align=center valign=center><A href="#warp changes">warp</A></TD>
 </TR><TR>
+<TD align=center valign=center><A href="#warp changes">warp</A></TD>
 <TD align=center valign=center><A href="#vczip changes">vczip</A></TD>
 <TD align=center valign=center><A href="#libast changes">libast</A></TD>
 <TD align=center valign=center><A href="#libardir changes">libardir</A></TD>
 <TD align=center valign=center><A href="#libcmd changes">libcmd</A></TD>
 <TD align=center valign=center><A href="#libdll changes">libdll</A></TD>
 <TD align=center valign=center><A href="#libexpr changes">libexpr</A></TD>
-<TD align=center valign=center><A href="#librecsort changes">librecsort</A></TD>
 </TR><TR>
+<TD align=center valign=center><A href="#librecsort changes">librecsort</A></TD>
 <TD align=center valign=center><A href="#libsum changes">libsum</A></TD>
 <TD align=center valign=center><A href="#libuu changes">libuu</A></TD>
 <TD align=center valign=center><A href="#libvdelta changes">libvdelta</A></TD>
 <TD align=center valign=center><A href="#libbz changes">libbz</A></TD>
 <TD align=center valign=center><A href="#libz changes">libz</A></TD>
 <TD align=center valign=center><A href="#libcoshell changes">libcoshell</A></TD>
-<TD align=center valign=center><A href="#libcs changes">libcs</A></TD>
 </TR><TR>
+<TD align=center valign=center><A href="#libcs changes">libcs</A></TD>
 <TD align=center valign=center><A href="#libmam changes">libmam</A></TD>
 <TD align=center valign=center><A href="#libpp changes">libpp</A></TD>
 <TD align=center valign=center><A href="#libcodex changes">libcodex</A></TD>
 <TD align=center valign=center><A href="#libdss changes">libdss</A></TD>
 <TD align=center valign=center><A href="#libpz changes">libpz</A></TD>
 <TD align=center valign=center><A href="#libtksh changes">libtksh</A></TD>
-<TD align=center valign=center><A href="#libtk changes">libtk</A></TD>
 </TR><TR>
+<TD align=center valign=center><A href="#libtk changes">libtk</A></TD>
 <TD align=center valign=center><A href="#libvcodex changes">libvcodex</A></TD>
 <TD align=center valign=center><A href="#libvgraph changes">libvgraph</A></TD>
 </TR></TABLE>
@@ -1116,7 +1117,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-11-01-28  --- Release ksh93u  ---
+11-02-02  --- Release ksh93u  ---
 11-01-28  A bug in file name completion for files containing both multibyte
 	  characters shell special characters has been fixed.
 11-01-18  The .sh.match variable now shows elements that do not match as
@@ -3761,6 +3762,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+11-02-02 pax-pds.c: ident now requires at least one dir entry
 10-10-10 file.c: don't prune state.update dirs based on time -- doh
 10-10-04 pax.c,misc.c: fix --meter off-by-one bugs for long paths
 10-10-04 pax.c: add #updated files to --update --verbose summary
@@ -4201,6 +4203,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+11-02-02 Makefile: don't update ../INIT/proto.c if no change or if cpp hack failed
 10-10-10 sear.sh: retain .exe suffix in sear -- its dos on the other side!
 10-09-10 sear.sh: add --args=args
 10-08-22 sear.sh: ratz+sear now requires -ladvapi32
@@ -4707,7 +4710,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-11-01-31 Makerules.mk: fix mam %.req to check for $INSTALLROOT/lib/lib/%
+11-02-02 --- release 5.6 ---
+11-02-02 command.c: fix .AFTER prereq bug that executed target twice
+11-02-02 Makerules.mk: add :LIBRARY: --static --private
+11-02-02 Makerules.mk: fix mam %.req to check for $INSTALLROOT/lib/lib/%
 11-01-21 expand.c: fix active() non-terminating loop for joint targets
 11-01-21 Makerules.mk: add "::" (.OPTIONS.$(&lt;)) : .PARAMETER
 11-01-18 Makerules.mk: handle sh patterns on rhs of :MAKE:
@@ -6520,6 +6526,13 @@ All recorded changes follow.
 
 </PRE>
 <P>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="num_t changes">num_t changes</A></H3></FONT></FONT></CENTER>
+<PRE>
+
+11-02-02 num_t.c: pow10 =&gt; pow_10 to avoid &lt;math.h&gt; clash
+
+</PRE>
+<P>
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="opaque changes">opaque changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
@@ -7546,6 +7559,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+11-02-02 sfio/sfmode.c: don't call sfsetbuf() on unbuffered stream to make it unbuffered
+11-02-02 features/wchar: handle hp.ia64 va_list interactions
+11-02-02 comp/omitted.c: fix mismatch between stat() vs _stat()
 11-01-31 std/wctype,features/wctype: add to handle &lt;wchar.h&gt; interactions
 11-01-28 add -lw for ancient sunos
 11-01-28 include/magic.h,misc/magic.c: add MAGIC_ALL
@@ -10996,7 +11012,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>February 01, 2011</TD>
+<TD align=right>February 08, 2011</TD>
 </TR>
 </TABLE>
 <P>

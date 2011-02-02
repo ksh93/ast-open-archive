@@ -42,11 +42,17 @@ if ! "$(-mam)"
 	#undef	__STDC__/' \
 		-e '/\/\*NODELAY_CONTROL\*\//s/^/#undef	DELAY_CONTROL /' \
 		$(*)
-		} > c.$(tmp).c
-		$(CPP) $(CPPFLAGS) -I$(INSTALLROOT)/include/ast -DPROTO_STANDALONE -D-F$(*) -D-L -I-D -E c.$(tmp).c |
+		} > a.$(tmp).c
+		$(CPP) $(CPPFLAGS) -I$(INSTALLROOT)/include/ast -DPROTO_STANDALONE -D-F$(*) -D-L -I-D -E a.$(tmp).c |
 		$(SED) -e 's%".*/src/cmd/proto/%"%' -e 's%".*/src/cmd/%"../%' -e 's%".*/src/lib/%"../../lib/%' |
-		$(PROTO) $(PROTOFLAGS:N!=-s) -f > $(<)
-		$(RM) -f c.$(tmp).c
+		$(PROTO) $(PROTOFLAGS:N!=-s) -f > b.$(tmp).c
+		if	$(CMP) -s b.$(tmp).c $(<:P=L*:O=N)
+		then	: no changes for $(<) :
+		elif	$(CC) -o b.$(tmp).x b.$(tmp).c 2>/dev/null
+		then	$(CP) b.$(tmp).c $(<)
+		else	: retain original $(<) :
+		fi
+		$(RM) -f ?.$(tmp).?
 	fi
 
 end

@@ -1,3 +1,4 @@
+11-02-02 pax-pds.c: ident now requires at least one dir entry
 10-10-10 file.c: don't prune state.update dirs based on time -- doh
 10-10-04 pax.c,misc.c: fix --meter off-by-one bugs for long paths
 10-10-04 pax.c: add #updated files to --update --verbose summary

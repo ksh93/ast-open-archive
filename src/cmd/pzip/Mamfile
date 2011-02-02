@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2011-01-31
+info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-02-02
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
@@ -73,7 +73,6 @@ done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
 done ${INSTALLROOT}/include/ast/stdio.h dontcare
-prev ${INSTALLROOT}/include/ast/wctype.h implicit
 prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 done ${INSTALLROOT}/include/ast/ast_wchar.h dontcare

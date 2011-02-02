@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-01-31 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-02-02 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2065,10 +2065,11 @@ RECURSEROOT = .
  */
 
 ":LIBRARY:" : .MAKE .OPERATOR .PROBE.INIT
-	local A B L M N P R S T V X
+	local A B I L M N P Q R S T V X
 	P := $(.PACKAGE.plugin)
 	B := $(<:O=1)
 	M := $(B)
+	I = 1
 	for T $(<:O>1)
 		if T == "+([-+.0-9])"
 			V := $(T)
@@ -2079,14 +2080,29 @@ RECURSEROOT = .
 				.DLL.TOP. = 1
 			end
 			.ALL : .$(B)
-		elif T == "id=*"
-			M := $(T:/id=//)
-		elif T == "plugin=*"
-			P := $(T:/plugin=//)
-		elif T == "shared=*"
-			N := $(T:/shared=//)
-		elif T == "static"
-			A = 1
+		else
+			if T == "--*"
+				T := $(T:/--//)
+			end
+			if T == "no*"
+				T := $(T:/no//}
+				X = 0
+			else
+				X = 1
+			end
+			if T == "id=*"
+				M := $(T:/id=//)
+			elif T == "install"
+				I := $(X)
+			elif T == "plugin=*"
+				P := $(T:/plugin=//)
+			elif T == "private"
+				let I = ! X
+			elif T == "shared=*"
+				N := $(T:/shared=//)
+			elif T == "static"
+				A := $(X)
+			end
 		end
 	end
 	if ! V
@@ -2114,19 +2130,21 @@ RECURSEROOT = .
 	$(L) : .ARCHIVE$(CC.SUFFIX.OBJECT)
 	.PLUGIN.$(B) := $(P)
 	.RETAIN : .PLUGIN.$(B)
-	if P
-		if ! A
+	if ! I || P
+		if ! I || ! A
 			:INSTALLDIR: $(L)
 		end
-		X := $(.DLL.NAME. $(B) $(V):B:C%\..*%%)
-		if CC.SHARED.REGISTRY
-			.CC.SHARED.REGISTRY.$(X) := $(LIBDIR)/$(P)/registry.ld
-			$(.DLL.NAME. $(B) $(V)) : .CC.DLL.DIR.INIT
-			.CC.DLL.DIR.INIT : .VIRTUAL .IGNORE $(LIBDIR)/$(P)
-			$(LIBDIR)/$(P) : .DO.INSTALL.DIR
+		if P
+			X := $(.DLL.NAME. $(B) $(V):B:C%\..*%%)
+			if I && CC.SHARED.REGISTRY
+				.CC.SHARED.REGISTRY.$(X) := $(LIBDIR)/$(P)/registry.ld
+				$(.DLL.NAME. $(B) $(V)) : .CC.DLL.DIR.INIT
+				.CC.DLL.DIR.INIT : .VIRTUAL .IGNORE $(LIBDIR)/$(P)
+				$(LIBDIR)/$(P) : .DO.INSTALL.DIR
+			end
+			.CC.DLL.DIR.$(X) := $(LIBDIR)/$(P)
+			.INSTALL.$(X) := .
 		end
-		.CC.DLL.DIR.$(X) := $(LIBDIR)/$(P)
-		.INSTALL.$(X) := .
 	end
 	if CC.SHARED.NAME && N != "-"
 		if N == "-+([0-9])"
@@ -2142,9 +2160,16 @@ RECURSEROOT = .
 		.CC.SHARED.NAME.$(X) := $(CC.SHARED.NAME)$(N)
 	end
 	if "$(>:G=%$(CC.SUFFIX.OBJECT):O=1)"
+		if ! I
+			X := $(.NO.INSTALL.)
+			.NO.INSTALL. := 1
+		end
 		eval
 		$(L) :: $(>:V:N!=[-+][lL]*)
 			$(@:V)
+		end
+		if ! I
+			.NO.INSTALL. := $(X)
 		end
 	end
 	.INSTALL : .DLL.CHECK.$(B)
@@ -2152,16 +2177,16 @@ RECURSEROOT = .
 	$(B).VERSION := $(V)
 	D := $(>:V:N=-L*)
 	if ! P || A
-		A := $(P)$(B)
-		S := $(A) $(>:V:N=[-+]l*::N!=[-+]l$(A)) $(.PACKAGE.LIBRARIES. $(.PACKAGE.build:A!=.TARGET):N!=[-+]l$(A)) $(LDLIBRARIES:N=[-+]l*:N!=[-+]l$(A))
+		Q := $(P)$(B)
+		S := $(Q) $(>:V:N=[-+]l*::N!=[-+]l$(Q)) $(.PACKAGE.LIBRARIES. $(.PACKAGE.build:A!=.TARGET):N!=[-+]l$(Q)) $(LDLIBRARIES:N=[-+]l*:N!=[-+]l$(Q))
 		eval
-		if ! "$(.NO.INSTALL.)"
-			$$(LIBDIR)/lib/$(A) :INSTALL: $(A).req
+		if I && ! "$(.NO.INSTALL.)"
+			$$(LIBDIR)/lib/$(Q) :INSTALL: $(Q).req
 		end
-		.REQUIRE.$(A) = $(S:U)
-		(.REQUIRE.$(A)) : .PARAMETER
+		.REQUIRE.$(Q) = $(S:U)
+		(.REQUIRE.$(Q)) : .PARAMETER
 		if "$(-mam:N=static*,port*)"
-			$(A).req : (CC) (CCFLAGS) (LDFLAGS) (.REQUIRE.$(A))
+			$(Q).req : (CC) (CCFLAGS) (LDFLAGS) (.REQUIRE.$(Q))
 				set -
 				echo 'int main(){return 0;}' > 1.$(tmp).c
 				$$(CC) $$(CCFLAGS) -c 1.$(tmp).c &&
@@ -2170,9 +2195,9 @@ RECURSEROOT = .
 				case "$(D)" in
 				*?)	echo " $(D)" ;;
 				esac
-				for i in $$(.MAM.REQ. $$(.REQUIRE.$(A)))
+				for i in $$(.MAM.REQ. $$(.REQUIRE.$(Q)))
 				do	case $i in
-					"$(A)"$(...:A=.ARCHIVE:A=.TARGET:N=$(CC.PREFIX.ARCHIVE)*$(CC.SUFFIX.ARCHIVE):/^$(CC.PREFIX.ARCHIVE)\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
+					"$(Q)"$(...:A=.ARCHIVE:A=.TARGET:N=$(CC.PREFIX.ARCHIVE)*$(CC.SUFFIX.ARCHIVE):/^$(CC.PREFIX.ARCHIVE)\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
 						;;
 					*)	if	test -f  $$(LIBDIR)/lib/$i
 						then	y=`cat $$(LIBDIR)/lib/$i`
@@ -2195,18 +2220,21 @@ RECURSEROOT = .
 				} > $$(<)
 				$$(RM) $$(RMFLAGS) 1.$(tmp).*
 		else
-			$(A).req : (CC) (.REQUIRE.$(A)) .PREQUIRE
-				echo "" $$(.REQ. $$(.REQUIRE.$(A))) > $$(<)
+			$(Q).req : (CC) (.REQUIRE.$(Q)) .PREQUIRE
+				echo "" $$(.REQ. $$(.REQUIRE.$(Q))) > $$(<)
 		end
-		$(L) : .INSERT $(A).req.REQUIRE
-		$(A).req.REQUIRE : .VIRTUAL .IGNORE .NULL $(A).req
+		$(L) : .INSERT $(Q).req.REQUIRE
+		$(Q).req.REQUIRE : .VIRTUAL .IGNORE .NULL $(Q).req
 		end
 	end
 	eval
 	_BLD_$(M:B:S:/[^a-zA-Z0-9_]/_/G) == 1
 	end
 	.LIBRARY.ONLY. += _BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G)=
-	$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
+	$(T) : $(L)
+	if ! A
+		$(T) : $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
+	end
 
 /*
  * <pseudo-library> :REQUIRE: -[lL]*
@@ -2408,25 +2436,25 @@ RECURSEROOT = .
 
 .SHARED.BIND. : .FUNCTION
 	local ( B X ... ) $(%)
-	local A L P S N
+	local A F L P S N
 	N := $(.SHARED.LIST.EXCLUDE.)
 	X += $("$(B).req":T=F:P=X:T=I:N!=$("\n")|[-+]l$(B)|$(X:/ /|/G):$(N))
 	if "$(X)"
 		let .NO.LIB.TYPE = .NO.LIB.TYPE + 1
-		for L $(X)
+		for F $(X)
 			if "$(CC.SHARED)"
-				if L == "+l*|-ldl|-liconv" /* XXX: probe!!! */
-					S += $(L)
-					if L == "+l*"
+				if F == "+l*|-ldl|-liconv" /* XXX: probe!!! */
+					S += $(F)
+					if F == "+l*"
 						if ! ( P = "$(<:T=M:A=.COMMAND:O=1)" ) 
 							P := $(<:T=M:B:S:N=$(CC.PREFIX.ARCHIVE)*$(CC.SUFFIX.ARCHIVE)|$(CC.PREFIX.SHARED)*$(CC.SUFFIX.SHARED)*:O=1)
 						end
 						if P
-							.PACKAGE.$(L:/+l//).library.$(P) := +l
+							.PACKAGE.$(F:/+l//).library.$(P) := +l
 						end
 					end
 				else
-					L := $(L:T=F)
+					L := $(F:T=F)
 					if L == "-l*|*$(CC.SUFFIX.DYNAMIC|CC.SUFFIX.SHARED|"..")|*/libm.a" /* XXX: probe!!! */
 						S += $(L)
 						if CC.SUFFIX.STATIC
@@ -2434,6 +2462,8 @@ RECURSEROOT = .
 								S += $(A)
 							end
 						end
+					elif L && "$(L:A=.TARGET)"
+						S += $(.REQUIRE.-l% $(F))
 					else
 						P := lib/$(L:B:/$(CC.PREFIX.SHARED)//)
 						$(P) : .ARCHIVE
@@ -2443,7 +2473,7 @@ RECURSEROOT = .
 					end
 				end
 			else
-				L := $(L:T=F)
+				L := $(F:T=F)
 				if L == "*$(CC.SUFFIX.ARCHIVE)"
 					S += $(L)
 				end

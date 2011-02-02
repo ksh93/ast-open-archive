@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1068,12 +1068,17 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 						}
 						else
 #endif
-						if (job->target == jammed && job->status != RUNNING)
+						if (job->target == jammed)
 						{
-							jammed = 0;
-							job->status = READY;
-							state.jobs++;
-							goto unjam;
+							if (job->status == AFTER)
+								goto another;
+							if (job->status != RUNNING)
+							{
+								jammed = 0;
+								job->status = READY;
+								state.jobs++;
+								goto unjam;
+							}
 						}
 				}
 				break;

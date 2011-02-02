@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -36,13 +36,13 @@
 		if (i = (format)->fixedpoint) \
 			for (;;) \
 			{ \
-				if (i < elementsof(pow10)) \
+				if (i < elementsof(pow_10)) \
 				{ \
-					f *= pow10[i]; \
+					f *= pow_10[i]; \
 					break; \
 				} \
-				f *= pow10[elementsof(pow10) - 1]; \
-				i -= elementsof(pow10); \
+				f *= pow_10[elementsof(pow_10) - 1]; \
+				i -= elementsof(pow_10); \
 			} \
 	}
 
@@ -52,18 +52,18 @@
 		if (i = (format)->fixedpoint) \
 			for (;;) \
 			{ \
-				if (i < elementsof(pow10)) \
+				if (i < elementsof(pow_10)) \
 				{ \
-					f /= pow10[i]; \
+					f /= pow_10[i]; \
 					break; \
 				} \
-				f /= pow10[elementsof(pow10) - 1]; \
-				i -= elementsof(pow10); \
+				f /= pow_10[elementsof(pow_10) - 1]; \
+				i -= elementsof(pow_10); \
 			} \
 		(value)->number = f; \
 	}
 
-static const Cxnumber_t		pow10[] =
+static const Cxnumber_t		pow_10[] =
 {
 	1E0,
 	1E1,

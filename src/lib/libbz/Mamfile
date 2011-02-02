@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.5 2011-01-31
+info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-02-02
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make LICENSE
-done LICENSE
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make bz
 make libbz.a archive
@@ -100,7 +100,6 @@ done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_wctype.h dontcare
 done ${PACKAGE_ast_INCLUDE}/wctype.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/wctype.h implicit
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
@@ -265,7 +264,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
 prev ${PACKAGE_ast_INCLUDE}
 prev sfdcbzip.h
-exec - proto -p -s -l LICENSE '-o zlib,since=1996,author="Julian R Seward"'  sfdcbzip.h  > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1996,author="Julian R Seward"'  sfdcbzip.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcbzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
@@ -273,7 +272,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/sfdcbzip.h generated
 make ${PACKAGE_ast_INCLUDE}/bzlib.h
 prev bzlib.h
-exec - proto -p -s -l LICENSE '-o zlib,since=1996,author="Julian R Seward"'  bzlib.h  > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1996,author="Julian R Seward"'  bzlib.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/bzlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/bzlib.h

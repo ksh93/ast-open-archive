@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -100,6 +100,7 @@
  *   2008             (5.3)             .	AT&T Research
  *   2009             (5.4)             .	AT&T Research
  *   2010             (5.5)             .	AT&T Research
+ *   2011             (5.6)             .	AT&T Research
  *
  * command line arguments are of three types
  *

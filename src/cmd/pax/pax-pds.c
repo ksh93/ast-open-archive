@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -108,7 +108,11 @@ pds_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 		}
 	}
  done:
-	pds->size = i;
+	if (!(pds->size = i))
+	{
+		free(pds);
+		return 0;
+	}
 	m = 0;
 	while (links > 0)
 	{
