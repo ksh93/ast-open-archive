@@ -20,7 +20,7 @@ sear :: sear.sh LICENSE=since=2001,author=dgk+gsf
 
 changes :: changes.sh LICENSE=since=2005,author=gsf
 
-$(LIBDIR)/sear :INSTALLDIR: ratz.c sear.ico
+$(LIBDIR)/sear :INSTALLDIR: ratz.c sear.ico sear32.ico sear64.ico
 
 :TEST: proto
 

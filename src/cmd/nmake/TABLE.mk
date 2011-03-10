@@ -32,7 +32,7 @@
 					class := $(class)_
 				end
 				if format
-					format := F=%($(format))s
+					format := F=%($(format))S
 				end
 				format := :$(format)
 				if options

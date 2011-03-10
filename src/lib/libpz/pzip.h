@@ -81,6 +81,10 @@
 #define PZ_PUSHED	0x00100000	/* internal sfdcpzip() stream	*/
 #define PZ_SPLIT	0x00200000	/* open for split		*/
 #define PZ_SORT		0x00400000	/* sort window before deflate	*/
+#define PZ_VARIABLE	0x00800000	/* variable row size		*/
+
+#define PZ_VAR_OFF(r)	((r)&0x3fff)	/* row => offset		*/
+#define PZ_VAR_LEN(r)	(1<<(((r)>>14)&0x3))	/* row => size len	*/
 
 #define PZ_VERIFY	PZ_STAT		/* verify but don't push	*/
 

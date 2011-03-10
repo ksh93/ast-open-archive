@@ -43,7 +43,7 @@ USAGE_LICENSE
 "	applications. Failed matches usually result in the less informative"
 "	\bascii text\b or \bbinary data\b.]"
 
-"[a:all?List all mabgic table matches.]"
+"[a:all?List all magic table matches.]"
 "[c:mime?List the \bmime\b(1) classification for each \afile\a. Although the"
 "	default descriptions are fairly consistent, use \b--mime\b for"
 "	precise classification matching.]"

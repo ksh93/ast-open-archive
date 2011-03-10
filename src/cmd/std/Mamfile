@@ -538,7 +538,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n seq.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: seq contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n seq.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -576,7 +579,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n shar.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: shar contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n shar.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac

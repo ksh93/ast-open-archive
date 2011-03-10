@@ -26,7 +26,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Research) 2011-01-11 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Research) 2011-03-03 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -818,22 +818,72 @@ main(int argc, char** argv)
 			while (state.in.complete != r)
 			{
 				s = b;
+
+				/*
+				 * m is the amount actually read
+				 * c is the specified (or default) block size
+				 */
+
 				if (m >= c)
 				{
-					n = c;
+					/*
+					 * the read gave us at least a complete block
+					 */
+
 					state.in.complete++;
+
+					/*
+					 * set n (the # of bytes to write) to the block size
+					 */
+
+					n = c;
+
+					/*
+					 * if we've hit the block count, check to see if the
+					 * previous write was in the middle of an output block, and
+					 * adjust the # of bytes to write accordingly; don't bother
+					 * adjusting the remains, since we're done
+					 */
+
+					if (state.in.complete >= r && (state.in.remains + n) >= c)
+						n -= state.in.remains;
 				}
 				else
 				{
+					/*
+					 * read gave us less than a complete block
+					 */
+
 					n = m;
 					if (state.in.special)
 						state.in.partial++;
-					if ((state.in.remains += n) >= c)
+
+					/*
+					 * see if writing the amount read in will cross an (output) block boundry
+					 */
+
+					if ((state.in.remains + n) >= c)
 					{
-						state.in.remains -= c;
 						state.in.complete++;
-						partial++;
+
+						/*
+						 * see above comment on block count, but also adjust
+						 * partial block byte count (remains)
+						 */
+
+						if (state.in.complete >= r)
+						{
+							n = c - state.in.remains;
+							state.in.remains += m - c;
+						}
+						else
+						{
+							partial++;
+							state.in.remains += m - c;
+						}
 					}
+					else
+						state.in.remains += n;
 					if (f & SYNC)
 					{
 						s = memcpy(state.buffer, s, n);

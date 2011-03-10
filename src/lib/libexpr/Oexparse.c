@@ -1639,7 +1639,7 @@ case 70:
 			if (!expr.program->disc->getf)
 				exerror("%s: function references not supported", exval.expr->data.operand.left->data.variable.symbol->name);
 			else if (expr.program->disc->reff)
-				(*expr.program->disc->reff)(expr.program, exval.expr, exval.expr->data.operand.left->data.variable.symbol, exvsp[-4].reference, NiL, EX_CALL, expr.program->disc);
+				(*expr.program->disc->reff)(expr.program, exval.expr->data.operand.left, exval.expr->data.operand.left->data.variable.symbol, exvsp[-4].reference, NiL, EX_CALL, expr.program->disc);
 		}
 break;
 case 71:

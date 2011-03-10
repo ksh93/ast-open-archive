@@ -46,7 +46,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n mamdag.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: mamdag contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n mamdag.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -83,7 +86,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n mamdot.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: mamdot contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n mamdot.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -120,7 +126,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n mamexec.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: mamexec contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n mamexec.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -274,7 +283,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n mamsh.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: mamsh contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n mamsh.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac

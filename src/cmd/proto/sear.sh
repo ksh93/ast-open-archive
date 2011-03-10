@@ -34,7 +34,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2010-10-10 $
+@(#)$Id: sear (AT&T Labs Research) 2011-03-04 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -57,8 +57,8 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
     string after the runtime sear operands are appended.]:[args]
 [b:bootstrap?Bootstrap-sepcific link.]
 [c:cc?The C compiler command and flags are set to \acc\a.]:[cc:='$cc$']
-[i:icon?The resource icon is set to
-    \aicon\a.]:[icon:=$INSTALLROOT/lib/sear/sear.ico]
+[i:icon?The resource icon is set to \aicon\a. The default is a 32 or 64
+    bit icon.]:[icon:=$INSTALLROOT/lib/sear/sear??.ico]
 [m:meter?Set the \bratz\b(1) \b--meter\b option when the archive is
     extracted.]
 [o:output?The self extracting file name is \afile\a.]:[file:='$out$']
@@ -117,49 +117,32 @@ do	case $OPT in
 done
 shift $((OPTIND-1))
 
-case $src in
-'')	f=ratz.c
-	for i in ${PATH//:/ }
-	do	if	test -f ${i%/*}/lib/$COMMAND/$f
-		then	src=${i%/*}/lib/$COMMAND/$f
-			break
-		fi
-	done
-	case $src in
-	'')	echo "$COMMAND: $f: cannot locate ratz source" >&2
-		exit 1
-		;;
-	esac
-	;;
-*)	if	test ! -f $src 
-	then	echo "$COMMAND: $src: cannot read ratz source" >&2
+if	[[ ! $src ]]
+then	f=ratz.c
+	src=$(dirname -r lib/$COMMAND/$f)
+	if	[[ ! $src ]]
+	then	echo "$COMMAND: $f: cannot locate ratz source" >&2
 		exit 1
 	fi
-	;;
-esac
-case $ico in
-'')	f=sear.ico
-	for i in ${PATH//:/ }
-	do	if	test -f ${i%/*}/lib/$COMMAND/$f
-		then	ico=${i%/*}/lib/$COMMAND/$f
-			break
-		fi
-	done
-	case $ico in
-	'')	echo "$COMMAND: $f: cannot locate icon source" >&2
-		exit 1
-		;;
-	esac
-	;;
-*)	if	test ! -f $ico 
-	then	echo "$COMMAND: $ico: cannot read icon" >&2
+elif	[[ ! -f $src ]]
+then	echo "$COMMAND: $src: cannot read ratz source" >&2
+	exit 1
+fi
+if	[[ ! $ico ]]
+then	w=$(uname -i 2>/dev/null)
+	w=${w%/*}
+	[[ $w == 32 || $w == 64 ]] || w=
+	f=sear$w.ico
+	ico=$(dirname -r lib/$COMMAND/$f)
+	if	[[ ! $ico ]]
+	then	echo "$COMMAND: $f: cannot locate icon source" >&2
 		exit 1
 	fi
-	;;
-esac
-case $opt in
-?*)	cc="$cc -D_SEAR_OPTS=\"-$opt\"" ;;
-esac
+elif	[[ ! -f $ico ]]
+then	echo "$COMMAND: $ico: cannot read icon" >&2
+	exit 1
+fi
+[[ $opt ]] && cc="$cc -D_SEAR_OPTS=\"-$opt\""
 cc="$cc $dyn"
 
 tmp=/tmp/sear$$

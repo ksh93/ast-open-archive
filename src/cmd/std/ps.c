@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2010-12-01 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2011-03-10 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -976,7 +976,10 @@ ps(Ps_t* pp)
 		}
 		s = "????";
 	string:
-		sfprintf(sfstdout, "%*.*s%s", kp->width, kp->prec, s, kp->sep);
+		if (kp->width == kp->prec)
+			sfprintf(sfstdout, "%0*s%s", kp->width, s, kp->sep);
+		else
+			sfprintf(sfstdout, "%*.*s%s", kp->width, kp->prec, s, kp->sep);
 		continue;
 	zombie:
 		s = "-";

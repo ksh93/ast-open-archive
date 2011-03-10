@@ -516,7 +516,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n delta2patch.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: delta2patch contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n delta2patch.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -553,7 +556,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n rpm2cpio.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: rpm2cpio contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n rpm2cpio.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -662,7 +668,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n testpax.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: testpax contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n testpax.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac

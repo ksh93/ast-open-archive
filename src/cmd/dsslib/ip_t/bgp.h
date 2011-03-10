@@ -117,10 +117,11 @@
 #define BGP_stamp		((57<<1)|1)
 #define BGP_time		((58<<1)|1)
 #define BGP_type		((59<<1)|1)
-#define BGP_weight		((60<<1)|1)
-#define BGP_unknown		((61<<1)|1)
+#define BGP_usec		((60<<1)|1)
+#define BGP_weight		((61<<1)|1)
+#define BGP_unknown		((62<<1)|1)
 
-#define BGP_LAST		61
+#define BGP_LAST		62
 
 #define BGP_INDEX(x)		(((x)>>1)-1)
 
@@ -220,6 +221,7 @@ struct Bgproute_s
 	Bgpnum_t	med;		/* med				*/
 	Bgpnum_t	weight;		/* router proprietary weight	*/
 	Bgpnum_t	time;		/* packet event time stamp	*/
+	Bgpnum_t	usec;		/* packet event time stamp usec	*/
 	Bgpnum_t	stamp;		/* data time stamp		*/
 	Bgpnum_t	originator;	/* originator id		*/
 	Bgpnum_t	agg_addr;	/* aggregator addr		*/
@@ -274,7 +276,7 @@ struct Bgproute_s
 	unsigned char	agg_addr32v6[16];/* aggregator as32 addr	*/
 	unsigned char	prefixv6[17];	/* prefix			*/
 
-	char		pad[16];	/* pad to 8 byte boundary	*/
+	char		pad[12];	/* pad to 8 byte boundary	*/
 
 	char		data[1752];	/* vector data (round to 2K)	*/
 };

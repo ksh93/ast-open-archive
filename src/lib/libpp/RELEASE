@@ -1,3 +1,4 @@
+11-03-02 ppop.c,ppcontrol.c: use ppset() to handle readonly values
 10-09-01 RE errors => exit(2)
 10-09-01 ppcall.c: no disgnostic for 0 actual args for 1 formal arg
 10-06-29 ppargs.c: ignore -H<number> (hpux /opt/langtools/lbin/cpp.ansi)

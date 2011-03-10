@@ -35,7 +35,7 @@
 #define SNAPSHOT_DELIM	"|"
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Research) 2010-08-15 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Research) 2011-03-03 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the "
@@ -199,7 +199,7 @@ USAGE_LICENSE
         "[+atime?access time; time/date strings are interpreted as "
             "\bdate\b(1) expressions]"
         "[+blocks?number of 1k blocks]"
-        "[+checksum?the file contents 32X4 checksum]"
+        "[+checksum?equivalent to \bsum(\"tw\")]"
         "[+ctime?status change time]"
         "[+dev?file system device]"
         "[+fstype?file system type name; \bufs\b if it can't be "
@@ -215,7 +215,7 @@ USAGE_LICENSE
             "initial value is 0. Multiple \alocal\a elements may be declared "
             "by \bint local.\b\aelement1\a...;. In this case the \blocal\b "
             "field itself is not accessible.]"
-        "[+md5sum?the file contents md5 checksum]"
+        "[+md5sum?equivalent to \bsum(\"md5\")]"
         "[+mime?the file contents \afile\a(1) \b--mime\b type]"
         "[+mode?type and permission bits; the \bFMT\b constant may be "
             "used to mask mask the file type and permission bits; \bmode\b "
@@ -237,6 +237,8 @@ USAGE_LICENSE
                 "[+SKIP?do not consider this file or any subdirectories "
                     "if it is a directory]"
             "}"
+        "[+sum(\"\amethod\a\")?file contents checksum using \amethod\a; "
+            "see \bsum\b(1) \b--method\b for details.]"
         "[+symlink?the symbolic link text if the file is a symbolic "
             "link]"
         "[+type?the type bits of \bmode\b:]"
@@ -325,7 +327,7 @@ USAGE_LICENSE
 "[+NOTES?In order to access the \bslocate\b(1) database the \btw\b "
     "executable must be setgid to the \bslocate\b group.]"
 "[+SEE ALSO?\bfind\b(1), \bgetconf\b(1), \blocate\b(1), \bslocate\b(1), "
-    "\bupdatedb\b(1), \bxargs\b(1)]"
+    "\bsum\b(1), \bupdatedb\b(1), \bxargs\b(1)]"
 ;
 
 #include "tw.h"

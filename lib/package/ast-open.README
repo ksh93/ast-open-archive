@@ -19,7 +19,7 @@ Source Package Installation Instructions:
   (4) If the bin/package script does not exist then run:
 		test -d bin || mkdir bin
 		url=$URL/package
-		(wget -O bin/package $url||curl $url||hurl $url) > bin/package
+		(wget -O bin/package $url||curl -L $url||hurl $url) > bin/package
 		chmod +x bin/package
   (5) Determine the list of package names you want from the download site, then
       use the package(1) command to do the actual download:
@@ -93,7 +93,11 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-11-02-02  --- Release ksh93u  ---
+11-02-08  --- Release ksh93u  ---
+11-02-08  A bug in which opening standard output after it has been closed with
+	  exec 1>&- doesn't work has been fixed.
+11-02-07  A bug on some systems for which a command subtitution could hang
+	  has been fixed.
 11-01-28  A bug in file name completion for files containing both multibyte
 	  characters shell special characters has been fixed.
 11-01-18  The .sh.match variable now shows elements that do not match as
@@ -2735,6 +2739,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+11-02-11 pax-tnef.c: handle "" member names -- really?
 11-02-02 pax-pds.c: ident now requires at least one dir entry
 10-10-10 file.c: don't prune state.update dirs based on time -- doh
 10-10-04 pax.c,misc.c: fix --meter off-by-one bugs for long paths
@@ -3170,6 +3175,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+11-03-04 sear.sh: add { sear32.ico sear64.ico }, $(dirname -r lib/$COMMAND/...)
 11-02-02 Makefile: don't update ../INIT/proto.c if no change or if cpp hack failed
 10-10-10 sear.sh: retain .exe suffix in sear -- its dos on the other side!
 10-09-10 sear.sh: add --args=args
@@ -3650,6 +3656,9 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+11-03-03 rules.win32.mk: add %.rc -DRCWOW=...
+11-03-02 Makerules.mk: fix :LIBRARY: --plugin=foo --static to generate the plugin!
+11-02-11 add '### .*archaic.* ###' test for %.sh install to diable sh -n check
 11-02-02 --- release 5.6 ---
 11-02-02 command.c: fix .AFTER prereq bug that executed target twice
 11-02-02 Makerules.mk: add :LIBRARY: --static --private
@@ -5342,6 +5351,7 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+11-03-02 bgp.h: add packet time usec part
 11-01-21 testiv.c: change to store hop prefix&name in segment data
 10-02-02 bgp.h: add rfc3107 BGP_labels
 10-02-02 ip_t.c: add labels_t -- pairs of 32 bit integers
@@ -5934,6 +5944,9 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+11-03-10 ps.c: use %0<width>s for string fields to retain last <width> chars of long strings
+11-03-03 dd.c: fix writes beyond count for piped input across partial input blocks (thanks ggreen)
+11-02-11 mount.c: fix umount operand verification
 11-01-28 file.c: add -a, --all to list all magic table matches
 11-01-11 dd.c,iconv.c: convert Iconv_disc_t* for iconv_move() and iconv_write()
 11-01-11 iconv.c: add posix { -c,--omit -l,--list -s,--silent }
@@ -6242,6 +6255,7 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+11-03-03 expr.c: add sum("method") for all libsum methods
 10-11-30 tw.tst: add "begin" scope tests
 10-09-01 find.c: RE errors => exit(2)
 10-08-18 tw.tst: add expr scope tests
@@ -6382,6 +6396,10 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+11-03-10 sfio/sfvprintf.c: add %0<width>s to preserve <width> trailing chars in string arg
+11-03-09 misc/magic.c: add %d...%s where if %d==1 then %s=="" else %s=="s"
+11-03-09 misc/magic.tab: add windows ico
+11-02-08 misc/stk.c: change STK_FSIZE to (1024*sizeof(char*)) for 64 bit normalization
 11-02-02 sfio/sfmode.c: don't call sfsetbuf() on unbuffered stream to make it unbuffered
 11-02-02 features/wchar: handle hp.ia64 va_list interactions
 11-02-02 comp/omitted.c: fix mismatch between stat() vs _stat()
@@ -8484,6 +8502,8 @@ All recorded changes follow.
 
 :::::::: libexpr ::::::::
 
+11-03-03 eparse.y: fix function reff node pointer
+11-03-03 exeval.c: function env is args[-1]
 10-11-30 fix "begin" scope logic that caused tw bug
 10-08-18 add static, global and function level variable scopes
 09-02-02 exgram.h: drop function ref in call() to avoid eval in exeval()
@@ -8847,6 +8867,7 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+11-03-02 ppop.c,ppcontrol.c: use ppset() to handle readonly values
 10-09-01 RE errors => exit(2)
 10-09-01 ppcall.c: no disgnostic for 0 actual args for 1 formal arg
 10-06-29 ppargs.c: ignore -H<number> (hpux /opt/langtools/lbin/cpp.ansi)
@@ -9537,6 +9558,7 @@ All recorded changes follow.
 
 :::::::: libpz ::::::::
 
+11-03-07 pzip.h,pzpart.c: handle length@offset variable row size
 06-12-18 pzline.c: move to separate plugin source dir
 06-10-11 add sfstruse() error checks
 06-03-22 pzopen.c: change "input stream close error" to "data corrupted"

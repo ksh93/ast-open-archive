@@ -656,7 +656,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n genlocal.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: genlocal contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n genlocal.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -693,7 +696,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n genshare.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: genshare contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n genshare.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac

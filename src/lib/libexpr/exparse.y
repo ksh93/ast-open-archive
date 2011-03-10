@@ -727,7 +727,7 @@ expr		:	'(' expr ')'
 			if (!expr.program->disc->getf)
 				exerror("%s: function references not supported", $$->data.operand.left->data.variable.symbol->name);
 			else if (expr.program->disc->reff)
-				(*expr.program->disc->reff)(expr.program, $$, $$->data.operand.left->data.variable.symbol, $1, NiL, EX_CALL, expr.program->disc);
+				(*expr.program->disc->reff)(expr.program, $$->data.operand.left, $$->data.operand.left->data.variable.symbol, $1, NiL, EX_CALL, expr.program->disc);
 		}
 		|	EXIT '(' expr ')'
 		{

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -30,7 +30,7 @@
 #if _lib_mount && ( _lib_umount || _lib_unmount )
 
 static const char mount_usage[] =
-"[-?\n@(#)$Id: mount (AT&T Research) 2003-07-29 $\n]"
+"[-?\n@(#)$Id: mount (AT&T Research) 2011-02-11 $\n]"
 USAGE_LICENSE
 "[+NAME?mount - mount and display filesystems]"
 "[+DESCRIPTION?\bmount\b attaches a named filesystem \afs\a to the"
@@ -160,6 +160,8 @@ extern int	unmount(const char*);
 #define MATCH_NOHOST	002
 #define MATCH_TYPE	004
 #define MATCH_NOTYPE	010
+
+typedef int (*Cmp_f)(const char*, const char*);
 
 typedef struct
 {
@@ -317,7 +319,9 @@ main(int argc, register char** argv)
 	register Mnt_t*	mnt;
 	const char*	usage;
 	void*		mp;
+	char*		p;
 	int		trydefault;
+	Cmp_f		cmp;
 	Mnt_t		ent;
 
 	NoP(argc);
@@ -405,7 +409,9 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if ((s = *argv) && !*++argv && !state.mtab || state.mtab && (!*state.mtab || streq(state.mtab, "-")) || !state.mtab && (state.all || state.match))
 		state.mtab = FSTAB;
-	if (!(mp = mntopen(state.mtab, "r")) && (!trydefault || !(mp = mntopen(state.mtab, "r"))))
+	if (state.unmount && (!s || *argv))
+		error(ERROR_SYSTEM|3, "one argument expected");
+	if (!(mp = mntopen(state.mtab, "r")) && (!trydefault || !(mp = mntopen(state.mtab = 0, "r"))))
 	{
 		if (state.mtab && !trydefault)
 			error(ERROR_SYSTEM|3, "%s: cannot open fs table", state.mtab);
@@ -448,14 +454,27 @@ main(int argc, register char** argv)
 		for (;;)
 		{
 			while (mnt = mntread(mp))
-				if (streq(mnt->fs, s) || streq(mnt->dir, s))
+			{
+				cmp = (Cmp_f)strcmp;
+				if (p = mnt->options)
+					while (*p)
+					{
+						if (*p == 'i' && (!memcmp(p, "ic", 2) || !memcmp(p, "icase", 5) || !memcmp(p, "ignorecase", 10)))
+						{
+							cmp = (Cmp_f)strcasecmp;
+							break;
+						}
+						while (*p && *p++ != ',');
+					}
+				if (!(*cmp)(mnt->fs, s) || !(*cmp)(mnt->dir, s))
 				{
 					mountop(mnt, state.options);
 					break;
 				}
+			}
 			if (!mnt)
 			{
-				if (trydefault)
+				if (trydefault && state.mtab)
 				{
 					trydefault = 0;
 					mntclose(mp);

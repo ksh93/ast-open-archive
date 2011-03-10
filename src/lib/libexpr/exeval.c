@@ -547,7 +547,7 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 	char*			e;
 	Exnode_t		tmp;
 	Exassoc_t*		assoc;
-	Extype_t		args[FRAME];
+	Extype_t		args[FRAME+1];
 	Extype_t		save[FRAME];
 
 	if (!expr || ex->loopcount)
@@ -773,9 +773,10 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		return v;
 	case FUNCTION:
 		n = 0;
+		args[n++].string = (char*)env;
 		for (x = expr->data.operand.right; x && n < elementsof(args); x = x->data.operand.right)
 			args[n++] = eval(ex, x->data.operand.left, env);
-		return (*ex->disc->getf)(ex, expr->data.operand.left, expr->data.operand.left->data.variable.symbol, expr->data.operand.left->data.variable.reference, args, EX_CALL, ex->disc);
+		return (*ex->disc->getf)(ex, expr->data.operand.left, expr->data.operand.left->data.variable.symbol, expr->data.operand.left->data.variable.reference, args+1, EX_CALL, ex->disc);
 	case ID:
 		if (expr->data.variable.index)
 			i = eval(ex, expr->data.variable.index, env);

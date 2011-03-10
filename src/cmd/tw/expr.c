@@ -34,6 +34,12 @@
 
 #define STAT(f,b)	((state.ftwflags&FTW_PHYSICAL)?lstat(f,b):pathstat(f,b))
 
+typedef struct Exsum_s
+{
+	Sum_t*		sum;
+	Sfio_t*		buf;
+} Exsum_t;
+
 static Exid_t	symbols[] =
 {
 	EXID("AGAIN",	CONSTANT,	C_AGAIN,	INTEGER,	0),
@@ -91,6 +97,7 @@ static Exid_t	symbols[] =
 	EXID("rdev",	ID,		F_rdev,		INTEGER,	0),
 	EXID("size",	ID,		F_size,		INTEGER,	0),
 	EXID("status",	ID,		F_status,	INTEGER,	0),
+	EXID("sum",	FUNCTION,	X_sum,		S|A(1,S),	0),
 	EXID("symlink",	ID,		F_symlink,	STRING,		0),
 	EXID("type",	ID,		F_type,		INTEGER,	0),
 	EXID("uid",	ID,		F_uid,		T_UID,		0),
@@ -126,74 +133,27 @@ deref(register Ftw_t* ftw, Exid_t* sym, register Exref_t* ref)
 }
 
 /*
- * return 32X4 checksum for path
+ * return sum() for path
  */
 
 static char*
-checksum(const char* path)
-{
-	register int		c;
-	register unsigned char*	s;
-	register unsigned char*	e;
-	register Sfio_t*	sp;
-
-	uint32_t		k0 = 0;
-	uint32_t		k1 = 0;
-	uint32_t		k2 = 0;
-	uint32_t		k3 = 0;
-
-	static char		buf[25];
-
-	if (!(sp = sfopen(NiL, path, "r")))
-		goto bad;
-	while (s = (unsigned char*)sfreserve(sp, SF_UNBOUND, 0))
-	{
-		e = s + sfvalue(sp);
-		while (s < e)
-		{
-			c = *s++;
-			k0 = k0 * 0x63c63cd9 + 0x9c39c33d + c;
-			k1 = k1 * 0x00000011 + 0x00017cfb + c;
-			k2 = k2 * 0x12345679 + 0x3ade68b1 + c;
-			k3 = k3 * 0xf1eac01d + 0xcafe10af + c;
-		}
-	}
-	sfsprintf(buf, sizeof(buf), "%06..64u%06..64u%06..64u%06..64u", k0, k1, k2, k3);
-	c = sfvalue(sp) != 0;
-	if (sfclose(sp) || c)
-		goto bad;
-	return buf;
- bad:
-	return "*******READ-ERROR*******";
-}
-
-/*
- * return md5 checksum for path
- */
-
-static char*
-md5sum(const char* path)
+sum(Exsum_t* sum, const char* path)
 {
 	Sfio_t*			sp;
 	char*			s;
 	int			r;
 
-	static Sum_t*		sum;
-	static Sfio_t*		buf;
-
-	if (!sum && !(sum = sumopen("md5")) || !buf && !(buf = sfstropen()))
-		error(3, "md5 checksum initialization error");
-	suminit(sum);
+	suminit(sum->sum);
 	if (!(sp = sfopen(NiL, path, "r")))
 		goto bad;
 	while (s = (char*)sfreserve(sp, SF_UNBOUND, 0))
-		sumblock(sum, s, sfvalue(sp));
+		sumblock(sum->sum, s, sfvalue(sp));
 	r = !!sfvalue(sp);
 	if (sfclose(sp) || r)
 		goto bad;
-	sumdone(sum);
-	sumprint(sum, buf, 0, 0);
-	return sfstruse(buf);
+	sumdone(sum->sum);
+	sumprint(sum->sum, sum->buf, 0, 0);
+	return sfstruse(sum->buf);
  bad:
 	return "*******READ-ERROR*******";
 }
@@ -247,6 +207,7 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 	Sfio_t*			fp;
 	Fileid_t		id;
 	Visit_t*		vp;
+	Exsum_t*		sp;
 
 	static char		text[PATH_MAX];
 
@@ -282,7 +243,7 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 #endif
 		break;
 	case F_checksum:
-		v.string = checksum(PATH(ftw));
+		v.string = sum((Exsum_t*)node->local.pointer, PATH(ftw));
 		goto string;
 	case F_ctime:
 		v.integer = st->st_ctime;
@@ -319,8 +280,8 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 			sfclose(fp);
 		goto string;
 	case F_md5sum:
-		v.string = md5sum(PATH(ftw));
-		goto string;
+		v.string = sum((Exsum_t*)node->local.pointer, PATH(ftw));
+		break;
 	case F_mime:
 		fp = sfopen(NiL, PATH(ftw), "r");
 		state.magicdisc.flags |= MAGIC_MIME;
@@ -409,6 +370,13 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 		cmdflush(state.cmd);
 		v.integer = 1;
 		break;
+	case X_sum:
+		sp = (Exsum_t*)node->local.pointer;
+		if (!sp->sum && !(sp->sum = sumopen(((Extype_t*)env)[0].string)))
+			error(ERROR_SYSTEM|3, "%s checksum initialization error", ((Extype_t*)env)[0].string);
+		ftw = (Ftw_t*)(((Extype_t*)env)[-1].string);
+		v.string = sum(sp, PATH(ftw));
+		break;
 	default:
 		switch (MEMINDEX(sym->index))
 		{
@@ -462,8 +430,9 @@ refval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, int el
 {
 	Ftw_t		ftwbuf;
 	Extype_t	v;
+	Exsum_t*	sp;
+	char*		m;
 
-	NoP(node);
 	if (elt >= 0)
 		error(3, "%s: arrays not supported", sym->name);
 	if (str)
@@ -572,9 +541,6 @@ refval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, int el
 		if (!state.vistab)
 			initvisit(sym);
 		break;
-	case X_cmdarg:
-		state.cmdflags &= ~CMD_IMPLICIT;
-		break;
 	case F_atime:
 	case F_blksize:
 	case F_blocks:
@@ -595,6 +561,24 @@ refval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, int el
 	case F_uid:
 	case F_uidok:
 		state.ftwflags &= ~FTW_DELAY;
+		break;
+	case X_cmdarg:
+		state.cmdflags &= ~CMD_IMPLICIT;
+		break;
+	case F_checksum:
+		m = "ast4";
+		goto sum;
+	case F_md5sum:
+		m = "md5sum";
+		goto sum;
+	case X_sum:
+		m = 0;
+	sum:
+		if (!(sp = newof(0, Exsum_t, 1, 0)) || !(sp->buf = sfstropen()))
+			error(ERROR_SYSTEM|3, "out of space [sum]");
+		node->local.pointer = (char*)sp;
+		if (m && !(sp->sum = sumopen(m)))
+			error(ERROR_SYSTEM|3, "sum(\"%s\") initialization error", m);
 		break;
 	}
 	return v;

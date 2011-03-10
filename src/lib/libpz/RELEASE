@@ -1,3 +1,4 @@
+11-03-07 pzip.h,pzpart.c: handle length@offset variable row size
 06-12-18 pzline.c: move to separate plugin source dir
 06-10-11 add sfstruse() error checks
 06-03-22 pzopen.c: change "input stream close error" to "data corrupted"

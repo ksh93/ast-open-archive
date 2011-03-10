@@ -240,7 +240,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n sear.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: sear contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n sear.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -278,7 +281,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n changes.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: changes contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n changes.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -351,6 +357,16 @@ make sear.ico
 done sear.ico
 exec - test '' = 'sear.ico' || ${STDCMP} 2>/dev/null -s sear.ico ${INSTALLROOT}/lib/sear/sear.ico || { ${STDMV} ${INSTALLROOT}/lib/sear/sear.ico ${INSTALLROOT}/lib/sear/sear.ico.old 2>/dev/null || true; ${STDCP} sear.ico ${INSTALLROOT}/lib/sear/sear.ico  		    		    ;}
 done ${INSTALLROOT}/lib/sear/sear.ico generated
+make ${INSTALLROOT}/lib/sear/sear32.ico
+make sear32.ico
+done sear32.ico
+exec - test '' = 'sear32.ico' || ${STDCMP} 2>/dev/null -s sear32.ico ${INSTALLROOT}/lib/sear/sear32.ico || { ${STDMV} ${INSTALLROOT}/lib/sear/sear32.ico ${INSTALLROOT}/lib/sear/sear32.ico.old 2>/dev/null || true; ${STDCP} sear32.ico ${INSTALLROOT}/lib/sear/sear32.ico  		    		    ;}
+done ${INSTALLROOT}/lib/sear/sear32.ico generated
+make ${INSTALLROOT}/lib/sear/sear64.ico
+make sear64.ico
+done sear64.ico
+exec - test '' = 'sear64.ico' || ${STDCMP} 2>/dev/null -s sear64.ico ${INSTALLROOT}/lib/sear/sear64.ico || { ${STDMV} ${INSTALLROOT}/lib/sear/sear64.ico ${INSTALLROOT}/lib/sear/sear64.ico.old 2>/dev/null || true; ${STDCP} sear64.ico ${INSTALLROOT}/lib/sear/sear64.ico  		    		    ;}
+done ${INSTALLROOT}/lib/sear/sear64.ico generated
 done install virtual
 make test
 make test.proto

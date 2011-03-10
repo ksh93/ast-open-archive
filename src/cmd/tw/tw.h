@@ -124,8 +124,9 @@
 
 #define X_cmdarg	58
 #define X_cmdflush	59
+#define X_sum		60
 
-#define M_MEMBER	60
+#define M_MEMBER	61
 
 typedef struct				/* unique file identifier	*/
 {

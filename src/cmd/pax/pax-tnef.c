@@ -196,6 +196,17 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 				tnef->offset = paxseek(pax, ap, (off_t)0, SEEK_CUR, 0);
 				if (paxseek(pax, ap, n, SEEK_SET, 1) != n)
 					error(3, "%s: %s input must be seekable", ap->name, ap->format->name);
+				if (!*f->name)
+				{
+					if (s = strrchr(ap->name, '/'))
+						s++;
+					else
+						s = ap->name;
+					if (!(e = strrchr(s, '.')) || isdigit(*(e + 1)))
+						e = s + strlen(s);
+					z = sfsprintf(state.tmp.buffer, state.tmp.buffersize, "%-.*s.%03u", e - s, s, ap->entry);
+					f->name = paxstash(pax, &ap->stash.head, state.tmp.buffer, z);
+				}
 				return 1;
 			}
 	}

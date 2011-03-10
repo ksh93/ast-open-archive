@@ -1,5 +1,5 @@
 /*
- * win32 specific makerules 2011-01-04
+ * win32 specific makerules 2011-03-03
  */
 
 .INSTALL.libast.a = .
@@ -29,9 +29,13 @@ SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 (RC) (RCFLAGS) : .PARAMETER
 
 %.res : %.rc (RC) (RCFLAGS)
-	$(CPP) $(.INCLUDE. rc:/^/-I/) $(>) > $(%).ri
-	$(RC) $(RCFLAGS) -I$(>:D:P=N) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(%).ri >/dev/null 2>&1 ||
-	$(RC) $(RCFLAGS) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(>:P=N)
+	RCWOW=$( uname -i )
+	RCWOW=${RCWOW%/*}
+	$(CPP) -D:catliteral -DRCWOW=\"$RCWOW\" $(.INCLUDE. rc:/^/-I/) $(>) > $(%).ri
+	$(RC) $(RCFLAGS) -I$(>:D:P=N) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(%).ri >/dev/null 2>&1 || {
+		$(SED) "s/\" RCWOW \"/$RCWOW/" $(>) > $(%).ri
+		$(RC) $(RCFLAGS) $(.INCLUDE. rc:P=N:/^/-I/) -r -fo$(<:P=N) $(%).ri
+	}
 	$(RM) $(RMFLAGS) $(%).ri
 
 %.def : %.sym

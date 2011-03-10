@@ -449,9 +449,9 @@ struct pathid				/* physical file name and id	*/
 #define pptokchr(c)	pptokstr(NiL,(c))
 #define pushcontrol()	do { if (pp.control++ >= pp.maxcon) ppnest(); } while (0)
 #define pushframe(m)	(m->next->prev=m,m=m->next)
-#define setmode(m,v)	((v)?(pp.mode|=(m)):(pp.mode&=~(m)))
-#define setoption(m,v)	((v)?(pp.option|=(m)):(pp.option&=~(m)))
-#define setstate(s,v)	((v)?(pp.state|=(s)):(pp.state&=~(s)))
+#define setmode(m,v)	ppset(&pp.mode,m,v)
+#define setoption(m,v)	ppset(&pp.option,m,v)
+#define setstate(m,v)	ppset(&pp.state,m,v)
 #define tracing		(error_info.trace<0)
 
 #define ppgetfile(x)	((struct ppfile*)hashlook(pp.filtab,x,HASH_LOOKUP,NiL))
@@ -809,6 +809,7 @@ _PP_DELAY_ endif
 #define pppush		_pp_push
 #define pprefmac	_pp_refmac
 #define ppsearch	_pp_search
+#define ppset		_pp_set
 #define ppstatestr	_pp_statestr
 #define pptokstr	_pp_tokstr
 #define pptrace		_pp_trace
@@ -841,6 +842,7 @@ extern int		pppredargs(void);
 extern void		pppush(int, char*, char*, int);
 extern struct ppsymbol*	pprefmac(char*, int);
 extern int		ppsearch(char*, int, int);
+extern void		ppset(long*, long, int);
 extern char*		ppstatestr(long);
 extern char*		pptokstr(char*, int);
 extern void		pptrace(int);

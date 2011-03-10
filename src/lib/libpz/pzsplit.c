@@ -164,7 +164,7 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 			ip->windows++;
 			if (n >= use && (!ip->row || (n / ip->row) > 16))
 			{
-				if (!ip->used++ && !ip->part && dp->pz->disc->errorf && (dp->pz->flags & (PZ_SUMMARY|PZ_VERBOSE|PZ_DUMP)))
+				if (!ip->used++ && !ip->part && !streq(ip->name, "0") && dp->pz->disc->errorf && (dp->pz->flags & (PZ_SUMMARY|PZ_VERBOSE|PZ_DUMP)))
 					(*dp->pz->disc->errorf)(dp->pz, dp->pz->disc, 1, "%s: generate a partition to improve compression", ip->name);
 				if (ip->use = !(dp->pz->flags & PZ_NOPZIP) && ip->part)
 					ip->part->flags |= PZ_UPDATE;

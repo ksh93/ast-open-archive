@@ -1,3 +1,4 @@
+11-03-04 sear.sh: add { sear32.ico sear64.ico }, $(dirname -r lib/$COMMAND/...)
 11-02-02 Makefile: don't update ../INIT/proto.c if no change or if cpp hack failed
 10-10-10 sear.sh: retain .exe suffix in sear -- its dos on the other side!
 10-09-10 sear.sh: add --args=args

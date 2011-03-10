@@ -1,3 +1,6 @@
+11-03-03 rules.win32.mk: add %.rc -DRCWOW=...
+11-03-02 Makerules.mk: fix :LIBRARY: --plugin=foo --static to generate the plugin!
+11-02-11 add '### .*archaic.* ###' test for %.sh install to diable sh -n check
 11-02-02 --- release 5.6 ---
 11-02-02 command.c: fix .AFTER prereq bug that executed target twice
 11-02-02 Makerules.mk: add :LIBRARY: --static --private

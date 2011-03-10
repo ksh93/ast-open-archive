@@ -40,16 +40,19 @@
  * initialization files have lowest precedence
  */
 
-static void
-set(register long* p, register long op, int val)
+void
+ppset(register long* p, register long op, int val)
 {
 	long*	r;
 
 	r = p == &pp.state ? &pp.ro_state : p == &pp.mode ? &pp.ro_mode : &pp.ro_option;
-	if (!(pp.mode & INIT) || !(pp.in->type == IN_FILE) || !(*r & op))
+	if (!(pp.mode & INIT) || pp.in->type != IN_FILE || !(*r & op))
 	{
-		if (!pp.initialized && !(pp.mode & INIT))
+		if (!pp.initialized && (!(pp.mode & INIT) || !(pp.mode & BUILTIN)) && (p != &pp.mode || !(op & BUILTIN)) && (p != &pp.option || !(op & PREDEFINED)))
+		{
 			*r |= op;
+			debug((-7, "readonly(%s)=%s", p == &pp.state ? "state" : p == &pp.mode ? "mode" : "option", p == &pp.state ? ppstatestr(*r) : p == &pp.mode ? ppmodestr(*r) : ppoptionstr(*r)));
+		}
 		if (val)
 			*p |= op;
 		else
@@ -434,7 +437,7 @@ ppop(int op, ...)
 			pp.flags &= ~PP_comment;
 		break;
 	case PP_COMPATIBILITY:
-		set(&pp.state, COMPATIBILITY, va_arg(ap, int));
+		ppset(&pp.state, COMPATIBILITY, va_arg(ap, int));
 #if COMPATIBLE
 		if (pp.initialized)
 			ppfsm(FSM_COMPATIBILITY, NiL);
@@ -510,7 +513,7 @@ ppop(int op, ...)
 		error_info.file = 0;
 		break;
 	case PP_DUMP:
-		set(&pp.mode, DUMP, va_arg(ap, int));
+		ppset(&pp.mode, DUMP, va_arg(ap, int));
 #if !CHECKPOINT
 		if (pp.mode & DUMP)
 			error(3, "preprocessor not compiled with checkpoint enabled [CHECKPOINT]");
@@ -539,7 +542,7 @@ ppop(int op, ...)
 		else if (streq(p, "-"))
 		{
 			if (pp.initialized)
-				set(&pp.mode, HOSTED, c);
+				ppset(&pp.mode, HOSTED, c);
 			else
 			{
 				pp.hosted = c ? 1 : 2;
@@ -750,7 +753,7 @@ ppop(int op, ...)
 					ppop(PP_COMPATIBILITY, 1);
 					ppop(PP_HOSTDIR, "-", 1);
 					ppop(PP_SPACEOUT, 1);
-					set(&pp.state, DISABLE, va_arg(ap, int));
+					ppset(&pp.state, DISABLE, va_arg(ap, int));
 				}
 			}
 
@@ -1181,7 +1184,7 @@ ppop(int op, ...)
 				error(ERROR_SYSTEM|3, "%s: cannot read", p);
 			if (strmatch(p, "*.(s|S|as|AS|asm|ASM)"))
 			{
-				set(&pp.mode, CATLITERAL, 0);
+				ppset(&pp.mode, CATLITERAL, 0);
 				ppop(PP_SPACEOUT, 1);
 			}
 			break;
@@ -1203,10 +1206,10 @@ ppop(int op, ...)
 	case PP_KEYARGS:
 		if (pp.initialized)
 			goto before;
-		set(&pp.option, KEYARGS, va_arg(ap, int));
+		ppset(&pp.option, KEYARGS, va_arg(ap, int));
 		if (pp.option & KEYARGS)
 #if MACKEYARGS
-			set(&pp.mode, CATLITERAL, 1);
+			ppset(&pp.mode, CATLITERAL, 1);
 #else
 			error(3, "preprocessor not compiled with macro keyword arguments enabled [MACKEYARGS]");
 #endif
@@ -1256,15 +1259,15 @@ ppop(int op, ...)
 		pp.macref = va_arg(ap, PPMACREF);
 		break;
 	case PP_MULTIPLE:
-		set(&pp.mode, ALLMULTIPLE, va_arg(ap, int));
+		ppset(&pp.mode, ALLMULTIPLE, va_arg(ap, int));
 		break;
 	case PP_NOHASH:
-		set(&pp.option, NOHASH, va_arg(ap, int));
+		ppset(&pp.option, NOHASH, va_arg(ap, int));
 		break;
 	case PP_NOISE:
 		op = va_arg(ap, int);
-		set(&pp.option, NOISE, op);
-		set(&pp.option, NOISEFILTER, op < 0);
+		ppset(&pp.option, NOISE, op);
+		ppset(&pp.option, NOISEFILTER, op < 0);
 		break;
 	case PP_OPTARG:
 		pp.optarg = va_arg(ap, PPOPTARG);
@@ -1279,19 +1282,19 @@ ppop(int op, ...)
 		break;
 	case PP_PASSTHROUGH:
 		if (!(pp.state & COMPILE))
-			set(&pp.state, PASSTHROUGH, va_arg(ap, int));
+			ppset(&pp.state, PASSTHROUGH, va_arg(ap, int));
 		break;
 	case PP_PEDANTIC:
-		set(&pp.mode, PEDANTIC, va_arg(ap, int));
+		ppset(&pp.mode, PEDANTIC, va_arg(ap, int));
 		break;
 	case PP_PLUSCOMMENT:
-		set(&pp.option, PLUSCOMMENT, va_arg(ap, int));
+		ppset(&pp.option, PLUSCOMMENT, va_arg(ap, int));
 		if (pp.initialized)
 			ppfsm(FSM_PLUSPLUS, NiL);
 		break;
 	case PP_PLUSPLUS:
-		set(&pp.option, PLUSPLUS, va_arg(ap, int));
-		set(&pp.option, PLUSCOMMENT, va_arg(ap, int));
+		ppset(&pp.option, PLUSPLUS, va_arg(ap, int));
+		ppset(&pp.option, PLUSCOMMENT, va_arg(ap, int));
 		if (pp.initialized)
 			ppfsm(FSM_PLUSPLUS, NiL);
 		break;
@@ -1340,7 +1343,7 @@ ppop(int op, ...)
 			ppfsm(c ? FSM_QUOTADD : FSM_QUOTDEL, p);
 		break;
 	case PP_REGUARD:
-		set(&pp.option, REGUARD, va_arg(ap, int));
+		ppset(&pp.option, REGUARD, va_arg(ap, int));
 		break;
 	case PP_RESERVED:
 		if ((pp.state & COMPILE) && (p = va_arg(ap, char*)))
@@ -1390,7 +1393,7 @@ ppop(int op, ...)
 		}
 		break;
 	case PP_SPACEOUT:
-		set(&pp.state, SPACEOUT, va_arg(ap, int));
+		ppset(&pp.state, SPACEOUT, va_arg(ap, int));
 		break;
 	case PP_STANDALONE:
 		if (pp.initialized)
@@ -1413,9 +1416,9 @@ ppop(int op, ...)
 					}
 		break;
 	case PP_STRICT:
-		set(&pp.state, TRANSITION, 0);
+		ppset(&pp.state, TRANSITION, 0);
 		pp.flags &= ~PP_transition;
-		set(&pp.state, STRICT, va_arg(ap, int));
+		ppset(&pp.state, STRICT, va_arg(ap, int));
 		if (pp.state & STRICT)
 			pp.flags |= PP_strict;
 		else
@@ -1477,9 +1480,9 @@ ppop(int op, ...)
 			}
 		break;
 	case PP_TRANSITION:
-		set(&pp.state, STRICT, 0);
+		ppset(&pp.state, STRICT, 0);
 		pp.flags &= ~PP_strict;
-		set(&pp.state, TRANSITION, va_arg(ap, int));
+		ppset(&pp.state, TRANSITION, va_arg(ap, int));
 		if (pp.state & TRANSITION)
 			pp.flags |= PP_transition;
 		else
@@ -1490,7 +1493,7 @@ ppop(int op, ...)
 			goto before;
 		if ((op = va_arg(ap, int)) < 0)
 			op = 0;
-		set(&pp.option, TRUNCATE, op);
+		ppset(&pp.option, TRUNCATE, op);
 		if (pp.option & TRUNCATE)
 		{
 			Hash_bucket_t*		b;
@@ -1544,7 +1547,7 @@ ppop(int op, ...)
 		}
 		break;
 	case PP_WARN:
-		set(&pp.state, WARN, va_arg(ap, int));
+		ppset(&pp.state, WARN, va_arg(ap, int));
 		break;
 	before:
 		error(3, "ppop(%d): preprocessor operation must be done before PP_INIT", op);

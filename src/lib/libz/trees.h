@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2011 AT&T Intellectual Property          *
+*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *

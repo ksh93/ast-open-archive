@@ -1,3 +1,5 @@
+11-03-03 eparse.y: fix function reff node pointer
+11-03-03 exeval.c: function env is args[-1]
 10-11-30 fix "begin" scope logic that caused tw bug
 10-08-18 add static, global and function level variable scopes
 09-02-02 exgram.h: drop function ref in call() to avoid eval in exeval()

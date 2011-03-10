@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.4 (AT&T Research) 2005-07-17 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.4 (AT&T Research) 2011-03-07 $\n]"
 "[a:append]"
 "[c:comment]:[text]"
 "[x:crc]"
@@ -380,6 +380,8 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 		return -1;
 	if (pz->disc->eventf && (*pz->disc->eventf)(pz, PZ_PARTITION, pp, 0, pz->disc) < 0)
 		return -1;
+	if (pp->flags & PZ_VARIABLE)
+		return 0;
 	if (pp->nfix != n)
 	{
 		if (!(pp->fix = vmnewof(pz->vm, pp->fix, size_t, VECTOR(pz, pp, pp->nfix), 0)))
@@ -668,6 +670,16 @@ pzoptions(register Pz_t* pz, register Pzpart_t* pp, char* options, int must)
 	return 0;
 }
 
+static char*
+partline(Pz_t* pz, Sfio_t* sp)
+{
+	char*	s;
+
+	if ((s = sfgetr(sp, '\n', 1)) && pz->disc->errorf)
+		error_info.line++;
+	return s;
+}
+
 /*
  * parse and load a partition file
  */
@@ -693,6 +705,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 	int*			gv;
 	int*			hv;
 	int			line;
+	long			f;
 	char*			file;
 	Sfio_t*			sp;
 	Vmalloc_t*		vm;
@@ -774,14 +787,12 @@ pzpartition(register Pz_t* pz, const char* partition)
 		vmclear(vm);
 		do
 		{
-			if (*s != '"' && !(s = sfgetr(sp, '\n', 1)))
+			if (*s != '"' && !(s = partline(pz, sp)))
 			{
 				if (pz->disc->errorf)
 					(*pz->disc->errorf)(pz, pz->disc, 2, "invalid partition file");
 				goto bad;
 			}
-			if (pz->disc->errorf)
-				error_info.line++;
 			for (; isspace(*s); s++);
 			if (*s == '"')
 			{
@@ -801,14 +812,41 @@ pzpartition(register Pz_t* pz, const char* partition)
 				*s++ = 0;
 				if (!(np = vmstrdup(pz->vm, e)))
 					goto bad;
+				for (; isspace(*s); s++);
 			}
-			else if (isalpha(*s))
+			if (isalpha(*s))
 			{
 				if (pzoptions(pz, pp, s, 1))
 					goto bad;
 				s = "";
 			}
 		} while (!(n = strtol(s, &t, 10)));
+		if (*t == '@')
+		{
+			switch (m = strtol(t + 1, &t, 10))
+			{
+			case 1:
+				m = 0;
+				break;
+			case 2:
+				m = 1;
+				break;
+			case 4:
+				m = 2;
+				break;
+			case 8:
+				m = 3;
+				break;
+			default:
+				if (pz->disc->errorf)
+					(*pz->disc->errorf)(pz, pz->disc, 2, "%s: %d: invalid size -- power of 2 from 1..8 expected", s, m);
+				goto bad;
+			}
+			n |= (m << 14);
+			f = PZ_VARIABLE;
+		}
+		else
+			f = 0;
 		if (pz->flags & PZ_ROWONLY)
 		{
 			if (!np || !pz->partname || streq(np, pz->partname))
@@ -820,14 +858,12 @@ pzpartition(register Pz_t* pz, const char* partition)
 			np = 0;
 			do
 			{
-				if (!(s = sfgetr(sp, '\n', 1)))
+				if (!(s = partline(pz, sp)))
 				{
 					if (pz->disc->errorf)
 						(*pz->disc->errorf)(pz, pz->disc, 2, "%s: partition not found", pz->partname);
 					goto bad;
 				}
-				if (pz->disc->errorf)
-					error_info.line++;
 				for (; isspace(*s); s++);
 			} while (*s != '"');
 			continue;
@@ -835,6 +871,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 		if (!(pp = vmnewof(pz->vm, 0, Pzpart_t, 1, 0)))
 			goto nope;
 		pp->row = n;
+		pp->flags = f;
 		if (np)
 		{
 			pp->name = np;
@@ -848,15 +885,10 @@ pzpartition(register Pz_t* pz, const char* partition)
 		m = 0;
 		g = 0;
 		for (s = t; isspace(*s); s++);
-		if (*s == '-')
+		if (*s != '-')
+			s = partline(pz, sp);
+		for (; s; s = partline(pz, sp))
 		{
-			sfungetc(sp, '\n');
-			sfungetc(sp, *s);
-		}
-		while (s = sfgetr(sp, '\n', 1))
-		{
-			if (pz->disc->errorf)
-				error_info.line++;
 			for (; isspace(*s); s++);
 			if (*s == '"')
 				break;

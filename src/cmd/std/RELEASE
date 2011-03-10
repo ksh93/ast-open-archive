@@ -1,3 +1,6 @@
+11-03-10 ps.c: use %0<width>s for string fields to retain last <width> chars of long strings
+11-03-03 dd.c: fix writes beyond count for piped input across partial input blocks (thanks ggreen)
+11-02-11 mount.c: fix umount operand verification
 11-01-28 file.c: add -a, --all to list all magic table matches
 11-01-11 dd.c,iconv.c: convert Iconv_disc_t* for iconv_move() and iconv_write()
 11-01-11 iconv.c: add posix { -c,--omit -l,--list -s,--silent }

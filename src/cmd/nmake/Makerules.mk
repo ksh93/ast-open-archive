@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-02-02 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-03-02 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1086,7 +1086,10 @@ end
 	?*:*:*|*::*|*:*:$RANDOM)
 		;;
 	*)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]} $$(( 1 + $x )) !(pattern)' 2>/dev/null
-		then	ENV= LC_ALL=C $SHELL -n $(>)
+		then	if	$(GREP) -q '### .*archaic.* ###'
+			then	: $(<) contains archaic constructs :
+			else	ENV= LC_ALL=C $SHELL -n $(>)
+			fi
 		fi
 		;;
 	esac
@@ -2231,9 +2234,10 @@ RECURSEROOT = .
 	_BLD_$(M:B:S:/[^a-zA-Z0-9_]/_/G) == 1
 	end
 	.LIBRARY.ONLY. += _BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G)=
-	$(T) : $(L)
-	if ! A
-		$(T) : $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
+	if P || ! A
+		$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
+	else
+		$(T) : $(L)
 	end
 
 /*

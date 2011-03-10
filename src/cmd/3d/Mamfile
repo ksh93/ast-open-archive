@@ -1143,7 +1143,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n 3d.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: 3d contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n 3d.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -1181,7 +1184,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n opaque.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: opaque contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n opaque.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
@@ -1218,7 +1224,10 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
 exec - *)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= LC_ALL=C $SHELL -n vex.sh
+exec - 	then	if	grep -q '### .*archaic.* ###'
+exec - 		then	: vex contains archaic constructs :
+exec - 		else	ENV= LC_ALL=C $SHELL -n vex.sh
+exec - 		fi
 exec - 	fi
 exec - 	;;
 exec - esac
