@@ -34,7 +34,7 @@ exrcsid[] = "$FreeBSD: src/usr.bin/yacc/skeleton.c,v 1.28 2000/01/17 02:04:06 bd
 #define EXRECOVERING() (exerrflag!=0)
 static int exgrowstack();
 #define EXPREFIX "ex"
-/* #line 2 "exparse.y" */
+/* #line 2 "/home/gsf/src/lib/libexpr/exparse.y" */
 
 /*
  * Glenn Fowler
@@ -47,7 +47,7 @@ static int exgrowstack();
 
 #undef	RS	/* hp.pa <signal.h> grabs this!! */
 
-/* #line 16 "exparse.y" */
+/* #line 16 "/home/gsf/src/lib/libexpr/exparse.y" */
 typedef union
 {
 	struct Exnode_s*expr;
@@ -59,7 +59,7 @@ typedef union
 	char*		string;
 	struct Exbuf_s*	buffer;
 } EXSTYPE;
-/* #line 129 "exparse.y" */
+/* #line 129 "/home/gsf/src/lib/libexpr/exparse.y" */
 
 #include "exgram.h"
 
@@ -770,7 +770,7 @@ short *exss;
 short *exsslim;
 EXSTYPE *exvs;
 int exstacksize;
-/* #line 1082 "exparse.y" */
+/* #line 1104 "/home/gsf/src/lib/libexpr/exparse.y" */
 
 #include "exgram.h"
 /* #line 756 "y.tab.c" */
@@ -969,7 +969,7 @@ exreduce:
     switch (exn)
     {
 case 1:
-/* #line 137 "exparse.y" */
+/* #line 137 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (exvsp[-1].expr && !(expr.program->disc->flags & EX_STRICT))
 			{
@@ -990,7 +990,7 @@ case 1:
 		}
 break;
 case 4:
-/* #line 161 "exparse.y" */
+/* #line 161 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 				register Dtdisc_t*	disc;
 
@@ -1011,7 +1011,7 @@ case 4:
 			}
 break;
 case 5:
-/* #line 179 "exparse.y" */
+/* #line 179 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			expr.procedure = 0;
 			if (expr.program->frame)
@@ -1033,13 +1033,13 @@ case 5:
 		}
 break;
 case 6:
-/* #line 201 "exparse.y" */
+/* #line 201 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 		}
 break;
 case 7:
-/* #line 205 "exparse.y" */
+/* #line 205 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (!exvsp[-1].expr)
 				exval.expr = exvsp[0].expr;
@@ -1050,38 +1050,47 @@ case 7:
 				exfreenode(expr.program, exvsp[-1].expr);
 				exval.expr = exvsp[0].expr;
 			}
-			else exval.expr = exnewnode(expr.program, ';', 1, exvsp[0].expr->type, exvsp[-1].expr, exvsp[0].expr);
+			else if (exvsp[-1].expr->op == ';')
+			{
+				exval.expr = exvsp[-1].expr;
+				exvsp[-1].expr->data.operand.last = exvsp[-1].expr->data.operand.last->data.operand.right = exnewnode(expr.program, ';', 1, exvsp[0].expr->type, exvsp[0].expr, NiL);
+			}
+			else
+			{
+				exval.expr = exnewnode(expr.program, ';', 1, exvsp[-1].expr->type, exvsp[-1].expr, NiL);
+				exval.expr->data.operand.last = exval.expr->data.operand.right = exnewnode(expr.program, ';', 1, exvsp[0].expr->type, exvsp[0].expr, NiL);
+			}
 		}
 break;
 case 8:
-/* #line 220 "exparse.y" */
+/* #line 229 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exvsp[-1].expr;
 		}
 break;
 case 9:
-/* #line 224 "exparse.y" */
+/* #line 233 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = (exvsp[-1].expr && exvsp[-1].expr->type == STRING) ? exnewnode(expr.program, S2B, 1, INTEGER, exvsp[-1].expr, NiL) : exvsp[-1].expr;
 		}
 break;
 case 10:
-/* #line 227 "exparse.y" */
+/* #line 236 "/home/gsf/src/lib/libexpr/exparse.y" */
 {expr.instatic=exvsp[0].integer;}
 break;
 case 11:
-/* #line 227 "exparse.y" */
+/* #line 236 "/home/gsf/src/lib/libexpr/exparse.y" */
 {expr.declare=exvsp[0].id->type;}
 break;
 case 12:
-/* #line 228 "exparse.y" */
+/* #line 237 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exvsp[-1].expr;
 			expr.declare = 0;
 		}
 break;
 case 13:
-/* #line 233 "exparse.y" */
+/* #line 242 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (exvsp[-3].expr->type == STRING)
 				exvsp[-3].expr = exnewnode(expr.program, S2B, 1, INTEGER, exvsp[-3].expr, NiL);
@@ -1091,7 +1100,7 @@ case 13:
 		}
 break;
 case 14:
-/* #line 241 "exparse.y" */
+/* #line 250 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, ITERATE, 0, INTEGER, NiL, NiL);
 			exval.expr->data.generate.array = exvsp[-2].expr;
@@ -1106,7 +1115,7 @@ case 14:
 		}
 break;
 case 15:
-/* #line 254 "exparse.y" */
+/* #line 263 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (!exvsp[-4].expr)
 			{
@@ -1123,7 +1132,7 @@ case 15:
 		}
 break;
 case 16:
-/* #line 269 "exparse.y" */
+/* #line 278 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (exvsp[-2].expr->type == STRING)
 				exvsp[-2].expr = exnewnode(expr.program, S2B, 1, INTEGER, exvsp[-2].expr, NiL);
@@ -1133,11 +1142,11 @@ case 16:
 		}
 break;
 case 17:
-/* #line 276 "exparse.y" */
+/* #line 285 "/home/gsf/src/lib/libexpr/exparse.y" */
 {expr.declare=exvsp[0].expr->type;}
 break;
 case 18:
-/* #line 277 "exparse.y" */
+/* #line 286 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			register Switch_t*	sw = expr.swstate;
 
@@ -1151,7 +1160,7 @@ case 18:
 		}
 break;
 case 19:
-/* #line 289 "exparse.y" */
+/* #line 298 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 		loopop:
 			if (!exvsp[-1].expr)
@@ -1165,13 +1174,13 @@ case 19:
 		}
 break;
 case 20:
-/* #line 301 "exparse.y" */
+/* #line 310 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto loopop;
 		}
 break;
 case 21:
-/* #line 305 "exparse.y" */
+/* #line 314 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (exvsp[-1].expr)
 			{
@@ -1183,7 +1192,7 @@ case 21:
 		}
 break;
 case 22:
-/* #line 317 "exparse.y" */
+/* #line 326 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			register Switch_t*		sw;
 			int				n;
@@ -1197,7 +1206,8 @@ case 22:
 				}
 				sw->prev = expr.swstate;
 			}
-			else sw = &swstate;
+			else
+				sw = &swstate;
 			expr.swstate = sw;
 			sw->type = expr.declare;
 			sw->firstcase = 0;
@@ -1215,7 +1225,7 @@ case 22:
 		}
 break;
 case 24:
-/* #line 350 "exparse.y" */
+/* #line 360 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			register Switch_t*	sw = expr.swstate;
 			int			n;
@@ -1225,7 +1235,8 @@ case 24:
 			{
 				if (sw->lastcase)
 					sw->lastcase->data.select.next = exval.expr;
-				else sw->firstcase = exval.expr;
+				else
+					sw->firstcase = exval.expr;
 				sw->lastcase = exval.expr;
 				n = sw->cur - sw->base;
 				sw->cur = sw->base;
@@ -1233,18 +1244,20 @@ case 24:
 				memcpy(exval.expr->data.select.constant, sw->base, n * sizeof(Extype_t*));
 				exval.expr->data.select.constant[n] = 0;
 			}
-			else exval.expr->data.select.constant = 0;
+			else
+				exval.expr->data.select.constant = 0;
 			if (sw->def)
 			{
 				sw->def = 0;
 				if (sw->defcase)
 					exerror("duplicate default in switch");
-				else sw->defcase = exvsp[0].expr;
+				else
+					sw->defcase = exvsp[0].expr;
 			}
 		}
 break;
 case 27:
-/* #line 383 "exparse.y" */
+/* #line 396 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			int	n;
 
@@ -1267,39 +1280,40 @@ case 27:
 		}
 break;
 case 28:
-/* #line 404 "exparse.y" */
+/* #line 417 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			expr.swstate->def = 1;
 		}
 break;
 case 29:
-/* #line 410 "exparse.y" */
+/* #line 423 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.integer = 0;
 		}
 break;
 case 30:
-/* #line 414 "exparse.y" */
+/* #line 427 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.integer = 1;
 		}
 break;
 case 32:
-/* #line 421 "exparse.y" */
+/* #line 434 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (exvsp[0].expr)
 				exval.expr = exvsp[-2].expr ? exnewnode(expr.program, ',', 1, exvsp[0].expr->type, exvsp[-2].expr, exvsp[0].expr) : exvsp[0].expr;
 		}
 break;
 case 33:
-/* #line 427 "exparse.y" */
+/* #line 440 "/home/gsf/src/lib/libexpr/exparse.y" */
 {expr.id=exvsp[0].id;}
 break;
 case 34:
-/* #line 428 "exparse.y" */
+/* #line 441 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
-			exvsp[-3].id->type = expr.declare;
+			if (!exvsp[-3].id->type || expr.declare)
+				exvsp[-3].id->type = expr.declare;
 			if (exvsp[-4].reference)
 			{
 				exvsp[-3].id->index = MEMBER;
@@ -1351,37 +1365,37 @@ case 34:
 		}
 break;
 case 37:
-/* #line 487 "exparse.y" */
+/* #line 501 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 		}
 break;
 case 38:
-/* #line 491 "exparse.y" */
+/* #line 505 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exvsp[0].expr;
 		}
 break;
 case 39:
-/* #line 497 "exparse.y" */
+/* #line 511 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 		}
 break;
 case 41:
-/* #line 504 "exparse.y" */
+/* #line 518 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exvsp[-1].expr;
 		}
 break;
 case 42:
-/* #line 508 "exparse.y" */
+/* #line 522 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = (exvsp[0].expr->type == exvsp[-2].id->type) ? exvsp[0].expr : excast(expr.program, exvsp[0].expr, exvsp[-2].id->type, NiL, 0);
 		}
 break;
 case 43:
-/* #line 512 "exparse.y" */
+/* #line 526 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			int	rel;
 
@@ -1395,9 +1409,11 @@ case 43:
 			{
 				if (!exvsp[0].expr->type)
 					exvsp[-2].expr->type = exvsp[0].expr->type = rel ? STRING : INTEGER;
-				else exvsp[-2].expr->type = exvsp[0].expr->type;
+				else
+					exvsp[-2].expr->type = exvsp[0].expr->type;
 			}
-			else if (!exvsp[0].expr->type) exvsp[0].expr->type = exvsp[-2].expr->type;
+			else if (!exvsp[0].expr->type)
+				exvsp[0].expr->type = exvsp[-2].expr->type;
 			if (exvsp[-2].expr->type != exvsp[0].expr->type)
 			{
 				if (exvsp[-2].expr->type == STRING)
@@ -1423,97 +1439,97 @@ case 43:
 		}
 break;
 case 44:
-/* #line 552 "exparse.y" */
+/* #line 568 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 45:
-/* #line 556 "exparse.y" */
+/* #line 572 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 46:
-/* #line 560 "exparse.y" */
+/* #line 576 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 47:
-/* #line 564 "exparse.y" */
+/* #line 580 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 48:
-/* #line 568 "exparse.y" */
+/* #line 584 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 49:
-/* #line 572 "exparse.y" */
+/* #line 588 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 50:
-/* #line 576 "exparse.y" */
+/* #line 592 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto relational;
 		}
 break;
 case 51:
-/* #line 580 "exparse.y" */
+/* #line 596 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto relational;
 		}
 break;
 case 52:
-/* #line 584 "exparse.y" */
+/* #line 600 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto relational;
 		}
 break;
 case 53:
-/* #line 588 "exparse.y" */
+/* #line 604 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto relational;
 		}
 break;
 case 54:
-/* #line 592 "exparse.y" */
+/* #line 608 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto relational;
 		}
 break;
 case 55:
-/* #line 596 "exparse.y" */
+/* #line 612 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 56:
-/* #line 600 "exparse.y" */
+/* #line 616 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 57:
-/* #line 604 "exparse.y" */
+/* #line 620 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 58:
-/* #line 608 "exparse.y" */
+/* #line 624 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto binary;
 		}
 break;
 case 59:
-/* #line 612 "exparse.y" */
+/* #line 628 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 		logical:
 			if (exvsp[-2].expr->type == STRING)
@@ -1524,38 +1540,40 @@ case 59:
 		}
 break;
 case 60:
-/* #line 621 "exparse.y" */
+/* #line 637 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto logical;
 		}
 break;
 case 61:
-/* #line 625 "exparse.y" */
+/* #line 641 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (exvsp[-2].expr->op == CONSTANT)
 			{
 				exfreenode(expr.program, exvsp[-2].expr);
 				exval.expr = exvsp[0].expr;
 			}
-			else exval.expr = exnewnode(expr.program, ',', 1, exvsp[0].expr->type, exvsp[-2].expr, exvsp[0].expr);
+			else
+				exval.expr = exnewnode(expr.program, ',', 1, exvsp[0].expr->type, exvsp[-2].expr, exvsp[0].expr);
 		}
 break;
 case 62:
-/* #line 633 "exparse.y" */
+/* #line 650 "/home/gsf/src/lib/libexpr/exparse.y" */
 {expr.nolabel=1;}
 break;
 case 63:
-/* #line 633 "exparse.y" */
+/* #line 650 "/home/gsf/src/lib/libexpr/exparse.y" */
 {expr.nolabel=0;}
 break;
 case 64:
-/* #line 634 "exparse.y" */
+/* #line 651 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (!exvsp[-3].expr->type)
 			{
 				if (!exvsp[0].expr->type)
 					exvsp[-3].expr->type = exvsp[0].expr->type = INTEGER;
-				else exvsp[-3].expr->type = exvsp[0].expr->type;
+				else
+					exvsp[-3].expr->type = exvsp[0].expr->type;
 			}
 			else if (!exvsp[0].expr->type)
 				exvsp[0].expr->type = exvsp[-3].expr->type;
@@ -1586,11 +1604,12 @@ case 64:
 				}
 				exfreenode(expr.program, exvsp[-6].expr);
 			}
-			else exval.expr = exnewnode(expr.program, '?', 1, exvsp[-3].expr->type, exvsp[-6].expr, exnewnode(expr.program, ':', 1, exvsp[-3].expr->type, exvsp[-3].expr, exvsp[0].expr));
+			else
+				exval.expr = exnewnode(expr.program, '?', 1, exvsp[-3].expr->type, exvsp[-6].expr, exnewnode(expr.program, ':', 1, exvsp[-3].expr->type, exvsp[-3].expr, exvsp[0].expr));
 		}
 break;
 case 65:
-/* #line 673 "exparse.y" */
+/* #line 692 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 		iunary:
 			if (exvsp[0].expr->type == STRING)
@@ -1609,31 +1628,31 @@ case 65:
 		}
 break;
 case 66:
-/* #line 690 "exparse.y" */
+/* #line 709 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto iunary;
 		}
 break;
 case 67:
-/* #line 694 "exparse.y" */
+/* #line 713 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto unary;
 		}
 break;
 case 68:
-/* #line 698 "exparse.y" */
+/* #line 717 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exvsp[0].expr;
 		}
 break;
 case 69:
-/* #line 702 "exparse.y" */
+/* #line 721 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, ADDRESS, 0, T(exvsp[0].expr->type), exvsp[0].expr, NiL);
 		}
 break;
 case 70:
-/* #line 706 "exparse.y" */
+/* #line 725 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, FUNCTION, 1, T(exvsp[-3].id->type), call(exvsp[-4].reference, exvsp[-3].id, exvsp[-1].expr), exvsp[-1].expr);
 			if (!expr.program->disc->getf)
@@ -1643,7 +1662,7 @@ case 70:
 		}
 break;
 case 71:
-/* #line 714 "exparse.y" */
+/* #line 733 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (!INTEGRAL(exvsp[-1].expr->type))
 				exvsp[-1].expr = excast(expr.program, exvsp[-1].expr, INTEGER, NiL, 0);
@@ -1651,14 +1670,14 @@ case 71:
 		}
 break;
 case 72:
-/* #line 720 "exparse.y" */
+/* #line 739 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, CALL, 1, exvsp[-3].id->type, NiL, exvsp[-1].expr);
 			exval.expr->data.call.procedure = exvsp[-3].id;
 		}
 break;
 case 73:
-/* #line 725 "exparse.y" */
+/* #line 744 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, exvsp[-3].id->index, 0, exvsp[-3].id->type, NiL, NiL);
 			if (exvsp[-1].expr && exvsp[-1].expr->data.operand.left->type == INTEGER)
@@ -1666,25 +1685,26 @@ case 73:
 				exval.expr->data.print.descriptor = exvsp[-1].expr->data.operand.left;
 				exvsp[-1].expr = exvsp[-1].expr->data.operand.right;
 			}
-			else switch (exvsp[-3].id->index)
-			{
-			case QUERY:
-				exval.expr->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
-				exval.expr->data.print.descriptor->data.constant.value.integer = 2;
-				break;
-			case PRINTF:
-				exval.expr->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
-				exval.expr->data.print.descriptor->data.constant.value.integer = 1;
-				break;
-			case SPRINTF:
-				exval.expr->data.print.descriptor = 0;
-				break;
-			}
+			else
+				switch (exvsp[-3].id->index)
+				{
+				case QUERY:
+					exval.expr->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
+					exval.expr->data.print.descriptor->data.constant.value.integer = 2;
+					break;
+				case PRINTF:
+					exval.expr->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
+					exval.expr->data.print.descriptor->data.constant.value.integer = 1;
+					break;
+				case SPRINTF:
+					exval.expr->data.print.descriptor = 0;
+					break;
+				}
 			exval.expr->data.print.args = preprint(exvsp[-1].expr);
 		}
 break;
 case 74:
-/* #line 749 "exparse.y" */
+/* #line 769 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			register Exnode_t*	x;
 
@@ -1694,21 +1714,22 @@ case 74:
 				exval.expr->data.scan.descriptor = exvsp[-1].expr->data.operand.left;
 				exvsp[-1].expr = exvsp[-1].expr->data.operand.right;
 			}
-			else switch (exvsp[-3].id->index)
-			{
-			case SCANF:
-				exval.expr->data.scan.descriptor = 0;
-				break;
-			case SSCANF:
-				if (exvsp[-1].expr && exvsp[-1].expr->data.operand.left->type == STRING)
+			else
+				switch (exvsp[-3].id->index)
 				{
-					exval.expr->data.scan.descriptor = exvsp[-1].expr->data.operand.left;
-					exvsp[-1].expr = exvsp[-1].expr->data.operand.right;
+				case SCANF:
+					exval.expr->data.scan.descriptor = 0;
+					break;
+				case SSCANF:
+					if (exvsp[-1].expr && exvsp[-1].expr->data.operand.left->type == STRING)
+					{
+						exval.expr->data.scan.descriptor = exvsp[-1].expr->data.operand.left;
+						exvsp[-1].expr = exvsp[-1].expr->data.operand.right;
+					}
+					else
+						exerror("%s: string argument expected", exvsp[-3].id->name);
+					break;
 				}
-				else
-					exerror("%s: string argument expected", exvsp[-3].id->name);
-				break;
-			}
 			if (!exvsp[-1].expr || !exvsp[-1].expr->data.operand.left || exvsp[-1].expr->data.operand.left->type != STRING)
 				exerror("%s: format argument expected", exvsp[-3].id->name);
 			exval.expr->data.scan.format = exvsp[-1].expr->data.operand.left;
@@ -1721,7 +1742,7 @@ case 74:
 		}
 break;
 case 75:
-/* #line 784 "exparse.y" */
+/* #line 805 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, CONSTANT, 0, exvsp[0].id->type, NiL, NiL);
 			if (!expr.program->disc->reff)
@@ -1734,7 +1755,7 @@ case 75:
 		}
 break;
 case 76:
-/* #line 795 "exparse.y" */
+/* #line 816 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			if (exvsp[0].expr)
 			{
@@ -1760,7 +1781,7 @@ case 76:
 		}
 break;
 case 77:
-/* #line 819 "exparse.y" */
+/* #line 840 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 		pre:
 			if (exvsp[0].expr->type == STRING)
@@ -1770,7 +1791,7 @@ case 77:
 		}
 break;
 case 78:
-/* #line 827 "exparse.y" */
+/* #line 848 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 		pos:
 			if (exvsp[-1].expr->type == STRING)
@@ -1780,56 +1801,57 @@ case 78:
 		}
 break;
 case 79:
-/* #line 835 "exparse.y" */
+/* #line 856 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto pre;
 		}
 break;
 case 80:
-/* #line 839 "exparse.y" */
+/* #line 860 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			goto pos;
 		}
 break;
 case 82:
-/* #line 846 "exparse.y" */
+/* #line 867 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, CONSTANT, 0, exvsp[0].id->type, NiL, NiL);
 			if (!expr.program->disc->reff)
 				exerror("%s: identifier references not supported", exvsp[0].id->name);
-			else exval.expr->data.constant.value = (*expr.program->disc->reff)(expr.program, exval.expr, exvsp[0].id, NiL, NiL, EX_SCALAR, expr.program->disc);
+			else
+				exval.expr->data.constant.value = (*expr.program->disc->reff)(expr.program, exval.expr, exvsp[0].id, NiL, NiL, EX_SCALAR, expr.program->disc);
 		}
 break;
 case 83:
-/* #line 853 "exparse.y" */
+/* #line 875 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, CONSTANT, 0, FLOATING, NiL, NiL);
 			exval.expr->data.constant.value.floating = exvsp[0].floating;
 		}
 break;
 case 84:
-/* #line 858 "exparse.y" */
+/* #line 880 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
 			exval.expr->data.constant.value.integer = exvsp[0].integer;
 		}
 break;
 case 85:
-/* #line 863 "exparse.y" */
+/* #line 885 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, CONSTANT, 0, STRING, NiL, NiL);
 			exval.expr->data.constant.value.string = exvsp[0].string;
 		}
 break;
 case 86:
-/* #line 868 "exparse.y" */
+/* #line 890 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, CONSTANT, 0, UNSIGNED, NiL, NiL);
 			exval.expr->data.constant.value.integer = exvsp[0].integer;
 		}
 break;
 case 92:
-/* #line 884 "exparse.y" */
+/* #line 906 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, ID, 0, exvsp[-1].id->type, NiL, NiL);
 			exval.expr->data.variable.symbol = QUALIFY(exvsp[-2].reference, exvsp[-1].id);
@@ -1845,7 +1867,7 @@ case 92:
 		}
 break;
 case 93:
-/* #line 898 "exparse.y" */
+/* #line 920 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, DYNAMIC, 0, exvsp[-1].id->type, NiL, NiL);
 			exval.expr->data.variable.symbol = exvsp[-1].id;
@@ -1855,7 +1877,7 @@ case 93:
 		}
 break;
 case 94:
-/* #line 906 "exparse.y" */
+/* #line 928 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, ID, 0, 0, NiL, NiL);
 			exval.expr->data.variable.symbol = exvsp[0].id;
@@ -1866,37 +1888,37 @@ case 94:
 		}
 break;
 case 95:
-/* #line 917 "exparse.y" */
+/* #line 939 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.integer = 0;
 		}
 break;
 case 96:
-/* #line 921 "exparse.y" */
+/* #line 943 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.integer = 1;
 		}
 break;
 case 97:
-/* #line 927 "exparse.y" */
+/* #line 949 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 		}
 break;
 case 98:
-/* #line 931 "exparse.y" */
+/* #line 953 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exvsp[-1].expr;
 		}
 break;
 case 99:
-/* #line 937 "exparse.y" */
+/* #line 959 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 		}
 break;
 case 100:
-/* #line 941 "exparse.y" */
+/* #line 963 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exvsp[0].expr->data.operand.left;
 			exvsp[0].expr->data.operand.left = exvsp[0].expr->data.operand.right = 0;
@@ -1904,26 +1926,26 @@ case 100:
 		}
 break;
 case 101:
-/* #line 949 "exparse.y" */
+/* #line 971 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, ';', 1, 0, exnewnode(expr.program, ';', 1, exvsp[0].expr->type, exvsp[0].expr, NiL), NiL);
 			exval.expr->data.operand.right = exval.expr->data.operand.left;
 		}
 break;
 case 102:
-/* #line 954 "exparse.y" */
+/* #line 976 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exvsp[-2].expr->data.operand.right = exvsp[-2].expr->data.operand.right->data.operand.right = exnewnode(expr.program, ',', 1, exvsp[-2].expr->type, exvsp[0].expr, NiL);
 		}
 break;
 case 103:
-/* #line 960 "exparse.y" */
+/* #line 982 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 		}
 break;
 case 104:
-/* #line 964 "exparse.y" */
+/* #line 986 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 			if (exvsp[0].id->type)
@@ -1931,13 +1953,13 @@ case 104:
 		}
 break;
 case 106:
-/* #line 973 "exparse.y" */
+/* #line 995 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, ',', 1, exvsp[0].expr->type, exvsp[0].expr, NiL);
 		}
 break;
 case 107:
-/* #line 977 "exparse.y" */
+/* #line 999 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			register Exnode_t*	x;
 			register Exnode_t*	y;
@@ -1948,11 +1970,11 @@ case 107:
 		}
 break;
 case 108:
-/* #line 987 "exparse.y" */
+/* #line 1009 "/home/gsf/src/lib/libexpr/exparse.y" */
 {expr.declare=exvsp[0].id->type;}
 break;
 case 109:
-/* #line 988 "exparse.y" */
+/* #line 1010 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, ID, 0, exvsp[0].id->type, NiL, NiL);
 			exval.expr->data.variable.symbol = exvsp[0].id;
@@ -1963,13 +1985,13 @@ case 109:
 		}
 break;
 case 110:
-/* #line 999 "exparse.y" */
+/* #line 1021 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.reference = expr.refs = expr.lastref = 0;
 		}
 break;
 case 111:
-/* #line 1003 "exparse.y" */
+/* #line 1025 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			Exref_t*	r;
 
@@ -1991,20 +2013,20 @@ case 111:
 		}
 break;
 case 112:
-/* #line 1025 "exparse.y" */
+/* #line 1047 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = 0;
 		}
 break;
 case 113:
-/* #line 1029 "exparse.y" */
+/* #line 1051 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = exnewnode(expr.program, '=', 1, exvsp[0].expr->type, NiL, exvsp[0].expr);
 			exval.expr->subop = exvsp[-1].op;
 		}
 break;
 case 115:
-/* #line 1036 "exparse.y" */
+/* #line 1058 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 				register Dtdisc_t*	disc;
 
@@ -2025,7 +2047,7 @@ case 115:
 			}
 break;
 case 116:
-/* #line 1053 "exparse.y" */
+/* #line 1075 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 				expr.id->lex = PROCEDURE;
 				expr.id->type = expr.procedure->type;
@@ -2034,7 +2056,7 @@ case 116:
 			}
 break;
 case 117:
-/* #line 1059 "exparse.y" */
+/* #line 1081 "/home/gsf/src/lib/libexpr/exparse.y" */
 {
 			exval.expr = expr.procedure;
 			expr.procedure = 0;
@@ -2056,7 +2078,7 @@ case 117:
 			exunlex(expr.program, ';');
 		}
 break;
-/* #line 2039 "y.tab.c" */
+/* #line 2061 "y.tab.c" */
     }
     exssp -= exm;
     exstate = *exssp;

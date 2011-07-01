@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1996-2010 AT&T Intellectual Property          #
+#          Copyright (c) 1996-2011 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -47,7 +47,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2010-09-10 $
+@(#)$Id: mm2html (AT&T Research) 2011-06-15 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man/mandoc subset to html]
@@ -297,7 +297,10 @@ do	case $OPT in
 		*\?*)	. ${OPTARG%%\?*} || exit 1
 			eval "license+=( ${OPTARG#*\?} )"
 			;;
-		*)	. $OPTARG || exit 1
+		*)	path=$PATH
+			[[ $OPTARG == */* ]] && PATH=${OPTARG%/*}:$PATH
+			. $OPTARG || exit 1
+			PATH=$path
 			;;
 		esac
 		;;
@@ -473,8 +476,12 @@ function getline
 		do	IFS= read -r -u$fd a || {
 				if	(( so > 0 ))
 				then	eval exec $fd'>&-'
-					if	(( ( fd = --so + soff ) == soff ))
+					while	(( ( n = --so + soff ) == fd ))
+					do	:
+					done
+					if	(( n == soff ))
 					then	(( fd = 0 ))
+					else	(( fd = n ))
 					fi
 					file=${so_file[so]}
 					line=${so_line[so]}
@@ -2392,9 +2399,7 @@ do	getline || {
 			'')	;;
 			*)	(( fd = so + soff ))
 				file=/tmp/m2h$$
-				path=$PATH
-				eval PATH=$HTMLPATH "$*" > $file
-				PATH=$path
+				( eval PATH=$HTMLPATH "$*" ) > $file
 				eval exec $fd'< $file'
 				rm $file
 				so_file[so]=$file

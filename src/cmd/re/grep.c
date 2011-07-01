@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2010-12-10 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2011-06-25 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -875,6 +875,7 @@ main(int argc, char** argv)
 				}
 				/*FALLTHROUGH*/
 			case FTS_NS:
+			case FTS_SLNONE:
 				state.notfound = 1;
 				if (!state.suppress)
 					error(ERROR_SYSTEM|2, "%s: cannot open", ent->fts_path);

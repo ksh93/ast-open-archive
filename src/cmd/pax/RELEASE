@@ -1,3 +1,5 @@
+11-06-21 pax.c,copy.c,file.c: add --filter option mtime=<date-string>
+11-03-17 copy.c: fix bug that didn't list special files for --verbose
 11-02-11 pax-tnef.c: handle "" member names -- really?
 11-02-02 pax-pds.c: ident now requires at least one dir entry
 10-10-10 file.c: don't prune state.update dirs based on time -- doh

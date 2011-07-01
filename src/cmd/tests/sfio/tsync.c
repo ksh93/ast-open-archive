@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -96,38 +96,38 @@ MAIN()
 
 	/* redirect stdout to a pipe */
 	if(pipe(p1) < 0 || close(1) < 0 || dup(p1[1]) != 1)
-		terror("Creating pipe1\n");
+		terror("Creating pipe1");
 
 	/* redirect stdin to a pipe with some input */
 	close(0);
 	if(pipe(p2) < 0)
-		terror("Creating a pipe2\n");
+		terror("Creating a pipe2");
 	if(write(p2[1],"foo\n",4) != 4)
-		terror("Writing to pipe\n");
+		terror("Writing to pipe");
 	close(p2[1]);
 
 	sfsetbuf(sfstdout,buf,sizeof(buf));
 	if(sfset(sfstdout,0,0)&SF_LINE)
-		terror("Line mode on unexpectedly\n");
+		terror("Line mode on unexpectedly");
 	sfset(sfstdout,SF_SHARE,0);
 
 	if(sfeof(sfstdin) )
-		terror("Premature eof\n");
+		terror("Premature eof");
 	if(sferror(sfstdout) )
-		terror("Weird error1\n");
+		terror("Weird error1");
 	if((off = sfmove(sfstdin,sfstdout,(Sfoff_t)SF_UNBOUND,-1)) != 4)
-		terror("Wrong # of bytes %lld\n", off);
+		terror("Wrong # of bytes %lld", off);
 	if(!sfeof(sfstdin) )
-		terror("Should be eof\n");
+		terror("Should be eof");
 	if(sferror(sfstdout) )
-		terror("Weird error2\n");
+		terror("Weird error2");
 	if(sfpurge(sfstdout) < 0)
-		terror("Purging stdout\n");
+		terror("Purging stdout");
 
 	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
-		terror("Opening file to write\n");
+		terror("Opening file to write");
 	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
-		terror("Opening file to read\n");
+		terror("Opening file to read");
 
 	sfset(f1,SF_IOCHECK,1);
 	sfdisc(f1,&Disc);
@@ -144,41 +144,41 @@ MAIN()
 	sfputc(f1,'6');
 
 	if((n = sfread(f2,buf,sizeof(buf))) != 4)
-		terror("Did not get all data n=%d\n", n);
+		terror("Did not get all data n=%d", n);
 	if(Count != 0)
-		terror("Should not have seen SF_SYNC yet\n");
+		terror("Should not have seen SF_SYNC yet");
 	sfsync(NIL(Sfio_t*));
 	if(Count != 1)
-		terror("Should have seen SF_SYNC\n");
+		terror("Should have seen SF_SYNC");
 
 	sfputc(f1,'7');
 	sfputc(f1,'8');
 
 	sfsync(f1);
 	if(Count != 2)
-		terror("Bad SF_SYNC count=%d, expecting 2\n", Count);
+		terror("Bad SF_SYNC count=%d, expecting 2", Count);
 	sfsync(f1);
 	if(Count != 3)
-		terror("Bad SF_SYNC count=%d, expecting 3\n", Count);
+		terror("Bad SF_SYNC count=%d, expecting 3", Count);
 
 	sfdisc(f1,NIL(Sfdisc_t*));
 
 	sfseek(f2,(Sfoff_t)0,0);
 	sfgetc(f2);
 	if((off = sftell(f2)) != 1)
-		terror("Wrong sfseek location %lld\n", off);
+		terror("Wrong sfseek location %lld", off);
 	sfsync(0);
 	if((off = (Sfoff_t)lseek(sffileno(f2), (off_t)0, 1)) != 1)
-		terror("Wrong lseek location %lld\n", off);
+		terror("Wrong lseek location %lld", off);
 
 	dupf2 = dup(sffileno(f2));
 	sfclose(f2);
 	if((off = (Sfoff_t)lseek(dupf2, (off_t)0, 1)) != 1)
-		terror("Wrong lseek location %lld\n", off);
+		terror("Wrong lseek location %lld", off);
 
 	/* test to see if data is written correctly */
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")))
-		terror("Creating temp file\n");
+		terror("Creating temp file");
 	sfdisc(f, &Mydisc.disc);
 	sfsetbuf(f, NIL(Void_t*), 95);
 	sfset(f, SF_IOCHECK, 1);

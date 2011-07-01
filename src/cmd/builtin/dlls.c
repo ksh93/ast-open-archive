@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1992-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1992-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dlls (AT&T Research) 2010-10-20 $\n]"
+"[-?\n@(#)$Id: dlls (AT&T Research) 2011-04-22 $\n]"
 USAGE_LICENSE
 "[+NAME?dlls - list dlls and shared libraries on $PATH]"
 "[+DESCRIPTION?\bdlls\b lists the base name and full path, one per line, "
@@ -180,6 +180,9 @@ b_dlls(int argc, char** argv, void* context)
 							break;
 						case LIST_PATH|LIST_LONG:
 							sfprintf(sfstdout, "%08lu %s\n", ver, dle->path);
+							break;
+						case LIST_PATH:
+							sfprintf(sfstdout, "%s\n", dle->path);
 							break;
 						case LIST_BASE|LIST_PATH:
 							sfprintf(sfstdout, "%14s %s\n", dle->name, dle->path);

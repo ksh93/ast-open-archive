@@ -137,9 +137,6 @@ done ${PACKAGE_ast_INCLUDE}/ftwalk.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ftwlocal.h
 make ${PACKAGE_ast_INCLUDE}/cmdarg.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/cmdarg.h
-make ${PACKAGE_ast_INCLUDE}/debug.h implicit
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/option.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -148,6 +145,10 @@ done ${PACKAGE_ast_INCLUDE}/option.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/error.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/cmdarg.h
+make ${PACKAGE_ast_INCLUDE}/debug.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/debug.h

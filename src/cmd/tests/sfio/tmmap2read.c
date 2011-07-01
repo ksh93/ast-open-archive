@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -66,13 +66,13 @@ MAIN()
 
 	/* test to see if malloc() winds up calling mmap() */
 	if(!(data = (char*)malloc(8*1024)) )
-		terror("Malloc failed\n");
+		terror("Malloc failed");
 	free(data);
 	Success = 0;
 
 	/* our real work */
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
-		terror("Can't open to write\n");
+		terror("Can't open to write");
 
 	for(n = 0; n < sizeof(buf); ++n)
 		buf[n] = '0' + (n%10);
@@ -81,13 +81,13 @@ MAIN()
 		sfwrite(f,buf,sizeof(buf));
 
 	if(!(f = sfopen(f, tstfile(0),"r")) )
-		terror("Can't open to read\n");
+		terror("Can't open to read");
 
 	for(n = 0; n < 10; ++n)
 	{	if((r = sfread(f,buf2,sizeof(buf))) != sizeof(buf))
-			terror("Bad read size=%d\n",r);
+			terror("Bad read size=%d",r);
 		if(strncmp(buf,buf2,sizeof(buf)) != 0)
-			terror("Get wrong data\n");
+			terror("Get wrong data");
 	}
 
 	TSTEXIT(0);

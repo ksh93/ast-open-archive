@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -28,63 +28,63 @@ MAIN()
 	int	r, w;
 
 	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
-		terror("Can't open f1\n");
+		terror("Can't open f1");
 	if(!(f1 = sfopen(f1, tstfile(0), "a+")) )
-		terror("Can't open f1\n");
+		terror("Can't open f1");
 
 	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "a+")) )
-		terror("Can't open f2\n");
+		terror("Can't open f2");
 
 	if(sfwrite(f1,"012345678\n",10) != 10 || sfsync(f1) < 0)
-		terror("Writing to f1\n");
+		terror("Writing to f1");
 	if((p = sftell(f1)) != 10)
-		terror("Bad sftell1 %ld\n",p);
+		terror("Bad sftell1 %ld",p);
 
 	if(sfwrite(f2,"abcdefghi\n",10) != 10 || sfsync(f2) < 0)
-		terror("Writing to f2\n");
+		terror("Writing to f2");
 	if((p = sftell(f2)) != 20)
-		terror("Bad sftell2\n");
+		terror("Bad sftell2");
 
 	if((p = sfseek(f1,(Sfoff_t)0,0)) != 0)
-		terror("Bad seek\n");
+		terror("Bad seek");
 	if(!(s = sfgetr(f1,'\n',1)) )
-		terror("Bad getr1\n");
+		terror("Bad getr1");
 	if(strcmp(s,"012345678") != 0)
-		terror("Bad input1\n");
+		terror("Bad input1");
 
 	if((p = sftell(f1)) != 10)
-		terror("Bad sftell3\n");
+		terror("Bad sftell3");
 
 	if(sfwrite(f1,"012345678\n",10) != 10 || sfsync(f1) < 0)
-		terror("Writing to f1\n");
+		terror("Writing to f1");
 	if((p = sftell(f1)) != 30)
-		terror("Bad sftell4\n");
+		terror("Bad sftell4");
 
 	if((p = sfseek(f2,(Sfoff_t)10,0)) != 10)
-		terror("Bad seek\n");
+		terror("Bad seek");
 	if(!(s = sfgetr(f2,'\n',1)) )
-		terror("Bad getr2\n");
+		terror("Bad getr2");
 	if(strcmp(s,"abcdefghi") != 0)
-		terror("Bad input2\n");
+		terror("Bad input2");
 
 	if(!(s = sfgetr(f2,'\n',1)) )
-		terror("Bad getr3\n");
+		terror("Bad getr3");
 	if(strcmp(s,"012345678") != 0)
-		terror("Bad input3\n");
+		terror("Bad input3");
 
 	if(!(f1 = sfopen(f1, tstfile(0), "w")) )
-		terror("Can't open file to write\n");
+		terror("Can't open file to write");
 	for(r = 0; r < 1024; ++r)
 		buf[r] = 'a';
 	if((w = sfwrite(f1,buf,1024)) != 1024)
-		terror("writing w=%d\n", w);
+		terror("writing w=%d", w);
 	if(!(f1 = sfopen(f1, tstfile(0), "a")) )
-		terror("Can't open file to append\n");
+		terror("Can't open file to append");
 	sfseek(f1,(Sfoff_t)0,0);
 	if((w = sfwrite(f1,buf,64)) != 64)
-		terror("writing w=%d\n", w);
+		terror("writing w=%d", w);
 	if((r = (int)sftell(f1)) != (1024+64) )
-		terror("seek position wrong s=%d\n", r);
+		terror("seek position wrong s=%d", r);
 
 	TSTEXIT(0);
 }

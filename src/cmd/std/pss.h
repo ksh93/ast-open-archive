@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -155,6 +155,7 @@ typedef struct Pssdisc_s
 	unsigned long	version;	/* interface version		*/
 	unsigned long	fields;		/* PSS_[a-z]* field requests	*/
 	unsigned long	flags;		/* PSS_[A-Z]* flags		*/
+	char*		command;	/* caller command path		*/
 	Pss_dev_t	tty;		/* PSS_TTY match value		*/
 	Pss_id_t	uid;		/* PSS_UID match value		*/
 	Pssmatch_t*	match;		/* match these fields		*/
@@ -187,7 +188,7 @@ struct Pss_s
 
 };
 
-#define pssinit(d,e)	(memset(d,0,sizeof(*(d))),(d)->version=PSS_VERSION,(d)->errorf=(Error_f)(e))
+#define pssinit(d,c,e)	(memset(d,0,sizeof(*(d))),(d)->version=PSS_VERSION,(d)->command=(char*)(c),(d)->errorf=(Error_f)(e))
 
 extern Pss_t*		pssopen(Pssdisc_t*);
 extern Pssent_t*	pssread(Pss_t*, Pss_id_t);

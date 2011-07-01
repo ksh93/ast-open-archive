@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1475,7 +1475,7 @@ flatfclose(Dssfile_t* file, Dssdisc_t* disc)
 static Dssformat_t flat_format =
 {
 	"flat",
-	"Flat format.",
+	"flat format (2010-11-10)",
 	CXH,
 	flatident,
 	flatfopen,

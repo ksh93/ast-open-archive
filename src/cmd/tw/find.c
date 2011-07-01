@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1121,7 +1121,7 @@ compile(State_t* state, char** argv, register Node_t* np, int nested)
 			argv[opt_info.index - 1] = 0;
 			if (k & CMD_INSERT)
 				i = 1;
-			if (!(np->first.xp = cmdopen(com, i, 0, "{}", k|CMD_IGNORE)))
+			if (!(np->first.xp = cmdopen(com, i, 0, "{}", k|CMD_EXIT|CMD_IGNORE, errorf)))
 			{
 				error(ERROR_SYSTEM|2, "out of space");
 				return -1;

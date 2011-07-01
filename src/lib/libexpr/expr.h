@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -161,6 +161,7 @@ union Exdata_u
 	{
 	Exnode_t*	left;		/* left operand			*/
 	Exnode_t*	right;		/* right operand		*/
+	Exnode_t*	last;		/* for cons			*/
 	}		operand;	/* operands			*/
 
 	struct

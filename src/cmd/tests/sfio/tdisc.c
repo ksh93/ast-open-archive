@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -34,7 +34,7 @@ Sfdisc_t*	disc;
 	char*	s = (char*)buf;
 
 	if(sfgetc(f) >= 0)
-		terror("Stream should be locked\n");
+		terror("Stream should be locked");
 
 	if((n = sfrd(f,buf,n,disc)) <= 0)
 		return n;
@@ -58,7 +58,7 @@ Sfdisc_t*	disc;
 	char*	s = (char*)buf;
 
 	if(sfputc(f,0) >= 0)
-		terror("Stream should be locked2\n");
+		terror("Stream should be locked2");
 
 	for(i = 0; i < n; ++i)
 		if(s[i] >= 'a' && s[i] <= 'z')
@@ -80,7 +80,7 @@ Sfdisc_t*	disc;
 	char*	s = (char*)buf;
 
 	if(sfgetc(f) >= 0)
-		terror("Stream should be locked\n");
+		terror("Stream should be locked");
 
 	if((n = sfrd(f,buf,n,disc)) <= 0)
 		return n;
@@ -108,7 +108,7 @@ Sfdisc_t*	disc;
 		return 6;
 	}
 	else
-	{	terror("Discipline is called twice\n");
+	{	terror("Discipline is called twice");
 		return -1;
 	}
 }
@@ -148,7 +148,7 @@ MAIN()
 	flags = sfset(sfstdin,0,0);
 	sfdisc(sfstdin,&Ldisc);
 	if(sfset(sfstdin,0,0) != flags)
-		terror("Flags changed after discipline setting\n");
+		terror("Flags changed after discipline setting");
 
 	l = low;
 	strcpy(l, "abcdefghijklmnopqrstuvwxyz");
@@ -157,78 +157,78 @@ MAIN()
 	n = strlen(l);
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")))
-		terror("Creating temp file\n");
+		terror("Creating temp file");
 	if((r = sfwrite(f,l,n)) != n)
-		terror("Writing data %d\n",r);
+		terror("Writing data %d",r);
 	sfsync(f);
 
 	sfseek(f,(Sfoff_t)0,0);
 	sfdisc(f,&Udisc);
 	if(!(s = sfreserve(f,n,0)) )
-		terror("Reading string1\n");
+		terror("Reading string1");
 	if(strncmp(s,u,n) != 0)
 	{	s[n-1] = 0;
-		terror("Input1=%s, Expect=%s\n",s,u);
+		terror("Input1=%s, Expect=%s",s,u);
 	}
 
 	sfseek(f,(Sfoff_t)0,0);
 	sfdisc(f,&Ldisc);
 	if(!(s = sfreserve(f,n,0)) )
-		terror("Reading string2\n");
+		terror("Reading string2");
 	if(strncmp(s,l,n) != 0)
 	{	s[n-1] = 0;
-		terror("Input2=%s, Expect=%s\n",s,l);
+		terror("Input2=%s, Expect=%s",s,l);
 	}
 	sfclose(f);
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
-		terror("Opening file\n");
+		terror("Opening file");
 	sfdisc(f,&Wdisc);
 	if(sfputr(f,low,'\n') < 0)
-		terror("Writing data\n");
+		terror("Writing data");
 	if(sfseek(f,(Sfoff_t)0,0) != 0)
-		terror("Seeking\n");
+		terror("Seeking");
 	if(!(s = sfgetr(f,'\n',1)))
-		terror("sfgetr\n");
+		terror("sfgetr");
 	if(strcmp(s,up) != 0)
-		terror("Bad data\n");
+		terror("Bad data");
 	sfclose(f);
 
 	/* read-once discipline */
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
-		terror("Opening file\n");
+		terror("Opening file");
 	sfdisc(f,&Odisc);
 	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
-		terror("Sfreserve failed1\n");
+		terror("Sfreserve failed1");
 	if(sfvalue(f) != 6)
-		terror("Wrong reserved length1\n");
+		terror("Wrong reserved length1");
 	sfread(f,s,3);
 
 	if(!(fs = sfopen(NIL(Sfio_t*),"abcdef","s")) )
-		terror("String open failed\n");
+		terror("String open failed");
 	sfstack(f,fs);
 	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
-		terror("Sfreserve failed2\n");
+		terror("Sfreserve failed2");
 	if(sfvalue(f) != 6)
-		terror("Wrong reserved length2\n");
+		terror("Wrong reserved length2");
 	sfread(f,s,6);
 
 	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
-		terror("sfreserve failed 3\n");
+		terror("sfreserve failed 3");
 	if(sfvalue(f) != 3)
-		terror("Wrong reserved length3\n");
+		terror("Wrong reserved length3");
 	sfclose(f);
 	sfclose(fs);
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
-		terror("Opening file to write\n");
+		terror("Opening file to write");
 	sfdisc(f,&Edisc);
 	if(sfwrite(f, "one", 3) != 3)
-		terror("Bad sfwrite\n");
+		terror("Bad sfwrite");
 	if(sfwr(f, "two", 4, NIL(Sfdisc_t*)) != 4)
-		terror("Bad sfwr\n");
+		terror("Bad sfwr");
 	if(strcmp(External,"onetwo") != 0)
-		terror("Bad call of sfwr\n");
+		terror("Bad call of sfwr");
 	sfclose(f);
 
 	/* test for setting discipline on an unseekable device */

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -42,21 +42,21 @@ Sfdisc_t*	disc;
 	Sfio_t*	sf;
 
 	if(*((char*)buf + n-1) != '\n')
-		terror("Not writing a whole record\n");
+		terror("Not writing a whole record");
 
 	sf = sfnew(NIL(Sfio_t*),(Void_t*)buf,n,-1,SF_STRING|SF_READ);
 	while((s = sfgetr(sf,'\n',0)) )
 	{	w = sfvalue(sf)-1;
 		if(s[0] != s[w-1]-1)
-			terror("Bad record\n");
+			terror("Bad record");
 		k = (s[2]-'0')*10 + (s[3]-'0');
 		if(k != w)
-			terror("Expect %d, get %d\n",k,w);
+			terror("Expect %d, get %d",k,w);
 	}
 	sfclose(sf);
 
 	if((w = write(sffileno(f),buf,n)) != (int)n)
-		terror("Write %d returns %d\n",n,w);
+		terror("Write %d returns %d",n,w);
 
 	return w;
 }
@@ -90,7 +90,7 @@ MAIN()
 	/* create file */
 	file = tstfile(0);
 	if(!(f = sfopen(NIL(Sfio_t*),file,"w+")) )
-		terror("Opening temporary file %s\n", file);
+		terror("Opening temporary file %s", file);
 
 	/* open file for appending */
 	for(i = 0; i < N_PROC; ++i)
@@ -108,7 +108,7 @@ MAIN()
 #define RETURN(v)	exit(v)
 #endif
 		if((pid = (int)FORK()) < 0 )
-			terror("Creating process %d\n", i);
+			terror("Creating process %d", i);
 		else if(pid == 0)
 		{	/* write to file */
 			sfsetbuf(fa[i], (Void_t*)buf[i], sizeof(buf[i]));
@@ -143,17 +143,17 @@ MAIN()
 	while((s = sfgetr(f,'\n',0)) )
 	{	n += 1;
 		if((i = s[0] - '0') < 0 || (i%2) != 0 || (i /= 2) >= N_PROC )
-			terror("%d: Wrong record type\n", n);
+			terror("%d: Wrong record type", n);
 
 		r = sfvalue(f);
 		if(s[r-2] != s[0]+1)
-			terror("%d: process%d, number=%d\n", n, i, count[i]);
+			terror("%d: process%d, number=%d", n, i, count[i]);
 		for(r -= 3; r > 4; --r)
 			if(s[r] != s[0])
-				terror("%d: process%d, count=%d\n", n, i, count[i]);
+				terror("%d: process%d, count=%d", n, i, count[i]);
 
 		if(sfvalue(f) != size[i][count[i]])
-			terror("%d: process%d number=%d expected size=%d read size=%d\n",
+			terror("%d: process%d number=%d expected size=%d read size=%d",
 				n, i, count[i], size[i][count[i]], sfvalue(f));
 
 		count[i] += 1;
@@ -161,7 +161,7 @@ MAIN()
 
 	for(i = 0; i < N_PROC; ++i)
 		if(count[i] != N_REC)
-			terror("Bad count%d %d\n", i, count[i]);
+			terror("Bad count%d %d", i, count[i]);
 
 	TSTEXIT(0);
 }

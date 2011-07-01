@@ -1,3 +1,5 @@
+11-06-30 tw.tst: add symbol table scope tests
+11-05-05 tw.c,find.c,xargs.c: update to cmdopen_20110505 api
 11-03-03 expr.c: add sum("method") for all libsum methods
 10-11-30 tw.tst: add "begin" scope tests
 10-09-01 find.c: RE errors => exit(2)

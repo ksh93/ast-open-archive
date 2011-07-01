@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -615,7 +615,6 @@ extoken(register Expr_t* ex)
 				#else
 					ex->symbols->view = v;
 				#endif
-				error(-1, "AHA s=%s declare=%d view=%p", s, expr.declare, v);
 				if (!exlval.id)
 				{
 					if (!(exlval.id = newof(0, Exid_t, 1, strlen(s) - EX_NAMELEN + 1)))
@@ -626,7 +625,15 @@ extoken(register Expr_t* ex)
 					strcpy(exlval.id->name, s);
 					exlval.id->lex = NAME;
 					expr.statics += exlval.id->isstatic = expr.instatic;
-					dtinsert(ex->symbols, exlval.id);
+
+					/*
+					 * LABELs are in the parent scope!
+					 */
+
+					if (c == ':' && !expr.nolabel && ex->frame && ex->frame->view)
+						dtinsert(ex->frame->view, exlval.id);
+					else
+						dtinsert(ex->symbols, exlval.id);
 				}
 
 				/*

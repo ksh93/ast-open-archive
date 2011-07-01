@@ -1,3 +1,5 @@
+11-05-09 Makerules.mk: add .SOURCE.h : $(INSTALLROOT)/include
+11-05-09 fix .LIST.PACKAGE.LICENSE to include .'d def files
 11-03-03 rules.win32.mk: add %.rc -DRCWOW=...
 11-03-02 Makerules.mk: fix :LIBRARY: --plugin=foo --static to generate the plugin!
 11-02-11 add '### .*archaic.* ###' test for %.sh install to diable sh -n check

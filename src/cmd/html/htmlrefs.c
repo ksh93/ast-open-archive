@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Research) 2010-02-02 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Research) 2011-04-18 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -1081,7 +1081,7 @@ main(int argc, char** argv)
 					ts.st_mtime = 0;
 					ts.st_mode = 0;
 				}
-				if (strmatch(p, "*/cgi-bin/*|*.cgi"))
+				if (strmatch(p, "*/cgi-bin/*|*.cgi|*.html"))
 					fp->flags |= COPY;
 				if (!state->exec)
 				{

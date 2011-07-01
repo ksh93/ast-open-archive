@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,22 +31,22 @@ MAIN()
 	sfset(sfstderr,SF_SHARE,0);
 
 	if(!sfpool(sfstdout,f,SF_SHARE) || !sfpool(sfstderr,f,SF_SHARE) )
-		terror("Pooling\n");
+		terror("Pooling");
 
 	if(sfputr(sfstdout,"01234",-1) != 5)
-		terror("Writing to stderr\n");
+		terror("Writing to stderr");
 	if(sfputr(sfstderr,"56789",-1) != 5)
-		terror("Writing to stdout\n");
+		terror("Writing to stdout");
 
 	if(sfputc(f,'\0') < 0)
-		terror("Writing to string stream\n");
+		terror("Writing to string stream");
 
 	sfseek(f,(Sfoff_t)0,0);
 	if(!(s = sfreserve(f,SF_UNBOUND,1)) )
-		terror("Peeking\n");
+		terror("Peeking");
 	sfwrite(f,s,0);
 	if(strcmp(s,"0123456789") != 0)
-		terror("Data is wrong\n");
+		terror("Data is wrong");
 
 	TSTEXIT(0);
 }

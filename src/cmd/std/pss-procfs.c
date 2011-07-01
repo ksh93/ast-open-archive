@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -48,11 +48,13 @@ NoN(pss_procfs)
 #define _mem_pr_lttydev_prpsinfo	0
 #endif
 
+#if !_mem_pr_npid_prpsinfo
 #if !defined(pr_ntpid) && !_mem_pr_ntpid_prpsinfo
 #undef	PSS_npid
 #define PSS_npid			0
 #else
 #define pr_npid				pr_ntpid
+#endif
 #endif
 
 #if !defined(pr_pgrp) && !_mem_pr_pgrp_prpsinfo
@@ -186,7 +188,7 @@ procfs_part(register Pss_t* pss, register Pssent_t* pe)
 	{
 		memset(pr, sizeof(*pr), 0);
 		n = sfsscanf(pss->buf, _PS_scan_format, _PS_scan_args(pr));
-		if (n != _PS_scan_count)
+		if (n < _PS_scan_count)
 		{
 			register char*	s;
 
@@ -199,8 +201,8 @@ procfs_part(register Pss_t* pss, register Pssent_t* pe)
 					break;
 				}
 			n = sfsscanf(pss->buf, _PS_scan_format, _PS_scan_args(pr));
-			if (n != _PS_scan_count)
-				error(1, "%lu: scan count %d, expected %d", (unsigned long)pss->pid, n, _PS_scan_count);
+			if (n < _PS_scan_count)
+				error(1, "%lu: scan count %d, expected at least %d", (unsigned long)pss->pid, n, _PS_scan_count);
 		}
 #ifdef _PS_scan_fix
 		_PS_scan_fix(pr, pe);
@@ -338,8 +340,12 @@ procfs_full(register Pss_t* pss, register Pssent_t* pe)
 	pe->cpu = PR_CPU(pr);
 	pe->flags = pr->pr_flag;
 	pe->nice = pr->pr_nice;
+#if _mem_pr_npid_prpsinfo
+	pe->npid = pr->pr_npid;
+#else
 #if _mem_pr_ntpid_prpsinfo
 	pe->npid = pr->pr_ntpid;
+#endif
 #endif
 	pe->ppid = pr->pr_ppid;
 	pe->pri = pr->pr_pri;

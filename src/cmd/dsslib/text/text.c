@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -416,7 +416,7 @@ textwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 static Dssformat_t text_format =
 {
 	"text",
-	"Text format.",
+	"text format (2010-05-28)",
 	CXH,
 	textident,
 	textfopen,

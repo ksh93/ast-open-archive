@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -84,7 +84,7 @@ MAIN()
 	fseek(f2, 0L, SEEK_SET);
 	rbuf[0] = 0;
 	if(fread(rbuf, 1, 7, f2) != 7)
-		terror("Bad read\n");
+		terror("Bad read");
 	for(i = 0; i < 7; ++i)
 		if(rbuf[i] != '0'+i)
 			terror("Bad data1");

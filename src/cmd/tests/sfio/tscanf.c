@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -93,86 +93,86 @@ MAIN()
 
 	i = -1;
 	if(sfsscanf("123456789","%.*.*d",4,10,&i) != 1)
-		terror("Bad %%d scanning\n");
+		terror("Bad %%d scanning");
 	if(i != 1234)
-		terror("Expected 1234, got %d\n", i);
+		terror("Expected 1234, got %d", i);
 
 	i = -1;
 	if(sfsscanf("0","%i",&i) != 1 || i != 0)
-		terror("Bad %%i scanning1\n");
+		terror("Bad %%i scanning1");
 	i = -1;
 	if(sfsscanf("0x","%1i%c",&i,c) != 2 || i != 0 || c[0] != 'x')
-		terror("Bad %%i scanning2\n");
+		terror("Bad %%i scanning2");
 	i = -1;
 	if(sfsscanf("0x1","%i",&i) != 1 || i != 1)
-		terror("Bad %%i scanning3\n");
+		terror("Bad %%i scanning3");
 	i = -1;
 	if(sfsscanf("07","%i",&i) != 1 || i != 7)
-		terror("Bad %%i scanning4\n");
+		terror("Bad %%i scanning4");
 	i = -1;
 	if(sfsscanf("08","%i%i",&i,&j) != 2 || i != 0 || j != 8)
-		terror("Bad %%i scanning5\n");
+		terror("Bad %%i scanning5");
 
 	sfsscanf("1234567890","%4I*s%2I*c%4I*[0-9]",4,str,2,c,6,cl);
 
 	if(strcmp(str,"123") != 0)
-		terror("Bad s\n");
+		terror("Bad s");
 	if(str[4] != 'x')
-		terror("str overwritten\n");
+		terror("str overwritten");
 
 	if(strncmp(c,"56",2) != 0)
-		terror("Bad c\n");
+		terror("Bad c");
 	if(c[2] != 'x')
-		terror("c overwritten\n");
+		terror("c overwritten");
 
 	if(strcmp(cl,"7890") != 0)
-		terror("Bad class\n");
+		terror("Bad class");
 	if(cl[5] != 'x')
-		terror("cl overwritten\n");
+		terror("cl overwritten");
 
 	if(sfsscanf("123 ab","%*d") != 0)
-		terror("Bad return value\n");
+		terror("Bad return value");
 
 	if(sfsscanf("123abcA","%[0-9]%[a-z]%[0-9]",str,c,cl) != 2 ||
 	   strcmp(str,"123") != 0 || strcmp(c,"abc") != 0)
-		terror("Bad character class scanning\n");
+		terror("Bad character class scanning");
 
 	if(sfsscanf("123 456 ","%d %d%n",&i,&j,&n) != 2)
-		terror("Bad integer scanning\n");
+		terror("Bad integer scanning");
 	if(i != 123 || j != 456 || n != 7)
-		terror("Bad return values\n");
+		terror("Bad return values");
 
 	if(sfsscanf("1 2","%d %d%n",&i,&j,&n) != 2)
-		terror("Bad scanning2\n");
+		terror("Bad scanning2");
 	if(i != 1 || j != 2 || n != 3)
-		terror("Bad return values 2\n");
+		terror("Bad return values 2");
 
 	if(sfsscanf("1234 1","%2d %d%n",&i,&j,&n) != 2)
-		terror("Bad scanning3\n");
+		terror("Bad scanning3");
 	if(i != 12 || j != 34 || n != 4)
-		terror("Bad return values 3\n");
+		terror("Bad return values 3");
 
 	if(sfsscanf("011234 1","%3i%1d%1d%n",&i,&j,&k,&n) != 3)
-		terror("Bad scanning4\n");
+		terror("Bad scanning4");
 	if(i != 9 || j != 2 || k != 3 || n != 5)
-		terror("Bad return values 4\n");
+		terror("Bad return values 4");
 
 	if(sfsscanf("4 6","%f %lf",&f, &d) != 2)
-		terror("Bad scanning5\n");
+		terror("Bad scanning5");
 	if(f != 4 || d != 6)
-		terror("Bad return values f=%f d=%f\n", f, d);
+		terror("Bad return values f=%f d=%f", f, d);
 
 	s = ".1234 .1234";
 	if(sfsscanf(s,"%f %lf",&f, &d) != 2)
-		terror("Bad scanning6\n");
+		terror("Bad scanning6");
 
 	if(f <= .1233 || f >= .1235 || d <= .1233 || d >= .1235)
-		terror("Bad return values: f=%.4f d=%.4lf\n",f,d);
+		terror("Bad return values: f=%.4f d=%.4lf",f,d);
 
 	/* test for scanning max double value */
 	s = sfprints("%.14le",MAXD);
 	if(!s || s[0] < '0' || s[0] > '9')
-		terror("sfprints failed\n");
+		terror("sfprints failed");
 	for(i = 0; s[i]; ++i)
 		if(s[i] == 'e')
 			break;
@@ -180,10 +180,10 @@ MAIN()
 		s[i-1] -= 1;
 	sfsscanf(s,"%le",&d);
 	if(d > MAXD || d < MAXD/2)
-		terror("sfscanf of MAXDOUBLE failed\n");
+		terror("sfscanf of MAXDOUBLE failed");
 
 	if(!(sf = sftmp(8*1024)) )
-		terror("Opening temp file\n");
+		terror("Opening temp file");
 
 	for(k = 2; k <= 64; ++k)
 	{	sfseek(sf,(Sfoff_t)0,0);
@@ -192,9 +192,9 @@ MAIN()
 		sfseek(sf,(Sfoff_t)0,0);
 		for(i = 0; i < 1000; ++i)
 		{	if(sfscanf(sf,"%i",&j) != 1)
-				terror("Scanf failed\n");
+				terror("Scanf failed");
 			if(i != j)
-				terror("Wrong scanned value\n");
+				terror("Wrong scanned value");
 		}
 	}
 
@@ -202,12 +202,12 @@ MAIN()
 	s = sfprints("%p", sf);
 	sfsscanf(s, "%p", &vp);
 	if(vp != (Void_t*)sf)
-		terror("Wrong pointer scan\n");
+		terror("Wrong pointer scan");
 
 	if(sfsscanf("2#1001","%i",&i) != 1 || i != 9)
-		terror("Bad %%i scanning\n");
+		terror("Bad %%i scanning");
 	if(sfsscanf("2#1001","%#i%c",&i,c) != 2 || i != 2 || c[0] != '#')
-		terror("Bad %%#i scanning\n");
+		terror("Bad %%#i scanning");
 
 	n = -1;
 	if(sfsscanf("12345","%d%n",&k,&n) != 1 || k != 12345 || n != 5)

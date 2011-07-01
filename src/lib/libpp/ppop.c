@@ -40,25 +40,28 @@
  * initialization files have lowest precedence
  */
 
-void
+int
 ppset(register long* p, register long op, int val)
 {
 	long*	r;
 
 	r = p == &pp.state ? &pp.ro_state : p == &pp.mode ? &pp.ro_mode : &pp.ro_option;
-	if (!(pp.mode & INIT) || pp.in->type != IN_FILE || !(*r & op))
+	if ((pp.mode & INIT) && pp.in->type == IN_FILE && (*r & op))
 	{
-		if (!pp.initialized && (!(pp.mode & INIT) || !(pp.mode & BUILTIN)) && (p != &pp.mode || !(op & BUILTIN)) && (p != &pp.option || !(op & PREDEFINED)))
-		{
-			*r |= op;
-			debug((-7, "readonly(%s)=%s", p == &pp.state ? "state" : p == &pp.mode ? "mode" : "option", p == &pp.state ? ppstatestr(*r) : p == &pp.mode ? ppmodestr(*r) : ppoptionstr(*r)));
-		}
-		if (val)
-			*p |= op;
-		else
-			*p &= ~op;
+		debug((-7, "set %s %s skipped -- readonly", p == &pp.state ? "state" : p == &pp.mode ? "mode" : "option", p == &pp.state ? ppstatestr(*r) : p == &pp.mode ? ppmodestr(*r) : ppoptionstr(*r)));
+		return 0;
 	}
-	debug((-7, "set(%s)=%s", p == &pp.state ? "state" : p == &pp.mode ? "mode" : "option", p == &pp.state ? ppstatestr(*p) : p == &pp.mode ? ppmodestr(*p) : ppoptionstr(*p)));
+	if (!pp.initialized && (!(pp.mode & INIT) || !(pp.mode & BUILTIN)) && (p != &pp.mode || !(op & BUILTIN)) && (p != &pp.option || !(op & PREDEFINED)))
+	{
+		*r |= op;
+		debug((-7, "set %s %s readonly", p == &pp.state ? "state" : p == &pp.mode ? "mode" : "option", p == &pp.state ? ppstatestr(*r) : p == &pp.mode ? ppmodestr(*r) : ppoptionstr(*r)));
+	}
+	if (val)
+		*p |= op;
+	else
+		*p &= ~op;
+	debug((-7, "set %s %s", p == &pp.state ? "state" : p == &pp.mode ? "mode" : "option", p == &pp.state ? ppstatestr(*r) : p == &pp.mode ? ppmodestr(*r) : ppoptionstr(*r)));
+	return 1;
 }
 
 /*
@@ -322,6 +325,33 @@ undefine(void* p)
 }
 
 /*
+ * return non-zero if its ok to ppop(op)
+ */
+
+static int
+ppok(int op)
+{
+	long		n;
+	long*		r;
+
+	r = &pp.ro_op[op >> 5];
+	n = 1L << op;
+	if ((pp.mode & INIT) && pp.in->type == IN_FILE && (*r & n))
+	{
+		debug((-7, "set op %d index %d skipped -- readonly", op, op >> 5));
+		return 0;
+	}
+	else if (!pp.initialized && (!(pp.mode & INIT) || !(pp.mode & BUILTIN)))
+	{
+		*r |= n;
+		debug((-7, "set op %d index %d readonly", op, op >> 5));
+	}
+	else
+		debug((-7, "set op %d index %d", op, op >> 5));
+	return 1;
+}
+
+/*
  * pp operations
  *
  * NOTE: PP_INIT must be done before the first pplex() call
@@ -338,6 +368,7 @@ ppop(int op, ...)
 	register char*			s;
 	int				c;
 	long				n;
+	long*				r;
 	char*				t;
 	struct ppdirs*			dp;
 	struct ppdirs*			hp;
@@ -437,18 +468,20 @@ ppop(int op, ...)
 			pp.flags &= ~PP_comment;
 		break;
 	case PP_COMPATIBILITY:
-		ppset(&pp.state, COMPATIBILITY, va_arg(ap, int));
+		if (ppset(&pp.state, COMPATIBILITY, va_arg(ap, int)))
+		{
 #if COMPATIBLE
-		if (pp.initialized)
-			ppfsm(FSM_COMPATIBILITY, NiL);
+			if (pp.initialized)
+				ppfsm(FSM_COMPATIBILITY, NiL);
 #else
-		if (pp.state & COMPATIBILITY)
-			error(3, "preprocessor not compiled with compatibility dialect enabled [COMPATIBLE]");
+			if (pp.state & COMPATIBILITY)
+				error(3, "preprocessor not compiled with compatibility dialect enabled [COMPATIBLE]");
 #endif
-		if (pp.state & COMPATIBILITY)
-			pp.flags |= PP_compatibility;
-		else
-			pp.flags &= ~PP_compatibility;
+			if (pp.state & COMPATIBILITY)
+				pp.flags |= PP_compatibility;
+			else
+				pp.flags &= ~PP_compatibility;
+		}
 		break;
 	case PP_COMPILE:
 		if (pp.initialized)
@@ -1215,37 +1248,50 @@ ppop(int op, ...)
 #endif
 		break;
 	case PP_LINE:
-		pp.linesync = va_arg(ap, PPLINESYNC);
+		if (ppok(op))
+			pp.linesync = va_arg(ap, PPLINESYNC);
 		break;
 	case PP_LINEBASE:
-		if (va_arg(ap, int))
-			pp.flags |= PP_linebase;
-		else
-			pp.flags &= ~PP_linebase;
+		if (ppok(op))
+		{
+			if (va_arg(ap, int))
+				pp.flags |= PP_linebase;
+			else
+				pp.flags &= ~PP_linebase;
+		}
 		break;
 	case PP_LINEFILE:
-		if (va_arg(ap, int))
-			pp.flags |= PP_linefile;
-		else
-			pp.flags &= ~PP_linefile;
+		if (ppok(op))
+		{
+			if (va_arg(ap, int))
+				pp.flags |= PP_linefile;
+			else
+				pp.flags &= ~PP_linefile;
+		}
 		break;
 	case PP_LINEID:
-		if (!(p = va_arg(ap, char*)))
-			pp.lineid = "";
-		else if (*p != '-')
-			pp.lineid = strdup(p);
-		else
-			pp.option |= IGNORELINE;
+		if (ppok(op))
+		{
+			if (!(p = va_arg(ap, char*)))
+				pp.lineid = "";
+			else if (*p != '-')
+				pp.lineid = strdup(p);
+			else
+				pp.option |= IGNORELINE;
+		}
 		break;
 	case PP_LINETYPE:
-		if ((n = va_arg(ap, int)) >= 1)
-			pp.flags |= PP_linetype;
-		else
-			pp.flags &= ~PP_linetype;
-		if (n >= 2)
-			pp.flags |= PP_linehosted;
-		else
-			pp.flags &= ~PP_linehosted;
+		if (ppok(op))
+		{
+			if ((n = va_arg(ap, int)) >= 1)
+				pp.flags |= PP_linetype;
+			else
+				pp.flags &= ~PP_linetype;
+			if (n >= 2)
+				pp.flags |= PP_linehosted;
+			else
+				pp.flags &= ~PP_linehosted;
+		}
 		break;
 	case PP_LOCAL:
 		if (pp.initialized)
@@ -1288,14 +1334,11 @@ ppop(int op, ...)
 		ppset(&pp.mode, PEDANTIC, va_arg(ap, int));
 		break;
 	case PP_PLUSCOMMENT:
-		ppset(&pp.option, PLUSCOMMENT, va_arg(ap, int));
-		if (pp.initialized)
+		if (ppset(&pp.option, PLUSCOMMENT, va_arg(ap, int)) && pp.initialized)
 			ppfsm(FSM_PLUSPLUS, NiL);
 		break;
 	case PP_PLUSPLUS:
-		ppset(&pp.option, PLUSPLUS, va_arg(ap, int));
-		ppset(&pp.option, PLUSCOMMENT, va_arg(ap, int));
-		if (pp.initialized)
+		if (ppset(&pp.option, PLUSPLUS, va_arg(ap, int)) && ppset(&pp.option, PLUSCOMMENT, va_arg(ap, int)) && pp.initialized)
 			ppfsm(FSM_PLUSPLUS, NiL);
 		break;
 	case PP_POOL:
@@ -1416,13 +1459,15 @@ ppop(int op, ...)
 					}
 		break;
 	case PP_STRICT:
-		ppset(&pp.state, TRANSITION, 0);
-		pp.flags &= ~PP_transition;
-		ppset(&pp.state, STRICT, va_arg(ap, int));
-		if (pp.state & STRICT)
-			pp.flags |= PP_strict;
-		else
-			pp.flags &= ~PP_strict;
+		if (ppset(&pp.state, STRICT, va_arg(ap, int)))
+		{
+			if (ppset(&pp.state, TRANSITION, 0))
+				pp.flags &= ~PP_transition;
+			if (pp.state & STRICT)
+				pp.flags |= PP_strict;
+			else
+				pp.flags &= ~PP_strict;
+		}
 		break;
 	case PP_TEST:
 		if (p = va_arg(ap, char*))
@@ -1480,13 +1525,15 @@ ppop(int op, ...)
 			}
 		break;
 	case PP_TRANSITION:
-		ppset(&pp.state, STRICT, 0);
-		pp.flags &= ~PP_strict;
-		ppset(&pp.state, TRANSITION, va_arg(ap, int));
-		if (pp.state & TRANSITION)
-			pp.flags |= PP_transition;
-		else
-			pp.flags &= ~PP_transition;
+		if (ppset(&pp.state, TRANSITION, va_arg(ap, int)))
+		{
+			if (ppset(&pp.state, STRICT, 0))
+				pp.flags &= ~PP_strict;
+			if (pp.state & TRANSITION)
+				pp.flags |= PP_transition;
+			else
+				pp.flags &= ~PP_transition;
+		}
 		break;
 	case PP_TRUNCATE:
 		if (pp.initialized)

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-03-02 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-05-09 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -4094,6 +4094,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			T4 := $(T3)
 		end
 	end
+	.SOURCE.h : $(INSTALLROOT)/include
 	if "$(-mam:N=dynamic*)"
 		.MAM.INSTALLROOT := $(INSTALLROOT:N=$(HOME):?$HOME?$(INSTALLROOT)?)
 		print -um setv INSTALLROOT $(.MAM.INSTALLROOT)
@@ -4857,7 +4858,7 @@ end
 .LIST.PACKAGE.SOURCE.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:H=RU:C,.*,C%^&/%%,:C, ,:,G)
 
 .LIST.PACKAGE.LICENSE : .ONOBJECT .MAKE
-	local I E
+	local I J E
 	if "$(package.license.class)"
 		if "$(LICENSECLASS)" != "$(package.license.class)"
 			if "$(LICENSECLASS)" != "."
@@ -4869,6 +4870,9 @@ end
 	E := $(.LIST.PACKAGE.SOURCE.EDIT.)
 	if I = "$(LICENSEINFO:P!=S)"
 		print ;;;$(I);$(I:$(E))
+		for J $(I:T=I:N=*.def:D=$(I:D):B:S:T=F)
+			print ;;;$(J);$(J:$(E))
+		end
 		I := $(I:D)/LICENSES/$(I:B)
 		if I = "$(I:T=F)"
 			print ;;;$(I);$(I:$(E))

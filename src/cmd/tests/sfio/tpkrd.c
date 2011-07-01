@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -30,7 +30,7 @@ int	sig;
 #endif
 {
 	if(write(Fd[1],"01234\n56789\n",12) != 12)
-		terror("Writing to pipe\n");
+		terror("Writing to pipe");
 }
 
 MAIN()
@@ -40,14 +40,14 @@ MAIN()
 	int	n;
 
 	if(pipe(Fd) < 0)
-		terror("Can't make pipe\n");
+		terror("Can't make pipe");
 
 	if(sfnew(sfstdin,NIL(Void_t*),(size_t)SF_UNBOUND,Fd[0],SF_READ) != sfstdin)
-		terror("Can't renew stdin\n");
+		terror("Can't renew stdin");
 	sfset(sfstdin,SF_SHARE,1);
 
 	if(sfpkrd(Fd[0],(Void_t*)buf,10,-1,1000,1) >= 0)
-		terror("There isn't any data yet\n");
+		terror("There isn't any data yet");
 
 	if((n = sfpkrd(Fd[0],(Void_t*)buf,sizeof(buf),-1,0L,0)) >= 0)
 		terror("Wrong data size %d, expecting < 0", n);
@@ -61,13 +61,13 @@ MAIN()
 	signal(SIGALRM,alarmhandler);
 	alarm(2);
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"01234") != 0)
-		terror("Expecting 01234\n");
+		terror("Expecting 01234");
 
 	if(sfstdin->_next < sfstdin->_endb)
-		terror("Sfgetr read too much\n");
+		terror("Sfgetr read too much");
 
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"56789") != 0)
-		terror("Expecting 56789\n");
+		terror("Expecting 56789");
 
 	TSTEXIT(0);
 }

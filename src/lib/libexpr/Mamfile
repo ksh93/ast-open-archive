@@ -369,7 +369,7 @@ prev exlib.h implicit
 done exzero.c
 meta exzero.o %.c>%.o exzero.c exzero
 prev exzero.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exzero.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}   -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exzero.c
 done exzero.o generated
 exec - ${AR} -cr libexpr.a exparse.o excc.o excontext.o exdata.o exeval.o exexpr.o exerror.o exopen.o exrewind.o extoken.o extype.o exnospace.o exstash.o exzero.o
 exec - (ranlib libexpr.a) >/dev/null 2>&1 || true

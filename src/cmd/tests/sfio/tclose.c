@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2007 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -66,34 +66,34 @@ MAIN()
 	signal(SIGPIPE,SIG_IGN);
 
 	if(pipe(fd) < 0)
-		terror("Opening pipes\n");
+		terror("Opening pipes");
 
 	if(!(w = sfnew(NIL(Sfio_t*),NIL(Void_t*),(size_t)SF_UNBOUND, fd[1],SF_WRITE)) )
-		terror("Opening write stream\n");
+		terror("Opening write stream");
 	if(!(r = sfnew(NIL(Sfio_t*),NIL(Void_t*),(size_t)SF_UNBOUND, fd[0],SF_READ)) )
-		terror("Opening read stream\n");
+		terror("Opening read stream");
 
 	sfdisc(w,&Wdisc);
 
 	if(sfputr(w,"abc",'\n') != 4)
-		terror("sfputr failed\n");
+		terror("sfputr failed");
 	if(!(s = sfgetr(r,'\n',1)) || strcmp(s,"abc") != 0)
-		terror("sfgetr failed\n");
+		terror("sfgetr failed");
 
 	if(sfclose(r) < 0)
-		terror("sfclose failed closing read stream\n");
+		terror("sfclose failed closing read stream");
 
 	if(sfputr(w,"def",'\n') != 4)
-		terror("sfputr failed2\n");
+		terror("sfputr failed2");
 
 	if(Write_error)
-		terror("Write exception should not have been raised\n");
+		terror("Write exception should not have been raised");
 
 	if(sfclose(w) >= 0)
-		terror("sfclose should have failed closing write stream\n");
+		terror("sfclose should have failed closing write stream");
 
 	if(!Write_error)
-		terror("Write exception did not get raised\n");
+		terror("Write exception did not get raised");
 
 	signal(SIGPIPE,SIG_DFL);
 	if((w = sfpopen(NIL(Sfio_t*), sfprints("%s %d", argv[0], N_STR), "w+")) )
@@ -101,7 +101,7 @@ MAIN()
 
 		if((handler = signal(SIGPIPE,SIG_IGN)) == SIG_DFL ||
 		   handler == SIG_IGN)
-			terror("Bad signal handler for SIGPIPE\n");
+			terror("Bad signal handler for SIGPIPE");
 		signal(SIGPIPE,handler);
 
 		Write_error = 0;
@@ -109,7 +109,7 @@ MAIN()
 
 		for(i = 0; i < N_STR*10; ++i)
 			if(sfputr(w, "abc",'\n') != 4)
-				terror("Writing to coprocess1\n");
+				terror("Writing to coprocess1");
 
 		sfsync(w);
 		sfset(w,SF_READ,1);
@@ -120,30 +120,30 @@ MAIN()
 
 		for(i = 0; i < N_STR; ++i)
 			if(!(s = sfgetr(w,'\n',1)) || strcmp(s,"abc") != 0)
-				terror("Reading coprocess [%s]\n", s);
+				terror("Reading coprocess [%s]", s);
 		if((s = sfgetr(w,'\n',1)) )
-			terror("sfgetr should have failed\n");
+			terror("sfgetr should have failed");
 
 		if(sfputr(w, "abc",'\n') != 4)
-			terror("Writing to coprocess2\n");
+			terror("Writing to coprocess2");
 
 		if(Write_error)
-			terror("Write exception should not have been raised yet\n");
+			terror("Write exception should not have been raised yet");
 
-		if(sfclose(w) < 0)
-			terror("sfclose should have returned an exit status\n");
+		if(!sfclose(w))
+			terror("sfclose should have returned error status");
 
 		if(!Write_error)
-			terror("Write exception should have been raised\n");
+			terror("Write exception should have been raised");
 	}
 
 	if(signal(SIGPIPE,SIG_DFL) != SIG_DFL)
-		terror("SIGPIPE handler should have been SIG_DFL\n");
+		terror("SIGPIPE handler should have been SIG_DFL");
 
 	/* test for stdio signal handling behavior */
 	w = sfpopen((Sfio_t*)(-1), sfprints("%s %d 2>/dev/null",argv[0],N_STR), "w+");
 	if(w && (handler = signal(SIGPIPE,SIG_DFL)) != SIG_DFL)
-		terror("SIGPIPE handler should have been SIG_DFL\n");
+		terror("SIGPIPE handler should have been SIG_DFL");
 
 	TSTEXIT(0);
 }

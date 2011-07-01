@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -48,18 +48,18 @@ MAIN()
 	char	buf[1024], rbuf[128*1024];
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
-		terror("Opening to write\n");
+		terror("Opening to write");
 
 	for(i = 0; i < sizeof(buf); ++i)
 		buf[i] = 'a' + (i%26);
 
 	for(i = 0; i < 1024; ++i)
 		if(sfwrite(f,buf,sizeof(buf)) != sizeof(buf) )
-			terror("Write error\n");
+			terror("Write error");
 	sfclose(f);
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
-		terror("Opening to read\n");
+		terror("Opening to read");
 	sfsetbuf(f,rbuf,sizeof(rbuf));
 
 	sfdisc(f,&Disc);
@@ -72,7 +72,7 @@ MAIN()
 	}
 
 	if(Read != 1024*sizeof(buf) )
-		terror("Count=%d Read=%d\n", Count, Read);
+		terror("Count=%d Read=%d", Count, Read);
 
 	TSTEXIT(0);
 }

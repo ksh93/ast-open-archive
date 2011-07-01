@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -117,7 +117,7 @@ main(int argc, register char** argv)
 
 	int			argmax = 0;
 	char*			eof = "_";
-	int			flags = CMD_EMPTY;
+	int			flags = CMD_EMPTY|CMD_EXIT;
 	char*			insert = 0;
 	int			lines = 0;
 	size_t			size = 0;
@@ -216,7 +216,7 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (!(cmd = cmdopen(argv, argmax, size, insert, flags)))
+	if (!(cmd = cmdopen(argv, argmax, size, insert, flags, errorf)))
 		error(ERROR_SYSTEM|3, "out of space [cmd]");
 	if (!(sp = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space [arg]");

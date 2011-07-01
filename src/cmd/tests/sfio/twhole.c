@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -35,7 +35,7 @@ Sfdisc_t*	disc;
 {
 	Count += 1;
 	if((n % Size) != 0)
-		terror("Wrong record size\n");
+		terror("Wrong record size");
 	return write(sffileno(f),buf,n);
 }
 
@@ -52,33 +52,33 @@ MAIN()
 	Size = 52;
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
-		terror("Opening to write\n");
+		terror("Opening to write");
 	sfsetbuf(f,buf,sizeof(buf));
 	sfset(f,SF_WHOLE,1);
 	sfdisc(f,&Disc);
 
 	for(i = 0; i < 100; ++i)
 		if(sfwrite(f,s,52) != 52)
-			terror("sfwrite failed\n");
+			terror("sfwrite failed");
 	sfclose(f);
 	if(Count != 10)
-		terror("Wrong number of writes1\n");
+		terror("Wrong number of writes1");
 
 	Count = 0;
 	Size = 53;
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
-		terror("Opening to write\n");
+		terror("Opening to write");
 	sfsetbuf(f,buf,sizeof(buf));
 	sfset(f,SF_WHOLE,1);
 	sfdisc(f,&Disc);
 
 	for(i = 0; i < 100; ++i)
 		if(sfputr(f,s,'\n') != 53)
-			terror("sfputr failed\n");
+			terror("sfputr failed");
 	sfclose(f);
 	if(Count != 10)
-		terror("Wrong number of writes2\n");
+		terror("Wrong number of writes2");
 
 	TSTEXIT(0);
 }

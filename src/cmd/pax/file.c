@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -864,7 +864,13 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 		if (*e)
 			error(2, "%s: invalid mode expression", state.mode);
 	}
-	message((-2, "getfile(): path=%s name=%s mode=%s size=%I*d", name, f->name, fmtmode(f->st->st_mode, 1), sizeof(f->st->st_size), f->st->st_size));
+	if (state.mtime)
+	{
+		f->st->st_mtime = tmdate(state.mtime, &e, NiL);
+		if (*e)
+			error(2, "%s: invalid mtime", state.mtime);
+	}
+	message((-2, "getfile(): path=%s name=%s mode=%s size=%I*d mtime=%s", name, f->name, fmtmode(f->st->st_mode, 1), sizeof(f->st->st_size), f->st->st_size, fmttime("%K", f->st->st_mtime)));
 	return 1;
 }
 

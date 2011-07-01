@@ -14,7 +14,7 @@ ID = 3d
 VERSION = 4.0
 CATALOG = 3d
 
-CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
+CCFLAGS = -O $(CC.DLL) /* NOTE: gcc $(CC.OPTIMIZE) fails here! */
 IFFEREFS = -last
 TMP = 3.$(tmp)
 

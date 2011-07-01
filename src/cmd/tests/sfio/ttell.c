@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -77,29 +77,29 @@ MAIN()
         }
 
 	if(!(f = sfpopen(NIL(Sfio_t*),sfprints("%s -p",argv[0]),"r+")) )
-		terror("Open coprocess\n");
+		terror("Open coprocess");
 
 	if(sfwrite(f,"123\n",4) != 4)
-		terror("Write coprocess\n");
+		terror("Write coprocess");
 	if(sftell(f) != 4)
-		terror("sftell1\n");
+		terror("sftell1");
 
 	if(!(s = sfreserve(f,4,0)) || strncmp(s,"123\n",4) != 0 )
-		terror("Read coprocess\n");
+		terror("Read coprocess");
 	if(sftell(f) != 8)
-		terror("sftell2\n");
+		terror("sftell2");
 
 	sfset(f,SF_SHARE,1);
 
 	if(sfwrite(f,"456\n",4) != 4)
-		terror("Write coprocess2\n");
+		terror("Write coprocess2");
 	if(sftell(f) != 12)
-		terror("sftell 3\n");
+		terror("sftell 3");
 
 	if(!(s = sfreserve(f,4,0)) || strncmp(s,"456\n",4) != 0 )
-		terror("Read coprocess2\n");
+		terror("Read coprocess2");
 	if(sftell(f) != 16)
-		terror("sftell 4\n");
+		terror("sftell 4");
 
 	sfclose(f);
 

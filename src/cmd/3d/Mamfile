@@ -354,6 +354,7 @@ done ../../lib/libast/comp/gross.c
 make ../../lib/libast/comp/spawnveg.c implicit
 make ${PACKAGE_ast_INCLUDE}/ast_vfork.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_vfork.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 make process.h implicit
 done process.h dontcare virtual

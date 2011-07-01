@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -309,7 +309,7 @@ dumpv9fclose(Dssfile_t* file, Dssdisc_t* disc)
 Dssformat_t netflow_dumpv9_format =
 {
 	"dumpv9",
-	"Cisco netflow v9 dump format.  Flow templates are retained across input files.",
+	"Cisco netflow v9 dump format (2008-12-10) flow templates are retained across input files",
 	CXH,
 	dumpv9ident,
 	dumpv9fopen,

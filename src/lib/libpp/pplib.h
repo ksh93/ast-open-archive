@@ -261,6 +261,7 @@ struct pathid				/* physical file name and id	*/
 	long		ro_state;	/* readonly state		*/ \
 	long		ro_mode;	/* readonly mode		*/ \
 	long		ro_option;	/* readonly option		*/ \
+	long		ro_op[2];	/* readonly op			*/ \
 	struct pathid	cdir;		/* arg C dir			*/ \
 	struct pathid	hostdir;	/* arg host dir			*/ \
 	char*		ppdefault;	/* arg default info file	*/ \
@@ -312,6 +313,7 @@ struct pathid				/* physical file name and id	*/
 	long		ro_state;	/* original pp.ro_state		*/ \
 	long		ro_mode;	/* original pp.ro_mode		*/ \
 	long		ro_option;	/* original pp.ro_option	*/ \
+	long		ro_op[2];	/* original pp.ro_op[]		*/ \
 	int		on;		/* PP_RESET enabled		*/ \
 	Hash_table_t*	symtab;		/* original pp.symtab scope	*/ \
 	}		reset;		/* PP_RESET state		*/ \
@@ -842,7 +844,7 @@ extern int		pppredargs(void);
 extern void		pppush(int, char*, char*, int);
 extern struct ppsymbol*	pprefmac(char*, int);
 extern int		ppsearch(char*, int, int);
-extern void		ppset(long*, long, int);
+extern int		ppset(long*, long, int);
 extern char*		ppstatestr(long);
 extern char*		pptokstr(char*, int);
 extern void		pptrace(int);

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -32,11 +32,11 @@ MAIN()
 	wbuf[sizeof(wbuf)-1] = '\0';
 
 	if(!(fp = sftmp(0)))
-		terror("Opening temp file\n");
+		terror("Opening temp file");
 
 	for(i = 0; i < 256; ++i)
 		if(sfwrite(fp,wbuf,sizeof(wbuf)) != sizeof(wbuf))
-			terror("Writing\n");
+			terror("Writing");
 
 	sfseek(fp,(Sfoff_t)0,0);
 	sfset(fp,SF_WRITE,0);
@@ -45,10 +45,10 @@ MAIN()
 
 	for(i = 0; i < 256; ++i)
 	{	if(sfread(fp,rbuf,sizeof(rbuf)) != sizeof(rbuf))
-			terror("Reading\n");
+			terror("Reading");
 
 		if(strcmp(rbuf,wbuf) != 0)
-			terror("Unmatched record\n");
+			terror("Unmatched record");
 	}
 
 	TSTEXIT(0);

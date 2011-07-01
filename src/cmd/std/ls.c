@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2010-05-25 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2011-06-10 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -77,7 +77,8 @@ USAGE_LICENSE
 "		[+atime?access time]"
 "		[+blocks?size in blocks]"
 "		[+ctime?change time]"
-"		[+device?device number]"
+"		[+dev?major/minor device numbers]"
+"		[+device?major/minor device numbers if block or character special device]"
 "		[+devmajor?major device number]"
 "		[+devminor?minor device number]"
 "		[+dir.blocks?directory blocks]"
@@ -106,6 +107,7 @@ USAGE_LICENSE
 "		[+total.files?running total file count]"
 "		[+trailer?listing trailer]"
 "		[+uid?owner id]"
+"		[+view?3d fs view level, 0 for the top or 2d]"
 "		[+----?subformats ----]"
 "		[+case\b::\bp\b\a1\a::\bs\b\a1\a::...::\bp\b\an\a::\bs\b\an\a?Expands"
 "			to \bs\b\ai\a if the value of \aid\a matches the shell"
@@ -225,6 +227,7 @@ USAGE_LICENSE
 #include <sfdisc.h>
 #include <hash.h>
 #include <tmx.h>
+#include <fs3d.h>
 
 #define LS_ACROSS	(LS_USER<<0)	/* multi-column row order	*/
 #define LS_ALL		(LS_USER<<1)	/* list all			*/
@@ -261,34 +264,36 @@ USAGE_LICENSE
 #define KEY_atime		1
 #define KEY_blocks		2
 #define KEY_ctime		3
-#define KEY_device		4
-#define KEY_devmajor		5
-#define KEY_devminor		6
-#define KEY_dir_blocks		7
-#define KEY_dir_bytes		8
-#define KEY_dir_count		9
-#define KEY_dir_files		10
-#define KEY_flags		11
-#define KEY_gid			12
-#define KEY_header		13
-#define KEY_ino			14
-#define KEY_linkop		15
-#define KEY_linkpath		16
-#define KEY_mark		17
-#define KEY_markdir		18
-#define KEY_mode		19
-#define KEY_mtime		20
-#define KEY_name		21
-#define KEY_nlink		22
-#define KEY_path		23
-#define KEY_perm		24
-#define KEY_size		25
-#define KEY_summary		26
-#define KEY_total_blocks	27
-#define KEY_total_bytes		28
-#define KEY_total_files		29
-#define KEY_trailer		30
-#define KEY_uid			31
+#define KEY_dev			4
+#define KEY_device		5
+#define KEY_devmajor		6
+#define KEY_devminor		7
+#define KEY_dir_blocks		8
+#define KEY_dir_bytes		9
+#define KEY_dir_count		10
+#define KEY_dir_files		11
+#define KEY_flags		12
+#define KEY_gid			13
+#define KEY_header		14
+#define KEY_ino			15
+#define KEY_linkop		16
+#define KEY_linkpath		17
+#define KEY_mark		18
+#define KEY_markdir		19
+#define KEY_mode		20
+#define KEY_mtime		21
+#define KEY_name		22
+#define KEY_nlink		23
+#define KEY_path		24
+#define KEY_perm		25
+#define KEY_size		26
+#define KEY_summary		27
+#define KEY_total_blocks	28
+#define KEY_total_bytes		29
+#define KEY_total_files		30
+#define KEY_trailer		31
+#define KEY_uid			32
+#define KEY_view		33
 
 #if 0
 #define BLOCKS(st)	((state.blocksize==LS_BLOCKSIZE)?iblocks(st):(state.blocksize>LS_BLOCKSIZE)?(iblocks(st)+state.blocksize/LS_BLOCKSIZE-1)/(state.blocksize/LS_BLOCKSIZE):iblocks(st)*(LS_BLOCKSIZE/state.blocksize))
@@ -360,6 +365,7 @@ static Key_t	keys[] =
 	{ "atime",		KEY_atime		},
 	{ "blocks",		KEY_blocks		},
 	{ "ctime",		KEY_ctime		},
+	{ "dev",		KEY_dev			},
 	{ "device",		KEY_device		},
 	{ "devmajor",		KEY_devmajor		},
 	{ "devminor",		KEY_devminor		},
@@ -388,6 +394,7 @@ static Key_t	keys[] =
 	{ "total.files",	KEY_total_files		},
 	{ "trailer",		KEY_trailer		},
 	{ "uid",		KEY_uid			},
+	{ "view",		KEY_view		},
 
 	/* aliases */
 
@@ -529,6 +536,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		}
 		if (!arg)
 			arg = state.timefmt;
+		break;
+	case KEY_dev:
+		if (st)
+			s = fmtdev(st);
 		break;
 	case KEY_device:
 		if (st && (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)))
@@ -729,6 +740,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			else
 				n = st->st_uid;
 		}
+		break;
+	case KEY_view:
+		if (st)
+			n = iview(st);
 		break;
 	default:
 		return 0;

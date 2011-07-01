@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -102,63 +102,63 @@ MAIN()
 	int	i;
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
-		terror("Can't open file\n");
+		terror("Can't open file");
 	sfset(f,SF_IOCHECK,1);
 
 	Disc.exceptf = except;
 	if(!sfdisc(f,&Disc) )
-		terror("Pushing discipline failed\n");
+		terror("Pushing discipline failed");
 
 	sfdisc(f,&Disc);
 	if(Type != SF_DPUSH)
-		terror("Did not get push event\n");
+		terror("Did not get push event");
 
 	/* this is to test sfraise(NULL,...) */
 	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
-		terror("Can't open file\n");
+		terror("Can't open file");
 	sfdisc(f2,&Disc);
 
 	Sfn = 0;
 	if(sfraise(0, SF_WRITE, 0) < 0)
-		terror("sfraise failed\n");
+		terror("sfraise failed");
 	if(Sfn != 2)
 		terror("Didn't get right event count");
 
 	sfdisc(f,NIL(Sfdisc_t*));
 	if(Type != SF_DPOP)
-		terror("Did not get pop event\n");
+		terror("Did not get pop event");
 
 	sfwrite(f,"123",3);
 	sfsync(f);
 	if(Type != SF_SYNC)
-		terror("Did not get sync event\n");
+		terror("Did not get sync event");
 
 	sfwrite(f,"123",3);
 	sfpurge(f);
 	if(Type != SF_PURGE)
-		terror("Did not get purge event\n");
+		terror("Did not get purge event");
 
 	sfclose(f);
 	if(Type != SF_CLOSING)
-		terror("Did not get close event\n");
+		terror("Did not get close event");
 
 	sfclose(f);
 	if(Type != SF_FINAL)
-		terror("Did not get final event\n");
+		terror("Did not get final event");
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
-		terror("Can't open file\n");
+		terror("Can't open file");
 	Disc2.readf = readfunc;
 	Disc2.exceptf = except3;
 	sfdisc(f,&Disc2);
 	if(sfgetc(f) >= 0)
-		terror("There should be no data here\n");
+		terror("There should be no data here");
 	if(Type != SF_LOCKED)
-		terror("Did not get lock event\n");
+		terror("Did not get lock event");
 
 	/* test to see if sfclose() preserves seek location */
 	if(!(f = sftmp(0)) )
-		terror("Can't create temp file\n");
+		terror("Can't create temp file");
 	sfsetbuf(f,buf,sizeof(buf));
 	for(i = 0; i < sizeof(rbuf); ++i)
 		rbuf[i] = i;
@@ -169,23 +169,23 @@ MAIN()
 	sfdisc(f,&Disc);
 	sfseek(f,(Sfoff_t)0,0);
 	if(sfread(f,rbuf,4) != 4)
-		terror("reading 4 bytes\n");
+		terror("reading 4 bytes");
 	for(i = 0; i < 4; ++i)
 		if(rbuf[i] != i)
-			terror("wrong 4 bytes\n");
+			terror("wrong 4 bytes");
 
 	sfsync(f);
 	if((o = lseek(sffileno(f), (off_t)0, SEEK_CUR)) != 4)
-		terror("Wrong seek location %lld\n", (Sfoff_t)o);
+		terror("Wrong seek location %lld", (Sfoff_t)o);
 
 	if((i = dup(sffileno(f))) < 0)
-		terror("Can't dup file descriptor\n");
+		terror("Can't dup file descriptor");
 	if((o = lseek(i, (off_t)0, SEEK_CUR)) != 4)
-		terror("Wrong seek location %lld\n", (Sfoff_t)o);
+		terror("Wrong seek location %lld", (Sfoff_t)o);
 
 	sfclose(f);
 	if((o = lseek(i, (off_t)0, SEEK_CUR)) != 4)
-		terror("Wrong seek location %lld\n", (Sfoff_t)o);
+		terror("Wrong seek location %lld", (Sfoff_t)o);
 
 	TSTEXIT(0);
 }

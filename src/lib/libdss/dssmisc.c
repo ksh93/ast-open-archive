@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -33,9 +33,24 @@ Dssexpr_t*
 dsscomp(Dss_t* dss, const char* s, Sfio_t* sp)
 {
 	Cxexpr_t*	expr;
+	char*		file;
 	void*		pop;
 
-	if (!(pop = cxpush(dss->cx, NiL, sp, s, -1, CX_INCLUDE)))
+	if (!sp && s && *s == '<')
+	{
+		while (isspace(*++s));
+		if (!(sp = sfopen(NiL, s, "r")))
+		{
+			if (dss->disc->errorf)
+				(*dss->disc->errorf)(dss, dss->disc, 2, "%s: cannot read expression file", s);
+			return 0;
+		}
+		file = (char*)s;
+		s = 0;
+	}
+	else
+		file = 0;
+	if (!(pop = cxpush(dss->cx, file, sp, s, -1, CX_INCLUDE)))
 		return 0;
 	expr = cxcomp(dss->cx);
 	cxpop(dss->cx, pop);

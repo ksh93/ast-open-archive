@@ -26,7 +26,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Research) 2011-03-03 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Research) 2011-04-21 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -38,13 +38,18 @@ USAGE_LICENSE
 " multipliers of the form `* \anumber\a', `x \anumber\a' or `X \anumber\a'."
 " Scale suffixes may be one of:]{"
 "	[+b|B?512]"
-"	[+c|C?1]"
-"	[+g|G?1073741824]"
-"	[+k|K?1024]"
-"	[+l|L?4]"
-"	[+m|M?1048576]"
-"	[+q|Q?8]"
-"	[+w|W?2]"
+"	[+k|K?1000]"
+"	[+ki|Ki?1024]"
+"	[+m|M?1000000]"
+"	[+mi|Mi?1048576]"
+"	[+g|G?1000000000]"
+"	[+gi|Gi?1073741824]"
+"	[+t|T?1000000000000]"
+"	[+ti|Ti?1099511627776]"
+"	[+p|P?1000000000000000]"
+"	[+pi|Pi?1125899906842624]"
+"	[+e|E?1000000000000000000]"
+"	[+ei|Ei?1152921504606846976]"
 "}"
 ;
 
@@ -688,6 +693,10 @@ main(int argc, char** argv)
 	{
 		state.ifn.value.string = "/dev/stdin";
 		state.in.fp = sfstdin;
+#if O_NONBLOCK
+		if ((i = fcntl(sffileno(sfstdin), F_GETFL)) > 0 && (i & O_NONBLOCK))
+			fcntl(sffileno(sfstdin), F_SETFL, i & ~O_NONBLOCK);
+#endif
 	}
 	else if (!(state.in.fp = sfopen(NiL, s, "rb")))
 		error(ERROR_SYSTEM|3, "%s: cannot read", s);

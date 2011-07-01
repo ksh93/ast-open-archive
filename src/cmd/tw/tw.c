@@ -696,7 +696,7 @@ main(int argc, register char** argv)
 	firstdir = lastdir = newof(0, Dir_t, 1, 0);
 	firstdir->name = ".";
 	state.action = LIST;
-	state.cmdflags = CMD_IGNORE|CMD_IMPLICIT|CMD_NEWLINE;
+	state.cmdflags = CMD_EXIT|CMD_IGNORE|CMD_IMPLICIT|CMD_NEWLINE;
 	state.errexit = EXIT_QUIT;
 	state.ftwflags = ftwflags()|FTW_DELAY;
 	state.select = ALL;
@@ -921,7 +921,7 @@ main(int argc, register char** argv)
 		}
 		if (*argv || args || count || !(state.cmdflags & CMD_IMPLICIT))
 		{
-			state.cmd = cmdopen(argv, count, size, args, state.cmdflags);
+			state.cmd = cmdopen(argv, count, size, args, state.cmdflags, errorf);
 			state.ftwflags |= FTW_DOT;
 		}
 		else

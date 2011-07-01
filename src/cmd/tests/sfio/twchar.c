@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -46,84 +46,84 @@ MAIN()
 	swprintf(wuf, sizeof(wuf), L"%ls", L"hello-world");
 	wcstombs(str, wuf, sizeof(str));
 	if (strcmp(tst, str))
-		terror("swprintf %%ls \"%s\" expected, \"%s\" returned\n", tst, str);
+		terror("swprintf %%ls \"%s\" expected, \"%s\" returned", tst, str);
 
 	swprintf(wuf, sizeof(wuf), L"%S", L"hello-world");
 	wcstombs(str, wuf, sizeof(str));
 	if (strcmp(tst, str))
-		terror("swprintf %%S \"%s\" expected, \"%s\" returned\n", tst, str);
+		terror("swprintf %%S \"%s\" expected, \"%s\" returned", tst, str);
 
 	n = swscanf(L" hello-world ", L"%ls", wuf);
 	if (n != 1)
-		terror("swscanf %%ls %d expected, %d returned\n", 1, n);
+		terror("swscanf %%ls %d expected, %d returned", 1, n);
 	else
 	{
 		wcstombs(str, wuf, sizeof(str));
 		if (strcmp(tst, str))
-			terror("swscanf %%ls \"%s\" expected, \"%s\" returned\n", tst, str);
+			terror("swscanf %%ls \"%s\" expected, \"%s\" returned", tst, str);
 	}
 
 	n = swscanf(L" hello-world ", L"%S", wuf);
 	if (n != 1)
-		terror("swscanf %%S %d expected, %d returned\n", 1, n);
+		terror("swscanf %%S %d expected, %d returned", 1, n);
 	else
 	{
 		wcstombs(str, wuf, sizeof(str));
 		if (strcmp(tst, str))
-			terror("swscanf %%S \"%s\" expected, \"%s\" returned\n", tst, str);
+			terror("swscanf %%S \"%s\" expected, \"%s\" returned", tst, str);
 	}
 
 	swprintf(wuf, sizeof(wuf), L"%lc%lc%lc%lc%lc%lc%lc%lc%lc%lc%lc",
 		L'h',L'e',L'l',L'l',L'o',L'-',L'w',L'o',L'r',L'l',L'd');
 	wcstombs(str, wuf, sizeof(str));
 	if (strcmp(tst, str))
-		terror("swprintf %%lc \"%s\" expected, \"%s\" returned\n", tst, str);
+		terror("swprintf %%lc \"%s\" expected, \"%s\" returned", tst, str);
 
 	swprintf(wuf, sizeof(wuf), L"%C%C%C%C%C%C%C%C%C%C%C",
 		L'h',L'e',L'l',L'l',L'o',L'-',L'w',L'o',L'r',L'l',L'd');
 	wcstombs(str, wuf, sizeof(str));
 	if (strcmp(tst, str))
-		terror("swprintf %%C \"%s\" expected, \"%s\" returned\n", tst, str);
+		terror("swprintf %%C \"%s\" expected, \"%s\" returned", tst, str);
 
 #endif
 
 	sfsprintf(buf, sizeof(buf), "%ls", L"hello-world");
 	if (strcmp(tst, buf))
-		terror("sfsprintf %%ls \"%s\" expected, \"%s\" returned\n", tst, buf);
+		terror("sfsprintf %%ls \"%s\" expected, \"%s\" returned", tst, buf);
 
 	sfsprintf(buf, sizeof(buf), "%S", L"hello-world");
 	if (strcmp(tst, buf))
-		terror("sfsprintf %%S \"%s\" expected, \"%s\" returned\n", tst, buf);
+		terror("sfsprintf %%S \"%s\" expected, \"%s\" returned", tst, buf);
 
 	n = sfsscanf(" hello-world ", "%ls", wuf);
 	if (n != 1)
-		terror("sfsscanf %%ls %d expected, %d returned\n", 1, n);
+		terror("sfsscanf %%ls %d expected, %d returned", 1, n);
 	else
 	{
 		wcstombs(str, wuf, sizeof(str));
 		if (strcmp(tst, str))
-			terror("sfsscanf %%ls \"%s\" expected, \"%s\" returned\n", tst, str);
+			terror("sfsscanf %%ls \"%s\" expected, \"%s\" returned", tst, str);
 	}
 
 	n = sfsscanf(" hello-world ", "%S", wuf);
 	if (n != 1)
-		terror("sfsscanf %%S %d expected, %d returned\n", 1, n);
+		terror("sfsscanf %%S %d expected, %d returned", 1, n);
 	else
 	{
 		wcstombs(str, wuf, sizeof(str));
 		if (strcmp(tst, str))
-			terror("sfsscanf %%S \"%s\" expected, \"%s\" returned\n", tst, str);
+			terror("sfsscanf %%S \"%s\" expected, \"%s\" returned", tst, str);
 	}
 
 	sfsprintf(buf, sizeof(buf), "%lc%lc%lc%lc%lc%lc%lc%lc%lc%lc%lc",
 		L'h',L'e',L'l',L'l',L'o',L'-',L'w',L'o',L'r',L'l',L'd');
 	if (strcmp(tst, buf))
-		terror("sfsprintf %%lc \"%s\" expected, \"%s\" returned\n", tst, buf);
+		terror("sfsprintf %%lc \"%s\" expected, \"%s\" returned", tst, buf);
 
 	sfsprintf(buf, sizeof(buf), "%C%C%C%C%C%C%C%C%C%C%C",
 		L'h',L'e',L'l',L'l',L'o',L'-',L'w',L'o',L'r',L'l',L'd');
 	if (strcmp(tst, buf))
-		terror("sfsprintf %%C \"%s\" expected, \"%s\" returned\n", tst, buf);
+		terror("sfsprintf %%C \"%s\" expected, \"%s\" returned", tst, buf);
 
 #endif
 

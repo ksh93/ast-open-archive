@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,7 +24,7 @@
  */
 
 static const char scan_usage[] =
-"[-1ls5P?\n@(#)$Id: dss scan query (AT&T Research) 2003-02-06 $\n]"
+"[-1ls5P?\n@(#)$Id: dss scan query (AT&T Research) 2011-06-15 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b \bscan\b query reads records from each input"
@@ -41,6 +41,7 @@ scan_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	char**		argv = (char**)data;
 	char**		files = expr->files;
 	char*		file;
+	Sfio_t*		sp;
 	Dssfile_t*	ip;
 	Dssrecord_t*	record;
 	int		errors;
@@ -74,8 +75,29 @@ scan_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 			argv++;
 	}
 	expr = expr->pass;
+	sp = 0;
 	for (;;)
 	{
+		if (sp)
+		{
+			if (!(file = sfgetr(sp, '\n', 1)))
+			{
+				sfclose(sp);
+				sp = 0;
+				goto next;
+			}
+		}
+		else if (file && *file == '<')
+		{
+			while (isspace(*++file));
+			if (!(sp = sfopen(NiL, file, "r")))
+			{
+				if (disc->errorf)
+					(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: cannot read file list", file);
+				goto next;
+			}
+			continue;
+		}
 		if (ip = dssfopen(dss, file, NiL, DSS_FILE_READ, NiL))
 		{
 			if (dssbeg(dss, expr))
@@ -91,7 +113,8 @@ scan_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 				}
 			dssfclose(ip);
 		}
-		if (!(file = *argv++))
+	next:
+		if (!sp && !(file = *argv++))
 		{
 			if (!files)
 				break;

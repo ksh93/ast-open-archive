@@ -1,3 +1,10 @@
+11-06-10 ls.c: add %(view)d for 3d fs view level (iview(struct stat*))
+11-05-09 ps,pss: handle pr_npid in /proc/<pid>/stat
+11-04-26 ps.c: increase COMMAND width from 16 => 24
+11-04-26 features/procfs: fix uwin /proc probes
+11-04-21 dd.c: turn stdin O_NONBLOCK off
+11-04-21 dd.c: fix SI vs US numeric suffix docs
+11-04-15 ls.c: add KEY_dev for all file types
 11-03-10 ps.c: use %0<width>s for string fields to retain last <width> chars of long strings
 11-03-03 dd.c: fix writes beyond count for piped input across partial input blocks (thanks ggreen)
 11-02-11 mount.c: fix umount operand verification

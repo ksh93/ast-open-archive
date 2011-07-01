@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2011-03-10 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2011-05-09 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -272,7 +272,7 @@ static Key_t	keys[] =
 		"Command file base name.",
 		PSS_command,
 		KEY_comm,
-		-16, 0,
+		-24, 0,
 		0,0,0,
 		KEY_cmd
 	},
@@ -1484,7 +1484,7 @@ main(int argc, register char** argv)
 	 * set up the disciplines
 	 */
 
-	pssinit(&state.pssdisc, errorf);
+	pssinit(&state.pssdisc, argv[0], errorf);
 	optinit(&od, optinfo);
 	memset(&kd, 0, sizeof(kd));
 	kd.key = offsetof(Key_t, name);

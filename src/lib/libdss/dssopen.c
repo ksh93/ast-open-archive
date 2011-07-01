@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2010-04-22 $\n]"
+"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2011-06-15 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method provides types, global "
@@ -375,7 +375,7 @@ dsslib(const char* name, Dssflags_t flags, Dssdisc_t* disc)
 					if (dll = dlopen(dle->path, RTLD_LAZY))
 						init(dll, dle->path, 0, disc);
 					else if (disc && disc->errorf)
-						(*disc->errorf)(NiL, disc, 2, "%s: %s", dle->path, dlerror());
+						(*disc->errorf)(NiL, disc, 1, "%s: %s", dle->path, dlerror());
 				dllsclose(dls);
 			}
 		}

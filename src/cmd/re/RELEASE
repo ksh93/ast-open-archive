@@ -1,3 +1,4 @@
+11-06-25 grep.c: handle FTS_SLNONE
 10-12-10 grep.c: fix some empty line buffer boundary bugs
 10-11-22 testregex.dat: add more [...\...] tests
 10-09-01 grep.c: RE errors => exit(2)

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -31,55 +31,55 @@ MAIN()
 	}
 
 	if(!(f = sfopen((Sfio_t*)0,tstfile(0),"w")))
-		terror("Opening to write\n");
+		terror("Opening to write");
 	if(sfputc(f,'a') != 'a')
-		terror("sfputc\n");
+		terror("sfputc");
 	if(sfgetc(f) >= 0)
-		terror("sfgetc\n");
+		terror("sfgetc");
 	
 	if(!(f = sfopen(f,tstfile(0),"r")))
-		terror("Opening to read\n");
+		terror("Opening to read");
 	if(sfgetc(f) != 'a')
-		terror("sfgetc2\n");
+		terror("sfgetc2");
 	if(sfputc(f,'b') >= 0)
-		terror("sfputc2\n");
+		terror("sfputc2");
 
 	if(!(f = sfopen(f,tstfile(0),"r+")))
-		terror("Opening to read/write\n");
+		terror("Opening to read/write");
 
 	if(sfgetc(f) != 'a')
-		terror("sfgetc3\n");
+		terror("sfgetc3");
 	if(sfputc(f,'b') != 'b')
-		terror("sfputc3\n");
+		terror("sfputc3");
 	if(sfclose(f) < 0)
-		terror("sfclose\n");
+		terror("sfclose");
 
 	if(!(f = sfpopen(NIL(Sfio_t*),sfprints("%s %s", argv[0], tstfile(0)),"r")))
-		terror("sfpopen\n");
+		terror("sfpopen");
 	if(sfgetc(f) != 'a')
-		terror("sfgetc4\n");
+		terror("sfgetc4");
 	if(sfgetc(f) != 'b')
-		terror("sfgetc5\n");
+		terror("sfgetc5");
 	if(sfgetc(f) >= 0)
-		terror("sfgetc6\n");
+		terror("sfgetc6");
 
 	if(!(f = sfopen(f,tstfile(0),"w")) )
-		terror("sfopen\n");
+		terror("sfopen");
 	if(sfputc(f,'a') != 'a')
-		terror("sfputc1\n");
+		terror("sfputc1");
 	sfsetfd(f,-1);
 	if(sfputc(f,'b') >= 0)
-		terror("sfputc2\n");
+		terror("sfputc2");
 	if(sfclose(f) < 0)
-		terror("sfclose\n");
+		terror("sfclose");
 
 	if(!(f = sfopen(NIL(Sfio_t*),tstfile(0),"a+")) )
-		terror("sfopen2\n");
+		terror("sfopen2");
 	sfset(f,SF_READ,0);
 	if(!sfreserve(f,0,-1) )
-		terror("Failed on buffer getting\n");
+		terror("Failed on buffer getting");
 	if(sfvalue(f) <= 0)
-		terror("There is no buffer?\n");
+		terror("There is no buffer?");
 
 	TSTEXIT(0);
 }

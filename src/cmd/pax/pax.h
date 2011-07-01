@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -574,6 +574,7 @@ typedef struct Pattern_s
 	}		mime; \
 	char*		mode;		/* output chmod(1) mode		*/ \
 	int		modtime;	/* retain mtime			*/ \
+	char*		mtime;		/* output date(1) mtime		*/ \
 	int		newer;		/* append only if newer		*/ \
 	int		operation;	/* IN|OUT operation mode	*/ \
 	Hash_table_t*	options;	/* option table			*/ \

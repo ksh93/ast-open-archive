@@ -1,3 +1,6 @@
+11-06-30 extoken.c: enter LABEL: in the parent scope symbol table!
+11-06-26 exparse.y: fix bug that lost function return type
+11-03-16 exparse.y,expr.h: fix statement_list cons tail recursion
 11-03-03 eparse.y: fix function reff node pointer
 11-03-03 exeval.c: function env is args[-1]
 10-11-30 fix "begin" scope logic that caused tw bug

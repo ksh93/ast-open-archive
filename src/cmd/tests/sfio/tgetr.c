@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -27,37 +27,37 @@ MAIN()
 
 	f = sfopen(NIL(Sfio_t*),string,"s");
 	if(!(s = sfgetr(f,'\n',SF_STRING|SF_LOCKR)) || strcmp(s,"111") != 0)
-		terror("sfgetr failed1\n");
+		terror("sfgetr failed1");
 
 	if(sfgetr(f,'\n',0) != NIL(char*))
-		terror("sfgetr should have failed because of locking\n");
+		terror("sfgetr should have failed because of locking");
 	sfread(f,s,1);
 
 	if(!(s = sfgetr(f,'\n',SF_STRING)) || strcmp(s,"222") != 0)
-		terror("sfgetr failed2\n");
+		terror("sfgetr failed2");
 
 	if((s = sfgetr(f,'\n',0)) != NIL(char*))
-		terror("sfgetr should have failed because of partial record\n");
+		terror("sfgetr should have failed because of partial record");
 
 	if(!(s = sfgetr(f,0,SF_LASTR)) )
-		terror("sfgetr should have succeeded getting partial record\n");
+		terror("sfgetr should have succeeded getting partial record");
 
 	/* test type == -1 and type == 1 modes */
 	sfseek(f,(Sfoff_t)0,0);
 	if(!(s = sfgetr(f,'\n',1)) || strcmp(s,"111") != 0)
-		terror("sfgetr failed in compatible mode\n");
+		terror("sfgetr failed in compatible mode");
 
 	if(!(s = sfgetr(f,'\n',SF_STRING|SF_LOCKR)) || strcmp(s,"222") != 0)
-		terror("sfgetr failed3\n");
+		terror("sfgetr failed3");
 	if(sfgetr(f,'\n',1) )
-		terror("sfgetr should have failed due to locking\n");
+		terror("sfgetr should have failed due to locking");
 	sfread(f,s,0);
 
 	if(sfgetr(f,'\n',1) )
-		terror("sfgetr should have failed because record is incomplete\n");
+		terror("sfgetr should have failed because record is incomplete");
 	
 	if(!(s = sfgetr(f,0,-1)) || strcmp(s,"333") != 0)
-		terror("sfgetr failed in getting last partial record\n");
+		terror("sfgetr failed in getting last partial record");
 
 	if(!(f = sftmp(0)) )
 		terror("Can't open temporary stream");

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,29 +26,29 @@ MAIN()
 	char*	s;
 
 	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
-		terror("Can't open file\n");
+		terror("Can't open file");
 	if(sfwrite(f1,"0123456789\n",11) != 11)
-		terror("Can't write to file\n");
+		terror("Can't write to file");
 
 	sfclose(sfstdin);
 	if(sfswap(f1,sfstdin) != sfstdin)
-		terror("Can't swap with sfstdin\n");
+		terror("Can't swap with sfstdin");
 	sfseek(sfstdin,(Sfoff_t)0,0);
 	if(!(s = sfgetr(sfstdin,'\n',1)) )
-		terror("sfgetr failed\n");
+		terror("sfgetr failed");
 	if(strcmp(s,"0123456789") != 0)
-		terror("Get wrong data\n");
+		terror("Get wrong data");
 
 	if(!(f1 = sfswap(sfstdin,NIL(Sfio_t*))) )
-		terror("Failed swapping to NULL\n");
+		terror("Failed swapping to NULL");
 	if(!sfstack(sfstdout,f1) )
-		terror("Failed stacking f1\n");
+		terror("Failed stacking f1");
 
 	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
-		terror("Can't open for read\n");
+		terror("Can't open for read");
 
 	if(sfswap(f1,f2) != NIL(Sfio_t*) )
-		terror("sfswap should have failed\n");
+		terror("sfswap should have failed");
 
 	TSTEXIT(0);
 }

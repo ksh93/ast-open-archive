@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -25,7 +25,7 @@
  * process status stream implementation
  */
 
-static const char id[] = "\n@(#)$Id: pss library (AT&T Research) 2010-12-01 $\0\n";
+static const char id[] = "\n@(#)$Id: pss library (AT&T Research) 2011-05-09 $\0\n";
 
 static const char lib[] = "std:pss";
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -79,7 +79,7 @@ next(Cx_t* cx)
 				if (cx->flags & (CX_DEBUG|CX_TRACE))
 					sfprintf(sfstderr, "+%d+ %-.*s%s", error_info.line, cx->include->last - cx->include->next, cx->include->base, cx->include->newline ? "\n" : "");
 			}
-			else if (cx->include->final)
+			else if (cx->include->final || !cx->include->pop)
 			{
 				cx->include->eof = 1;
 				return 0;

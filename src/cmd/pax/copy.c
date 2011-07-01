@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -312,7 +312,11 @@ filein(register Archive_t* ap, register File_t* f)
 		else if (ap->format->getdata)
 			(*ap->format->getdata)(&state, ap, f, wfd);
 		else
+		{
+			if (wfd < -1)
+				listentry(f);
 			goto skip;
+		}
 		break;
 	}
 	listentry(f);
@@ -490,6 +494,7 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 	register int	c;
 	unsigned long	flags;
 	char*		mode;
+	char*		mtime;
 
 	if (ap)
 	{
@@ -516,6 +521,7 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 		sfopen(sfstdin, NiL, "rt");
 		sfset(sfstdin, SF_SHARE, 0);
 		mode = state.mode;
+		mtime = state.mtime;
 		for (;;)
 		{
 			if (s = state.peekfile)
@@ -584,6 +590,8 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 					}
 					else if (streq(s, "mode"))
 						state.mode = v;
+					else if (streq(s, "mtime"))
+						state.mtime = v;
 					if (!t)
 						break;
 					s = t + 1;
@@ -591,13 +599,14 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 				s = state.filter.path;
 				state.filter.line = *state.filter.name ? 2 : 1;
 			}
-			if (*s && ftwalk(s, copyfile, flags, NiL))
+			c = *s ? ftwalk(s, copyfile, flags, NiL) : 0;
+			state.mode = mode;
+			state.mtime = mtime;
+			if (c)
 			{
-				state.mode = mode;
 				error(2, "%s: not completely copied", s);
 				break;
 			}
-			state.mode = mode;
 		}
 	}
 	if (ap)

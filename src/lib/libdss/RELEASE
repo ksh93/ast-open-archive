@@ -1,3 +1,7 @@
+11-06-21 cxcomp.c: fix back() on empty input stack logic
+11-06-15 dssmisc.c: add "< expr-file" expression to dsscomp()
+11-06-15 dss-scan.h: add "< list-of-files-file" argv to snan_beg()
+11-06-15 dssopen.c: dsslib() scan invalid plugin is just a warning
 10-05-04 dssopt.c: check for '[' usage in description, drop [+PATH?...]
 10-05-01 cxopen.c: document string type format details
 10-04-22 dssprintf.c: %(:details:)s for default %s details

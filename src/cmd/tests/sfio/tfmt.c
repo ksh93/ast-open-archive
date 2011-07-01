@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -53,7 +53,7 @@ MAIN()
 	sfsprintf(buf1,sizeof(buf1),"%s",Mystr);
 	sfsprintf(buf2,sizeof(buf2),"%!", &fe);
 	if(strcmp(buf1,buf2) != 0)
-		terror("Failed testing $position\n");
+		terror("Failed testing $position");
 
 	return 0;
 }

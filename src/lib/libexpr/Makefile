@@ -15,7 +15,8 @@ expr 2.0 :LIBRARY: RELEASE expr.h exlib.h exgram.h exparse.y \
 		exerror.c exopen.c exrewind.c extoken.c extype.c \
 		exnospace.c exstash.c exzero.c
 
-"*.i386*" :NOOPTIMIZE: exeval.c
+/* internal compiler error: in gen_lowpart_general, at rtlhooks.c:59 */
+"*.i386*" :NOOPTIMIZE: exeval.c exzero.c
 
 exop.h : exparse.h
 	{

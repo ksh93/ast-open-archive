@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -62,18 +62,18 @@ MAIN()
 	sfset(sfstdout,SF_LINE,0);
 
 	if(sfdisc(sfstdout,&seekable) != &seekable)
-		terror("Can't set discipline\n");
+		terror("Can't set discipline");
 	if(sfseek(sfstdout,(Sfoff_t)0,0) < 0)
-		terror("Sfstdout should be seekable\n");
+		terror("Sfstdout should be seekable");
 	if(sfwrite(sfstdout,"123\n",4) != 4)
-		terror("Can't write\n");
+		terror("Can't write");
 	if(sfwrite(sfstdout,"123\n",4) != 4)
-		terror("Can't write\n");
+		terror("Can't write");
 	if(sfdisc(sfstdout,NIL(Sfdisc_t*)) != &seekable)
-		terror("Can't pop discipline\n");
+		terror("Can't pop discipline");
 
 	if(buffer != buf || size != 8 || count != 1)
-		terror("Wrong calls to write\n");
+		terror("Wrong calls to write");
 
 	TSTEXIT(0);
 }

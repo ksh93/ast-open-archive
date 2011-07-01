@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -166,7 +166,7 @@ fixedclose(Dssfile_t* file, Dssdisc_t* disc)
 Dssformat_t netflow_fixed_format =
 {
 	"fixed",
-	"Cisco netflow fixed format that compresses well with pzip(1).",
+	"Cisco netflow fixed format (2008-06-20) compresses well with pzip(1)",
 	CXH,
 	fixedident,
 	fixedopen,

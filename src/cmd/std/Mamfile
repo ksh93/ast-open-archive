@@ -316,6 +316,10 @@ done locale generated
 make ls
 make ls.o
 make ls.c
+make ${PACKAGE_ast_INCLUDE}/fs3d.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/fs3d.h
 make ${PACKAGE_ast_INCLUDE}/tmx.h implicit
 make ${PACKAGE_ast_INCLUDE}/tv.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit

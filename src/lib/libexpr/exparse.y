@@ -231,7 +231,16 @@ statement_list	:	/* empty */
 				exfreenode(expr.program, $1);
 				$$ = $2;
 			}
-			else $$ = exnewnode(expr.program, ';', 1, $2->type, $1, $2);
+			else if ($1->op == ';')
+			{
+				$$ = $1;
+				$1->data.operand.last = $1->data.operand.last->data.operand.right = exnewnode(expr.program, ';', 1, $2->type, $2, NiL);
+			}
+			else
+			{
+				$$ = exnewnode(expr.program, ';', 1, $1->type, $1, NiL);
+				$$->data.operand.last = $$->data.operand.right = exnewnode(expr.program, ';', 1, $2->type, $2, NiL);
+			}
 		}
 		;
 
@@ -346,7 +355,8 @@ switch_list	:	/* empty */
 				}
 				sw->prev = expr.swstate;
 			}
-			else sw = &swstate;
+			else
+				sw = &swstate;
 			expr.swstate = sw;
 			sw->type = expr.declare;
 			sw->firstcase = 0;
@@ -375,7 +385,8 @@ switch_item	:	case_list statement_list
 			{
 				if (sw->lastcase)
 					sw->lastcase->data.select.next = $$;
-				else sw->firstcase = $$;
+				else
+					sw->firstcase = $$;
 				sw->lastcase = $$;
 				n = sw->cur - sw->base;
 				sw->cur = sw->base;
@@ -383,13 +394,15 @@ switch_item	:	case_list statement_list
 				memcpy($$->data.select.constant, sw->base, n * sizeof(Extype_t*));
 				$$->data.select.constant[n] = 0;
 			}
-			else $$->data.select.constant = 0;
+			else
+				$$->data.select.constant = 0;
 			if (sw->def)
 			{
 				sw->def = 0;
 				if (sw->defcase)
 					exerror("duplicate default in switch");
-				else sw->defcase = $2;
+				else
+					sw->defcase = $2;
 			}
 		}
 		;
@@ -446,7 +459,8 @@ dcl_list	:	dcl_item
 dcl_item	:	reference NAME {expr.id=$2;} array initialize
 		{
 			$$ = 0;
-			$2->type = expr.declare;
+			if (!$2->type || expr.declare)
+				$2->type = expr.declare;
 			if ($1)
 			{
 				$2->index = MEMBER;
@@ -541,9 +555,11 @@ expr		:	'(' expr ')'
 			{
 				if (!$3->type)
 					$1->type = $3->type = rel ? STRING : INTEGER;
-				else $1->type = $3->type;
+				else
+					$1->type = $3->type;
 			}
-			else if (!$3->type) $3->type = $1->type;
+			else if (!$3->type)
+				$3->type = $1->type;
 			if ($1->type != $3->type)
 			{
 				if ($1->type == STRING)
@@ -647,7 +663,8 @@ expr		:	'(' expr ')'
 				exfreenode(expr.program, $1);
 				$$ = $3;
 			}
-			else $$ = exnewnode(expr.program, ',', 1, $3->type, $1, $3);
+			else
+				$$ = exnewnode(expr.program, ',', 1, $3->type, $1, $3);
 		}
 		|	expr '?' {expr.nolabel=1;} expr ':' {expr.nolabel=0;} expr
 		{
@@ -655,7 +672,8 @@ expr		:	'(' expr ')'
 			{
 				if (!$7->type)
 					$4->type = $7->type = INTEGER;
-				else $4->type = $7->type;
+				else
+					$4->type = $7->type;
 			}
 			else if (!$7->type)
 				$7->type = $4->type;
@@ -686,7 +704,8 @@ expr		:	'(' expr ')'
 				}
 				exfreenode(expr.program, $1);
 			}
-			else $$ = exnewnode(expr.program, '?', 1, $4->type, $1, exnewnode(expr.program, ':', 1, $4->type, $4, $7));
+			else
+				$$ = exnewnode(expr.program, '?', 1, $4->type, $1, exnewnode(expr.program, ':', 1, $4->type, $4, $7));
 		}
 		|	'!' expr
 		{
@@ -748,20 +767,21 @@ expr		:	'(' expr ')'
 				$$->data.print.descriptor = $3->data.operand.left;
 				$3 = $3->data.operand.right;
 			}
-			else switch ($1->index)
-			{
-			case QUERY:
-				$$->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
-				$$->data.print.descriptor->data.constant.value.integer = 2;
-				break;
-			case PRINTF:
-				$$->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
-				$$->data.print.descriptor->data.constant.value.integer = 1;
-				break;
-			case SPRINTF:
-				$$->data.print.descriptor = 0;
-				break;
-			}
+			else
+				switch ($1->index)
+				{
+				case QUERY:
+					$$->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
+					$$->data.print.descriptor->data.constant.value.integer = 2;
+					break;
+				case PRINTF:
+					$$->data.print.descriptor = exnewnode(expr.program, CONSTANT, 0, INTEGER, NiL, NiL);
+					$$->data.print.descriptor->data.constant.value.integer = 1;
+					break;
+				case SPRINTF:
+					$$->data.print.descriptor = 0;
+					break;
+				}
 			$$->data.print.args = preprint($3);
 		}
 		|	scan '(' args ')'
@@ -774,21 +794,22 @@ expr		:	'(' expr ')'
 				$$->data.scan.descriptor = $3->data.operand.left;
 				$3 = $3->data.operand.right;
 			}
-			else switch ($1->index)
-			{
-			case SCANF:
-				$$->data.scan.descriptor = 0;
-				break;
-			case SSCANF:
-				if ($3 && $3->data.operand.left->type == STRING)
+			else
+				switch ($1->index)
 				{
-					$$->data.scan.descriptor = $3->data.operand.left;
-					$3 = $3->data.operand.right;
+				case SCANF:
+					$$->data.scan.descriptor = 0;
+					break;
+				case SSCANF:
+					if ($3 && $3->data.operand.left->type == STRING)
+					{
+						$$->data.scan.descriptor = $3->data.operand.left;
+						$3 = $3->data.operand.right;
+					}
+					else
+						exerror("%s: string argument expected", $1->name);
+					break;
 				}
-				else
-					exerror("%s: string argument expected", $1->name);
-				break;
-			}
 			if (!$3 || !$3->data.operand.left || $3->data.operand.left->type != STRING)
 				exerror("%s: format argument expected", $1->name);
 			$$->data.scan.format = $3->data.operand.left;
@@ -866,7 +887,8 @@ constant	:	CONSTANT
 			$$ = exnewnode(expr.program, CONSTANT, 0, $1->type, NiL, NiL);
 			if (!expr.program->disc->reff)
 				exerror("%s: identifier references not supported", $1->name);
-			else $$->data.constant.value = (*expr.program->disc->reff)(expr.program, $$, $1, NiL, NiL, EX_SCALAR, expr.program->disc);
+			else
+				$$->data.constant.value = (*expr.program->disc->reff)(expr.program, $$, $1, NiL, NiL, EX_SCALAR, expr.program->disc);
 		}
 		|	FLOATING
 		{

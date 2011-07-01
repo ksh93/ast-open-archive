@@ -164,8 +164,6 @@ done ${INSTALLROOT}/include/ast/cdt.h dontcare
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/nval.h dontcare
-make name.h implicit
-done name.h dontcare virtual
 prev ${INSTALLROOT}/include/ast/cdt.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit

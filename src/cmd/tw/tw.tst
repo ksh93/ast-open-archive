@@ -37,6 +37,9 @@ function DATA
 				chmod $i$i$i mode/$i$i$i
 			done
 			;;
+		one)	mkdir one
+			> one/one
+			;;
 		esac
 	done
 }
@@ -781,3 +784,15 @@ b13636b37c6f5b405ca26d92b91550af154cf940 data/zzz/333/7/s.z'
 0qsgea2@bMIu0QawY63YAiSM data/zzz/333/7/q.c
 3p2F@I1Zl8hW2fhc@E0j3EQi data/zzz/333/7/r.d
 36VPCr1yKgDC1EGGwT01PqXl data/zzz/333/7/s.z'
+
+TEST 10 'symbol table scope'
+
+	DO DATA one
+
+	EXEC	-d one -e '
+			 begin: printf("begin:\n");
+        		select: if (type == REG) printf("select: %s\n", path); else return 0;
+        		action: printf("action: %s\n", path);
+        		   end: printf("end:\n");
+		'
+		OUTPUT - $'begin:\nselect: one/one\naction: one/one\nend:'

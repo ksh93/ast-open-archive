@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -42,28 +42,28 @@ MAIN()
 	buf[0] = 0;
 	sfsetbuf(sfstdout,buf,sizeof(buf));
 	if(!sfstdout->pool)
-		terror("No pool\n");
+		terror("No pool");
 	sfdisc(sfstdout,&Disc);
 	sfset(sfstdout,SF_SHARE,0);
 	sfputr(sfstdout,"123456789",0);
 	if(strcmp(buf,"123456789") != 0)
-		terror("Setting own buffer for stdout\n");
+		terror("Setting own buffer for stdout");
 	if(sfpurge(sfstdout) < 0)
-		terror("Purging sfstdout\n");
+		terror("Purging sfstdout");
 
 	if((fd = creat(tstfile(0),0666)) < 0)
-		terror("Creating file\n");
+		terror("Creating file");
 
 	if(write(fd,buf,sizeof(buf)) != sizeof(buf))
-		terror("Writing to file\n");
+		terror("Writing to file");
 	if(lseek(fd, (off_t)0, 0) < 0)
-		terror("Seeking back to origin\n");
+		terror("Seeking back to origin");
 
 	if(!(f = sfnew((Sfio_t*)0,buf,sizeof(buf),fd,SF_WRITE)))
-		terror("Making stream\n");
+		terror("Making stream");
 
 	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || s != buf)
-		terror("sfreserve1 returns the wrong pointer\n");
+		terror("sfreserve1 returns the wrong pointer");
 	sfwrite(f,s,0);
 
 #define NEXTFD	12
@@ -74,27 +74,27 @@ MAIN()
 			fdv[i] = fstat(i,&st);
 	}
 	if((n = sfsetfd(f,fd+NEXTFD)) != fd+NEXTFD)
-		terror("Try to set file descriptor to %d but get %d\n",fd+NEXTFD,n);
+		terror("Try to set file descriptor to %d but get %d",fd+NEXTFD,n);
 	if((fd+NEXTFD) < (sizeof(fdv)/sizeof(fdv[0])) )
 	{	struct stat	st;
 		int		i;
 		for(i = 0; i < fd+NEXTFD; ++i)
 			if(i != fd && fdv[i] != fstat(i,&st))
-				terror("Fd %d changes status after sfsetfd %d->%d\n",
+				terror("Fd %d changes status after sfsetfd %d->%d",
 					i, fd, fd+NEXTFD);
 	}
 
 	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || s != buf)
-		terror("sfreserve2 returns the wrong pointer\n");
+		terror("sfreserve2 returns the wrong pointer");
 	sfwrite(f,s,0);
 
 	if(sfsetbuf(f,NIL(Void_t*),(size_t)SF_UNBOUND) != buf)
-		terror("sfsetbuf didnot returns last buffer\n");
+		terror("sfsetbuf didnot returns last buffer");
 
 	sfsetbuf(f,buf,sizeof(buf));
 
 	if(sfreserve(f,SF_UNBOUND,SF_LOCKR) != buf || sfvalue(f) != sizeof(buf) )
-		terror("sfreserve3 returns the wrong value\n");
+		terror("sfreserve3 returns the wrong value");
 	sfwrite(f,s,0);
 
 	TSTEXIT(0);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,16 +31,20 @@
 #include <error.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss (AT&T Research) 2010-05-21 $\n]"
+"[-?\n@(#)$Id: dss (AT&T Research) 2011-06-15 $\n]"
 USAGE_LICENSE
 "[+NAME?dss - scan a data stream and apply a select expression to each "
     "record]"
 "[+DESCRIPTION?\bdss\b scans a record-oriented data stream, applies a "
     "select \aexpression\a to each record, and writes the matching records "
     "to the standard output. If \aexpression\a is \b-\b or empty then all "
-    "records match. If \afile\a is \b-\b or omitted then the standard input "
-    "is read. If |{\bwrite\b \aformat\a} is not specified then the output "
-    "format is the same as the format of the first input \afile\a.]"
+    "records match. If \aexpression\a begins with \b<\b then the remainder "
+    "of the expression is a file containing the expression. If \afile\a is "
+    "\b-\b or omitted then the standard input is read. If \afile\a begins "
+    "with \b<\b then the string with \b<\b removed is a file containing a "
+    "newline-separated list of files to process. If |{\bwrite\b \aformat\a}"
+    "is not specified then the output format is the same as the format of "
+    "the first input \afile\a.]"
 "[+?Input files are \avczip\a(1), \agzip\a(1), \abzip2\a(1) or "
     "\apzip\a(1) decompressed if necessary.]"
 "[+EXPRESSIONS?Query expressions support C-style syntax. Strings may be "

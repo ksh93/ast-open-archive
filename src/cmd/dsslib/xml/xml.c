@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*            Copyright (c) 2010 AT&T Intellectual Property             *
+*          Copyright (c) 2010-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -603,7 +603,7 @@ xmlfclose(Dssfile_t* file, Dssdisc_t* disc)
 static Dssformat_t xml_format =
 {
 	"xml",
-	"xml format.",
+	"xml format (2010-05-19)",
 	CXH,
 	xmlident,
 	xmlfopen,
@@ -956,7 +956,7 @@ jsonwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 static Dssformat_t json_format =
 {
 	"json",
-	"json format.",
+	"json format (2010-05-19)",
 	CXH,
 	jsonident,
 	xmlfopen,

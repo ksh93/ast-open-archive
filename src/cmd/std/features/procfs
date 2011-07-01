@@ -8,7 +8,9 @@ lib	pstat_getproc sys/param.h sys/pstat.h
 
 mem	extern_proc.p_pid,extern_proc.p_starttime,extern_proc.p_wchan,extern_proc.p_usrpri,extern_proc.p_addr,eproc.e_xsize sys/time.h sys/param.h sys/proc.h sys/sysctl.h -lkvm
 mem	procsinfo64.pi_pri procinfo.h
-mem	prpsinfo.pr_clname,prpsinfo.pr_cstime,prpsinfo.pr_cstime.tv_sec,prpsinfo.pr_ctime,prpsinfo.pr_cutime,prpsinfo.pr_gid,prpsinfo.pr_lttydev,prpsinfo.pr_ntpid,prpsinfo.pr_pgid,prpsinfo.pr_pgrp,prpsinfo.pr_psargs,prpsinfo.pr_refcount,prpsinfo.pr_rssize,prpsinfo.pr_sid,prpsinfo.pr_sonproc,prpsinfo.pr_start,prpsinfo.pr_start.tv_sec,prpsinfo.pr_starttime,prpsinfo.pr_starttime.tv_sec,prpsinfo.pr_stime,prpsinfo.pr_tgrp,prpsinfo.pr_time,prpsinfo.pr_time.tv_sec,prpsinfo.pr_utime,prpsinfo.pr_zomb,prpsinfo.pr_pctcpu,prpsinfo.pr_cpu,prpsinfo.pr_lwp.pr_pctcpu,prpsinfo.pr_lwp.pr_cpu -D_STRUCTURED_PROC -Dprpsinfo=psinfo  sys/types.h sys/procfs.h
+mem	prpsinfo.pr_clname,prpsinfo.pr_cstime,prpsinfo.pr_cstime.tv_sec,prpsinfo.pr_ctime,prpsinfo.pr_cutime,prpsinfo.pr_gid,prpsinfo.pr_lttydev,prpsinfo.pr_ntpid,prpsinfo.pr_pgid,prpsinfo.pr_pgrp,prpsinfo.pr_psargs,prpsinfo.pr_refcount,prpsinfo.pr_rssize,prpsinfo.pr_sid,prpsinfo.pr_sonproc,prpsinfo.pr_start,prpsinfo.pr_start.tv_sec,prpsinfo.pr_starttime,prpsinfo.pr_starttime.tv_sec,prpsinfo.pr_state,prpsinfo.pr_stime,prpsinfo.pr_tgrp,prpsinfo.pr_time,prpsinfo.pr_time.tv_sec,prpsinfo.pr_utime,prpsinfo.pr_zomb,prpsinfo.pr_pctcpu,prpsinfo.pr_cpu,prpsinfo.pr_lwp.pr_pctcpu,prpsinfo.pr_lwp.pr_cpu -D_STRUCTURED_PROC -Dprpsinfo=psinfo sys/types.h sys/procfs.h
+
+typ	struct.prpsinfo -D_STRUCTURED_PROC -Dprpsinfo=psinfo sys/types.h sys/procfs.h
 
 tst	lib_info note{ info(2) kernel table api }end link{
 	#include <info.h>
@@ -21,14 +23,20 @@ tst	lib_info note{ info(2) kernel table api }end link{
 
 tst	run{
 	if	test -d /proc
-	then	if	test "$_hdr_asm_param" = 1 -a -r /proc/self/stat
+	then	if	test -r /proc/self/stat && test "$_hdr_asm_param" = 1 -o "$_typ_struct_prpsinfo" = 1
 		then	self=self
 			cat <<!
 	/*
 	 * linux style /proc
 	 */
 
+	#if _hdr_asm_param
 	#include <asm/param.h>
+	#else
+	#if _sys_param
+	#include <sys/param.h>
+	#endif
+	#endif
 
 	#ifndef PRNODEV
 	#define PRNODEV		((dev_t)(0))
@@ -43,6 +51,33 @@ tst	run{
 	#define _PS_path_str	"/proc/%s/%s"
 	#define _PS_status	"stat"
 	#define _PS_scan_boot	1
+
+	#undef	_mem_pr_clname_prpsinfo
+	#undef	_mem_pr_cpu_prpsinfo
+	#undef	_mem_pr_lttydev_prpsinfo
+	#undef	_mem_pr_psargs_prpsinfo
+	#undef	_mem_pr_refcount_prpsinfo
+	#undef	_mem_pr_start_tv_sec_prpsinfo
+	#undef	_mem_pr_zomb_prpsinfo
+
+	#define _mem_pr_cnswap_prpsinfo			1
+	#define _mem_pr_delayacct_blkio_ticks_prpsinfo	1
+	#define _mem_pr_exit_signal_prpsinfo		1
+	#define _mem_pr_nice_prpsinfo			1
+	#define _mem_pr_nswap_prpsinfo			1
+	#define _mem_pr_num_threads_prpsinfo		1
+	#define _mem_pr_policy_prpsinfo			1
+	#define _mem_pr_processor_prpsinfo		1
+	#define _mem_pr_rt_priority_prpsinfo		1
+
+	#if _mem_pr_ntpid_prpsinfo
+	#undef	_mem_pr_ntpid_prpsinfo
+	#define _mem_pr_npid_prpsinfo			1
+	#endif
+
+	#if _typ_struct_prpsinfo
+	#define prpsinfo	pss_prpsinfo
+	#endif
 
 	struct prpsinfo
 	{
@@ -63,9 +98,9 @@ tst	run{
 		unsigned long	pr_stime;
 		unsigned long	pr_cutime;
 		unsigned long	pr_cstime;
-		long		pr_counter;
 		long		pr_priority;
-		long		pr_timeout;
+		long		pr_nice;
+		long		pr_num_threads;
 		unsigned long	pr_itrealvalue;
 		unsigned long	pr_starttime;
 		unsigned long	pr_vsize;
@@ -81,13 +116,19 @@ tst	run{
 		unsigned long	pr_sigignore;
 		unsigned long	pr_sigcatch;
 		unsigned long	pr_wchan;
+		unsigned long	pr_nswap;
+		unsigned long	pr_cnswap;
+		long		pr_exit_signal;
+		long		pr_processor;
+		unsigned long	pr_rt_priority;
+		unsigned long	pr_policy;
+		unsigned long	pr_delayacct_blkio_ticks;
+		long		pr_npid;
 
 		/* must be added after the stat file is read */
 
 		unsigned long	pr_uid;		/* fstat(stat-fd) */
 		unsigned long	pr_gid;		/* fstat(stat-fd) */
-		long		pr_nice;	/* pr_priority-15 */
-		int		pr_cpu;		/* ??? */
 	};
 
 	#define pr_addr		pr_startcode
@@ -102,9 +143,13 @@ tst	run{
 	#define pr_start	pr_starttime
 	#define pr_tgrp		pr_tpgid
 	#define pr_ttydev	pr_tty
-	
-	#define _PS_scan_format	"%ld %s %c %ld %ld %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu"
+
+	#define _PS_scan_format "%ld %s %c %ld %ld %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %ld %ld %lu %lu %lu %*ld %*ld %*ld %*ld %*ld %ld"
+	#if _UWIN
+	#define _PS_scan_count	43
+	#else
 	#define _PS_scan_count	35
+	#endif
 	#define _PS_scan_args(p) \
 			&(p)->pr_pid, \
 			(p)->pr_comm, \
@@ -123,9 +168,9 @@ tst	run{
 			&(p)->pr_stime, \
 			&(p)->pr_cutime, \
 			&(p)->pr_cstime, \
-			&(p)->pr_counter, \
 			&(p)->pr_priority, \
-			&(p)->pr_timeout, \
+			&(p)->pr_nice, \
+			&(p)->pr_num_threads, \
 			&(p)->pr_itrealvalue, \
 			&(p)->pr_starttime, \
 			&(p)->pr_vsize, \
@@ -140,7 +185,15 @@ tst	run{
 			&(p)->pr_blocked, \
 			&(p)->pr_sigignore, \
 			&(p)->pr_sigcatch, \
-			&(p)->pr_wchan
+			&(p)->pr_wchan, \
+			&(p)->pr_nswap, \
+			&(p)->pr_cnswap, \
+			&(p)->pr_exit_signal, \
+			&(p)->pr_processor, \
+			&(p)->pr_rt_priority, \
+			&(p)->pr_policy, \
+			&(p)->pr_delayacct_blkio_ticks, \
+			&(p)->pr_npid
 	
 	#define PR_HZ		HZ
 	#define PR_TIME(p)	((((p)->pr_utime+(p)->pr_stime))/HZ)
@@ -382,62 +435,66 @@ tst	output{
 		printf("	char	pr_psargs[PRARGSZ];\n");
 		printf("};\n");
 	#endif
-	#if _mem_pr_lttydev_prpsinfo && !defined(pr_ttydev)
-		printf("#define pr_ttydev	pr_lttydev\n");
-	#endif
-		printf("#ifndef PR_TIME\n");
-	#if _mem_pr_utime_prpsinfo && _mem_pr_stime_prpsinfo
-		printf("#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))\n");
-	#else
-	#if _mem_pr_time_tv_sec_prpsinfo
-		printf("#define PR_TIME(p)	((p)->pr_time.tv_sec)\n");
-	#else
-		printf("#define PR_TIME(p)	((p)->pr_time)\n");
-	#endif
-	#endif
-		printf("#endif\n");
-		printf("#ifndef PR_CTIME\n");
-	#if _mem_pr_cutime_prpsinfo && _mem_pr_cstime_prpsinfo
-		printf("#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))\n");
-	#else
-	#if _mem_pr_ctime_tv_sec_prpsinfo
-		printf("#define PR_CTIME(p)	((p)->pr_ctime.tv_sec)\n");
-	#else
-	#if _mem_pr_ctime_prpsinfo
-		printf("#define PR_CTIME(p)	((p)->pr_ctime)\n");
-	#else
-		printf("#define PR_CTIME(p)	PR_TIME(p)\n");
-	#endif
-	#endif
-	#endif
-		printf("#endif\n");
-		printf("#ifndef PR_START\n");
-	#if _mem_pr_start_tv_sec_prpsinfo
-		printf("#define PR_START(p)	((p)->pr_start.tv_sec)\n");
-	#else
-		printf("#define PR_START(p)	((p)->pr_start)\n");
-	#endif
-		printf("#endif\n");
-		printf("#ifndef PR_ZOMBIE\n");
-	#if _mem_pr_zomb_prpsinfo
-		printf("#define PR_ZOMBIE(p)	((p)->pr_zomb)\n");
-	#else
-		printf("#define PR_ZOMBIE(p)	((p)->pr_sname=='Z')\n");
-	#endif
-		printf("#endif\n");
-		printf("#ifndef PR_CPU\n");
-	#if _mem_pr_pctcpu_prpsinfo
-		printf("#define PR_CPU(p)	((p)->pr_pctcpu)\n");
-	#else
-	#if _mem_pr_cpu_prpsinfo
-		printf("#define PR_CPU(p)	((p)->pr_cpu)\n");
-	#else
-		printf("#define PR_CPU(p)	(0)\n");
-	#endif
-	#endif
-		printf("#endif\n");
 		return 0;
 	}
+}end
+
+cat{
+
+#if _mem_pr_lttydev_prpsinfo && !defined(pr_ttydev)
+#define pr_ttydev	pr_lttydev
+#endif
+#ifndef PR_TIME
+#if _mem_pr_utime_prpsinfo && _mem_pr_stime_prpsinfo
+#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))
+#else
+#if _mem_pr_time_tv_sec_prpsinfo
+#define PR_TIME(p)	((p)->pr_time.tv_sec)
+#else
+#define PR_TIME(p)	((p)->pr_time)
+#endif
+#endif
+#endif
+#ifndef PR_CTIME
+#if _mem_pr_cutime_prpsinfo && _mem_pr_cstime_prpsinfo
+#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))
+#else
+#if _mem_pr_ctime_tv_sec_prpsinfo
+#define PR_CTIME(p)	((p)->pr_ctime.tv_sec)
+#else
+#if _mem_pr_ctime_prpsinfo
+#define PR_CTIME(p)	((p)->pr_ctime)
+#else
+#define PR_CTIME(p)	PR_TIME(p)
+#endif
+#endif
+#endif
+#endif
+#ifndef PR_START
+#if _mem_pr_start_tv_sec_prpsinfo
+#define PR_START(p)	((p)->pr_start.tv_sec)
+#else
+#define PR_START(p)	((p)->pr_start)
+#endif
+#endif
+#ifndef PR_ZOMBIE
+#if _mem_pr_zomb_prpsinfo
+#define PR_ZOMBIE(p)	((p)->pr_zomb)
+#else
+#define PR_ZOMBIE(p)	((p)->pr_sname=='Z')
+#endif
+#endif
+#ifndef PR_CPU
+#if _mem_pr_pctcpu_prpsinfo
+#define PR_CPU(p)	((p)->pr_pctcpu)
+#else
+#if _mem_pr_cpu_prpsinfo
+#define PR_CPU(p)	((p)->pr_cpu)
+#else
+#define PR_CPU(p)	(0)
+#endif
+#endif
+#endif
 }end
 
 tst	run{

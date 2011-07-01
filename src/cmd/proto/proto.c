@@ -119,7 +119,7 @@ USAGE_LICENSE
 "		[+query=\atext\a?If \atext\a is one of the \aname\as above"
 "			then its value is expanded, otherwise"
 "			\b${\b\aname\a\b}\b in \atext\a is expanded. The"
-"			results is printed as a line on the standard output"
+"			result is printed as a line on the standard output"
 "			and \bproto\b exits. This should only be used via"
 "			\b--options\b.]"
 "}"
