@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -69,29 +69,31 @@ initialize()
 
 Rskey_t*
 #if __STD_C
-rskeyopen(Rskeydisc_t* disc)
+rskeyopen(Rskeydisc_t* keydisc, Rsdisc_t* disc)
 #else
-rskeyopen(disc)
-Rskeydisc_t*	disc;
+rskeyopen(keydisc)
+Rskeydisc_t*	keydisc;
 #endif
 {
 	register Rskey_t*	kp;
 
 	if (!state.dict[' '])
 		initialize();
-	if (!(kp = vmnewof(Vmheap, 0, Rskey_t, 1, sizeof(Rsdisc_t))))
+	if (keydisc->version < 20111011L)
+		disc = 0;
+	if (!(kp = vmnewof(Vmheap, 0, Rskey_t, 1, disc ? 0 : sizeof(Rsdisc_t))))
 		return 0;
 	kp->id = lib;
-	kp->disc = (Rsdisc_t*)(kp + 1);
-	kp->disc->version = RS_VERSION;
+	kp->disc = disc ? disc : (Rsdisc_t*)(kp + 1);
+	kp->disc->version = keydisc->version;
 	kp->disc->keylen = -1;
 	kp->disc->data = REC_D_TYPE('\n');
-	kp->keydisc = disc;
+	kp->keydisc = keydisc;
 	kp->state = &state;
 	kp->insize = INSIZE;
 	kp->outsize = OUTSIZE;
 	kp->procsize = PROCSIZE;
-	kp->field.head = kp->field.tail = &kp->field.global;
+	kp->head = kp->tail = &kp->field.global;
 	kp->field.global.end.field = MAXFIELD;
 	kp->meth = Rsrasp;
 	if (mbcoll())
@@ -118,8 +120,8 @@ rskeyclose(kp)
 Rskey_t*	kp;
 #endif
 {
-	register Field_t*	fp;
-	register Field_t*	np;
+	register Rskeyfield_t*	fp;
+	register Rskeyfield_t*	np;
 
 	if (!kp)
 		return -1;

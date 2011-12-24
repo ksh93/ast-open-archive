@@ -1,3 +1,4 @@
+11-08-30 ppproto.c: bump BLOCK to 16*1024 for (ppargs.c self-doc!)
 11-03-15 ppop.c: add ppok() readonly check for subset of ppop(PP_*)
 11-03-02 ppop.c,ppcontrol.c: use ppset() to handle readonly values
 10-09-01 RE errors => exit(2)

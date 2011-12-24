@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -17,6 +17,8 @@
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                                                                      *
 ***********************************************************************/
+#pragma prototyped
+
 #include "ivlib.h"
 
 /* This method manages nested intervals so that only points in
@@ -40,9 +42,11 @@ struct Itvl_s
 struct Nest_s
 {
 	Dtdisc_t	dc;	/* dt discipline	*/
+	Ivfree_f	freef;	/* user data free	*/
 	Dt_t*		dt;	/* to keep intervals	*/
 	Iv_t*		flat;	/* flat interval handle	*/
 	Iv_t*		iv;	/* original interval	*/
+	Ivdisc_t	disc;	/* flat discipline	*/
 	int		changed;/* intervals changed	*/
 };
 
@@ -66,6 +70,8 @@ nestmake(Dt_t* dt, void* p, Dtdisc_t* disc)
 static void
 nestfree(Dt_t* dt, void* obj, Dtdisc_t* disc)
 {
+	if (((Nest_t*)disc)->freef && ((Itvl_t*)obj)->data)
+		((Nest_t*)disc)->freef(((Nest_t*)disc)->iv, ((Itvl_t*)obj)->data);
 	free(obj);
 }
 
@@ -166,7 +172,7 @@ static int nest2flat(Iv_t* iv, Nest_t* nst)
 
 	if (nst->flat)
 		ivclose(nst->flat);
-	if (!(nst->flat = ivopen(iv->disc, ivmeth("flat"), iv->size, 0)))
+	if (!(nst->flat = ivopen(&nst->disc, ivmeth("flat"), iv->size, 0)))
 		return -1;
 	/* insert "in order" all intervals into the Ivflat handle */
 	for(it = (Itvl_t*)dtfirst(nst->dt); it; it = (Itvl_t*)dtnext(nst->dt, it))
@@ -215,7 +221,10 @@ nestevent(Iv_t* iv, int type, void* data)
 		}
 		nst->changed = 0;
 		nst->flat = 0;
+		nst->freef = iv->disc->freef;
 		nst->iv = iv;
+		nst->disc = *iv->disc;
+		nst->disc.freef = 0;
 		iv->data = (void*)nst;
 		break;
 	case IV_CLOSE:

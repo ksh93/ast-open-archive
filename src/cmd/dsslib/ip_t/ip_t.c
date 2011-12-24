@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -234,10 +234,7 @@ as32_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 	int		n;
 
 	as = value->number;
-	if (n = (as >> 16) & 0xffff)
-		n = sfsprintf(buf, size, "%u.%lu", n, as & 0xffff);
-	else
-		n = sfsprintf(buf, size, "%lu", as & 0xffff);
+	n = sfsprintf(buf, size, "%lu", as & 0xffff);
 	if (n >= size)
 		return n + 1;
 	return n;
@@ -268,13 +265,13 @@ as32_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 static ssize_t
 as32path_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
-	return itl4external(cx, type, 2, 1, 1, details, &format, value, buf, size, disc);
+	return itl4external(cx, type, 0, 1, 1, details, &format, value, buf, size, disc);
 }
 
 static ssize_t
 as32path_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
-	return itl4internal(cx, &ret->value, 2, 1, 1, buf, size, vm, disc);
+	return itl4internal(cx, &ret->value, 0, 1, 1, buf, size, vm, disc);
 }
 
 static ssize_t
@@ -298,7 +295,7 @@ aspath_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 	if (b < e && *b == '.')
 	{
 		ret->type = AS32PATH_T;
-		itl4internal(cx, &ret->value, 2, 1, 1, buf, size, vm, disc);
+		itl4internal(cx, &ret->value, 0, 1, 1, buf, size, vm, disc);
 	}
 	ret->type = AS16PATH_T;
 	return itl2internal(cx, &ret->value, 0, 1, 1, buf, size, vm, disc);
@@ -344,7 +341,7 @@ aspath_match_exec(Cx_t* cx, void* data, Cxtype_t* type, Cxvalue_t* val, Cxdisc_t
 		{
 			iredisc.version = IRE_VERSION;
 			iredisc.errorf = disc->errorf;
-			if (!(ire = irecomp(pm->pat, 4, 1, 1, 1, &iredisc)))
+			if (!(ire = irecomp(pm->pat, 4, 0, 1, 1, &iredisc)))
 				return -2;
 			pm->ire32 = ire;
 		}
@@ -466,13 +463,13 @@ labels_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 
 	formats[0] = 0;
 	formats[1] = format;
-	return itl2external(cx, type, 0, 4, 0, details, formats, value, buf, size, disc);
+	return itl4external(cx, type, 0, 2, 0, details, formats, value, buf, size, disc);
 }
 
 static ssize_t
 labels_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
 {
-	return itl2internal(cx, &ret->value, 0, 4, 0, buf, size, vm, disc);
+	return itl4internal(cx, &ret->value, 0, 2, 0, buf, size, vm, disc);
 }
 
 static void*
@@ -754,7 +751,7 @@ ptload(int str, Cxvalue_t* val, Ptdisc_t* ptdisc, Cxdisc_t* disc)
 		if (ip = dssfopen(dss, s + 1, NiL, DSS_FILE_READ, NiL))
 		{
 			while (rp = (Bgproute_t*)dssfread(ip))
-				if (!ptinsert(pt, PTMIN(rp->addr, rp->bits), PTMAX(rp->addr, rp->bits)))
+				if (!ptinsert(pt, PTMIN(rp->addr.v4, rp->bits), PTMAX(rp->addr.v4, rp->bits)))
 				{
 					dssfclose(ip);
 					ptclose(pt);
@@ -911,7 +908,7 @@ static Cxmatch_t	match_prefixv4 =
 static Cxmatch_t	match_prefixv6 =
 {
 	"prefix-v6-match",
-	"Matches on this type treat a string pattern as an ipv6 prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is a \bprefixv6_t\b then matches test if the subject is matched by the prefix.",
+	"Matches on this type treat a string pattern as an ipv6 prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is an \bipv6prefix_t\b then matches test if the subject is matched by the prefix.",
 	CXH,
 	prefix_match_comp,
 	prefix_match_exec,
@@ -977,22 +974,22 @@ CXC(CX_MATCH,	"buffer",	"ipv6prefix_t",	op_match_ip6_NP,	0)
 
 Cxtype_t	types[] =
 {
-{ "as16_t", "An unsigned 16 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 2, 5 }, 0 },
-{ "as32_t",	"A dotted pair 32 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, as32_external, as32_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 11 }, 0 },
-{ "as_t", 0, CXH, (Cxtype_t*)"number", 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 2, 5 }, 0, 0, &as_generic[0] },
-{ "as16path_t", "A sequence of as16_t 16 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, as16path_external, as16path_internal, 0, 0, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal (default)), followed by the separator string.", "u," }, &match_as16path },
-{ "as32path_t", "A sequence of as32_t 32 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, as32path_external, as32path_internal, 0, 0, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \b2\b: dotted 2-byte (default), \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal), followed by the separator string.", "u," }, &match_as32path },
-{ "aspath_t", 0, CXH, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, { 0 }, &match_aspath, 0, &aspath_generic[0] },
-{ "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
-{ "community_t", "A sequence of unsigned 16 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
-{ "extended_t", "A sequence of unsigned 64 bit integer tuples.", CXH, (Cxtype_t*)"buffer", 0, extended_external, extended_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted elements, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_extended },
-{ "ipv4addr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, addrv4_external, addrv4_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefixv4 },
-{ "ipv6addr_t",	"An RFC 2373 ipv6 address. The details string \"C\" lists the prefix as 16 0x%02x comma-separated values.", CXH, (Cxtype_t*)"buffer", 0, addrv6_external, addrv6_internal, 0, 0, { 0 }, &match_prefixv6 },
-{ "ipaddr_t",	0, CXH, (Cxtype_t*)"number", 0, addr_external, addr_internal, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefix, 0, &addr_generic[0] },
-{ "ipv4prefix_t", "/length appended to an ipv4addr_t prefix.", CXH, (Cxtype_t*)"number", 0, prefixv4_external, prefixv4_internal, 0, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_prefixv4 },
-{ "ipv6prefix_t", "/length appended to an ipv6addr_t prefix. The details string \"C\" lists the prefix as 17 0x%02x comma-separated values, the first 16 being the address, and the 17th being the number of prefix bits.", CXH, (Cxtype_t*)"buffer", 0, prefixv6_external, prefixv6_internal, 0, 0, { 0 }, &match_prefixv6 },
-{ "ipprefix_t", 0, CXH, (Cxtype_t*)"number", 0, prefix_external, prefix_internal, 0, 0, { 0 }, &match_prefix, 0, &prefix_generic[0] },
-{ "labels_t", "A sequence of unsigned 32 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, labels_external, labels_internal, 0, 0, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_labels },
+{ "as16_t", "An unsigned 16 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, 0, 0, 0, 0, 2, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 2, 5 }, 0 },
+{ "as32_t",	"A 32 bit autonomous system number.", CXH, (Cxtype_t*)"number", 0, as32_external, as32_internal, 0, 0, 4, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 11 }, 0 },
+{ "as_t", 0, CXH, (Cxtype_t*)"number", 0, 0, 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 2, 5 }, 0, 0, &as_generic[0] },
+{ "as16path_t", "A sequence of as16_t 16 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, as16path_external, as16path_internal, 0, 0, 0, 2, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal (default)), followed by the separator string.", "u," }, &match_as16path },
+{ "as32path_t", "A sequence of as32_t 32 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, as32path_external, as32path_internal, 0, 0, 0, 4, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \b2\b: dotted 2-byte, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal (default)), followed by the separator string.", "u," }, &match_as32path },
+{ "aspath_t", 0, CXH, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, 0, 0, { 0 }, &match_aspath, 0, &aspath_generic[0] },
+{ "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, 0, 4, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
+{ "community_t", "A sequence of unsigned 16 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, 0, 2, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
+{ "extended_t", "A sequence of unsigned 64 bit integer tuples.", CXH, (Cxtype_t*)"buffer", 0, extended_external, extended_internal, 0, 0, 0, 8, { "The format details string is the format character (\b.\b: dotted elements, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_extended },
+{ "ipv4addr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, addrv4_external, addrv4_internal, 0, 0, 4, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefixv4 },
+{ "ipv6addr_t",	"An RFC 2373 ipv6 address. The details string \"C\" lists the prefix as 16 0x%02x comma-separated values.", CXH, (Cxtype_t*)"buffer", 0, addrv6_external, addrv6_internal, 0, 0, 16, 0, { 0 }, &match_prefixv6 },
+{ "ipaddr_t",	0, CXH, (Cxtype_t*)"number", 0, addr_external, addr_internal, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefix, 0, &addr_generic[0] },
+{ "ipv4prefix_t", "/length appended to an ipv4addr_t prefix.", CXH, (Cxtype_t*)"number", 0, prefixv4_external, prefixv4_internal, 0, 0, 5, 0, { "The format details string is a \bprintf\b(3) format specification for the integer arguments \aaddress,bits\a; e.g., \b%2$u|%1$08x\b prints the decimal bits followed by the hexadecimal prefix address.", 0, CX_UNSIGNED|CX_INTEGER, 8, 19 }, &match_prefixv4 },
+{ "ipv6prefix_t", "/length appended to an ipv6addr_t prefix. The details string \"C\" lists the prefix as 17 0x%02x comma-separated values, the first 16 being the address, and the 17th being the number of prefix bits.", CXH, (Cxtype_t*)"buffer", 0, prefixv6_external, prefixv6_internal, 0, 0, 17, 0, { 0 }, &match_prefixv6 },
+{ "ipprefix_t", 0, CXH, (Cxtype_t*)"number", 0, prefix_external, prefix_internal, 0, 0, 0, 0, { 0 }, &match_prefix, 0, &prefix_generic[0] },
+{ "labels_t", "A sequence of unsigned 32 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, labels_external, labels_internal, 0, 0, 0, 8, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_labels },
 {0}
 };
 
@@ -1000,7 +997,7 @@ Dsslib_t dss_lib_ip_t =
 {
 	"ip_t",
 	"IP type support"
-	"[-?\n@(#)$Id: dss ip type library (AT&T Research) 2008-08-11 $\n]"
+	"[-?\n@(#)$Id: dss ip type library (AT&T Research) 2008-08-18 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	0,

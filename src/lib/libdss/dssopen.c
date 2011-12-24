@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2011-06-15 $\n]"
+"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2011-09-11 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method provides types, global "
@@ -308,7 +308,10 @@ static Dsslib_t		dss_library =
 	0,
 	0,
 	0,
-	&queries[0]
+	&queries[0],
+	0,
+	0,
+	0
 };
 
 /*
@@ -316,9 +319,8 @@ static Dsslib_t		dss_library =
  */
 
 static Dsslib_t*
-init(void* dll, const char* path, Dssflags_t flags, Dssdisc_t* disc)
+init(void* dll, Dsslib_t* lib, const char* path, Dssflags_t flags, Dssdisc_t* disc)
 {
-	Dsslib_t*	lib;
 	Dsslib_f	libf;
 	char		buf[64];
 
@@ -326,8 +328,12 @@ init(void* dll, const char* path, Dssflags_t flags, Dssdisc_t* disc)
 	 * check for the Dsslib_t* function
 	 */
 
-	sfsprintf(buf, sizeof(buf), "%s_lib", id);
-	if ((libf = (Dsslib_f)dlllook(dll, buf)) && (lib = (*libf)(path, disc)))
+	if (dll)
+	{
+		sfsprintf(buf, sizeof(buf), "%s_lib", id);
+		lib = (libf = (Dsslib_f)dlllook(dll, buf)) ? (*libf)(path, disc) : (Dsslib_t*)0;
+	}
+	if (lib)
 	{
 		if (!(lib->path = (const char*)strdup(path)))
 		{
@@ -352,16 +358,11 @@ init(void* dll, const char* path, Dssflags_t flags, Dssdisc_t* disc)
 Dsslib_t*
 dsslib(const char* name, Dssflags_t flags, Dssdisc_t* disc)
 {
-	register char*		s;
-	register char*		t;
 	register Dsslib_t*	lib;
-	int			order;
 	Dllscan_t*		dls;
 	Dllent_t*		dle;
 	void*			dll;
-	char			base[256];
-	char			path[PATH_MAX];
-	char*			test[2];
+	Dllnames_t		names;
 
 	dssstate(disc);
 	if (!name)
@@ -373,7 +374,7 @@ dsslib(const char* name, Dssflags_t flags, Dssdisc_t* disc)
 			{
 				while (dle = dllsread(dls))
 					if (dll = dlopen(dle->path, RTLD_LAZY))
-						init(dll, dle->path, 0, disc);
+						init(dll, NiL, dle->path, 0, disc);
 					else if (disc && disc->errorf)
 						(*disc->errorf)(NiL, disc, 1, "%s: %s", dle->path, dlerror());
 				dllsclose(dls);
@@ -381,48 +382,11 @@ dsslib(const char* name, Dssflags_t flags, Dssdisc_t* disc)
 		}
 		return (Dsslib_t*)dtfirst(state.cx->libraries);
 	}
-	if (streq(name, DSS_ID "_s") || streq(name, DSS_ID "_t")) /* XXX: must be a better way around this */
+	if (!dllnames(id, name, &names))
 		return 0;
-
-	/*
-	 * determine the base name
-	 */
-
-	if ((s = strrchr(name, '/')) || (s = strrchr(name, '\\')))
-	{
-		s++;
-		order = 0;
-	}
-	else
-	{
-		s = (char*)name;
-		order = 1;
-	}
-	if (strneq(s, "lib", 3))
-		s += 3;
-	for (t = s; *t && *t != '.' && *t != '-'; t++);
-	base[sfsprintf(base, sizeof(base) - 1, "%-.*s", t - s, s)] = 0;
-
-	/*
-	 * check if its already loaded
-	 */
-
-	if (!(lib = (Dsslib_t*)dtmatch(state.cx->libraries, base)))
-	{
-		/*
-		 * load
-		 */
-
-		test[order] = (char*)name;
-		test[!order] = base;
-		if (!(dll = dllplugin(id, test[0], NiL, DSS_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path))) && (streq(test[0], test[1]) || !(dll = dllplugin(id, test[1], NiL, DSS_PLUGIN_VERSION, NiL, RTLD_LAZY, path, sizeof(path)))))
-		{
-			if ((flags & DSS_VERBOSE) && disc->errorf)
-				(*disc->errorf)(NiL, disc, 2, "%s: library not found", name);
-			return 0;
-		}
-		lib = init(dll, path, flags|DSS_VERBOSE, disc);
-	}
+	if ((lib = (Dsslib_t*)dtmatch(state.cx->libraries, names.base)) ||
+	    (lib = (Dsslib_t*)dll_lib(&names, DSS_PLUGIN_VERSION, (flags & DSS_VERBOSE) ? (Error_f)disc->errorf : (Error_f)0, disc)))
+		init(NiL, lib, names.path, flags|DSS_VERBOSE, disc);
 	return lib;
 }
 
@@ -571,7 +535,7 @@ static Cxmember_t	dss_mem =
 
 static Cxtype_t		dss_type[] =
 {
-	{ DSS_ID "_s", "Global state struct.", CXH, (Cxtype_t*)"void", 0, 0, 0, 0, 0, {0}, 0, &dss_mem },
+	{ DSS_ID "_s", "Global state struct.", CXH, (Cxtype_t*)"void", 0, 0, 0, 0, 0, 0, 0, {0}, 0, &dss_mem },
 	{ DSS_ID "_t", "Global state.", CXH, (Cxtype_t*)DSS_ID "_s" },
 };
 
@@ -634,12 +598,12 @@ dssopen(Dssflags_t flags, Dssflags_t test, Dssdisc_t* disc, Dssmeth_t* meth)
 	dss->id = id;
 	dss->vm = vm;
 	dss->disc = disc;
+	if (!meth->cx || (meth->flags & DSS_BASE))
+		meth = dssmethinit(NiL, NiL, NiL, disc, meth);
 	dss->meth = meth;
 	dss->flags = flags;
 	dss->test = test;
 	dss->state = &state;
-	if (!meth->cx)
-		dssmethinit(NiL, NiL, NiL, disc, meth);
 	if (!(dss->cx = cxscope(NiL, meth->cx, flags & DSS_CX_FLAGS, test, disc)) || disc->map && !loadtags(disc->map, "map", disc, meth))
 		goto bad;
 	dss->cx->caller = dss;
@@ -701,10 +665,24 @@ dssmethinit(const char* name, const char* options, const char* schema, Dssdisc_t
 	Dssmeth_t*	ometh;
 	Opt_t		opt;
 
-	if (!(meth->cx = cxopen(0, 0, disc)) || !(meth->formats = dtopen(&state.cx->namedisc, Dttree)))
+	if (meth->flags & DSS_BASE)
 	{
-		if (meth->cx)
-			cxclose(meth->cx);
+		if (!(ometh = newof(0, Dssmeth_t, 1, 0)))
+		{
+			if (disc->errorf)
+				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
+			return 0;
+		}
+		*ometh = *meth;
+		meth = ometh;
+		meth->flags &= ~DSS_BASE;
+		meth->cx = 0;
+	}
+	if (!meth->cx && !(meth->cx = cxopen(0, 0, disc)))
+		return 0;
+	if (!meth->formats && !(meth->formats = dtopen(&state.cx->namedisc, Dtoset)))
+	{
+		cxclose(meth->cx);
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return 0;
@@ -722,7 +700,7 @@ dssmethinit(const char* name, const char* options, const char* schema, Dssdisc_t
 			if (!meth)
 				return 0;
 			if (meth != ometh)
-				dtinsert(state.cx->methods, meth);
+				meth->reference++;
 		}
 		else if (options)
 			return 0;

@@ -1,5 +1,5 @@
 /*
- * interactive debug support
+ * debug support
  *
  * @(#)debug (AT&T Research) 2010-02-14
  *

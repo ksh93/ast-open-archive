@@ -50,6 +50,7 @@ tst	run{
 	#define _PS_path_num	"/proc/%lu/%s"
 	#define _PS_path_str	"/proc/%s/%s"
 	#define _PS_status	"stat"
+	#define _PS_task	"task"
 	#define _PS_scan_boot	1
 
 	#undef	_mem_pr_clname_prpsinfo

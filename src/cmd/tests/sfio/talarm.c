@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -18,7 +18,6 @@
 *                                                                      *
 ***********************************************************************/
 #include	"sftest.h"
-#include	<signal.h>
 
 #define HANDLER	"Handler"
 char	Buf[16];
@@ -42,7 +41,7 @@ int	sig;
 	}
 	else if(Except == 2)
 	{	twarn("System call was automatically resumed by the OS");
-		exit(0);
+		texit(0);
 	}
 	else	terror("Unexpected Except(%d) state", Except);
 }
@@ -71,7 +70,7 @@ Sfdisc_t*	disc;
 
 Sfdisc_t Disc = {NIL(Sfread_f), NIL(Sfwrite_f), NIL(Sfseek_f), exceptf};
 
-MAIN()
+tmain()
 {
 	int	fd[2];
 	ssize_t	n;
@@ -116,5 +115,5 @@ MAIN()
 	if((n = sfread(sfstdin,buf,sizeof(buf))) != 10)
 		twarn("Wrong read size(%d) after an interrupt\n", n);
 
-	TSTEXIT(0);
+	texit(0);
 }

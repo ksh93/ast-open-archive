@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -18,9 +18,8 @@
 *                                                                      *
 ***********************************************************************/
 #include	"sftest.h"
-#include	<signal.h>
 
-MAIN()
+tmain()
 {
 	Sfio_t	*f;
 	char	*s, *endos, *os = "one\ntwo\nthree\n";
@@ -32,7 +31,7 @@ MAIN()
 		return 0;
 	}
 
-	if(!(f = sfpopen((Sfio_t*)0, sfprints("%s -p > %s", argv[0], tstfile(0)), "w")))
+	if(!(f = sfpopen((Sfio_t*)0, sfprints("%s -p > %s", argv[0], tstfile("sf", 0)), "w")))
 		terror("Opening for write");
 	if(sfwrite(f,os,strlen(os)) != (ssize_t)strlen(os))
 		terror("Writing");
@@ -46,7 +45,7 @@ MAIN()
 
 	sfclose(f);
 
-	if(!(f = sfpopen((Sfio_t*)0, sfprints("%s -p < %s", argv[0], tstfile(0)), "r")))
+	if(!(f = sfpopen((Sfio_t*)0, sfprints("%s -p < %s", argv[0], tstfile("sf", 0)), "r")))
 		terror("Opening for read");
 	sleep(1);
 
@@ -63,5 +62,5 @@ MAIN()
 	if(os != endos)
 		terror("Does not match all data, left=%s",os);
 
-	TSTEXIT(0);
+	texit(0);
 }

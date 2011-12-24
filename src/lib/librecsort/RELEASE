@@ -1,3 +1,5 @@
+11-10-11 recsort.h,rskeyopen.c: RSKEY_VERSION=20111011, add Rsdisc_t* argument
+11-09-27 rsopen.c,rsmerge.c: drop obsolete VM_TRUST
 10-05-25 rskey.c: locale-ize Rskey_t.tab and key_m_code()
 10-04-22 rskey.c: 'C' codeer => 'E' to make way for posix -C
 09-12-09 rskey.c: add h option for key_n_code (IEEE 1541-2002 scales)

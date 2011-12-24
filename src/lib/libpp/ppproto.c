@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1986-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1986-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -29,7 +29,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2008-05-11 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2011-08-30 $\0\n";
 
 #if PROTOMAIN
 
@@ -53,7 +53,7 @@ static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2008-05-11 $\0\n";
 #define MAGICDIR	"pragma"	/* proto magic directive	*/
 #define MAGICARG	"prototyped"	/* proto magic directive arg	*/
 #define MAGICOFF	"noticed"	/* no notice if found in pragma	*/
-#define MAGICTOP	64		/* must be in these top lines	*/
+#define MAGICTOP	80		/* must be in these top lines	*/
 #define NOTICED		"Copyright"	/* no notice if found in magic	*/
 #define PUBLICDOMAIN	"Public Domain"	/* no notice if found in magic	*/
 
@@ -168,7 +168,7 @@ struct proto				/* proto buffer state		*/
 #ifndef CHUNK
 #define CHUNK		1024
 #endif
-#define BLOCK		(8*CHUNK)
+#define BLOCK		(16*CHUNK)
 
 #define T_VA_START	(N_TOKEN+1)
 

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -17,6 +17,8 @@
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                                                                      *
 ***********************************************************************/
+#pragma prototyped
+
 #ifndef _IV_H
 #define _IV_H	1
 
@@ -32,7 +34,7 @@
 
 #include <fv.h>
 
-#define IV_VERSION	20090717L
+#define IV_VERSION	20111001L
 
 #define IV_OPEN		1
 #define IV_CLOSE	2
@@ -44,7 +46,7 @@ typedef struct Ivdisc_s		Ivdisc_t;	/* interval discipline		*/
 typedef struct Ivmeth_s		Ivmeth_t;	/* interval method		*/
 typedef struct Ivseg_s		Ivseg_t;	/* a segment of data		*/
 
-typedef int	(*Ivevent_f)(Iv_t*, int, void*);
+typedef void	(*Ivfree_f)(Iv_t*, void*);
 
 struct Ivseg_s
 {	
@@ -61,6 +63,7 @@ struct Ivdisc_s
 	uint32_t	version;	/* api version				*/
 	void*		unmatched;	/* data for unmatched addresses		*/ 
 	Error_f		errorf;		/* error handling function		*/
+	Ivfree_f	freef;		/* for each Ivseg_t.data on ivclose()	*/
 };
 
 struct Ivmeth_s
@@ -98,6 +101,8 @@ _BEGIN_EXTERNS_
 extern Ivmeth_t*	ivmeth(const char*);
 extern Iv_t*		ivopen(Ivdisc_t*, Ivmeth_t*, int, const char*);
 extern int		ivclose(Iv_t*);
+extern int		ivstr(Iv_t*, const char*, char**, unsigned char*, unsigned char*);
+extern char*		ivfmt(Iv_t*, const unsigned char*, int);
 
 _END_EXTERNS_
 

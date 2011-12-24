@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -85,25 +85,41 @@ struct letter {
  * Ouput message part to op.
  */
 static int
-part(register struct parse* pp, FILE* op, const char* encoding, off_t size, char* prefix, int prefixlen, int emptylen, unsigned long flags)
+part(register struct parse* pp, FILE* op, struct part* ap, off_t size, char* prefix, int prefixlen, int emptylen, unsigned long flags)
 {
 	register int	n = 0;
 	register int	i;
 	register FILE*	ip;
 	int		r = -1;
+	char*		s;
+	FILE*		tp;
 	int		skip;
 	int		line;
 
 	ip = pp->fp;
-	if (*encoding && !isdigit(*encoding)) {
-		register FILE*	tp;
-
+	if (*ap->code && !isdigit(*ap->code)) {
 		if (!(tp = fileopen(state.tmp.more, "Ew")))
 			return -1;
 		filecopy(NiL, ip, NiL, tp, NiL, size, NiL, NiL, 0);
 		fileclose(tp);
-		sfprintf(state.path.temp, "uudecode -h -t -o - -x %s %s", encoding, state.tmp.more);
+		sfprintf(state.path.temp, "uudecode -h -t -o - -x %s %s", ap->code, state.tmp.more);
+		if (!(ap->flags & PART_text) &&
+		    !mimecmp("text", ap->type, NiL) &&
+		    mime(1) &&
+		    (s = mimeview(state.part.mime, NiL, "", ap->type, NiL)))
+			sfprintf(state.path.temp, " | %s", s);
 		if (!(ip = pipeopen(struse(state.path.temp), "r")))
+			goto bad;
+	}
+	else if (!(ap->flags & PART_text) &&
+	         !mimecmp("text", ap->type, NiL) &&
+		 mime(1) &&
+		 (s = mimeview(state.part.mime, NiL, state.tmp.more, ap->type, NiL))) {
+		if (!(tp = fileopen(state.tmp.more, "Ew")))
+			return -1;
+		filecopy(NiL, ip, NiL, tp, NiL, size, NiL, NiL, 0);
+		fileclose(tp);
+		if (!(ip = pipeopen(s, "r")))
 			goto bad;
 	}
 	if (prefix) {
@@ -175,6 +191,7 @@ copy(register struct msg* mp, FILE* op, Dt_t** ignore, char* prefix, unsigned lo
 	char*		from;
 	int		emptylen;
 	int		prefixlen;
+	long		n;
 	struct part*	ap;
 	struct parse	pp;
 
@@ -244,26 +261,29 @@ copy(register struct msg* mp, FILE* op, Dt_t** ignore, char* prefix, unsigned lo
 	 */
 
 	if (ap = state.part.in.head) {
+		n = 0;
 		do {
 			if (flags & GINTERPOLATE) {
 				boundary();
 				note(DEBUG, "interpolate boundary=%s offset=%ld size=%ld", state.part.out.boundary, (long)ap->raw.offset, (long)ap->raw.size);
 				fprintf(op, "\n--%s\n", state.part.out.boundary);
 				fseek(pp.fp, ap->raw.offset, SEEK_SET);
-				if (part(&pp, op, state.part.global.code, ap->raw.size, prefix, prefixlen, emptylen, flags))
+				if (part(&pp, op, &state.part.global, ap->raw.size, prefix, prefixlen, emptylen, flags))
 					return -1;
+				n += ap->raw.size;
 			}
-			else if (ap->flags & PART_body) {
+			else if ((ap->flags & PART_body) || (flags & GMIME) && ap->count == 1 && !n && ap->next && !ap->next->lines && mime(1) && (s = mimeview(state.part.mime, NiL, NiL, ap->type, ap->opts))) {
 				note(DEBUG, "copy part text offset=%ld size=%ld lines=%ld", (long)ap->offset, (long)ap->size, (long)ap->lines);
 				fseek(pp.fp, ap->offset, SEEK_SET);
-				if (part(&pp, op, ap->code, ap->size, prefix, prefixlen, emptylen, flags))
+				if (part(&pp, op, ap, ap->size, prefix, prefixlen, emptylen, flags))
 					return -1;
+				n += ap->lines;
 			}
 			else
 				fprintf(op, "(attachment %2d %s %20s \"%s\")\n\n", ap->count, counts(1, ap->lines, ap->size), ap->type, ap->name);
 		} while (ap = ap->next);
 	}
-	else if (part(&pp, op, state.part.global.code, pp.count, prefix, prefixlen, emptylen, flags))
+	else if (part(&pp, op, &state.part.global, pp.count, prefix, prefixlen, emptylen, flags))
 		return -1;
 	return 0;
 }

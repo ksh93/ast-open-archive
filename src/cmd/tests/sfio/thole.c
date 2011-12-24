@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -21,7 +21,7 @@
 
 /*	Test for /dev/null and hole-preserving code */
 
-MAIN()
+tmain()
 {
 	Sfio_t*		null;
 	Sfio_t*		f;
@@ -33,8 +33,8 @@ MAIN()
 
 	sfsetbuf(null,NIL(char*),(size_t)SF_UNBOUND);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
-		terror("Creating %s", tstfile(0));
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w+")) )
+		terror("Creating %s", tstfile("sf", 0));
 	sfwrite(f,"1234",4);
 	sfseek(f,(Sfoff_t)1,0);
 	sfsync(f);
@@ -52,8 +52,8 @@ MAIN()
 	for(k = sizeof(buf)/4; k < sizeof(buf)/2; ++k) /* make a big hole */
 		buf[k] = 0;
 
-	if(!(f = sfopen(f, tstfile(0), "w+")) )
-		terror("Creating %s", tstfile(0));
+	if(!(f = sfopen(f, tstfile("sf", 0), "w+")) )
+		terror("Creating %s", tstfile("sf", 0));
 	n = sizeof(buf)-127;
 	if(sfwrite(f,buf,n) != n)
 		terror("Writing large buffer");
@@ -64,5 +64,5 @@ MAIN()
 		if(b[k] != buf[k])
 			terror("Bad data");
 
-	TSTEXIT(0);
+	texit(0);
 }

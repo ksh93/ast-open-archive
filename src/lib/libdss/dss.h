@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -67,10 +67,11 @@
 #define DSS_CX_FLAGS	(CX_FLAGS-1)
 
 #define DSS_APPEND	(CX_FLAGS<<0)		/* DSS_FILE_APPEND	*/
-#define DSS_FORCE	(CX_FLAGS<<1)		/* populate all fields	*/
-#define DSS_WRITE	(CX_FLAGS<<2)		/* {write} referenced	*/
+#define DSS_BASE	(CX_FLAGS<<1)		/* base method		*/
+#define DSS_FORCE	(CX_FLAGS<<2)		/* populate all fields	*/
+#define DSS_WRITE	(CX_FLAGS<<3)		/* {write} referenced	*/
 
-#define DSS_METH_FLAGS	(CX_FLAGS<<3)		/* first method flag	*/
+#define DSS_METH_FLAGS	(CX_FLAGS<<4)		/* first method flag	*/
 #define DSS_FLAGS	(DSS_METH_FLAGS<<8)	/* first caller flag	*/
 
 #define DSS_FILE_READ	(1<<0)			/* read mode		*/
@@ -216,7 +217,7 @@ extern Dssmeth_t*	dsstags(Sfio_t*, const char*, int, Dssflags_t, Dssdisc_t*, Dss
 extern Sfio_t*		dssfind(const char*, const char*, Dssflags_t, char*, size_t, Dssdisc_t*);
 
 extern int		dssoptinfo(Opt_t*, Sfio_t*, const char*, Optdisc_t*);
-extern int		dssoptlib(Sfio_t*, Dsslib_t*, Dssdisc_t*);
+extern int		dssoptlib(Sfio_t*, Dsslib_t*, const char*, Dssdisc_t*);
 
 extern Dss_t*		dssopen(Dssflags_t, Dssflags_t, Dssdisc_t*, Dssmeth_t*);
 extern int		dssrun(Dss_t*, const char*, const char*, const char*, char**);
@@ -235,7 +236,7 @@ extern int		dssend(Dss_t*, Dssexpr_t*);
 extern int		dsslist(Dss_t*, Dssexpr_t*, Sfio_t*);
 extern int		dssfree(Dss_t*, Dssexpr_t*);
 extern ssize_t		dssmagic(Dss_t*, Sfio_t*, const char*, const char*, uint32_t, size_t);
-extern int		dssprintf(Dss_t*, Sfio_t*, const char*, Dssrecord_t*);
+extern int		dssprintf(Dss_t*, Cx_t*, Sfio_t*, const char*, Dssrecord_t*);
 
 extern int		dssget(Dssrecord_t*, Dssvariable_t*, Dsstype_t*, const char*, Dssvalue_t*);
 extern Dsstype_t*	dsstype(Dss_t*, const char*);

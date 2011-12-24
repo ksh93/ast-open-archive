@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,7 +19,7 @@
 ***********************************************************************/
 #include	"vmtest.h"
 
-main()
+tmain()
 {
 	Vmalloc_t*	vm;
 	Void_t*		addr;
@@ -48,7 +48,7 @@ main()
 	if(vmstat(vm,&st) < 0 )
 		terror("vmstat failed21");
 	if(st.n_busy != 1 || st.s_busy != 13 )
-		terror("Wrong statistics2 (n_busy=%d s_busy=%d)", st.n_busy, st.s_busy);
+		terror("Wrong statistics2");
 	if(vmfree(vm,addr) < 0)
 		terror("vmfree failed2");
 	if(vmstat(vm,&st) < 0 )
@@ -89,5 +89,5 @@ main()
 		terror("Wrong statistics42");
 	vmclose(vm);
 
-	return 0;
+	texit(0);
 }

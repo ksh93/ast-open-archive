@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -62,7 +62,7 @@ Sfdisc_t	Disc1 = { discread, discwrite };
 Sfdisc_t	Disc2 = { discread, discwrite };
 Sfdisc_t	Disc3 = { discread, discwrite };
 
-MAIN()
+tmain()
 {
 	Sfio_t*	f;
 	char*	s;
@@ -73,7 +73,7 @@ MAIN()
         {       /* coprocess only */
                 while((s = sfgetr(sfstdin,'\n',0)) )
                         sfwrite(sfstdout,s,sfvalue(sfstdin));
-		TSTEXIT(0);
+		texit(0);
         }
 
 	if(!(f = sfpopen(NIL(Sfio_t*),sfprints("%s -p",argv[0]),"r+")) )
@@ -106,7 +106,7 @@ MAIN()
 	/* the below tests to see if stream position is correct when
 	   multiple disciplines are put on a stream.
 	*/
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")))
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")))
 		terror("Opening file to write");
 	sfdisc(f,&Disc1);
 	sfdisc(f,&Disc2);
@@ -121,7 +121,7 @@ MAIN()
 	}
 	sfclose(f);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "r")))
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "r")))
 		terror("Opening file to read");
 	sfdisc(f,&Disc1);
 	sfdisc(f,&Disc2);
@@ -137,7 +137,7 @@ MAIN()
 	}
 	sfclose(f);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "r")))
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "r")))
 		terror("Opening file to read");
 	Disc1.seekf = discseek; sfdisc(f,&Disc1);
 	Disc2.seekf = discseek; sfdisc(f,&Disc2);
@@ -153,5 +153,5 @@ MAIN()
 	}
 	sfclose(f);
 
-	TSTEXIT(0);
+	texit(0);
 }

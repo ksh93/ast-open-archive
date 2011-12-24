@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,7 +19,7 @@
 ***********************************************************************/
 #include	"sftest.h"
 
-MAIN()
+tmain()
 {
 	Sfio_t*	f;
 
@@ -44,7 +44,7 @@ MAIN()
 	if(sfeof(f))
 		terror("Shouldn't be eof any more");
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w+")) )
 		terror("Can't open stream2");
 	if(sfeof(f) || sferror(f))
 		terror("Can't be eof or error yet2");
@@ -69,13 +69,13 @@ MAIN()
 	if(sfeof(f))
 		terror("Shouldn't be eof any more2");
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
-		terror("Reopening %s", tstfile(0));
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w+")) )
+		terror("Reopening %s", tstfile("sf", 0));
 	sfwrite(f,"1234567890",10);
 	sfseek(f,(Sfoff_t)0,0);
 
-	if(sfopen(sfstdout, tstfile(1), "w") != sfstdout)
-		terror("Opening %s", tstfile(1));
+	if(sfopen(sfstdout, tstfile("sf", 1), "w") != sfstdout)
+		terror("Opening %s", tstfile("sf", 1));
 
 	if(sfmove(f,sfstdout,(Sfoff_t)(-1),-1) != 10)
 		terror("sfmove failed");
@@ -84,5 +84,5 @@ MAIN()
 	if(sferror(sfstdout))
 		terror("sfstdout should not be in error");
 
-	TSTEXIT(0);
+	texit(0);
 }

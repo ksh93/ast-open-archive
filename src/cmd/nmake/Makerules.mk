@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-05-09 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-12-13 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -87,7 +87,7 @@ set virtual:=1
 
 .OPTION.COMPATIBILITY : .MAKE .VIRTUAL .FORCE
 	local N O
-	if .MAKEVERSION. < 20110101
+	if .MAKEVERSION. < 20121221
 		O =
 		N =
 		if ! "$(-?clobber)" && "$("clobber":T=QV)"
@@ -183,10 +183,15 @@ set virtual:=1
 	 */
 
 	if MAKE_OPTIONS
-		set $(MAKE_OPTIONS:N!=*.*=*:/no\(.*\)/\1=0/:/=/:=/:/^[^=]*$/&:=1/)
-		for O $(MAKE_OPTIONS:N=*.*=*)
-			eval
-			$(O:V)
+		for O $(MAKE_OPTIONS)
+			if O == "-*"
+				set $(O)
+			else if O == "*([^=])[[:upper:].]*([^=])=*"
+				eval
+				$(O:V)
+				end
+			else
+				set --$(O:V)
 			end
 		end
 	end
@@ -336,8 +341,10 @@ STDLN := $$(_feature_:N=ln:?$(.X.)?$$(STDCP)?)
  * action related symbols
  */
 
+
 AR = $(CC.AR) $(CC.AR.ARFLAGS)
-ARFLAGS = -r
+ARFLAGS = $(ARHYPHEN)r
+ARHYPHEN =	/* XXX: change to ``-'' when sun4 finally expires */
 AS = as
 if "$(PATH:/:/ /G:X=awk:P=X)"
 AWK = awk
@@ -495,7 +502,7 @@ end
 .BUILT. = $(...:T=XU:A!=.TERMINAL:T=F:P=L:N!=/*$(.INSTALL.LIST.:@/ /|/G:/^./|&/)$(VROOT:?|$(VROOT)/*??)$(-global:@/:/|/G:/^./|&/)|$(CATALOG).msg:T=G)
 .CLOBBER. = $(".":L=*.([it]i|l[hn])) core
 .FILES. = $(LICENSEFILE)
-.MANIFEST.FILES. = $(*.COMMON.SAVE:T=F) $(.SELECT.:A!=.ARCHIVE|.COMMAND|.OBJECT)
+.MANIFEST.FILES. = $(*.COMMON.SAVE:T=F) $(.SELECT.:A!=.ARCHIVE|.COMMAND|.OBJECT|.TARGET)
 .MANIFEST. = $(.MANIFEST.FILES.:P=F:T=FR:P=C:H=U)
 .SOURCES. = $(.SELECT.:A=.REGULAR:A!=.ARCHIVE|.COMMAND|.OBJECT)
 
@@ -506,7 +513,8 @@ end
 (AR) (ARFLAGS) (AS) (ASFLAGS) (CPP) (CC) (CCFLAGS) (CCLD) \
 	(CCLDFLAGS) (COATTRIBUTES) (COBOL) (COBOLDIALECT) (COBOLFLAGS) \
 	(F77) (F77FLAGS) (IFFE) (IFFEFLAGS) (LD) (LDFLAGS) (LDLIBRARIES) \
-	(LDSHARED) (LEX) (LEXFLAGS) (M4) (M4FLAGS) (PERLMAGIC) (SHELLMAGIC) \
+	(LDSHARED) (LEX) (LEXFLAGS) (M4) (M4FLAGS) (PERLMAGIC) \
+	(PROTO) (PROTOFLAGS) (SHELLMAGIC) \
 	(YACC) (YACCFLAGS) : .PARAMETER
 
 /*
@@ -1028,7 +1036,7 @@ end
 .ARCHIVE.OMIT. = $(CC.LD.STATIC)|$(CC.LD.DYNAMIC)$(.LD.KEEP.:/^/|*/:/ //G)
 
 .ARCHIVE.o : .USE .ARCHIVE (AR) (ARFLAGS) .ARPREVIOUS .ARUPDATE .ARCLEAN
-	$(^:?$$(CP) $$(^) $$(<)$$("\n")??)$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(>:N!=$(.ARCHIVE.OMIT.):K=$(AR) $(ARFLAGS) $(<))
+	$(^:?$$(CP) $$(^) $$(<)$$("\n")??)$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) $$(ARHYPHEN)d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(>:N!=$(.ARCHIVE.OMIT.):K=$(AR) $(ARFLAGS) $(<))
 
 .ARPREVIOUS : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
 	eval
@@ -1171,7 +1179,7 @@ end
 %.c %.h : %.y .YACC.SEMAPHORE (YACC) (YACCFLAGS)
 	if	silent $(YACC) --version >/dev/null 2>&1
 	then	$(YACC) $(YACCFLAGS) -o$(<:N=*.c) $(YACCFIX.$(%):?-p$(YACCFIX.$(%))??) $(>)
-	else	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/[yY][yY]/s//<<<<&>>>>/g$("\n")g/<<<<yy>>>>/s//$(YACCFIX.$(%))/g$("\n")g/<<<<YY>>>>/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+	else	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/[yY][yY]/s//<<<<&>>>>/g$("\n")g/<<<<yy>>>>/s//$(YACCFIX.$(%))/g$("\n")g/<<<<YY>>>>/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")g/extern.*malloc/d$("\n")w$("\n")q$("\n")!??)
 		$(MV) y.tab.c $(%).c
 		if	$(SILENT) test -s y.tab.h
 		then	$(STDED) $(STDEDFLAGS) y.tab.h <<'!'
@@ -1252,6 +1260,7 @@ $(IFFEGENDIR)/% : "" .SCAN.c (IFFE) (IFFEFLAGS)
 
 .IFFE.REF. : .FUNCTION
 	local T
+	set mam=hold
 	T := $(...:N=*.req:A=.TARGET)
 	.MAKE : $(T)
 	T := $(T:T=F:T=I:/[[:space:]][[:space:]]*/ /G:N!=-l($(T:B:C, ,|,G)))
@@ -1259,6 +1268,7 @@ $(IFFEGENDIR)/% : "" .SCAN.c (IFFE) (IFFEFLAGS)
 	.R. : .CLEAR .MAKE $(T)
 		: $(*)
 	.MAKE : .R.
+	set mam=nohold
 	T := $(*.SOURCE.%.STD.INCLUDE:N=*/($(.PACKAGE.build:A!=.TARGET:/ /|/G)):T=FD:U!)
 	T := $(T:/^/-I/) $(T:D:U:/^/-I/) $(*.R.:N!=$(<:T=M:@/ /|/G):U)
 	if T
@@ -1412,7 +1422,7 @@ DAGGERFLAGS =
 	elif RO == "-S.data"
 		.ROSED. = s/^\([ 	]*\.*\)data/\\1text/
 		return $(@.DO.READONLY.c.sed)
-	elif RO == "-S.data"
+	elif RO == "-S.rdata"
 		.ROSED. = s/^\([ 	]*\.*\)data/\1rdata/
 		return $(@.DO.READONLY.c.sed)
 	end
@@ -1546,7 +1556,12 @@ RECURSEROOT = .
 			elif "$(N:T=F=D)"
 				.X. : $(N)
 			else
-				.X. : $(".":L=$(N):T=F=D)
+				P := $(".":L=$(N):T=F=D)
+				if P
+					.X. : $(P)
+				else
+					.X. : $(N)
+				end
 			end
 		end
 		D := $(~.X.)
@@ -2870,6 +2885,13 @@ RECURSEROOT = .
 			continue
 		end
 		FOUND = 0
+		H := $(PACKAGE_$(P))
+		if ! H
+			H := $($(P:F=%(upper)s)_HOME)
+			if H && H == "*/*"
+				PACKAGE_$(P) := $(H)
+			end
+		end
 		E := $(PACKAGE_$(P)_BIN)
 		EP := $(.PACKAGE.$(P).bin)
 		if EP == "/*"
@@ -3502,8 +3524,8 @@ PACKAGES : .SPECIAL .FUNCTION
 			if I != "/*"
 				I := $$(I:D=$$(BINDIR):B:S)
 			end
-			if I = "$$(I:T=F)"
-				print ;;;$$(I:P=A)
+			if I = "$$(I:T=F:P=A)"
+				print ;;;$$(I);$$(I)
 			end
 		end
 	end
@@ -4343,7 +4365,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	end
 	if "$(CC.ARFLAGS)"
 		.ARCHIVE.o : .CLEAR .USE .ARPREVIOUS (CC) (AR)
-			$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(CC) $(CC.ARFLAGS) $(CCLDFLAGS) -o $(<) $(*)
+			$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) $$(ARHYPHEN)d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(CC) $(CC.ARFLAGS) $(CCLDFLAGS) -o $(<) $(*)
 		.SHARED.o : .CLEAR .USE (LDSHARED)
 			$(LDSHARED) $(CC.SHARED) $(CCLDFLAGS) -o $(<) $(*$(**):N!=*$(CC.SUFFIX.ARCHIVE))
 		.ATTRIBUTE.%.a : -ARCHIVE
@@ -4670,7 +4692,7 @@ test : .SPECIAL .DONTCARE .ONOBJECT $$("check":A=.TARGET:A!=.ARCHIVE|.COMMAND|.O
 		$(RM) $(RMFLAGS) $(RMRECURSEFLAGS) $(<)
 		$(MKDIR) $(<)
 		cd $(<)
-		$(AR) x $(*:P=A)
+		$(AR) $(ARHYPHEN)x $(*:P=A)
 	.MAKE : $(F)
 	.DONE : .DONE.$(F)
 	.DONE.$(F) : .FORCE
@@ -5085,8 +5107,8 @@ end
 	PACKAGEROOT = ${PACKAGEROOT}
 	print -um setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
 	AR = ${AR}
-	print -um setv ARFLAGS -cr
-	ARFLAGS = -cr
+	print -um setv ARFLAGS $(ARHYPHEN)rc
+	ARFLAGS = $(ARHYPHEN)rc
 	print -um setv AS as
 	AS = ${AS}
 	print -um setv ASFLAGS

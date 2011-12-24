@@ -2,7 +2,7 @@
 .MT 4
 .TL
 
-.H 1 Introduction
+.H 1 "nmake Overview"
 .BR nmake (1)
 is the standard software construction tool at AT&T and
 Alcatel-Lucent.
@@ -1524,7 +1524,7 @@ named
 .BR nmake :
 .VL 6
 .LI
-.B "nmake (AT&T Research) 5.5 2010-03-11"
+.B "nmake (AT&T Research) 5.6 2011-02-02"
 This is the version maintained by the original author.
 .LI
 .B "Alcatel-Lucent nmake 12"
@@ -1644,8 +1644,8 @@ Lucent and AT&T
 The makerules variable form is supported for backwards compatibility.
 Warnings will eventually be enabled to encourage use of the
 makerules option form.
-.I "Not all incompatibilities are caught"
-the workaround is triggered by the
+.I "Not all incompatibilities are caught" .
+Compatibility checks are triggered by the
 .B .PROBE.INIT
 rule which is usually done early in the makefile input process.
 There may some instances where the

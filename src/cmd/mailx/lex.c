@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -602,13 +602,15 @@ folderinfo(int msgcount)
 	else {
 		for (mp = state.msg.list + msgcount; mp < state.msg.list + state.msg.count; mp++)
 			if (mp->m_flag & MNEW)
-				break;
+			 	break;
 		if (mp >= state.msg.list + state.msg.count)
 			for (mp = state.msg.list + msgcount; mp < state.msg.list + state.msg.count; mp++)
 				if (!(mp->m_flag & MREAD))
 					break;
 		if (mp < state.msg.list + state.msg.count)
 			dot = mp;
+		else if (msgcount <= 0 && state.var.recent)
+			dot = state.msg.list + state.msg.count - 1;
 		else {
 			dot = state.msg.list;
 			if (!state.msg.count)

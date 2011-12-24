@@ -1,14 +1,14 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1989-2005 AT&T Corp.                  #
+#          Copyright (c) 1989-2011 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
-#                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                 Eclipse Public License, Version 1.0                  #
+#                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
-#            http://www.opensource.org/licenses/cpl1.0.txt             #
-#         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         #
+#          http://www.eclipse.org/org/documents/epl-v10.html           #
+#         (with md5 checksum b35adb5213ca9657e911e9befb180842)         #
 #                                                                      #
 #              Information and Software Systems Research               #
 #                            AT&T Research                             #
@@ -24,7 +24,7 @@
 #
 # this is the worst iffe script, we promise
 #
-# @(#)syscall.sh (AT&T Research) 2002-10-18
+# @(#)syscall.sh (AT&T Research) 2011-12-06
 #
 eval $1
 shell=
@@ -1064,7 +1064,11 @@ extern long $u();" >> $tmp.g
 				case $1 in
 				*...)	d="$d, ..."
 					va=va_alist
-					vo="__OTORP__($o) int $i; va_list ap; __VA_START__(ap,$vx); __OTORP__("
+					case $l in
+					fcntl)	t='void*' ;;
+					*)	t=int ;;
+					esac
+					vo="__OTORP__($o) $t $i; va_list ap; __VA_START__(ap,$vx); __OTORP__("
 					o=va_dcl
 					IFS=$comma
 					set $p
@@ -1076,7 +1080,10 @@ extern long $u();" >> $tmp.g
 						vo="$vo$i = va_arg(ap, $1);"
 						shift
 					done
-					vo="$vo) $i = va_arg(ap, int); va_end(ap);"
+					case $l in
+					fcntl)	vo="$vo) $i = va_arg(ap, void*); va_end(ap);" ;;
+					*)	vo="$vo) $i = va_arg(ap, int); va_end(ap);" ;;
+					esac
 					break
 					;;
 				*\[\])	case $shell in

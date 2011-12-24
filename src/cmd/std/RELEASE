@@ -1,3 +1,6 @@
+11-12-13 features/procfs, pss-procfs.c: check _PS_task for { st_uid st_gid }
+11-08-24 ls.c: fix { linkop linktext } to check for FTS_SLNONE too
+11-08-01 file.c: add -b, --brief | --no-filename
 11-06-10 ls.c: add %(view)d for 3d fs view level (iview(struct stat*))
 11-05-09 ps,pss: handle pr_npid in /proc/<pid>/stat
 11-04-26 ps.c: increase COMMAND width from 16 => 24

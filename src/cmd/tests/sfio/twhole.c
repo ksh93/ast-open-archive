@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -18,7 +18,6 @@
 *                                                                      *
 ***********************************************************************/
 #include	"sftest.h"
-
 
 static int	Count;
 static int	Size;
@@ -41,7 +40,7 @@ Sfdisc_t*	disc;
 
 Sfdisc_t	Disc = {(Sfread_f)0, writef, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0};
 
-MAIN()
+tmain()
 {
 	Sfio_t*	f;
 	char	buf[550];
@@ -51,7 +50,7 @@ MAIN()
 	Count = 0;
 	Size = 52;
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")) )
 		terror("Opening to write");
 	sfsetbuf(f,buf,sizeof(buf));
 	sfset(f,SF_WHOLE,1);
@@ -67,7 +66,7 @@ MAIN()
 	Count = 0;
 	Size = 53;
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w")) )
 		terror("Opening to write");
 	sfsetbuf(f,buf,sizeof(buf));
 	sfset(f,SF_WHOLE,1);
@@ -80,5 +79,5 @@ MAIN()
 	if(Count != 10)
 		terror("Wrong number of writes2");
 
-	TSTEXIT(0);
+	texit(0);
 }

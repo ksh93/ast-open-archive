@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -86,7 +86,7 @@ Sfdisc_t*	disc;
 
 Mydisc_t Mydisc = {{(Sfread_f)0, newline, (Sfseek_f)0, event, (Sfdisc_t*)0}, 0};
 
-MAIN()
+tmain()
 {
 	int	p1[2], p2[2];
 	int	n, dupf2;
@@ -124,9 +124,9 @@ MAIN()
 	if(sfpurge(sfstdout) < 0)
 		terror("Purging stdout");
 
-	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
+	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")) )
 		terror("Opening file to write");
-	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
+	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"r")) )
 		terror("Opening file to read");
 
 	sfset(f1,SF_IOCHECK,1);
@@ -177,7 +177,7 @@ MAIN()
 		terror("Wrong lseek location %lld", off);
 
 	/* test to see if data is written correctly */
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")))
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w+")))
 		terror("Creating temp file");
 	sfdisc(f, &Mydisc.disc);
 	sfsetbuf(f, NIL(Void_t*), 95);
@@ -203,5 +203,5 @@ MAIN()
 			terror("Bad read data");
 	}
 
-	TSTEXIT(0);
+	texit(0);
 }

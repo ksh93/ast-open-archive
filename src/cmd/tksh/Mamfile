@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
 setv INSTALLROOT ../../..
 setv PACKAGE_X11 ${INSTALLROOT}
 setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11
@@ -15,7 +15,7 @@ setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGEROOT ../../../../..
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -115,6 +115,10 @@ make ${INSTALLROOT}/include/ast/ast.h implicit
 make ${INSTALLROOT}/include/ast/ast_api.h implicit
 done ${INSTALLROOT}/include/ast/ast_api.h dontcare
 make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/aso.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/aso.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
@@ -173,7 +177,7 @@ done ${INSTALLROOT}/include/tcl/tksh.h
 done uinit.c
 meta uinit.o %.c>%.o uinit.c uinit
 prev uinit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -c uinit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -c uinit.c
 done uinit.o generated
 make tkMain.o
 make tkMain.c
@@ -193,7 +197,7 @@ prev ${INSTALLROOT}/include/tcl/tksh.h implicit
 done tkMain.c
 meta tkMain.o %.c>%.o tkMain.c tkMain
 prev tkMain.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -c tkMain.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -c tkMain.c
 done tkMain.o generated
 make ${mam_libX11} archive
 done ${mam_libX11} dontcare virtual

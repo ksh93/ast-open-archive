@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -301,8 +301,8 @@ extern Dtmethod_t _PTR_	_Dtstack;
 extern Dtmethod_t _PTR_	_Dtqueue;
 _END_EXTERNS_
 
-#define Dthash		(_ADR_ _Dthash)
-#define Dttree		(_ADR_ _Dttree)
+#define Dtset		(_ADR_ _Dthash)
+#define Dtoset		(_ADR_ _Dttree)
 #define Dtlist		(_ADR_ _Dtlist)
 #define Dtstack		(_ADR_ _Dtstack)
 #define Dtqueue		(_ADR_ _Dtqueue)

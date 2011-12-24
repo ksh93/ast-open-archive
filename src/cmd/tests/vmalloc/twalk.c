@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,8 +19,15 @@
 ***********************************************************************/
 #include	"vmtest.h"
 
-static Vmuchar_t	Buf[4*1024];
-static Vmuchar_t*	Avail = Buf;
+typedef union _myalign_u
+{	void*		v;
+	unsigned long	l;
+	double		d;
+	unsigned int	i;
+} Align_t;
+
+static Align_t		Algn[16*1024];
+static Vmuchar_t	*Buf, *Endbuf, *Avail;
 static int		Count = 0;
 static int		Walk = 0;
 
@@ -36,60 +43,106 @@ size_t		newsize;
 Vmdisc_t*	disc;
 #endif
 {
+	if(!Avail)
+	{	Avail = Buf = (Vmuchar_t*)(&Algn[0]);
+		Endbuf = Buf + sizeof(Algn);
+	}
+
 	if(oldsize)
 		return NIL(Void_t*);
 
 	Count += 1;
 	caddr = (Void_t*)Avail;
 	Avail += newsize;
-	if(Avail >= Buf+sizeof(Buf))
+	if(Avail >= Endbuf)
 		terror("No more buffer");
 
 	return caddr;
 }
 
-static Vmdisc_t	Disc = {memory, NIL(Vmexcept_f), 64};
+static int except(Vmalloc_t* vm, int type, Void_t* data, Vmdisc_t* disc)
+{
+	/* make the eventual handle be a part of our memory */
+	if(type == VM_OPEN && data)
+		*((Void_t**)data) = data;
+	return 0;
+}
+
+static Vmdisc_t	Disc = {memory, except, 64};
 
 #if __STD_C
-static walk(Vmalloc_t* vm, Void_t* addr, size_t size, Vmdisc_t* disc, Void_t* handle)
+static int walk(Vmalloc_t* vm, Void_t* addr, size_t size, Vmdisc_t* disc, Void_t* handle)
 #else
-static walk(vm, addr, size, disc, handle)
+static int walk(vm, addr, size, disc, handle)
 Vmalloc_t*	vm;
 Void_t*		addr;
 size_t		size;
 Vmdisc_t*	disc;
-Void_t*		handle;
+VOid_t*		handle;
 #endif
 {
 	if(disc == &Disc)
-		*((int*)handle) += 1;
+		Walk += 1;
 	return 0;
 }
 
-main()
+tmain()
 {
-	reg Vmalloc_t*	vm1 = vmopen(&Disc,Vmbest,0);
-	reg Vmalloc_t*	vm2 = vmopen(&Disc,Vmbest,0);
-	reg Vmalloc_t*	vm3 = vmopen(&Disc,Vmbest,0);
-	reg Vmalloc_t*	vm4 = vmopen(&Disc,Vmbest,0);
-	reg Void_t	*m1, *m2, *m3, *m4;
+	Void_t		*m1, *m2, *m3, *m4;
+	Vmalloc_t	*vm1, *vm2, *vm3, *vm4;
 
-	m1 = vmalloc(vm1,258);
-	m2 = vmalloc(vm2,258);
-	m3 = vmalloc(vm3,258);
-	m4 = vmalloc(vm4,258);
+	if(!(vm1 = vmopen(&Disc,Vmbest,0)) )
+		terror("Failed to open vm1");
+	if((Vmuchar_t*)vm1 < Buf || (Vmuchar_t*)vm1 >= Endbuf)
+		terror("Failed to get vm1 memory to be ours");
 
-	if(Count != 8)
-		terror("Wrong count\n");
+	if(!(vm2 = vmopen(&Disc,Vmbest,0)) )
+		terror("Failed to open vm2");
+	if((Vmuchar_t*)vm2 < Buf || (Vmuchar_t*)vm2 >= Endbuf)
+		terror("Failed to get vm2 memory to be ours");
 
-	vmwalk(NIL(Vmalloc_t*),walk,&Walk);
-	if(Walk != 8)
+	if(!(vm3 = vmopen(&Disc,Vmbest,0)) )
+		terror("Failed to open vm3");
+	if((Vmuchar_t*)vm3 < Buf || (Vmuchar_t*)vm3 >= Endbuf)
+		terror("Failed to get vm3 memory to be ours");
+
+	Disc.exceptf = NIL(Vmexcept_f);
+	if(!(vm4 = vmopen(&Disc,Vmbest,0)) )
+		terror("Failed to open vm4");
+	if((Vmuchar_t*)vm4 >= Buf && (Vmuchar_t*)vm4 < Endbuf)
+		terror("vm4 memory should not be ours");
+
+	if(!(m1 = vmalloc(vm1,1024)) )
+		terror("vmalloc failed on m1");
+	if(!(m2 = vmalloc(vm2,1024)) )
+		terror("vmalloc failed on m2");
+	if(!(m3 = vmalloc(vm3,1024)) )
+		terror("vmalloc failed on m3");
+	if(!(m4 = vmalloc(vm4,1024)) )
+		terror("vmalloc failed on m4");
+
+	if(!(m1 = vmresize(vm1, m1, 4*1024, VM_RSMOVE|VM_RSCOPY)) )
+		terror("vmresize failed on m1");
+	if(!(m2 = vmresize(vm2, m2, 4*1024, VM_RSMOVE|VM_RSCOPY)) )
+		terror("vmresize failed on m2");
+	if(!(m3 = vmresize(vm3, m3, 4*1024, VM_RSMOVE|VM_RSCOPY)) )
+		terror("vmresize failed on m3");
+	if(!(m4 = vmresize(vm4, m4, 4*1024, VM_RSMOVE|VM_RSCOPY)) )
+		terror("vmresize failed on m4");
+
+	vmwalk(NIL(Vmalloc_t*),walk,NIL(Void_t*));
+	if(Walk != Count)
 		terror("Wrong walk count\n");
+	tinfo("Number of segments: %d", Count);
 
-	vmfree(vm1,m1);
-	vmfree(vm2,m2);
-	vmfree(vm3,m3);
-	vmfree(vm4,m4);
+	if(vmfree(vm1,m1) < 0 )
+		terror("vmfree failed on m1");
+	if(vmfree(vm2,m2) < 0 )
+		terror("vmfree failed on m2");
+	if(vmfree(vm3,m3) < 0 )
+		terror("vmfree failed on m3");
+	if(vmfree(vm4,m4) < 0 )
+		terror("vmfree failed on m4");
 
-	return 0;
+	texit(0);
 }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -753,7 +753,7 @@ mimeopen(Mimedisc_t* disc)
 	mp->dict.key = offsetof(Ent_t, name);
 	mp->dict.comparf = order;
 	mp->dict.freef = drop;
-	if (!(mp->buf = sfstropen()) || !(mp->cap = dtopen(&mp->dict, Dtorder)))
+	if (!(mp->buf = sfstropen()) || !(mp->cap = dtopen(&mp->dict, Dtoset)))
 	{
 		mimeclose(mp);
 		return 0;

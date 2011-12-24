@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -62,6 +62,7 @@ time_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format,
 	char*	e;
 	char*	f;
 
+	buf = (const char*)cxcvt(cx, buf, size);
 	if (CXDETAILS(details, format, type, 0))
 	{
 		ret->value.number = tmscan(buf, &e, details, &f, NiL, 0);
@@ -178,16 +179,18 @@ precise_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* form
 	char*		e;
 	char*		f;
 	Precise_t*	precise = (Precise_t*)type->data;
+	Time_t		now = TMX_NOW;
 	Time_t		t;
 
+	buf = (const char*)cxcvt(cx, buf, size);
 	if (CXDETAILS(details, format, type, 0))
 	{
-		t = tmxscan(buf, &e, details, &f, NiL, 0);
-		if (*f || e == (char*)buf)
-			t = tmxdate(buf, &e, NiL);
+		t = tmxscan(buf, &e, details, &f, now, 0);
+		if (*f || (e - (char*)buf) < size)
+			t = tmxdate(buf, &e, now);
 	}
 	else
-		t = tmxdate(buf, &e, NiL);
+		t = tmxdate(buf, &e, now);
 	if (precise->shift)
 		t = n2s(t, precise->shift);
 	ret->value.number = t;
@@ -563,14 +566,14 @@ static Cxmember_t	tm_member =
 
 static Cxtype_t types[] =
 {
-	{ "tm_hour_t",	"Hour since midnight with optional meridian (AM/PM).", CXH, (Cxtype_t*)"number", 0, tm_hour_external, tm_hour_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%d", CX_UNSIGNED|CX_INTEGER, 1 } },
-	{ "tm_mon_t",	"Month name represented as a number [0-11], starting at January.", CXH, (Cxtype_t*)"number", 0, tm_mon_external, tm_mon_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
-	{ "tm_wday_t",	"Weekday name represented as a number [0-6], starting at Sunday.", CXH, (Cxtype_t*)"number", 0, tm_wday_external, tm_wday_internal, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
-	{ "tm_t",	"Time parts.", CXH, (Cxtype_t*)"number", tm_init, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4 }, 0, &tm_member	},
-	{ "elapsed_t",	"Elapsed time in milliseconds.", CXH, (Cxtype_t*)"number", 0, elapsed_external, elapsed_internal, 0, 0, { 0, 0, CX_INTEGER, 4 }	},
-	{ "ns_t",	"64 bit nanoseconds since the epoch.", CXH, (Cxtype_t*)"tm_t", ns_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K.%9N", CX_UNSIGNED|CX_INTEGER, 8 } },
-	{ "stamp_t",	"64 bit 1/2**32 seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", stamp_init, precise_external, precise_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K.%N", CX_UNSIGNED|CX_INTEGER, 8 } },
-	{ "time_t",	"32 bit seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", 0, time_external, time_internal, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 4 } },
+	{ "tm_hour_t",	"Hour since midnight with optional meridian (AM/PM).", CXH, (Cxtype_t*)"number", 0, tm_hour_external, tm_hour_internal, 0, 0, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%d", CX_UNSIGNED|CX_INTEGER, 1 } },
+	{ "tm_mon_t",	"Month name represented as a number [0-11], starting at January.", CXH, (Cxtype_t*)"number", 0, tm_mon_external, tm_mon_internal, 0, 0, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
+	{ "tm_wday_t",	"Weekday name represented as a number [0-6], starting at Sunday.", CXH, (Cxtype_t*)"number", 0, tm_wday_external, tm_wday_internal, 0, 0, 0, 0, { "The format details string is a \bprintf\b(3) format string.", "%s", CX_UNSIGNED|CX_INTEGER, 1 } },
+	{ "tm_t",	"Time parts.", CXH, (Cxtype_t*)"number", tm_init, 0, 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4 }, 0, &tm_member	},
+	{ "elapsed_t",	"Elapsed time in milliseconds.", CXH, (Cxtype_t*)"number", 0, elapsed_external, elapsed_internal, 0, 0, 0, 0, { 0, 0, CX_INTEGER, 4 }	},
+	{ "ns_t",	"64 bit nanoseconds since the epoch.", CXH, (Cxtype_t*)"tm_t", ns_init, precise_external, precise_internal, 0, 0, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K.%9N", CX_UNSIGNED|CX_INTEGER, 8 } },
+	{ "stamp_t",	"64 bit 1/2**32 seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", stamp_init, precise_external, precise_internal, 0, 0, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K.%N", CX_UNSIGNED|CX_INTEGER, 8 } },
+	{ "time_t",	"32 bit seconds since the epoch.", CXH, (Cxtype_t*)"tm_t", 0, time_external, time_internal, 0, 0, 0, 0, { "The format details string is a \bstrftime\b(3)/\bstrptime\b(3) format string.", "%K", CX_UNSIGNED|CX_INTEGER, 4 } },
 	{ 0, 0 }
 };
 
@@ -578,7 +581,7 @@ Dsslib_t dss_lib_time_t =
 {
 	"time_t",
 	"time type support"
-	"[-?\n@(#)$Id: dss time type library (AT&T Research) 2009-01-30 $\n]"
+	"[-?\n@(#)$Id: dss time type library (AT&T Research) 2011-09-10 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	0,

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 2010-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -26,7 +26,6 @@
  */
 
 static const char usage[] =
-"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b xml method reads XML data in two formats: "
     "pure XML (\aname=value\a attributes within tags ignored) and JSON. In "
     "general XML data provides field names but not type information, so by "
@@ -1211,10 +1210,16 @@ xmlmeth(const char* name, const char* options, const char* schema, Dssdisc_t* di
 	sp = 0;
 	if (options)
 	{
-		sfprintf(meth->cx->buf, "%s%s", strchr(dss_lib_xml.description, '['), usage);
-		if (tagusage(tags, meth->cx->buf, &xml->dsstagdisc.tagdisc))
+		if (!(sp = sfstropen()))
 			goto drop;
-		sfprintf(meth->cx->buf, "}\n\n--method=%s[,option...]\n\n", meth->name);
+		sfprintf(sp, "%s", usage);
+		if (tagusage(tags, sp, &xml->dsstagdisc.tagdisc))
+			goto drop;
+		sfprintf(sp, "}\n");
+		if (dssoptlib(meth->cx->buf, &dss_lib_xml, sfstruse(sp), disc))
+			goto drop;
+		sfclose(sp);
+		sp = 0;
 		s = sfstruse(meth->cx->buf);
 		for (;;)
 		{

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -93,7 +93,7 @@ Sfdisc_t* disc;
 
 static Sfdisc_t	Disc, Disc2;
 
-MAIN()
+tmain()
 {
 	Sfio_t	*f, *f2;
 	char	buf[1024];
@@ -101,7 +101,7 @@ MAIN()
 	off_t	o;
 	int	i;
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")) )
 		terror("Can't open file");
 	sfset(f,SF_IOCHECK,1);
 
@@ -114,7 +114,7 @@ MAIN()
 		terror("Did not get push event");
 
 	/* this is to test sfraise(NULL,...) */
-	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
+	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")) )
 		terror("Can't open file");
 	sfdisc(f2,&Disc);
 
@@ -146,7 +146,7 @@ MAIN()
 	if(Type != SF_FINAL)
 		terror("Did not get final event");
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "r")) )
 		terror("Can't open file");
 	Disc2.readf = readfunc;
 	Disc2.exceptf = except3;
@@ -187,5 +187,5 @@ MAIN()
 	if((o = lseek(i, (off_t)0, SEEK_CUR)) != 4)
 		terror("Wrong seek location %lld", (Sfoff_t)o);
 
-	TSTEXIT(0);
+	texit(0);
 }

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -26,8 +26,6 @@
  */
 
 #include "dsslib.h"
-
-static regdisc_t	redisc;
 
 static int
 dss_method_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc)
@@ -364,60 +362,23 @@ map_part_edit_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc)
 	Dsstagdisc_t*	state = (Dsstagdisc_t*)disc;
 	Cxpart_t*	part = fp->prev->data;
 	Cxedit_t*	edit;
-	Cxedit_t*	x;
-	char*		s;
 
-	if (isalpha(*data))
-	{
-		if (!(x = cxedit(NiL, data, state->disc)))
-		{
-			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, 2, "%s: edit not defined", data);
-			return -1;
-		}
-		if (!(edit = newof(0, Cxedit_t, 1, 0)))
-		{
-			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
-			return -1;
-		}
-		edit->name = x->name;
-		edit->description = x->description;
-		edit->initf = x->initf;
-		edit->num2strf = x->num2strf;
-		edit->str2numf = x->str2numf;
-	}
-	else
-	{
-		if (!(edit = newof(0, Cxedit_t, 1, strlen(data) + 1)))
-		{
-			if (disc->errorf)
-				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
-			return -1;
-		}
-		redisc.re_version = REG_VERSION;
-		redisc.re_errorf = (regerror_t)disc->errorf;
-		edit->re.re_disc = &redisc;
-		s = (char*)data;
-		if (regcomp(&edit->re, s, REG_DELIMITED|REG_LENIENT|REG_NULL))
-			return -1;
-		s += edit->re.re_npat;
-		if (regsubcomp(&edit->re, s, NiL, 0, 0))
-			return -1;
-		s += edit->re.re_npat;
-		if (*s && disc->errorf)
-			(*disc->errorf)(NiL, disc, 1, "invalid character after substitution: %s", s);
-		strcpy((char*)(edit->substitute = (const char*)(edit + 1)), data);
-	}
+	if (!(edit = cxedit(NiL, data, state->disc)))
+		return -1;
 	if (fp->tag->name[0] == 'n' || fp->tag->name[0] == 'N')
 	{
 		edit->next = part->num2str;
 		part->num2str = edit;
 	}
-	else
+	else if (fp->tag->name[3] == 'n' || fp->tag->name[3] == 'N')
 	{
 		edit->next = part->str2num;
 		part->str2num = edit;
+	}
+	else
+	{
+		edit->next = part->edit;
+		part->edit = edit;
 	}
 	return 0;
 }
@@ -438,6 +399,9 @@ static Tags_t	tags_map_part[] =
 			0,0,map_part_edit_dat,0,
 	"STR2NUM",	"A number to string ed(1) style substitute expression"
 			" that converts a string value to a number.",
+			0,0,map_part_edit_dat,0,
+	"EDIT",		"A string to string ed(1) style substitute expression"
+			" that edits string values.",
 			0,0,map_part_edit_dat,0,
 	0
 };
@@ -686,21 +650,21 @@ static int
 constraint_match_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc)
 {
 	Cxconstraint_t*		con;
-
-	static regdisc_t	redisc;
+	regdisc_t*		redisc;
 
 	if (!(con = constraint_def(tag, fp, disc)))
 		return -1;
-	if (!(con->re = newof(0, regex_t, 1, strlen(data))))
+	if (!(con->re = newof(0, regex_t, 1, sizeof(regdisc_t) + strlen(data))))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return -1;
 	}
-	strcpy((char*)(con->pattern = (const char*)(con->re + 1)), data);
-	redisc.re_version = REG_VERSION;
-	redisc.re_errorf = (regerror_t)disc->errorf;
-	con->re->re_disc = &redisc;
+	redisc = (regdisc_t*)(con->re + 1);
+	strcpy((char*)(con->pattern = (const char*)(redisc + 1)), data);
+	redisc->re_version = REG_VERSION;
+	redisc->re_errorf = (regerror_t)disc->errorf;
+	con->re->re_disc = redisc;
 	return regcomp(con->re, data, REG_AUGMENTED|REG_DISCIPLINE) ? -1 : 0;
 }
 

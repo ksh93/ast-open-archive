@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -24,7 +24,7 @@
 ** at every time the allocation algorithm in Vmbest changes.
 */
 
-MAIN()
+tmain()
 {
 	Vmalloc_t	*vm;
 	Void_t		*dt[10];
@@ -64,10 +64,8 @@ MAIN()
 		terror("vmresize failed");
 	vmfree(vm,dt[1]);
 
-	for(i = 6; i < 10; ++i)
-		vmfree(vm, dt[i]);
 	if(vmresize(vm, dt[0], 120, 1) != dt[0])
 		terror("vmresize did not extend correctly3");
 
-	exit(0);
+	texit(0);
 }

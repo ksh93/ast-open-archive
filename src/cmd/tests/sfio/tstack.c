@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -77,16 +77,16 @@ Sfdisc_t*	disc;
 
 Sfdisc_t	Disc = { readf, writef, NIL(Sfseek_f), exceptf, 0 };
 
-MAIN()
+tmain()
 {
 	Sfio_t	*f1, *f2, *f3, *f;
 	char	*s, *s1, *s2, *s3, *s4, str[1024], *ss;
 	int	n;
 	int	fd[2];
 
-	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
+	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w+")) )
 		terror("Opening file1");
-	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
+	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w+")) )
 		terror("Opening file2");
 	Fclose = f2;
 	sfdisc(f1,&Disc);
@@ -99,7 +99,7 @@ MAIN()
 	Fclose = f1;
 	if(sfclose(f1) < 0)
 		terror("Can't close f1");
-	tstcleanup();
+	tcleanup();
 
 	s1 = "1234567890";
 	s2 = "abcdefghijklmnopqrstuvwxyz";
@@ -116,7 +116,7 @@ MAIN()
 	if(sffileno(sfstdin) != 0)
 		terror("Bad fd for stdin");
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w+")) )
 		terror("Opening file");
 	if(sfwrite(f,"0123456789",10) != 10)
 		terror("Write file");
@@ -131,7 +131,7 @@ MAIN()
 	   !sfeof(sfstdin) || sferror(sfstdout))
 		terror("Bad sfmove");
 
-	tstcleanup();
+	tcleanup();
 
 	if(!(f = sftmp(0)))
 		terror("Opening temp file");
@@ -214,5 +214,5 @@ MAIN()
 	if(strcmp(s, "1234abcd") != 0)
 		terror("sfgetr got wrong data");
 
-	TSTEXIT(0);
+	texit(0);
 }

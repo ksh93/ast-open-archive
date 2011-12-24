@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -134,8 +134,8 @@ USAGE_LICENSE
     "the input. The current implementation still uses one process for the "
     "final merge phase; improvements are planned.]#[processes]"
 "[m:merge?Merge; the input files are already sorted.]"
-"[u:unique?Unique. Keep only the first of two lines that compare equal "
-    "on all keys. Implies \b-s\b.]"
+"[u:unique?Unique. Keep only the first of multiple records that compare "
+    "equal on all keys. Implies \b-s\b.]"
 "[s:stable?Stable sort. When all keys compare equal, preserve input "
     "order. The default is \b--nostable\b (\aunstable\a sort): when all "
     "keys compare equal, break the tie by using the entire record, ignoring "
@@ -815,12 +815,12 @@ parse(register Sort_t* sp, char** argv)
  * dump keys to stderr
  */
 
-static int
-dumpkey(Rs_t* rs, unsigned char* dat, int datlen, unsigned char* key, int keylen, Rsdisc_t* disc)
+static ssize_t
+dumpkey(Rs_t* rs, unsigned char* dat, size_t datlen, unsigned char* key, size_t keylen, Rsdisc_t* disc)
 {
 	Sort_t*	sp = (Sort_t*)RSKEYDISC(disc);
+	ssize_t	n;
 	int	i;
-	int	n;
 	char	buf[2];
 
 	if ((n = (*sp->defkeyf)(rs, dat, datlen, key, keylen, disc)) > 0)
@@ -862,7 +862,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	dp->version = RSKEY_VERSION;
 	dp->flags = 0;
 	dp->errorf = errorf;
-	if (!(sp->key = key = rskeyopen(dp)) || !(sp->rec = rsnew(key->disc)))
+	if (!(sp->key = key = rskeyopen(dp, NiL)) || !(sp->rec = rsnew(key->disc)))
 		return -1;
 	z = key->insize = 2 * INMAX;
 #if 0
@@ -1158,7 +1158,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	 * finally ready for recsort now
 	 */
 
-	if (rsinit(sp->rec, key->meth, key->procsize, key->type))
+	if (rsinit(sp->rec, key->meth, key->procsize, key->type, key))
 	{
 		error(ERROR_SYSTEM|2, "sort library initialization error");
 		rskeyclose(key);

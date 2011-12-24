@@ -1,10 +1,10 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGEROOT ../../../../..
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -109,6 +109,10 @@ make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+make ${PACKAGE_ast_INCLUDE}/aso.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
@@ -191,7 +195,7 @@ done make.h
 done archive.c
 meta archive.o %.c>%.o archive.c archive
 prev archive.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c archive.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c archive.c
 done archive.o generated
 make bind.o
 make bind.c
@@ -201,7 +205,7 @@ prev make.h implicit
 done bind.c
 meta bind.o %.c>%.o bind.c bind
 prev bind.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c bind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c bind.c
 done bind.o generated
 make command.o
 make command.c
@@ -211,7 +215,7 @@ prev make.h implicit
 done command.c
 meta command.o %.c>%.o command.c command
 prev command.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c command.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c command.c
 done command.o generated
 make dump.o
 make dump.c
@@ -219,7 +223,7 @@ prev make.h implicit
 done dump.c
 meta dump.o %.c>%.o dump.c dump
 prev dump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dump.c
 done dump.o generated
 make expand.o
 make expand.c
@@ -235,7 +239,7 @@ prev make.h implicit
 done expand.c
 meta expand.o %.c>%.o expand.c expand
 prev expand.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expand.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expand.c
 done expand.o generated
 make main.o
 make main.c
@@ -256,7 +260,7 @@ prev make.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
 done main.o generated
 make make.o
 make make.c
@@ -264,7 +268,7 @@ prev make.h implicit
 done make.c
 meta make.o %.c>%.o make.c make
 prev make.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c make.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c make.c
 done make.o generated
 make mam.o
 make mam.c
@@ -272,7 +276,7 @@ prev make.h implicit
 done mam.c
 meta mam.o %.c>%.o mam.c mam
 prev mam.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c mam.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c mam.c
 done mam.o generated
 make metarule.o
 make metarule.c
@@ -280,7 +284,7 @@ prev make.h implicit
 done metarule.c
 meta metarule.o %.c>%.o metarule.c metarule
 prev metarule.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c metarule.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c metarule.c
 done metarule.o generated
 make misc.o
 make misc.c
@@ -288,7 +292,7 @@ prev make.h implicit
 done misc.c
 meta misc.o %.c>%.o misc.c misc
 prev misc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c misc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c misc.c
 done misc.o generated
 make object.o
 make object.c
@@ -303,7 +307,7 @@ prev make.h implicit
 done object.c
 meta object.o %.c>%.o object.c object
 prev object.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c object.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c object.c
 done object.o generated
 make option.o
 make option.c
@@ -312,7 +316,7 @@ prev make.h implicit
 done option.c
 meta option.o %.c>%.o option.c option
 prev option.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2011 AT&T Intellectual Property][-license?http://www.opensource.org/licenses/cpl1.0.txt]"\" -D_PACKAGE_ast -c option.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2011 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
 make parse.o
 make parse.c
@@ -322,7 +326,7 @@ prev make.h implicit
 done parse.c
 meta parse.o %.c>%.o parse.c parse
 prev parse.c
-exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c parse.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?}  ${BINDINDEX+-DBINDINDEX=${BINDINDEX}} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c parse.c
 done parse.o generated
 make read.o
 make read.c
@@ -330,7 +334,7 @@ prev make.h implicit
 done read.c
 meta read.o %.c>%.o read.c read
 prev read.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c read.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c read.c
 done read.o generated
 make rule.o
 make rule.c
@@ -339,7 +343,7 @@ prev make.h implicit
 done rule.c
 meta rule.o %.c>%.o rule.c rule
 prev rule.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c rule.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c rule.c
 done rule.o generated
 make scan.o
 make scan.c
@@ -348,7 +352,7 @@ prev make.h implicit
 done scan.c
 meta scan.o %.c>%.o scan.c scan
 prev scan.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c scan.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c scan.c
 done scan.o generated
 make state.o
 make state.c
@@ -357,7 +361,7 @@ prev make.h implicit
 done state.c
 meta state.o %.c>%.o state.c state
 prev state.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c state.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c state.c
 done state.o generated
 make trap.o
 make trap.c
@@ -366,7 +370,7 @@ prev make.h implicit
 done trap.c
 meta trap.o %.c>%.o trap.c trap
 prev trap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c trap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c trap.c
 done trap.o generated
 make variable.o
 make variable.c
@@ -375,14 +379,14 @@ prev make.h implicit
 done variable.c
 meta variable.o %.c>%.o variable.c variable
 prev variable.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D__OBSOLETE__=20100101 -D_PACKAGE_ast -c variable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D__OBSOLETE__=20110101 -D_PACKAGE_ast -c variable.c
 done variable.o generated
 make version.o
 make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.6 2011-02-02 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.6 2011-12-13 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -452,7 +456,7 @@ make nmake.1.body
 done nmake.1.body
 make nmake.1.tail
 done nmake.1.tail
-exec - nmake --nroff 2>&1 | sed -e '/itself/r nmake.1.body ' -e '/fBsh/r nmake.1.tail ' > nmake.1
+exec - nmake --nroff 2>&1 | sed -e '/itself/r nmake.1.body' -e '/fBsh/r nmake.1.tail' > nmake.1
 done nmake.1 generated
 exec - test '' = 'nmake.1' || ${STDCMP} 2>/dev/null -s nmake.1 ${INSTALLROOT}/man/man1/nmake.1 || { ${STDMV} ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; ${STDCP} nmake.1 ${INSTALLROOT}/man/man1/nmake.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/nmake.1 generated
@@ -563,6 +567,11 @@ make debug.mk
 done debug.mk
 exec - test '' = 'debug.mk' || ${STDCMP} 2>/dev/null -s debug.mk ${INSTALLROOT}/lib/make/debug.mk || { ${STDMV} ${INSTALLROOT}/lib/make/debug.mk ${INSTALLROOT}/lib/make/debug.mk.old 2>/dev/null || true; ${STDCP} debug.mk ${INSTALLROOT}/lib/make/debug.mk  		    		    ;}
 done ${INSTALLROOT}/lib/make/debug.mk generated
+make ${INSTALLROOT}/lib/make/debug-package.mk
+make debug-package.mk
+done debug-package.mk
+exec - test '' = 'debug-package.mk' || ${STDCMP} 2>/dev/null -s debug-package.mk ${INSTALLROOT}/lib/make/debug-package.mk || { ${STDMV} ${INSTALLROOT}/lib/make/debug-package.mk ${INSTALLROOT}/lib/make/debug-package.mk.old 2>/dev/null || true; ${STDCP} debug-package.mk ${INSTALLROOT}/lib/make/debug-package.mk  		    		    ;}
+done ${INSTALLROOT}/lib/make/debug-package.mk generated
 make ${INSTALLROOT}/lib/make/mkservice.mk
 make mkservice.mk
 done mkservice.mk

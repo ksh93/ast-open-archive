@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0s5P?\n@(#)$Id: sum (AT&T Research) 2010-05-27 $\n]"
+"[-1lp0s5P?\n@(#)$Id: sum (AT&T Research) 2011-08-23 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?sum - sort uniq summary discipline]"
 "[+DESCRIPTION?The \bsum\b \bsort\b(1) discipline applies "
@@ -128,6 +128,7 @@ typedef struct State_s
 	Sflong_t	records;
 	Recfmt_t	fmt;
 	unsigned char*	tab;
+	unsigned char	delim[256];
 	int		alt;
 	int		regress;
 	Buffer_t	tmp;
@@ -160,6 +161,7 @@ record(register State_t* state, register Rsobj_t* r, int op)
 	register unsigned char*		e;
 	register unsigned char*		a;
 	register unsigned char*		z;
+	register unsigned char*		del;
 	register const unsigned char*	map;
 	unsigned char*			x;
 	unsigned char*			tab;
@@ -183,15 +185,17 @@ record(register State_t* state, register Rsobj_t* r, int op)
 	t = *tab++;
 	if (!*tab)
 		tab = 0;
+	del = state->delim;
 	for (sum = state->sum; sum; sum = sum->next)
 	{
 		while (beg < sum->beg.field)
 		{
 		tab1:
 			while (s < e)
-				if (*s++ == t)
+				if (del[*s++])
 				{
 					if (tab)
+					{
 						for (c = 0; (s + c) < e; c++)
 							if (!tab[c])
 							{
@@ -200,6 +204,10 @@ record(register State_t* state, register Rsobj_t* r, int op)
 							}
 							else if (tab[c] != s[c])
 								goto tab1;
+					}
+					else if (t == ' ')
+						while (s < e && del[*s])
+							s++;
 					break;
 				}
 			end = ++beg;
@@ -211,9 +219,10 @@ record(register State_t* state, register Rsobj_t* r, int op)
 			{
 			tab2:
 				while (s < e)
-					if (*s++ == t)
+					if (del[*s++])
 					{
 						if (tab)
+						{
 							for (c = 0; (s + c) < e; c++)
 								if (!tab[c])
 								{
@@ -222,6 +231,10 @@ record(register State_t* state, register Rsobj_t* r, int op)
 								}
 								else if (tab[c] != s[c])
 									goto tab2;
+						}
+						else if (t == ' ')
+							while (s < e && del[*s])
+								s++;
 						break;
 					}
 				end++;
@@ -230,14 +243,19 @@ record(register State_t* state, register Rsobj_t* r, int op)
 			{
 			tab3:
 				while (s < e)
-					if (*s++ == t)
+					if (del[*s++])
 					{
 						if (tab)
+						{
 							for (c = 0; (s + c) < e; c++)
 								if (!tab[c])
 									break;
 								else if (tab[c] != s[c])
 									goto tab3;
+						}
+						else if (t == ' ')
+							while (s < e && del[*s])
+								s++;
 						s--;
 						break;
 					}
@@ -353,7 +371,7 @@ record(register State_t* state, register Rsobj_t* r, int op)
 						while (n++ < w)
 							*a++ = c;
 					}
-					for (s = state->tmp.buf; a < z; *a++ = map[*s++]);
+					for (x = state->tmp.buf; a < z; *a++ = map[*x++]);
 				}
 				else
 				{
@@ -363,7 +381,7 @@ record(register State_t* state, register Rsobj_t* r, int op)
 						while (n++ < w)
 							*a++ = c;
 					}
-					for (s = state->tmp.buf; a < z; *a++ = *s++);
+					for (x = state->tmp.buf; a < z; *a++ = *x++);
 				}
 			}
 		}
@@ -673,7 +691,15 @@ rs_disc(Rskey_t* key, const char* options)
 	key->type &= ~RS_DATA;
 	key->type |= RS_UNIQ;
 	state->fmt = key->disc->data;
-	state->tab = key->tab;
+	if (!*key->tab || *key->tab == ' ')
+	{
+		state->tab = (unsigned char*)" ";
+		for (n = 0; n < elementsof(state->delim); n++)
+			if (isspace(n))
+				state->delim[n] = 1;
+	}
+	else
+		state->delim[*(state->tab = key->tab)] = 1;
 	state->disc.eventf = summary;
 	state->disc.events = RS_SUMMARY|RS_POP;
 	for (sum = state->sum; sum; sum = sum->next)

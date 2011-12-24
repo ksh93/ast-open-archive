@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -34,7 +34,7 @@
 #include <vmalloc.h>
 
 #define CX_ID		"cx"
-#define CX_VERSION	20041011L
+#define CX_VERSION	20110811L
 
 /* Cx_t.flags */
 
@@ -68,6 +68,7 @@
 #define CX_pointer	3
 #define CX_reference	4
 #define CX_buffer	5		/* allocated separately		*/
+#define CX_type		6
 
 /* Cxformat_t.flags */
 
@@ -161,7 +162,7 @@
 #define CX_RECODE_INIT(op,type1,type2,recode,description) \
 	{0,description,CX_HEADER_INIT,op,(Cxtype_t*)type1,(Cxtype_t*)type2,recode},
 #define CX_TYPE_INIT(name,base,external,internal,match,description) \
-	{name,description,CX_HEADER_INIT,(Cxtype_t*)base,0,external,internal,0,0,CX_HEADER_INIT,match},
+	{name,description,CX_HEADER_INIT,(Cxtype_t*)base,0,external,internal,0,0,0,0,CX_HEADER_INIT,match},
 #define CX_VARIABLE_INIT(name,type,index,description) \
 	{name,description,CX_HEADER_INIT,0,(Cxtype_t*)type,0,index},
 
@@ -266,7 +267,8 @@ typedef struct Cxcodeheader_s		/* code key dict element header	*/
 typedef struct Cxbuffer_s		/* buffer type			*/
 {
 	void*		data;		/* data pointer			*/
-	size_t		size;		/* data size			*/
+	uint32_t	size;		/* data size			*/
+	uint32_t	elements;	/* sizeof() elements		*/
 } Cxbuffer_t;
 
 typedef struct Cxstring_s		/* string type			*/
@@ -281,6 +283,7 @@ typedef union Cxvalue_u			/* fundamental types		*/
 	Cxnumber_t	number;		/* long/double number		*/
 	void*		pointer;	/* generic pointer		*/
 	Cxstring_t	string;		/* 0-terminated string		*/
+	Cxtype_t*	type;		/* type				*/
 	Cxvariable_t*	variable;	/* variable reference		*/
 } Cxvalue_t;
 
@@ -334,7 +337,6 @@ struct Cxedit_s				/* edit list element		*/
 	Cxinit_f	initf;		/* called at cxaddedit()	*/
 	Cxnum2str_f	num2strf;	/* num=>str function		*/
 	Cxstr2num_f	str2numf;	/* str=>num function		*/
-	const char*	substitute;	/* substitute expression	*/
 	void*		data;		/* private data			*/
 #ifdef _CX_EDIT_PRIVATE_
 	_CX_EDIT_PRIVATE_
@@ -349,8 +351,9 @@ struct Cxpart_s				/* map part			*/
 	Cxitem_t*	item;		/* item list			*/
 	Cxflags_t	flags;		/* flags			*/
 	Cxtype_t*	type;		/* item value type		*/
-	Cxedit_t*	str2num;	/* str=>num edit list		*/
 	Cxedit_t*	num2str;	/* num=>str edit list		*/
+	Cxedit_t*	str2num;	/* str=>num edit list		*/
+	Cxedit_t*	edit;		/* str=>str edit list		*/
 };
 
 struct Cxmap_s				/* str<=>num map		*/
@@ -462,6 +465,8 @@ struct Cxtype_s				/* type info			*/
 	Cxinternal_f	internalf;	/* external => internal		*/
 	unsigned short	representation;	/* fundamental type index	*/
 	unsigned short	index;		/* caller defined index		*/
+	unsigned short	size;		/* sizeof() size in bytes	*/
+	unsigned short	element;	/* element size in bytes	*/
 	Cxformat_t	format;		/* format defaults		*/
 	Cxmatch_t*	match;		/* match info			*/
 	Cxmember_t*	member;		/* member info			*/
@@ -569,10 +574,12 @@ struct Cxstate_s			/* cx library global state	*/
 	Dt_t*		queries;	/* Cxquery_t dictionary		*/
 	Dt_t*		constraints;	/* Cxconstraint_t dictionary	*/
 	Dt_t*		edits;		/* Cxedit_t dictionary		*/
+	Dt_t*		variables;	/* Cxvariable_t dictionary	*/
 	Cxtype_t*	type_buffer;	/* buffer fundamental type	*/
 	Cxtype_t*	type_number;	/* number fundamental type	*/
-	Cxtype_t*	type_string;	/* string fundamental type	*/
 	Cxtype_t*	type_reference;	/* reference fundamental type	*/
+	Cxtype_t*	type_string;	/* string fundamental type	*/
+	Cxtype_t*	type_type_t;	/* type				*/
 	Cxtype_t*	type_void;	/* void fundamental type	*/
 #ifdef _CX_STATE_PRIVATE_
 	_CX_STATE_PRIVATE_
@@ -604,7 +611,7 @@ struct Cx_s				/* interface handle		*/
 	Dt_t*		constraints;	/* Cxconstraint_t dictionary	*/
 	Dt_t*		edits;		/* Cxedit_t dictionary		*/
 	Cx_t*		scope;		/* next scope			*/
-	unsigned char	ctype[UCHAR_MAX+1];	/* ctype table		*/
+	unsigned char*	ctype;		/* ctype table			*/
 #ifdef _CX_PRIVATE_
 	_CX_PRIVATE_
 #endif
@@ -632,6 +639,7 @@ extern int		cxend(Cx_t*, Cxexpr_t*);
 extern int		cxlist(Cx_t*, Cxexpr_t*, Sfio_t*);
 extern int		cxfree(Cx_t*, Cxexpr_t*);
 extern int		cxcast(Cx_t*, Cxoperand_t*, Cxvariable_t*, Cxtype_t*, void*, const char*);
+extern size_t		cxsizeof(Cx_t*, Cxvariable_t*, Cxtype_t*, Cxvalue_t*);
 
 extern char*		cxcontext(Cx_t*);
 extern char*		cxlocation(Cx_t*, void*);
@@ -660,8 +668,13 @@ extern Cxrecode_f	cxrecode(Cx_t*, int, Cxtype_t*, Cxtype_t*, Cxdisc_t*);
 extern Cxtype_t*	cxtype(Cx_t*, const char*, Cxdisc_t*);
 extern Cxvariable_t*	cxvariable(Cx_t*, const char*, Cxtype_t*, Cxdisc_t*);
 
-extern int		cxstr2num(Cx_t*, Cxformat_t*, const char*, size_t, Cxunsigned_t*);
 extern int 		cxnum2str(Cx_t*, Cxformat_t*, Cxunsigned_t, char**);
+extern int		cxstr2num(Cx_t*, Cxformat_t*, const char*, size_t, Cxunsigned_t*);
+
+extern int		cxsub(Cx_t*, Cxedit_t*, Cxoperand_t*);
+extern int		cxsuball(Cx_t*, Cxpart_t*, Cxoperand_t*);
+
+extern char*		cxcvt(Cx_t*, const char*, size_t);
 
 extern int		cxatfree(Cx_t*, Cxexpr_t*, Cxdone_f, void*);
 

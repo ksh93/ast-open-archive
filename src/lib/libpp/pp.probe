@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2009-02-02
+# @(#)pp.probe (AT&T Research) 2011-11-11
 #
 # C probe for libpp
 #
@@ -725,6 +725,17 @@ $i"
 				*)	break ;;
 				esac
 			done
+			case $m in
+			__*_BIT__|__*_DIG__|__*_MIN__|__*_MAX__|__*_TYPE__|*_FLT_*|*_DBL_*|*_LDBL_*)
+				case $nopredef in
+				0)	nopredef=1
+					continue
+					;;
+				1)	continue
+					;;
+				esac
+				;;
+			esac
 			case $nopredef in
 			2)	;;
 			*)	case $v in

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -270,8 +270,10 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 		v.integer = ftw->level;
 		break;
 	case F_local:
-		if (state.localmem) error(3, "%s: reference invalid when members declared", sym->name);
-		else v.integer = ftw->local.number;
+		if (state.localmem)
+			error(3, "%s: reference invalid when members declared", sym->name);
+		else
+			v.integer = ftw->local.number;
 		break;
 	case F_magic:
 		fp = sfopen(NiL, PATH(ftw), "r");
@@ -347,7 +349,7 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 		v.integer = !isdigit(*fmtuid(st->st_uid));
 		break;
 	case F_url:
-		v.string = fmturl(ftw->path);
+		v.string = fmturl(ftw->path ? ftw->path : ftw->name);
 		goto string;
 	case F_view:
 		v.integer = iview(st);

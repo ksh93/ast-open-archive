@@ -1,3 +1,7 @@
+11-10-06 testiv.c: add { -ip4 -ip6 } options
+11-10-06 ivstr.c,ivfmt.c: add for iv addr size 1..255
+11-10-06 iv-nested.c: fix bug that called nested freef on internal flat intervals
+11-08-11 bgp.h: add mcast vpn definitions
 11-03-02 bgp.h: add packet time usec part
 11-01-21 testiv.c: change to store hop prefix&name in segment data
 10-02-02 bgp.h: add rfc3107 BGP_labels

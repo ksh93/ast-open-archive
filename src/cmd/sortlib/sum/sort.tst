@@ -68,6 +68,43 @@ gsf,G,480
 jrr,C,300
 pdragosh,B,96'
 
+	EXEC -t' ' -k 1,2 -lsum,op=sum:3
+		INPUT - $'car    C    100
+jrr    C    100
+gsf    G    1
+pdragosh    B    1
+car    C    200
+jrr    C    200
+gsf    G    23
+pdragosh    B    95
+gsf    G    456'
+		OUTPUT - $'car    C    300
+gsf    G    480
+jrr    C    300
+pdragosh    B    96'
+
+	EXEC -k1,1 -lsum,op=max:2,op=sum:9
+		INPUT - $'message      1  record      1  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 43  offset 0
+message      2  record      2  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 57  offset 55
+message      3  record      3  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 124
+message      4  record      4  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 186
+message      5  record      5  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 248
+message      6  record      6  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 310
+message      7  record      7  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 372
+message      8  record      8  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 434
+message      9  record      9  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 496
+message     10  record     10  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 558
+message     11  record     11  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 620
+message     12  record     12  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 682
+message     13  record     13  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 744
+message     14  record     14  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 43  offset 806
+message     15  record     15  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 861
+message     16  record     16  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 57  offset 923
+message     17  record     17  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 992
+message     18  record     18  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 50  offset 1054
+message     19  record     19  time 1314100800  TABLE_DUMP.IPV6_UNICAST size 80  offset 1116'
+		OUTPUT - $'message      19 record      1  time 1314100800  TABLE_DUMP.IPV4_UNICAST size 980 offset 0'
+
 TEST 05 'different types'
 
 	EXEC -t'|' -k 4,4 -lsum,op=sum:integer:7 $data/nyse.dat

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -148,6 +148,8 @@ static Option_t		options[] =	/* option table			*/
 		"[+----?0 or more comma separated subtypes ----]"
 		"[+port?used by the base rules to generate portable"
 		" makefiles; some paths are parameterized; on by default]"
+		"[+----?mam options ----]"
+		"[+[no]]hold?\bhold\b \amam\a output until nested \bnohold\b]"
 	"}" },
 { "never",	OPT_never,	(char*)&state.never,		0,
 	"Don't execute any shell actions. \b--noexec\b executes \b.ALWAYS\b"
@@ -772,7 +774,7 @@ setop(register Option_t* op, register int n, char* s, int type)
 				sfprintf(internal.tmp, "='%s'", s);
 			else
 				sfprintf(internal.tmp, "=\"%s\"", s);
-			n = sfstrtell(internal.tmp);
+			n = sfstrtell(internal.tmp) + 1;
 			s = sfstruse(internal.tmp);
 			x = newof(0, Oplist_t, 1, n);
 			x->option = strcpy((char*)(x + 1), s);
@@ -885,6 +887,19 @@ setop(register Option_t* op, register int n, char* s, int type)
 		state.jobs = n;
 		return;
 	case OPT(OPT_mam):
+		if (t = s)
+		{
+			if (t[0] == 'n' && t[1] == 'o')
+				t += 2;
+			if (streq(t, "hold"))
+			{
+				if (t == s)
+					state.mam.hold++;
+				else
+					state.mam.hold--;
+				return;
+			}
+		}
 		if (state.mam.label != null)
 		{
 			if (state.mam.label)

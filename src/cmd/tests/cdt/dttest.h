@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -21,29 +21,29 @@
 #include	"terror.h"
 
 #if __STD_C
-static compare(Dt_t* dt, Void_t* o1, Void_t* o2, Dtdisc_t* disc)
+static int compare(Dt_t* dt, Void_t* o1, Void_t* o2, Dtdisc_t* disc)
 #else
-static compare(dt,o1,o2,disc)
+static int compare(dt,o1,o2,disc)
 Dt_t*		dt;
 Void_t*		o1;
 Void_t*		o2;
 Dtdisc_t*	disc;
 #endif
 {
-	return (int)o1 - (int)o2;
+	return (int)((char*)o1 - (char*)o2);
 }
 
 #if __STD_C
-static rcompare(Dt_t* dt, Void_t* o1, Void_t* o2, Dtdisc_t* disc)
+static int rcompare(Dt_t* dt, Void_t* o1, Void_t* o2, Dtdisc_t* disc)
 #else
-static rcompare(dt,o1,o2,disc)
+static int rcompare(dt,o1,o2,disc)
 Dt_t*		dt;
 Void_t*		o1;
 Void_t*		o2;
 Dtdisc_t*	disc;
 #endif
 {
-	return (int)o2 - (int)o1;
+	return (int)((char*)o2 - (char*)o1);
 }
 
 #if __STD_C
@@ -67,5 +67,5 @@ Void_t*		o;
 Dtdisc_t*	disc;
 #endif
 {
-	return (unsigned int)o;
+	return (unsigned int)((char*)o - (char*)0);
 }

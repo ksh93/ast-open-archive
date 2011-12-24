@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -31,7 +31,7 @@
 #include <error.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss (AT&T Research) 2011-06-15 $\n]"
+"[-?\n@(#)$Id: dss (AT&T Research) 2011-09-11 $\n]"
 USAGE_LICENSE
 "[+NAME?dss - scan a data stream and apply a select expression to each "
     "record]"
@@ -79,7 +79,7 @@ USAGE_LICENSE
 "[l:library?Load the dynamic library \aname\a. \bdss\b libraries may "
     "define methods, types, maps, queries or functions.]:[name]"
 "[m:map?Numeric field value map XML file. \b--method=dss,man\b describes "
-    "the \b<MAP>\b tag.]"
+    "the \b<MAP>\b tag.]:[file]"
 "[P:plugins?List plugin information for each \afile\a operand in "
     "--\astyle\a on the standard error. The \aexpression\a operand is not "
     "specified in this case. If no \afile\a operands are specified then the "
@@ -102,6 +102,12 @@ USAGE_LICENSE
     "\b$PATH\b, are:]:[method[,option[=value]]...]][::schema]]]"
     "{\fmethods\f} [T:test?Enable test code defined by \amask\a. Test code "
     "is implementation specific.]#[mask]"
+    "{"
+        "[0x00f0?method specific tests]"
+        "[0x0f00?cx library specific tests]"
+        "[0x0100?enable cxeval() code trace]"
+        "[0xf000?dss library specific tests]"
+    "}"
 "[c:count?Write the \amatched/total\a records on the standard output. "
     "Deprecated: compose the expression with |{\bcount\b} instead.]"
 "[f:format?Set the output method format. Deprecated: compose the "
@@ -168,7 +174,7 @@ showplugin(register Dsslib_t* lib, const char* style, Sfio_t* sp, int* sep, Dssd
 			sfputc(sfstderr, '\n');
 		else
 			*sep = 1;
-		dssoptlib(sp, lib, disc);
+		dssoptlib(sp, lib, NiL, disc);
 		error(ERROR_USAGE, "%s", opthelp(sfstruse(sp), style));
 	}
 }

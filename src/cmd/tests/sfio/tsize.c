@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,14 +19,14 @@
 ***********************************************************************/
 #include	"sftest.h"
 
-MAIN()
+tmain()
 {
 	Sfio_t	*f, *f2;
 	char*	s;
 	int	i, n;
 	char	buf[16*1024];
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+") ) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w+") ) )
 		terror("Can't open file");
 
 	if(sfnputc(f,'a',1000) != 1000)
@@ -95,13 +95,13 @@ MAIN()
 	if(sfsize(f) != 10)
 		terror("String size is wrong9");
 
-	if(!(f = sfopen(f, tstfile(0),"w") ) )
+	if(!(f = sfopen(f, tstfile("sf", 0),"w") ) )
 		terror("Reopening file1");
 	for(i = 0; i < 10000; ++i)
 		if(sfputc(f,'0'+(i%10)) != '0'+(i%10) )
 			terror("sfputc failed");
 
-	if(!(f = sfopen(f, tstfile(0),"r+") ) )
+	if(!(f = sfopen(f, tstfile("sf", 0),"r+") ) )
 		terror("Reopening file2");
 	if(sfsize(f) != 10000)
 		terror("Bad size of file1");
@@ -148,5 +148,5 @@ MAIN()
 	if(strcmp(buf, "012345678") != 0)
 		terror("Get wrong data");
 
-	TSTEXIT(0);
+	texit(0);
 }

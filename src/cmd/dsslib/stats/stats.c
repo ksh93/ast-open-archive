@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -31,7 +31,9 @@ static const char stats_usage[] =
 "[a:average?List the average.]"
 "[c:count?List the record count.]"
 "[d:deviation?List the unbiased standard deviation.]"
-"[g:group?Group by values in \afield\a.]:[field]"
+"[g:group?Group by values in \afield\a. More than one \b--group\b may be "
+    "specified; grouping is done by the tuple of all \afield\a "
+    "values.]:[field]"
 "[l:label?Label the output with \alabel\a.]:[label]"
 "[m:maxgroups?Maximum number of groupings. Values beyond \amax\a are"
 "	listed as \bOVERFLOW\b.]#[max:=100]"
@@ -53,9 +55,10 @@ static const char stats_usage[] =
 #define STATS_COUNT	0x0002
 #define STATS_DEVIATION	0x0004
 #define STATS_FIELD	0x0008
-#define STATS_MAX	0x0010
-#define STATS_MIN	0x0020
-#define STATS_SUM	0x0040
+#define STATS_GROUP	0x0010
+#define STATS_MAX	0x0020
+#define STATS_MIN	0x0040
+#define STATS_SUM	0x0080
 
 #define STATS_RANGE	(STATS_MAX|STATS_MIN)
 
@@ -78,7 +81,7 @@ struct Total_s
 struct Bucket_s
 {
 	Dtlink_t	link;
-	Cxvalue_t*	key;
+	Cxoperand_t*	key;
 	Total_t		total[1];
 };
 
@@ -100,8 +103,9 @@ struct Print_s
 {
 	Field_t*	field;
 	Group_t*	group;
+	const char*	label;
 	Total_t*	total;
-	Cxvalue_t*	key;
+	Cxoperand_t*	key;
 };
 
 struct State_s
@@ -112,11 +116,12 @@ struct State_s
 	Cx_t*		print;
 	Group_t*	group;
 	char*		label;
-	Cxvalue_t*	key;
+	Cxoperand_t*	key;
 	Dt_t*		buckets;
 	Total_t*	total;
 	Vmalloc_t*	vm;
 	int		fields;
+	int		fw;
 	int		groups;
 	int		maxgroups;
 	int		op;
@@ -128,6 +133,7 @@ CXV("AVERAGE",  "number", STATS_AVERAGE,   "Average value.")
 CXV("COUNT",    "number", STATS_COUNT,     "Number of values.")
 CXV("DEVIATION","number", STATS_DEVIATION, "Unbiased standard deviation.")
 CXV("FIELD",    "string", STATS_FIELD,     "Field name.")
+CXV("GROUP",    "string", STATS_GROUP,     "Group (key) values.")
 CXV("MAX",      "number", STATS_MAX,       "Maximum value.")
 CXV("MIN",      "number", STATS_MIN,       "Minimum value.")
 CXV("SUM",      "number", STATS_SUM,       "Sum of values.")
@@ -141,9 +147,26 @@ getop(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t
 	register State_t*	state = (State_t*)((Dssrecord_t*)data)->data;
 	Cxvariable_t*		variable = pc->data.variable;
 	Group_t*		group;
+	char*			s;
+	char*			v;
 
 	if (variable->data == (void*)&variables[0])
+	{
 		state->op |= variable->index;
+		if (variable->format.delimiter <= 0)
+			variable->format.delimiter = ':';
+		if (a && (s = a->value.string.data))
+			do
+			{
+				while (*s == ':')
+					s++;
+				for (v = s; *s && *s != ':'; s++);
+				if (strneq(v, "delimiter=", 10))
+					variable->format.delimiter = v[10];
+				else if (strneq(v, "nodelimiter", 11))
+					variable->format.delimiter = 0;
+			} while (*s);
+	}
 	else
 	{
 		group = state->group;
@@ -170,9 +193,12 @@ getvalue(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperan
 {
 	register Print_t*	print = (Print_t*)((Dssrecord_t*)data)->data;
 	Cxvariable_t*		variable = pc->data.variable;
+	char*			s;
 	Group_t*		group;
-	Cxvalue_t*		key;
+	Cxoperand_t*		key;
+	Cxoperand_t		arg;
 	Cxnumber_t		u;
+	int			sep;
 
 	if (variable->data == (void*)&variables[0])
 		switch (variable->index)
@@ -201,6 +227,31 @@ getvalue(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperan
 				r->value.string.data = "-";
 			r->value.string.size = strlen(r->value.string.data);
 			break;
+		case STATS_GROUP:
+			sfstrseek(cx->buf, SEEK_SET, 0);
+			if (key = print->key)
+				for (sep = 0, group = print->group; group; group = group->next, key++)
+				{
+					if (sep)
+						sfputc(cx->buf, sep);
+					else
+						sep = variable->format.delimiter;
+					if (group->string)
+						s = key->value.string.data;
+					else
+					{
+						arg = *key;
+						if (cxcast(cx, &arg, 0, cx->state->type_string, NiL, group->variable->format.details))
+							return -1;
+						s = arg.value.string.data;
+					}
+					sfprintf(cx->buf, "%s", s);
+				}
+			else if (print->label)
+				sfprintf(cx->buf, "%s", print->label);
+			r->value.string.size = sfstrtell(cx->buf);
+			r->value.string.data = sfstruse(cx->buf);
+			break;
 		case STATS_MAX:
 			r->value.number = print->total->max;
 			break;
@@ -213,8 +264,8 @@ getvalue(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperan
 		}
 	else if (key = print->key)
 	{
-		for (group = print->group, key = print->key; group->variable != variable; group = group->next, key++);
-		r->value = *key;
+		for (group = print->group; group->variable != variable; group = group->next, key++);
+		r->value = key->value;
 	}
 	else
 		memset(&r->value, 0, sizeof(r->value));
@@ -225,8 +276,8 @@ static int
 bucketcmp(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 {
 	register State_t*	state = (State_t*)disc;
-	register Cxvalue_t*	ka = (Cxvalue_t*)a;
-	register Cxvalue_t*	kb = (Cxvalue_t*)b;
+	register Cxoperand_t*	ka = (Cxoperand_t*)a;
+	register Cxoperand_t*	kb = (Cxoperand_t*)b;
 	register Group_t*	group;
 	register int		n;
 
@@ -234,17 +285,17 @@ bucketcmp(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 	{
 		if (group->string)
 		{
-			n = ka->string.size < kb->string.size ? ka->string.size : kb->string.size;
-			if (n = memcmp(ka->string.data, kb->string.data, n))
+			n = ka->value.string.size < kb->value.string.size ? ka->value.string.size : kb->value.string.size;
+			if (n = memcmp(ka->value.string.data, kb->value.string.data, n))
 				return n;
-			if (ka->string.size < kb->string.size)
+			if (ka->value.string.size < kb->value.string.size)
 				return -1;
-			if (ka->string.size > kb->string.size)
+			if (ka->value.string.size > kb->value.string.size)
 				return 1;
 		}
-		else if (ka->number < kb->number)
+		else if (ka->value.number < kb->value.number)
 			return -1;
-		else if (ka->number > kb->number)
+		else if (ka->value.number > kb->value.number)
 			return 1;
 	}
 	return 0;
@@ -289,7 +340,6 @@ stats_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		cxclose(state->print);
 		goto bad;
 	}
-	DSS(cx)->cx = state->print;
 	for (i = 0; i < elementsof(variables); i++)
 	{
 		if (cxaddvariable(state->print, &variables[i], disc))
@@ -314,7 +364,6 @@ stats_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		case 'g':
 			if (!(variable = cxvariable(cx, opt_info.arg, NiL, disc)))
 				goto bad;
-
 			if (!(group = vmnewof(vm, 0, Group_t, 1, 0)))
 			{
 				if (disc->errorf)
@@ -378,6 +427,7 @@ stats_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		state->op = ~0;
 	if (all = !*argv)
 		variable = 0;
+	state->fw = 5;
 	do
 	{
 		if (all)
@@ -411,6 +461,8 @@ stats_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		else
 			lastfield = state->field = field;
 		state->fields++;
+		if (state->fw < (i = (int)strlen(variable->name)))
+			state->fw = i;
 	} while (all || *++argv);
 	if (!state->fields)
 	{
@@ -434,38 +486,34 @@ stats_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		state->bucketdisc.link = offsetof(Bucket_t, link);
 		state->bucketdisc.size = -1;
 		state->bucketdisc.key = offsetof(Bucket_t, key);
-		if (!(state->buckets = dtnew(vm, &state->bucketdisc, Dttree)))
+		if (!(state->buckets = dtnew(vm, &state->bucketdisc, Dtoset)))
 		{
 			if (disc->errorf)
 				(*disc->errorf)(cx, disc, ERROR_SYSTEM|2, "out of space");
 			goto bad;
 		}
 	}
-	if (!(tmp = sfstropen()))
-	{
-		if (disc->errorf)
-			(*disc->errorf)(cx, disc, ERROR_SYSTEM|2, "out of space");
-		goto bad;
-	}
 	if (state->format)
 	{
+		if (!(tmp = sfstropen()))
+		{
+			if (disc->errorf)
+				(*disc->errorf)(cx, disc, ERROR_SYSTEM|2, "out of space");
+			goto bad;
+		}
 		state->print->getf = getop;
 		record.data = state;
-		i = dssprintf(DSS(cx), tmp, state->format, &record);
+		i = dssprintf(DSS(cx), state->print, tmp, state->format, &record);
+		state->print->getf = getvalue;
 		sfclose(tmp);
 		if (i < 0)
 			goto bad;
-		state->print->getf = getvalue;
-	}
-	DSS(cx)->cx = cxscope(state->print, NiL, 0, 0, disc);
-	if (!state->format)
-	{
-		cxclose(state->print);
-		state->print = 0;
 	}
 	expr->data = state;
 	return 0;
  bad:
+	if (state->print)
+		cxscope(state->print, NiL, 0, 0, disc);
 	vmclose(vm);
 	return -1;
 }
@@ -474,7 +522,7 @@ static int
 stats_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	register State_t*	state = (State_t*)expr->data;
-	register Cxvalue_t*	key;
+	register Cxoperand_t*	key;
 	register Field_t*	field;
 	register Group_t*	group;
 	register Total_t*	total;
@@ -487,18 +535,15 @@ stats_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	total = state->total;
 	if (state->group)
 	{
-		if (!state->key && !(state->key = vmnewof(state->vm, 0, Cxvalue_t, state->groups, 0)))
+		if (!state->key && !(state->key = vmnewof(state->vm, 0, Cxoperand_t, state->groups, 0)))
 		{
 			if (disc->errorf)
 				(*disc->errorf)(cx, disc, ERROR_SYSTEM|2, "out of space");
 			return -1;
 		}
 		for (group = state->group, key = state->key; group; group = group->next, key++)
-		{
-			if (cxcast(cx, &val, group->variable, group->variable->type, data, NiL))
+			if (cxcast(cx, key, group->variable, group->variable->type, data, NiL))
 				return -1;
-			*key = val.value;
-		}
 		if (bucket = (Bucket_t*)dtmatch(state->buckets, state->key))
 			total = bucket->total;
 		else if (dtsize(state->buckets) < state->maxgroups)
@@ -512,14 +557,14 @@ stats_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 			for (group = state->group, key = state->key; group; group = group->next, key++)
 				if (group->string)
 				{
-					s = key->string.data;
-					if (!(key->string.data = vmnewof(state->vm, 0, char, key->string.size, 1)))
+					s = key->value.string.data;
+					if (!(key->value.string.data = vmnewof(state->vm, 0, char, key->value.string.size, 1)))
 					{
 						if (disc->errorf)
 							(*disc->errorf)(cx, disc, ERROR_SYSTEM|2, "out of space");
 						return -1;
 					}
-					memcpy(key->string.data, s, key->string.size);
+					memcpy(key->value.string.data, s, key->value.string.size);
 				}
 			bucket->key = state->key;
 			state->key = 0;
@@ -568,7 +613,7 @@ number(Sfio_t* op, Cxnumber_t n, int fw)
 }
 
 static int
-list(Cx_t* cx, register State_t* state, Sfio_t* op, const char* label, register Field_t* field, register Total_t* total, Cxvalue_t* key)
+list(Cx_t* cx, register State_t* state, Sfio_t* op, const char* label, register Field_t* field, register Total_t* total, Cxoperand_t* key)
 {
 	Dssrecord_t	record;
 	Print_t		pr;
@@ -580,22 +625,21 @@ list(Cx_t* cx, register State_t* state, Sfio_t* op, const char* label, register 
 
 	do
 	{
-		if (state->print)
+		if (state->format)
 		{
 			record.data = &pr;
 			pr.field = field;
 			pr.group = state->group;
+			pr.label = label;
 			pr.total = total;
 			pr.key = key;
-			DSS(cx)->cx = state->print;
-			r = dssprintf(DSS(cx), op, state->format, &record);
-			DSS(cx)->cx = cx;
-			if (r < 0)
+			if (dssprintf(DSS(cx), state->print, op, state->format, &record) < 0)
 				return -1;
 		}
 		else
 		{
-			sfprintf(op, "%*s", FW, field ? field->variable->name : "-");
+			if (field)
+				sfprintf(op, "%*s", state->fw, field->variable->name);
 			if (state->op & STATS_COUNT)
 				number(op, (Cxinteger_t)total->count, FW);
 			u = total->value / (Cxinteger_t)total->count;
@@ -627,12 +671,11 @@ list(Cx_t* cx, register State_t* state, Sfio_t* op, const char* label, register 
 				{
 					sfputc(op, ' ');
 					if (group->string)
-						s = key->string.data;
+						s = key->value.string.data;
 					else
 					{
-						arg.type = group->variable->type;
-						arg.value = *key;
-						if (cxcast(cx, &arg, NiL, cx->state->type_string, NiL, group->variable->format.details))
+						arg = *key;
+						if (cxcast(cx, &arg, 0, cx->state->type_string, NiL, group->variable->format.details))
 							return -1;
 						s = arg.value.string.data;
 					}
@@ -656,9 +699,10 @@ stats_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 
 	if (state->label)
 		sfprintf(expr->op, "%s\n", state->label);
-	if (!state->print)
+	if (!state->format)
 	{
-		sfprintf(expr->op, "%*s", FW, "FIELD");
+		if (state->field)
+			sfprintf(expr->op, "%*s", state->fw, "FIELD");
 		if (state->op & STATS_COUNT)
 			sfprintf(expr->op, " %*s", FW, "COUNT");
 		if (state->op & STATS_SUM)
@@ -687,13 +731,9 @@ stats_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	}
 	else if (list(cx, state, expr->op, NiL, state->field, state->total, NiL))
 		goto bad;
-	if (state->print)
-		cxclose(state->print);
 	vmclose(state->vm);
 	return 0;
  bad:
-	if (state->print)
-		cxclose(state->print);
 	vmclose(state->vm);
 	return -1;
 }
@@ -716,7 +756,7 @@ Dsslib_t		dss_lib_stats =
 {
 	"stats",
 	"stats query"
-	"[-1lms5P?\n@(#)$Id: dss stats query (AT&T Research) 2003-05-05 $\n]"
+	"[-1lms5P?\n@(#)$Id: dss stats query (AT&T Research) 2011-09-11 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	0,

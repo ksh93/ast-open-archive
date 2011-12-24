@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1990-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1990-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -349,7 +349,7 @@ post(State_t* state, Connection_t* con, const char* name, int id)
 	Event_t*	ep;
 	Waiting_t*	wp;
 
-	if (!con->waiting && !(con->waiting = dtopen(&state->waitdisc, Dthash)))
+	if (!con->waiting && !(con->waiting = dtopen(&state->waitdisc, Dtset)))
 	{
 		error(ERROR_SYSTEM|3, "out of space [waiting]");
 		return -1;
@@ -1131,7 +1131,7 @@ main(int argc, char** argv)
 		state.eventdisc.link = offsetof(Event_t, link);
 		state.eventdisc.key = offsetof(Event_t, name);
 		state.eventdisc.freef = eventfree;
-		if (!(state.events = dtopen(&state.eventdisc, Dttree)))
+		if (!(state.events = dtopen(&state.eventdisc, Dtoset)))
 			error(ERROR_SYSTEM|3, "out of space [event dictionary]");
 		state.waitdisc.link = offsetof(Waiting_t, link);
 		state.waitdisc.key = offsetof(Waiting_t, event);

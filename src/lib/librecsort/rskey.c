@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -85,15 +85,15 @@ datasize(void)
 #define encode(x)	(neg?(10-(x)):((x)+2))
 #define putdig(x)	(nib?(*dig=encode(x)<<4,nib=0):(*dig++|=encode(x),nib=1))
 
-static int
+static ssize_t
 #if __STD_C
-key_n_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
+key_n_code(Rskey_t* kp, Rskeyfield_t* f, unsigned char* dp, size_t len, unsigned char* cp, unsigned char* zp)
 #else
 key_n_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
-Field_t*	f;
+Rskeyfield_t*	f;
 unsigned char*	dp;
-int		len;
+size_t		len;
 unsigned char*	cp;
 unsigned char*	zp;
 #endif
@@ -263,15 +263,15 @@ unsigned char*	zp;
  * packed decimal (bcd)
  */
 
-static int
+static ssize_t
 #if __STD_C
-key_p_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
+key_p_code(Rskey_t* kp, Rskeyfield_t* f, unsigned char* dp, size_t len, unsigned char* cp, unsigned char* zp)
 #else
 key_p_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
-Field_t*	f;
+Rskeyfield_t*	f;
 unsigned char*	dp;
-int		len;
+size_t		len;
 unsigned char*	cp;
 unsigned char*	zp;
 #endif
@@ -329,15 +329,15 @@ unsigned char*	zp;
  * zoned decimal
  */
 
-static int
+static ssize_t
 #if __STD_C
-key_z_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
+key_z_code(Rskey_t* kp, Rskeyfield_t* f, unsigned char* dp, size_t len, unsigned char* cp, unsigned char* zp)
 #else
 key_z_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
-Field_t*	f;
+Rskeyfield_t*	f;
 unsigned char*	dp;
-int		len;
+size_t		len;
 unsigned char*	cp;
 unsigned char*	zp;
 #endif
@@ -396,15 +396,15 @@ unsigned char*	zp;
  * random shuffle
  */
 
-static int
+static ssize_t
 #if __STD_C
-key_j_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
+key_j_code(Rskey_t* kp, Rskeyfield_t* f, unsigned char* dp, size_t len, unsigned char* cp, unsigned char* zp)
 #else
 key_j_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
-Field_t*	f;
+Rskeyfield_t*	f;
 unsigned char*	dp;
-int		len;
+size_t		len;
 unsigned char*	cp;
 unsigned char*	zp;
 #endif
@@ -429,15 +429,15 @@ unsigned char*	zp;
  * as 0x0101 and 0x0102, and similarly for complements
  */
 
-static int
+static ssize_t
 #if __STD_C
-key_t_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
+key_t_code(Rskey_t* kp, Rskeyfield_t* f, unsigned char* dp, size_t len, unsigned char* cp, unsigned char* zp)
 #else
 key_t_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
-Field_t*	f;
+Rskeyfield_t*	f;
 unsigned char*	dp;
-int		len;
+size_t		len;
 unsigned char*	cp;
 unsigned char*	zp;
 #endif
@@ -521,7 +521,7 @@ unsigned char*	zp;
 	else
 	{
 	native:
-		while (--len >= 0)
+		while (len-- > 0)
 		{
 			c = *dp++;
 			if (keep[c])
@@ -549,15 +549,15 @@ unsigned char*	zp;
 	return xp - cp;
 }
 
-static int
+static ssize_t
 #if __STD_C
-key_m_code(Rskey_t* kp, Field_t* f, unsigned char* dp, int len, unsigned char* cp, unsigned char* zp)
+key_m_code(Rskey_t* kp, Rskeyfield_t* f, unsigned char* dp, size_t len, unsigned char* cp, unsigned char* zp)
 #else
 key_m_code(kp, f, dp, len, cp, zp)
 Rskey_t*	kp;
-Field_t*	f;
+Rskeyfield_t*	f;
 unsigned char*	dp;
-int		len;
+size_t		len;
 unsigned char*	cp;
 unsigned char*	zp;
 #endif
@@ -603,22 +603,22 @@ unsigned char*	zp;
  * return encoded key for dat,datlen in key,keylen
  */
 
-static int
+static ssize_t
 #if __STD_C
-code(Rs_t* rs, unsigned char* dat, int datlen, unsigned char* key, int keylen, Rsdisc_t* disc)
+code(Rs_t* rs, unsigned char* dat, size_t datlen, unsigned char* key, size_t keylen, Rsdisc_t* disc)
 #else
 code(rs, dat, datlen, key, keylen, disc)
 Rs_t*		rs;
 unsigned char*	dat;
-int		datlen;
+size_t		datlen;
 unsigned char*	key;
-int		keylen;
+size_t		keylen;
 Rsdisc_t*	disc;
 #endif
 {
-	Rskey_t*	kp = (Rskey_t*)((char*)disc - sizeof(Rskey_t));
+	Rskey_t*	kp = rs ? rs->key : (Rskey_t*)((char*)disc - sizeof(Rskey_t));
 	unsigned char*	cp;
-	Field_t*	fp;
+	Rskeyfield_t*	fp;
 	unsigned char*	ep;
 	unsigned char*	op = key;
 	unsigned char*	zp = key + keylen;
@@ -665,7 +665,7 @@ Rsdisc_t*	disc;
 			}
 		break;
 	}
-	for (fp = kp->field.head; fp; fp = fp->next)
+	for (fp = kp->head; fp; fp = fp->next)
 	{
 		n = fp->begin.field;
 		if (n < np)
@@ -736,11 +736,11 @@ int		c;
 
 static int
 #if __STD_C
-checkfield(Rskey_t* kp, Field_t* fp, const char* key, int c)
+checkfield(Rskey_t* kp, Rskeyfield_t* fp, const char* key, int c)
 #else
 checkfield(kp, fp, key, c)
 Rskey_t*	kp;
-Field_t*	fp;
+Rskeyfield_t*	fp;
 char*		key;
 int		c;
 #endif
@@ -768,12 +768,12 @@ int		c;
 
 static void
 #if __STD_C
-addcoder(Rskey_t* kp, Field_t* fp, Coder_t np, int c, int b)
+addcoder(Rskey_t* kp, Rskeyfield_t* fp, Rskeycode_f np, int c, int b)
 #else
 addcoder(kp, fp, np, c, b)
 Rskey_t*	kp;
-Field_t*	fp;
-Coder_t		np;
+Rskeyfield_t*	fp;
+Rskeycode_f	np;
 int		c;
 int		b;
 #endif
@@ -813,11 +813,11 @@ unsigned char*	np;
 
 static int
 #if __STD_C
-addopt(Rskey_t* kp, register Field_t* fp, register char* s, int end)
+addopt(Rskey_t* kp, register Rskeyfield_t* fp, register char* s, int end)
 #else
 addopt(kp, fp, s, end)
 Rskey_t*		kp;
-register Field_t*	fp;
+register Rskeyfield_t*	fp;
 register char*		s;
 int			end;
 #endif
@@ -842,7 +842,7 @@ int			end;
 				kp->keydisc->flags |= RSKEY_ERROR;
 				return 0;
 			}
-			(kp->field.tail = kp->field.prev)->next = 0;
+			(kp->tail = kp->field.prev)->next = 0;
 			kp->field.prev = 0;
 			if (kp->accumulate.tail)
 				kp->accumulate.tail->next = fp;
@@ -909,7 +909,7 @@ int			end;
 		if (x != CC_NATIVE && CCIN(x) != CCOUT(x))
 		{
 			fp->code = x;
-			if (fp == kp->field.head)
+			if (fp == kp->head)
 				kp->code = fp->code;
 		}
 		return s - b;
@@ -951,7 +951,7 @@ int			end;
 		return 0;
 	}
 	kp->coded = 1;
-	if (kp->keydisc->errorf && fp != kp->field.tail)
+	if (kp->keydisc->errorf && fp != kp->tail)
 		(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "field spec precedes global option %c", c);
 	return s - b;
 }
@@ -972,11 +972,11 @@ char*		key;
 int		all;
 #endif
 {
-	register Field_t*	fp;
+	register Rskeyfield_t*	fp;
 	register int		i;
 	char*			s;
 
-	fp = all ? kp->field.head : kp->field.tail;
+	fp = all ? kp->head : kp->tail;
 	s = (char*)key;
 	while (i = addopt(kp, fp, s, 0))
 		s += i;
@@ -1007,7 +1007,7 @@ char*		key;
 int		obsolete;
 #endif
 {
-	register Field_t*	fp;
+	register Rskeyfield_t*	fp;
 	int			o;
 	int			n;
 	int			standard;
@@ -1073,16 +1073,16 @@ int		obsolete;
 		if (!kp->field.global.next && rskey(kp, "0", 1))
 			return -1;
 		s = (char*)key;
-		if ((kp->field.tail->end.field = *s == '.' ? kp->field.tail->begin.field : (int)strtol(s, &s, 10)) > kp->field.maxfield)
-			kp->field.maxfield = kp->field.tail->end.field;
+		if ((kp->tail->end.field = *s == '.' ? kp->tail->begin.field : (int)strtol(s, &s, 10)) > kp->field.maxfield)
+			kp->field.maxfield = kp->tail->end.field;
 		if (*s == '.')
-			kp->field.tail->end.index = (int)strtol(s + 1, &s, 10);
+			kp->tail->end.index = (int)strtol(s + 1, &s, 10);
 		else
-			kp->field.tail->end.field--;
-		if (!kp->field.tail->end.index)
-			kp->field.tail->end.index = -1;
+			kp->tail->end.field--;
+		if (!kp->tail->end.index)
+			kp->tail->end.index = -1;
 	}
-	else if (!(fp = vmnewof(Vmheap, 0, Field_t, 1, 0)))
+	else if (!(fp = vmnewof(Vmheap, 0, Rskeyfield_t, 1, 0)))
 	{
 		if (kp->keydisc->errorf)
 			(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "out of space [field]");
@@ -1092,14 +1092,14 @@ int		obsolete;
 	else
 	{
 		fp->index = ++kp->field.index;
-		kp->field.prev = kp->field.tail;
-		kp->field.tail = kp->field.tail->next = fp;
+		kp->field.prev = kp->tail;
+		kp->tail = kp->tail->next = fp;
 		fp->bflag = fp->eflag = 0;
 		fp->standard = standard;
 		if ((fp->begin.field = n - fp->standard) > kp->field.maxfield)
 			kp->field.maxfield = fp->begin.field;
 		fp->end.field = MAXFIELD;
-		fp->code = kp->field.head->code;
+		fp->code = kp->head->code;
 		if (*s == '.')
 		{
 			fp->begin.index = (int)strtol(s + 1, &s, 10) - fp->standard;
@@ -1119,11 +1119,11 @@ int		obsolete;
 
 static int
 #if __STD_C
-transform(Rskey_t* kp, register Field_t* fp)
+transform(Rskey_t* kp, register Rskeyfield_t* fp)
 #else
 transform(kp, fp)
 Rskey_t*		kp;
-register Field_t*	fp;
+register Rskeyfield_t*	fp;
 #endif
 {
 	register unsigned char*	m;
@@ -1177,7 +1177,7 @@ register Rskey_t*	kp;
 #endif
 {
 	register long		n;
-	register Field_t*	fp;
+	register Rskeyfield_t*	fp;
 	long			m;
 	size_t			z;
 
@@ -1187,9 +1187,9 @@ register Rskey_t*	kp;
 	 * finalize the fields
 	 */
 
-	if (checkfield(kp, kp->field.tail, NiL, 0))
+	if (checkfield(kp, kp->tail, NiL, 0))
 		return -1;
-	fp = kp->field.head;
+	fp = kp->head;
 	if (!fp->coder)
 	{
 		fp->coder = key_t_code;
@@ -1272,10 +1272,10 @@ register Rskey_t*	kp;
 			}
 		}
 	}
-	fp = kp->field.head;
+	fp = kp->head;
 	if (fp = fp->next)
 	{
-		kp->field.head = fp;
+		kp->head = fp;
 		if (!fp->next && !kp->tab[0] && !fp->begin.field && !fp->end.field && fp->end.index > 0 && fp->flag == 't' && fp->trans == kp->state->ident && fp->keep == kp->state->all && !fp->bflag && !fp->eflag && !fp->rflag)
 		{
 			kp->disc->type |= RS_KSAMELEN;
@@ -1285,7 +1285,7 @@ register Rskey_t*	kp;
 		else
 			kp->coded = 1;
 	}
-	else if (kp->field.head->flag == 't' && kp->xfrmbuf)
+	else if (kp->head->flag == 't' && kp->xfrmbuf)
 		kp->coded = 1;
 	if (kp->coded)
 	{

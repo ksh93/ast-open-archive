@@ -1,3 +1,15 @@
+11-10-07 dssopen.c: use generic dll_lib() to load methods
+11-09-11 cxmap.c: fix cxsub() to cast <=> string if necessary
+11-09-11 add <MAP><PART><EDIT>ed-style-substitute</></></>
+11-09-11 dssprintf.c: add edit=<del>from<del>to<del>[flags]
+11-09-11 cxopen.c: add edit() builtin
+11-09-10 cxopen.c: add cxcvt()
+11-09-07 dssprintf.c: fix if/else nesting -- ouch
+11-08-22 add cxsizeof()
+11-08-22 add sizeof(var), typeof(var), type==type, type!=type
+11-08-19 add DSS_BASE for base methods (with dynamic schemas)
+11-08-19 dss-print.h: add --all to list name/value for all fields
+11-08-18 cxeval.c: (cx->test&0x0100) enables code trace
 11-06-21 cxcomp.c: fix back() on empty input stack logic
 11-06-15 dssmisc.c: add "< expr-file" expression to dsscomp()
 11-06-15 dss-scan.h: add "< list-of-files-file" argv to snan_beg()

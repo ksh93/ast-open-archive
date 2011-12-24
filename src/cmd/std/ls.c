@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2011-06-10 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2011-08-24 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -89,7 +89,7 @@ USAGE_LICENSE
 "		[+gid?group id]"
 "		[+header?listing header]"
 "		[+ino?serial number]"
-"		[+linkop?link operation: => for symbolic, == for hard]"
+"		[+linkop?link operation: -> for symbolic, empty otherwise]"
 "		[+linkname?symbolic link text]"
 "		[+linkpath?symbolic link text]"
 "		[+mark?file or directory mark character]"
@@ -606,7 +606,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			n = st->st_ino;
 		break;
 	case KEY_linkpath:
-		if (ftw && ftw->info == FTW_SL)
+		if (ftw && (ftw->info & FTW_SL))
 		{
 			char*		dirnam;
 			int		c;
@@ -636,7 +636,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			return 0;
 		break;
 	case KEY_linkop:
-		if (ftw && ftw->info == FTW_SL)
+		if (ftw && (ftw->info & FTW_SL))
 			s = "->";
 		else
 			return 0;

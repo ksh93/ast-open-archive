@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -22,7 +22,7 @@
 #include	<locale.h>
 #endif
 
-MAIN()
+tmain()
 {
 #if _lib_locale
 	char		buf[128], cmp[128];
@@ -33,7 +33,7 @@ MAIN()
 	setlocale(LC_ALL, "");
 
 	if(!(lv = localeconv()))
-		TSTEXIT(0);
+		texit(0);
 
 	decimal = '.';
 	if(lv->decimal_point && lv->decimal_point[0])
@@ -63,5 +63,5 @@ MAIN()
 		terror("Deep formatting error");
 #endif
 
-	TSTEXIT(0);
+	texit(0);
 }

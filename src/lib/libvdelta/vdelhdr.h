@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1995-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -259,9 +259,11 @@ typedef struct _vdbufio_s
 _BEGIN_EXTERNS_
 extern Vdbufio_t	_Vdbufio;
 extern long		_vdupdate_01 _ARG_((Vddisc_t*, Vddisc_t*, Vddisc_t*));
+#if !_PACKAGE_ast
 extern Void_t*		memcpy _ARG_((Void_t*, const Void_t*, size_t));
 extern Void_t*		malloc _ARG_((size_t));
 extern void		free _ARG_((Void_t*));
+#endif
 _END_EXTERNS_
 
 #endif /*_VDELHDR_H*/

@@ -1,10 +1,10 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGEROOT ../../../../../..
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -116,6 +116,10 @@ make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+make ${PACKAGE_ast_INCLUDE}/aso.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
@@ -138,9 +142,9 @@ done ${PACKAGE_ast_INCLUDE}/codex.h
 done gzip.c
 meta gzip.o %.c>%.o gzip.c gzip
 prev gzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c gzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c gzip.c
 done gzip.o generated
-exec - ${AR} -cr libcodexgzip.a gzip.o
+exec - ${AR} rc libcodexgzip.a gzip.o
 exec - (ranlib libcodexgzip.a) >/dev/null 2>&1 || true
 done libcodexgzip.a generated
 done gzip virtual

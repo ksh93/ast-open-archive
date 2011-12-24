@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -26,7 +26,7 @@
 #endif
 
 /* test compliance of certain stdio behaviors */
-MAIN()
+tmain()
 {
 	FILE	*f, *f2;
 	long	s1, s2;
@@ -41,7 +41,7 @@ MAIN()
 	}
 
 	/* test for shared streams and seek behavior */
-	if(!(f = fopen(tstfile(0),"w+")) )
+	if(!(f = fopen(tstfile("sf", 0),"w+")) )
 		terror("Opening file to read&write");
 
 	/* change stdout to a dup of fileno(f) */
@@ -126,5 +126,5 @@ MAIN()
 	if(rbuf[i] != '\n')
 		terror("Did not get new-line");
 
-	TSTEXIT(0);
+	texit(0);
 }

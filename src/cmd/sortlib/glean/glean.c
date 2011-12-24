@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2006-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2006-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -135,12 +135,25 @@ gleancmp(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 	Category_t*	x = (Category_t*)a;
 	Category_t*	y = (Category_t*)b;
 
-	message((-4, "gleancmp a:%d:%-*.*s: b:%d:%-*.*s:", x->key.len, x->key.len, x->key.len, x->key.data, y->key.len, y->key.len, y->key.len, y->key.data));
+	message((-4, "gleancmp a:%d:%-.*s: b:%d:%-.*s:", x->key.len, x->key.len, x->key.data, y->key.len, y->key.len, y->key.data));
 	if (x->key.len < y->key.len)
 		return -1;
 	if (x->key.len > y->key.len)
 		return 1;
 	return memcmp(x->key.data, y->key.data, x->key.len);
+}
+
+static char*
+fmtdata(void* data, size_t size)
+{
+	size_t	i;
+	char*	b;
+	char*	s;
+
+	s = b = fmtbuf(2 * size + 1);
+	for (i = 0; i < size; i++)
+		s += sfsprintf(s, 3, "%02x", ((unsigned char*)data)[i]);
+	return b;
 }
 
 static int
@@ -190,7 +203,7 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 		}
 		state->total++;
 		p->count++;
-		message((-2, "glean record p=%p %I*u/%I*u key='%-*.*s' r:%d:%-*.*s: '%-*.*s'", p, sizeof(p->count), p->count, sizeof(state->total), state->total, r->keylen, r->keylen, r->key, x.key.len, x.key.len, x.key.len, x.key.data, r->datalen, r->datalen, r->data));
+		message((-2, "glean record p=%p %I*u/%I*u key='%-.*s' r:%d:%-.*s: '%-.*s'", p, sizeof(p->count), p->count, sizeof(state->total), state->total, r->keylen, r->key, x.key.len, x.key.len, x.key.data, r->datalen && r->data[r->datalen - 1] == '\n' ? r->datalen - 1 : r->datalen, r->data));
 		m = 0;
 		for (f = state->field; f; f = f->next)
 		{
@@ -201,7 +214,7 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 				k *= r->datalen;
 				if (save(state->vm, &state->key, 0, k))
 					return -1;
-				if ((k = (*f->lim->disc->defkeyf)(rs, r->data, r->datalen, state->key.data, state->key.size, f->lim->disc)) < 0)
+				if ((k = (*f->lim->disc->defkeyf)(NiL, r->data, r->datalen, state->key.data, state->key.size, f->lim->disc)) < 0)
 					return -1;
 				t.len = state->key.len = k;
 				t.data = state->key.data;
@@ -213,12 +226,12 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 					k += r->datalen - f->lim->disc->key;
 				t.len = k;
 			}
-			message((-1, "glean [%d] %c a:%d:%-*.*s:", f->index, f->mm, t.len, t.len, t.len, t.data));
+			message((-1, "glean [%d] %c a:%d:%s:", f->index, f->mm, t.len, fmtdata(t.data, t.len)));
 			if (!p->lim[f->index].data)
 				n = f->mm == 'm' ? -1 : 1;
 			else
 			{
-				message((-1, "glean [%d] %c b:%d:%-*.*s:", f->index, f->mm, p->lim[f->index].len, p->lim[f->index].len, p->lim[f->index].len, p->lim[f->index].data));
+				message((-1, "glean [%d] %c b:%d:%s:", f->index, f->mm, p->lim[f->index].len, fmtdata(p->lim[f->index].data, p->lim[f->index].len)));
 				if ((k = t.len) < p->lim[f->index].len)
 					k = p->lim[f->index].len;
 				if (!(n = memcmp(t.data, p->lim[f->index].data, k)))
@@ -275,7 +288,7 @@ rs_disc(Rskey_t* key, const char* options)
 	state->kydisc.errorf = errorf;
 	state->rsdisc.eventf = glean;
 	state->rsdisc.events = RS_READ|RS_POP;
-	if ((key->keydisc->flags & RSKEY_KEYS) && !(state->categories = dtnew(vm, &state->dtdisc, Dttree)))
+	if ((key->keydisc->flags & RSKEY_KEYS) && !(state->categories = dtnew(vm, &state->dtdisc, Dtoset)))
 		error(ERROR_SYSTEM|3, "out of space [dictionary]");
 	if (options)
 	{
@@ -298,7 +311,7 @@ rs_disc(Rskey_t* key, const char* options)
 			case 'M':
 				if (opt_info.assignment == ':' || !(f = state->field) || f->mm != i)
 				{
-					if (!(f = vmnewof(vm, 0, Field_t, 1, 0)) || !(f->lim = rskeyopen(&state->kydisc)))
+					if (!(f = vmnewof(vm, 0, Field_t, 1, 0)) || !(f->lim = rskeyopen(&state->kydisc, NiL)))
 						error(ERROR_SYSTEM|3, "out of space");
 					strcpy((char*)f->lim->tab, (char*)key->tab);
 					f->lim->type = key->type;

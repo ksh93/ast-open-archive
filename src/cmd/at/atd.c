@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -305,7 +305,7 @@ queue(register State_t* state, register char* s)
 		}
 		if (!state->queue)
 			state->queue = que;
-		if (!que->owner && !(que->owner = dtopen(&state->table.owner.discipline, Dthash)))
+		if (!que->owner && !(que->owner = dtopen(&state->table.owner.discipline, Dtset)))
 			error(ERROR_SYSTEM|3, "out of space [queue %s owner hash]", que->name);
 		que->allow = -1;
 		que->specific = 0;
@@ -1396,25 +1396,25 @@ init(const char* path)
 		error(ERROR_SYSTEM|3, "out of space [atx]");
 	state->table.job.discipline.key = offsetof(Job_t, start);
 	state->table.job.discipline.comparf = order;
-	if (!(state->table.job.handle = dtopen(&state->table.job.discipline, Dttree)))
+	if (!(state->table.job.handle = dtopen(&state->table.job.discipline, Dtoset)))
 		error(ERROR_SYSTEM|3, "out of space [job table]");
 	state->table.owner.discipline.key = offsetof(Owner_t, user);
 	state->table.owner.discipline.size = sizeof(User_t*);
 	state->table.pid.discipline.key = offsetof(Job_t, pid);
 	state->table.pid.discipline.size = sizeof(long);
 	state->table.pid.discipline.link = offsetof(Job_t, bypid);
-	if (!(state->table.pid.handle = dtopen(&state->table.pid.discipline, Dthash)))
+	if (!(state->table.pid.handle = dtopen(&state->table.pid.discipline, Dtset)))
 		error(ERROR_SYSTEM|3, "out of space [pid table]");
 	state->table.queue.discipline.key = offsetof(Queue_t, name);
-	if (!(state->table.queue.handle = dtopen(&state->table.queue.discipline, Dttree)))
+	if (!(state->table.queue.handle = dtopen(&state->table.queue.discipline, Dtoset)))
 		error(ERROR_SYSTEM|3, "out of space [queue table]");
 	state->table.uid.discipline.key = offsetof(User_t, uid);
 	state->table.uid.discipline.size = sizeof(long);
 	state->table.uid.discipline.link = offsetof(User_t, byuid);
-	if (!(state->table.uid.handle = dtopen(&state->table.uid.discipline, Dthash)))
+	if (!(state->table.uid.handle = dtopen(&state->table.uid.discipline, Dtset)))
 		error(ERROR_SYSTEM|3, "out of space [uid table]");
 	state->table.user.discipline.key = offsetof(User_t, name);
-	if (!(state->table.user.handle = dtopen(&state->table.user.discipline, Dttree)))
+	if (!(state->table.user.handle = dtopen(&state->table.user.discipline, Dtoset)))
 		error(ERROR_SYSTEM|3, "out of space [user table]");
 	for (i = 0; i < elementsof(queuedefs); i++)
 		queue(state, strcpy(state->buf, queuedefs[i]));

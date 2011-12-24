@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,8 +19,10 @@
 ***********************************************************************/
 #include	"dttest.h"
 
-static Void_t*	Space[1024];
-static char*	Current = (char*)(&Space[0]);
+static char	Space[16*1024*1024];
+static char	*Current = &Space[0];
+static int	Close = 0;
+static int	Free = 0;
 
 #if __STD_C
 static int event(Dt_t* dt, int type, Void_t* obj, Dtdisc_t* disc)
@@ -31,16 +33,24 @@ int	type;
 Void_t* obj;
 Dtdisc_t* disc;
 #endif
-{	if(type != DT_OPEN)
-		return 0;
-
-	/* opening first dictionary */
-	if(Current == (char*)(&Space[0]))
-		return 0;
-	else /* opening a dictionary sharing with some previous one */
-	{	*((Void_t**)obj) = (Void_t*)(&Space[0]);
-		return 1;
+{	if(type == DT_OPEN)
+	{	/* opening first dictionary */
+		if(obj)
+		{	if(Current == &Space[0])
+				return 0;
+			else /* opening a dictionary sharing with some previous one */
+			{	*((Void_t**)obj) = (Void_t*)(&Space[0]);
+				return 1;
+			}
+		}
+		else	return 0;
 	}
+	else if(type == DT_CLOSE)
+	{	if(Close == 0 ) /* do not free objects */
+			return 1;
+		else	return 0;
+	}
+	else	return 0;
 }
 
 #if __STD_C
@@ -58,45 +68,68 @@ Dtdisc_t* disc;
 		buf = (Void_t*)Current;
 		Current += size;
 	}
+	else
+	{	if(Close > 0)
+			Free += 1;
+	}
 	return buf;
 }
 
 Dtdisc_t Disc =
-	{ 0, sizeof(int), -1,
+	{ 0, sizeof(long), -1,
 	  newint, NIL(Dtfree_f), compare, hashint,
 	  memory, event
 	};
 
-main()
+tmain()
 {
 	Dt_t		*dt1, *dt2;
-	int		i, k;
+	long		i, k;
 
-	if(!(dt1 = dtopen(&Disc,Dtorder)) )
-		terror("Opening Dtorder1");
-	if((int)dtinsert(dt1,1) != 1)
+	if(!(dt1 = dtopen(&Disc,Dtoset)) )
+		terror("Opening Dtoset1");
+	if((long)dtinsert(dt1,1L) != 1)
 		terror("Inserting 1");
-	if((int)dtinsert(dt1,3) != 3)
+	if((long)dtinsert(dt1,3L) != 3)
 		terror("Inserting 3");
-	if((int)dtinsert(dt1,5) != 5)
+	if((long)dtinsert(dt1,5L) != 5)
 		terror("Inserting 5");
 
-	if(!(dt2 = dtopen(&Disc,Dtorder)) )
-		terror("Opening Dtorder2");
-	if((int)dtinsert(dt2,2) != 2)
+	if(!(dt2 = dtopen(&Disc,Dtoset)) )
+		terror("Opening Dtoset2");
+	if((long)dtinsert(dt2,2L) != 2)
 		terror("Inserting 2");
-	if((int)dtinsert(dt2,4) != 4)
+	if((long)dtinsert(dt2,4L) != 4)
 		terror("Inserting 4");
-	if((int)dtinsert(dt2,6) != 6)
+	if((long)dtinsert(dt2,6L) != 6)
 		terror("Inserting 6");
 
 	for(i = 1; i <= 6; ++i)
-		if((int)dtsearch(dt1,i) != i)
-			terror("Didn't find an int");
+		if((long)dtsearch(dt1,i) != i)
+			terror("Didn't find a long");
 
-	for(i = (int)dtlast(dt2), k = 6; i != 0; i = (int)dtprev(dt2,i), k -= 1)
+	for(i = (long)dtlast(dt2), k = 6; i != 0; i = (long)dtprev(dt2,i), k -= 1)
 		if(i != k)
-			terror("Didn't walk an int");
+			terror("Didn't walk a long");
 
-	return 0;
+	/* this test makes sure that dtclose() does not free objects */
+	Close = 0;
+	dtclose(dt1);
+	if(Free > 0 )
+		terror("Memory should not have been freed");
+
+	/* this test makes sure that all objects are freed */
+	Close = 1;
+	dtclose(dt2);
+	if(Free <= 0 )
+		terror("Memory should have been freed");
+
+	/* test to make sure that shared dictionaries use the same method */
+	Current = &Space[0];
+	if(!(dt1 = dtopen(&Disc, Dtrhset)) )
+		terror("Opening first dictionary");
+	if((dt2 = dtopen(&Disc, Dtset)) )
+		terror("This open should have failed");
+
+	texit(0);
 }

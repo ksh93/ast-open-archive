@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2008 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -714,10 +714,25 @@ grabtype(struct parse* pp, register struct msg* mp, unsigned long type)
 	register char*	e;
 	register char*	t;
 	register FILE*	fp;
+	struct sender*	sp;
+	struct sendor*	op;
+	struct sendand*	ap;
 	int		i;
 	int		first = 1;
 	char		namebuf[LINESIZE];
 
+	if (type & (GREPLY|GSENDER)) {
+		for (sp = state.sender; sp; sp = sp->next)
+			for (op = &sp->sendor; op; op = op->next)
+				for (ap = &op->sendand; ap;) {
+					if (!(s = grabname(pp, mp, ap->head, ap->flags)) || !strmatch(s, ap->pattern))
+						break;
+					if (!(ap = ap->next))
+						return sp->address;
+				}
+		if (type & GSENDER)
+			return 0;
+	}
 	e = namebuf + sizeof(namebuf);
 	for (i = 0; i < elementsof(fields); i++)
 		if ((fields[i].type & type) &&

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -24,7 +24,7 @@
  */
 
 static const char print_usage[] =
-"[-1ls5P?\n@(#)$Id: dss print query (AT&T Research) 2010-04-22 $\n]"
+"[-1ls5P?\n@(#)$Id: dss print query (AT&T Research) 2011-08-19 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b \bprint\b query formats and prints the "
@@ -47,6 +47,8 @@ USAGE_LICENSE
 "[+?The default print format is \fprint\f. The \bdf\b(1), \bls\b(1), "
     "\bpax\b(1) and \bps\b(1) commands have \b--format\b options in this "
     "same style.]"
+"[a:all?Print the name and value of field, one per line, using the field "
+    "default output format.]"
 "\n"
 "\n[ format ]\n"
 "\n";
@@ -55,12 +57,16 @@ static int
 print_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
 	char**	argv = (char**)data;
+	int	all = 0;
 	int	errors = error_info.errors;
 
 	for (;;)
 	{
 		switch (optget(argv, print_usage))
 		{
+		case 'a':
+			all = 1;
+			continue;
 		case '?':
 			if (disc->errorf)
 				(*disc->errorf)(NiL, disc, ERROR_USAGE|4, "%s", opt_info.arg);
@@ -75,8 +81,11 @@ print_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	if (error_info.errors > errors)
 		return -1;
 	argv += opt_info.index;
-	if (!(expr->data = *argv++))
+	if (all)
+		expr->data = 0;
+	else if (!(expr->data = *argv++))
 	{
+		argv--;
 		if (!(expr->data = (char*)DSS(cx)->meth->print))
 		{
 			if (disc->errorf)
@@ -84,19 +93,19 @@ print_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 			return -1;
 		}
 	}
-	else if (*argv)
+	if (*argv)
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_USAGE|4, "%s", optusage(NiL));
 		return -1;
 	}
-	return cx->referencef ? dssprintf(DSS(cx), 0, (char*)expr->data, NiL) : 0;
+	return cx->referencef ? dssprintf(DSS(cx), cx, 0, (char*)expr->data, NiL) : 0;
 }
 
 static int
 print_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 {
-	return dssprintf(DSS(cx), expr->op, (char*)expr->data, data);
+	return dssprintf(DSS(cx), cx, expr->op, (char*)expr->data, data);
 }
 
 static int
@@ -108,9 +117,9 @@ print_ref(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	if (cx->referencef && (a = (char**)data) && *a++)
 		while (s = *a++)
 			if (*s != '-')
-				return dssprintf(DSS(cx), 0, s, NiL);
+				return dssprintf(DSS(cx), cx, 0, s, NiL);
 			else if (*(s + 1) == '-' && !*(s + 2))
-				return *a ? dssprintf(DSS(cx), 0, *a, NiL) : 0;
+				return *a ? dssprintf(DSS(cx), cx, 0, *a, NiL) : 0;
 	return 0;
 }
 

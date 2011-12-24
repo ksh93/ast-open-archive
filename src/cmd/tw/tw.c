@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -35,7 +35,7 @@
 #define SNAPSHOT_DELIM	"|"
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Research) 2011-03-03 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Research) 2011-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the "
@@ -630,6 +630,7 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 			x = x->data.operand.left;
 			continue;
 		case S2B:
+		case X2I:
 			x = x->data.operand.left;
 			continue;
 		case ID:
@@ -648,7 +649,11 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 					v = 0;
 			}
 			if (v)
+			{
+				if (reverse)
+					v = -v;
 				break;
+			}
 			if (!(x = y))
 				break;
 			y = 0;
@@ -658,8 +663,6 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 		}
 		break;
 	}
-	if (state.reverse)
-		v = -v;
 	message((-2, "order(%s,%s) = %d [n1=%ld n2=%ld]", f1->name, f2->name, v, n1, n2));
 	return v;
 }
@@ -895,9 +898,10 @@ main(int argc, register char** argv)
 				case ',':
 					y = x->data.operand.right;
 					/*FALLTHROUGH*/
+				case '!':
 				case '~':
 				case S2B:
-				case '!':
+				case X2I:
 					x = x->data.operand.left;
 					continue;
 				case ID:
@@ -906,7 +910,7 @@ main(int argc, register char** argv)
 					y = 0;
 					continue;
 				default:
-					error(3, "invalid sort identifier");
+					error(3, "invalid sort identifier (op 0x%02x)", x->op);
 					break;
 				}
 				break;

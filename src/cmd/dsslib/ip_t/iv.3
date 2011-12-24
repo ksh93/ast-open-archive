@@ -50,6 +50,7 @@ typedef struct Ivdisc_s
   uint32_t  version;
   void*     unmatched;
   Error_f   errorf;
+  Ivfree_f  freef;
 } Ivdisc_t;
 .Ce
 .Ss "METHODS"
@@ -147,17 +148,20 @@ The \f5Ivseg_t\fP structure has three elements:
 .PP
 .Ss "DISCIPLINE"
 A discipline structure must be supplied to the \f5ivopen()\fP call.
-It contains two elements:
+It contains three elements:
 
 .Cs
     void*   unmatched;
     int     (*errorf)(void* handle, void* disc, int level, const char* format, ...);
+    void    (*freef)(Iv_t* iv, void* data);
 .Ce
 .PP
 The \f5unmatched\fP element defines the value associated with points not 
 covered by any intervals.
 .PP
 \f5(*errorf)()\fP is called to process library diagnostic messages.
+.PP
+\f5(*freef)()\fP is called on for each non-null interval data item on \f5ivclose()\fP.
 
 .PP
 .Ss "METHODS"

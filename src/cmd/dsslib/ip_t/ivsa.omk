@@ -7,20 +7,22 @@ ivsa : astsa testiv
 include astsa.omk
 
 CC = cc
-CFLAGS = -O -I. -D_PACKAGE_astsa -DUSAGE_LICENSE='"[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2010 AT&T Knowledge Ventures][-license?http://www.research.att.com/sw/license/ast-special.html][--catalog?dss]"'
+CFLAGS = -O -I. -D_PACKAGE_astsa -DUSAGE_LICENSE='"[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2011 AT&T Knowledge Ventures][-license?http://www.research.att.com/sw/license/ast-special.html][--catalog?dss]"'
 
 testiv : testiv.o libivsa.a libastsa.a
 	$(CC) $(CFLAGS) -o testiv $?
 
 libivsa.a : \
-		fv.o ivopen.o ivclose.o ivmeth.o iv-flat.o iv-nested.o
+		fv.o ivopen.o ivclose.o ivfmt.o ivstr.o ivmeth.o iv-flat.o iv-nested.o
 	ar cr libivsa.a $?
 
 test : testiv
-	testiv iv-prefix.dat iv-addr.dat > testiv.tmp
-	@cmp -s testiv.out testiv.tmp || { echo 'test FAILED -- >: expected <: got'; diff  testiv.tmp testiv.out; }
+	testiv -ip4 iv-ip4-prefix.dat iv-ip4-addr.dat > iv-ip4.tmp
+	@cmp -s iv-ip4.out iv-ip4.tmp || { echo 'test ip4 FAILED -- >: expected <: got'; diff  iv-ip4.tmp iv-ip4.out; }
+	testiv -ip6 iv-ip6-prefix.dat iv-ip6-addr.dat > iv-ip6.tmp
+	@cmp -s iv-ip6.out iv-ip6.tmp || { echo 'test ip6 FAILED -- >: expected <: got'; diff  iv-ip6.tmp iv-ip6.out; }
 
 clobber : iv_clobber
 
 iv_clobber :
-	rm -f testiv
+	rm -f testiv iv-ip4.tmp iv-ip6.tmp

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2009 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -530,6 +530,78 @@ set_pwd(struct var* vp, const char* value)
 }
 
 /*
+ * Trap sender variable assignment.
+ */
+
+void
+set_sender(struct var* vp, const char* value)
+{
+	struct sender*	sp;
+	struct sendor*	op;
+	struct sendand*	ap;
+	char*		v;
+	int		c;
+	int		d;
+	int		n;
+
+	if (value && *value) {
+		if (!(sp = newof(0, struct sender, 1, strlen(value))))
+			note(PANIC, "Out of space");
+		v = sp->address;
+		d = *value++;
+		while ((c = *value++) && c != d)
+			*v++ = c;
+		*v++ = 0;
+		op = &sp->sendor;
+		ap = &op->sendand;
+		n = 1;
+		value--;
+		while (c = *value++) {
+			if (c == d) {
+				*v++ = 0;
+				if (n == 1) {
+					n = 2;
+					ap->head = v;
+				}
+				else if (n == 2) {
+					n = 3;
+					ap->pattern = v;
+					if (!strcasecmp(ap->head, "received"))
+						ap->flags |= GLAST;
+				}
+				else if (!(c = *value++) || *value != d)
+					break;
+				else if (c == '|') {
+					if (!(op->next = newof(0, struct sendor, 1, 0)))
+						note(PANIC, "Out of space");
+					op = op->next;
+					ap = &op->sendand;
+					n = 1;
+				}
+				else if (c == '&') {
+					if (!(ap->next = newof(0, struct sendand, 1, 0)))
+						note(PANIC, "Out of space");
+					ap = ap->next;
+					n = 1;
+				}
+				else
+					break;
+			}
+			else
+				*v++ = c;
+		}
+		if (c)
+			note(ERROR, "sender match operand syntax error: '%s' not expected", value - 1);
+		else {
+			sp->next = state.sender;
+			state.sender = sp;
+		}
+	}
+	else
+		state.sender = 0;
+}
+
+/*
  * Trap screen variable assignment.
  */
 
@@ -717,7 +789,7 @@ dictsearch(Dt_t** dp, const char* name, register int op)
 			dict->disc.comparf = ignorecase;
 		if (!(op & STACK))
 			dict->disc.freef = drop;
-		if (!(dt = dtopen(&dict->disc, Dttree)))
+		if (!(dt = dtopen(&dict->disc, Dtoset)))
 			note(PANIC, "Out of space");
 		if ((op & STACK) && state.onstack > 0) {
 			dict->next = state.stacked;

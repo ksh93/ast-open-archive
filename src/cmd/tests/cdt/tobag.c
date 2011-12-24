@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -20,100 +20,129 @@
 #include	"dttest.h"
 
 Dtdisc_t Disc =
-	{ 0, sizeof(int), -1,
+	{ 0, sizeof(long), -1,
 	  newint, NIL(Dtfree_f), compare, hashint,
 	  NIL(Dtmemory_f), NIL(Dtevent_f)
 	};
 
 Dtdisc_t Rdisc =
-	{ 0, sizeof(int), -1,
+	{ 0, sizeof(long), -1,
 	  newint, NIL(Dtfree_f), rcompare, hashint,
 	  NIL(Dtmemory_f), NIL(Dtevent_f)
 	};
 
-main()
+tmain()
 {
 	Dt_t*		dt;
 	Dtlink_t*	link;
-	int		i, k, count[10];
+	long		x, g, i, k, count[10];
 
 	/* testing Dtobag */
 	dt = dtopen(&Disc,Dtobag);
-	if((int)dtinsert(dt,5) != 5)
-		terror("Insert 5.1");
-	if((int)dtinsert(dt,2) != 2)
-		terror("Insert 2.1");
-	if((int)dtinsert(dt,5) != 5)
-		terror("Insert 5.2");
-	for(k = 0, i = (int)dtfirst(dt); i; k = i, i = (int)dtnext(dt,i))
+	x = 5;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 2;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 5;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	for(k = 0, i = (long)dtfirst(dt); i; k = i, i = (long)dtnext(dt,i))
 		if(i < k)
-			terror("Wrong order1\n");
-	if((int)dtinsert(dt,3) != 3)
-		terror("Insert 3.1");
-	if((int)dtinsert(dt,5) != 5)
-		terror("Insert 5.3");
-	for(k = 0, i = (int)dtfirst(dt); i; k = i, i = (int)dtnext(dt,i))
+			terror("Disorder %ld >= %ld", k, i);
+	x = 3;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 5;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	for(k = 0, i = (long)dtfirst(dt); i; k = i, i = (long)dtnext(dt,i))
 		if(i < k)
-			terror("Wrong order2\n");
-	if((int)dtinsert(dt,4) != 4)
-		terror("Insert 4.1");
-	if((int)dtinsert(dt,1) != 1)
-		terror("Insert 1");
-	for(k = 0, i = (int)dtfirst(dt); i; k = i, i = (int)dtnext(dt,i))
+			terror("Disorder %ld >= %ld", k, i);
+	x = 4;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 1;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	for(k = 0, i = (long)dtfirst(dt); i; k = i, i = (long)dtnext(dt,i))
 		if(i < k)
-			terror("Wrong order3\n");
-	if((int)dtinsert(dt,2) != 2)
-		terror("Insert 2.2");
-	if((int)dtinsert(dt,5) != 5)
-		terror("Insert 5.4");
-	if((int)dtinsert(dt,4) != 4)
-		terror("Insert 4.2");
-	if((int)dtinsert(dt,3) != 3)
-		terror("Insert 3.2");
-	for(k = 0, i = (int)dtfirst(dt); i; k = i, i = (int)dtnext(dt,i))
+			terror("Disorder %ld >= %ld", k, i);
+	x = 2;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 5;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 4;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 3;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	for(k = 0, i = (long)dtfirst(dt); i; k = i, i = (long)dtnext(dt,i))
 		if(i < k)
-			terror("Wrong order4\n");
-	if((int)dtinsert(dt,4) != 4)
-		terror("Insert 4.3");
-	if((int)dtinsert(dt,5) != 5)
-		terror("Insert 5.5");
-	for(k = 0, i = (int)dtfirst(dt); i; k = i, i = (int)dtnext(dt,i))
+			terror("Disorder %ld >= %ld", k, i);
+	x = 4;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 5;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	for(k = 0, i = (long)dtfirst(dt); i; k = i, i = (long)dtnext(dt,i))
 		if(i < k)
-			terror("Wrong order5\n");
-	if((int)dtinsert(dt,3) != 3)
-		terror("Insert 3.3");
-	if((int)dtinsert(dt,4) != 4)
-		terror("Insert 4.4");
-
-	for(k = 0, i = (int)dtfirst(dt); i; k = i, i = (int)dtnext(dt,i))
+			terror("Disorder %ld >= %ld", k, i);
+	x = 3;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	x = 4;
+	if((g = (char*)dtinsert(dt,x) - (char*)0) != x)
+		terror("Insert -- expected %ld, got %ld", x, g);
+	for(k = 0, i = (long)dtfirst(dt); i; k = i, i = (long)dtnext(dt,i))
 		if(i < k)
-			terror("Wrong order5\n");
-
+			terror("Disorder %ld >= %ld", k, i);
 	for(i = 0; i <= 5; ++i)
 		count[i] = 0;
-	for(i = (int)dtfirst(dt); i; i = (int)dtnext(dt,i))
+	for(i = (long)dtfirst(dt); i; i = (long)dtnext(dt,i))
 		count[i] += 1;
 	for(i = 0; i <= 5; ++i)
 		if(count[i] != i)
-			terror("Wrong count\n");
-
+			terror("dtnext count failed -- expected %d, got %ld", i, count[i]);
 	for(i = 0; i <= 5; ++i)
 		count[i] = 0;
-	for(i = (int)dtlast(dt); i; i = (int)dtprev(dt,i))
+	for(i = (long)dtlast(dt); i; i = (long)dtprev(dt,i))
 		count[i] += 1;
 	for(i = 0; i <= 5; ++i)
 		if(count[i] != i)
-			terror("Wrong count2\n");
-
-	for(k = 0, i = (int)dtfirst(dt); i; k = i, i = (int)dtnext(dt,i))
+			terror("dtprev count failed -- expected %d, got %ld", i, count[i]);
+	for(k = 0, i = (long)dtfirst(dt); i; k = i, i = (long)dtnext(dt,i))
 		if(i < k)
-			terror("Wrong order6\n");
+			terror("Disorder %ld >= %ld", k, i);
 
 	for(link = dtflatten(dt), i = 1; link; ++i)
-	{	for(k = 1; k <= i; ++k, link = dtlink(dt,link))
-			if(i != (int)dtobj(dt,link))
-				terror("Bad element\n");
-	}
+		for(k = 1; k <= i; ++k, link = dtlink(dt,link))
+			if(i != (long)dtobj(dt,link))
+				terror("Bad element");
 
-	return 0;
+	dtclear(dt);
+	if(dtsize(dt) > 0 )
+		terror("Non empty dictionary after clearing");
+
+	for(i = 1; i <= 10; ++i)
+	for(k = 1; k <= 10; ++k)
+		if((long)dtinsert(dt, k) != k)
+			terror("Can't insert k=%d at iteration %d", k, i);
+
+	for(k = 0, i = (long)dtatmost(dt,5L); i == 5; i = (long)dtnext(dt,i) )
+		k += 1;
+	if(k != 10)
+		terror("Did not see all 5's k=%d", k);
+
+	for(k = 0, i = (long)dtatleast(dt,3L); i == 3; i = (long)dtprev(dt,i) )
+		k += 1;
+	if(k != 10)
+		terror("Did not see all 3's k=%d", k);
+
+	texit(0);
 }

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -18,14 +18,14 @@
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                                                                      *
 ***********************************************************************/
-#include	"rshdr.h"
+#include	"rskeyhdr.h"
 
 /*	Opening sorting contexts
 **
 **	Written by Kiem-Phong Vo (07/08/96)
 */
 
-static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2006-07-17 $\0\n";
+static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2011-10-11 $\0\n";
 
 #if __STD_C
 Rs_t* rsnew(Rsdisc_t* disc)
@@ -42,13 +42,14 @@ Rsdisc_t*	disc;	/* discipline describing record types	*/
 }
 
 #if __STD_C
-int rsinit(reg Rs_t* rs, Rsmethod_t* meth, ssize_t c_max, int type)
+int rsinit(reg Rs_t* rs, Rsmethod_t* meth, ssize_t c_max, int type, Rskey_t* key)
 #else
-int rsinit(rs, meth, c_max, type)
+int rsinit(rs, meth, c_max, type, key)
 Rs_t*		rs;	/* handle from rsnew()			*/
 Rsmethod_t*	meth;	/* sorting method			*/
 ssize_t		c_max;	/* process about this much per chain	*/
 int		type;	/* sort controls			*/
+Rskey_t*	key;	/* key coder state			*/
 #endif
 {
 	Rsdisc_t*	disc;
@@ -58,12 +59,12 @@ int		type;	/* sort controls			*/
 		round /= 4;
 	rs->vmdisc.memoryf = Vmdcheap->memoryf;
 	rs->vmdisc.exceptf = Vmdcheap->exceptf;
-	if(!(rs->vm = (Vmalloc_t*)vmopen(&rs->vmdisc, Vmbest, VM_TRUST)) )
+	if(!(rs->vm = (Vmalloc_t*)vmopen(&rs->vmdisc, Vmbest, 0)) )
 	{	vmfree(Vmheap,(void*)rs);
 		return -1;
 	}
 	rs->vmdisc.round = round <= 0 ? RS_RESERVE : round;
-	if(!(rs->vm = (Vmalloc_t*)vmopen(&rs->vmdisc, Vmbest, VM_TRUST)) )
+	if(!(rs->vm = (Vmalloc_t*)vmopen(&rs->vmdisc, Vmbest, 0)) )
 	{	vmfree(Vmheap,(void*)rs);
 		return -1;
 	}
@@ -74,6 +75,7 @@ int		type;	/* sort controls			*/
 	rs->meth = meth;
 	rs->c_max = c_max;
 	rs->type = rs->disc->type | (type&RS_TYPES);
+	rs->key = rs->disc->version < 20111011L ? (Rskey_t*)((char*)rs->disc - sizeof(Rskey_t)) : key;
 
 	rs->events = 0;
 	for (disc = rs->disc; disc; disc = disc->disc)
@@ -101,7 +103,7 @@ int		type;	/* sort controls			*/
 {
 	reg Rs_t*	rs;
 
-	if((rs = rsnew(disc)) && rsinit(rs, meth, c_max, type))
+	if((rs = rsnew(disc)) && rsinit(rs, meth, c_max, type, NiL))
 	{	vmclose(rs->vm);
 		vmfree(Vmheap,rs);
 		rs = 0;

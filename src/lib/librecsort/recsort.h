@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -29,7 +29,7 @@
 
 #define RS_PLUGIN_VERSION	AST_PLUGIN_VERSION(20100528L)
 #define RS_VERSION		20030811L
-#define RSKEY_VERSION		19961031L
+#define RSKEY_VERSION		20111011L
 
 #define SORTLIB(m)		unsigned long plugin_version(void) { return RS_PLUGIN_VERSION; }
 
@@ -37,15 +37,15 @@ typedef struct _rsobj_s		Rsobj_t;
 typedef struct _rs_s		Rs_t;
 typedef struct _rsmethod_s	Rsmethod_t;
 typedef struct _rsdisc_s	Rsdisc_t;
-typedef int 			(*Rsdefkey_f)
-				  _ARG_((Rs_t*, unsigned char*, int,
-					 unsigned char*, int, Rsdisc_t*));
+typedef ssize_t 		(*Rsdefkey_f)_ARG_((Rs_t*, unsigned char*, size_t, unsigned char*, size_t, Rsdisc_t*));
 typedef int			(*Rsevent_f)_ARG_((Rs_t*, int, Void_t*, Void_t*, Rsdisc_t*));
 
 typedef struct _rskey_s		Rskey_t;
 typedef struct _rskeydisc_s	Rskeydisc_t;
-typedef int			(*Rskeyerror_f)
-				  _ARG_((Void_t*, Void_t*, int, ...));
+typedef struct _rskeyfield_s	Rskeyfield_t;
+typedef int			(*Rskeyerror_f)_ARG_((Void_t*, Void_t*, int, ...));
+
+typedef ssize_t (*Rskeycode_f)_ARG_((Rskey_t*, Rskeyfield_t*, unsigned char*, size_t, unsigned char*, unsigned char*));
 
 struct _rsmethod_s
 {	int		(*insertf)_ARG_((Rs_t*, Rsobj_t*));
@@ -85,6 +85,19 @@ struct _rskeydisc_s
 	Rskeyerror_f	errorf;		/* error function		*/
 };
 
+struct _rskeyfield_s
+{	Rskeyfield_t*	next;		/* next in list			*/
+	Rskeycode_f	coder;		/* encode data into key		*/
+	void*		user;		/* user specific data		*/
+
+	unsigned	flag;		/* code flag			*/
+	unsigned char	rflag;		/* reverse order		*/
+
+#ifdef _RSKEYFIELD_PRIVATE_
+	_RSKEYFIELD_PRIVATE_
+#endif
+};
+
 struct _rskey_s
 {	const char*	id;		/* library id			*/
 	Rskeydisc_t*	keydisc;	/* rskey discipline		*/
@@ -110,6 +123,9 @@ struct _rskey_s
 	int		code;		/* global ccode translation	*/
 
 	unsigned char	tab[32];	/* global tab char/string	*/
+
+	Rskeyfield_t*	head;		/* key field list head		*/
+	Rskeyfield_t*	tail;		/* key field list tail		*/
 
 #ifdef _RSKEY_PRIVATE_
 	_RSKEY_PRIVATE_
@@ -216,7 +232,7 @@ _BEGIN_EXTERNS_	/* public functions */
 #endif
 
 extern Rs_t*		rsnew _ARG_((Rsdisc_t*));
-extern int		rsinit _ARG_((Rs_t*, Rsmethod_t*, ssize_t, int));
+extern int		rsinit _ARG_((Rs_t*, Rsmethod_t*, ssize_t, int, Rskey_t*));
 
 extern Rs_t*		rsopen _ARG_((Rsdisc_t*, Rsmethod_t*, ssize_t, int));
 extern int		rsclear _ARG_((Rs_t*));
@@ -229,7 +245,7 @@ extern int		rsmerge _ARG_((Rs_t*, Sfio_t*, Sfio_t**, int, int));
 extern Rsdisc_t*	rsdisc _ARG_((Rs_t*, Rsdisc_t*, int));
 extern Rsmethod_t*	rsmethod _ARG_((Rs_t*, Rsmethod_t*));
 
-extern Rskey_t*		rskeyopen _ARG_((Rskeydisc_t*));
+extern Rskey_t*		rskeyopen _ARG_((Rskeydisc_t*, Rsdisc_t*));
 extern int		rskey _ARG_((Rskey_t*, const char*, int));
 extern int		rskeyopt _ARG_((Rskey_t*, const char*, int));
 extern Rsmethod_t*	rskeymeth _ARG_((Rskey_t*, const char*));

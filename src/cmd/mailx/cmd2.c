@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2007 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -638,11 +638,14 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 			sfprintf(state.path.temp, " -t");
 		if (cmd)
 			sfprintf(state.path.temp, " -o - | %s", cmd);
-		else if (filestd(name, "w"))
+		else if (filestd(name, "w")) {
+			if ((flags & GMIME) && mime(1) && (s = mimeview(state.part.mime, NiL, NiL, ap->type, ap->opts)))
+				sfprintf(state.path.temp, " | %s", s);
 			sfprintf(state.path.temp, " | %s", state.var.pager);
+		}
 		else
 		{
-			sfprintf(state.path.temp, " -o ", name);
+			sfprintf(state.path.temp, " -o ");
 			shquote(state.path.temp, name);
 		}
 		s = struse(state.path.temp);
@@ -653,20 +656,19 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 		n = -1;
 	}
 	else if (filestd(name, "w")) {
-		s = state.var.pager;
-		n = -1;
+		if ((flags & GMIME) && mime(1) && (s = mimeview(state.part.mime, NiL, NiL, ap->type, ap->opts))) {
+			sfprintf(state.path.temp, "%s | %s", s, state.var.pager);
+			s = struse(state.path.temp);
+			n = 1;
+		}
+		else {
+			s = state.var.pager;
+			n = -1;
+		}
 	}
 	else {
 		s = name;
 		n = 0;
-	}
-	if (state.var.debug) {
-		note(DEBUG, "%s `%s'", n ? "pipe" : "file", s);
-		if ((flags & GMIME) &&
-		    mime(1) &&
-		    (s = mimeview(state.part.mime, NiL, name, ap->type, ap->opts)))
-			note(DEBUG, "mimeview `%s'", s);
-		return 0;
 	}
 	if (!(op = n ? pipeopen(s, "w") : fileopen(s, "ERw")))
 		return 1;
@@ -680,11 +682,6 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 	fileclose(op);
 	if (flags & GDISPLAY)
 		note(0, "\"%s\" %ld/%ld", name, (long)*lines, (long)*chars);
-	if ((flags & GMIME) &&
-	    mime(1) &&
-	    (s = mimeview(state.part.mime, NiL, name, ap->type, ap->opts)) &&
-	    (n = start_command(state.var.shell, SIG_REG_EXEC, -1, -1, "-c", s, NiL)) >= 0)
-		wait_command(n);
 	return 0;
 }
 

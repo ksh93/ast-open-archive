@@ -1,3 +1,16 @@
+11-12-13 option.c: fix off by 1 undermalloc
+11-12-13 Makerules.mk: fix MAKE_OPTIONS to peoperly handle --*=* options
+11-11-01 Makerules.mk: omit .TARGETs from manifest
+11-10-28 command.c: expand .EXPORT values at export time -- doh
+11-10-10 Makerules.mk: parameter (PROTO) (PROTOFLAGS) -- doh
+11-09-11 parse.c: fix ``local ( A B ... ) 1'' that did not declare B
+11-09-09 Makerules.mk: check $PACKAGE_foo and then $FOO_HOME
+11-09-07 debug-package.mk: add
+11-08-31 mam.c,option.c: add state.mam.hold, set mam=[no]hold
+11-08-30 object.c: drop OLD_header_t.version union for old cc
+11-08-28 Makerules.mk: add $(ARHYPHEN) for ancient sun4-vintage ar(1)
+11-08-25 Makerules.mk: change obsolete name=value option timeout to 20121221
+11-08-11 Makerules.mk: fix :READONLY: typo
 11-05-09 Makerules.mk: add .SOURCE.h : $(INSTALLROOT)/include
 11-05-09 fix .LIST.PACKAGE.LICENSE to include .'d def files
 11-03-03 rules.win32.mk: add %.rc -DRCWOW=...

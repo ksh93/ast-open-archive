@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -48,14 +48,14 @@ void*	data;
 	}
 }
 
-MAIN()
+tmain()
 {
 	Sfio_t*	f;
 	int	fd;
 
 	sfnotify(notify);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) && Type != SF_NEW)
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")) && Type != SF_NEW)
 		terror("Notify did not announce SF_NEW event");
 	fd = sffileno(f);
 	close(fd+5);
@@ -70,5 +70,5 @@ MAIN()
 	if(sfgetc(sfstdout) >= 0 || Type != SF_READ)
 		terror("Notify did not announce SF_READ event");
 
-	TSTEXIT(0);
+	texit(0);
 }

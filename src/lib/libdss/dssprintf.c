@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -33,6 +33,7 @@ struct Arg_s
 	Cxvariable_t*		variable;
 	Cxexpr_t*		expr;
 	Cxtype_t*		cast;
+	Cxedit_t*		edit;
 	char*			details;
 	char*			qb;
 	char*			qe;
@@ -52,7 +53,7 @@ struct Format_s
 typedef struct Fmt_s
 {
 	Sffmt_t			fmt;
-	Dss_t*			dss;
+	Cx_t*			cx;
 	void*			data;
 	int			errors;
 	Arg_t*			ap;
@@ -90,7 +91,7 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	Value_t*	value = (Value_t*)vp;
 	Cxoperand_t	ret;
 
-	if (ap->expr && cxeval(fp->dss->cx, ap->expr, fp->data, &ret) < 0 || cxcast(fp->dss->cx, &ret, ap->variable, ap->cast, fp->data, ap->details))
+	if (ap->expr && cxeval(fp->cx, ap->expr, fp->data, &ret) < 0 || cxcast(fp->cx, &ret, ap->variable, ap->cast, fp->data, ap->details))
 	{
 		fp->errors++;
 		return -1;
@@ -142,12 +143,14 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
 			value->q = (Sfulong_t)((Sflong_t)ret.value.number);
 		break;
 	case DSS_FORMAT_string:
+		if (ap->fmt & (FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_NOCR|FMT_EXP_NONL|FMT_EXP_WIDE))
+			ret.value.string.size = strexp(ret.value.string.data, ap->fmt);
+		if (ap->edit)
+			cxsub(fp->cx, ap->edit, &ret);
+		if (ap->flags & DSS_FORMAT_quote)
+			ret.value.string.size = strlen(ret.value.string.data = fmtquote(ret.value.string.data, ap->qb, ap->qe, ret.value.string.size, ap->fmt));
 		value->s = ret.value.string.data;
 		fp->fmt.size = ret.value.string.size;
-		if (ap->fmt & (FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_NOCR|FMT_EXP_NONL|FMT_EXP_WIDE))
-			fp->fmt.size = strexp(value->s, ap->fmt);
-		if (ap->flags & DSS_FORMAT_quote)
-			fp->fmt.size = strlen(value->s = fmtquote(value->s, ap->qb, ap->qe, fp->fmt.size, ap->fmt));
 		break;
 	}
 	return 0;
@@ -158,7 +161,7 @@ getfmt(Sfio_t* sp, void* vp, Sffmt_t* dp)
  */
 
 int
-dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
+dssprintf(Dss_t* dss, Cx_t* cx, Sfio_t* sp, const char* format, Dssrecord_t* record)
 {
 	register char*	s;
 	register char*	t;
@@ -170,402 +173,479 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 	int		l;
 	int		x;
 	char*		f;
+	char*		o;
 	char*		w;
 	Format_t*	fp;
 	Fmt_t		fmt;
 
+	if (!cx)
+		cx = dss->cx;
 	for (fp = dss->print; fp && fp->oformat != (char*)format; fp = fp->next);
 	if (!fp)
 	{
-		char*	details['z' - 'a' + 1];
-
-		memset(details, 0, sizeof(details));
-		f = s = (char*)format;
-		d = 0;
-		l = 0;
-		n = 0;
-		q = 0;
-		w = 0;
-		for (;;)
+		if (f = s = (char*)format)
 		{
-			switch (*s++)
+			char*	details['z' - 'a' + 1];
+
+			memset(details, 0, sizeof(details));
+			d = 0;
+			l = 0;
+			n = 0;
+			q = 0;
+			w = 0;
+			for (;;)
 			{
-			case 0:
-				if (q)
+				switch (*s++)
 				{
-					if (dss->disc->errorf)
-						(*dss->disc->errorf)(NiL, dss->disc, 2, "%s: format character omitted", f);
-					return -1;
-				}
-				break;
-			case '%':
-				if (*s != '%')
-				{
-					q = 1;
-					n++;
-					f = s - 1;
-				}
-				continue;
-			case '(':
-				if (q == 1)
-				{
-					q++;
-					for (;;)
-					{
-						switch (*s++)
-						{
-						case 0:
-							s--;
-							break;
-						case '(':
-							q++;
-							continue;
-						case ')':
-							if (--q == 1)
-								break;
-							continue;
-						case ':':
-							if (*s == ':')
-								s++;
-							else if (!d)
-								d = s;
-							continue;
-						default:
-							continue;
-						}
-						break;
-					}
-					if (d)
-					{
-						l += s - d + 1;
-						d = 0;
-					}
-				}
-				continue;
-			case 'c':
-			case 'd':
-			case 'e':
-			case 'f':
-			case 'g':
-			case 'o':
-			case 's':
-			case 'u':
-			case 'x':
-				if (q == 1)
-					q = 0;
-				continue;
-			default:
-				continue;
-			}
-			break;
-		}
-		if (!(fp = vmnewof(dss->vm, 0, Format_t, 1, (n - 1) * sizeof(Arg_t) + strlen(format) + 2 * n + l + 2)))
-		{
-			if (dss->disc->errorf)
-				(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "out of space");
-			return -1;
-		}
-		fp->oformat = (char*)format;
-		fp->next = dss->print;
-		dss->print = fp;
-		ap = &fp->arg[0];
-		s = t = fp->nformat = (char*)(&fp->arg[n]);
-		strcpy(t, format);
-		f = t + strlen(format) + 2 * n + 1;
-		q = 0;
-		d = 0;
-		l = 0;
-		for (;;)
-		{
-			switch (*t++ = *s++)
-			{
-			case 0:
-				*(t - 1) = '\n';
-				*t = 0;
-				break;
-			case '%':
-				if (*s == '%')
-					*t++ = *s++;
-				else
-					q = 1;
-				continue;
-			case '(':
-				if (q == 1)
-				{
-					q++;
-					t--;
-					x = 0;
-					v = s;
-					for (;;)
-					{
-						switch (*s++)
-						{
-						case 0:
-							if (dss->disc->errorf)
-								(*dss->disc->errorf)(NiL, dss->disc, 2, "%s: %(...) imbalance", fp->oformat);
-							return -1;
-						case '(':
-							if (!d)
-								x = 1;
-							q++;
-							continue;
-						case ')':
-							if (--q == 1)
-								break;
-							continue;
-						case ':':
-							if (*s == ':')
-								s++;
-							else if (!d && q == 2)
-								d = s;
-							continue;
-						case ',':
-							if (!d)
-								x = 1;
-							continue;
-						default:
-							if (!d && dss->cx->table->opcode[*(unsigned char*)(s - 1)])
-								x = 1;
-							continue;
-						}
-						break;
-					}
-					if (d)
-						*(d - 1) = 0;
-					*(s - 1) = 0;
-					if (*v)
-					{
-						if (x)
-						{
-							void*	pop;
-
-							if (!(pop = cxpush(dss->cx, NiL, NiL, v, (d ? d : s) - v - 1, 0)))
-								return -1;
-							ap->expr = cxcomp(dss->cx);
-							cxpop(dss->cx, pop);
-							if (!ap->expr)
-								return -1;
-						}
-						else if (dss->cx->referencef)
-						{
-							Cxoperand_t	a;
-							Cxoperand_t	b;
-							Cxoperand_t	r;
-
-							a.type = dss->cx->state->type_string;
-							a.value.string.size = s - v - 1;
-							a.value.string.data = v;
-							b.type = a.type;
-							if ((*dss->cx->referencef)(dss->cx, NiL, &r, &b, &a, NiL, dss->cx->disc))
-								return -1;
-							ap->variable = r.value.variable;
-						}
-						else if (!(ap->variable = cxvariable(dss->cx, v, NiL, dss->cx->disc)))
-							return -1;
-					}
-					else if (d)
-						w = d;
-				}
-				continue;
-			case 'c':
-				if (q == 1)
-				{
-					ap->type = DSS_FORMAT_char;
-					ap->cast = dss->cx->state->type_number;
-					goto set;
-				}
-				continue;
-			case 'd':
-			case 'o':
-			case 'u':
-			case 'x':
-				if (q == 1)
-				{
-					if (l > 1 || ap->variable->format.width == 8 || ap->variable->type->format.width == 8)
-					{
-						n = *(t - 1);
-						*(t - 1) = 'l';
-						*t++ = 'l';
-						*t++ = n;
-						ap->type = DSS_FORMAT_long;
-					}
-					else
-						ap->type = DSS_FORMAT_int;
-					ap->cast = dss->cx->state->type_number;
-					goto set;
-				}
-				continue;
-			case 'e':
-			case 'f':
-			case 'g':
-				if (q == 1)
-				{
-					ap->type = DSS_FORMAT_float;
-					ap->cast = dss->cx->state->type_number;
-					goto set;
-				}
-				continue;
-			case 'h':
-				if (q == 1)
-					t--;
-				continue;
-			case 'l':
-				if (q == 1)
-				{
-					t--;
-					l++;
-				}
-				continue;
-			case 's':
-				if (q == 1)
-				{
-					ap->type = DSS_FORMAT_string;
-					ap->cast = dss->cx->state->type_string;
-				set:
-					if (w)
-					{
-						details[*(s-1) - 'a'] = w;
-						w = 0;
-						fp->nformat = t = s;
-						continue;
-					}
-					if (!ap->variable && !ap->expr)
+				case 0:
+					if (q)
 					{
 						if (dss->disc->errorf)
-						{
-							*t = 0;
-							(*dss->disc->errorf)(NiL, dss->disc, 2, "%s: (variable) omitted in format", fp->nformat);
-						}
+							(*dss->disc->errorf)(NiL, dss->disc, 2, "%s: format character omitted", f);
 						return -1;
 					}
-					l = 0;
-					q = 0;
-					if (d || (d = details[*(s-1) - 'a']) || (d = dss->cx->state->type_string->format.details))
+					break;
+				case '%':
+					if (*s != '%')
 					{
-						ap->fmt = FMT_ALWAYS|FMT_ESCAPED;
-						while (*d)
+						q = 1;
+						n++;
+						f = s - 1;
+					}
+					continue;
+				case '(':
+					if (q == 1)
+					{
+						q++;
+						for (;;)
 						{
-							v = d;
-							while (*d)
-								if (*d++ == ':')
-								{
-									*(d - 1) = 0;
+							switch (*s++)
+							{
+							case 0:
+								s--;
+								break;
+							case '(':
+								q++;
+								continue;
+							case ')':
+								if (--q == 1)
 									break;
-								}
-							if (strneq(v, "endquote=", 8))
-							{
-								ap->qe = v += 8;
-								while (*f++ = *v++);
-							}
-							else if (streq(v, "expand"))
-							{
-								ap->fmt |= FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_WIDE;
+								continue;
+							case ':':
+								if (*s == ':')
+									s++;
+								else if (!d)
+									d = s;
+								continue;
+							default:
 								continue;
 							}
-							else if (strneq(v, "expand=", 7))
+							break;
+						}
+						if (d)
+						{
+							l += s - d + 1;
+							d = 0;
+						}
+					}
+					continue;
+				case 'c':
+				case 'd':
+				case 'e':
+				case 'f':
+				case 'g':
+				case 'o':
+				case 's':
+				case 'u':
+				case 'x':
+					if (q == 1)
+						q = 0;
+					continue;
+				default:
+					continue;
+				}
+				break;
+			}
+			if (!(fp = vmnewof(dss->vm, 0, Format_t, 1, (n - 1) * sizeof(Arg_t) + strlen(format) + 2 * n + l + 2)))
+			{
+				if (dss->disc->errorf)
+					(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "out of space");
+				return -1;
+			}
+			fp->oformat = (char*)format;
+			fp->next = dss->print;
+			dss->print = fp;
+			ap = &fp->arg[0];
+			s = t = fp->nformat = (char*)(&fp->arg[n]);
+			strcpy(t, format);
+			f = t + strlen(format) + 2 * n + 1;
+			q = 0;
+			d = 0;
+			l = 0;
+			for (;;)
+			{
+				switch (*t++ = *s++)
+				{
+				case 0:
+					*(t - 1) = '\n';
+					*t = 0;
+					break;
+				case '%':
+					if (*s == '%')
+						*t++ = *s++;
+					else
+						q = 1;
+					continue;
+				case '(':
+					if (q == 1)
+					{
+						q++;
+						t--;
+						x = 0;
+						v = s;
+						for (;;)
+						{
+							switch (*s++)
 							{
-								v += 7;
-								while (*v)
-								{
-									if (*v == '|' || *v == ',')
+							case 0:
+								if (dss->disc->errorf)
+									(*dss->disc->errorf)(NiL, dss->disc, 2, "%s: %(...) imbalance", fp->oformat);
+								return -1;
+							case '(':
+								if (!d)
+									x = 1;
+								q++;
+								continue;
+							case ')':
+								if (--q == 1)
+									break;
+								continue;
+							case ':':
+								if (*s == ':')
+									s++;
+								else if (!d && q == 2)
+									d = s;
+								continue;
+							case ',':
+								if (!d)
+									x = 1;
+								continue;
+							default:
+								if (!d && cx->table->opcode[*(unsigned char*)(s - 1)])
+									x = 1;
+								continue;
+							}
+							break;
+						}
+						if (d)
+							*(d - 1) = 0;
+						*(s - 1) = 0;
+						if (*v)
+						{
+							if (x)
+							{
+								void*	pop;
+	
+								if (!(pop = cxpush(cx, NiL, NiL, v, (d ? d : s) - v, 0)))
+									return -1;
+								ap->expr = cxcomp(cx);
+								cxpop(cx, pop);
+								if (!ap->expr)
+									return -1;
+							}
+							else if (cx->referencef)
+							{
+								Cxoperand_t	a;
+								Cxoperand_t	b;
+								Cxoperand_t	r;
+	
+								a.type = cx->state->type_string;
+								a.value.string.size = s - v - 1;
+								a.value.string.data = v;
+								b.type = a.type;
+								if ((*cx->referencef)(cx, NiL, &r, &b, &a, NiL, cx->disc))
+									return -1;
+								ap->variable = r.value.variable;
+							}
+							else if (!(ap->variable = cxvariable(cx, v, NiL, cx->disc)))
+								return -1;
+						}
+						else if (d)
+						{
+							w = d;
+							d = 0;
+						}
+					}
+					continue;
+				case 'c':
+					if (q == 1)
+					{
+						ap->type = DSS_FORMAT_char;
+						ap->cast = cx->state->type_number;
+						goto set;
+					}
+					continue;
+				case 'd':
+				case 'o':
+				case 'u':
+				case 'x':
+					if (q == 1)
+					{
+						if (l > 1 || ap->variable && (ap->variable->format.width == 8 || ap->variable->type->format.width == 8))
+						{
+							n = *(t - 1);
+							*(t - 1) = 'l';
+							*t++ = 'l';
+							*t++ = n;
+							ap->type = DSS_FORMAT_long;
+						}
+						else
+							ap->type = DSS_FORMAT_int;
+						ap->cast = cx->state->type_number;
+						goto set;
+					}
+					continue;
+				case 'e':
+				case 'f':
+				case 'g':
+					if (q == 1)
+					{
+						ap->type = DSS_FORMAT_float;
+						ap->cast = cx->state->type_number;
+						goto set;
+					}
+					continue;
+				case 'h':
+					if (q == 1)
+						t--;
+					continue;
+				case 'l':
+					if (q == 1)
+					{
+						t--;
+						l++;
+					}
+					continue;
+				case 's':
+					if (q == 1)
+					{
+						ap->type = DSS_FORMAT_string;
+						ap->cast = cx->state->type_string;
+					set:
+						if (w)
+						{
+							details[*(s-1) - 'a'] = w;
+							w = 0;
+							fp->nformat = t = s;
+							continue;
+						}
+						if (!ap->variable && !ap->expr)
+						{
+							if (dss->disc->errorf)
+							{
+								*t = 0;
+								(*dss->disc->errorf)(NiL, dss->disc, 2, "%s: (variable) omitted in format", fp->nformat);
+							}
+							return -1;
+						}
+						l = 0;
+						q = 0;
+						if (d || (d = details[*(s-1) - 'a']) || (d = cx->state->type_string->format.details))
+						{
+							ap->fmt = FMT_ALWAYS|FMT_ESCAPED;
+							while (*d)
+							{
+								o = 0;
+								v = d;
+								while (*d)
+									if (*d++ == ':')
 									{
-										v++;
-										continue;
-									}
-									if (strneq(v, "all", 3))
-									{
-										ap->fmt |= FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_WIDE;
+										*(o = d - 1) = 0;
 										break;
 									}
-									else if (strneq(v, "char", 4))
+								if (strneq(v, "edit=", 5))
+								{
+									if (o)
+										*o = ':';
+									if (ap->edit = cxedit(cx, v + 5, dss->disc))
 									{
-										v += 4;
-										ap->fmt |= FMT_EXP_CHAR;
+										d = v + 5 + ap->edit->re.re_npat;
+										if (d == o)
+											d++;
 									}
-									else if (strneq(v, "line", 4))
+								}
+								else if (strneq(v, "endquote=", 8))
+								{
+									ap->qe = v += 8;
+									while (*f++ = *v++);
+								}
+								else if (streq(v, "expand"))
+								{
+									ap->fmt |= FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_WIDE;
+									continue;
+								}
+								else if (strneq(v, "expand=", 7))
+								{
+									v += 7;
+									while (*v)
 									{
-										v += 4;
-										ap->fmt |= FMT_EXP_LINE;
+										if (*v == '|' || *v == ',')
+										{
+											v++;
+											continue;
+										}
+										if (strneq(v, "all", 3))
+										{
+											ap->fmt |= FMT_EXP_CHAR|FMT_EXP_LINE|FMT_EXP_WIDE;
+											break;
+										}
+										else if (strneq(v, "char", 4))
+										{
+											v += 4;
+											ap->fmt |= FMT_EXP_CHAR;
+										}
+										else if (strneq(v, "line", 4))
+										{
+											v += 4;
+											ap->fmt |= FMT_EXP_LINE;
+										}
+										else if (strneq(v, "nocr", 4))
+										{
+											v += 4;
+											ap->fmt |= FMT_EXP_NOCR;
+										}
+										else if (strneq(v, "nonl", 4))
+										{
+											v += 4;
+											ap->fmt |= FMT_EXP_NONL;
+										}
+										else if (strneq(v, "wide", 4))
+										{
+											v += 4;
+											ap->fmt |= FMT_EXP_WIDE;
+										}
+										else
+											while (*v && *v != '|' && *v != ',')
+												v++;
 									}
-									else if (strneq(v, "nocr", 4))
+									continue;
+								}
+								else if (streq(v, "escape"))
+									ap->fmt &= ~FMT_ESCAPED;
+								else if (strneq(v, "opt", 3))
+									ap->fmt &= ~FMT_ALWAYS;
+								else if (streq(v, "quote") || strneq(v, "quote=", 6))
+								{
+									if (v[5])
 									{
-										v += 4;
-										ap->fmt |= FMT_EXP_NOCR;
-									}
-									else if (strneq(v, "nonl", 4))
-									{
-										v += 4;
-										ap->fmt |= FMT_EXP_NONL;
-									}
-									else if (strneq(v, "wide", 4))
-									{
-										v += 4;
-										ap->fmt |= FMT_EXP_WIDE;
+										ap->qb = v += 6;
+										while (*f++ = *v++);
 									}
 									else
-										while (*v && *v != '|' && *v != ',')
-											v++;
+										ap->qb = "\"";
+									if (!ap->qe)
+										ap->qe = ap->qb;
 								}
-								continue;
-							}
-							else if (streq(v, "escape"))
-								ap->fmt &= ~FMT_ESCAPED;
-							else if (strneq(v, "opt", 3))
-								ap->fmt &= ~FMT_ALWAYS;
-							else if (streq(v, "quote") || strneq(v, "quote=", 6))
-							{
-								if (v[5])
+								else if (streq(v, "shell") || strneq(v, "shell=", 6))
 								{
-									ap->qb = v += 6;
-									while (*f++ = *v++);
+									ap->fmt |= FMT_SHELL;
+									if (v[5])
+									{
+										ap->qb = v += 6;
+										while (*f++ = *v++);
+									}
+									else
+										ap->qb = "$'";
+									if (!ap->qe)
+										ap->qe = "'";
 								}
+								else if (streq(v, "wide"))
+									ap->fmt |= FMT_WIDE;
 								else
-									ap->qb = "\"";
-								if (!ap->qe)
-									ap->qe = ap->qb;
-							}
-							else if (streq(v, "shell") || strneq(v, "shell=", 6))
-							{
-								ap->fmt |= FMT_SHELL;
-								if (v[5])
 								{
-									ap->qb = v += 6;
-									while (*f++ = *v++);
+									if (*d)
+										*(d - 1) = ':';
+									d = v;
+									break;
 								}
-								else
-									ap->qb = "$'";
-								if (!ap->qe)
-									ap->qe = "'";
+								ap->flags |= DSS_FORMAT_quote;
 							}
-							else if (streq(v, "wide"))
-								ap->fmt |= FMT_WIDE;
-							else
-							{
-								if (*d)
-									*(d - 1) = ':';
-								d = v;
-								break;
-							}
-							ap->flags |= DSS_FORMAT_quote;
+							ap->details = f;
+							while (*f++ = *d++);
+							d = 0;
 						}
-						ap->details = f;
-						while (*f++ = *d++);
-						d = 0;
+						if (ap->variable && !ap->edit && cxisstring(ap->variable->type) && ap->variable->format.map && ap->variable->format.map->part && ap->variable->format.map->part->edit)
+							ap->edit = ap->variable->format.map->part->edit;
+						ap++;
 					}
-					ap++;
+					continue;
+				case 'L':
+					if (q == 1)
+					{
+						t--;
+						l += 2;
+					}
+					continue;
+				default:
+					continue;
 				}
-				continue;
-			case 'L':
-				if (q == 1)
-				{
-					t--;
-					l += 2;
-				}
-				continue;
-			default:
-				continue;
+				break;
 			}
-			break;
+		}
+		else
+		{
+			Cxvariable_t*	vp;
+
+			n = q = 0;
+			if (dss->meth->cx->fields)
+			{
+				for (vp = (Cxvariable_t*)dtfirst(dss->meth->cx->fields); vp; vp = (Cxvariable_t*)dtnext(dss->meth->cx->fields, vp), n++)
+					if (q < (l = strlen(vp->name)))
+						q = l;
+			}
+			else if (dss->meth->data)
+			{
+				for (vp = (Cxvariable_t*)dss->meth->data; vp->name; vp++, n++)
+					if (q < (l = strlen(vp->name)))
+						q = l;
+			}
+			q += 2;
+			if (!(fp = vmnewof(dss->vm, 0, Format_t, 1, n * sizeof(Arg_t) + n * (q + 3) + 2)))
+			{
+				if (dss->disc->errorf)
+					(*dss->disc->errorf)(NiL, dss->disc, ERROR_SYSTEM|2, "out of space");
+				return -1;
+			}
+			fp->oformat = 0;
+			fp->next = dss->print;
+			dss->print = fp;
+			ap = &fp->arg[0];
+			s = fp->nformat = (char*)(&fp->arg[n]);
+			*s++ = '\n';
+			vp = dss->meth->cx->fields ? (Cxvariable_t*)dtfirst(dss->meth->cx->fields) : dss->meth->data ? (Cxvariable_t*)dss->meth->data : 0;
+			if (vp)
+				for (;;)
+				{
+					if (dss->meth->cx->fields)
+					{
+						if (!vp)
+							break;
+					}
+					else if (!vp->name)
+						break;
+					s += sfsprintf(s, q + 4, "%-*s%%s\n", q, vp->name);
+					ap->variable = vp;
+					ap->type = DSS_FORMAT_string;
+					ap->cast = cx->state->type_string;
+					if (cxisstring(vp->type) && vp->format.map && vp->format.map->part && vp->format.map->part->edit)
+						ap->edit = vp->format.map->part->edit;
+					ap++;
+					if (dss->meth->cx->fields)
+						vp = (Cxvariable_t*)dtnext(dss->meth->cx->fields, vp);
+					else
+						vp++;
+				}
+			*s = 0;
 		}
 		if (!sp)
 			return 0;
@@ -574,7 +654,7 @@ dssprintf(Dss_t* dss, Sfio_t* sp, const char* format, Dssrecord_t* record)
 	fmt.fmt.version = SFIO_VERSION;
 	fmt.fmt.form = fp->nformat;
 	fmt.fmt.extf = getfmt;
-	fmt.dss = dss;
+	fmt.cx = cx;
 	fmt.data = record;
 	fmt.ap = &fp->arg[0];
 	n = sfprintf(sp, "%!", &fmt);

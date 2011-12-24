@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1998-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -200,6 +200,8 @@ sfdczip(Sfio_t* sp, const char* path, register const char* meth, Error_f errorf)
 			}
 			break;
 		}
+		if (r > 0)
+			sfset(sp, SF_SHARE, 0);
 	}
 	if (r < 0 && errorf)
 		(*errorf)(NiL, NiL, 2, "%s: %s: %s", path, meth, mesg);

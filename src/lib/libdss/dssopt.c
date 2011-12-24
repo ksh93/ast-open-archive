@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -213,6 +213,7 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 	Cxtype_t*	tp;
 	Cxvariable_t*	vp;
 	long		pos;
+	int		all;
 	int		head;
 	char		name[64];
 
@@ -303,12 +304,13 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		/*FALLTHROUGH*/
 	case 'v':
 		/* fields|variables */
+		all = !state->meth || meth->cx && (!meth->cx->fields || !dtsize(meth->cx->fields));
 		if (head)
 			head = 0;
 		else if (meth->description && optout(sp, meth->name, NiL, NiL, NiL, meth->description, NiL))
 			return -1;
 		for (tp = (Cxtype_t*)dtfirst(state->cx->types); tp; tp = (Cxtype_t*)dtnext(state->cx->types, tp))
-			if ((tp->base || tp->match) && (tp->header.flags & CX_REFERENCED) || !state->meth)
+			if (all || (tp->base || tp->match) && (tp->header.flags & CX_REFERENCED))
 			{
 				if (!head)
 				{
@@ -321,7 +323,7 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 			}
 		head = 0;
 		for (mp = (Cxmap_t*)dtfirst(state->cx->maps); mp; mp = (Cxmap_t*)dtnext(state->cx->maps, mp))
-			if ((mp->header.flags & CX_REFERENCED) || !state->meth)
+			if (all || (mp->header.flags & CX_REFERENCED))
 			{
 				if (!head)
 				{
@@ -334,8 +336,24 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 				if (optmap(sp, mp))
 					return -1;
 			}
+		if (all && meth->cx && meth->cx->variables)
+		{
+			head = 0;
+			for (vp = (Cxvariable_t*)dtfirst(meth->cx->variables); vp; vp = (Cxvariable_t*)dtnext(meth->cx->variables, vp))
+				if (vp->prototype)
+				{
+					if (!head)
+					{
+						if (optout(sp, "----- functions -----", NiL, NiL, NiL, NiL, NiL))
+							return -1;
+						head = 1;
+					}
+					if (optout(sp, vp->name, vp->prototype, NiL, vp->type->name, vp->description, NiL))
+						return -1;
+				}
+		}
 		head = 0;
-		if (state->meth && meth->cx && meth->cx->fields)
+		if (!all)
 			for (vp = (Cxvariable_t*)dtfirst(meth->cx->fields); vp; vp = (Cxvariable_t*)dtnext(meth->cx->fields, vp))
 			{
 				if (!head)
@@ -348,7 +366,7 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 					return -1;
 			}
 		else if (meth->data)
-			for (vp = (Cxvariable_t*)meth->data; vp->name; vp = vp++)
+			for (vp = (Cxvariable_t*)meth->data; vp->name; vp++)
 			{
 				if (!head)
 				{
@@ -372,7 +390,7 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
  */
 
 int
-dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
+dssoptlib(Sfio_t* sp, Dsslib_t* lib, const char* usage, Dssdisc_t* disc)
 {
 	register int	i;
 	register char*	s;
@@ -385,14 +403,20 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	if (dssadd(lib, disc))
 		return -1;
 	if (lib->description && (s = strchr(lib->description, '[')))
+	{
 		sfprintf(sp, "%s[+PLUGIN?%s - %-.*s]\n", s, lib->name, s - lib->description, lib->description);
+	}
 	else
 		sfprintf(sp, "[-1ls5Pp0?][+PLUGIN?%s - %s]\n", lib->name, lib->description ? lib->description : "support library");
+	if (usage)
+		sfprintf(sp, "%s", usage);
 	if (lib->meth)
 	{
 		if (!state->meth)
 			state->meth = lib->meth;
-		sfprintf(sp, "[+DESCRIPTION?The %s method handles %s.]\n{\fformats and variables\f}\n\n--method=%s[,option...]\n\n", lib->meth->name, lib->meth->description, lib->meth->name);
+		if (!usage || strncmp(usage, "[+DESCRIPTION?", 13))
+			sfprintf(sp, "[+DESCRIPTION?The %s method handles %s.]\n", lib->meth->name, lib->meth->description);
+		sfprintf(sp, "{\fformats and variables\f}\n\n--method=%s[,option...]\n\n", lib->meth->name);
 	}
 	if (lib->types)
 	{

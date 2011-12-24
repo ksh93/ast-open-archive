@@ -494,7 +494,8 @@ all :
 		ERROR - $'make: ".TEST.", line 1: 3: only 2 actual arguments expected'
 
 	EXEC	-n ARGS=""
-		INPUT Makefile $'.TEST. : .FUNCTION
+		INPUT Makefile $'C = OOPS
+.TEST. : .FUNCTION
 	local ( A B C ... ) $(%)
 	return A $(A) : B $(B) : C $(C) :
 all :

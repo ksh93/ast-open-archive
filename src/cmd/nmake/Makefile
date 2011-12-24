@@ -11,7 +11,8 @@ DEBUG == 1
 
 RULES = Makerules.mk $(ALTRULES)
 RULESFILES = Scanrules.mk S.mk SYSTEM.mk TABLE.mk \
-		debug.mk mkservice.mk yacc.mk \
+		debug.mk debug-package.mk \
+		mkservice.mk yacc.mk \
 		rules-win32.mk \
 		pkg-tcl.mk pkg-X11.mk pkg-freetype.mk \
 		pkg-cobol.mk pkg-cobol-cobc.mk pkg-cobol-mfcobc.mk
@@ -37,7 +38,7 @@ nmake :: Version.mk nmake.1 \
 $(RULESDIR) :INSTALLDIR: Makeinstall.mk $(RULES) $(RULESFILES) ppcc
 
 nmake.1 : nmake nmake.1.body nmake.1.tail
-	$(*:O=1) --nroff 2>&1 | $(SED) -e '/itself/r $(*:O=2) ' -e '/fBsh/r $(*:O=3) ' > $(<)
+	$(*:O=1) --nroff 2>&1 | $(SED) -e '/itself/r $(*:O=2)' -e '/fBsh/r $(*:O=3)' > $(<)
 
 :: nmake.mm PROMO.mm FEATURES HISTORY README RELEASE REFERENCES
 

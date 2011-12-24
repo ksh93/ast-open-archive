@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -207,6 +207,10 @@ procfs_part(register Pss_t* pss, register Pssent_t* pe)
 #ifdef _PS_scan_fix
 		_PS_scan_fix(pr, pe);
 #endif
+#ifdef _PS_task
+		sfsprintf(pss->buf, sizeof(pss->buf), _PS_path_num, (unsigned long)pss->pid, _PS_task);
+		(void)stat(pss->buf, &st);
+#endif
 		pr->pr_uid = st.st_uid;
 		pr->pr_gid = st.st_gid;
 		pr->pr_nice = pr->pr_priority - 15;
@@ -368,7 +372,7 @@ procfs_full(register Pss_t* pss, register Pssent_t* pe)
 static Pssmeth_t procfs_method =
 {
 	"/proc",
-	"[-version?@(#)$Id: pss /proc (AT&T Research) 2010-12-01 $\n]"
+	"[-version?@(#)$Id: pss /proc (AT&T Research) 2011-12-13 $\n]"
 	"[-author?Glenn Fowler <gsf@research.att.com>]",
 	PSS_all,
 	procfs_init,

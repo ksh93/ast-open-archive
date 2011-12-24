@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -697,20 +697,28 @@ execute(register Joblist_t* job)
 		}
 		if (p = internal.exports->prereqs)
 		{
+			Sfio_t*	exp;
+
+			exp = sfstropen();
 			do
 			{
 				if (v = getvar(p->rule->name))
-					coexport(state.coshell, p->rule->name, v->value);
+				{
+					expand(exp, v->value);
+					coexport(state.coshell, p->rule->name, sfstruse(exp));
+				}
 				else if (s = strchr(p->rule->name, '='))
 				{
 					*s = 0;
-					coexport(state.coshell, p->rule->name, s + 1);
+					expand(exp, s + 1);
+					coexport(state.coshell, p->rule->name, sfstruse(exp));
 					*s = '=';
 				}
 			} while (p = p->next);
-			#if 0
+			sfstrclose(exp);
+#if 0
 			freelist(internal.exports->prereqs);
-			#endif
+#endif
 			internal.exports->prereqs = 0;
 		}
 		if (job->flags & CO_DATAFILE)

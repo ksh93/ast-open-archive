@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -109,6 +109,10 @@
 #include "make.h"
 #include "options.h"
 
+#if !__STDC__
+#undef	canon
+#endif
+
 #include <ccode.h>
 
 /*
@@ -186,11 +190,7 @@ struct OLD_list_s; typedef struct OLD_list_s OLD_list_t;
 typedef struct OLD_header_s		/* old make object file header	*/
 {
 	long		magic;		/* magic number			*/
-	union
-	{
-	char		string[32];	/* old was string		*/
-	long		number;		/* older was number		*/
-	}		version;	/* compiler/loader version	*/
+	char		version[32];	/* old was str - older was num  */
 	unsigned char	null;		/* 0 byte for long version's	*/
 	unsigned char	sequence;	/* different still compatible	*/
 	unsigned char	sizes[10];	/* misc size checks		*/
@@ -1544,18 +1544,18 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		}
 		if ((st.st_size - sizeof(old_trailer)) & (OLD_ALIGN - 1))
 			goto badversion;
-		strcpy(old_stamp.version.string, OLD_VERSION);
+		strcpy(old_stamp.version, OLD_VERSION);
 		if (memcmp(((char*)&old_header) + sizeof(old_header.magic), ((char*)&old_stamp) + sizeof(old_stamp.magic), sizeof(old_header) - sizeof(old_header.magic)))
 		{
-			strcpy(old_stamp.version.string, OLD_VERSION_2);
+			strcpy(old_stamp.version, OLD_VERSION_2);
 			if (memcmp(((char*)&old_header) + sizeof(old_header.magic), ((char*)&old_stamp) + sizeof(old_stamp.magic), sizeof(old_header) - sizeof(old_header.magic)))
 				goto badversion;
 			sequence = 2;
 		}
-		if (s = strrchr(old_stamp.version.string, ' '))
+		if (s = strrchr(old_stamp.version, ' '))
 			s++;
 		else
-			s = old_stamp.version.string;
+			s = old_stamp.version;
 		strncopy(ident, s, sizeof(ident));
 		if (old_trailer.magic != old_header.magic || old_trailer.size != st.st_size)
 			goto badmagic;
@@ -2335,18 +2335,18 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	}
 	return 1;
  badversion:
-	if (strncmp(old_header.version.string, old_stamp.version.string, sizeof(old_header.version.string)))
+	if (strncmp(old_header.version, old_stamp.version, sizeof(old_header.version)))
 	{
 		/*
 		 * old old versions were only numbers
 		 */
 
-		if (!isalpha(*old_header.version.string))
-			sfsprintf(old_header.version.string, sizeof(old_header.version.string), "%d", old_header.version.number);
-		error(1, "%s: old format (%s) incompatible with make loader (%s)", objfile, old_header.version.string, old_stamp.version.string);
+		if (!isalpha(*old_header.version))
+			sfsprintf(old_header.version, sizeof(old_header.version), "%d", (unsigned long)old_header.version);
+		error(1, "%s: old format (%s) incompatible with make loader (%s)", objfile, old_header.version, old_stamp.version);
 	}
 	else
-		error(1, "%s: old format (%s) generated on an incompatible architecture", objfile, old_header.version.string);
+		error(1, "%s: old format (%s) generated on an incompatible architecture", objfile, old_header.version);
 	return 0;
  badio:
 	error(ERROR_SYSTEM|2, "%s: object file io error", objfile);

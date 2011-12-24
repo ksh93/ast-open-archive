@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,cmd"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2011-05-09 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2011-12-13 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -1524,7 +1524,7 @@ main(int argc, register char** argv)
 	 * initialize the format key table
 	 */
 
-	if (!(state.keys = dtopen(&kd, Dthash)) || !(state.bypid = dtopen(&nd, Dthash)) || !(state.byorder = dtopen(&sd, Dttree)))
+	if (!(state.keys = dtopen(&kd, Dtset)) || !(state.bypid = dtopen(&nd, Dtset)) || !(state.byorder = dtopen(&sd, Dtset)))
 		error(ERROR_SYSTEM|3, "out of space");
 	for (n = 1; n < elementsof(keys); n++)
 		dtinsert(state.keys, keys + n);

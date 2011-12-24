@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -36,19 +36,19 @@ Sfdisc_t*	disc;
 }
 Sfdisc_t	Serialdc = {NIL(Sfread_f), writef, NIL(Sfseek_f), NIL(Sfexcept_f) };
 
-MAIN()
+tmain()
 {
 	int	i, n, on;
 	char	*s, *os, *s1, *s2, *s3;
 	char	poolbuf[1024];
 	Sfio_t	*f, *f1, *f2, *f3, *f4;
 
-	if(!(f1 = sfopen((Sfio_t*)0,tstfile(0),"w+")) ||
-	   !(f2 = sfopen((Sfio_t*)0,tstfile(1),"w"))  ||
-	   !(f3 = sfopen((Sfio_t*)0,tstfile(2),"w")))
+	if(!(f1 = sfopen((Sfio_t*)0,tstfile("sf", 0),"w+")) ||
+	   !(f2 = sfopen((Sfio_t*)0,tstfile("sf", 1),"w"))  ||
+	   !(f3 = sfopen((Sfio_t*)0,tstfile("sf", 2),"w")))
 		terror("Opening files");
 
-	if(!(f4 = sfopen((Sfio_t*)0,tstfile(0),"r+")) )
+	if(!(f4 = sfopen((Sfio_t*)0,tstfile("sf", 0),"r+")) )
 		terror("Opening file to read");
 	sfungetc(f1,'a');
 	sfungetc(f4,'b');
@@ -77,9 +77,9 @@ MAIN()
 	}
 
 	/* see if data matches */
-	if(!(f1 = sfopen(f1, tstfile(0), "r")) ||
-	   !(f2 = sfopen(f2, tstfile(1), "r")) ||
-	   !(f3 = sfopen(f3, tstfile(2), "r")) )
+	if(!(f1 = sfopen(f1, tstfile("sf", 0), "r")) ||
+	   !(f2 = sfopen(f2, tstfile("sf", 1), "r")) ||
+	   !(f3 = sfopen(f3, tstfile("sf", 2), "r")) )
 		terror("sfopen for file comparison");
 
 	if(sfsize(f1) != sfsize(f2) || sfsize(f2) != sfsize(f3))
@@ -115,14 +115,14 @@ MAIN()
 	sfdisc(sfstderr,NIL(Sfdisc_t*));
 
 	sfclose(sfstdout);
-	if(!(f1 = sfopen((Sfio_t*)0,tstfile(0),"r")))
+	if(!(f1 = sfopen((Sfio_t*)0,tstfile("sf", 0),"r")))
 		terror("sfopen");
 	if(!sfpool(f1,sfstderr,0) )
 		terror("sfpool2");
 
-	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) ||
-	   !(f2 = sfopen(NIL(Sfio_t*), tstfile(1), "w+")) ||
-	   !(f3 = sfopen(NIL(Sfio_t*), tstfile(2), "w+")) )
+	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w+")) ||
+	   !(f2 = sfopen(NIL(Sfio_t*), tstfile("sf", 1), "w+")) ||
+	   !(f3 = sfopen(NIL(Sfio_t*), tstfile("sf", 2), "w+")) )
 		terror("sfopen3");
 	if(sfpool(f1,f2,SF_SHARE) != f2)
 		terror("sfpool3 f1");
@@ -161,8 +161,8 @@ MAIN()
 	if(sfpool(f1,NIL(Sfio_t*),0) != f1 )
 		terror("sfpool delete of a lone stream did not return self");
 
-	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) ||
-	   !(f2 = sfopen(NIL(Sfio_t*), tstfile(1), "w")) )
+	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w+")) ||
+	   !(f2 = sfopen(NIL(Sfio_t*), tstfile("sf", 1), "w")) )
 		terror("sfopen4");
 	sfputc(f1,'a');
 	sfputc(f1,'b');
@@ -175,5 +175,5 @@ MAIN()
 	if(!(s = sfreserve(f1,3,SF_LOCKR)) || memcmp(s,"abc",3) != 0)
 		terror("Can't get data from f1");
 
-	TSTEXIT(0);
+	texit(0);
 }

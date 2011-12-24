@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -130,21 +130,24 @@ mampush(Sfio_t* sp, register Rule_t* r, Flags_t flags)
 	if (strmatch(r->name, "${mam_*}"))
 		return 0;
 	pop = !(r->dynamic & D_built) || (flags & P_force);
-	sfprintf(sp, "%s%s %s%s%s%s%s\n"
-		, state.mam.label
-		, pop ? "make" : "prev"
-		, mamname(r)
-		, (r->property & P_archive) ? " archive" : null
-		, (flags & P_implicit) ? " implicit" : null
-		, (flags & P_joint) ? " joint" : null
-		, (r->property & P_state) ? " state" : null
-		);
-	if (pop && (state.mam.dynamic || state.mam.regress))
+	if (!state.mam.hold)
 	{
-		if (r->uname && strcmp(r->uname, mamname(r)))
-			sfprintf(sp, "%sbind %s %s %s\n", state.mam.label, r->uname, timefmt(NiL, r->time), mamname(r));
-		else
-			sfprintf(sp, "%sbind %s %s\n", state.mam.label, mamname(r), timefmt(NiL, r->time));
+		sfprintf(sp, "%s%s %s%s%s%s%s\n"
+			, state.mam.label
+			, pop ? "make" : "prev"
+			, mamname(r)
+			, (r->property & P_archive) ? " archive" : null
+			, (flags & P_implicit) ? " implicit" : null
+			, (flags & P_joint) ? " joint" : null
+			, (r->property & P_state) ? " state" : null
+			);
+		if (pop && (state.mam.dynamic || state.mam.regress))
+		{
+			if (r->uname && strcmp(r->uname, mamname(r)))
+				sfprintf(sp, "%sbind %s %s %s\n", state.mam.label, r->uname, timefmt(NiL, r->time), mamname(r));
+			else
+				sfprintf(sp, "%sbind %s %s\n", state.mam.label, mamname(r), timefmt(NiL, r->time));
+		}
 	}
 	return pop;
 }
@@ -167,15 +170,18 @@ mampop(Sfio_t* sp, register Rule_t* r, Flags_t flags)
 		mampop(sp, r->prereqs->rule, flags|P_joint|P_virtual);
 		r->prereqs->rule->property |= P_target;
 	}
-	s = staterule(RULE, r, NiL, 0);
-	sfprintf(sp, "%sdone %s%s%s%s%s\n"
-		, state.mam.label
-		, mamname(r)
-		, (r->property & P_dontcare) ? " dontcare" : null
-		, (r->property & P_ignore) ? " ignore" : null
-		, (flags & P_joint) ? " generated" : null
-		, (flags & P_virtual) && !(r->property & P_state) && ((r->property & P_virtual) || !(r->dynamic & (D_entries|D_member|D_membertoo|D_regular)) && (!s || !s->time)) ? " virtual" : s && (s->dynamic & D_built) ? " generated" : null
-		);
+	if (!state.mam.hold)
+	{
+		s = staterule(RULE, r, NiL, 0);
+		sfprintf(sp, "%sdone %s%s%s%s%s\n"
+			, state.mam.label
+			, mamname(r)
+			, (r->property & P_dontcare) ? " dontcare" : null
+			, (r->property & P_ignore) ? " ignore" : null
+			, (flags & P_joint) ? " generated" : null
+			, (flags & P_virtual) && !(r->property & P_state) && ((r->property & P_virtual) || !(r->dynamic & (D_entries|D_member|D_membertoo|D_regular)) && (!s || !s->time)) ? " virtual" : s && (s->dynamic & D_built) ? " generated" : null
+			);
+	}
 }
 
 /*

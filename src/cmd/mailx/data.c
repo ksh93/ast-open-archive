@@ -10,7 +10,7 @@
 static const char	id[] = STAMP;
 
 static const char	terms[] = "\n\
-@(#)Copyright (c) 1980, 1993, 1996 - 2010\n\
+@(#)Copyright (c) 1980, 1993, 1996 - 2011\n\
 \tThe Regents of the University of California. All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
@@ -427,6 +427,8 @@ static const struct var	vartab[] =
 	X("Suppress the opening message and version on program entry."),
 "receive",	&state.var.receive,		R,	0,0,
 	X("Set if currently in receive mode."),
+"recent",	&state.var.recent,		0,	0,0,
+	X("If all messages have been read then the default current message is set to the last message."),
 "record",	&state.var.log,			A,	0,0,
 	X("log"),
 "replyall",	&state.var.flipr,		A,	0,0,
@@ -441,6 +443,8 @@ static const struct var	vartab[] =
 	X("Accept /header:string in message addresses."),
 "sendheaders",	&state.var.sendheaders,		S,	0,0,
 	X("Interpret headers in send mode messages."),
+"sender",	&state.var.sender,		N,	0,set_sender,
+	X("/header/pattern/sender/ -- override sender address."),
 "sendmail",	&state.var.sendmail,		D|N,	"",set_sendmail,
 	X("The utility invoked to deliver messages. smtp://[host] uses SMTP to host or to ${smtp} if host is omitted."),
 "sendwait",	&state.var.sendwait,		0,	0,0,

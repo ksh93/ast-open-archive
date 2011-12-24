@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -26,7 +26,6 @@
  */
 
 static const char usage[] =
-"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b flat method schema is the name of an XML file "
     "that describes fixed-width and/or field-delimited flat files. Public "
     "schemas are usually placed in a \b../lib/dss\b sibling directory on "
@@ -1193,7 +1192,7 @@ tabinit(Flat_t* flat, Dssdisc_t* disc)
 	t->disc.link = offsetof(Key_t, link);
 	t->disc.key = offsetof(Key_t, name);
 	t->disc.comparf = keycmp;
-	if (!(t->dict = dtopen(&t->disc, Dttree)))
+	if (!(t->dict = dtopen(&t->disc, Dtoset)))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
@@ -3186,10 +3185,16 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 	sp = 0;
 	if (options)
 	{
-		sfprintf(meth->cx->buf, "%s%s", strchr(dss_lib_flat.description, '['), usage);
-		if (tagusage(tags, meth->cx->buf, &flat->dsstagdisc.tagdisc))
+		if (!(sp = sfstropen()))
 			goto drop;
-		sfprintf(meth->cx->buf, "}\n\n--method=%s[,option...]\n\n", meth->name);
+		sfprintf(sp, "%s", usage);
+		if (tagusage(tags, sp, &flat->dsstagdisc.tagdisc))
+			goto drop;
+		sfprintf(sp, "}\n");
+		if (dssoptlib(meth->cx->buf, &dss_lib_flat, sfstruse(sp), disc))
+			goto drop;
+		sfclose(sp);
+		sp = 0;
 		s = sfstruse(meth->cx->buf);
 		for (;;)
 		{
@@ -3807,7 +3812,13 @@ static Dssmeth_t method =
 	flatmeth,
 	flatopen,
 	0,
-	0
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	DSS_BASE
 };
 
 static const char flatten_usage[] =
@@ -4151,7 +4162,7 @@ Dsslib_t dss_lib_flat =
 {
 	"flat",
 	"flat method"
-	"[-1ls5Pp0?\n@(#)$Id: dss flat method (AT&T Research) 2010-11-12 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss flat method (AT&T Research) 2011-08-19 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	0,

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2010 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -347,11 +347,12 @@ struct headline {
 #define GREPLY		(1L<<20)	/* For reply to sender */
 #define GRULE		(1L<<21)	/* Ouput rule if GNL */
 #define GSEND		(1L<<22)	/* Get it ready to send */
-#define GSTACK		(1L<<23)	/* savestr() unmapped names */
-#define GSTATUS		(1L<<24)	/* Grab Status: line */
-#define GSUB		(1L<<25)	/* Grab Subject: line */
-#define GTO		(1L<<26)	/* Grab To: line */
-#define GUSER		(1L<<27)	/* Stop if ${user}@ */
+#define GSENDER		(1L<<23)	/* Get state.var.sender address only */
+#define GSTACK		(1L<<24)	/* savestr() unmapped names */
+#define GSTATUS		(1L<<25)	/* Grab Status: line */
+#define GSUB		(1L<<26)	/* Grab Subject: line */
+#define GTO		(1L<<27)	/* Grab To: line */
+#define GUSER		(1L<<28)	/* Stop if ${user}@ */
 
 #define GCOMPOSE	(GEDIT|GSTATUS)	/* Composable headers */
 #define GEDIT		(GSTD|GMISC)	/* Editable headers */
@@ -475,7 +476,7 @@ struct dict {
 };
 
 struct match {
-	struct match*	next;		/* enxt in list */
+	struct match*	next;		/* next in list */
 	int		length;		/* string length */
 	int		beg;		/* begin character match */
 	int		mid;		/* mid character match */
@@ -490,6 +491,24 @@ struct linematch {
 	unsigned char	end[256];	/* end character match */
 	struct match*	match;		/* exact match list */
 	struct match*	last;		/* last match list item */
+};
+
+struct sendand {
+	struct sendand*	next;		/* next in and list */
+	char*		head;		/* head	*/
+	char*		pattern;	/* match pattern */
+	unsigned long	flags;		/* grab*() flags */
+};
+
+struct sendor {
+	struct sendor*	next;		/* next in or list */
+	struct sendand	sendand;	/* and list */
+};
+
+struct sender {
+	struct sender*	next;		/* next in list */
+	struct sendor	sendor;		/* or list */
+	char		address[1];	/* sender address override */
 };
 
 /*
@@ -637,6 +656,7 @@ typedef struct {
 	struct cmd*	cmd;		/* Current command table entry */
 	struct file*	files;		/* fileopen() list */
 	struct linematch* bodymatch;	/* compiled state.var.spambody */
+	struct sender*	sender;		/* compiled state.var.sender */
 	struct stat	openstat;	/* fileopen stat */
 	Dt_t* 		ignore;		/* Ignored fields */
 	Dt_t*		saveignore;	/* Ignored fields on save to folder */
@@ -817,10 +837,12 @@ typedef struct {
 	char*	pwd;
 	char*	quiet;
 	char*	receive;
+	char*	recent;
 	char*	rule;
 	char*	save;
 	long	screen;
 	char*	searchheaders;
+	char*	sender;
 	char*	sendheaders;
 	char*	sendmail;
 	char*	sendwait;
@@ -1015,6 +1037,7 @@ extern void		set_news(struct var*, const char*);
 extern void		set_notyet(struct var*, const char*);
 extern void		set_pwd(struct var*, const char*);
 extern void		set_screen(struct var*, const char*);
+extern void		set_sender(struct var*, const char*);
 extern void		set_sendmail(struct var*, const char*);
 extern void		set_shell(struct var*, const char*);
 extern void		set_spambody(struct var*, const char*);

@@ -1,5 +1,7 @@
-dss provides low level sequential ops that declarative sql
-typically decomposes to
+cp Makeargs.debug Makeargs
+gdb --directory=$A/src/cmd/dss --directory=$A/src/lib/libdss --directory=$A/src/lib/libast $A/bin/dss core.*
+
+dss provides low level sequential ops that declarative sql typically decomposes to
 
 what happens when the stream hits the db
 

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -23,7 +23,7 @@
 /*	Test multiple processes reading/writing from same file
 **	descriptor.
 */
-MAIN()
+tmain()
 {
 	char*	s;
 
@@ -46,10 +46,10 @@ MAIN()
 			if(!(s = sfgetr(f,'\n',1)) || strcmp(s,"Line3") != 0)
 				terror("Coprocess move did not get Line3");
 		}
-		TSTEXIT(0);
+		texit(0);
 	}
 
-	if(sfopen(sfstdout, tstfile(0), "w") != sfstdout )
+	if(sfopen(sfstdout, tstfile("sf", 0), "w") != sfstdout )
 		terror("Opening file");
 	if(sfputr(sfstdout,"Line1",'\n') < 0 ||
 	   sfputr(sfstdout,"Line2",'\n') < 0 ||
@@ -59,7 +59,7 @@ MAIN()
 	sfopen(sfstdout,"/dev/null","w");
 
 	/* testing coprocess calling sfgetr */
-	if(sfopen(sfstdin, tstfile(0),"r") != sfstdin)
+	if(sfopen(sfstdin, tstfile("sf", 0),"r") != sfstdin)
 		terror("Opening to read");
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line1") != 0)
 		terror("Did not get Line1 for sfgetr");
@@ -70,7 +70,7 @@ MAIN()
 		terror("Did not get Line4 for sfgetr");
 
 	/* testing coprocess calling sfmove */
-	if(sfopen(sfstdin, tstfile(0), "r") != sfstdin)
+	if(sfopen(sfstdin, tstfile("sf", 0), "r") != sfstdin)
 		terror("Opening to read");
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line1") != 0)
 		terror("Did not get Line1 for sfmove");
@@ -82,7 +82,7 @@ MAIN()
 
 	/* testing the head program */
 #ifdef HEAD
-	if(sfopen(sfstdin, tstfile(0), "r") != sfstdin)
+	if(sfopen(sfstdin, tstfile("sf", 0), "r") != sfstdin)
 		terror("Opening to read");
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line1") != 0)
 		terror("Did not get Line1 for head");
@@ -93,5 +93,5 @@ MAIN()
 		terror("Did not get Line4 for head");
 #endif
 
-	TSTEXIT(0);
+	texit(0);
 }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2008 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -498,12 +498,21 @@ spammed(register struct msg* mp)
 			note(0, "spam: To: header missing");
 		return 1;
 	}
+	test = 0;
+	if (t = grab(mp, GSENDER|GCOMPARE|GDISPLAY, NiL))
+	{
+		if (TRACING('x'))
+			note(0, "spam: sender `%s'", t);
+		if (addrmatch(t, state.var.user) || state.var.spamfromok && usermatch(t, state.var.spamfromok, 0))
+			return 0;
+		if (addrmatch(t, to) || state.var.spamfrom && usermatch(t, state.var.spamfrom, 0))
+			test |= SPAM_from_spam;
+	}
 	if (headset(&pp, mp, NiL, NiL, NiL, GFROM))
 	{
 		d = state.var.spamdelay;
 		q = 0;
 		ok = no = fromours = me = 0;
-		test = 0;
 		if (state.var.domain)
 		{
 			ours = strlen(state.var.domain);
@@ -583,7 +592,7 @@ spammed(register struct msg* mp)
 						note(0, "spam: from `%s'", t);
 					if (addrmatch(t, state.var.user) || state.var.spamfromok && usermatch(t, state.var.spamfromok, 0))
 						return 0;
-					else if (addrmatch(t, to) || state.var.spamfrom && usermatch(t, state.var.spamfrom, 0))
+					if (addrmatch(t, to) || state.var.spamfrom && usermatch(t, state.var.spamfrom, 0))
 						test |= SPAM_from_spam;
 					if (fromours >= 0)
 						fromours = insider(t, NiL, fromours, state.var.domain, ours, domain2, ours2);

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: file (AT&T Research) 2011-01-28 $\n]"
+"[-?\n@(#)$Id: file (AT&T Research) 2011-08-01 $\n]"
 USAGE_LICENSE
 "[+NAME?file - determine file type]"
 "[+DESCRIPTION?\bfile\b tests and attempts to classify each \afile\a argument."
@@ -44,6 +44,7 @@ USAGE_LICENSE
 "	\bascii text\b or \bbinary data\b.]"
 
 "[a:all?List all magic table matches.]"
+"[b:brief|no-filename?Suppress the output line file name prefix.]"
 "[c:mime?List the \bmime\b(1) classification for each \afile\a. Although the"
 "	default descriptions are fairly consistent, use \b--mime\b for"
 "	precise classification matching.]"
@@ -78,7 +79,7 @@ USAGE_LICENSE
 "	expressions, descriptions, and \bmime\b(1) classifications. Each line"
 "	in the file consists of five \btab\b separated fields:]{"
 "	[+[op]]offset?\aoffset\a determines tha data location for the content"
-"		test. \b(@\b\aexpression\a\b)\b spefifies an indirect offset,"
+"		test. \b(@\b\aexpression\a\b)\b specifies an indirect offset,"
 "		i.e., the offset is the numeric contents of the data"
 "		location at \aexpression\a. The default indirect numeric size"
 "		is 4 bytes; a \bB\b suffix denotes 1 byte, \bH\b denotes 2"
@@ -137,10 +138,11 @@ USAGE_LICENSE
 #include <ctype.h>
 #include <error.h>
 
-#define MAGIC_LIST	(MAGIC_USER<<0)
-#define MAGIC_LOAD	(MAGIC_USER<<1)
-#define MAGIC_PHYSICAL	(MAGIC_USER<<2)
-#define MAGIC_SILENT	(MAGIC_USER<<3)
+#define MAGIC_BRIEF	(MAGIC_USER<<0)
+#define MAGIC_LIST	(MAGIC_USER<<1)
+#define MAGIC_LOAD	(MAGIC_USER<<2)
+#define MAGIC_PHYSICAL	(MAGIC_USER<<3)
+#define MAGIC_SILENT	(MAGIC_USER<<4)
 
 static int
 type(Magic_t* mp, char* file, const char* pattern, register Magicdisc_t* disc)
@@ -159,7 +161,9 @@ type(Magic_t* mp, char* file, const char* pattern, register Magicdisc_t* disc)
 	e = pathcanon(file, 0, 0);
 	if (!pattern)
 	{
-		sfprintf(sfstdout, "%s:\t%s%s\n", file, e - file > 6 ? "" : "\t", s);
+		if (!(disc->flags & MAGIC_BRIEF))
+			sfprintf(sfstdout, "%s:\t%s", file, e - file > 6 ? "" : "\t");
+		sfprintf(sfstdout, "%s\n", s);
 		return 1;
 	}
 	else if (strmatch(s, pattern))
@@ -178,6 +182,7 @@ main(int argc, register char** argv)
 	register char*		p;
 	char*			pattern = 0;
 	Sfio_t*			list = 0;
+	int			head = 1;
 	int			hit;
 	Magicdisc_t		disc;
 
@@ -194,6 +199,9 @@ main(int argc, register char** argv)
 		{
 		case 'a':
 			disc.flags |= MAGIC_ALL;
+			continue;
+		case 'b':
+			disc.flags |= MAGIC_BRIEF;
 			continue;
 		case 'c':
 			disc.flags |= MAGIC_MIME;

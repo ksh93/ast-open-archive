@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2009 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -17,6 +17,8 @@
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                                                                      *
 ***********************************************************************/
+#pragma prototyped
+
 #include "ivlib.h"
 
 /* This method allows a new interval to simply overwrite
@@ -32,6 +34,7 @@ typedef struct Flat_s	Flat_t;
 struct Flat_s
 {
 	Dtdisc_t	dc;	/* discipline structure for dictionary	*/
+	Ivfree_f	freef;	/* user data free */
 	Dt_t*		dt;
 	Iv_t*		iv;
 	int		search;	/* during search, use a faster compare	*/
@@ -63,6 +66,8 @@ flatmake(Dt_t* dt, void* obj, Dtdisc_t* disc)
 static void
 flatfree(Dt_t* dt, void* obj, Dtdisc_t* disc)
 {
+	if (((Flat_t*)disc)->freef && ((Ivseg_t*)obj)->data)
+		((Flat_t*)disc)->freef(((Flat_t*)disc)->iv, ((Ivseg_t*)obj)->data);
 	free(obj);
 }
 
@@ -256,6 +261,7 @@ flatevent(Iv_t* iv, int type, void* data)
 			free(fl);
 			return -1;
 		}
+		fl->freef = iv->disc->freef;
 		fl->iv = iv;
 		iv->data = (void*)fl;
 		break;

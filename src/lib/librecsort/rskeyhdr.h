@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -55,37 +55,26 @@
 
 #define blank(c)	((c)==' '||(c)=='\t')
 
-struct Field_s;
-struct _rskey_s;
-
-typedef int (*Coder_t)(struct _rskey_s*, struct Field_s*, unsigned char*, int, unsigned char*, unsigned char*);
-
-typedef struct				/* field position		*/
+typedef struct Position_s		/* field position		*/
 {
 	int		field;		/* field offset			*/
 	int		index;		/* char offset			*/
 } Position_t;
 
-typedef struct Field_s			/* key field			*/
-{
-	struct Field_s*	next;		/* next in list			*/
-	Coder_t		coder;		/* encode data into key		*/
-	int		binary;		/* binary data			*/
-	int		code;		/* coder ccode or conversion	*/
-	int		index;		/* field definition index	*/
-	int		flag;		/* code flag			*/
-	int		freetrans;	/* free trans on close		*/
-	unsigned char*	trans;		/* translation table		*/
-	unsigned char*	keep;		/* deletion table		*/
-	void*		data;		/* coder specific data		*/
-	Position_t	begin;		/* key begins here		*/
+#define _RSKEYFIELD_PRIVATE_ \
+	unsigned char	aflag;		/* accumulate dups here		*/ \
+	unsigned char	bflag;		/* skip initial blanks		*/ \
+	unsigned char	eflag;		/* skip trailing blanks		*/ \
+	unsigned char	standard;	/* 1:-k 0:+pos-pos		*/ \
+	int		binary;		/* binary data			*/ \
+	int		code;		/* coder ccode or conversion	*/ \
+	int		index;		/* field definition index	*/ \
+	int		freetrans;	/* free trans on close		*/ \
+	unsigned char*	trans;		/* translation table		*/ \
+	unsigned char*	keep;		/* deletion table		*/ \
+	void*		data;		/* coder specific data		*/ \
+	Position_t	begin;		/* key begins here		*/ \
 	Position_t	end;		/* and ends here		*/
-	unsigned char	aflag;		/* accumulate dups here		*/
-	unsigned char	bflag;		/* skip initial blanks		*/
-	unsigned char	eflag;		/* skip trailing blanks		*/
-	unsigned char	rflag;		/* reverse order		*/
-	unsigned char	standard;	/* 1:-k 0:+pos-pos		*/
-} Field_t;
 
 typedef struct
 {
@@ -99,21 +88,19 @@ typedef struct
 
 #define _RSKEY_PRIVATE_ \
 	State_t*	state;		/* readonly state		*/ \
-	Rsdisc_t*	tail;		/* rslib() disc stack tail	*/ \
+	Rsdisc_t*	disctail;	/* rslib() disc stack tail	*/ \
 	struct								   \
 	{								   \
-	Field_t		global;		/* global field info		*/ \
-	Field_t*	head;		/* field list head		*/ \
-	Field_t*	tail;		/* field list tail		*/ \
-	Field_t*	prev;		/* previous field list tail	*/ \
+	Rskeyfield_t	global;		/* global field info		*/ \
+	Rskeyfield_t*	prev;		/* previous field list tail	*/ \
 	int		index;		/* last field index		*/ \
 	int		maxfield;	/* max field position		*/ \
 	unsigned char**	positions;	/* field start positions	*/ \
 	}		field;		/* key field info		*/ \
 	struct								   \
 	{								   \
-	Field_t*	head;		/* accumulate list head		*/ \
-	Field_t*	tail;		/* accumulate list tail		*/ \
+	Rskeyfield_t*	head;		/* accumulate list head		*/ \
+	Rskeyfield_t*	tail;		/* accumulate list tail		*/ \
 	}		accumulate;	/* accumulate field info	*/ \
 	unsigned char*	xfrmbuf;	/* strxfrm buffer		*/ \
 	unsigned int	xfrmsiz;	/* strxfrm buffer size		*/ \

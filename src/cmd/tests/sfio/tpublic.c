@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,7 +19,7 @@
 ***********************************************************************/
 #include	"sftest.h"
 
-MAIN()
+tmain()
 {
 	Sfio_t*	f;
 	Sfio_t*	g;
@@ -27,14 +27,14 @@ MAIN()
 	char	buf[1024];
 	int	n, i;
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")) )
 		terror("Can't open file to write");
 	sfputr(f,"1111",'\n');
 	sfputr(f,"2222",'\n');
 	sfputr(f,"3333",'\n');
 	sfputr(f,"4444",'\n');
 
-	if(!(f = sfopen(f, tstfile(0), "r")) )
+	if(!(f = sfopen(f, tstfile("sf", 0), "r")) )
 		terror("Can't open file to read1");
 	if(!(g = sfnew(NIL(Sfio_t*),
 			NIL(Void_t*),(size_t)SF_UNBOUND,dup(sffileno(f)),SF_READ)) )
@@ -58,7 +58,7 @@ MAIN()
 
 	sfclose(f);
 	sfclose(g);
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "r+")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "r+")) )
 		terror("Can't open file to write2");
 	if(!(g = sfnew(NIL(Sfio_t*),
 			NIL(Void_t*),(size_t)SF_UNBOUND,dup(sffileno(f)),SF_READ)) )
@@ -80,7 +80,7 @@ MAIN()
 		terror("Wrong data6");
 	sfsync(g);
 
-	if(!(f = sfopen(f, tstfile(0), "w")) )
+	if(!(f = sfopen(f, tstfile("sf", 0), "w")) )
 		terror("Can't open file to write3");
 
 	for(i = 0; i < sizeof(buf); ++i)
@@ -95,7 +95,7 @@ MAIN()
 		if(sfwrite(f,buf,sizeof(buf)) != sizeof(buf))
 			terror("Writing buffer1");
 
-	if(!(f = sfopen(f, tstfile(0), "r")) )
+	if(!(f = sfopen(f, tstfile("sf", 0), "r")) )
 		terror("Can't open file to read3");
 	sfset(f,SF_SHARE|SF_PUBLIC,1);
 
@@ -118,12 +118,12 @@ MAIN()
 	if((s = sfreserve(f,1,0)) )
 		terror("Reading beyond eof");
 
-	if(!(f = sfopen(f, tstfile(0), "w")) )
+	if(!(f = sfopen(f, tstfile("sf", 0), "w")) )
 		terror("Can't open to write");
 	if(sfwrite(f,"aaa\nbbb\nccc\n",12) != 12)
 		terror("Can't write");
 	sfclose(f);
-	if(sfopen(sfstdin,tstfile(0),"r") != sfstdin)
+	if(sfopen(sfstdin,tstfile("sf", 0),"r") != sfstdin)
 		terror("Can't open file as sfstdin");
 	if((n = (int)sfmove(sfstdin,NIL(Sfio_t*),(Sfoff_t)SF_UNBOUND,'\n')) != 3)
 		terror("sfmove wrong number of lines %d",n);
@@ -134,5 +134,5 @@ MAIN()
 	if((n = (int)sfmove(sfstdin,NIL(Sfio_t*),(Sfoff_t)SF_UNBOUND,'\n')) != 1)
 		terror("sfmove3 wrong number of lines %d",n);
 
-	TSTEXIT(0);
+	texit(0);
 }

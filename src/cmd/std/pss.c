@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1989-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -56,8 +56,8 @@ pssopen(Pssdisc_t* disc)
 	pss->ttybydevdisc.key = offsetof(Tty_t, dev);
 	pss->ttybydevdisc.size = sizeof(Pss_dev_t);
 	pss->ttybydevdisc.link = offsetof(Tty_t, bydev);
-	if (!(pss->ttybyname = dtnew(pss->vm, &pss->ttybynamedisc, Dthash)) ||
-	    !(pss->ttybydev = dtnew(pss->vm, &pss->ttybydevdisc, Dthash)))
+	if (!(pss->ttybyname = dtnew(pss->vm, &pss->ttybynamedisc, Dtset)) ||
+	    !(pss->ttybydev = dtnew(pss->vm, &pss->ttybydevdisc, Dtset)))
 		goto bad;
 	pss->meth = (_pss_ps && ((disc->flags & PSS_PS) || getenv("_PSS_ps"))) ? _pss_ps : _pss_method;
 	while (pss->meth->initf && (*pss->meth->initf)(pss) <= 0)

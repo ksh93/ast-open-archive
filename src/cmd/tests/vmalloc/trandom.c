@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -18,18 +18,8 @@
 *                                                                      *
 ***********************************************************************/
 #include	"vmtest.h"
-#include	<stdlib.h>
 
-#ifdef TWARN		/* enable debug warnings */
-#undef	TWARN
-#define TWARN(x)	twarn x
-#else
-#define TWARN(x)
-#endif /*TWARN*/
-
-static unsigned long	RAND_state = 1;
-
-#define RAND()		(RAND_state = RAND_state * 0x63c63cd9L + 0x9c39c33dL)
+#define RAND()		random()
 
 typedef struct _obj_s	Obj_t;
 struct _obj_s
@@ -61,8 +51,7 @@ static Obj_t		Obj[N_OBJ], *List[N_OBJ+1];
 #define COMPACT(kk)	((kk % (N_OBJ/5000)) == 0 ? 1 : 0)
 #define RESIZE(kk)	((kk % (N_OBJ/500)) == 0 ? 1 : 0)
 
-int
-main()
+tmain()
 {
 	Obj_t		*o, *next;
 	Void_t		*huge;
@@ -94,19 +83,18 @@ main()
 		}
 
 		if(COMPACT(k)) /* global compaction */
-		{	
-			if(vmstat(Vmregion, &sb) < 0)
+		{	if(vmstat(Vmregion, &sb) < 0)
 				terror("Vmstat failed");
-			TWARN(("Arena: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
+			tinfo("Arena: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
 				sb.n_busy,sb.s_busy, sb.n_free,sb.s_free,
-				sb.extent, sb.n_seg));
+				sb.extent, sb.n_seg);
 			if(vmcompact(Vmregion) < 0 )
 				terror("Vmcompact failed");
 			if(vmstat(Vmregion, &sb) < 0)
 				terror("Vmstat failed");
-			TWARN(("Compact: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
+			tinfo("Compact: busy=(%u,%u) free=(%u,%u) extent=%u #segs=%d",
 				sb.n_busy,sb.s_busy, sb.n_free,sb.s_free,
-				sb.extent, sb.n_seg));
+				sb.extent, sb.n_seg);
 		}
 
 		if(RESIZE(k)) /* make the huge block bigger */
@@ -128,14 +116,14 @@ main()
 
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	TWARN(("Full: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
+	tinfo("Full: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
 	if(vmcompact(Vmregion) < 0 )
 		terror("Vmcompact failed");
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	TWARN(("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
+	tinfo("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
 
 	/* now free all left-overs */
 	for(o = List[N_OBJ]; o; o = o->next)
@@ -144,21 +132,21 @@ main()
 
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	TWARN(("Free: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
+	tinfo("Free: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
 	if(vmcompact(Vmregion) < 0 )
 		terror("Vmcompact failed2");
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	TWARN(("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
+	tinfo("Compact: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
 
 	if(!(huge = vmalloc(Vmregion, 10)))
 		terror("Vmalloc failed");
 	if(vmstat(Vmregion, &sb) < 0)
 		terror("Vmstat failed");
-	TWARN(("Small: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
-		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg));
+	tinfo("Small: Busy=(%u,%u) Free=(%u,%u) Extent=%u #segs=%d\n",
+		sb.n_busy, sb.s_busy, sb.n_free, sb.s_free, sb.extent, sb.n_seg);
 
-	exit(0);
+	texit(0);
 }

@@ -1,3 +1,5 @@
+11-09-11 mm2html: add .H n "title" link="href"
+11-08-06 mm2html: use optget() style for .SH and .TP
 11-04-18 htmlrefs: don't symlink .html for --copy (doh)
 10-09-07 use += to append to compond values
 10-06-01 sync with ast api 20100601

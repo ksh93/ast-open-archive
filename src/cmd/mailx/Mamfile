@@ -1,10 +1,10 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-02-02
+info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGEROOT ../../../../..
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -49,7 +49,7 @@ meta FEATURE/lcl %.iffe>FEATURE/% lcl.iffe lcl
 make lcl.iffe
 done lcl.iffe
 bind -last
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run lcl.iffe
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run lcl.iffe
 done FEATURE/lcl dontcare generated
 done local.h
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
@@ -137,6 +137,10 @@ make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+make ${PACKAGE_ast_INCLUDE}/aso.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
@@ -169,7 +173,7 @@ done mailx.h
 done data.c
 meta data.o %.c>%.o data.c data
 prev data.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c data.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c data.c
 done data.o generated
 make cmd1.o
 make cmd1.c
@@ -177,7 +181,7 @@ prev mailx.h implicit
 done cmd1.c
 meta cmd1.o %.c>%.o cmd1.c cmd1
 prev cmd1.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd1.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd1.c
 done cmd1.o generated
 make cmd2.o
 make cmd2.c
@@ -185,7 +189,7 @@ prev mailx.h implicit
 done cmd2.c
 meta cmd2.o %.c>%.o cmd2.c cmd2
 prev cmd2.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd2.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd2.c
 done cmd2.o generated
 make cmd3.o
 make cmd3.c
@@ -193,7 +197,7 @@ prev mailx.h implicit
 done cmd3.c
 meta cmd3.o %.c>%.o cmd3.c cmd3
 prev cmd3.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd3.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd3.c
 done cmd3.o generated
 make collect.o
 make collect.c
@@ -201,7 +205,7 @@ prev mailx.h implicit
 done collect.c
 meta collect.o %.c>%.o collect.c collect
 prev collect.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c collect.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c collect.c
 done collect.o generated
 make edit.o
 make edit.c
@@ -209,7 +213,7 @@ prev mailx.h implicit
 done edit.c
 meta edit.o %.c>%.o edit.c edit
 prev edit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c edit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c edit.c
 done edit.o generated
 make fio.o
 make fio.c
@@ -223,7 +227,7 @@ prev mailx.h implicit
 done fio.c
 meta fio.o %.c>%.o fio.c fio
 prev fio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c fio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c fio.c
 done fio.o generated
 make head.o
 make head.c
@@ -231,7 +235,7 @@ prev mailx.h implicit
 done head.c
 meta head.o %.c>%.o head.c head
 prev head.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c head.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c head.c
 done head.o generated
 make local.o
 make local.c
@@ -245,7 +249,7 @@ prev mailx.h implicit
 done local.c
 meta local.o %.c>%.o local.c local
 prev local.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c local.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c local.c
 done local.o generated
 make lex.o
 make lex.c
@@ -253,7 +257,7 @@ prev mailx.h implicit
 done lex.c
 meta lex.o %.c>%.o lex.c lex
 prev lex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lex.c
 done lex.o generated
 make list.o
 make list.c
@@ -261,7 +265,7 @@ prev mailx.h implicit
 done list.c
 meta list.o %.c>%.o list.c list
 prev list.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c list.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c list.c
 done list.o generated
 make main.o
 make main.c
@@ -270,7 +274,7 @@ prev mailx.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Kurt Shoens (UCB)][-author?gsf][-copyright?Copyright (c) 1978-2011 The Regents of the University of California and AT&T][-license?http://www.opensource.org/licenses/bsd-license][--catalog?mailx]"\" -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Kurt Shoens (UCB)][-author?gsf][-copyright?Copyright (c) 1978-2011 The Regents of the University of California and AT&T][-license?http://www.opensource.org/licenses/bsd-license][--catalog?mailx]"\" -D_PACKAGE_ast -c main.c
 done main.o generated
 make misc.o
 make misc.c
@@ -278,7 +282,7 @@ prev mailx.h implicit
 done misc.c
 meta misc.o %.c>%.o misc.c misc
 prev misc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c misc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c misc.c
 done misc.o generated
 make names.o
 make names.c
@@ -286,7 +290,7 @@ prev mailx.h implicit
 done names.c
 meta names.o %.c>%.o names.c names
 prev names.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c names.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c names.c
 done names.o generated
 make proc.o
 make proc.c
@@ -294,7 +298,7 @@ prev mailx.h implicit
 done proc.c
 meta proc.o %.c>%.o proc.c proc
 prev proc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c proc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c proc.c
 done proc.o generated
 make quit.o
 make quit.c
@@ -302,7 +306,7 @@ prev mailx.h implicit
 done quit.c
 meta quit.o %.c>%.o quit.c quit
 prev quit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c quit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c quit.c
 done quit.o generated
 make send.o
 make send.c
@@ -310,7 +314,7 @@ prev mailx.h implicit
 done send.c
 meta send.o %.c>%.o send.c send
 prev send.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c send.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c send.c
 done send.o generated
 make spam.o
 make spam.c
@@ -319,7 +323,7 @@ prev mailx.h implicit
 done spam.c
 meta spam.o %.c>%.o spam.c spam
 prev spam.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c spam.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c spam.c
 done spam.o generated
 make tty.o
 make tty.c
@@ -327,7 +331,7 @@ prev mailx.h implicit
 done tty.c
 meta tty.o %.c>%.o tty.c tty
 prev tty.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tty.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tty.c
 done tty.o generated
 make vars.o
 make vars.c
@@ -335,7 +339,7 @@ prev mailx.h implicit
 done vars.c
 meta vars.o %.c>%.o vars.c vars
 prev vars.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vars.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vars.c
 done vars.o generated
 make imap.o
 make imap.c
@@ -359,7 +363,7 @@ prev mailx.h implicit
 done imap.c
 meta imap.o %.c>%.o imap.c imap
 prev imap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c imap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c imap.c
 done imap.o generated
 make smtp.o
 make smtp.c
@@ -369,7 +373,7 @@ prev mailx.h implicit
 done smtp.c
 meta smtp.o %.c>%.o smtp.c smtp
 prev smtp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c smtp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c smtp.c
 done smtp.o generated
 bind -lcs
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mailx data.o cmd1.o cmd2.o cmd3.o collect.o edit.o fio.o head.o local.o lex.o list.o main.o misc.o names.o proc.o quit.o send.o spam.o tty.o vars.o imap.o smtp.o ${mam_libcs} ${mam_libast}

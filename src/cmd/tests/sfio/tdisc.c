@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -18,7 +18,6 @@
 *                                                                      *
 ***********************************************************************/
 #include	"sftest.h"
-
 
 #if __STD_C
 ssize_t upper(Sfio_t* f, Void_t* buf, size_t n, Sfdisc_t* disc)
@@ -136,7 +135,7 @@ Sfdisc_t Ldisc = {lower, (Sfwrite_f)0, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0}
 Sfdisc_t Odisc = {once, (Sfwrite_f)0, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0};
 Sfdisc_t Edisc = {(Sfread_f)0, external, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0};
 
-MAIN()
+tmain()
 {
 	Sfio_t	*f, *fs;
 	char	*l, *u, *s;
@@ -156,7 +155,7 @@ MAIN()
 	strcpy(u, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	n = strlen(l);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")))
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w+")))
 		terror("Creating temp file");
 	if((r = sfwrite(f,l,n)) != n)
 		terror("Writing data %d",r);
@@ -181,7 +180,7 @@ MAIN()
 	}
 	sfclose(f);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w+")) )
 		terror("Opening file");
 	sfdisc(f,&Wdisc);
 	if(sfputr(f,low,'\n') < 0)
@@ -195,7 +194,7 @@ MAIN()
 	sfclose(f);
 
 	/* read-once discipline */
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"r")) )
 		terror("Opening file");
 	sfdisc(f,&Odisc);
 	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
@@ -220,7 +219,7 @@ MAIN()
 	sfclose(f);
 	sfclose(fs);
 
-	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w")) )
 		terror("Opening file to write");
 	sfdisc(f,&Edisc);
 	if(sfwrite(f, "one", 3) != 3)
@@ -252,5 +251,5 @@ MAIN()
 	if(buf[0] != 'a' || buf[1] != 'b' || buf[2] != 'c' || buf[3] != 'd')
 		terror("Bad read data");
 
-	TSTEXIT(0);
+	texit(0);
 }

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 2003-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -146,7 +146,7 @@ zip_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_
 	    (hdr = paxget(pax, ap, ZIP_END_HEADER, NiL)) &&
 	    swapget(0, &hdr[0], 4) == ZIP_END_MAGIC)
 	{
-		if (!(ar->mem = dtnew(ar->vm, &ar->memdisc, Dthash)))
+		if (!(ar->mem = dtnew(ar->vm, &ar->memdisc, Dtset)))
 		{
 			zip_done(pax, ap);
 			return paxnospace(pax);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2011 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -143,10 +143,12 @@ printhead(int mesg, int who)
 		dispc = who ? 'R' : ' ';
 	if (who)
 	{
-		if (!state.var.domain || strchr(hl.l_from, '@'))
-			printf("%c %s\n", dispc, hl.l_from);
+		if (!(name = grab(mp, GSENDER|GDISPLAY, NiL)))
+			name = hl.l_from;
+		if (!state.var.domain || strchr(name, '@'))
+			printf("%c %s\n", dispc, name);
 		else
-			printf("%c %s@%s\n", dispc, hl.l_from, state.var.domain);
+			printf("%c %s@%s\n", dispc, name, state.var.domain);
 	}
 	else
 	{

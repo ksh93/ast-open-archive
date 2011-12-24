@@ -1,3 +1,4 @@
+11-08-25 exparse.y: fix "begin()" frame symbol table check
 11-06-30 extoken.c: enter LABEL: in the parent scope symbol table!
 11-06-26 exparse.y: fix bug that lost function return type
 11-03-16 exparse.y,expr.h: fix statement_list cons tail recursion

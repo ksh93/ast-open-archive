@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,7 +19,7 @@
 ***********************************************************************/
 #include	"sftest.h"
 
-MAIN()
+tmain()
 {
 	int	fd[2];
 	Sfio_t	*fr, *fw;
@@ -34,9 +34,9 @@ MAIN()
 		terror("Can't open pipe streams");
 	sfset(fr,SF_SHARE,1);
 
-	if(sfopen(sfstdout,tstfile(0),"w") != sfstdout)
+	if(sfopen(sfstdout,tstfile("sf", 0),"w") != sfstdout)
 		terror("Can't open for write");
-	if(sfopen(sfstdin,tstfile(0),"r") != sfstdin)
+	if(sfopen(sfstdin,tstfile("sf", 0),"r") != sfstdin)
 		terror("Can't open for read");
 
 	for(n = 0; n < 100; ++n)
@@ -54,5 +54,5 @@ MAIN()
 			terror("Wrong data");
 	}
 
-	TSTEXIT(0);
+	texit(0);
 }

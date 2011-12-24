@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -63,7 +63,7 @@ Sfdisc_t*	disc;
 
 static Sfdisc_t	Disc[N_PROC];
 
-MAIN()
+tmain()
 {
 	ssize_t		size[N_PROC][N_REC];
 	int		count[N_PROC];
@@ -88,7 +88,7 @@ MAIN()
 		record[i][r] = '0' + 2*i;
 
 	/* create file */
-	file = tstfile(0);
+	file = tstfile("sf", 0);
 	if(!(f = sfopen(NIL(Sfio_t*),file,"w+")) )
 		terror("Opening temporary file %s", file);
 
@@ -105,7 +105,7 @@ MAIN()
 #define RETURN(v)
 #else
 #define FORK()		fork()
-#define RETURN(v)	exit(v)
+#define RETURN(v)	texit(v)
 #endif
 		if((pid = (int)FORK()) < 0 )
 			terror("Creating process %d", i);
@@ -163,5 +163,5 @@ MAIN()
 		if(count[i] != N_REC)
 			terror("Bad count%d %d", i, count[i]);
 
-	TSTEXIT(0);
+	texit(0);
 }

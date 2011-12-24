@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -21,7 +21,7 @@
 
 /* errnos tested for xopen-compliance */
 
-MAIN()
+tmain()
 {
 	Sfio_t*	fw;
 	Sfio_t*	fr;
@@ -29,10 +29,10 @@ MAIN()
 	int	lseek_errno;
 	int	rv;
 
-	if(!(fw = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
-		terror("Can't create temp file %s to write", tstfile(0));
-	if(!(fr = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
-		terror("Can't open temp file %s to read", tstfile(0));
+	if(!(fw = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w")) )
+		terror("Can't create temp file %s to write", tstfile("sf", 0));
+	if(!(fr = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "r")) )
+		terror("Can't open temp file %s to read", tstfile("sf", 0));
 
 	sfseek(fr, (Sfoff_t)0, SEEK_END);
 	if(sfgetc(fr) >= 0 || !sfeof(fr))
@@ -81,5 +81,5 @@ MAIN()
 	if(errno != EBADF)
 		twarn("Wrong errno %d after sfseek, expecting %d", EBADF);
 
-	TSTEXIT(0);
+	texit(0);
 }

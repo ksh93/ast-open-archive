@@ -5,24 +5,26 @@ INCLUDE cc.def
 TEST 01 'option basics'
 
 	EXEC	-n -f - . 'print -- $(-?:/ /$("\n")/G)'
-		OUTPUT - $'--regress:=message
---all-static:=1
+		OUTPUT - $'--all-static:=1
 --archive-output:=\'option\'
 --cctype:=cc
 --compare:=1
 --lib-type:=1
---native-pp:=-1
 --official-output:=OFFICIAL
---prefix-include:=1
 --preserve:=\'lib*.so.*|\'
 --recurse:=1
 --separate-include:=1
 --virtual:=1'
 
 	EXEC	-n -f - . 'print -- $(-+:/ /$("\n")/G)'
-		OUTPUT - $'--noexec'
+		OUTPUT - $'--noexec
+--regress=message'
 
 	EXEC	-n -f - . 'print -- $(-:/ /$("\n")/G)'
+		OUTPUT - $'--noexec
+--regress=message
+--native-pp=-1
+--noprefix-include'
 
 	EXEC	-n -f - . 'print -- $(--:/ /$("\n")/G)'
 		OUTPUT - $'--noaccept
@@ -55,7 +57,7 @@ TEST 01 'option basics'
 --noquestionable
 --noreadonly
 --readstate=32
---regress:=message
+--regress=message
 --noreread
 --noruledump
 --scan
@@ -91,9 +93,9 @@ TEST 01 'option basics'
 --lib-type:=1
 --nolink
 --nolocal-static
---native-pp:=-1
+--native-pp=-1
 --official-output:=OFFICIAL
---prefix-include:=1
+--noprefix-include
 --preserve:=\'lib*.so.*|\'
 --noprofile
 --recurse:=1
@@ -110,26 +112,27 @@ TEST 01 'option basics'
 --virtual:=1'
 
 	EXEC	--clobber -n -f - . 'print -- $(-?:/ /$("\n")/G)'
-		OUTPUT - $'--regress:=message
---all-static:=1
+		OUTPUT - $'--all-static:=1
 --archive-output:=\'option\'
 --cctype:=cc
 --compare:=1
 --lib-type:=1
---native-pp:=-1
 --official-output:=OFFICIAL
---prefix-include:=1
 --preserve:=\'lib*.so.*|\'
 --recurse:=1
 --separate-include:=1
 --virtual:=1'
 
 	EXEC	--clobber -n -f - . 'print -- $(-+:/ /$("\n")/G)'
-		OUTPUT - $'--noexec'
+		OUTPUT - $'--noexec
+--regress=message'
 
 	EXEC	--clobber -n -f - . 'print -- $(-:/ /$("\n")/G)'
 		OUTPUT - $'--noexec
---clobber=\'*\''
+--regress=message
+--clobber=\'*\'
+--native-pp=-1
+--noprefix-include'
 
 	EXEC	--clobber -n -f - . 'print -- $(--:/ /$("\n")/G)'
 		OUTPUT - $'--noaccept
@@ -162,7 +165,7 @@ TEST 01 'option basics'
 --noquestionable
 --noreadonly
 --readstate=32
---regress:=message
+--regress=message
 --noreread
 --noruledump
 --scan
@@ -198,9 +201,9 @@ TEST 01 'option basics'
 --lib-type:=1
 --nolink
 --nolocal-static
---native-pp:=-1
+--native-pp=-1
 --official-output:=OFFICIAL
---prefix-include:=1
+--noprefix-include
 --preserve:=\'lib*.so.*|\'
 --noprofile
 --recurse:=1
@@ -247,7 +250,7 @@ TEST 01 'option basics'
 --noquestionable
 --noreadonly
 --readstate=32
---regress:=message
+--regress=message
 --noreread
 --noruledump
 --scan
@@ -283,9 +286,9 @@ TEST 01 'option basics'
 --lib-type:=1
 --nolink
 --nolocal-static
---native-pp:=-1
+--native-pp=-1
 --official-output:=OFFICIAL
---prefix-include:=1
+--noprefix-include
 --preserve:=\'lib*.so.*|\'
 --noprofile
 --recurse:=1
@@ -380,13 +383,13 @@ all : .MAKE
 	print : $(-) :
 	print : $(--) :'
 		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1
-: --force --silent --unconditional :
-: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress:=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp:=-1 --official-output:=OFFICIAL --prefix-include:=1 --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
+: --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :
+: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp=-1 --official-output:=OFFICIAL --noprefix-include --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
 
 	EXEC --silent
 		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1
-: --force --silent --unconditional :
-: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress:=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp:=-1 --official-output:=OFFICIAL --prefix-include:=1 --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
+: --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :
+: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp=-1 --official-output:=OFFICIAL --noprefix-include --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
@@ -398,68 +401,68 @@ set option=u;unconditional;b;.set.unconditional;\'Equivalent to \\b--force\\b.;\
 set unconditional
 all : .MAKE
 	print force=$(-force) unconditional=$(-unconditional) -F=$(-F) -u=$(-u) : $(-) :'
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :'
 
 	EXEC --silent -u
 
 	EXEC --silent
 
 	EXEC --silent +u
-		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --regress=message --silent --native-pp=-1 --noprefix-include --nounconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
 
 	EXEC --silent +u
-		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --regress=message --silent --native-pp=-1 --noprefix-include --nounconditional :'
 
 	EXEC --silent +u
 
 	EXEC --silent
 
 	EXEC --silent -u
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --regress=message --silent --native-pp=-1 --noprefix-include --nounconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
 
 	EXEC --silent -o unconditional
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :'
 
 	EXEC --silent
 
 	EXEC --silent -o nounconditional
-		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --regress=message --silent --native-pp=-1 --noprefix-include --nounconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
 
 	EXEC --silent --unconditional
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :'
 
 	EXEC --silent
 
 	EXEC --silent --nounconditional
-		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --regress=message --silent --native-pp=-1 --noprefix-include --nounconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :'
 
 TEST 04 'command line definition'
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' --Ztest
 		INPUT Makefile $'tst :
 	: $(-) : $(-Z) : $(-Ztest) :'
-		OUTPUT - $'+ : --noexec --Ztest : 1 : 1 :'
+		OUTPUT - $'+ : --noexec --regress=message --Ztest --native-pp=-1 --noprefix-include : 1 : 1 :'
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o Ztest
 
@@ -474,22 +477,22 @@ TEST 04 'command line definition'
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o Z
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' --noZtest
-		OUTPUT - $'+ : --noexec --noZtest :  :  :'
+		OUTPUT - $'+ : --noexec --regress=message --noZtest --native-pp=-1 --noprefix-include :  :  :'
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o noZtest
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o --noZtest
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o -noZtest
-		OUTPUT - $'+ : --noexec :  :  :'
+		OUTPUT - $'+ : --noexec --regress=message --native-pp=-1 --noprefix-include :  :  :'
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' +Z
-		OUTPUT - $'+ : --noexec --noZtest :  :  :'
+		OUTPUT - $'+ : --noexec --regress=message --noZtest --native-pp=-1 --noprefix-include :  :  :'
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o +Z
 
 	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o Z
-		OUTPUT - $'+ : --noexec --Ztest : 1 : 1 :'
+		OUTPUT - $'+ : --noexec --regress=message --Ztest --native-pp=-1 --noprefix-include : 1 : 1 :'
 
 TEST 05 '.mo interaction'
 
@@ -497,16 +500,16 @@ TEST 05 '.mo interaction'
 		INPUT Makefile $'all : status
 status : .MAKE .VIRTUAL .FORCE .REPEAT
 	print : $(-) : keepgoing=$(-keepgoing)'
-		OUTPUT - $': --noexec : keepgoing='
+		OUTPUT - $': --noexec --regress=message --native-pp=-1 --noprefix-include : keepgoing='
 
 	EXEC	-n -k
-		OUTPUT - $': --noexec --keepgoing : keepgoing=1'
+		OUTPUT - $': --noexec --keepgoing --regress=message --native-pp=-1 --noprefix-include : keepgoing=1'
 
 	EXEC	-k
-		OUTPUT - $': --keepgoing : keepgoing=1'
+		OUTPUT - $': --keepgoing --regress=message --native-pp=-1 --noprefix-include : keepgoing=1'
 
 	EXEC	--
-		OUTPUT - $':  : keepgoing='
+		OUTPUT - $': --regress=message --native-pp=-1 --noprefix-include : keepgoing='
 
 TEST 06 'jobs'
 
@@ -765,8 +768,7 @@ TEST 11 'rules obsolete "name=value" compatibility'
 	EXEC	-n clobber=1 --noclobber
 
 	EXEC	-n clobber=0
-		OUTPUT - $'+ :  : 0 :'
-		ERROR - $'make: warning: clobber=0: obsolete: use --noclobber'
+		OUTPUT - $'+ : * : 0 :'
 
 	EXEC	-n --clobber
 		OUTPUT - $'+ : * :  :'
@@ -782,8 +784,7 @@ TEST 11 'rules obsolete "name=value" compatibility'
 	EXEC	-n
 		INPUT Makefile $'clobber = 0
 all :\n\t: $(-clobber) : $(clobber) :'
-		OUTPUT - $'+ :  : 0 :'
-		ERROR - $'make: warning: clobber=0: obsolete: use --noclobber'
+		OUTPUT - $'+ : * : 0 :'
 
 	EXEC	-n
 		INPUT Makefile $'set noclobber
@@ -795,7 +796,6 @@ all :\n\t: $(-clobber) : $(clobber) :'
 		INPUT Makefile $'clobber = 1
 all :\n\t: $(-clobber) : $(clobber) :'
 		OUTPUT - $'+ : * : 1 :'
-		ERROR - $'make: warning: clobber=1: obsolete: use --clobber'
 
 	EXEC	-n
 		INPUT Makefile $'set clobber

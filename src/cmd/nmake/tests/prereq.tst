@@ -79,7 +79,7 @@ bind .FIND. 0.0
 done .FIND. virtual
 setv PACKAGEROOT $HOME
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -207,7 +207,7 @@ bind .FIND. 0.3
 done .FIND. virtual
 setv PACKAGEROOT $HOME
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -315,7 +315,7 @@ bind .FIND. 0.3
 done .FIND. virtual
 setv PACKAGEROOT $HOME
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc

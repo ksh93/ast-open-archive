@@ -402,7 +402,7 @@ s2 done'
 		ERROR - $'s1:
 s1.0:
 + cd s2
-+ nmake --noexec'
++ nmake --noexec \'--regress=message\' \'--native-pp=-1\' --noprefix-include'
 
 	EXPORT	VPATH=$TWD/top:$TWD/bot
 
@@ -415,7 +415,7 @@ s2 done'
 		ERROR - $'s1: warning: cannot recurse on virtual directory
 s1.0: warning: cannot recurse on virtual directory
 + cd s2
-+ nmake --noexec --novirtual'
++ nmake --noexec \'--regress=message\' \'--native-pp=-1\' --noprefix-include --novirtual'
 
 	EXEC	-n
 		OUTPUT - $'+ echo make s1
@@ -425,13 +425,13 @@ s2 done'
 		ERROR - $'s1:
 s1.0:
 + cd s2
-+ nmake --noexec'
++ nmake --noexec \'--regress=message\' \'--native-pp=-1\' --noprefix-include'
 
 	EXEC	-n --novirtual
 		ERROR - $'s1:
 s1.0:
 + cd s2
-+ nmake --noexec --novirtual'
++ nmake --noexec \'--regress=message\' \'--native-pp=-1\' --noprefix-include --novirtual'
 
 TEST 15 '3 levels'
 

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -30,14 +30,14 @@ static ssize_t writef(Sfio_t* f, const void* data, size_t n, Sfdisc_t* disc)
 			break;
 
 	if((k = (dt - (char*)data) + 1) == 0 )
-		twarn("Processing a partial line, ok");
+		tinfo("Processing a partial line, ok");
 
 	return k;
 }
 
 Sfdisc_t Disc = { 0, writef, 0, 0, 0 };
 
-MAIN()
+tmain()
 {
 	char	buf[100];
 	Sfio_t	*fp;
@@ -87,5 +87,5 @@ MAIN()
 	if(sfputr(fp, "1", -1) != 1)
 		terror("Sfputr failed3");
 
-	TSTEXIT(0);
+	texit(0);
 }

@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -125,7 +125,7 @@ _trace_next(Cx_t* cx)
 	c = next(cx);
 	buf[0] = c;
 	buf[1] = 0;
-	error(-1, "cxcomp next include=%p '%s'", cx->include, c ? fmtesc(buf) : "\\0");
+	error(-2, "cxcomp next include=%p eof=%d '%s'", cx->include, cx->include->eof, c ? fmtesc(buf) : "\\0");
 	return c;
 }
 
@@ -285,12 +285,17 @@ cxcodetrace(Cx_t* cx, const char* fun, Cxinstruction_t* pc, unsigned int offset,
 	o = cxcodename(pc->op);
 	if ((*o == 'G' || *o == 'S') && *(o + 1) == 'E')
 		sfsprintf(val, sizeof(val), "  %s", pc->data.variable->name);
+	else if (*o == 'C')
+	{
+		if (pc->data.pointer)
+			sfsprintf(val, sizeof(val), "  %s", ((Cxedit_t*)pc->data.pointer)->name);
+	}
 	else if (pc->type == cx->state->type_string)
 		sfsprintf(val, sizeof(val), "  \"%-.6s\"", pc->data.string);
 	else if (pc->type == cx->state->type_number)
 		sfsprintf(val, sizeof(val), "  %8.4Lf", pc->data.number);
-	else if (pc->type != cx->state->type_void || *o == 'C')
-		sfsprintf(val, sizeof(val), "  %08x", pc->data.pointer);
+	else if (pc->type != cx->state->type_void)
+		sfsprintf(val, sizeof(val), "  %p", pc->data.pointer);
 	else
 		val[0] = 0;
 	if (bp)
@@ -300,7 +305,7 @@ cxcodetrace(Cx_t* cx, const char* fun, Cxinstruction_t* pc, unsigned int offset,
 		else if ((sp-1)->type == cx->state->type_number)
 			sfsprintf(a, sizeof(a), "  [%d]%8.4Lf", (sp-1) - bp, (sp-1)->value.number);
 		else if ((sp-1)->type != cx->state->type_void)
-			sfsprintf(a, sizeof(a), "  [%d]%08x", (sp-1) - bp, (sp-1)->value.pointer);
+			sfsprintf(a, sizeof(a), "  [%d]%p", (sp-1) - bp, (sp-1)->value.pointer);
 		else
 			a[0] = 0;
 		if (sp->type == cx->state->type_string)
@@ -308,7 +313,7 @@ cxcodetrace(Cx_t* cx, const char* fun, Cxinstruction_t* pc, unsigned int offset,
 		else if (sp->type == cx->state->type_number)
 			sfsprintf(b, sizeof(b), "  [%d]%8.4Lf", sp - bp, sp->value.number);
 		else if (sp->type != cx->state->type_void)
-			sfsprintf(b, sizeof(b), "  [%d]%08x", sp - bp, sp->value.pointer);
+			sfsprintf(b, sizeof(b), "  [%d]%p", sp - bp, sp->value.pointer);
 		else
 			b[0] = 0;
 	}
@@ -541,7 +546,7 @@ identifier(Cx_t* cx, Cxcompile_t* cc, register int c, Cxoperand_t* r)
  */
 
 static Cxvariable_t*
-variable(Cx_t* cx, Cxcompile_t* cc, int c, Cxtype_t* m)
+variable(Cx_t* cx, Cxcompile_t* cc, int c, Cxtype_t* m, Cxtype_t** type)
 {
 	Cxoperand_t	r;
 	Cxoperand_t	a;
@@ -558,10 +563,55 @@ variable(Cx_t* cx, Cxcompile_t* cc, int c, Cxtype_t* m)
 	else
 	{
 		a.refs = 0;
-		if ((*cx->referencef)(cx, NiL, &r, &b, &a, NiL, cx->disc))
+		if (type && (*type = (Cxtype_t*)dtmatch(cx->types, a.value.string.data)) || (*cx->referencef)(cx, NiL, &r, &b, &a, NiL, cx->disc))
 			return 0;
 	}
 	return r.value.variable;
+}
+
+/*
+ * eval time cast
+ */
+
+static int
+cast(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	if ((*r->type->internalf)(cx, r->type, NiL, &r->type->format, r, r->value.string.data, r->value.string.size, cx->em, cx->disc) < 0)
+	{
+		(*cx->disc->errorf)(cx, cx->disc, 2, "cannot cast from %s to %s", r->type->name, r->type->fundamental->name);
+		return -1;
+	}
+	return 0;
+}
+
+/*
+ * eval time edit
+ */
+
+static int
+edit(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	return cxsuball(cx, (Cxpart_t*)pc->data.pointer, r);
+}
+
+/*
+ * output cast instruction
+ */
+
+static int
+codecast(Cx_t* cx, Cxcompile_t* cc, Cxtype_t* t, Cxcallout_f cast, void* pointer)
+{
+	Cxinstruction_t		c;
+
+	c.callout = cast;
+	c.op = CX_CAST;
+	c.type = t;
+	c.data.pointer = pointer;
+	c.pp = 0;
+	if ((cx->flags & CX_DEBUG) && sfstrtell(cc->xp))
+		cxcodetrace(cx, "comp", &c, (unsigned int)sfstrtell(cc->xp) / sizeof(c), 0, 0);
+	sfwrite(cc->xp, &c, sizeof(c));
+	return 0;
 }
 
 /*
@@ -615,7 +665,7 @@ code(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1,
 	{
 		i1 = (Cxinstruction_t*)(sfstrseek(cc->xp, 0, SEEK_CUR) - 2 * sizeof(Cxinstruction_t));
 		i2 = i1 + 1;
-		if (i1->op == CX_GET && (f = cxrecode(cx, op, type1, type2, cx->disc)))
+		if ((i1->op == CX_GET || i1->op == CX_CAST && (i1 - 1)->op == CX_GET) && (f = cxrecode(cx, op, type1, type2, cx->disc)))
 		{
 			expr->vm = cc->vm;
 			expr->done = cc->done;
@@ -775,7 +825,7 @@ code(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1,
 	if (x.callout = cxcallout(cx, op, cx->state->type_void, cx->state->type_void, cx->disc))
 		goto done;
 	if (cx->disc->errorf)
-		(*cx->disc->errorf)(cx, cx->disc, 2, "%s %s not supported [%d:%d]", cxcontext(cx), cxopname(op, type1, type2), cxrepresentation(type1), cxrepresentation(type2));
+		(*cx->disc->errorf)(cx, cx->disc, 2, "%s %s not supported [%d:%d] %p", cxcontext(cx), cxopname(op, type1, type2), cxrepresentation(type1), cxrepresentation(type2), cxcallout(cx, op, cx->state->type_string, cx->state->type_string, cx->disc));
 	return 0;
  done:
 	if ((cx->flags & CX_DEBUG) && sfstrtell(cc->xp))
@@ -786,42 +836,9 @@ code(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1,
 			(*cx->disc->errorf)(cx, cx->disc, 2, "out of space");
 		return 0;
 	}
+	if (op == CX_GET && (v1 = (Cxvariable_t*)pointer) && cxisstring(v1->type) && v1->format.map && v1->format.map->part && v1->format.map->part->edit)
+		codecast(cx, cc, v1->type, edit, v1->format.map->part);
 	return cc->type = x.type;
-}
-
-/*
- * eval time cast
- */
-
-static int
-cast(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
-{
-	if ((*r->type->internalf)(cx, r->type, NiL, &r->type->format, r, r->value.string.data, r->value.string.size, cx->em, cx->disc) < 0)
-	{
-		(*cx->disc->errorf)(cx, cx->disc, 2, "cannot cast from %s to %s", r->type->name, r->type->fundamental->name);
-		return -1;
-	}
-	return 0;
-}
-
-/*
- * output cast instruction
- */
-
-static int
-codecast(Cx_t* cx, Cxcompile_t* cc, Cxtype_t* t)
-{
-	Cxinstruction_t		c;
-
-	c.callout = cast;
-	c.op = CX_CAST;
-	c.type = t;
-	c.data.number = 0;
-	c.pp = 0;
-	if ((cx->flags & CX_DEBUG) && sfstrtell(cc->xp))
-		cxcodetrace(cx, "comp", &c, (unsigned int)sfstrtell(cc->xp) / sizeof(c), 0, 0);
-	sfwrite(cc->xp, &c, sizeof(c));
-	return 0;
 }
 
 /*
@@ -882,6 +899,12 @@ prototype(Cx_t* cx, Cxcompile_t* cc, Cxvariable_t* v, Cxtype_t** tp, char** sp, 
 				r = 1;
 				break;
 			}
+		}
+		else if (c == '*')
+		{
+			t = cx->state->type_void;
+			r = 1;
+			break;
 		}
 		else if (c == '&' && (cx->ctype[*(unsigned char*)s] & CX_CTYPE_ALPHA) || (cx->ctype[c] & CX_CTYPE_ALPHA))
 		{
@@ -993,7 +1016,7 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 							(*cx->disc->errorf)(cx, cx->disc, 2, "%s operator requires lvalue", cxcontext(cx));
 						goto bad;
 					}
-					if (!(v = variable(cx, cc, 0, m)))
+					if (!(v = variable(cx, cc, 0, m, 0)))
 						goto bad;
 					h = v;
 					m = 0;
@@ -1047,7 +1070,7 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			}
 			else if (o == CX_REF)
 			{
-				if (!(v = variable(cx, cc, 0, m)))
+				if (!(v = variable(cx, cc, 0, m, 0)))
 					goto bad;
 				m = 0;
 				if (!code(cx, cc, expr, CX_REF, 1, cx->state->type_reference, cx->state->type_void, v, 0, NiL))
@@ -1058,7 +1081,12 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			}
 			else
 			{
-				if (v)
+				if (x == 2)
+				{
+					if (!code(cx, cc, expr, CX_NUM, 1, cx->state->type_type_t, cx->state->type_void, t, 0, NiL))
+						goto bad;
+				}
+				else if (v)
 				{
 					if (cxisvoid(v->type))
 						goto undefined;
@@ -1189,8 +1217,15 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			if (x)
 				goto operator_expected;
 		alpha:
-			if (!(v = variable(cx, cc, c, m)))
+			if (!(v = variable(cx, cc, c, m, &t)))
+			{
+				if (t)
+				{
+					x = 2;
+					continue;
+				}
 				goto bad;
+			}
 			h = v;
 			m = 0;
 			while ((c = next(cx)) == ' ' || c == '\t' || c == '\r');
@@ -1294,7 +1329,7 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 					goto bad;
 				if (g)
 				{
-					if (codecast(cx, cc, g))
+					if (codecast(cx, cc, g, cast, NiL))
 						goto bad;
 					g = 0;
 				}
@@ -1316,7 +1351,7 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			case 0:
 				goto done;
 			case '.':
-				if (!x && !v && (v = variable(cx, cc, c, m)))
+				if (!x && !v && (v = variable(cx, cc, c, m, 0)))
 					x = 1;
 				if (!x || !v || !v->type->base || !v->type->base->member)
 				{
@@ -1364,9 +1399,9 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			case '(':
 				if (x)
 					goto operator_expected;
+				e = cx->include->next;
 				if (cx->ctype[c = next(cx)] & CX_CTYPE_ALPHA)
 				{
-					e = cx->include->next;
 					if (!identifier(cx, cc, c, &w) && (c = next(cx)) == ')' && ((c = next(cx)) == '(' || (cx->ctype[c] & CX_CTYPE_ALPHA)))
 					{
 						if (!(g = cxtype(cx, w.value.string.data, cx->disc)))
@@ -1379,13 +1414,10 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 							goto alpha;
 					}
 					else
-					{
 						cx->include->next = e;
-						back(cx);
-					}
 				}
 				else
-					back(cx);
+					cx->include->next = e;
 				x = 1;
 				k = cc->balanced;
 				cc->balanced = 0;
@@ -1526,13 +1558,18 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 		goto operand_expected;
 	if (c && (precedence || c != '\n' && c != ';'))
 		back(cx);
-	if (v)
+	if (x == 2)
+	{
+		if (!code(cx, cc, expr, CX_NUM, 1, cx->state->type_type_t, cx->state->type_void, t, 0, NiL))
+			goto bad;
+	}
+	else if (v)
 	{
 		if (cxisvoid(v->type))
 			goto undefined;
 		if (!code(cx, cc, expr, CX_GET, 1, v->type, cx->state->type_void, v, 0, NiL))
 			goto bad;
-		if (g && codecast(cx, cc, g))
+		if (g && codecast(cx, cc, g, cast, NiL))
 			goto bad;
 	}
 	if (ref)
@@ -2028,7 +2065,7 @@ cxcomp(Cx_t* cx)
 	Cxexpr_t*	expr;
 	int		c;
 
-	error(-1, "cxcomp push include=%p eof=%d", cx->include, cx->eof);
+	error(-1, "cxcomp push include=%p file=%s eof=%d", cx->include, cx->include ? cx->include->file : 0, cx->eof);
 	if (cx->eof || !cx->include && (cx->eof = 1))
 		return 0;
 	expr = 0;
@@ -2048,7 +2085,11 @@ cxcomp(Cx_t* cx)
 		goto nospace;
 	cx->include->head = 1;
 	if (!(c = peek(cx, !cx->interactive)))
+	{
+		if (!cx->include->pop)
+			cx->eof = 1;
 		goto done;
+	}
 	else if (c == '{' || c == '(')
 	{
 		if (!(expr = compose(cx, cc, 0)))
@@ -2076,7 +2117,7 @@ cxcomp(Cx_t* cx)
 			vmclose(cc->vm);
 		vmfree(cx->vm, cc);
 	}
-	error(-1, "cxcomp done include=%p eof=%d", cx->include, cx->eof);
+	error(-1, "cxcomp done include=%p file=%s eof=%d", cx->include, cx->include ? cx->include->file : 0, cx->eof);
 	return expr;
 }
 

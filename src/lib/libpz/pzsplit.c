@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1998-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -328,7 +328,7 @@ deflate(Pz_t* pz, Sfio_t* op)
 	def.pz = pz;
 	if (!(state.buf = sfstropen()) || !(def.xp = sfstropen()))
 		goto nospace;
-	if (!(def.ids = dtopen(&iddisc, Dttree)) || !(def.sqs = dtopen(&sqdisc, Dttree)))
+	if (!(def.ids = dtopen(&iddisc, Dtoset)) || !(def.sqs = dtopen(&sqdisc, Dtoset)))
 		goto nospace;
 	def.seq = 0;
 
@@ -505,7 +505,7 @@ inflate(Pz_t* pz, Sfio_t* op)
 	iddisc.link = offsetof(Id_t, byid);
 	iddisc.size = -1;
 	iddisc.freef = freeid;
-	if (!(ids = dtopen(&iddisc, Dttree)))
+	if (!(ids = dtopen(&iddisc, Dtoset)))
 		goto nospace;
 	if (!(state.buf = sfstropen()))
 		goto nospace;
@@ -736,7 +736,7 @@ pzssplit(Pz_t* pz)
 	iddisc.comparf = byulong;
 #endif
 	iddisc.freef = freeid;
-	if (!(ids = dtopen(&iddisc, Dttree)))
+	if (!(ids = dtopen(&iddisc, Dtoset)))
 		goto nospace;
 
 	/*

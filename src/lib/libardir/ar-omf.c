@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2005 AT&T Corp.                  *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -31,7 +31,7 @@
 #define EILSEQ		EINVAL
 #endif
 
-#define FILENAME    "U_w_i_n"
+#define FILENAME    "U_w_i_n.o"
 
 typedef struct _arfile_
 {
@@ -262,7 +262,7 @@ omfopen(Ardir_t* ar, char* buf, size_t size)
 	char name[PATH_MAX];
 	Arfile_t *fp;
 	struct Table *tp=0, *tpnew;
-	int dmars=0,n,type,special=0,len,flen=strlen(FILENAME ".");
+	int dmars=0,n,type,special=0,len;
 
 	if (ar->fd>=0 && (size<=0 || *((unsigned char*)buf) != OMF_LIBHDR))
 		return -1;
@@ -313,7 +313,7 @@ omfopen(Ardir_t* ar, char* buf, size_t size)
 		}
 		else if(type==OMF_THEADR)
 		{
-			if(memcmp(addr+1,FILENAME".",flen))
+			if(memcmp(addr+1,FILENAME,sizeof(FILENAME)-2))
 			{
 				begin = addr+1;
 				len = *addr;
@@ -455,7 +455,7 @@ int omfinsert(Ardir_t *ar, const char *name, int op)
 
 const char *omfspecial(Ardir_t *ar)
 {
-	return(FILENAME ".o");
+	return(FILENAME);
 }
 
 /*

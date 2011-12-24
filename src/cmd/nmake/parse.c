@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -310,7 +310,7 @@ declare(char* t, int line, long flags)
 
 /*
  * declare local variables using tmp string xp
- * s is first expanded
+ * v is first expanded
  * 2 funtion argument styles supported
  *	(formal ...) actual ...
  *	-[n] actual
@@ -398,10 +398,12 @@ local(Sfio_t* xp, char* v)
 	{
 		if (formal)
 		{
-			a = getarg(&argv, NiL);
-			if (!optional && (!a || !streq(a, "...")))
-				error(3, "%s: actual argument expected", formal, argc - 1);
-			formal = a;
+			if (!optional)
+			{
+				a = getarg(&argv, NiL);
+				if (!a || !streq(a, "..."))
+					error(3, "%s: actual argument expected", formal, argc - 1);
+			}
 			while (formal)
 			{
 				declare(formal, error_info.line, 0);

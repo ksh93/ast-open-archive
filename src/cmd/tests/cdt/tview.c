@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -20,7 +20,7 @@
 #include	"dttest.h"
 
 Dtdisc_t Disc =
-	{ 0, sizeof(int), -1,
+	{ 0, sizeof(long), -1,
 	  newint, NIL(Dtfree_f), compare, hashint,
 	  NIL(Dtmemory_f), NIL(Dtevent_f)
 	};
@@ -28,44 +28,51 @@ Dtdisc_t Disc =
 static int Count, See[10];
 
 #if __STD_C
-static visit(Dt_t* dt, Void_t* obj, Void_t* data)
+static int visit(Dt_t* dt, Void_t* obj, Void_t* data)
 #else
-static visit(dt, obj, data)
+static int visit(dt, obj, data)
 Dt_t*	dt;
 Void_t* obj;
 Void_t*	data;
 #endif
 {
-	See[(int)obj] = 1;
+	See[(long)obj] = 1;
 	Count += 1;
 	return 0;
 }
 
-main()
+tmain()
 {
-	Dt_t		*dt1, *dt2;
-	int		i;
+	Dt_t		*dt1, *dt2, *dt3;
+	long		i, k;
 
 	if(!(dt1 = dtopen(&Disc,Dtoset)) )
 		terror("Opening Dtoset");
 	if(!(dt2 = dtopen(&Disc,Dtoset)) )
 		terror("Opening Dtoset");
+	if(!(dt3 = dtopen(&Disc,Dtoset)) )
+		terror("Opening Dtoset");
 
-	dtinsert(dt1,1);
-	dtinsert(dt1,3);
-	dtinsert(dt1,5);
-	dtinsert(dt1,2);
+	dtinsert(dt1,1L);
+	dtinsert(dt1,3L);
+	dtinsert(dt1,5L);
+	dtinsert(dt1,2L);
 
-	dtinsert(dt2,2);
-	dtinsert(dt2,4);
-	dtinsert(dt2,6);
-	dtinsert(dt2,3);
+	dtinsert(dt2,2L);
+	dtinsert(dt2,4L);
+	dtinsert(dt2,6L);
+	dtinsert(dt2,3L);
 
-	if((int)dtsearch(dt1,4) != 0)
+	dtinsert(dt3,2L);
+	dtinsert(dt3,7L);
+	dtinsert(dt3,6L);
+	dtinsert(dt3,8L);
+
+	if((long)dtsearch(dt1,4L) != 0)
 		terror("Finding 4 here?");
 
 	dtview(dt1,dt2);
-	if((int)dtsearch(dt1,4) != 4)
+	if((long)dtsearch(dt1,4L) != 4)
 		terror("Should find 4 here!");
 
 	dtwalk(dt1,visit,NIL(Void_t*));
@@ -75,30 +82,44 @@ main()
 		if(!See[i] )
 			terror("Bad walk");
 
-	dtinsert(dt1,2);
+	dtinsert(dt1,2L);
 
 	Count = 0;
-	for(i = (int)dtfirst(dt1); i; i = (int)dtnext(dt1,i))
+	for(i = (long)dtfirst(dt1); i; i = (long)dtnext(dt1,i))
 		Count++;
 	if(Count != 6)
 		terror("Walk wrong length2");
 
 	Count = 0;
-	for(i = (int)dtlast(dt1); i; i = (int)dtprev(dt1,i))
+	for(i = (long)dtlast(dt1); i; i = (long)dtprev(dt1,i))
 		Count++;
 	if(Count != 6)
 		terror("Walk wrong length3");
 
+	/* check union of elements in order across ordered sets */
+	dtview(dt2,dt3);
+	for(k = 1, i = (long)dtfirst(dt1); i; ++k, i = (long)dtnext(dt1,i) )
+		if(i != k)
+			terror("Elements not appearing in order");
+
+	dtinsert(dt3, 10L);
+	if((long)dtatmost(dt1,9L) != 8L)
+		terror("dtatmost failed on an order set");
+	if((long)dtatleast(dt1,9L) != 10L)
+		terror("dtatleast failed on an order set");
+
 	/* dt1: 1 3 5 2
 	   dt2: 2 4 6 3
+	   dt3: 2 7 6 8 10
 	*/
 	Count = 0;
 	dtmethod(dt1,Dtset);
 	dtmethod(dt2,Dtset);
-	for(i = (int)dtfirst(dt1); i; i = (int)dtnext(dt1,i))
+	dtmethod(dt3,Dtset);
+	for(i = (long)dtfirst(dt1); i; i = (long)dtnext(dt1,i))
 		Count++;
-	if(Count != 6)
+	if(Count != 9)
 		terror("Walk wrong length4");
 
-	return 0;
+	texit(0);
 }

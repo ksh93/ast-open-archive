@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -32,7 +32,7 @@ static long vrandom()
 	return (hash = hash*0xbadbeef + 0xdeadbeef)&LOWBITS;
 }
 
-MAIN()
+tmain()
 {
 	ssize_t	size[N_WRITER][N_RECORD];
 	int	count[N_WRITER];
@@ -52,11 +52,11 @@ MAIN()
 		record[i][r] = '0'+i;
 
 	/* create file */
-	fr = sfopen(NIL(Sfio_t*),tstfile(0),"w+");
+	fr = sfopen(NIL(Sfio_t*),tstfile("sf", 0),"w+");
 
 	/* create records */
 	for(i = 0; i < N_WRITER; ++i)
-	{	fw[i] = sfopen(NIL(Sfio_t*),tstfile(0),"a");
+	{	fw[i] = sfopen(NIL(Sfio_t*),tstfile("sf", 0),"a");
 		count[i] = 0;
 	}
 
@@ -99,5 +99,5 @@ MAIN()
 		if(count[i] != N_RECORD)
 			terror("Bad count%d %d", i, count[i]);
 
-	TSTEXIT(0);
+	texit(0);
 }

@@ -130,7 +130,10 @@ TEST 07 ':INSTALLDIR:'
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= LC_ALL=C $SHELL -n test.sh
++ 	then	if	grep -q \'### .*archaic.* ###\'
++ 		then	: test contains archaic constructs :
++ 		else	ENV= LC_ALL=C $SHELL -n test.sh
++ 		fi
 + 	fi
 + 	;;
 + esac
@@ -366,7 +369,10 @@ TEST 15 ':: .sh rhs mismatch with lhs'
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= LC_ALL=C $SHELL -n foo.sh
++ 	then	if	grep -q \'### .*archaic.* ###\'
++ 		then	: bin/foo contains archaic constructs :
++ 		else	ENV= LC_ALL=C $SHELL -n foo.sh
++ 		fi
 + 	fi
 + 	;;
 + esac
@@ -479,7 +485,10 @@ ug gu :LINK: gg'
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= LC_ALL=C $SHELL -n gg.sh
++ 	then	if	grep -q \'### .*archaic.* ###\'
++ 		then	: gg contains archaic constructs :
++ 		else	ENV= LC_ALL=C $SHELL -n gg.sh
++ 		fi
 + 	fi
 + 	;;
 + esac
@@ -619,7 +628,10 @@ BBB :: BBB.sh'
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= LC_ALL=C $SHELL -n AAA.sh
++ 	then	if	grep -q \'### .*archaic.* ###\'
++ 		then	: bin/AAA contains archaic constructs :
++ 		else	ENV= LC_ALL=C $SHELL -n AAA.sh
++ 		fi
 + 	fi
 + 	;;
 + esac
@@ -650,7 +662,10 @@ BBB :: BBB.sh'
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= LC_ALL=C $SHELL -n BBB.sh
++ 	then	if	grep -q \'### .*archaic.* ###\'
++ 		then	: BBB contains archaic constructs :
++ 		else	ENV= LC_ALL=C $SHELL -n BBB.sh
++ 		fi
 + 	fi
 + 	;;
 + esac

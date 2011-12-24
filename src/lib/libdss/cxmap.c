@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2008 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -89,10 +89,10 @@ initmap(Frame_t* frame, Cxmap_t* map, Cxdisc_t* disc)
 		{
 			stricase2numdisc = str2numdisc;
 			stricase2numdisc.comparf = ignorecase;
-			map->str2num = dtopen(&stricase2numdisc, Dttree);
+			map->str2num = dtopen(&stricase2numdisc, Dtoset);
 		}
 		else
-			map->str2num = dtopen(&str2numdisc, Dttree);
+			map->str2num = dtopen(&str2numdisc, Dtoset);
 		if (!map->str2num)
 		{
 			if (disc->errorf)
@@ -134,7 +134,7 @@ initmap(Frame_t* frame, Cxmap_t* map, Cxdisc_t* disc)
 		num2strdisc.link = offsetof(Cxitem_t, num2str);
 		num2strdisc.key = offsetof(Cxitem_t, value);
 		num2strdisc.size = sizeof(Cxunsigned_t);
-		if (!(map->num2str = dtopen(&num2strdisc, Dttree)))
+		if (!(map->num2str = dtopen(&num2strdisc, Dtoset)))
 		{
 			if (disc->errorf)
 				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
@@ -326,5 +326,46 @@ cxstr2num(Cx_t* cx, Cxformat_t* format, const char* str, size_t siz, Cxunsigned_
 	}
 	if (p)
 		*p = n;
+	return 0;
+}
+
+/*
+ * apply edit substitutions in edit to r
+ */
+
+int
+cxsub(Cx_t* cx, Cxedit_t* edit, Cxoperand_t* r)
+{
+	Cxtype_t*	type;
+	regmatch_t	match[10];
+
+	if (!cxisstring(r->type))
+	{
+		type = r->type;
+		if (cxcast(cx, r, NiL, cx->state->type_string, NiL, NiL))
+			return -1;
+	}
+	else
+		type = 0;
+	if (!regnexec(&edit->re, r->value.string.data, r->value.string.size, elementsof(match), match, 0) && !regsubexec(&edit->re, r->value.string.data, elementsof(match), match))
+		r->value.string.size = strlen(r->value.string.data = edit->re.re_sub->re_buf);
+	if (type && cxcast(cx, r, NiL, type, NiL, NiL))
+		return -1;
+	return 0;
+}
+
+/*
+ * apply edit substitutions in part to r
+ */
+
+int
+cxsuball(Cx_t* cx, Cxpart_t* part, Cxoperand_t* r)
+{
+	while (part)
+	{
+		if (part->edit && cxsub(cx, part->edit, r))
+			return -1;
+		part = part->next;
+	}
 	return 0;
 }

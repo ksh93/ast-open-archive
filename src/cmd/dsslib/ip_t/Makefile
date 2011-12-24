@@ -13,7 +13,7 @@ ip_t plugin=dss static :LIBRARY: iv.3 ptv.3 \
 	ptintersect.c ptinvert.c ptmatch.c ptopen.c ptprint.c ptranges.c \
 	ptsize.c ptstats.c ptsubset.c ptunion.c ptdump.c ptrebit.c \
 	fv.c \
-	ivopen.c ivclose.c ivmeth.c iv-flat.c iv-nested.c \
+	ivopen.c ivclose.c ivstr.c ivfmt.c ivmeth.c iv-flat.c iv-nested.c \
 	ptvaddresses.c ptvcopy.c ptvcover.c ptvdifference.c ptvdump.c \
 	ptvequal.c ptvintersect.c ptvinvert.c ptvmatch.c ptvmin.c ptvmax.c \
 	ptvopen.c ptvprint.c ptvranges.c ptvrebit.c ptvsize.c ptvstats.c \
@@ -22,10 +22,26 @@ ip_t plugin=dss static :LIBRARY: iv.3 ptv.3 \
 
 $(INCLUDEDIR) :INSTALLPROTO: bgp.h fv.h iv.h ivmethods.h pt.h ptv.h
 
-iv :TEST: testiv iv-prefix.dat iv-addr.dat testiv.out
-	set +x
-	$(*:O<4) > testiv.tmp
-	cmp -s testiv.tmp $(*:O=4) || echo iv test failed
+iv :TEST: testiv \
+		iv-ip4-prefix.dat iv-ip4-addr.dat iv-ip4.out \
+		iv-ip6-prefix.dat iv-ip6-addr.dat iv-ip6.out
+	set +x $(*:O>1)
+	while	:
+	do	case $# in
+		[012])	break ;;
+		esac
+		case $1 in
+		*-ip4-*)f=-ip4 ;;
+		*)	f=-ip6 ;;
+		esac
+		$(*:O=1) $f $1 $2 > iv$f.tmp
+		if	cmp -s iv$f.tmp $3
+		then	r=passed
+		else	r=failed
+		fi
+		echo iv $f test $r
+		shift 3
+	done
 
 :INSTALLDIR: bgpsize testiv testptv
 
@@ -41,5 +57,5 @@ ivsa.tgz ptvsa.tgz : $$(<:B:S=.manifest:T=F:T=I:/[[:space:]][[:space:]]*/ /G)
 	$(PAX) $(PAXFLAGS) -wf $(<) -x $(<:/.*\.//) -s ',.*/,,' -A $(PAXFILTER:@Q) $(*)
 
 :: RELEASE \
-	README-ivsa ivsa.manifest ivsa.omk \
-	README-ptvsa ptvsa.manifest ptvsa.omk
+	README-ivsa ivsa.manifest ivsa.mm ivsa.omk \
+	README-ptvsa ptvsa.manifest ptvsa.mm ptvsa.omk

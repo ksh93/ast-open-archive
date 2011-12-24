@@ -780,135 +780,139 @@ getopts (AT&T Research) 1999-02-02'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>getopts man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;GETOPTS&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>GETOPTS&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>GETOPTS&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>GETOPTS&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>getopts - parse utility options
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX-->getopts - parse utility options
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>getopts</B> &#0091; <I>options</I> &#0093; opstring name &#0091;args...&#0093;
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>getopts</B> &#0091; <I>options</I> &#0093; opstring name &#0091;args...&#0093;
 <P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>-<B>a</B>, --<B>command</B>=<I>name</I><DD>Use <I>name</I> instead of the
+</DIV>
+<H4><A name="OPTIONS">OPTIONS</A></H4>
+<DIV class=SH>
+<DL>
+<DT>-<B>a</B>, --<B>command</B>=<I>name</I><DD><BR>Use <I>name</I> instead of the
 command name in usage messages.
 </DL>
-<DT><H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
-<DL compact>
-<DT>The <B>getopts</B> utility can be used to retrieve options and arguments
-from a list of arguments give by <I>args</I> or the positional parameters if <I>args
+</DIV>
+<H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
+<DIV class=SH>
+The <B>getopts</B> utility can be used to retrieve options and arguments from a
+list of arguments give by <I>args</I> or the positional parameters if <I>args
 </I> is omitted. It can also generate usage messages and a man page for the
 command based on the information in <I>optstring</I>.
 <P>
-<DT>The <I>optstring</I> string consists of alpha-numeric characters, the
-special characters +, -, ?, :, and &lt;space&gt;, or character groups enclosed
-in &#0091;...&#0093;. Character groups may be nested in {...}. Outside of a &#0091;...&#0093; group, a
+The <I>optstring</I> string consists of alpha-numeric characters, the special
+characters +, -, ?, :, and &lt;space&gt;, or character groups enclosed in
+&#0091;...&#0093;. Character groups may be nested in {...}. Outside of a &#0091;...&#0093; group, a
 single new-line followed by zero or more blanks is ignored. One or more blank
 lines separates the options from the command argument synopsis.
 <P>
-<DT>Each &#0091;...&#0093; group consists of an optional label, optional attributes
-separated by :, and an optional description string following ?. The characters
-from the ? to the end of the next &#0093; are ignored for option parsing and short
-usage messages. They are used for generating verbose help or man pages. The :
+Each &#0091;...&#0093; group consists of an optional label, optional attributes separated
+by :, and an optional description string following ?. The characters from the ?
+to the end of the next &#0093; are ignored for option parsing and short usage
+messages. They are used for generating verbose help or man pages. The :
 character may not appear in the label. The ? character must be specified as ??
 in label and the &#0093; character must be specified as &#0093;&#0093; in the description string.
 Text between two \\b (backspace) characters indicates that the text should be
 emboldened when displayed. Text between two \\a (bell) characters indicates that
 the text should be emphasised or italicised when displayed.
 <P>
-<DT>There are four types of groups:
-<DL compact>
-<DL compact>
-<DT><A name="1."><B>1.</B></A><DD>An option specifiation of the form <I>option
-</I>:<I>longname</I>. In this case the first field is the option character. If
-there is no option character, then a two digit number should be specified that
+There are four types of groups:
+<DL>
+<DT><A name="1."><B>1.</B></A><DD>An option specifiation of the form <I>option</I>:
+<I>longname</I>. In this case the first field is the option character. If there
+is no option character, then a two digit number should be specified that
 corresponds to the long options. This negative of this number will be returned
 as the value of <I>name</I> by <B>getopts</B> if the long option is matched. A
 longname is matched with <B>--</B><I>longname</I>. A * in the <I>longname</I>
 field indicates that only characters up that point need to match provided any
 additional characters match the option. The &#0091; and &#0093; can be omitted for options
 that don\'t have longnames or descriptive text.
-<DT><A name="2."><B>2.</B></A><DD>A string option argument specification.
-Options that take arguments can be followed by : or # and an option group
+<DT><A name="2."><B>2.</B></A><DD>A string option argument specification. Options
+that take arguments can be followed by : or # and an option group
 specification. An option group specification consists of a name for the option
 argument as field 1. The remaining fields are a typename and zero or more of
 the special attribute words <B>listof</B>, <B>oneof</B>, and <B>ignorecase</B>.
 The option specification can be followed by a list of option value descriptions
 enclosed in parenthesis.
 <DT><A name="3."><B>3.</B></A><DD>A option value description.
-<DT><A name="4."><B>4.</B></A><DD>A argument specification. A list of valid
-option argument values can be specified by enclosing them inside a {...}
-following the option argument specification. Each of the permitted values can
-be specified with a &#0091;...&#0093; containing the value followed by a description.
+<DT><A name="4."><B>4.</B></A><DD>A argument specification. A list of valid option
+argument values can be specified by enclosing them inside a {...} following the
+option argument specification. Each of the permitted values can be specified
+with a &#0091;...&#0093; containing the value followed by a description.
 <P>
 </DL>
-</DL>
-<DT>If the leading character of <I>optstring</I> is +, then arguments beginning
+If the leading character of <I>optstring</I> is +, then arguments beginning
 with + will also be considered options.
 <P>
-<DT>A leading : character or a : following a leading + in <I>optstring</I>
-affects the way errors are handled. If an option character or longname argument
-not specified in <I>optstring</I> is encountered when processing options, the
-shell variable whose name is <I>name</I> will be set to the ? character. The
-shell variable <B>OPTARG</B> will be set to the character found. If an option
+A leading : character or a : following a leading + in <I>optstring</I> affects
+the way errors are handled. If an option character or longname argument not
+specified in <I>optstring</I> is encountered when processing options, the shell
+variable whose name is <I>name</I> will be set to the ? character. The shell
+variable <B>OPTARG</B> will be set to the character found. If an option
 argument is missing or has an invalid value, then <I>name</I> will be set to
 the : character and the shell variable <B>OPTARG</B> will be set to the option
 character found. Without the leading :, <I>name</I> will be set to the ?
 character, <B>OPTARG</B> will be unset, and an error message will be written to
 standard error when errors are encountered.
 <P>
-<DT>The end of options occurs when:
-<DL compact>
-<DL compact>
+The end of options occurs when:
+<DL>
 <DT><A name="1."><B>1.</B></A><DD>The special argument <B>--</B>.
-<DT><A name="2."><B>2.</B></A><DD>An argument that does not beging with a <B>-
-</B>.
+<DT><A name="2."><B>2.</B></A><DD>An argument that does not beging with a <B>-</B>.
 <DT><A name="3."><B>3.</B></A><DD>A help argument is specified.
 <DT><A name="4."><B>4.</B></A><DD>An error is encountered.
 <P>
 </DL>
-</DL>
-<DT>If <B>OPTARG</B> is set to the value <B>1</B>, a new set of arguments can
-be used.
+If <B>OPTARG</B> is set to the value <B>1</B>, a new set of arguments can be
+used.
 <P>
-<DT><B>getopts</B> can also be used to generate help messages containing
-command usage and detailed descriptions. Specify <I>args</I> as:
-<DL compact>
-<DL compact>
+<B>getopts</B> can also be used to generate help messages containing command
+usage and detailed descriptions. Specify <I>args</I> as:
+<DL>
 <DT><A name="-?"><B>-?</B></A><DD>To generate a usage synopsis.
 <DT><A name="--??"><B>--??</B></A><DD>To generate a verbose usage message.
-<DT><A name="--??man"><B>--??man</B></A><DD>To generate a formatted man page.
-<DT><A name="--??api"><B>--??api</B></A><DD>To generate an easy to parse usage
+<DT><A name="--??man"><B>--??man</B></A><DD><BR>To generate a formatted man page.
+<DT><A name="--??api"><B>--??api</B></A><DD><BR>To generate an easy to parse usage
 message.
-<DT><A name="--??html"><B>--??html</B></A><DD>To generate a man page in <B>html
+<DT><A name="--??html"><B>--??html</B></A><DD><BR>To generate a man page in <B>html
 </B> format.
 <P>
 </DL>
-</DL>
-<DT>When the end of options is encountered, <B>getopts</B> exits with a
-non-zero return value and the variable <B>OPTIND</B> is set to the index of the
-first non-option argument.
-</DL>
-<DT><H4><A name="EXIT STATUS">EXIT STATUS</A></H4>
-<DL compact>
+When the end of options is encountered, <B>getopts</B> exits with a non-zero
+return value and the variable <B>OPTIND</B> is set to the index of the first
+non-option argument.
+</DIV>
+<H4><A name="EXIT STATUS">EXIT STATUS</A></H4>
+<DIV class=SH>
+<DL>
 <DT><A name="0"><B>0</B></A><DD>An option specified was found.
 <DT><A name="1"><B>1</B></A><DD>An end of options was encountered.
 <DT><A name="2"><B>2</B></A><DD>A usage or information message was generated.
 </DL>
-<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
-<DL compact>
-<DT><A name="version"><B>version</B></A><DD>getopts (AT&amp;T Research)
+</DIV>
+<H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DIV class=SH>
+<DL>
+<DT><A name="version"><B>version</B></A><DD><BR>getopts (AT&amp;T Research)
 1999-02-02
-</DL></DL>
+</DL>
+</DIV>
 </BODY>
 </HTML>'
 	EXEC	getopts "$usage" '--version'
@@ -1278,6 +1282,7 @@ TEST 11 'find style!'
 	EXEC	find "$find" --nroff
 		OUTPUT - $'return=? option=- name=-nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
+.TH FIND 1 2010-04-22
 .fp 5 CW
 .nr mH 5
 .de H0
@@ -1352,7 +1357,6 @@ TEST 11 'find style!'
 .ft R
 .in -3n
 ..
-.TH FIND 1 2010-04-22
 .SH NAME
 \\fBfind\\fP \\- find files
 .SH SYNOPSIS
@@ -1468,41 +1472,42 @@ TEST 16 'detailed man'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>ah man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;AH&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>AH&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>AH&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>AH&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>ah
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX-->ah
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>ah</B> &#0091; <I>options</I> &#0093;
-</DL>
-<DT><H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
-<DL compact>
-<DT><I>bla</I> does bla and bla. The blas are:
-<DL compact>
-<DL compact>
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>ah</B> &#0091; <I>options</I> &#0093;
+</DIV>
+<H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
+<DIV class=SH>
+<I>bla</I> does bla and bla. The blas are:
+<DL>
 <DT><A name="aha"><I>aha</I></A><DD>bla bla aha
-<DT><A name="bwaha">bwaha</A><DD>not bold
+<DT><A name="bwaha">bwaha</A><DD><BR>not bold
 <DT><A name="bold"><B>bold</B></A><DD>yes it is
 <P>
 </DL>
-</DL>
-<DT>Next paragraph
-<DL compact>
-<DL compact>
+Next paragraph
+<DL>
 <DT><A name="aaa"><B>aaa</B></A><DD>aaa
 <DT><A name="bbb"><B>bbb</B></A><DD>bbb
 </DL>
-</DL>
-</DL></DL>
+</DIV>
 </BODY>
 </HTML>'
 		EXIT 2
@@ -1534,6 +1539,7 @@ duh
 	EXEC	zwei "$usage" --nroff
 		OUTPUT - $'return=? option=- name=--nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
+.TH ZWEI 1
 .fp 5 CW
 .nr mH 5
 .de H0
@@ -1608,7 +1614,6 @@ duh
 .ft R
 .in -3n
 ..
-.TH ZWEI 1
 .SH SYNOPSIS
 \\fBzwei\\fP\\ [\\ \\fIoptions\\fP\\ ]
 .SH OPTIONS
@@ -1784,45 +1789,57 @@ TEST 24 'detailed html'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <!--INTERNAL-->
 <TITLE>dd man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;DD&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>DD&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>DD&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>DD&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT><B>dd</B> - copy and convert file
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX--><B>dd</B> - copy and convert file
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>dd</B> &#0091; <I>options</I> &#0093;
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>dd</B> &#0091; <I>options</I> &#0093;
 <P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>--<B>if</B>=<I>file</I> (see <NOBR><A href="../man2/stat.html"><B>stat</B></A>(2))</NOBR>
-<DD>Input file name (see <NOBR><A href="../man2/intro.html"><I>intro</I></A>(2)).</NOBR>
-<DT>--<B>conv</B>=<I>conversion</I><DD>Conversion option <I>begin&#0091;-end&#0093;=value
+</DIV>
+<H4><A name="OPTIONS">OPTIONS</A></H4>
+<DIV class=SH>
+<DL>
+<DT>--<B>if</B>=<I>file</I> (see
+<NOBR><A href="../man2/stat.html"><B>stat</B></A>(2))</NOBR><DD><BR>Input file
+name (see <NOBR><A href="../man2/intro.html"><I>intro</I></A>(2)).</NOBR>
+<DT>--<B>conv</B>=<I>conversion</I><DD><BR>Conversion option <I>begin&#0091;-end&#0093;=value
 </I> passed to <B>main</B>().
 </DL>
-<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
-<DL compact>
-<DT><NOBR><A href="../man1/cp.html"><B>cp</B></A>(1),</NOBR> <NOBR><A href="../man1/pax.html"><B>pax</B></A>(1),</NOBR>
-<NOBR><A href="../man1/tr.html"><B>tr</B></A>(1),</NOBR> <NOBR><A href="../man2/seek.html"><B>seek</B></A>(2),</NOBR>
+</DIV>
+<H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DIV class=SH>
+<NOBR><A href="../man1/cp.html"><B>cp</B></A>(1),</NOBR>
+<NOBR><A href="../man1/pax.html"><B>pax</B></A>(1),</NOBR>
+<NOBR><A href="../man1/tr.html"><B>tr</B></A>(1),</NOBR>
+<NOBR><A href="../man2/seek.html"><B>seek</B></A>(2),</NOBR>
 <NOBR><A href="../man5P/dd-plugin.html"><B>dd::plugin</B></A>(5P)</NOBR>
-</DL>
-<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+</DIV>
+<H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DIV class=SH>
 
-<DL compact>
-<DT><A name="author"><B>author</B></A><DD>Glenn Fowler &lt;<A
+<DL>
+<DT><A name="author"><B>author</B></A><DD><BR>Glenn Fowler &lt;<A
 href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
-<DT><A name="copyright"><B>copyright</B></A><DD>Copyright &copy; 1989-1999 AT&amp;T Corp.
-<DT><A name="license"><B>license</B></A><DD><A href="http://www.research.att.com/sw/license/ast-proprietary.html">http://www.research.att.com/sw/license/ast-proprietary.html</A>
-</DL></DL>
+<DT><A name="copyright"><B>copyright</B></A><DD><BR>Copyright &copy; 1989-1999 AT&amp;T Corp.
+<DT><A name="license"><B>license</B></A><DD><BR><A href="http://www.research.att.com/sw/license/ast-proprietary.html">http://www.research.att.com/sw/license/ast-proprietary.html</A>
+</DL>
+</DIV>
 </BODY>
 </HTML>'
 
@@ -1934,27 +1951,32 @@ OPTIONS
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>bar man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;BAR&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>BAR&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>BAR&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>BAR&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>bar
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX-->bar
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>bar</B> &#0091; <I>options</I> &#0093;
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>bar</B> &#0091; <I>options</I> &#0093;
 <P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>-<B>f</B>, --<B>flag</B>
-</DL></DL>
+</DIV>
+<H4><A name="OPTIONS">OPTIONS</A></H4>
+<DIV class=SH>
+-<B>f</B>, --<B>flag</B>
+</DIV>
 </BODY>
 </HTML>'
 
@@ -2055,51 +2077,61 @@ TEST 30 'library interfaces'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>sum man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;SUM&nbsp;(&nbsp;3S&nbsp;)&nbsp;<TH align=center><A href="." title="Index">STANDARD I/O FUNCTIONS</A><TH align=right>SUM&nbsp;(&nbsp;3S&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>SUM&nbsp;(&nbsp;3S&nbsp;)&nbsp;<TH align=center><A href="." title="Index">STANDARD I/O FUNCTIONS</A><TH align=right>SUM&nbsp;(&nbsp;3S&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>sum - checksum library
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX-->sum - checksum library
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT>#include &lt;sum.h&gt;
-</DL>
-<DT><H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
-<DL compact>
-<DT><B>sum</B> is a checksum library.
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+#include &lt;sum.h&gt;
+</DIV>
+<H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
+<DIV class=SH>
+<B>sum</B> is a checksum library.
 <P>
-</DL>
-<DT><H4><A name="FUNCTIONS">FUNCTIONS</A></H4>
-<DL compact>
-<DT>Sum_t* <B>sumopen</B>(const char* <I>method</I>)<DD>Open a sum handle for
+</DIV>
+<H4><A name="FUNCTIONS">FUNCTIONS</A></H4>
+<DIV class=SH>
+<DL>
+<DT>Sum_t* <B>sumopen</B>(const char* <I>method</I>)<DD><BR>Open a sum handle for
 <I>method</I>.
-<DT>int <B>sumclose</B>(Sum_t* <I>sum</I>)<DD>Close a sum handle <I>sum</I>
+<DT>int <B>sumclose</B>(Sum_t* <I>sum</I>)<DD><BR>Close a sum handle <I>sum</I>
 previously returned by <B>sumopen</B>.
 </DL>
-<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
-<DL compact>
-<DT><NOBR><A href="../man1/cksum.html"><B>cksum</B></A>(1)</NOBR>
-</DL>
-<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
-<DL compact>
-<DT><A name="version"><B>version</B></A><DD>sum (AT&amp;T Research) 1999-12-11
-<DT><A name="author"><B>author</B></A><DD>Glenn Fowler &lt;<A
+</DIV>
+<H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DIV class=SH>
+<NOBR><A href="../man1/cksum.html"><B>cksum</B></A>(1)</NOBR>
+</DIV>
+<H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DIV class=SH>
+<DL>
+<DT><A name="version"><B>version</B></A><DD><BR>sum (AT&amp;T Research) 1999-12-11
+<DT><A name="author"><B>author</B></A><DD><BR>Glenn Fowler &lt;<A
 href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
-<DT><A name="copyright"><B>copyright</B></A><DD>Copyright &copy; 1995-1999 AT&amp;T Corp.
-<DT><A name="license"><B>license</B></A><DD><A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
-</DL></DL>
+<DT><A name="copyright"><B>copyright</B></A><DD><BR>Copyright &copy; 1995-1999 AT&amp;T Corp.
+<DT><A name="license"><B>license</B></A><DD><BR><A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+</DL>
+</DIV>
 </BODY>
 </HTML>'
 	EXEC	sum "$usage" --nroff
 		OUTPUT - $'return=? option=- name=nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
+.TH SUM 3S 1999-12-11
 .fp 5 CW
 .nr mH 5
 .de H0
@@ -2174,7 +2206,6 @@ href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 .ft R
 .in -3n
 ..
-.TH SUM 3S 1999-12-11
 .SH NAME
 sum \\- checksum library
 .SH SYNOPSIS
@@ -2217,6 +2248,7 @@ TEST 32 'miscellaneous'
 		EXIT 2
 		OUTPUT - $'return=? option=- name=--nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
+.TH WOW 1
 .fp 5 CW
 .nr mH 5
 .de H0
@@ -2291,7 +2323,6 @@ TEST 32 'miscellaneous'
 .ft R
 .in -3n
 ..
-.TH WOW 1
 .SH NAME
 wow \\- zowee
 .SH SYNOPSIS
@@ -2547,6 +2578,7 @@ IMPLEMENTATION
 	EXEC eg "$usage" --nroff
 		OUTPUT - 'return=? option=- name=--nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
+.TH EG 1
 .fp 5 CW
 .nr mH 5
 .de H0
@@ -2621,7 +2653,6 @@ IMPLEMENTATION
 .ft R
 .in -3n
 ..
-.TH EG 1
 .SH NAME
 eg \\- test example examples
 .SH SYNOPSIS
@@ -2656,57 +2687,62 @@ SpamCo'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>eg man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;EG&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>EG&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>EG&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>EG&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>eg - test example examples
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX-->eg - test example examples
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>eg</B> &#0091; <I>options</I> &#0093;
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>eg</B> &#0091; <I>options</I> &#0093;
 <P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD>Quote names according to <I>style
+</DIV>
+<H4><A name="OPTIONS">OPTIONS</A></H4>
+<DIV class=SH>
+<DL>
+<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD><BR>Quote names according to <I>style
 </I>: The default value is <B>question</B>.
 </DL>
-<DT><H4><A name="EXAMPLES">EXAMPLES</A></H4>
+</DIV>
+<H4><A name="EXAMPLES">EXAMPLES</A></H4>
+<DIV class=SH>
 <P>
-<DT><PRE>
-<DL compact>
-<DT><TT>one
-<DT>two</TT>
+<PRE>
+<TT>one
+two</TT>
+</PRE>
+<PRE>
+three
+four
+</PRE>
+<PRE>
+<I>five
+six</I>
+</PRE>
+</DIV>
+<H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DIV class=SH>
+<NOBR><A href="../man1/egman.html"><B>egman</B></A>(1)</NOBR>
+</DIV>
+<H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DIV class=SH>
+<DL>
+<DT><A name="version"><B>version</B></A><DD><BR>aha
+<DT><A name="catalog"><B>catalog</B></A><DD><BR>SpamCo
 </DL>
-<DT></PRE>
-<DT><PRE>
-<DL compact>
-<DT>three
-<DT>four
-</DL>
-<DT></PRE>
-<DT><PRE>
-<DL compact>
-<DT><I>five
-<DT>six</I>
-</DL>
-<DT></PRE>
-<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
-<DL compact>
-<DT><NOBR><A href="../man1/egman.html"><B>egman</B></A>(1)</NOBR>
-</DL>
-<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
-<DL compact>
-<DT><A name="version"><B>version</B></A><DD>aha
-<DT><A name="catalog"><B>catalog</B></A><DD>SpamCo
-</DL></DL>
+</DIV>
 </BODY>
 </HTML>'
 	usage=$'[-?\naha\n][-catalog?SpamCo][+NAME?eg - test example examples][Q:quote?Quote names according to \astyle\a:]:[style:=question][+EXAMPLES]{[+dss -x bgp \'(type==\"A\")??{write table > a}::{write cisco > b}\' mrt.dat?Write the announce records from \bmrt.dat\b to the file \ba\b in the \btable\b format and all other records to the file \bb\b in the \bcisco\b format.]}[+SEE ALSO?\begman\b(1), \bwalrus\b(8)]'
@@ -2716,45 +2752,57 @@ SpamCo'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>eg man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;EG&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>EG&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>EG&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>EG&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>eg - test example examples
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX-->eg - test example examples
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>eg</B> &#0091; <I>options</I> &#0093;
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>eg</B> &#0091; <I>options</I> &#0093;
 <P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD>Quote names according to <I>style
+</DIV>
+<H4><A name="OPTIONS">OPTIONS</A></H4>
+<DIV class=SH>
+<DL>
+<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD><BR>Quote names according to <I>style
 </I>: The default value is <B>question</B>.
 </DL>
-<DT><H4><A name="EXAMPLES">EXAMPLES</A></H4>
-<DL compact>
-<DT><A name="dss -x bgp \'(type==&quot;A&quot;)?{write table &gt; a}:{write
-cisco &gt; b}\' mrt.dat"><B>dss -x bgp \'</B>(type==&quot;A&quot;)?{write table
-&gt; a}:{write cisco &gt; b}\' mrt.dat</A><DD>Write the announce records from <B>mrt.dat
+</DIV>
+<H4><A name="EXAMPLES">EXAMPLES</A></H4>
+<DIV class=SH>
+<DL>
+<DT><A name="dss -x bgp \'(type==&quot;A&quot;)?{write table &gt; a}:{write cisco
+&gt; b}\' mrt.dat"><B>dss -x bgp \'</B>(type==&quot;A&quot;)?{write table &gt;
+a}:{write cisco &gt; b}\' mrt.dat</A><DD><BR>Write the announce records from <B>mrt.dat
 </B> to the file <B>a</B> in the <B>table</B> format and all other records to
 the file <B>b</B> in the <B>cisco</B> format.
 </DL>
-<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
-<DL compact>
-<DT><NOBR><A href="../man1/egman.html"><B>egman</B></A>(1),</NOBR> <NOBR><A href="../man8/walrus.html"><B>walrus</B></A>(8)</NOBR>
+</DIV>
+<H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DIV class=SH>
+<NOBR><A href="../man1/egman.html"><B>egman</B></A>(1),</NOBR>
+<NOBR><A href="../man8/walrus.html"><B>walrus</B></A>(8)</NOBR>
+</DIV>
+<H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DIV class=SH>
+<DL>
+<DT><A name="version"><B>version</B></A><DD><BR>aha
+<DT><A name="catalog"><B>catalog</B></A><DD><BR>SpamCo
 </DL>
-<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
-<DL compact>
-<DT><A name="version"><B>version</B></A><DD>aha
-<DT><A name="catalog"><B>catalog</B></A><DD>SpamCo
-</DL></DL>
+</DIV>
 </BODY>
 </HTML>'
 
@@ -2992,40 +3040,42 @@ TEST 46 'html escapism'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>codex man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;CODEX&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>CODEX&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>CODEX&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>CODEX&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>codex - encode/decode filter
+<H4><A name="NAME">NAME</A></H4>
+<DIV class=SH>
+<!--MAN-INDEX-->codex - encode/decode filter
 <P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>codex</B> &#0091; <I>options</I> &#0093; &#0091; &#0091; &lt;,&gt; &#0093; method &#0091; &lt;,&gt;,| method
-... &#0093; &#0093;
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>codex</B> &#0091; <I>options</I> &#0093; &#0091; &#0091; &lt;,&gt; &#0093; method &#0091; &lt;,&gt;,| method ...
+&#0093; &#0093;
 <P>
-<DT>Methods:
-<DL compact>
-<DL compact>
+Methods:
+<DL>
 <DT><A name="and"><B>and</B></A><DD>things
-<DL compact>
-<DL compact>
-<DT><A name="of=nature"><B>of=<I>nature</I></B></A><DD>this &lt;= 64.
-<DT><A name="govern"><B>govern</B></A><DD>ator
+<DL>
+<DT><A name="of=nature"><B>of=<I>nature</I></B></A><DD><BR>this &lt;= 64.
+<DT><A name="govern"><B>govern</B></A><DD><BR>ator
 </DL>
 </DL>
-</DL>
-</DL>
-</DL>
-<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
-<DL compact>
-<DT><NOBR><A href="../man3/codex.html"><B>codex</B></A>(3),</NOBR> <NOBR><A href="../man3/vcodex.html"><B>vcodex</B></A>(3)</NOBR>
-</DL></DL>
+</DIV>
+<H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DIV class=SH>
+<NOBR><A href="../man3/codex.html"><B>codex</B></A>(3),</NOBR>
+<NOBR><A href="../man3/vcodex.html"><B>vcodex</B></A>(3)</NOBR>
+</DIV>
 </BODY>
 </HTML>'
 
@@ -3085,24 +3135,31 @@ OPTIONS
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>make man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;MAKE&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>MAKE&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>MAKE&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>MAKE&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>make</B> &#0091; <I>options</I> &#0093;
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>make</B> &#0091; <I>options</I> &#0093;
+</DIV>
 <P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>--<B>clobber</B>&#0091;=<I>pattern</I>&#0093;<DD>Clobber pattern. If the option value
+<H4><A name="OPTIONS">OPTIONS</A></H4>
+<DIV class=SH>
+<DL>
+<DT>--<B>clobber</B>&#0091;=<I>pattern</I>&#0093;<DD><BR>Clobber pattern. If the option value
 is omitted then <B>*</B> is assumed. The default value is <B>*.exe</B>.
-<DT>--<B>select</B>=<I>pattern=*.&#0091;ch&#0093;</I><DD>Select pattern.
-</DL></DL>
+<DT>--<B>select</B>=<I>pattern=*.&#0091;ch&#0093;</I><DD><BR>Select pattern.
+</DL>
+</DIV>
 </BODY>
 </HTML>'
 	EXEC make "$usage2" --html
@@ -3707,27 +3764,34 @@ SYNOPSIS
 		ERROR - '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Research) 2010-04-22">
+<META name="generator" content="optget (AT&T Research) 2011-11-11">
 <TITLE>conformance man document</TITLE>
+<STYLE type="text/css">
+div.SH { padding-left:2em; text-indent:0em; }
+div.SY { padding-left:4em; text-indent:-2em; }
+dt { float:left; clear:both; }
+dd { margin-left:3em; }
+</STYLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;CONFORMANCE&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>CONFORMANCE&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>CONFORMANCE&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>CONFORMANCE&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL compact>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>-<B>a</B>, --<B>all</B><DD>ALL
-<DT>-<B>s</B>, --<B>some</B><DD>&#0091;(foo|ast) conformance&#0093; SOME
-<DT>-<B>n</B>, --<B>never</B><DD>&#0091;(foo|bar) conformance&#0093; NEVER
-<DT>-<B>e</B>, --<B>every</B><DD>EVERY
+<H4><A name="OPTIONS">OPTIONS</A></H4>
+<DIV class=SH>
+<DL>
+<DT>-<B>a</B>, --<B>all</B><DD><BR>ALL
+<DT>-<B>s</B>, --<B>some</B><DD><BR>&#0091;(foo|ast) conformance&#0093; SOME
+<DT>-<B>n</B>, --<B>never</B><DD><BR>&#0091;(foo|bar) conformance&#0093; NEVER
+<DT>-<B>e</B>, --<B>every</B><DD><BR>EVERY
 <P>
 <DT>&#0091;(foo|bar) conformance&#0093; Specific text.
 <P>
 </DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>conformance</B> &#0091; <I>options</I> &#0093;
-</DL></DL>
+</DIV>
+<H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DIV class=SY>
+<B>conformance</B> &#0091; <I>options</I> &#0093;
+</DIV>
 </BODY>
 </HTML>'
 

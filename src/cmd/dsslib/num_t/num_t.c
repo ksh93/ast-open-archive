@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 2002-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -1132,13 +1132,13 @@ sf_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, C
 
 static Cxtype_t types[] =
 {
-	{ "bcd_t",	"Binary coded decimal.", CXH, (Cxtype_t*)"number", 0, bcd_external, bcd_internal, 0, 0, { 0, 0, CX_INTEGER } },
-	{ "be_t",	"Big endian binary.", CXH, (Cxtype_t*)"number", 0, be_external, be_internal, 0, 0, { 0, 0, CX_BINARY } },
-	{ "hash_t",	"Repeatable string hash.", CXH, (Cxtype_t*)"string", hash_init, hash_external, hash_internal, 0, 0, { 0, 0, CX_STRING } },
-	{ "heka_t",	"Base 100 binary integer.", CXH, (Cxtype_t*)"number", 0, heka_external, heka_internal, 0, 0, { 0, 0, CX_INTEGER } },
-	{ "ibm_t",	"IBM 4 and 8 byte floating point.", CXH, (Cxtype_t*)"number", 0, ibm_external, ibm_internal, 0, 0, { 0, 0, CX_FLOAT } },
-	{ "le_t",	"Little endian binary.", CXH, (Cxtype_t*)"number", 0, le_external, le_internal, 0, 0, { 0, 0, CX_BINARY } },
-	{ "rand_t",	"Non-repeatable pseudo-random string hash.", CXH, (Cxtype_t*)"string", hash_init, hash_external, hash_internal, 0, 0, { "The format details string is an optional initial pseudo-random seed number. The default is synthesized using current process/system characteristics.", 0, CX_STRING } },
+	{ "bcd_t",	"Binary coded decimal.", CXH, (Cxtype_t*)"number", 0, bcd_external, bcd_internal, 0, 0, 0, 0, { 0, 0, CX_INTEGER } },
+	{ "be_t",	"Big endian binary.", CXH, (Cxtype_t*)"number", 0, be_external, be_internal, 0, 0, 0, 0, { 0, 0, CX_BINARY } },
+	{ "hash_t",	"Repeatable string hash.", CXH, (Cxtype_t*)"string", hash_init, hash_external, hash_internal, 0, 0, 0, 0, { 0, 0, CX_STRING } },
+	{ "heka_t",	"Base 100 binary integer.", CXH, (Cxtype_t*)"number", 0, heka_external, heka_internal, 0, 0, 0, 0, { 0, 0, CX_INTEGER } },
+	{ "ibm_t",	"IBM 4 and 8 byte floating point.", CXH, (Cxtype_t*)"number", 0, ibm_external, ibm_internal, 0, 0, 0, 0, { 0, 0, CX_FLOAT } },
+	{ "le_t",	"Little endian binary.", CXH, (Cxtype_t*)"number", 0, le_external, le_internal, 0, 0, 0, 0, { 0, 0, CX_BINARY } },
+	{ "rand_t",	"Non-repeatable pseudo-random string hash.", CXH, (Cxtype_t*)"string", hash_init, hash_external, hash_internal, 0, 0, 0, 0, { "The format details string is an optional initial pseudo-random seed number. The default is synthesized using current process/system characteristics.", 0, CX_STRING } },
 	{ "sf_t",	"sfio sfputd()/sfputl()/sfputu() encoding.", CXH, (Cxtype_t*)"number", 0, sf_external, sf_internal },
 	{0}
 };

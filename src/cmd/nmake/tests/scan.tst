@@ -309,7 +309,7 @@ z.x'
 setv INSTALLROOT ../../../..
 setv PACKAGEROOT ../../../../../..
 setv AR ${mam_cc_AR} ${mam_cc_AR_ARFLAGS}
-setv ARFLAGS -cr
+setv ARFLAGS rc
 setv AS as
 setv ASFLAGS
 setv CC cc
@@ -565,7 +565,10 @@ echo $STATE
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	ENV= LC_ALL=C $SHELL -n x.sh
++ 	then	if	grep -q \'### .*archaic.* ###\'
++ 		then	: x contains archaic constructs :
++ 		else	ENV= LC_ALL=C $SHELL -n x.sh
++ 		fi
 + 	fi
 + 	;;
 + esac

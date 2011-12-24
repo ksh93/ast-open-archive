@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -242,7 +242,7 @@ va_dcl
 	va_end(args);
 }
 
-MAIN()
+tmain()
 {
 	char		buf1[1024], buf2[1024], *list[4], *s;
 	double		x=0.0051, y;
@@ -253,7 +253,7 @@ MAIN()
 	Sffmt_t		fe;
 	Sfio_t*		f;
 
-	f = sfopen(NIL(Sfio_t*), tstfile(0), "w+");
+	f = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "w+");
 	sfsetbuf(f,buf1,10);
 	sfprintf(f,"%40s\n","0123456789");
 	sfsprintf(buf2,sizeof(buf2),"%40s","0123456789");
@@ -632,5 +632,5 @@ MAIN()
 	if(strcmp(buf1, "987654321098782") != 0)
 		terror("(double)987654321098782.0 %%1.15g format error: %s", buf1);
 
-	TSTEXIT(0);
+	texit(0);
 }

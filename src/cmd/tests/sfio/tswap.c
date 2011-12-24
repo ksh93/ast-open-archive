@@ -3,12 +3,12 @@
 *               This software is part of the ast package               *
 *          Copyright (c) 1999-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -19,13 +19,13 @@
 ***********************************************************************/
 #include	"sftest.h"
 
-MAIN()
+tmain()
 {
 	Sfio_t*	f1;
 	Sfio_t* f2;
 	char*	s;
 
-	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
+	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile("sf", 0),"w+")) )
 		terror("Can't open file");
 	if(sfwrite(f1,"0123456789\n",11) != 11)
 		terror("Can't write to file");
@@ -44,11 +44,11 @@ MAIN()
 	if(!sfstack(sfstdout,f1) )
 		terror("Failed stacking f1");
 
-	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
+	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile("sf", 0), "r")) )
 		terror("Can't open for read");
 
 	if(sfswap(f1,f2) != NIL(Sfio_t*) )
 		terror("sfswap should have failed");
 
-	TSTEXIT(0);
+	texit(0);
 }

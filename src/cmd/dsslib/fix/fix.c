@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -20,7 +20,6 @@
 #pragma prototyped
 
 static const char usage[] =
-"[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The fix query generates a fixed binary flat schema from the"
 "	input file schema on the standard output. If the input schema is"
 "	variable width then the input file is used to estimate average and"
@@ -98,7 +97,8 @@ fix_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		return -1;
 	}
 	state->vm = vm;
-	sfprintf(cx->buf, "%s%s", strchr(dss_lib_fix.description, '['), usage);
+	if (dssoptlib(cx->buf, &dss_lib_fix, usage, disc))
+		goto bad;
 	s = sfstruse(cx->buf);
 	for (;;)
 	{
@@ -131,7 +131,7 @@ fix_beg(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 		goto bad;
 	argv += opt_info.index;
 	state->fielddisc.comparf = fieldcmp;
-	if (!(state->fields = dtnew(vm, &state->fielddisc, Dttree)))
+	if (!(state->fields = dtnew(vm, &state->fielddisc, Dtoset)))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
