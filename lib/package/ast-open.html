@@ -1,16 +1,16 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&amp;T Research) 2011-09-11">
+<META name="generator" content="mm2html (AT&amp;T Research) 2011-12-30">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
 <META name="author" content="gsf+dgk+kpv">
 <STYLE type="text/css">
-div.FI { padding-left:2em; text-indent:0em; }
-div.HI { padding-left:4em; text-indent:-2em; }
-dt { float:left; clear:both; }
-dd { margin-left:3em; }
+div.FI	{ padding-left:2em; text-indent:0em; }
+div.HI	{ padding-left:4em; text-indent:-2em; }
+dt	{ float:left; clear:both; }
+dd	{ margin-left:3em; }
 </STYLE>
 </HEAD>
 <BODY bgcolor=white link=slateblue vlink=teal >
@@ -1035,7 +1035,13 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-11-12-13  --- Release ksh93u+ ---
+12-01-01  --- Release ksh93u+ ---
+12-01-01  A timing problem with &gt;; has been fixed.
+12-01-01  A macro expansion memory leak has been fixed.
+11-12-26  A bug in array assignments of the form arr=( $arr&#0091;i&#0093; ...) in which
+	  arr was not unset before the assignment has been fixed. 
+11-12-20  A number of code changes were made based on the results of errors
+	  indicated by static code analysis.
 11-12-13  In vi edit mode a lteral &lt;TAB&gt; can now be entered by preceding it
 	  with a backshash.
 11-12-13  When tab is entered for completion after a ' or ", the ' and "
@@ -4208,6 +4214,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+11-12-30 mm2html: add .xx faq
 11-09-11 mm2html: add .H n "title" link="href"
 11-08-06 mm2html: use optget() style for .SH and .TP
 11-04-18 htmlrefs: don't symlink .html for --copy (doh)
@@ -11294,7 +11301,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>December 26, 2011</TD>
+<TD align=right>January 04, 2012</TD>
 </TR>
 </TABLE>
 <P>

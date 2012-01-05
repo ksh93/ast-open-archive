@@ -134,7 +134,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../codex/codex.c
 meta codex.o %.c>%.o ../../codex/codex.c codex
 prev ../../codex/codex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -Dmain=b_codex -D_PACKAGE_ast -D_BLD_codex -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2011 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshcodex]"\" -c ../../codex/codex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -Dmain=b_codex -D_PACKAGE_ast -D_BLD_codex -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2007-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshcodex]"\" -c ../../codex/codex.c
 done codex.o generated
 make lib.o
 make lib.c

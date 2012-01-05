@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1996-2011 AT&T Intellectual Property          #
+#          Copyright (c) 1996-2012 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                 Eclipse Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -26,6 +26,7 @@
 # \h'0/\w"LABEL"'TEXT\h'0'	local link label with alternate text
 # \h'0/1'LABEL\h'0'		local link label
 #
+# .xx faq			.VL is a FAQ list with all but current answer hidden
 # .xx meta.NAME="CONTENT"	<meta name="NAME" content="CONTENT">
 # .xx label="LABEL"		local link label request
 # .xx link="URL\tHOT-TEXT"	link goto with url request
@@ -41,13 +42,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2011-09-11' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2011-12-30' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2011-09-11 $
+@(#)$Id: mm2html (AT&T Research) 2011-12-30 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man/mandoc subset to html]
@@ -135,7 +136,7 @@ esac
 set -o noglob
 
 integer count row n s ndirs=0 nfiles=0 last_level=0 IN=2 IS=2 man_SY=0
-integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4
+integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4 faq=0
 integer labels=0 mark=4 reference=1 ident=0 ce=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
 typeset -u upper
@@ -693,8 +694,13 @@ function getline
 					no?*)	nam=${nam#no}
 						val=0
 						;;
-					*)	val=${1#*=}
-						[[ $val ]] || val=1
+					*)	case $1 in
+						*=*)	val=${1#*=}
+							[[ $val ]] || val=1
+							;;
+						*)	val=1
+							;;
+						esac
 						;;
 					esac
 					shift
@@ -714,6 +720,8 @@ function getline
 						then	print -r -- "$val"
 						else	meta="$meta$nl$val"
 						fi
+						;;
+					faq)	(( faq = val ))
 						;;
 					index)	case $val in
 						0)	labels=-1 ;;
@@ -783,9 +791,9 @@ function getline
 							;;
 						esac
 						;;
-					meta.*)	meta="$meta$nl<META name=\"${nam#*.}\" content=\"$val\">"
-						;;
 					logo)	eval html.$nam.src='$'val
+						;;
+					meta.*)	meta="$meta$nl<META name=\"${nam#*.}\" content=\"$val\">"
 						;;
 					ident|labels|logo*|title|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
 						eval html.$nam='$'val
@@ -1038,12 +1046,63 @@ TD { font-family:${ss}; font-size:$((vg_ps-1))pt; }
 		return
 		;;
 	esac
+	if	(( faq ))
+	then	print -r -- '<SCRIPT type="text/javascript">
+var A, P, Q;
+function FAQ_mark(mark) {
+	P = null;
+	for (var i = 0; i < A.length; i++)
+		A[i].className = mark;
+}
+function FAQ_init() {
+	Q = document.getElementsByTagName("dt");
+	A = document.getElementsByTagName("dd");
+	FAQ_mark("hide");
+	for (var i = 0; i < Q.length; i++) {
+		 Q[i].onclick=function() {
+		 	var next = this.nextSibling;
+			while (next.nodeType != 1)
+				next = next.nextSibling;
+			if (P != null && P != next)
+				P.className = "hide";
+			if (next.className == "hide") {
+				next.className = "show";
+				P = next;
+			}
+			else {
+				next.className = "hide";
+				P = null;
+			}
+		}
+	 }
+}
+window.onload = FAQ_init;
+</SCRIPT>'
+	fi
 	print -r -- "<STYLE type=\"text/css\">
-div.FI { padding-left:2em; text-indent:0em; }
-div.HI { padding-left:4em; text-indent:-2em; }
-dt { float:left; clear:both; }
-dd { margin-left:3em; }
-</STYLE>
+div.FI	{ padding-left:2em; text-indent:0em; }
+div.HI	{ padding-left:4em; text-indent:-2em; }"
+	if	(( faq ))
+	then	print -r -- "dt	{ margin: 15px 40px 5px; cursor: pointer; }
+dt:before {
+	content: \"Q\";
+	font-family: Georgia, \"Times New Roman\", Times, serif;
+	margin-right: 7px;
+	padding: 2px 6px 5px;
+	color: #FFD87D;
+	background-color: teal;
+	font-weight: normal;
+	margin-left: -35px;
+	position: relative;
+}
+dd	{ margin: 25px 70px 0px; }
+li	{ padding: 2px 0; }
+.show	{ display: block; }
+.hide	{ display: none; }"
+	else	print -r -- "dt	{ float:left; clear:both; }
+dd	{ margin-left:3em; }"
+	fi
+	print -r -- "</STYLE>
 </HEAD>"
 	case ${html.heading} in
 	?*)	case ${html.heading} in
@@ -1367,9 +1426,11 @@ function mandoc
 
 function nohang
 {
-	typeset a=${1//'<'*([^'>'])'>'/}
-	a=${a//'&'*([^';'])';'/X}
-	(( ${#a} >= 5 )) && print "<BR>"
+	if	(( ! faq ))
+	then	typeset a=${1//'<'*([^'>'])'>'/}
+		a=${a//'&'*([^';'])';'/X}
+		(( ${#a} >= 5 )) && print "<BR>"
+	fi
 }
 
 if	[[ $frame != '' ]]
@@ -2718,6 +2779,14 @@ case $references in
 	print "</DL>"
 	;;
 esac
+if	(( faq ))
+then	print -r "<TABLE cellpadding=4>
+<TR>
+<TD bgcolor=teal><A href='#' onclick='FAQ_mark(\"show\")'><FONT color=\"#FFD87D\">show all answers</FONT></A></TD>
+<TD bgcolor=teal><A href='#' onclick='FAQ_mark(\"hide\")'><FONT color=\"#FFD87D\">hide all answers</FONT></A></TD>
+</TR>
+</TABLE>"
+fi
 print -r -- "<P>"
 print -r -- "<HR>"
 print -r -- "<TABLE border=0 align=center width=96%>"

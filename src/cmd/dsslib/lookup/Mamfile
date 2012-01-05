@@ -169,7 +169,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done lookup.c
 meta lookup.o %.c>%.o lookup.c lookup
 prev lookup.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2010-2011 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dsslookup]"\" -D_PACKAGE_ast -c lookup.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2010-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dsslookup]"\" -D_PACKAGE_ast -c lookup.c
 done lookup.o generated
 make lib.o
 make lib.c
@@ -185,3 +185,9 @@ done libdsslookup.a generated
 done lookup virtual
 done install virtual
 make test
+make test.dss
+make dss.tst
+done dss.tst
+exec - regress  dss.tst
+done test.dss virtual
+done test dontcare virtual

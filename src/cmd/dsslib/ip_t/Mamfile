@@ -226,7 +226,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done ip_t.c
 meta ip_t.o %.c>%.o ip_t.c ip_t
 prev ip_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2011 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssip_t]"\" -D_BLD_pt -D_PACKAGE_ast -c ip_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssip_t]"\" -D_BLD_pt -D_PACKAGE_ast -c ip_t.c
 done ip_t.o generated
 make lib.o
 make lib.c
@@ -732,54 +732,3 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/ptv.h generated
 done install virtual
 make test
-make test.iv
-make testiv
-make testiv.o
-make testiv.c
-prev ${PACKAGE_ast_INCLUDE}/option.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ip6.h implicit
-prev iv.h implicit
-done testiv.c
-meta testiv.o %.c>%.o testiv.c testiv
-prev testiv.c
-setv _BLD_ip_t -U_BLD_ip_t
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2011 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_pt -c testiv.c
-done testiv.o generated
-prev libdssip_t.a archive
-bind -ldssip_t
-bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testiv testiv.o ${mam_libdssip_t} ${mam_libast}
-done testiv generated
-make iv-ip4-prefix.dat
-done iv-ip4-prefix.dat
-make iv-ip4-addr.dat
-done iv-ip4-addr.dat
-make iv-ip4.out
-done iv-ip4.out
-make iv-ip6-prefix.dat
-done iv-ip6-prefix.dat
-make iv-ip6-addr.dat
-done iv-ip6-addr.dat
-make iv-ip6.out
-done iv-ip6.out
-exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
-exec - set +x iv-ip4-prefix.dat iv-ip4-addr.dat iv-ip4.out iv-ip6-prefix.dat iv-ip6-addr.dat iv-ip6.out
-exec - while	:
-exec - do	case $# in
-exec - 	[012])	break ;;
-exec - 	esac
-exec - 	case $1 in
-exec - 	*-ip4-*)f=-ip4 ;;
-exec - 	*)	f=-ip6 ;;
-exec - 	esac
-exec - 	testiv $f $1 $2 > iv$f.tmp
-exec - 	if	cmp -s iv$f.tmp $3
-exec - 	then	r=passed
-exec - 	else	r=failed
-exec - 	fi
-exec - 	echo iv $f test $r
-exec - 	shift 3
-exec - done
-done test.iv virtual
-done test dontcare virtual
