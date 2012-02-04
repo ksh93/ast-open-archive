@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1992-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1992-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -21,7 +21,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)pty (AT&T Research) 2010-06-21\n]"
+"[-?\n@(#)pty (AT&T Research) 2012-01-26\n]"
 USAGE_LICENSE
 "[+NAME?pty - create pseudo terminal and run command]"
 "[+DESCRIPTION?\bpty\b creates a pseudo pty and then runs \bcommand\b "
@@ -42,6 +42,9 @@ USAGE_LICENSE
     "string. The \are\a \b?.\b matches EOF. The commands are:]"
     "{"
         "[\b#\b \acomment\a?comment line]"
+        "[c \atext\a?write \atext\a to the master; C style escapes "
+            "in text are converted, including \\E for ESC and \\cX for "
+            "control-X]"
         "[d \amilliseconds\a?set the delay before each master write to "
             "\amilliseconds\a; the default is no delay]"
         "[i \are\a?read a line from the master; if it matches \are\a "
@@ -57,16 +60,17 @@ USAGE_LICENSE
         "[s \amilliseconds\a?sleep for \amilliseconds\a]"
         "[t \amilliseconds\a?set the master read timout to "
             "\amilliseconds\a; the default is \b1000\b]"
+        "[u \are\a?read lines from the master until one matches \are\a]"
         "[v \alevel\a?set the verbose trace \alevel\a, more output for "
             "higher levels, disabled for level 0]"
-        "[w \atext\a?write \atext\a to the master; C style escapes in "
-            "text are converted, including \\E for ESC and \\cX for "
+        "[w \atext\a?write \atext\a\\r\\n to the master; C style escapes "
+            "in text are converted, including \\E for ESC and \\cX for "
             "control-X]"
-        "[x [\acode\a]"
+        "[x [\acode\a]]"
             "?exit \bpty\b with exit code \b0\b [\acode\a]]]"
         "[I \are\a?ignore master lines matching \are\a]"
         "[L \alabel\a?prefix all diagnostics with \alabel\a:]"
-        "[P [\atext\a]]?delay each master write until the beginning of "
+        "[P \atext\a?delay each master write until the beginning of "
             "an unread input line exactly matches \atext\a]"
     "}"
 "[m:messages?Redirect diagnostic message output to \afile\a.]:[file]"
@@ -940,7 +944,7 @@ typedef struct Argv_s
 } Argv_t;
 
 int
-b_pty(int argc, char* argv[], void* context)
+b_pty(int argc, char** argv, Shbltin_t* context)
 {
 	int		master;
 	int		slave;
