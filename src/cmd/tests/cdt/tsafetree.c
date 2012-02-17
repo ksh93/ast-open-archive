@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,13 +26,10 @@
 ** Written by Kiem-Phong Vo
 */
 
-#define SINGLE	0
-
-#if SINGLE
-#define N_PROC		1
-#else
-#define N_PROC		64	/* number of subprocesses	*/
+#ifndef N_PROC
+#define N_PROC		64
 #endif
+
 #define	N_OBJ		(N_PROC*64*1024) /* #objects to insert	*/
 #define SEARCH		4	/* #searches while inserting	*/
 #define PROGRESS	(N_OBJ/(N_PROC*4)) /* amount done	*/
@@ -119,15 +116,9 @@ static void sigchild(int sig)
 	else	st = "normal";
 
 	tinfo("Child process %d exited (%s)", pid, st);
+	if(status)
+		terror("Child process %d exit code %d", pid, status);
 	signal(SIGCHLD, sigchild);
-}
-
-static void sigsegv(int sig)
-{
-	pid_t pid = getpid();
-	tinfo("Child process %d got sigsegv", pid);
-	for(;;)
-		usleep(1000);
 }
 
 static void workload(Dt_t* dt, Proc_t* proc, int p)
@@ -201,10 +192,10 @@ tmain()
 	Obj_t		*o;
 	Dt_t		*dt;
 	pid_t		pid[N_PROC];
-	int		status;
 	int		zerof;
 
 	taso(ASO_PROCESS);
+	tchild();
 
 	if((zerof = open("/dev/zero", O_RDWR)) < 0)
 		terror("Can't open /dev/zero");
@@ -256,7 +247,7 @@ tmain()
 	if(dtcustomize(dt, DT_SHARE, 1) != DT_SHARE )
 		terror("Cannot turn on share mode");
 
-#if SINGLE
+#if N_PROC == 1
 	Pnum = 1;
 	workload(dt, Proc, 0);
 #else
@@ -269,7 +260,6 @@ tmain()
 		else 
 		{	Pnum = k+1;
 			signal(SIGCHLD,SIG_IGN);
-			signal(SIGSEGV,sigsegv);
 			workload(dt, Proc+k, k);
 			texit(0);
 		}
@@ -303,8 +293,7 @@ tmain()
 		twarn("Some deletion was not properly recorded?");
 
 	tinfo("\ttsafetree: All testing done.");
-	for(k = 0; k < N_PROC; ++k)
-		waitpid(pid[k], &status, 0);
+	twait(pid, -N_PROC);
 
 	texit(0);
 }

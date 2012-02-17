@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Research) 2011-04-18 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Research) 2012-01-01 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -705,7 +705,7 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 					break;
 				}
 			}
-			else if (flags != INTERNAL && (s == (buf + 5) && (buf[0] == 'F' || buf[0] == 'f') && (buf[1] == 'R' || buf[1] == 'r') && (buf[2] == 'A' || buf[2] == 'a') && (buf[3] == 'M' || buf[3] == 'm') && (buf[4] == 'E' || buf[4] == 'e') || s == (buf + 3) && (buf[0] == 'I' || buf[0] == 'i') && (buf[1] == 'M' || buf[1] == 'm') && (buf[2] == 'G' || buf[2] == 'g')))
+			else if (flags != INTERNAL && (s == (buf + 5) && (buf[0] == 'F' || buf[0] == 'f') && (buf[1] == 'R' || buf[1] == 'r') && (buf[2] == 'A' || buf[2] == 'a') && (buf[3] == 'M' || buf[3] == 'm') && (buf[4] == 'E' || buf[4] == 'e') || s == (buf + 3) && (buf[0] == 'I' || buf[0] == 'i') && (buf[1] == 'M' || buf[1] == 'm') && (buf[2] == 'G' || buf[2] == 'g') || s == (buf + 6) && (buf[0] == 'S' || buf[0] == 's') && (buf[1] == 'C' || buf[1] == 'c') && (buf[2] == 'R' || buf[2] == 'r') && (buf[3] == 'I' || buf[3] == 'i') && (buf[4] == 'P' || buf[4] == 'p') && (buf[5] == 'T' || buf[5] == 't')))
 			{
 				s = buf;
 				r = 0;

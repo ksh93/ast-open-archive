@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -119,7 +119,7 @@ tmain()
 	    		tv2.tv_usec += 1000000;
 		}
  
-		tinfo("%s method elapsed time %ld.%lds\n", meth->name,
+		tinfo("%s method elapsed time %ld.%lds", meth->name,
 			tv2.tv_sec - tv1.tv_sec, tv2.tv_usec - tv1.tv_usec);
 	}
  

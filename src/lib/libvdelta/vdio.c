@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -39,8 +39,8 @@ reg Vdio_t*	io;
 	}
 	io->next = io->data;
 	io->endb = io->data + io->size;
+	io->left = io->delta->size;
 }
-
 
 #if __STD_C
 static int _vdfilbuf(reg Vdio_t* io)
@@ -56,9 +56,12 @@ reg Vdio_t*	io;
 	if(io->data != io->buf)	/* all data was given in core */
 		return REMAIN(io);
 
-	if((n = (*READF(io))(DATA(io),SIZE(io),HERE(io),DELTA(io))) > 0)
+	if ((n = SIZE(io)) > LEFT(io))
+		n = LEFT(io);
+	if((n = (*READF(io))(DATA(io),n,HERE(io),DELTA(io))) > 0)
 	{	ENDB(io) = (NEXT(io) = DATA(io)) + n;
 		HERE(io) += n;
+		LEFT(io) -= n;
 	}
 	return n;
 }

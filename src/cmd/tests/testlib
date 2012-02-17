@@ -8,17 +8,35 @@ src=
 unset=
 verbose=
 
-case $1 in
--v)	exec 9>&2
+while	:
+do	case $1 in
+	--proc*=*)
+		opt="$opt -DN_PROC=${1#*=}"
+		;;
+	--thread*=*)
+		opt="$opt -DN_THREAD=${1#*=}"
+		;;
+	--timeout*=*)
+		opt="$opt -DTIMEOUT=${1#*=}"
+		;;
+	--v*|-v)
+		opt="$opt -DINFO"
+		exec 9>&2
+		shift
+		verbose=1
+		;;
+	*)	break
+		;;
+	esac
 	shift
-	verbose=1
-	;;
-*)	exec 9>/dev/null
-	;;
-esac
+done
 case $# in
 [01])	echo "Usage: testlib [-v] library unit [cc-options] [*.h] [*.c]" >&2
 	exit 2
+	;;
+esac
+case $verbose in
+'')	exec 9>/dev/null
 	;;
 esac
 library=$1

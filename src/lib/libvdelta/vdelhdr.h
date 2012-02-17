@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -200,6 +200,7 @@ typedef struct _vdio_s
 	uchar*		endb;
 	uchar*		data;
 	int		size;
+	int		left;
 	long		here;
 	Vddisc_t*	delta;
 	uchar		buf[1024];
@@ -210,6 +211,7 @@ typedef struct _vdio_s
 #define HERE(io)	((io)->here)
 #define DATA(io)	((io)->data)
 #define SIZE(io)	((io)->size)
+#define LEFT(io)	((io)->left)
 #define DELTA(io)	((io)->delta)
 #define READF(io)	((io)->delta->readf)
 #define WRITEF(io)	((io)->delta->writef)

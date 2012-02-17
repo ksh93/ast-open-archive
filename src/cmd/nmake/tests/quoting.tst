@@ -23,7 +23,7 @@ tst :: tst.sh'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
 + 	then	if	grep -q \'### .*archaic.* ###\'
 + 		then	: tst contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n tst.sh

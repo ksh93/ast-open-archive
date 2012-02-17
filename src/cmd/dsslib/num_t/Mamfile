@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -10,7 +10,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -42,33 +42,33 @@ make libdssnum_t.a archive
 make dssnum_t.req
 exec - set -
 exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
-exec - *?)	echo " " ;;
+exec - *?) echo " " ;;
 exec - esac
 exec - for i in dssnum_t ast
-exec - do	case $i in
-exec - 	"dssnum_t"|dssnum_t)
-exec - 		;;
-exec - 	*)	if	test -f  ${INSTALLROOT}/lib/lib/$i
-exec - 		then	y=`cat ${INSTALLROOT}/lib/lib/$i`
-exec - 			case $y in
-exec - 			*-?*)	echo "" $y ;;
-exec - 			esac
-exec - 			continue
-exec - 		elif	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   -L${INSTALLROOT}/lib ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 				*$x*) continue ;;
-exec - 				esac
-exec - 				;;
-exec - 			esac
-exec - 		fi
-exec - 		;;
-exec - 	esac
-exec - 	echo " -l$i"
+exec - do case $i in
+exec - "dssnum_t"|dssnum_t)
+exec - ;;
+exec - *) if test -f ${INSTALLROOT}/lib/lib/$i
+exec - then y=`cat ${INSTALLROOT}/lib/lib/$i`
+exec - case $y in
+exec - *-?*) echo "" $y ;;
+exec - esac
+exec - continue
+exec - elif test ! -f ${INSTALLROOT}/lib/lib$i.a
+exec - then case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -L${INSTALLROOT}/lib ${LDFLAGS} -o 1.${COTEMP}.x 1.${COTEMP}.o -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - *$x*) case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} -o 1.${COTEMP}.x 1.${COTEMP}.o -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - *$x*) continue ;;
+exec - esac
+exec - ;;
+exec - esac
+exec - fi
+exec - ;;
+exec - esac
+exec - echo " -l$i"
 exec - done
 exec - } > dssnum_t.req
 exec - rm -f 1.${COTEMP}.*
@@ -95,10 +95,6 @@ done ${PACKAGE_ast_INCLUDE}/hashpart.h
 make ${PACKAGE_ast_INCLUDE}/dsslib.h implicit
 make ${PACKAGE_ast_INCLUDE}/dss.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/aso.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
@@ -119,7 +115,6 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
@@ -145,7 +140,6 @@ done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -160,12 +154,9 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/option.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/error.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cx.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
@@ -175,15 +166,12 @@ make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cx.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dss.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cxlib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -191,22 +179,19 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cx.h implicit
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cxlib.h dontcare
 make ${PACKAGE_ast_INCLUDE}/tag.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tag.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/swap.h implicit
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/dt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done num_t.c
 meta num_t.o %.c>%.o num_t.c num_t
 prev num_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssnum_t]"\" -D_PACKAGE_ast -c num_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssnum_t]"\" -D_PACKAGE_ast -c num_t.c
 done num_t.o generated
 make lib.o
 make lib.c
@@ -214,7 +199,7 @@ prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
 meta lib.o %.c>%.o lib.c lib
 prev lib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated
 exec - ${AR} rc libdssnum_t.a num_t.o lib.o
 exec - (ranlib libdssnum_t.a) >/dev/null 2>&1 || true
@@ -222,25 +207,25 @@ done libdssnum_t.a generated
 done num_t virtual
 prev libdssnum_t.a archive
 make ${INSTALLROOT}/lib
-exec - if	silent test ! -d ${INSTALLROOT}/lib
-exec - then	mkdir -p ${INSTALLROOT}/lib
+exec - if silent test ! -d ${INSTALLROOT}/lib
+exec - then mkdir -p ${INSTALLROOT}/lib
 exec - fi
 done ${INSTALLROOT}/lib generated
 make ${INSTALLROOT}/lib/libdssnum_t.a archive
 prev ${INSTALLROOT}/lib
 prev libdssnum_t.a archive
-exec - test '' = 'libdssnum_t.a' || ${STDCMP} 2>/dev/null -s libdssnum_t.a ${INSTALLROOT}/lib/libdssnum_t.a || { ${STDMV} ${INSTALLROOT}/lib/libdssnum_t.a ${INSTALLROOT}/lib/libdssnum_t.a.old 2>/dev/null || true; ${STDCP} libdssnum_t.a ${INSTALLROOT}/lib/libdssnum_t.a  		    		    ;}
+exec - test '' = 'libdssnum_t.a' || ${STDCMP} 2>/dev/null -s libdssnum_t.a ${INSTALLROOT}/lib/libdssnum_t.a || { ${STDMV} ${INSTALLROOT}/lib/libdssnum_t.a ${INSTALLROOT}/lib/libdssnum_t.a.old 2>/dev/null || true; ${STDCP} libdssnum_t.a ${INSTALLROOT}/lib/libdssnum_t.a ;}
 exec - (ranlib ${INSTALLROOT}/lib/libdssnum_t.a) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/libdssnum_t.a generated
 make ${INSTALLROOT}/lib/lib
-exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
-exec - then	mkdir -p ${INSTALLROOT}/lib/lib
+exec - if silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
 done ${INSTALLROOT}/lib/lib generated
 make ${INSTALLROOT}/lib/lib/dssnum_t
 prev ${INSTALLROOT}/lib/lib
 prev dssnum_t.req
-exec - test '' = 'dssnum_t.req' || ${STDCMP} 2>/dev/null -s dssnum_t.req ${INSTALLROOT}/lib/lib/dssnum_t || { ${STDMV} ${INSTALLROOT}/lib/lib/dssnum_t ${INSTALLROOT}/lib/lib/dssnum_t.old 2>/dev/null || true; ${STDCP} dssnum_t.req ${INSTALLROOT}/lib/lib/dssnum_t  		    		    ;}
+exec - test '' = 'dssnum_t.req' || ${STDCMP} 2>/dev/null -s dssnum_t.req ${INSTALLROOT}/lib/lib/dssnum_t || { ${STDMV} ${INSTALLROOT}/lib/lib/dssnum_t ${INSTALLROOT}/lib/lib/dssnum_t.old 2>/dev/null || true; ${STDCP} dssnum_t.req ${INSTALLROOT}/lib/lib/dssnum_t ;}
 done ${INSTALLROOT}/lib/lib/dssnum_t generated
 done install virtual
 make test

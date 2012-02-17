@@ -1,3 +1,13 @@
+12-02-14 Makerules.mk: ignore MAKE_OPTIONS for --mam
+12-02-14 Makerules.mk: add LICENSEFILEDEFAULT
+12-02-14 Makerules.mk: add PWD edit ala MAKEPATH to PAXFLAGS
+12-02-07 metarule.c: fix read string past terminator bug
+12-02-02 Makerules.mk: add [[ a || b ]] to the $SHELL -n compatibility test
+12-01-30 Makerules.mk: fix .INSTALL* to better handle 'text file busy'
+12-01-26 SCCS.mk: add to rule install list
+12-01-21 --- release 5.7 ---
+12-01-21 internal tmfmt() must use user format on special times too
+12-01-09 Makerules.mk: fix .MAMEDIT. to elide -[DI]-*
 11-12-13 option.c: fix off by 1 undermalloc
 11-12-13 Makerules.mk: fix MAKE_OPTIONS to peoperly handle --*=* options
 11-11-01 Makerules.mk: omit .TARGETs from manifest

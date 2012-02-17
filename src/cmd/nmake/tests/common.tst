@@ -195,7 +195,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libtst.a root/lib/libtst.a ||
 + 		{
 + 		if	silent test -f "root/lib/libtst.a"
-+ 		then	mv -f root/lib/libtst.a root/lib/libtst.a.old
++ 		then	{ mv -f root/lib/libtst.a root/lib/libtst.a.old || { test -f root/lib/libtst.a && ignore rm -f root/lib/libtst.a.old* && mv -f root/lib/libtst.a `echo root/lib/libtst.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libtst.a root/lib/libtst.a  		    		   
 + 		}
@@ -213,7 +213,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s tst.req root/lib/lib/tst ||
 + 		{
 + 		if	silent test -f "root/lib/lib/tst"
-+ 		then	mv -f root/lib/lib/tst root/lib/lib/tst.old
++ 		then	{ mv -f root/lib/lib/tst root/lib/lib/tst.old || { test -f root/lib/lib/tst && ignore rm -f root/lib/lib/tst.old* && mv -f root/lib/lib/tst `echo root/lib/lib/tst.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp tst.req root/lib/lib/tst  		    		   
 + 		}
@@ -227,7 +227,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libaha.a root/lib/libaha.a ||
 + 		{
 + 		if	silent test -f "root/lib/libaha.a"
-+ 		then	mv -f root/lib/libaha.a root/lib/libaha.a.old
++ 		then	{ mv -f root/lib/libaha.a root/lib/libaha.a.old || { test -f root/lib/libaha.a && ignore rm -f root/lib/libaha.a.old* && mv -f root/lib/libaha.a `echo root/lib/libaha.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libaha.a root/lib/libaha.a  		    		   
 + 		}
@@ -242,7 +242,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s aha.req root/lib/lib/aha ||
 + 		{
 + 		if	silent test -f "root/lib/lib/aha"
-+ 		then	mv -f root/lib/lib/aha root/lib/lib/aha.old
++ 		then	{ mv -f root/lib/lib/aha root/lib/lib/aha.old || { test -f root/lib/lib/aha && ignore rm -f root/lib/lib/aha.old* && mv -f root/lib/lib/aha `echo root/lib/lib/aha.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp aha.req root/lib/lib/aha  		    		   
 + 		}
@@ -271,7 +271,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libtst.a root/lib/libtst.a ||
 + 		{
 + 		if	silent test -f "root/lib/libtst.a"
-+ 		then	mv -f root/lib/libtst.a root/lib/libtst.a.old
++ 		then	{ mv -f root/lib/libtst.a root/lib/libtst.a.old || { test -f root/lib/libtst.a && ignore rm -f root/lib/libtst.a.old* && mv -f root/lib/libtst.a `echo root/lib/libtst.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ln -s ../../libtst.a root/lib/libtst.a || ignore cp libtst.a root/lib/libtst.a  		    		   
 + 		}
@@ -289,7 +289,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s tst.req root/lib/lib/tst ||
 + 		{
 + 		if	silent test -f "root/lib/lib/tst"
-+ 		then	mv -f root/lib/lib/tst root/lib/lib/tst.old
++ 		then	{ mv -f root/lib/lib/tst root/lib/lib/tst.old || { test -f root/lib/lib/tst && ignore rm -f root/lib/lib/tst.old* && mv -f root/lib/lib/tst `echo root/lib/lib/tst.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ln -s ../../../tst.req root/lib/lib/tst || ignore cp tst.req root/lib/lib/tst  		    		   
 + 		}
@@ -303,7 +303,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libaha.a root/lib/libaha.a ||
 + 		{
 + 		if	silent test -f "root/lib/libaha.a"
-+ 		then	mv -f root/lib/libaha.a root/lib/libaha.a.old
++ 		then	{ mv -f root/lib/libaha.a root/lib/libaha.a.old || { test -f root/lib/libaha.a && ignore rm -f root/lib/libaha.a.old* && mv -f root/lib/libaha.a `echo root/lib/libaha.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ln -s ../../libaha.a root/lib/libaha.a || ignore cp libaha.a root/lib/libaha.a  		    		   
 + 		}
@@ -318,7 +318,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s aha.req root/lib/lib/aha ||
 + 		{
 + 		if	silent test -f "root/lib/lib/aha"
-+ 		then	mv -f root/lib/lib/aha root/lib/lib/aha.old
++ 		then	{ mv -f root/lib/lib/aha root/lib/lib/aha.old || { test -f root/lib/lib/aha && ignore rm -f root/lib/lib/aha.old* && mv -f root/lib/lib/aha `echo root/lib/lib/aha.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ln -s ../../../aha.req root/lib/lib/aha || ignore cp aha.req root/lib/lib/aha  		    		   
 + 		}
@@ -495,7 +495,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t1 ../bin/t1 ||
 + 		{
 + 		if	silent test -f "../bin/t1"
-+ 		then	mv -f ../bin/t1 ../bin/t1.old
++ 		then	{ mv -f ../bin/t1 ../bin/t1.old || { test -f ../bin/t1 && ignore rm -f ../bin/t1.old* && mv -f ../bin/t1 `echo ../bin/t1.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t1 ../bin/t1  		    		   
 + 		}
@@ -509,7 +509,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t2 ../bin/t2 ||
 + 		{
 + 		if	silent test -f "../bin/t2"
-+ 		then	mv -f ../bin/t2 ../bin/t2.old
++ 		then	{ mv -f ../bin/t2 ../bin/t2.old || { test -f ../bin/t2 && ignore rm -f ../bin/t2.old* && mv -f ../bin/t2 `echo ../bin/t2.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t2 ../bin/t2  		    		   
 + 		}
@@ -526,7 +526,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t3.a ../lib/t3.a ||
 + 		{
 + 		if	silent test -f "../lib/t3.a"
-+ 		then	mv -f ../lib/t3.a ../lib/t3.a.old
++ 		then	{ mv -f ../lib/t3.a ../lib/t3.a.old || { test -f ../lib/t3.a && ignore rm -f ../lib/t3.a.old* && mv -f ../lib/t3.a `echo ../lib/t3.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t3.a ../lib/t3.a  		    		   
 + 		}
@@ -541,7 +541,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s libt4.a ../lib/libt4.a ||
 + 		{
 + 		if	silent test -f "../lib/libt4.a"
-+ 		then	mv -f ../lib/libt4.a ../lib/libt4.a.old
++ 		then	{ mv -f ../lib/libt4.a ../lib/libt4.a.old || { test -f ../lib/libt4.a && ignore rm -f ../lib/libt4.a.old* && mv -f ../lib/libt4.a `echo ../lib/libt4.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libt4.a ../lib/libt4.a  		    		   
 + 		}
@@ -559,7 +559,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t4.req ../lib/lib/t4 ||
 + 		{
 + 		if	silent test -f "../lib/lib/t4"
-+ 		then	mv -f ../lib/lib/t4 ../lib/lib/t4.old
++ 		then	{ mv -f ../lib/lib/t4 ../lib/lib/t4.old || { test -f ../lib/lib/t4 && ignore rm -f ../lib/lib/t4.old* && mv -f ../lib/lib/t4 `echo ../lib/lib/t4.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t4.req ../lib/lib/t4  		    		   
 + 		}
@@ -729,7 +729,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.h include/t.h ||
 + 		{
 + 		if	silent test -f "include/t.h"
-+ 		then	mv -f include/t.h include/t.h.old
++ 		then	{ mv -f include/t.h include/t.h.old || { test -f include/t.h && ignore rm -f include/t.h.old* && mv -f include/t.h `echo include/t.h.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t.h include/t.h  		    		   
 + 		}
@@ -746,7 +746,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t bin/t ||
 + 		{
 + 		if	silent test -f "bin/t"
-+ 		then	mv -f bin/t bin/t.old
++ 		then	{ mv -f bin/t bin/t.old || { test -f bin/t && ignore rm -f bin/t.old* && mv -f bin/t `echo bin/t.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t bin/t  		    		   
 + 		}
@@ -760,7 +760,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t2 bin/t2 ||
 + 		{
 + 		if	silent test -f "bin/t2"
-+ 		then	mv -f bin/t2 bin/t2.old
++ 		then	{ mv -f bin/t2 bin/t2.old || { test -f bin/t2 && ignore rm -f bin/t2.old* && mv -f bin/t2 `echo bin/t2.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t2 bin/t2  		    		   
 + 		}
@@ -777,7 +777,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s libt.a lib/libt.a ||
 + 		{
 + 		if	silent test -f "lib/libt.a"
-+ 		then	mv -f lib/libt.a lib/libt.a.old
++ 		then	{ mv -f lib/libt.a lib/libt.a.old || { test -f lib/libt.a && ignore rm -f lib/libt.a.old* && mv -f lib/libt.a `echo lib/libt.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libt.a lib/libt.a  		    		   
 + 		}
@@ -795,7 +795,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.req lib/lib/t ||
 + 		{
 + 		if	silent test -f "lib/lib/t"
-+ 		then	mv -f lib/lib/t lib/lib/t.old
++ 		then	{ mv -f lib/lib/t lib/lib/t.old || { test -f lib/lib/t && ignore rm -f lib/lib/t.old* && mv -f lib/lib/t `echo lib/lib/t.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t.req lib/lib/t  		    		   
 + 		}
@@ -822,7 +822,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.h include/t.h ||
 + 		{
 + 		if	silent test -f "include/t.h"
-+ 		then	mv -f include/t.h include/t.h.old
++ 		then	{ mv -f include/t.h include/t.h.old || { test -f include/t.h && ignore rm -f include/t.h.old* && mv -f include/t.h `echo include/t.h.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t.h include/t.h  		    		   
 + 		}
@@ -839,7 +839,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t bin/t ||
 + 		{
 + 		if	silent test -f "bin/t"
-+ 		then	mv -f bin/t bin/t.old
++ 		then	{ mv -f bin/t bin/t.old || { test -f bin/t && ignore rm -f bin/t.old* && mv -f bin/t `echo bin/t.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ln -s ../t bin/t || ignore cp t bin/t  		    		   
 + 		}
@@ -853,7 +853,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t2 bin/t2 ||
 + 		{
 + 		if	silent test -f "bin/t2"
-+ 		then	mv -f bin/t2 bin/t2.old
++ 		then	{ mv -f bin/t2 bin/t2.old || { test -f bin/t2 && ignore rm -f bin/t2.old* && mv -f bin/t2 `echo bin/t2.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t2 bin/t2  		    		   
 + 		}
@@ -870,7 +870,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s libt.a lib/libt.a ||
 + 		{
 + 		if	silent test -f "lib/libt.a"
-+ 		then	mv -f lib/libt.a lib/libt.a.old
++ 		then	{ mv -f lib/libt.a lib/libt.a.old || { test -f lib/libt.a && ignore rm -f lib/libt.a.old* && mv -f lib/libt.a `echo lib/libt.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libt.a lib/libt.a  		    		   
 + 		}
@@ -888,7 +888,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.req lib/lib/t ||
 + 		{
 + 		if	silent test -f "lib/lib/t"
-+ 		then	mv -f lib/lib/t lib/lib/t.old
++ 		then	{ mv -f lib/lib/t lib/lib/t.old || { test -f lib/lib/t && ignore rm -f lib/lib/t.old* && mv -f lib/lib/t `echo lib/lib/t.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ln -s ../../t.req lib/lib/t || ignore cp t.req lib/lib/t  		    		   
 + 		}
@@ -974,7 +974,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/NSTMTC.fld ||
 + 		{
 + 		if	silent test -f "etc/NSTMTC.fld"
-+ 		then	mv -f etc/NSTMTC.fld etc/NSTMTC.fld.old
++ 		then	{ mv -f etc/NSTMTC.fld etc/NSTMTC.fld.old || { test -f etc/NSTMTC.fld && ignore rm -f etc/NSTMTC.fld.old* && mv -f etc/NSTMTC.fld `echo etc/NSTMTC.fld.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp NSTMTC.fld etc/NSTMTC.fld  		    		   
 + 		}
@@ -988,7 +988,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/EIT5E.fld ||
 + 		{
 + 		if	silent test -f "etc/EIT5E.fld"
-+ 		then	mv -f etc/EIT5E.fld etc/EIT5E.fld.old
++ 		then	{ mv -f etc/EIT5E.fld etc/EIT5E.fld.old || { test -f etc/EIT5E.fld && ignore rm -f etc/EIT5E.fld.old* && mv -f etc/EIT5E.fld `echo etc/EIT5E.fld.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp NSTMTC.fld etc/EIT5E.fld  		    		   
 + 		}
@@ -1002,7 +1002,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/EIT4EP.fld ||
 + 		{
 + 		if	silent test -f "etc/EIT4EP.fld"
-+ 		then	mv -f etc/EIT4EP.fld etc/EIT4EP.fld.old
++ 		then	{ mv -f etc/EIT4EP.fld etc/EIT4EP.fld.old || { test -f etc/EIT4EP.fld && ignore rm -f etc/EIT4EP.fld.old* && mv -f etc/EIT4EP.fld `echo etc/EIT4EP.fld.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp NSTMTC.fld etc/EIT4EP.fld  		    		   
 + 		}
@@ -1016,7 +1016,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/NSTUI.fld ||
 + 		{
 + 		if	silent test -f "etc/NSTUI.fld"
-+ 		then	mv -f etc/NSTUI.fld etc/NSTUI.fld.old
++ 		then	{ mv -f etc/NSTUI.fld etc/NSTUI.fld.old || { test -f etc/NSTUI.fld && ignore rm -f etc/NSTUI.fld.old* && mv -f etc/NSTUI.fld `echo etc/NSTUI.fld.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp NSTMTC.fld etc/NSTUI.fld  		    		   
 + 		}
@@ -1041,7 +1041,7 @@ TEST 19 'synthesized rule name clashes'
 + 	else	silent cmp -s file ../../install/file ||
 + 		{
 + 		if	silent test -f "../../install/file"
-+ 		then	mv -f ../../install/file ../../install/file.old
++ 		then	{ mv -f ../../install/file ../../install/file.old || { test -f ../../install/file && ignore rm -f ../../install/file.old* && mv -f ../../install/file `echo ../../install/file.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp file ../../install/file  		    		   
 + 		}

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -15,6 +15,7 @@
 *                           Florham Park NJ                            *
 *                                                                      *
 *                 Glenn Fowler <gsf@research.att.com>                  *
+*                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
 #pragma prototyped

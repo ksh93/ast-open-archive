@@ -20,7 +20,7 @@ GETFLAGS =
 			$(RM) $(RMFLAGS) $(.SCCS.UNGET)
 	end
 	.SCCS.UNGET += $(O)
-	return $(GET) $(GETFLAGS) $(I) > $(O)
+	return $(GET) $(GETFLAGS) $(I)
 
 % : .TERMINAL s.%
 	$(.SCCS.get $(>) $(<))

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,7 +26,10 @@
 ** Written by Kiem-Phong Vo
 */
 
-#define N_PROC		16	/* #subprocesses, must be < 128	*/
+#ifndef N_PROC
+#define N_PROC		16
+#endif
+
 #define N_SLOT		12	/* number of lock slots		*/
 #define N_STEP		1000	/* number of working steps	*/
 static int		Pnum;	/* process number		*/
@@ -48,7 +51,7 @@ int lockobj(void* lck, ssize_t size, int locking)
 			lckv = *((short*)lck);
 		else	lckv = *((int*)lck);
 		if(lckv != Pnum ) /* unlocking a wrong lock */
-			terror("Process %3d(pid=%d): unlocking %d(pid=%d)?\n",
+			terror("Process %3d(pid=%d): unlocking %d(pid=%d)?",
 				Pnum, Pid[Pnum], lckv);
 
 		if(size == sizeof(char))
@@ -57,7 +60,7 @@ int lockobj(void* lck, ssize_t size, int locking)
 			aso = asocasshort(lck, Pnum, 0);
 		else	aso = asocasint(lck, Pnum, 0);
 		if(aso != Pnum) /* CAS failed! */
-			terror("Process %3d(pid=%d): unlocking CAS error %d\n",
+			terror("Process %3d(pid=%d): unlocking CAS error %d",
 				Pnum, Pid[Pnum], aso);
 
 		return 0;
@@ -73,10 +76,10 @@ int lockobj(void* lck, ssize_t size, int locking)
 		if(aso == 0)
 			break;
 		else if(aso < 0)
-			terror("Process %3d(pid=%d): locking CAS error %d\n",
+			terror("Process %3d(pid=%d): locking CAS error %d",
 				Pnum, Pid[Pnum], aso);
 		else if(k > 0 && (k%10000) == 0)
-			twarn("Process %3d(pid=%d): locking loop %d blocked by %d\n",
+			twarn("Process %3d(pid=%d): locking loop %d blocked by %d",
 				Pnum, Pid[Pnum], k, aso);
 	}
 
@@ -87,7 +90,7 @@ int lockobj(void* lck, ssize_t size, int locking)
 			lckv = *((short*)lck);
 		else	lckv = *((int*)lck);
 		if(lckv != Pnum)
-			terror("Process %3d(pid=%d): at step %d lock=%d?\n",
+			terror("Process %3d(pid=%d): at step %d lock=%d?",
 				Pnum, Pid[Pnum], k, lckv);
 	}
 
@@ -131,7 +134,6 @@ tmain()
 {
 	ssize_t		k, z;
 	Void_t		*addr;
-	int		status;
 	int		zerof;
 	pid_t		pid;
 
@@ -179,8 +181,8 @@ tmain()
 		}
 	}
 
-	for(k = 1; k <= N_PROC; ++k) /* wait for all children to finish */
-		waitpid(Pid[k], &status, 0);
+	if (twait(Pid+1, N_PROC))
+		terror("workload subprocess error");
 
 	if(*Done != N_PROC)
 		terror("Some subprocess did not finish its workload");

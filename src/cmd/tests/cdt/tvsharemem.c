@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -25,13 +25,21 @@
 
 /* Test insert/delete/search in shared/persistent memory region.  */
 
-#define N_INSERT	16	/* #concurrent writers		*/
-#define N_DELETE	16	/* #concurrent deleters		*/
-#define N_SEARCH	16	/* #concurrent searchers	*/
+#ifndef N_PROC
+#define N_PROC		48
+#endif
+#if N_PROC < 8
+#undef	N_PROC
+#define N_PROC		8
+#endif
+
+#define N_INSERT	(N_PROC/3)	/* #concurrent writers		*/
+#define N_DELETE	(N_PROC/3)	/* #concurrent deleters		*/
+#define N_SEARCH	(N_PROC/3)	/* #concurrent searchers	*/
 #define N_WRITER	(N_INSERT+N_DELETE)
 #define N_PROCESS	(N_INSERT+N_DELETE+N_SEARCH)
-#define W_EXTENT	125000	/* size of a dataset to write	*/
-#define COLLISION	8	/* should be < N_INSERT		*/
+#define W_EXTENT	(2604*N_PROCESS)/* size of a dataset to write	*/
+#define COLLISION	(N_INSERT/2)	/* should be < N_INSERT		*/
 
 #define DTMETHOD	Dtrhset	/* storage method to use	*/
 #define LONGGONE	(-1000000) /* setting refn to gone	*/
@@ -144,8 +152,8 @@ static int mmevent(Dt_t* dt, int type, Void_t* data, Dtdisc_t* disc)
 					asorelax(1);
 
 			/* increase reference count */
-			if(asoincint(&obj->refn) <= 0 )
-				tpause("Process %d: refn<=0 on adding op=%d obj[%d,refn=%d,fpid=%d]",
+			if(asoincint(&obj->refn) < 0 )
+				tpause("Process %d: refn<0 on adding op=%d obj[%d,refn=%d,fpid=%d]",
 					mmdc->pid, type&~DT_ANNOUNCE, obj->dval, obj->refn, obj->fpid);
 		}
 
@@ -192,7 +200,7 @@ static void mmfree(Dt_t* dt, Void_t* objarg, Dtdisc_t* disc)
 }
 
 /* open a shared dictionary based on a common backing store */
-static Dt_t* opendictionary(char* type, int num, pid_t pid, char* store)
+static Dt_t* opendictionary(char* actor, char* type, int num, pid_t pid, char* store)
 {
 	Vmalloc_t	*vm;
 	Dt_t		*dt;
@@ -201,7 +209,7 @@ static Dt_t* opendictionary(char* type, int num, pid_t pid, char* store)
 
 	/* create/reopen the region backed by a file using mmap */
 	if(!(vm = vmmopen(store, store == Mapstore ? -1 : 1, MEMSIZE)) )
-		terror("%s[num=%d,pid=%d]: Couldn't create vmalloc region", type, num, pid);
+		terror("%s %s [num=%d,pid=%d]: Couldn't create vmalloc region", actor, type, num, pid);
 
 	/* discipline for objects identified by their decimal values */
 	Mmdc.disc.key  = (ssize_t)DTOFFSET(Obj_t,dval);
@@ -219,9 +227,9 @@ static Dt_t* opendictionary(char* type, int num, pid_t pid, char* store)
 	Mmdc.pid = (int)getpid();
 
 	if(!(dt = dtopen(&Mmdc.disc, DTMETHOD)) ) /* open dictionary with hash-trie */
-		terror("%s[num=%d,pid=%d]: Can't open dictionary", type, num, pid);
+		terror("%s %s [num=%d,pid=%d]: Can't open dictionary", actor, type, num, pid);
 	if(dtcustomize(dt, (DT_ANNOUNCE|DT_SHARE), 1) != (DT_ANNOUNCE|DT_SHARE) )
-		terror("%s[num=%d,pid=%d]: Can't customize dictionary", type, num, pid);
+		terror("%s %s [num=%d,pid=%d]: Can't customize dictionary", actor, type, num, pid);
 
 	return dt;
 }
@@ -235,7 +243,7 @@ static pid_t makeprocess(char* proc, char* type, char* actor, int num, char* aso
 	char	*argv[9];
 
 	if((pid = fork()) < 0 )
-		terror("%s[num=%d]: Could not fork() a subprocess", actor, num);
+		terror("%s %s [num=%d]: Could not fork() a subprocess", actor, type, num);
 	else if(pid > 0 ) /* return to parent process */
 		return pid;
 	else
@@ -252,7 +260,7 @@ static pid_t makeprocess(char* proc, char* type, char* actor, int num, char* aso
 		argv[i++] = text;
 		argv[i++] = 0;
 		if(execv(proc, argv) < 0 )
-			terror("%s[num=%d]: Could not execv() process %s %s", actor, num, proc, type);
+			terror("%s %s [num=%d]: Could not execv() process %s %s", actor, type, num, proc, type);
 	}
 	return -1;
 }
@@ -269,15 +277,15 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 
 	num = atoi(procnum);
 	if((pid = getpid()) < 0 )
-		terror("%s[num=%d]: can't get process id", actor, num);
+		terror("%s %s [num=%d]: can't get process id", actor, type, num);
 
 	/* open the shared/persistent dictionary */
-	if(!(dt = opendictionary(actor, num, pid, store)) )
-		terror("%s[num=%d,pid=%d]: can't open dictionary", actor, num, pid);
+	if(!(dt = opendictionary(actor, type, num, pid, store)) )
+		terror("%s %s [num=%d,pid=%d]: can't open dictionary", actor, type, num, pid);
 
 	/* get the discipline structure with the Vmalloc region */
 	if(!(mmdc = (Mmdisc_t*)dtdisc(dt, NIL(Dtdisc_t*), 0)) )
-		terror("%s[num=%d,pid=%d]: can't get dictionary discipline", actor, num, pid);
+		terror("%s %s [num=%d,pid=%d]: can't get dictionary discipline", actor, type, num, pid);
 
 	/* all writers wait until they are all ready before going */
 	if(strcmp(actor, "inserter") == 0 || strcmp(actor, "deleter") == 0)
@@ -298,34 +306,33 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 	walk = first = insert = delete = search = unsrch = unins = undel = 0;
 	if(strcmp(actor, "inserter") == 0 )
 	{	base = BASE((num/COLLISION)*COLLISION); /* make these inserters do the same thing */
-		tinfo("%s[num=%d,pid=%d]: range=[%d,%d) ready to go",
-			actor, num, pid, base, base+W_EXTENT);
+		tinfo("%s %s [num=%d,pid=%d]: range=[%d,%d) ready to go", actor, type, num, pid, base, base+W_EXTENT);
 
 		for(i = 0; i < W_EXTENT; ++i)
 		{	/* insert a new object */
 			if(!(o = (Obj_t*)vmalloc(mmdc->vm, sizeof(Obj_t))) )
-				terror("%s[num=%d,pid=%d]: vmalloc failed", actor, num, pid);
+				terror("%s %s [num=%d,pid=%d]: vmalloc failed", actor, type, num, pid);
 
 			memset(o, 0, sizeof(Obj_t));
 			o->dval = i+base;
 			if(!(rv = dtinsert(dt, o)) ) /* failed insert */
-				terror("%s[num=%d,pid=%d]: insert failed", actor, num, pid);
+				terror("%s %s [num=%d,pid=%d]: insert failed", actor, type, num, pid);
 
 			if(rv == o) /* successfully inserted, complete it by making string value */
 			{	insert += 1;
 
 				if(!(sval = vmalloc(mmdc->vm, 16)) ) /* construct string value */
-					terror("%s[num=%d,pid=%d]: vmalloc failed", actor, num, pid);
+					terror("%s %s [num=%d,pid=%d]: vmalloc failed", actor, type, num, pid);
 				sprintf(sval, "%d", o->dval);
 				o->sval = sval;
 
 				if(o->dval < 0) /* this ain't no way! */
-					terror("%s[num=%d,pid=%d]: already freed? obj[dval=%d,pid=%d]",
-						actor, num, pid, o->dval, o->fpid);
+					terror("%s %s [num=%d,pid=%d]: already freed? obj[dval=%d,pid=%d]",
+						actor, type, num, pid, o->dval, o->fpid);
 
 				if(o->refn != 1 ) /* everyone else should still be spinning */
-					terror("%s[num=%d,pid=%d]: refn != 1? obj[dval=%d,refn=%d,op=%d,opid=%d]",
-						actor, num, pid, o->dval, o->refn, o->type, o->opid);
+					terror("%s %s [num=%d,pid=%d]: refn != 1? obj[dval=%d,refn=%d,op=%d,opid=%d]",
+						actor, type, num, pid, o->dval, o->refn, o->type, o->opid);
 
 				o->ready = 1; /* tell the world that object is ready */
 				asodecint(&o->refn); /* decrease o's reference count */
@@ -335,8 +342,8 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 				vmfree(mmdc->vm, o);
 
 				if(rv->refn <= 0 || rv->dval < 0) /* refn should be at least 1 */
-					terror("%s[num=%d,pid=%d]: refn <= 0? obj[dval=%d,refn=%d,op=%d,opid=%d]",
-						actor, num, pid, o->dval, o->refn, o->type, o->opid);
+					terror("%s %s [num=%d,pid=%d]: refn <= 0? obj[dval=%d,refn=%d,op=%d,opid=%d]",
+						actor, type, num, pid, o->dval, o->refn, o->type, o->opid);
 
 				if(!rv->sval) /* count #incomplete objects */
 					vmmvalue(mmdc->vm, CDT_INCOMPLETE, (Void_t*)1, VM_MMADD);
@@ -345,8 +352,8 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 			}
 		}
 			
-		tinfo("%s[num=%d,pid=%d]: done, base=%d try=%d insert=%d[+%d]",
-			actor, num, pid, base, W_EXTENT, insert, unins);
+		tinfo("%s %s [num=%d,pid=%d]: done, base=%d try=%d insert=%d[+%d]",
+			actor, type, num, pid, base, W_EXTENT, insert, unins);
 
 		/* total number of successful inserts */
 		vmmvalue(mmdc->vm, CDT_INSERT, (Void_t*)((long)insert), VM_MMADD );
@@ -354,15 +361,15 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 	else if(strcmp(actor, "deleter") == 0 )
 	{	srandom(num);
 		size = dtsize(dt);
-		tinfo("%s[num=%d,pid=%d]: dtsize=%d ready to go", actor, num, pid, size);
+		tinfo("%s %s [num=%d,pid=%d]: dtsize=%d ready to go", actor, type, num, pid, size);
 
 		for(o = dtfirst(dt); o; o = next )
 		{	next = dtnext(dt,o);
 			walk += 1;
 
 			if(o->refn <= 0 ) /* refn should be >= 1 */
-				terror("%s[num=%d,pid=%d]: refn <= 0? obj[dval=%d,refn=%d,op=%d,opid=%d]",
-					actor, num, pid, o->dval, o->refn, o->type, o->opid);
+				terror("%s %s [num=%d,pid=%d]: refn <= 0? obj[dval=%d,refn=%d,op=%d,opid=%d]",
+					actor, type, num, pid, o->dval, o->refn, o->type, o->opid);
 
 			if(!o->sval) /* count incomplete objects */
 				vmmvalue(mmdc->vm, CDT_INCOMPLETE, (Void_t*)1, VM_MMADD);
@@ -374,22 +381,22 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 			else	delete += 1;
 		}
 
-		tinfo("%s[num=%d,pid=%d]: done, size=%d[walk=%d] delete=%d[+%d]",
-			actor, num, pid, size, walk, delete, undel);
+		tinfo("%s %s [num=%d,pid=%d]: done, size=%d[walk=%d] delete=%d[+%d]",
+			actor, type, num, pid, size, walk, delete, undel);
 
 		size = 0; /* make sure that free elements were deleted right */
 		for(o = mmdc->list; o; o = next)
 		{	next = o->next;
 			size += 1;
 			if(o->free != 1) /* multiply deleted? */
-				terror("%s[num=%d,pid=%d]: multiple delete? obj[dval=%d,free=%d,fpid=%d]",
-					actor, num, mmdc->pid, o->dval, o->free, o->fpid);
+				terror("%s %s [num=%d,pid=%d]: multiple delete? obj[dval=%d,free=%d,fpid=%d]",
+					actor, type, num, mmdc->pid, o->dval, o->free, o->fpid);
 			if(o->fpid != mmdc->pid) /* who deleted this? */
-				terror("%s[num=%d,pid=%d]: Wrong deleter obj[dval=%d,free=%d,fpid=%d]",
-					actor, num, mmdc->pid, o->dval, o->free, o->fpid);
+				terror("%s %s [num=%d,pid=%d]: Wrong deleter obj[dval=%d,free=%d,fpid=%d]",
+					actor, type, num, mmdc->pid, o->dval, o->free, o->fpid);
 		}
 		if(size != delete)
-			terror("%s[num=%d,pid=%d]: free=%d delete=%d", actor, num, pid, size, delete);
+			terror("%s %s [num=%d,pid=%d]: free=%d delete=%d", actor, type, num, pid, size, delete);
 
 		/* save the number of deleted objects */
 		vmmvalue(mmdc->vm, CDT_DELETE, (Void_t*)((long)delete), VM_MMADD );
@@ -397,7 +404,7 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 	else if(strcmp(actor, "searcher") == 0 )
 	{	srandom(num);
 		size = dtsize(dt);
-		tinfo("%s[num=%d,pid=%d]: dtsize=%d ready to go", actor, num, pid, size);
+		tinfo("%s %s [num=%d,pid=%d]: dtsize=%d ready to go", actor, type, num, pid, size);
 
 		size = size > COLLISION*W_EXTENT ? size : COLLISION*W_EXTENT;
 		if(num%2 == 0 ) /* this searcher searches random elements */
@@ -409,12 +416,12 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 				{	search += 1;
 
 					if(rv->dval < 0) /* should not be freed yet */
-						terror("%s[num=%d,pid=%d]: already freed? obj[%d,fpid=%d]",
-							actor, num, pid, o->dval, o->fpid);
+						terror("%s %s [num=%d,pid=%d]: already freed? obj[%d,fpid=%d]",
+							actor, type, num, pid, rv->dval, rv->fpid);
 
 					if(rv->refn <= 0) /* refn should be at least 1 just for us */
-						terror("%s[num=%d,pid=%d]: refn <= 0? obj[%d,refn=%d,op=%d,opid=%d]",
-							actor, num, pid, o->dval, o->refn, o->type, o->opid);
+						terror("%s %s [num=%d,pid=%d]: refn <= 0? obj[%d,refn=%d,op=%d,opid=%d]",
+							actor, type, num, pid, rv->dval, rv->refn, rv->type, rv->opid);
 
 					if(!rv->sval) /* count incomplete objects */
 						vmmvalue(mmdc->vm, CDT_INCOMPLETE, (Void_t*)1, VM_MMADD);
@@ -423,8 +430,8 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 				}
 			}
 			size = dtsize(dt);
-			tinfo("%s[num=%d,pid=%d]: done, dtsize=%d search=%d[+%d]",
-				actor, num, pid, size, search, unsrch);
+			tinfo("%s %s [num=%d,pid=%d]: done, dtsize=%d search=%d[+%d]",
+				actor, type, num, pid, size, search, unsrch);
 		}
 		else /* this searcher walks the dictionary */
 		{	obj.dval = 0;
@@ -436,11 +443,11 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 				else	break; /* empty dictionary */
 
 				if(o->dval < 0) /* should not be deleted yet */
-					terror("%s[num=%d,pid=%d]: already freed obj[%d,refn=%d,fpid=%d,op=%d,opid=%d ",
-						actor, num, pid, o->dval, o->refn, o->fpid, o->type, o->opid);
+					terror("%s %s [num=%d,pid=%d]: already freed obj[%d,refn=%d,fpid=%d,op=%d,opid=%d ",
+						actor, type, num, pid, o->dval, o->refn, o->fpid, o->type, o->opid);
 				if(o->refn <= 0 ) /* refn must be >= 1 */
-					terror("%s[num=%d,pid=%d]: refn<=0? obj[%d,refn=%d,op=%d,opid=%d",
-						actor, num, pid, o->dval, o->refn, o->type, o->opid);
+					terror("%s %s [num=%d,pid=%d]: refn<=0? obj[%d,refn=%d,op=%d,opid=%d",
+						actor, type, num, pid, o->dval, o->refn, o->type, o->opid);
 
 				if(!o->sval) /* count incomplete objects */
 					vmmvalue(mmdc->vm, CDT_INCOMPLETE, (Void_t*)1, VM_MMADD);
@@ -449,11 +456,11 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 				asodecint(&o->refn); /* reduce reference count */
 			}
 			size = dtsize(dt);
-			tinfo("%s[num=%d,pid=%d]: done, dtsize=%d walk=%d first=%d",
-				actor, num, pid, size, walk, first);
+			tinfo("%s %s [num=%d,pid=%d]: done, dtsize=%d walk=%d first=%d",
+				actor, type, num, pid, size, walk, first);
 		}
 	}
-	else	terror("%s[num=%d,pid=%d]: unknown actor", actor, num, pid);
+	else	terror("%s %s [num=%d,pid=%d]: unknown actor", actor, num, pid);
 
 	vmmvalue(mmdc->vm, CDT_FINISHED, (Void_t*)1, VM_MMADD); /* count a done process */
 
@@ -466,19 +473,19 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 	size = dtsize(dt);
 	for(walk = 0, o = dtfirst(dt); o; o = dtnext(dt,o) )
 		walk += 1;
-	tinfo("%s[num=%d,pid=%d]: start walk, dtsize=%d, dtfirst/next=%d ins-del=%d",
-		actor, num, pid, size, walk, insert-delete);
+	tinfo("%s %s [num=%d,pid=%d]: start walk, dtsize=%d, dtfirst/next=%d ins-del=%d",
+		actor, type, num, pid, size, walk, insert-delete);
 	if(insert < delete)
-		terror("%s[num=%d,pid=%d]: insert=%d < delete=%d", actor, num, pid, insert, delete);
+		terror("%s %s [num=%d,pid=%d]: insert=%d < delete=%d", actor, type, num, pid, insert, delete);
 	if(walk != size)
-		terror("%s[num=%d,pid=%d]: dtsize=%d != walk=%d", actor, num, pid, size, walk);
+		terror("%s %s [num=%d,pid=%d]: dtsize=%d != walk=%d", actor, type, num, pid, size, walk);
 
 	/* concurrently walk the dictionary and add count to appropriate fields */
 	i = strcmp(actor, "inserter") == 0 ? 1 : strcmp(actor, "deleter") == 0 ? 2 : 3;
 	for(k = 0, o = (Obj_t*)dtfirst(dt); o; ++k, o = (Obj_t*)dtnext(dt,o) )
 	{	if(o->dval < 0)
-			terror("%s[num=%d,pid=%d]: object %d already freed",
-				actor, num, pid, o->dval);
+			terror("%s %s [num=%d,pid=%d]: object %d already freed",
+				actor, type, num, pid, o->dval);
 
 		if(i == 1) /* inserter */
 		{	asoincint(&o->ins);
@@ -508,16 +515,17 @@ static int readwrite(char* type, char* store, char* actor, char* procnum)
 
 tmain()
 {
-	pid_t		ipid[N_INSERT], dpid[N_DELETE], spid[N_SEARCH], ppid, pid;
-	size_t		size, walk, i, d, s, k, p;
+	pid_t		wpid[N_INSERT+N_DELETE+N_SEARCH], ppid, pid;
+	size_t		size, walk, i, k, p;
 	int		t;
 	struct timeval	begtm, endtm;
 	Dt_t		*dt;
 	Obj_t		*o;
 	Mmdisc_t	*mmdc;
 	Vmalloc_t	*vm;
-	char		*aso, *a, *store, *type;
+	char		*aso, *a, *cmd, *store, *type;
 
+	cmd = *argv;
 	aso = taso(ASO_PROCESS);
 	if(k = tchild())
 	{	Mapstore = argv[k++];
@@ -536,7 +544,7 @@ tmain()
 			return readwrite(type, store, a, argv[k]);
 		terror("%s: invalid child process operation -- { inserter deleter searcher } expected", a);
 	}
-	else if(type = argv[1])
+	else if(*++argv)
 		t = -1;
 	else
 		t = 0;
@@ -551,13 +559,14 @@ tmain()
 	{	switch (t)
 		{
 		case -1:
+			type = *argv++;
 			if(strcmp(type, "map") == 0 )
 				store = Mapstore;
 			else if(strcmp(type, "shm") == 0)
 				store = Shmstore;
 			else
 				terror("%s: invalid store type -- { map shm } expected", type);
-			t = 2;
+			t = *argv ? -2 : 2;
 			break;
 		case 0:
 			type = "map";
@@ -574,67 +583,44 @@ tmain()
 			break;
 		}
 
-		tinfo("Parent[pid=%d]: Testing %s concurrent accesses", ppid, type);
+		tinfo("parent %s [pid=%d]: Testing %s concurrent accesses", type, ppid, type);
 		gettimeofday(&begtm, 0);
 
-		tinfo("\tParent[pid=%d]: initializing dictionary", ppid);
-		if(!(dt = opendictionary("parent", 0, ppid, store)) )
-			terror("Parent[pid=%d]: Can't open %s dictionary", ppid, type);
+		tinfo("parent %s [pid=%d]: initializing dictionary", type, ppid);
+		if(!(dt = opendictionary("parent", type, 0, ppid, store)) )
+			terror("parent %s [pid=%d]: Can't open %s dictionary", type, ppid, type);
 		if(!(mmdc = (Mmdisc_t*)dtdisc(dt, (Dtdisc_t*)0, 0)) )
-			terror("Parent[pid=%d]: Can't get dictionary discipline", ppid);
-		tinfo("\tParent[pid=%d]: share dictionary created", ppid);
+			terror("parent %s [pid=%d]: Can't get dictionary discipline", type, ppid);
+		tinfo("parent %s [pid=%d]: share dictionary created", type, ppid);
 
-		for(i = 0; i < N_INSERT; ++i) /* start inserters */
-			if((ipid[i] = makeprocess(argv[0], type, "inserter", i, aso)) < 0 )
-				terror("Parent[pid=%d]: Could not make inserter process %d", ppid, i);
+		for(p = i = 0; i < N_INSERT; ++i) /* start inserters */
+			if((wpid[p++] = makeprocess(cmd, type, "inserter", i, aso)) < 0 )
+				terror("parent %s [pid=%d]: Could not make inserter process %d", type, ppid, i);
 
-		for(d = 0; d < N_DELETE; ++d) /* start deleters */
-			if((dpid[d] = makeprocess(argv[0], type, "deleter", d, aso)) < 0 )
-				terror("Parent[pid=%d]: Could not make deleter process %d", ppid, d);
+		for(i = 0; i < N_DELETE; ++i) /* start deleters */
+			if((wpid[p++] = makeprocess(cmd, type, "deleter", i, aso)) < 0 )
+				terror("parent %s [pid=%d]: Could not make deleter process %d", type, ppid, i);
 
-		for(s = 0; s < N_SEARCH; ++s) /* start searchers */
-			if((spid[s] = makeprocess(argv[0], type, "searcher", s, aso)) < 0 )
-				terror("Parent[pid=%d]: Could not make searcher process %d", ppid, s);
+		for(i = 0; i < N_SEARCH; ++i) /* start searchers */
+			if((wpid[p++] = makeprocess(cmd, type, "searcher", i, aso)) < 0 )
+				terror("parent %s [pid=%d]: Could not make searcher process %d", type, ppid, i);
 
-		while(i > 0 || d > 0 || s > 0 ) /* wait for all subprocesses to finish */
-		{	if((pid = wait(0)) < 0 )
-				terror("Wait() failed");
-
-			for(k = 0; k < N_INSERT; ++k)
-			{	if(pid == ipid[k])
-				{	ipid[k] = -1;
-					i -= 1;
-				}
-			}
-
-			for(k = 0; k < N_SEARCH; ++k)
-			{	if(pid == spid[k])
-				{	spid[k] = -1;
-					s -= 1;
-				}
-			}
-
-			for(k = 0; k < N_DELETE; ++k)
-			{	if(pid == dpid[k])
-				{	dpid[k] = -1;
-					d -= 1;
-				}
-			}
-		}
+		if (twait(wpid, p))
+			terror("workload subprocess error");
 
 		walk = 0; /* count objects from "persistent" dictionary itself */
 		for(o = (Obj_t*)dtfirst(dt); o; o = (Obj_t*)dtnext(dt,o) ) 
 		{	if(o->dval < 0 || o->dval > N_INSERT*W_EXTENT)
-				terror("Parent[pid=%d]: bad object", ppid);
+				terror("parent %s [pid=%d]: bad object", type, ppid);
 			if(o->ins != N_INSERT)
-				terror("Parent[pid=%d]: object %d has wrong insert count %d",
-					ppid, o->dval, o->ins);
+				terror("parent %s [pid=%d]: object %d has wrong insert count %d",
+					type, ppid, o->dval, o->ins);
 			if(o->srch != N_SEARCH)
-				terror("Parent[pid=%d]: object %d has wrong search count %d",
-					ppid, o->dval, o->srch);
+				terror("parent %s [pid=%d]: object %d has wrong search count %d",
+					type, ppid, o->dval, o->srch);
 			if(o->del != N_DELETE)
-				terror("Parent[pid=%d]: object %d has wrong delete count %d",
-					ppid, o->dval, o->del);
+				terror("parent %s [pid=%d]: object %d has wrong delete count %d",
+					type, ppid, o->dval, o->del);
 #ifdef DEBUG
 			tlog(ppid, "%d", o->dval);
 #endif
@@ -645,14 +631,14 @@ tmain()
 
 		for(k = 0; k < N_INSERT*W_EXTENT; ++k)
 			if(Count[k] > 1) /* should be unique */
-				terror("Parent[pid=%d]: Count[%d] = %d > 1", ppid, k, Count[k]);
+				terror("parent %s [pid=%d]: Count[%d] = %d > 1", type, ppid, k, Count[k]);
 
 		size = (ssize_t)dtsize(dt);
 		i = (ssize_t)(unsigned long)vmmvalue(mmdc->vm, CDT_INCOMPLETE, (Void_t*)0, VM_MMGET);
-		tinfo("Parent[pid=%d]: dtfirst/dtnext=%d dtsize=%d, incomplete=%d, no error.",
-			ppid, walk, size, i);
+		tinfo("parent %s [pid=%d]: dtfirst/dtnext=%d dtsize=%d, incomplete=%d, no error.",
+			type, ppid, walk, size, i);
 		if(size != walk)
-			terror("Parent[pid=%d]: counts mismatched", ppid);
+			terror("parent %s [pid=%d]: counts mismatched", type, ppid);
 
 		tinfo("Storage type=%s, #insertions=%d #inserters=%d #deleters=%d #searchers=%d",
 			type,  N_INSERT*W_EXTENT, N_INSERT, N_DELETE, N_SEARCH);

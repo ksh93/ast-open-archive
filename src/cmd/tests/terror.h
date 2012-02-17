@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -47,6 +47,10 @@
 #define integralof(x)	(((char*)(x))-((char*)0))
 #endif
 
+#ifndef TIMEOUT
+#define TIMEOUT		0	/* timeout in minutes */
+#endif
+
 _BEGIN_EXTERNS_
 
 extern int	sprintf _ARG_((char*, const char*, ...));
@@ -68,6 +72,7 @@ extern int	write _ARG_((int, const void*, int));
 extern int	unlink _ARG_((const char*));
 extern Void_t*	sbrk _ARG_((int));
 extern int	getpid();
+extern int	getpgrp();
 #endif
 
 extern void	tsterror _ARG_((char*, ...));
@@ -78,7 +83,9 @@ extern void	tstsuccess _ARG_((char*, ...));
 _END_EXTERNS_
 
 static int		Tstall;
+static int		Tstchild;
 static int		Tstline;
+static int		Tsttimeout = TIMEOUT;
 static char		Tstfile[16][256];
 
 #ifdef __LINE__
@@ -178,6 +185,23 @@ static void tcleanup()
 }
 
 #if __STD_C
+static void tnote(char* note)
+#else
+static void tnote(note)
+char*	note;
+#endif
+{
+	char	buf[1024];
+
+#if _SFIO_H
+	sfsprintf(buf, sizeof(buf), "[%s] ", note);
+#else
+	sprintf(buf, "[%s] ", note);
+#endif
+	write(2, buf, strlen(buf));
+}
+
+#if __STD_C
 static void tstputmesg(int line, char* form, va_list args)
 #else
 static void tstputmesg(line, form, args)
@@ -235,18 +259,24 @@ va_dcl
 	form = va_arg(args,char*);
 #endif
 
+	if (form)
+	{
 #if _SFIO_H
-	sfsprintf(failform, sizeof(failform), "FAILED %s [errno=%d]", form, errno);
+		sfsprintf(failform, sizeof(failform), "FAILED %s [errno=%d]", form, errno);
 #else
-	sprintf(failform, "FAILED %s [errno=%d]", form, errno);
+		sprintf(failform, "FAILED %s [errno=%d]", form, errno);
 #endif
-
-	tstputmesg(Tstline,failform,args);
+		tstputmesg(Tstline,failform,args);
+	}
 
 	va_end(args);
 
-	tcleanup();
-	exit(1);
+	if (Tstchild)
+	{
+		signal(SIGTERM, SIG_IGN);
+		kill(0, SIGTERM);
+	}
+	texit(1);
 }
 
 #if __STD_C
@@ -269,8 +299,7 @@ va_dcl
 
 	va_end(args);
 
-	tcleanup();
-	exit(0);
+	texit(0);
 }
 
 #if __STD_C
@@ -350,6 +379,20 @@ va_dcl
 	sleep(15);
 }
 
+static int asoerror(int type, const char* mesg)
+{
+	static unsigned long	hit;
+
+	if (hit & (1<<type))
+		tsterror(0);
+	else
+	{
+		hit |= (1<<type);
+		tsterror("aso error %d: %s", type, mesg);
+	}
+	return 0;
+}
+
 #if __STD_C
 int tstwait(pid_t* proc, int nproc)
 #else
@@ -358,27 +401,33 @@ pid_t*	proc;
 int	nproc;
 #endif
 {
-	int	code = 2, n, status, reaped = 0;
+	int	code = 2, n, status, reaped = 0, ignore = 0;
 	pid_t	pid, parent = getpid();
 
+	if (nproc < 0)
+	{	nproc = -nproc;
+		ignore = 1;
+	}
 	tstinfo("Parent[pid=%d]: waiting for %d child%s", parent, nproc, nproc == 1 ? "" : "ren");
 	while ((pid = wait(&status)) > 0)
-	{	for (n = 0; n < nproc; n++)
-		{	if (proc[n] == pid)
-			{	tstinfo("Parent[pid=%d]: process %d[pid=%d] status=%d", parent, n, pid, status);
-				reaped++;
-				break;
+	{	if (proc)
+		{	for (n = 0; n < nproc; n++)
+			{	if (proc[n] == pid)
+				{	tstinfo("Parent[pid=%d]: process %d[pid=%d] status=%d", parent, n, pid, status);
+					reaped++;
+					break;
+				}
 			}
+			if (n >= nproc)
+				tstwarn("Parent[pid=%d]: process UNKNOWN[pid=%d] status=%d", parent, pid, status);
 		}
-		if (n >= nproc)
-			tstwarn("Parent[pid=%d]: process UNKNOWN[pid=%d] status=%d", parent, pid, status);
 		if (status)
 			code = 1;
 		else if (code > 1)
 			code = 0;
 	}
-	if (reaped != nproc)
-	{	tstwarn("Parent[pid=%d]: expected %d process%s, got %d", parent, nproc, nproc == 1 ? "" : "es", reaped);
+	if (reaped != nproc && !ignore)
+	{	tsterror("Parent[pid=%d]: expected %d process%s, got %d", parent, nproc, nproc == 1 ? "" : "es", reaped);
 		code = 2;
 	}
 	return code;
@@ -433,12 +482,6 @@ int	n;
 	}
 
 	return Tstfile[n];
-}
-
-static int asoerror(int type, const char* mesg)
-{
-	tsterror("aso error %d: %s", type, mesg);
-	return 0;
 }
 
 typedef struct Asotype_s
@@ -504,8 +547,9 @@ char**	argv;
 			}
 			else
 				a = 0;
-			break;
 		}
+		else if (strncmp(a, "--timeout=", 10) == 0)
+			Tsttimeout = atoi(a + 10);
 	if (type || name)
 	{
 		if (!(meth = asometh(0, name)))
@@ -517,24 +561,55 @@ char**	argv;
 			if (!(meth = asometh(type, name)))
 				tsterror("aso method type %s not found", asotypes(type));
 			if (asoinit(0, meth, 0))
-				tsterror("aso method %s initialization error *and* asoerror() did not report it");
+				tsterror("aso method %s initialization error *and* asoerror() did not report it", meth->name);
 		}
 	}
 	return a;
 }
 
 static void
-asodie(int sig)
+asointr(int sig)
 {
-	pid_t	pid;
 	int	use;
 
-	pid = getpid();
 	signal(sig, SIG_IGN);
-	if ((use = sig) == SIGALRM)
-		use = SIGTERM;
-	kill(-pid, use);
-	tsterror("%d terminated with signal %d", pid, sig);
+	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
+		use = sig;
+	else
+		signal(use = SIGTERM, SIG_IGN);
+	kill(0, use);
+	switch (sig)
+	{
+	case SIGALRM:
+		write(2, "\tFAILED due to timeout\n", 23);
+		break;
+	case SIGBUS:
+		write(2, "\tFAILED with SIGBUS\n", 20);
+		break;
+	case SIGSEGV:
+		write(2, "\tFAILED with SIGSEGV\n", 21);
+		break;
+	}
+	texit(sig);
+}
+
+#if __STD_C
+static void tstintr(void)
+#else
+static void tstintr()
+#endif
+{
+	setpgid(0, 0);
+	signal(SIGINT, asointr);
+	signal(SIGQUIT, asointr);
+	signal(SIGTERM, asointr);
+	signal(SIGBUS, asointr);
+	signal(SIGSEGV, asointr);
+	if (Tsttimeout)
+	{
+		signal(SIGALRM, asointr);
+		alarm(Tsttimeout * 60);
+	}
 }
 
 #if __STD_C
@@ -547,22 +622,19 @@ char**	argv;
 	char**		v = argv;
 	char*		a;
 
+	Tstchild = 1;
 	while (a = *++v)
 		if (strcmp(a, "--all") == 0)
 			Tstall++;
 		else if (strcmp(a, "--child") == 0)
 			return (int)(v - argv + 1);
+		else if (strncmp(a, "--timeout=", 10) == 0)
+			Tsttimeout = atoi(a + 10);
 		else if (strcmp(a, "--") == 0)
 			break;
 		else if (strncmp(a, "--", 2) != 0)
 			break;
-	setpgid(0, 0);
-	signal(SIGALRM, asodie);
-	signal(SIGINT, asodie);
-	signal(SIGQUIT, asodie);
-	signal(SIGTERM, asodie);
-	/* no single test should take longer than 10 minutes, right? */
-	alarm(10 * 60);
+	tstintr();
 	return 0;
 }
 
@@ -579,9 +651,12 @@ char**	argv;
 	while (a = *++v)
 		if (strcmp(a, "--all") == 0)
 			Tstall++;
+		else if (strncmp(a, "--timeout=", 10) == 0)
+			Tsttimeout = atoi(a + 10);
 		else if (strcmp(a, "--") == 0)
 			return (int)(v - argv + 1);
 		else if (strncmp(a, "--", 2) != 0)
 			break;
+	tstintr();
 	return (int)(v - argv);
 }

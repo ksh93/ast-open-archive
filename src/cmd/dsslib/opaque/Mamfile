@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -10,7 +10,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -58,10 +58,6 @@ done ${PACKAGE_ast_INCLUDE}/magicid.h
 make ${PACKAGE_ast_INCLUDE}/dsslib.h implicit
 make ${PACKAGE_ast_INCLUDE}/dss.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/aso.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
@@ -82,7 +78,6 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
@@ -108,7 +103,6 @@ done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -123,12 +117,9 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/option.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/error.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cx.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
@@ -138,15 +129,12 @@ make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cx.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dss.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cxlib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -154,11 +142,9 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cx.h implicit
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cxlib.h dontcare
 make ${PACKAGE_ast_INCLUDE}/tag.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tag.h dontcare
 make ${PACKAGE_ast_INCLUDE}/swap.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -167,12 +153,11 @@ done ${PACKAGE_ast_INCLUDE}/swap.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/dt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done opaque.c
 meta opaque.o %.c>%.o opaque.c opaque
 prev opaque.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssopaque]"\" -D_PACKAGE_ast -c opaque.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssopaque]"\" -D_PACKAGE_ast -c opaque.c
 done opaque.o generated
 make lib.o
 make lib.c
@@ -180,7 +165,7 @@ prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
 meta lib.o %.c>%.o lib.c lib
 prev lib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated
 exec - ${AR} rc libdssopaque.a opaque.o lib.o
 exec - (ranlib libdssopaque.a) >/dev/null 2>&1 || true

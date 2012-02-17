@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -25,7 +25,10 @@
 ** Written by Kiem-Phong Vo
 */
 
-#define N_PROC	64		/* #concurrent processes	*/
+#ifndef N_PROC
+#define N_PROC		64
+#endif
+
 #define M_SIZE	32		/* max size of an allocated blk	*/
 #define	N_ALLOC	(16*1024)	/* #allocations in each process	*/
 #define N_FREE	(8*1024)	/* #frees <= #allocations	*/
@@ -111,6 +114,8 @@ tmain()
 	Vmstat_t	vmst;
 	Vmalloc_t	*vm;
 	pid_t		proc[N_PROC];
+
+	taso(ASO_PROCESS);
 
 	size = 0; /* make up list of pieces for allocation */
 	srandom(0); /* make it easier to debug */

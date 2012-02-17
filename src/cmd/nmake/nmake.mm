@@ -80,7 +80,7 @@ and
 packages at
 .xx link="/sw/download/	Software Systems Research software;"
 there is also a
-.xx link="/sw/download/faq.nmake.html	FAQ."
+.xx link="/sw/download/faq.html	FAQ."
 Although
 .B nmake
 makefiles are not compatible with UNIX
@@ -1524,10 +1524,10 @@ named
 .BR nmake :
 .VL 6
 .LI
-.B "nmake (AT&T Research) 5.6 2011-02-02"
+.B "nmake (AT&T Research) 5.6 2011-12-13"
 This is the version maintained by the original author.
 .LI
-.B "Alcatel-Lucent nmake 12"
+.B "Alcatel-Lucent nmake 13"
 The the variant that split in 1995 when AT&T spun off Lucent.
 .LI
 .B "MicroSoft NMAKE"

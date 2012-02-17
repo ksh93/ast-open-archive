@@ -1,6 +1,6 @@
 :PACKAGE: ast
 
-LICENSE = since=2000,author=gsf
+LICENSE = since=2000,author=gsf+kpv
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
@@ -51,7 +51,7 @@ testiv :: testiv.c -ldssip_t
 
 testptv :: testptv.c -ldssip_t
 
-PAXFILTER = ;*.[ch];$(PROTO) $(PROTOFLAGS) -c "" -p
+PAXFILTER = ;*.[ch];$(PROTO) $(PROTOFLAGS) -c "" -d -p
 
 ivsa.tgz ptvsa.tgz : $$(<:B:S=.manifest:T=F:T=I:/[[:space:]][[:space:]]*/ /G)
 	$(PAX) $(PAXFLAGS) -wf $(<) -x $(<:/.*\.//) -s ',.*/,,' -A $(PAXFILTER:@Q) $(*)

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -206,17 +206,21 @@ char*
 timefmt(const char* fmt, Time_t t)
 {
 	if (!t)
-		return "0.0";
+		t = 0;
 	else if (t == NOTIME)
-		return "0.1";
+		t = 100000000;
 	else if (t == OLDTIME)
-		return "0.2";
-	else if (!state.regress)
-		return fmttmx((fmt && *fmt) ? fmt : "%s.%6N", t);
-	else if (t < state.start)
-		return "0.3";
+		t = 200000000;
+	else if (state.regress)
+	{
+		if (t < state.start)
+			t = 300000000;
+		else
+			t = 400000000;
+	}
 	else
-		return "0.4";
+		return fmttmx((fmt && *fmt) ? fmt : "%s.%6N", t);
+	return fmttmx((fmt && *fmt) ? fmt : "%s.%1N", t);
 }
 
 /*

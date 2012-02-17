@@ -117,7 +117,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS

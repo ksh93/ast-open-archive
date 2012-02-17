@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -10,7 +10,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -61,10 +61,6 @@ done netflow.h dontcare
 make ${PACKAGE_ast_INCLUDE}/dsslib.h implicit
 make ${PACKAGE_ast_INCLUDE}/dss.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/aso.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
@@ -85,7 +81,6 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
@@ -111,7 +106,6 @@ done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -126,12 +120,9 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/option.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/error.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cx.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
@@ -141,15 +132,12 @@ make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cx.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dss.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cxlib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -157,11 +145,9 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cx.h implicit
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cxlib.h dontcare
 make ${PACKAGE_ast_INCLUDE}/tag.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tag.h dontcare
 make ${PACKAGE_ast_INCLUDE}/swap.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -170,13 +156,12 @@ done ${PACKAGE_ast_INCLUDE}/swap.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/dt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h dontcare
 done flowlib.h
 done netflow.c
 meta netflow.o %.c>%.o netflow.c netflow
 prev netflow.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssnetflow]"\" -D_PACKAGE_ast -c netflow.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssnetflow]"\" -D_PACKAGE_ast -c netflow.c
 done netflow.o generated
 make flow-dump.o
 make flow-dump.c
@@ -185,7 +170,7 @@ prev flowlib.h implicit
 done flow-dump.c
 meta flow-dump.o %.c>%.o flow-dump.c flow-dump
 prev flow-dump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-dump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-dump.c
 done flow-dump.o generated
 make flow-dumpv9.o
 make flow-dumpv9.c
@@ -193,7 +178,7 @@ prev flowlib.h implicit
 done flow-dumpv9.c
 meta flow-dumpv9.o %.c>%.o flow-dumpv9.c flow-dumpv9
 prev flow-dumpv9.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-dumpv9.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-dumpv9.c
 done flow-dumpv9.o generated
 make flow-fixed.o
 make flow-fixed.c
@@ -206,7 +191,7 @@ prev flowlib.h implicit
 done flow-fixed.c
 meta flow-fixed.o %.c>%.o flow-fixed.c flow-fixed
 prev flow-fixed.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-fixed.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-fixed.c
 done flow-fixed.o generated
 make flow-flat.o
 make flow-flat.c
@@ -214,7 +199,7 @@ prev flowlib.h implicit
 done flow-flat.c
 meta flow-flat.o %.c>%.o flow-flat.c flow-flat
 prev flow-flat.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-flat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-flat.c
 done flow-flat.o generated
 make flow-tool.o
 make flow-tool.c
@@ -223,7 +208,7 @@ prev flowlib.h implicit
 done flow-tool.c
 meta flow-tool.o %.c>%.o flow-tool.c flow-tool
 prev flow-tool.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-tool.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c flow-tool.c
 done flow-tool.o generated
 make lib.o
 make lib.c
@@ -231,68 +216,68 @@ prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
 meta lib.o %.c>%.o lib.c lib
 prev lib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated
 exec - ${AR} rc libdssnetflow.a netflow.o flow-dump.o flow-dumpv9.o flow-fixed.o flow-flat.o flow-tool.o lib.o
 exec - (ranlib libdssnetflow.a) >/dev/null 2>&1 || true
 done libdssnetflow.a generated
 done netflow virtual
 make ${PACKAGE_ast_INCLUDE}
-exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	mkdir -p ${PACKAGE_ast_INCLUDE}
+exec - if silent test ! -d ${PACKAGE_ast_INCLUDE}
+exec - then mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/netflow.h
 prev ${PACKAGE_ast_INCLUDE}
 prev netflow.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  netflow.h  > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/netflow.h 1.${COTEMP}.x
-exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/netflow.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf' netflow.h > 1.${COTEMP}.x
+exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/netflow.h 1.${COTEMP}.x
+exec - then rm -f 1.${COTEMP}.x
+exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/netflow.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/netflow.h generated
 make ${INSTALLROOT}/lib/dss
-exec - if	silent test ! -d ${INSTALLROOT}/lib/dss
-exec - then	mkdir -p ${INSTALLROOT}/lib/dss
+exec - if silent test ! -d ${INSTALLROOT}/lib/dss
+exec - then mkdir -p ${INSTALLROOT}/lib/dss
 exec - fi
 done ${INSTALLROOT}/lib/dss generated
 make ${INSTALLROOT}/lib/dss/netflow-cflow.dss
 prev ${INSTALLROOT}/lib/dss
 make data/netflow-cflow.dss
 done data/netflow-cflow.dss
-exec - test '' = 'data/netflow-cflow.dss' || ${STDCMP} 2>/dev/null -s data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss.old 2>/dev/null || true; ${STDCP} data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss  		    		    ;}
+exec - test '' = 'data/netflow-cflow.dss' || ${STDCMP} 2>/dev/null -s data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss.old 2>/dev/null || true; ${STDCP} data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss ;}
 done ${INSTALLROOT}/lib/dss/netflow-cflow.dss generated
 make ${INSTALLROOT}/lib/dss/netflow-map.dss
 make data/netflow-map.dss
 done data/netflow-map.dss
-exec - test '' = 'data/netflow-map.dss' || ${STDCMP} 2>/dev/null -s data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss.old 2>/dev/null || true; ${STDCP} data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss  		    		    ;}
+exec - test '' = 'data/netflow-map.dss' || ${STDCMP} 2>/dev/null -s data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss.old 2>/dev/null || true; ${STDCP} data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss ;}
 done ${INSTALLROOT}/lib/dss/netflow-map.dss generated
 make ${INSTALLROOT}/lib/dss/netflow-sample.dss
 make data/netflow-sample.dss
 done data/netflow-sample.dss
-exec - test '' = 'data/netflow-sample.dss' || ${STDCMP} 2>/dev/null -s data/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss.old 2>/dev/null || true; ${STDCP} data/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss  		    		    ;}
+exec - test '' = 'data/netflow-sample.dss' || ${STDCMP} 2>/dev/null -s data/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss.old 2>/dev/null || true; ${STDCP} data/netflow-sample.dss ${INSTALLROOT}/lib/dss/netflow-sample.dss ;}
 done ${INSTALLROOT}/lib/dss/netflow-sample.dss generated
 make ${INSTALLROOT}/lib/dss/ip.map
 make data/ip.map
 done data/ip.map
-exec - test '' = 'data/ip.map' || ${STDCMP} 2>/dev/null -s data/ip.map ${INSTALLROOT}/lib/dss/ip.map || { ${STDMV} ${INSTALLROOT}/lib/dss/ip.map ${INSTALLROOT}/lib/dss/ip.map.old 2>/dev/null || true; ${STDCP} data/ip.map ${INSTALLROOT}/lib/dss/ip.map  		    		    ;}
+exec - test '' = 'data/ip.map' || ${STDCMP} 2>/dev/null -s data/ip.map ${INSTALLROOT}/lib/dss/ip.map || { ${STDMV} ${INSTALLROOT}/lib/dss/ip.map ${INSTALLROOT}/lib/dss/ip.map.old 2>/dev/null || true; ${STDCP} data/ip.map ${INSTALLROOT}/lib/dss/ip.map ;}
 done ${INSTALLROOT}/lib/dss/ip.map generated
 make ${INSTALLROOT}/lib/pz
-exec - if	silent test ! -d ${INSTALLROOT}/lib/pz
-exec - then	mkdir -p ${INSTALLROOT}/lib/pz
+exec - if silent test ! -d ${INSTALLROOT}/lib/pz
+exec - then mkdir -p ${INSTALLROOT}/lib/pz
 exec - fi
 done ${INSTALLROOT}/lib/pz generated
 make ${INSTALLROOT}/lib/pz/dss-netflow.prt
 prev ${INSTALLROOT}/lib/pz
 make dss-netflow.prt
 done dss-netflow.prt
-exec - test '' = 'dss-netflow.prt' || ${STDCMP} 2>/dev/null -s dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt || { ${STDMV} ${INSTALLROOT}/lib/pz/dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt.old 2>/dev/null || true; ${STDCP} dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt  		    		    ;}
+exec - test '' = 'dss-netflow.prt' || ${STDCMP} 2>/dev/null -s dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt || { ${STDMV} ${INSTALLROOT}/lib/pz/dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt.old 2>/dev/null || true; ${STDCP} dss-netflow.prt ${INSTALLROOT}/lib/pz/dss-netflow.prt ;}
 done ${INSTALLROOT}/lib/pz/dss-netflow.prt generated
 done install virtual
 make test
 make test.dss
 make dss.tst
 done dss.tst
-exec - regress  dss.tst
+exec - regress dss.tst
 done test.dss virtual
 done test dontcare virtual

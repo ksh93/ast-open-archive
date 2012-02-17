@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2011-12-13 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-02-14 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -182,7 +182,7 @@ set virtual:=1
 	 * exported options
 	 */
 
-	if MAKE_OPTIONS
+	if MAKE_OPTIONS && ! "$(-mam:N=static*)"
 		for O $(MAKE_OPTIONS)
 			if O == "-*"
 				set $(O)
@@ -202,7 +202,7 @@ set virtual:=1
 		.MAMROOT. := $(PWD:C@.*/src/@/src/@:C@/[^/]*@/..@G:C@/@@)
 		.MAKE : .MAM.LOAD
 	end
-	PAXFLAGS &= $$(MAKEPATH:C@:@ @G:N!=...*:C@.*@-s\@&/*\@\@@)
+	PAXFLAGS &= $$(MAKEPATH:C@:@ @G:N!=...*:C@.*@-s\@&/*\@\@@) $$(PWD:C@.*@-s\@&/*\@\@@)
 	.MAKE : .PROBE.LOAD
 
 /*
@@ -240,7 +240,8 @@ CATALOG = $(.CATALOG.NAME.)
 HTMLINITFILES = 2HTML:$(HOME)/.2html
 LICENSE =
 LICENSEFILE = LICENSE
-LICENSEFILES = $(.PACKAGE.license) $(LICENSE:/,.*//:N!=*=*:/.*/$(.PACKAGE.)-& &) $(LICENSEFILE) $(.PACKAGE.:X=$$(.PACKAGE.):C,/,-,) $(.PACKAGE.:X=$$(PWD:C,^$(INSTALLROOT)/[^/]*/[^/]*/,,:C,/.*,,:/^lib//:/lib$//):C,/,-,) $(.PACKAGE.)
+LICENSEFILEDEFAULT =
+LICENSEFILES = $(.PACKAGE.license) $(LICENSE:/,.*//:N!=*=*:/.*/$(.PACKAGE.)-& &) $(LICENSEFILE) $(LICENSEFILEDEFAULT) $(.PACKAGE.:X=$$(.PACKAGE.):C,/,-,) $(.PACKAGE.:X=$$(PWD:C,^$(INSTALLROOT)/[^/]*/[^/]*/,,:C,/.*,,:/^lib//:/lib$//):C,/,-,) $(.PACKAGE.)
 LICENSEINFO = $(.FIND. lib/package .lic $(LICENSEFILES))
 LICENSECLASS = $(LICENSEINFO:P=W=$(LICENSE),query=${type}.${class})
 
@@ -1093,7 +1094,7 @@ end
 	case $(-mam:N=(regress|static)*:/:.*//)$(-regress):$OPTIND:$RANDOM in
 	?*:*:*|*::*|*:*:$RANDOM)
 		;;
-	*)	if	ENV= LC_ALL=C x= $SHELL -nc ': ${list[level]} $$(( 1 + $x )) !(pattern)' 2>/dev/null
+	*)	if	ENV= LC_ALL=C x= $SHELL -nc '[[ a || b ]] && : ${list[level]} $$(( 1 + $x )) !(pattern)' 2>/dev/null
 		then	if	$(GREP) -q '### .*archaic.* ###'
 			then	: $(<) contains archaic constructs :
 			else	ENV= LC_ALL=C $SHELL -n $(>)
@@ -1349,13 +1350,15 @@ DAGGERFLAGS =
 		   $(~:N=group=*:@C,.*,\&\& { $(CHGRP) & $(<) || true ;},:@C, group=, ,G) \
 		   $(~:N=mode=*:@C,.*,\&\& $(CHMOD) & $(<),:@C, mode=\([-+]\), ugo\1,G:@C, mode=, ,G)
 
+.DO.INSTALL.OLD.BUSY = { test -f $(%) && ignore $(RM) $(RMFLAGS) $(%).old* && $(MV) $(MVFLAGS) $(%) `echo $(%).old* | $(SED) -e 's/.* //' -e 's/old\(z*\)$/old\1z/' -e 's/\*$//'`; }
+
 .DO.INSTALL.OLD. : .FUNCTION
 	if "$(-preserve)" == "\*" || "$(-preserve:N=*/*:?$$(%:N=$$(-preserve))?$$(%:B:S:N=$$(-preserve))?)"
 		return $(SILENT) test -d $(%:D:B=ETXTBSY) || $(MKDIR) $(%:D:B=ETXTBSY); $(MV) $(MVFLAGS) $(%) $(%:D:B=ETXTBSY)/$(%:B)#$(%:P=I)
 	elif "$(-clobber)" == "\*" || "$(-clobber:N=*/*:?$$(%:N=$$(-clobber))?$$(%:B:S:N=$$(-clobber))?)"
-		return $(RM) $(RMFLAGS) $(%)
+		return { $(RM) $(RMFLAGS) $(%) || $(.DO.INSTALL.OLD.BUSY); }
 	else
-		return $(MV) $(MVFLAGS) $(%) $(%).old
+		return { $(MV) $(MVFLAGS) $(%) $(%).old || $(.DO.INSTALL.OLD.BUSY); }
 	end
 
 .DO.INSTALL : .USE $$(<:N=*$$(CC.SUFFIX.ARCHIVE):?.ARCOPY??)
@@ -4530,6 +4533,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	if ! .MAMEDIT.
 		local E P
 		.MAMEDIT. = :
+		E = N!=-[DI]-*:
 		for P $(.MAMPACKAGE.)
 			E := $(E)@C%$($(P):C@\.@\\.@G)%$("$"){$(P)}%G:
 		end

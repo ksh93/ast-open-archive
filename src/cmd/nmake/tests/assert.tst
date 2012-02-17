@@ -129,7 +129,7 @@ TEST 07 ':INSTALLDIR:'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
 + 	then	if	grep -q \'### .*archaic.* ###\'
 + 		then	: test contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n test.sh
@@ -171,7 +171,7 @@ TEST 07 ':INSTALLDIR:'
 + 	else	silent cmp -s test fun/test ||
 + 		{
 + 		if	silent test -f "fun/test"
-+ 		then	mv -f fun/test fun/test.old
++ 		then	{ mv -f fun/test fun/test.old || { test -f fun/test && ignore rm -f fun/test.old* && mv -f fun/test `echo fun/test.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp test fun/test  		    		   
 + 		}
@@ -368,7 +368,7 @@ TEST 15 ':: .sh rhs mismatch with lhs'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
 + 	then	if	grep -q \'### .*archaic.* ###\'
 + 		then	: bin/foo contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n foo.sh
@@ -484,7 +484,7 @@ ug gu :LINK: gg'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
 + 	then	if	grep -q \'### .*archaic.* ###\'
 + 		then	: gg contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n gg.sh
@@ -536,7 +536,7 @@ ug gu :LINK: gg'
 + 	else	silent cmp -s gg bin/gg ||
 + 		{
 + 		if	silent test -f "bin/gg"
-+ 		then	mv -f bin/gg bin/gg.old
++ 		then	{ mv -f bin/gg bin/gg.old || { test -f bin/gg && ignore rm -f bin/gg.old* && mv -f bin/gg `echo bin/gg.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp gg bin/gg  		    		   
 + 		}
@@ -627,7 +627,7 @@ BBB :: BBB.sh'
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
 + 	then	if	grep -q \'### .*archaic.* ###\'
 + 		then	: bin/AAA contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n AAA.sh
@@ -661,7 +661,7 @@ BBB :: BBB.sh'
 + case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
 + 	then	if	grep -q \'### .*archaic.* ###\'
 + 		then	: BBB contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n BBB.sh
@@ -934,7 +934,7 @@ TEST 27 ':MAKE: + install + file name clash'
 + 	else	silent cmp -s t.exe bin/t.exe ||
 + 		{
 + 		if	silent test -f "bin/t.exe"
-+ 		then	mv -f bin/t.exe bin/t.exe.old
++ 		then	{ mv -f bin/t.exe bin/t.exe.old || { test -f bin/t.exe && ignore rm -f bin/t.exe.old* && mv -f bin/t.exe `echo bin/t.exe.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t.exe bin/t.exe  		    		   
 + 		}
@@ -981,7 +981,7 @@ $$(BINDIR) :INSTALLDIR: mode=0644 $(FILES)'
 + 	else	silent cmp -s a bin/a ||
 + 		{
 + 		if	silent test -f "bin/a"
-+ 		then	mv -f bin/a bin/a.old
++ 		then	{ mv -f bin/a bin/a.old || { test -f bin/a && ignore rm -f bin/a.old* && mv -f bin/a `echo bin/a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp a bin/a  		    		   && chmod 0644 bin/a
 + 		}
@@ -1039,7 +1039,7 @@ t :: t.c .TBIN'
 + 	else	silent cmp -s t tbin/t ||
 + 		{
 + 		if	silent test -f "tbin/t"
-+ 		then	mv -f tbin/t tbin/t.old
++ 		then	{ mv -f tbin/t tbin/t.old || { test -f tbin/t && ignore rm -f tbin/t.old* && mv -f tbin/t `echo tbin/t.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t tbin/t  		    		   
 + 		}
@@ -1065,7 +1065,7 @@ t :: t.c .TBIN'
 + 	else	silent cmp -s t.o tbin/t.o ||
 + 		{
 + 		if	silent test -f "tbin/t.o"
-+ 		then	mv -f tbin/t.o tbin/t.o.old
++ 		then	{ mv -f tbin/t.o tbin/t.o.old || { test -f tbin/t.o && ignore rm -f tbin/t.o.old* && mv -f tbin/t.o `echo tbin/t.o.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t.o tbin/t.o  		    		   
 + 		}
@@ -1079,7 +1079,7 @@ t :: t.c .TBIN'
 + 	else	silent cmp -s t tbin/t ||
 + 		{
 + 		if	silent test -f "tbin/t"
-+ 		then	mv -f tbin/t tbin/t.old
++ 		then	{ mv -f tbin/t tbin/t.old || { test -f tbin/t && ignore rm -f tbin/t.old* && mv -f tbin/t `echo tbin/t.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp t tbin/t  		    		   
 + 		}

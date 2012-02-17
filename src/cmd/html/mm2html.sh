@@ -42,13 +42,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Research) 2011-12-30' # NOTE: repeated in USAGE
+version='mm2html (AT&T Research) 2012-01-11' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Research) 2011-12-30 $
+@(#)$Id: mm2html (AT&T Research) 2012-01-11 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man/mandoc subset to html]
@@ -344,7 +344,7 @@ HTMLPATH=${HTMLPATH#:}
 
 ds[Cr]='&#169;'
 ds[Dt]=$(date -f "%B %d, %Y" $x)
-ds[Rf]="\\u[$reference]\\d"
+ds[Rf]="<FONT SIZE=-6>[$reference]</FONT>"
 ds[Rg]='&#174;'
 ds[CM]='&#169;'
 ds[RM]='&#174;'
@@ -1860,8 +1860,7 @@ do	getline || {
 			esac
 			;;
 		.[IR]S)	case $macros:$op in
-			mm:.RS)	Rf="\\u[$reference]\\d"
-				references="$references$nl<DT>[$reference]<DD>"$(nohang "[$reference]")
+			mm:.RS) references="$references$nl<DT>[$reference]<DD>"$(nohang "[$reference]")
 				while	getline
 				do	case $1 in
 					.RF)	break ;;
@@ -1869,6 +1868,7 @@ do	getline || {
 					references="$references$nl$*"
 				done
 				(( reference++ ))
+				ds[Rf]="<FONT SIZE=-6>[$reference]</FONT>"
 				continue
 				;;
 			esac

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -20,7 +20,14 @@
 #include	"vmtest.h"
 #include	<pthread.h>
 
-#define	N_THREAD	32
+#ifndef N_THREAD
+#define N_THREAD	32
+#endif
+#if N_THREAD > 32
+#undef	N_THREAD
+#define N_THREAD	32
+#endif
+
 #define N_ALLOC		5000
 
 typedef struct _thread_s
@@ -83,6 +90,9 @@ tmain()
 	void		*status;
 	pthread_t	th[N_THREAD];
 	Vmstat_t	vmst;
+
+	topts();
+	taso(ASO_THREAD);
 
 	if(argc > 1) /* set max number of regions to avoid collisions */
 		setregmax(atoi(argv[1]));

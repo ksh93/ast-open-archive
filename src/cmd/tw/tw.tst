@@ -549,7 +549,10 @@ TEST 08 'function declaration order'
 
 TEST 09 'sum() functions'
 
+	DO	DATA data
+
 	EXEC	-d data -e '
+			sort:	name;
         		select: type == REG; 
         		action: printf("%s %s\n", md5sum, path);
 		'
@@ -627,11 +630,13 @@ c77f4a1c5a8ce8a8c196575fe93cf0c1 data/zzz/333/4/s.z
 927aaf31e6809ac0a952629e852db78c data/zzz/333/7/s.z'
 
 	EXEC	-d data -e '
+			sort:	name;
         		select: type == REG; 
         		action: printf("%s %s\n", sum("md5"), path);
 		'
 
 	EXEC	-d data -e '
+			sort:	name;
         		select: type == REG; 
         		action: printf("%s %s\n", sum("sha1"), path);
 		'
@@ -709,6 +714,7 @@ ee919e4f33b3aeab78883c19f43d4bcc71017340 data/zzz/333/6/q.c
 b13636b37c6f5b405ca26d92b91550af154cf940 data/zzz/333/7/s.z'
 
 	EXEC	-d data -e '
+			sort:	name;
         		select: type == REG; 
         		action: printf("%s %s\n", sum("tw"), path);
 		'

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -22,7 +22,10 @@
 #include <sys/mman.h>
 #include <sys/time.h>
 
-#define N_PROC		8	/* #subprocesses	*/
+#ifndef N_PROC
+#define N_PROC		8
+#endif
+
 #define N_STEP		1000	/* #working steps	*/
 #define N_REP		1000	/* #repeats per step	*/
 
@@ -105,8 +108,8 @@ tmain()
 				texit(0);
 			}
 
-		for(k = 0; k < N_PROC; ++k) /* wait for all children to finish */
-			waitpid(cpid[k], &status, 0);
+		if (twait(cpid, N_PROC))
+			terror("workload subprocess error");
 #else
 		workload((unsigned int)getpid());
 #endif
@@ -123,7 +126,7 @@ tmain()
 	    		tv2.tv_usec += 1000000;
 		}
  
-		tinfo("%s method elapsed time %ld.%lds\n", meth->name,
+		tinfo("%s method elapsed time %ld.%lds", meth->name,
 			tv2.tv_sec - tv1.tv_sec, tv2.tv_usec - tv1.tv_usec);
 	}
 

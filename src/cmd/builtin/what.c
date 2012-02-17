@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: what (AT&T Research) 2002-11-14 $\n]"
+"[-?\n@(#)$Id: what (AT&T Research) 2012-02-11 $\n]"
 USAGE_LICENSE
 "[+NAME?what - display binary identification strings]"
 "[+DESCRIPTION?\bwhat\b searches the given files for all occurrences of"
@@ -122,7 +122,7 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 				switch (skip[buf[0]])
 				{
 				case HIT:
-					if (buf[0] == ')' && s[0] == '@' && s[1] == '(' && s[2] == '#' || buf[0] == ':' && s[0] == '$' && s[1] == 'I' && s[2] == 'd')
+					if (buf[0] == ')' && s[2] == '#' && s[1] == '(' && s[0] == '@' || buf[0] == ':' && s[2] == 'd' && s[1] == 'I' && s[0] == '$')
 					{
 						index = 0;
 						s = buf + 1;
@@ -130,7 +130,7 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 					}
 					break;
 				case 1:
-					if (buf[0] == ')' && s[1] == '@' && s[2] == '(' && buf[1] == '#' || buf[0] == ':' && s[1] == '$' && s[2] == 'I' && s[3] == 'd')
+					if (buf[1] == ')' && buf[0] == '#' && s[2] == '(' && s[1] == '@' || buf[1] == ':' && buf[0] == 'd' && s[2] == 'I' && s[1] == '$')
 					{
 						index = 1;
 						s = buf + 2;
@@ -138,7 +138,7 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 					}
 					break;
 				case 2:
-					if (buf[0] == ')' && s[2] == '@' && buf[1] == '(' && buf[2] == '#' || buf[0] == ':' && s[2] == '$' && s[3] == 'I' && s[3] == 'd')
+					if (buf[2] == ')' && buf[1] == '#' && buf[0] == '(' && s[2] == '@' || buf[2] == ':' && buf[1] == 'd' && buf[0] == 'I' && s[2] == '$')
 					{
 						index = 2;
 						s = buf + 3;
@@ -155,11 +155,13 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 				{
 					s++;
 				hit:
-					for (;;)
+					while (s < e)
 					{
-						while (*s == ' ' || *s == '\t')
+						while (s < e && (*s == ' ' || *s == '\t'))
 							s++;
-						if (s[0] == '@' && s[1] == '(' && s[2] == '#' && s[3] == ')')
+						if ((e - s) < 4)
+							break;
+						else if (s[0] == '@' && s[1] == '(' && s[2] == '#' && s[3] == ')')
 							s += 4;
 						else if (s[0] == '$' && s[1] == 'I' && s[2] == 'd' && s[3] == ':')
 							s += 4;
@@ -196,7 +198,7 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 							list:
 								if ((s - b) > 2 && *(s - 1) == '$' && *(s - 2) == ' ')
 									s -= 2;
-								if (s > b)
+								if (s > b || !*t)
 								{
 									sfprintf(op, "%s%-.*s\n", t, s - b, b);
 									state.hit = 1;

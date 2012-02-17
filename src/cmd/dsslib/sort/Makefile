@@ -8,4 +8,5 @@ sort plugin=dss :LIBRARY: sort.c lib.c -lrecsort -ldss
 
 :TEST: dss
 
-:: RELEASE
+:: RELEASE \
+	data/pwd.dat data/pwd.dss

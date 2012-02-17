@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -139,6 +139,9 @@ tmain()
 	size_t		k, p, n;
 	Mydisc_t	disc[2];
 	Obj_t		*o, *list[2], obj;
+
+	topts();
+	taso(ASO_THREAD);
 
 	/* create two dictionaries to volley objects back and forth */
 	for(n = 0; n < 2; ++n)

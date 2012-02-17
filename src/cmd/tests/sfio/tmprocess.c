@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -23,7 +23,10 @@
 **	a consistent set of records.
 */
 
-#define N_PROC	3
+#ifndef N_PROC
+#define N_PROC		3
+#endif
+
 #define N_REC	1000
 #define B_SIZE	256
 

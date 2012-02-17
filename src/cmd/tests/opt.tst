@@ -4770,7 +4770,7 @@ IMPLEMENTATION
                           (debug,ls,libast,Multi-column across the page.)
                     (debug,ls,libast,single-column)
                           (debug,ls,libast,One column down the page.)'
-	ELSE '$INSTALLROOT/share/lib/local/C/LC_MESSAGES/libast not installed'
+	ELSE '$INSTALLROOT/share/lib/locale/C/LC_MESSAGES/libast not installed'
 
 	EXEC ls "$usage" --man
 		OUTPUT - 'return=? option=- name=--man num=0'

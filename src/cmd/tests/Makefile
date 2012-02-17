@@ -7,6 +7,8 @@
 
 LICENSE = since=1999,author=gsf
 
+TESTLIBFLAGS = --proc=8 --thread=8 --timeout=1
+
 :TEST: astconf ip6 opt strelapsed strtoi strtof
 
 aso :TESTLIB: ast -ltaso \

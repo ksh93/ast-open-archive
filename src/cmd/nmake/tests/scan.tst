@@ -315,7 +315,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -564,7 +564,7 @@ echo $STATE
 		OUTPUT - $'+ case message:$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
-+ *)	if	ENV= LC_ALL=C x= $SHELL -nc \': ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
++ *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
 + 	then	if	grep -q \'### .*archaic.* ###\'
 + 		then	: x contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n x.sh

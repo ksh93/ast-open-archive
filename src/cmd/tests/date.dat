@@ -511,6 +511,15 @@ this month				NULL	Fri Aug  1 00:00:00 EDT 2008
 last month				NULL	Tue Jul  1 00:00:00 EDT 2008
 next month				NULL	Mon Sep  1 00:00:00 EDT 2008
 
+# ad-hoc parser corner cases
+
+SET					NOW	2011-11-11+11:11:11
+
+999 days ago				NULL	Sun Feb 15 11:11:11 EST 2009
+1000 days ago				NULL	Sat Feb 14 11:11:11 EST 2009
+10000 days ago				NULL	Tue Jun 26 11:11:11 EDT 1984
+15289 days ago				NULL	Thu Jan  1 11:11:11 EST 1970
+
 # format tests
 
 SET			NOW			Mon Sep 22 15:09:47 EDT 1986

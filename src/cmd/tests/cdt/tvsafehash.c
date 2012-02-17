@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,7 +26,15 @@
 ** two dictionaries, one built with mmap and the other shmget.
 */
 
-#define N_CONCUR	64	/* #players, must be even	*/
+#ifndef N_PROC
+#define N_PROC		64
+#endif
+#if N_PROC < 2
+#undef	N_PROC
+#define N_PROC		2
+#endif
+
+#define N_CONCUR	((N_PROC/2)*2)	/* #players, must be even	*/
 #define N_OBJ		20000	/* total number of objects	*/
 #define MEMSIZE		(N_OBJ*2*sizeof(Obj_t) + sizeof(Void_t*)*1024*1024 )
 
@@ -239,7 +247,7 @@ tmain()
 	(void)unlink(Mapstore); 
 	(void)unlink(Shmstore); 
 
-	tinfo("\tParent[pid=%d]: initializing shared dictionaries", ppid);
+	tinfo("\tParent[pid=%d]: initializing shared dictionaries for %s", ppid, aso);
 	if(!(mapdt = opendictionary(0, ppid, Mapstore)) )
 		terror("Parent[pid=%d]: Can't open dictionary for %s", ppid, Mapstore);
 	if(!(mapdc = (Mmdisc_t*)dtdisc(mapdt, NIL(Dtdisc_t*), 0)) )
@@ -273,13 +281,8 @@ tmain()
 	for(p = 0; p < N_CONCUR; ++p )
 		if((cpid[p] = makeprocess(argv[0], p, aso)) < 0 )
 			terror("Parent[pid=%d]: Could not make process %d", ppid, p);
-	while(p > 0 )
-	{	if((pid = wait(0)) < 0 )
-			terror("Parent[pid=%d]: wait() failed", ppid);
-		for(k = 0; k < N_CONCUR; ++k)
-			if(pid == cpid[k])
-				{ cpid[k] = -1; p -= 1; break; }
-	}
+	if (twait(cpid, N_CONCUR))
+		terror("workload subprocess error");
 
 	tinfo("\tParent[pid=%d]: check integrity", ppid);
 

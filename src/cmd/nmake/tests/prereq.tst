@@ -53,7 +53,7 @@ done makerules.mo
 done Makefile
 make Makefile.mo
 bind Makefile.mo 0.4
-exec  : compile into make object
+exec : compile into make object
 done Makefile.mo
 make .OPTION.COMPATIBILITY
 bind .OPTION.COMPATIBILITY 0.0
@@ -85,7 +85,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -170,7 +170,7 @@ done bar.h generated
 done mymain generated
 make Makefile.ms
 bind Makefile.ms 0.4
-exec  : compile into make object
+exec : compile into make object
 done Makefile.ms
 info finish regression'
 
@@ -213,7 +213,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -321,7 +321,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -390,7 +390,7 @@ done bar.h generated
 done mymain generated
 make Makefile.ms
 bind Makefile.ms 0.4
-exec  : compile into make object
+exec : compile into make object
 done Makefile.ms
 info finish regression'
 
@@ -632,7 +632,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
 + 		if	silent test -f "lib/libfoo.a"
-+ 		then	mv -f lib/libfoo.a lib/libfoo.a.old
++ 		then	{ mv -f lib/libfoo.a lib/libfoo.a.old || { test -f lib/libfoo.a && ignore rm -f lib/libfoo.a.old* && mv -f lib/libfoo.a `echo lib/libfoo.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libfoo.a lib/libfoo.a  		    		   
 + 		}
@@ -650,7 +650,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
 + 		if	silent test -f "lib/lib/foo"
-+ 		then	mv -f lib/lib/foo lib/lib/foo.old
++ 		then	{ mv -f lib/lib/foo lib/lib/foo.old || { test -f lib/lib/foo && ignore rm -f lib/lib/foo.old* && mv -f lib/lib/foo `echo lib/lib/foo.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp foo.req lib/lib/foo  		    		   
 + 		}
@@ -689,7 +689,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
 + 		if	silent test -f "lib/libfoo.a"
-+ 		then	mv -f lib/libfoo.a lib/libfoo.a.old
++ 		then	{ mv -f lib/libfoo.a lib/libfoo.a.old || { test -f lib/libfoo.a && ignore rm -f lib/libfoo.a.old* && mv -f lib/libfoo.a `echo lib/libfoo.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libfoo.a lib/libfoo.a  		    		   
 + 		}
@@ -707,7 +707,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
 + 		if	silent test -f "lib/lib/foo"
-+ 		then	mv -f lib/lib/foo lib/lib/foo.old
++ 		then	{ mv -f lib/lib/foo lib/lib/foo.old || { test -f lib/lib/foo && ignore rm -f lib/lib/foo.old* && mv -f lib/lib/foo `echo lib/lib/foo.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp foo.req lib/lib/foo  		    		   
 + 		}
@@ -746,7 +746,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
 + 		if	silent test -f "lib/libfoo.a"
-+ 		then	mv -f lib/libfoo.a lib/libfoo.a.old
++ 		then	{ mv -f lib/libfoo.a lib/libfoo.a.old || { test -f lib/libfoo.a && ignore rm -f lib/libfoo.a.old* && mv -f lib/libfoo.a `echo lib/libfoo.a.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp libfoo.a lib/libfoo.a  		    		   
 + 		}
@@ -764,7 +764,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
 + 		if	silent test -f "lib/lib/foo"
-+ 		then	mv -f lib/lib/foo lib/lib/foo.old
++ 		then	{ mv -f lib/lib/foo lib/lib/foo.old || { test -f lib/lib/foo && ignore rm -f lib/lib/foo.old* && mv -f lib/lib/foo `echo lib/lib/foo.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
 + 		fi
 + 		ignore cp foo.req lib/lib/foo  		    		   
 + 		}

@@ -46,9 +46,9 @@ if ! "$(-mam)"
 		$(CPP) $(CPPFLAGS) -I$(INSTALLROOT)/include/ast -DPROTO_STANDALONE -D-F$(*) -D-L -I-D -E a.$(tmp).c |
 		$(SED) -e 's%".*/src/cmd/proto/%"%' -e 's%".*/src/cmd/%"../%' -e 's%".*/src/lib/%"../../lib/%' |
 		$(PROTO) $(PROTOFLAGS:N!=-s) -f > b.$(tmp).c
-		if	$(CMP) -s b.$(tmp).c $(<:P=L*:O=N)
+		if	test '' != '$(<:P=L*:O=N)' && $(CMP) -s b.$(tmp).c $(<:P=L*:O=N)
 		then	: no changes for $(<) :
-		elif	$(CC) -o b.$(tmp).x b.$(tmp).c 2>/dev/null
+		elif	$(CC) -o b.$(tmp).x b.$(tmp).c
 		then	$(CP) b.$(tmp).c $(<)
 		else	: retain original $(<) :
 		fi
