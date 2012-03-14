@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -35,7 +35,7 @@
 
 #define vnode(np)	((Cxvariable_t*)((np)->nvname))
 
-static int match(int, char *[], void *);
+static int match(int, char *[], Shbltin_t *);
 static Namval_t *create_dss(Namval_t*,const char*,int,Namfun_t*);
 static Namval_t *create_type(Namval_t*,const char*,int,Namfun_t*);
 
@@ -129,9 +129,8 @@ struct parent
  * the following function is added as a builtin for each query
  * function that a variable can have
  */
-static int query(int argc, char *argv[], void *ptr)
+static int query(int argc, char *argv[], Shbltin_t *bp)
 {
-	Shbltin_t	*bp = (Shbltin_t*)ptr;
 	struct parent	*dp = (struct parent*)nv_hasdisc(bp->vnode,&parent_disc);
 	Dss_t		*dss = dp->dss;
 	struct query	*pp = dp->qp;
@@ -764,7 +763,9 @@ static Namval_t *next_parent(register Namval_t* np, Dt_t *root,Namfun_t *fp)
 		if(root)
 		{
 			if(np==nv_namptr(dp->hdr.nodes,0))
-				vp=(Cxvariable_t*)dtfirst(root=dp->dict);
+			{	root=dp->dict;
+				vp=(Cxvariable_t*)dtfirst(root);
+			}
 			else
 			{
 				if(!vp)
@@ -853,7 +854,7 @@ static const Namdisc_t parent2_disc =
 /*
  * add discipline builtin given by name to type
  */
-static Namval_t *add_discipline(const char *typename, const char *name, int (*fun)(int, char*[],void*), void *context)
+static Namval_t *add_discipline(const char *typename, const char *name, int (*fun)(int, char*[],Shbltin_t*), void* context)
 {
 	Namval_t *mp;
 	int offset = stktell(stkstd);
@@ -1317,9 +1318,9 @@ USAGE_LICENSE
 #define fval(x)		(1L<<(x)-'a')
 static const char *listnames[] = { "library", "method", "query", "type", 0 };
 
-static int listdss(int argc, char *argv[], void *data)
+static int listdss(int argc, char *argv[], Shbltin_t *bp)
 {
-	Cxstate_t	*sp = cxstate((Cxdisc_t*)((Shbltin_t*)data)->ptr);
+	Cxstate_t	*sp = cxstate((Cxdisc_t*)bp->ptr);
 	int		flags=0, n, delim='\n';
 	Dt_t		*dict;
 	char		*name;
@@ -1387,9 +1388,9 @@ USAGE_LICENSE
 "[+SEE ALSO?\b"NV_CLASS".dss.list\b(1)]"
 ;
 
-static int loadlib(int argc, char *argv[], void *data)
+static int loadlib(int argc, char *argv[], Shbltin_t *bp)
 {
-	Cxdisc_t	*dp = (Cxdisc_t*)((Shbltin_t*)data)->ptr;
+	Cxdisc_t	*dp = (Cxdisc_t*)bp->ptr;
 	char		*name;
 	int		n;
 	NOT_USED(argc);
@@ -1460,9 +1461,8 @@ USAGE_LICENSE
 "[+SEE ALSO?\bdss\b(3)]"
 ;
 
-static int match(int argc, char *argv[], void *ptr)
+static int match(int argc, char *argv[], Shbltin_t *bp)
 {
-	Shbltin_t	*bp = (Shbltin_t*)ptr;
 	struct type	*tp = (struct type*)bp->ptr;
 	Cxmatch_t	*mp = tp->type->match;
 	Namval_t	*np;

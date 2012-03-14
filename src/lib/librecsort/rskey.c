@@ -415,7 +415,7 @@ unsigned char*	zp;
 	while (--len >= 0)
 	{
 		c = *dp++;
-		kp->shuffle = HASHPART(kp->shuffle, c);
+		HASHPART(kp->shuffle, c);
 		*xp++ = (kp->shuffle >> 4) & 0xff;
 	}
 	return xp - cp;

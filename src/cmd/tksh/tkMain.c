@@ -1,23 +1,3 @@
-/***********************************************************************
-*                                                                      *
-*               This software is part of the ast package               *
-*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
-*                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                    by AT&T Intellectual Property                     *
-*                                                                      *
-*                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
-*                                                                      *
-*              Information and Software Systems Research               *
-*                            AT&T Research                             *
-*                           Florham Park NJ                            *
-*                                                                      *
-*                  David Korn <dgk@research.att.com>                   *
-*                       Jeff Korn <@google.com>                        *
-*                                                                      *
-***********************************************************************/
 #pragma prototyped
 /* 
  * tkMain.c --
@@ -528,9 +508,9 @@ static void bindsetup(Tcl_Interp *interp)
 		Tksh_SetCommandType(interp, "bind", INTERP_CURRENT);
 	}
 }
-static int b_tkloop(int argc, char **argv, void *data)
+static int b_tkloop(int argc, char **argv, Shbltin_t *context)
 {
-	Tcl_Interp *interp = (Tcl_Interp *)((Shbltin_t*)data)->ptr;
+	Tcl_Interp *interp = (Tcl_Interp *)context->ptr;
 	Tksh_BeginBlock(interp, INTERP_TCL);
 	Tk_MainLoop();
 	Tksh_EndBlock(interp);
@@ -684,18 +664,16 @@ static void stoptk(void)
         Tcl_Exit(0);
 }
 #endif
-int b_tkinit(int argc, char *argv[], void *data)
+int b_tkinit(int argc, char *argv[], Shbltin_t *context)
 {
         static char *av[] = { "tkinit", 0 };
 
-	if (data)
-		data = ((Shbltin_t*)data)->ptr;
         if (argc == 0)
         {
                 argc = 1;
                 argv = av;
         }
-        Tksh_TkMain(argc,argv,(data?((Tcl_AppInitProc *) data) : Tksh_AppInit));
+        Tksh_TkMain(argc,argv,context ? (Tcl_AppInitProc*)context->ptr : Tksh_AppInit);
 	Tcl_CreateEventSource(SigEventSetup,SigEventCheck,NULL);
 	sh_waitnotify(tksh_waitevent);
         /* atexit(stoptk); */

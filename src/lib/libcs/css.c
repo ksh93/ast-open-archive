@@ -296,7 +296,7 @@ cssopen(const char* path, Cssdisc_t* disc)
 			chown(css->mount, -1, css->gid);
 			css->oldkey = css->newkey;
 			for (n = 0; n < (css->newkey & 0xff); n++)
-				css->conkey = CSTOSS(css->conkey, n);
+				CSTOSS(css->conkey, n);
 			css->challenge = (st.st_mode & S_IXOTH) ? 2 : 0;
 		}
 		*css->control = CS_MNT_PROCESS;

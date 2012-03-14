@@ -314,7 +314,6 @@ sort_act(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 	State_t*	state = (State_t*)expr->data;
 	Dssrecord_t*	record = (Dssrecord_t*)data;
 	char*		s;
-	char*		t;
 	ssize_t		n;
 
 	if (dssfwrite(state->file, record))

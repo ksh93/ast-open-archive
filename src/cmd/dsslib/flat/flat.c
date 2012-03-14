@@ -2331,26 +2331,6 @@ flat_size_base_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc
 	return 0;
 }
 
-static int
-flat_size_size_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc)
-{
-	char*	e;
-
-	if (*data == '+')
-	{
-		data++;
-		((Size_t*)fp->prev->data)->add = 1;
-	}
-	((Size_t*)fp->prev->data)->size = strtoul(data, &e, 0);
-	if (*e)
-	{
-		if (disc->errorf)
-			(*disc->errorf)(NiL, disc, 2, "%s: invalid number", data);
-		return -1;
-	}
-	return 0;
-}
-
 static Tags_t	tags_flat_size[] =
 {
 	"TYPE",		"Size field physical type. The types are:"
@@ -2645,22 +2625,6 @@ flat_magic_number_dat(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* d
 	char*			e;
 
 	flat->magic->number = strtoul(data, &e, 0);
-	if (*e)
-	{
-		if (disc->errorf)
-			(*disc->errorf)(NiL, disc, 2, "%s: invalid number", data);
-		return -1;
-	}
-	return 0;
-}
-
-static int
-flat_magic_length(Tag_t* tag, Tagframe_t* fp, const char* data, Tagdisc_t* disc)
-{
-	register Flat_t*	flat = (Flat_t*)disc;
-	char*			e;
-
-	flat->magic->length = strtoul(data, &e, 0);
 	if (*e)
 	{
 		if (disc->errorf)

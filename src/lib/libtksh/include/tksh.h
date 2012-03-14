@@ -291,9 +291,9 @@ extern void		TkshCreateInterp(Tcl_Interp *interp, void *data);
 extern void		TkshSubShell(void);
 extern int		Tksh_CreatePipeline(Tcl_Interp*, int, char**, Tcl_DString*);
 
-extern int		b_print(int argc, char *argv[], void *);
-extern int		b_tclinit(int argc, char *argv[], void *);
-extern int		b_tkinit(int argc, char *argv[], void *);
+extern int		b_print(int argc, char *argv[], Shbltin_t *);
+extern int		b_tclinit(int argc, char *argv[], Shbltin_t *);
+extern int		b_tkinit(int argc, char *argv[], Shbltin_t *);
 
 #undef	extern
 

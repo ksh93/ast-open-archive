@@ -276,7 +276,40 @@ string_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 static ssize_t
 buffer_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
-	return base64encode(value->buffer.data, value->buffer.size, NiL, buf, size, NiL);
+	register unsigned char*	t;
+	register unsigned char*	f;
+	register unsigned char*	e;
+	register int		v;
+	int			z;
+
+	static const char	hex[] = "0123456789abcdefg";
+
+	switch (details ? *details : 0)
+	{
+	case 0:
+	case 'b':
+	case 'm':
+		return base64encode(value->buffer.data, value->buffer.size, NiL, buf, size, NiL);
+	case 'h':
+	case 'x':
+		z = value->buffer.size;
+		f = (unsigned char*)value->buffer.data;
+		e = f + z;
+		z *= 2;
+		if (size < z)
+			return z;
+		t = (unsigned char*)buf;
+		while (f < e)
+		{
+			v = *f++;
+			*t++ = hex[v >> 4];
+			*t++ = hex[v & 0xf];
+		}
+		return z;
+	}
+	if (cx->disc->errorf)
+		(*cx->disc->errorf)(cx, cx->disc, ERROR_SYSTEM|2, "%s: unknown buffer representation details", details);
+	return -1;
 }
 
 /*

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -10,7 +10,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -43,7 +43,6 @@ make sync.o
 make sync.c
 make ss.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/aso.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
@@ -53,11 +52,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
 done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
@@ -77,7 +71,9 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
@@ -153,7 +149,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sync.c
 meta sync.o %.c>%.o sync.c sync
 prev sync.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?sortsync]"\" -c sync.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?sortsync]"\" -c sync.c
 done sync.o generated
 make ss.o
 make ss.c
@@ -173,7 +169,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ss.c
 meta ss.o %.c>%.o ss.c ss
 prev ss.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ss.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ss.c
 done ss.o generated
 exec - ${AR} rc libsortsync.a sync.o ss.o
 exec - (ranlib libsortsync.a) >/dev/null 2>&1 || true
@@ -186,14 +182,14 @@ prev ss.h implicit
 done test.c
 meta test.o %.c>%.o test.c test
 prev test.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c test.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c test.c
 done test.o generated
 exec - ${AR} rc libsorttest.a test.o
 exec - (ranlib libsorttest.a) >/dev/null 2>&1 || true
 done libsorttest.a generated
 make ${PACKAGE_ast_INCLUDE}
-exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	mkdir -p ${PACKAGE_ast_INCLUDE}
+exec - if silent test ! -d ${PACKAGE_ast_INCLUDE}
+exec - then mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/ssexit.h
@@ -203,13 +199,13 @@ prev ${PACKAGE_ast_INCLUDE}/recsort.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ssexit.h
-exec - test '' = 'ssexit.h' || ${STDCMP} 2>/dev/null -s ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h.old 2>/dev/null || true; ${STDCP} ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h  		    		    ;}
+exec - test '' = 'ssexit.h' || ${STDCMP} 2>/dev/null -s ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h.old 2>/dev/null || true; ${STDCP} ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h ;}
 done ${PACKAGE_ast_INCLUDE}/ssexit.h generated
 done install virtual
 make test
 make test.sort
 make sort.tst
 done sort.tst
-exec - regress  sort.tst
+exec - regress sort.tst
 done test.sort virtual
 done test dontcare virtual

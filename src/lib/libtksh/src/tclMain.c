@@ -109,18 +109,18 @@ int Tcl_AppInit(Tcl_Interp *interp)
     return TCL_OK;
 }
 
-int b_tclinit(int argc, char *argv[], void *data)
+int b_tclinit(int argc, char *argv[], Shbltin_t *context)
 {
 	static char *av[] = { "tclinit", 0 };
 
-	if (data)
-		av[0] = (char *) data;
+	if (context)
+		av[0] = (char *) context;
 	if (argc == 0)		/* Called from C code (not shell) */
 	{
 		argc = 1;
 		argv = av;
 	}
 
-	Tcl_Main(argc, argv, (data? ((Tcl_AppInitProc *) data) : Tcl_AppInit));
+	Tcl_Main(argc, argv, (context? ((Tcl_AppInitProc *) context) : Tcl_AppInit));
 	return 0;
 }

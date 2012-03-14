@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -28,9 +28,47 @@
  *	$PWD/AT_EXEC_FILE $SHELL <job>
  */
 
-static const char id[] = "\n@(#)$Id: atx (AT&T Research) 2000-06-16 $\0\n";
+static const char id[] = "\n@(#)$Id: atx (AT&T Research) 2012-02-29 $\0\n";
 
 #include "at.h"
+
+/*
+ * prepend current date-time to buffer on fd==2
+ * and drop the initial command label if any
+ */
+
+static ssize_t
+stampwrite(int fd, const void* buf, size_t n)
+{
+	register char*		s;
+	register int		i;
+	register ssize_t	r;
+	register ssize_t	z;
+
+	r = 0;
+	if (fd == 2 && (s = fmttime(AT_TIME_FORMAT, time(0))))
+	{
+		i = strlen(s);
+		s[i++] = ' ';
+		if ((z = write(fd, s, i)) < 0)
+			r = -1;
+		else
+			r += z;
+		for (s = (char*)buf; s < ((char*)buf + n - 1) && !isspace(*s); s++)
+			if (*s == ':')
+			{
+				while (++s < ((char*)buf + n - 1) && isspace(*s));
+				n -= s - (char*)buf;
+				buf = (void*)s;
+				break;
+			}
+	}
+	if ((z = write(fd, buf, n)) < 0)
+		r = -1;
+	else if (r >= 0)
+		r += z;
+	return r;
+}
 
 int
 main(int argc, char** argv)
@@ -44,6 +82,7 @@ main(int argc, char** argv)
 	struct stat	xs;
 
 	error_info.id = "atx";
+	error_info.write = stampwrite;
 	if (argc != 3 ||
 	    ++n && lstat(".", &ds) ||
 	    ++n && !AT_DIR_OK(&ds) ||
@@ -55,13 +94,13 @@ main(int argc, char** argv)
 
 	    ++n && sfsscanf(argv[2], "%..36lu.%..36lu.%..36lu", &uid, &gid, &tid) != 3)
 		error(3, "%s: command garbled [%d]", argc >= 3 ? argv[2] : (char*)0, n);
-	if (setuid(uid))
-		error(3, "%s: user denied", argv[2]);
 	if (setgid(gid))
-		error(3, "%s: group denied", argv[2]);
+		error(ERROR_SYSTEM|3, "%s %s group denied (gid=%u egid=%u => gid=%d)", argv[2], error_info.id, getgid(), getegid(), gid);
+	if (setuid(uid))
+		error(ERROR_SYSTEM|3, "%s %s user denied (uid=%u euid=%u => uid=%d)", argv[2], error_info.id, getuid(), geteuid(), uid);
 	setsid();
 	argv++;
 	execvp(argv[0], argv);
-	error(3, "%s: exec failed", argv[2]);
+	error(ERROR_SYSTEM|3, "%s: exec failed", argv[2]);
 	return 1;
 }

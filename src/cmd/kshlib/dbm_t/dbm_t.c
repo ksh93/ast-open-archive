@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2007-2010 AT&T Intellectual Property          *
+*          Copyright (c) 2007-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -330,11 +330,10 @@ static void *dbm_associative(register Namval_t *np,const char *sp,int mode)
 	}
 }
 
-static int dbm_create(int argc, char** argv, void* context)
+static int dbm_create(int argc, char** argv, Shbltin_t* context)
 {
 	int			oflags = 0, zflag=0;
 	Namval_t		*np;
-	Shbltin_t		*bp = (Shbltin_t*)context;
 	struct dbm_array	*ap;
 	char			*dbfile, *tname=0;
 	DBM			*db;
@@ -398,7 +397,7 @@ static int dbm_create(int argc, char** argv, void* context)
 		ap->dbm = db;
 	else
 		error(ERROR_exit(1),"%s: unable to create array",nv_name(np));
-	ap->shp = bp->shp;
+	ap->shp = context->shp;
 	if(tname)
 	{
 		Namval_t *tp;
@@ -425,11 +424,11 @@ void lib_init(int flag, void* context)
 {
 	Shell_t		*shp = ((Shbltin_t*)context)->shp;
 	Namval_t	*mp,*bp;
-	if(flag)
-		return;
-	bp = sh_addbuiltin("Dbm_t", dbm_create, (void*)0); 
-	mp = nv_search("typeset",shp->bltin_tree,0);
-	nv_onattr(bp,nv_isattr(mp,NV_PUBLIC));
+
+	if (!flag &&
+	    (bp = sh_addbuiltin("Dbm_t", dbm_create, (void*)0)) &&
+	    (mp = nv_search("typeset", shp->bltin_tree, 0)))
+		nv_onattr(bp, nv_isattr(mp, NV_PUBLIC));
 }
 
 SHLIB(dbm_t)

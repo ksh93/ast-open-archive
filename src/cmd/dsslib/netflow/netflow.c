@@ -262,7 +262,7 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 #if _typ_int64_t
 		r->value.number = (int64_t)rp->end; /* ms cc requires signed */
 #else
-		r->value.number = rp->start;
+		r->value.number = rp->end;
 #endif
 		break;
 	case NETFLOW_engine_id:
@@ -802,21 +802,6 @@ netflowopen(Dss_t* dss, Dssdisc_t* disc)
 	}
 	flow->base = (Netflow_template_t*)&template;
 	dss->data = flow;
-	return 0;
-}
-
-/*
- * closef
- */
-
-static int
-flowclose(Dss_t* dss, Dssdisc_t* disc)
-{
-	Netflow_method_t*	flow;
-
-	if (!(flow = (Netflow_method_t*)dss->data) || !flow->tmp)
-		return -1;
-	sfstrclose(flow->tmp);
 	return 0;
 }
 

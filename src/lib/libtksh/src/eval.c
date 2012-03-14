@@ -12,13 +12,13 @@
 
 static int inEval;
 
-static int tksh_command(int argc, char *argv[], void *data)
+static int tksh_command(int argc, char *argv[], Shbltin_t *context)
 {
 	int result, commandType, oldInterpType;
-	TkshCommandData *commandData = (TkshCommandData *)((Shbltin_t*)data)->ptr;
+	TkshCommandData *commandData = (TkshCommandData *)context->ptr;
 	Interp *interp = (Interp *) commandData->interp;
 
-	interp->shbltin = data;
+	interp->shbltin = context;
 	Tcl_ResetResult(commandData->interp);
 
 	commandType = commandData->commandType;
@@ -445,7 +445,7 @@ int Tcl_RecordAndEval(Tcl_Interp *interp, char *script, int flags)
 		args[1] = "-s";
 		args[2] = script;
 		args[3] = 0;
-		b_print(3, args, (void *) NULL);
+		b_print(3, args, (Shbltin_t *) NULL);
 	} 
 
 	return result;

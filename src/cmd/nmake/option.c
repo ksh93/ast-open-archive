@@ -194,7 +194,7 @@ static Option_t		options[] =	/* option table			*/
 	"[action:!message]"
 	"{"
 	"	[+message?alter messages only]"
-	"	[+sync?sync 1-second clocks if necessacy and alter messages]"
+	"	[+sync?sync 1-second clocks if necessary and alter messages]"
 	"}" },
 { "reread",	OPT_reread,	(char*)&state.reread,		0,
 	"Ignore any previously generated \b.mo\b files and re-read all"

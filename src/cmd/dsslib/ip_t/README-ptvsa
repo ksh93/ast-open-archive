@@ -1,15 +1,14 @@
-ipv6 address longest prefix match using an interval dictionary
-use this until the lpm(1) retrie implementation handles ipv6 addresses
+ptv provides functions that apply set operations on collections of
+prefix tables of addresses with arbitrary size.  In particular, ptv
+supports ipv4 and ipv6 prefix table set operations.
 
 	Glenn Fowler
-	Network Services Research
+	Information and Software Systems Research
 	gsf@research.att.com
 
-This directory contains the standalone code for ipv6 address longest
-prefix match using an interval dictionary. The code is currently AT&T
-PROPRIETARY, so don't propagate this outside of AT&T.  ptvsa requires
-the ast standalone astsa source package.  Read this package and astsa
-in the same directory and run this to build libptvsa.a:
+This directory contains ptvsa, the standalone code for ptv.  ptvsa
+requires the ast standalone astsa source package.  Read this package
+and astsa in the same directory and run this to build libptvsa.a:
 
 	make -f ptvsa.omk
 

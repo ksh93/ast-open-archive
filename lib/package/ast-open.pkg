@@ -7,7 +7,7 @@ ast-open :PACKAGE: \
 		re sort sortlib std tksh tw warp libdss libpz \
 		libtksh libtk vczip libvcodex libvgraph libtaso
 
-:COVERS: ast-base
+:COVERS: ast-base ast-dss
 
 :LICENSE: *.open
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -182,7 +182,6 @@ main(int argc, register char** argv)
 	register char*		p;
 	char*			pattern = 0;
 	Sfio_t*			list = 0;
-	int			head = 1;
 	int			hit;
 	Magicdisc_t		disc;
 

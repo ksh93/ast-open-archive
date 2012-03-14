@@ -1,4 +1,4 @@
-:PACKAGE: ast
+:PACKAGE: ast ksh93:force
 
 LICENSE = since=2007,author=gsf
 

@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2010-09-01 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2012-02-29 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -225,7 +225,6 @@ struct State_s
 	char*		codes;
 	char*		fast;
 	int		icase;
-	int		lastval;
 	int		primary;
 	int		reverse;
 	int		silent;
@@ -1341,7 +1340,7 @@ execute(State_t* state, FTSENT* ent)
 	register int		val = 0;
 	register unsigned long	u;
 	unsigned long		m;
-	int			not = 1;
+	int			not = 0;
 	char*			bp;
 	Sfio_t*			fp;
 	Node_t*			tp;
@@ -1401,8 +1400,8 @@ execute(State_t* state, FTSENT* ent)
 		case OR:
 			tp = state->topnode;
 			state->topnode = np->first.np;
-			execute(state, ent);
-			val = state->lastval;
+			if ((val = execute(state, ent)) < 0)
+				return val;
 			state->topnode = tp;
 			switch (np->action)
 			{
@@ -1411,7 +1410,7 @@ execute(State_t* state, FTSENT* ent)
 				break;
 			case OR:
 				if (val)
-					return 0;
+					return 1;
 				val = 1;
 				break;
 			}
@@ -1583,7 +1582,10 @@ execute(State_t* state, FTSENT* ent)
 			else if (val == REG_NOMATCH)
 				val = 0;
 			else
+			{
 				regfatal(np->second.re, 4, val);
+				return -1;
+			}
 			break;
 		case PRINT:
 			sfputr(np->first.fp, ent->fts_path, np->second.i);
@@ -1606,7 +1608,7 @@ execute(State_t* state, FTSENT* ent)
 			val = 1;
 			break;
 		case FSTYPE:
-			val = strcmp(fmtfs(ent->fts_statp), np->first.cp);
+			val = strcmp(fmtfs(ent->fts_statp), np->first.cp) == 0;
 			break;
 		case LS:
 			fmtls(state->buf, ent->fts_path, ent->fts_statp, NiL, S_ISLNK(ent->fts_statp->st_mode) && pathgetlink(PATH(ent), state->txt, sizeof(state->txt)) > 0 ? state->txt : NiL, LS_LONG|LS_INUMBER|LS_BLOCKS);
@@ -1646,13 +1648,12 @@ execute(State_t* state, FTSENT* ent)
 			error(2, "internal error: %s: action not implemented", np->name);
 			return -1;
 		}
-		state->lastval = val;
-		if (val ^ not)
-			return 0;
-		not = 1;
+		if (!(val ^= not))
+			break;
+		not = 0;
 		np = np->next;
 	}
-	return 0;
+	return val;
 }
 
 /*

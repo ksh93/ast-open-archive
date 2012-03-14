@@ -1,3 +1,5 @@
+12-02-14 yes.sh: add
+12-01-23 du.c: the rightmost of { -b -h -k -K -m } overrides the others
 11-12-13 features/procfs, pss-procfs.c: check _PS_task for { st_uid st_gid }
 11-08-24 ls.c: fix { linkop linktext } to check for FTS_SLNONE too
 11-08-01 file.c: add -b, --brief | --no-filename

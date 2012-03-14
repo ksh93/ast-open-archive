@@ -36,12 +36,12 @@ typedef struct TkshArgcArgv
 } TkshArgcArgv;
 
 
-static int tksh_cmd_split(int argc, char *argv[], void *data)
+static int tksh_cmd_split(int argc, char *argv[], Shbltin_t *context)
 {
 	int i, size=0;
 	char **newargv;
 	char *newptr;
-	TkshArgcArgv *args = (TkshArgcArgv *)((Shbltin_t*)data)->ptr;
+	TkshArgcArgv *args = (TkshArgcArgv *)context->ptr;
 
 	for (i=1; i < argc; i++)
 		size += strlen(argv[i]);

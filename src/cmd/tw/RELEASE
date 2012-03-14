@@ -1,3 +1,4 @@
+12-02-29 find.c: fix ``! -type f'' vs ``! -type f -print'' bug
 11-10-31 tw.c: handle -lexpr X2I change -- scary
 11-07-25 expr.c: fix -e sort:url core dump
 11-06-30 tw.tst: add symbol table scope tests

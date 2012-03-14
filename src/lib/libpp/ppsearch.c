@@ -146,9 +146,9 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 		(fp->flags & INC_BOUND(INC_STANDARD)) ? "STANDARD|" : "",
 		dp ? (dp->index == INC_PREFIX ? "pre" : dp->index == INC_LOCAL ? "lcl" : dp->index == INC_VENDOR ? "vnd" : "std") : NiL,
 		dp ? dp->name : NiL,
-		!(fp->flags & INC_MEMBER(INC_PREFIX)) && (xp = fp->bound[INC_PREFIX]) ? xp->name : NiL,
-		!(fp->flags & INC_MEMBER(INC_LOCAL)) && (xp = fp->bound[INC_LOCAL]) ? xp->name : NiL,
-		!(fp->flags & INC_MEMBER(INC_VENDOR)) && (xp = fp->bound[INC_VENDOR]) ? xp->name : NiL,
+		!(fp->flags & INC_MEMBER(INC_PREFIX)) && fp->bound[INC_PREFIX] ? fp->bound[INC_PREFIX]->name : NiL,
+		!(fp->flags & INC_MEMBER(INC_LOCAL)) && fp->bound[INC_LOCAL] ? fp->bound[INC_LOCAL]->name : NiL,
+		!(fp->flags & INC_MEMBER(INC_VENDOR)) && fp->bound[INC_VENDOR] ? fp->bound[INC_VENDOR]->name : NiL,
 		!(fp->flags & INC_MEMBER(INC_STANDARD)) && (xp = fp->bound[INC_STANDARD]) ? xp->name : NiL,
 		error_info.file
 		));

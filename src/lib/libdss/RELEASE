@@ -1,3 +1,4 @@
+12-02-29 cxopen.c: add "hex" details for external buffer representation
 11-10-07 dssopen.c: use generic dll_lib() to load methods
 11-09-11 cxmap.c: fix cxsub() to cast <=> string if necessary
 11-09-11 add <MAP><PART><EDIT>ed-style-substitute</></></>

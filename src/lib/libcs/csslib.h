@@ -38,7 +38,7 @@
 #define EXPIRE		60
 #define KEYEXPIRE	(60*5)
 #define KEYMASK		0x7fffffff
-#define TOSS(k)		while((k=CSTOSS(k,cs.time))<=CS_KEY_MAX)
+#define TOSS(k)		while(CSTOSS(k,cs.time)<=CS_KEY_MAX)
 
 typedef struct
 {

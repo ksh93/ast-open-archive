@@ -133,19 +133,19 @@ Tksh_RenameCmd(dummy, interp, argc, argv)
 		return TCL_ERROR;
 	}
 	commandData = (TkshCommandData *) namval->nvfun;
-	sh_addbuiltin(argv[2],(ShellProc_t)namval->nvalue,(void *)commandData);
+	sh_addbuiltin(argv[2],(Shbltin_f)namval->nvalue,(void *)commandData);
 	nv_close(namval);
 	sh_addbuiltin(argv[1], NULL, NULL);
 	namval->nvalue = NULL;	/* Having to do this is a ksh bug (??) XX */
 	return TCL_OK;
 }
 
-int b_TkshSetlistCmd(argc, argv, data)
+int b_TkshSetlistCmd(argc, argv, context)
 	int argc;
 	char *argv[];
-	void *data;
+	Shbltin_t *context;
 {
-	Tcl_Interp *interp = (Tcl_Interp *)((Shbltin_t*)data)->ptr;
+	Tcl_Interp *interp = (Tcl_Interp *)context->ptr;
 	char *kshList;
 
 	if (argc < 2)
@@ -165,14 +165,14 @@ int b_TkshSetlistCmd(argc, argv, data)
 	return 0;
 }
 
-int b_TkshInfoCmd(argc, argv, data)
+int b_TkshInfoCmd(argc, argv, context)
 	int argc;
 	char *argv[];
-	void *data;
+	Shbltin_t *context;
 {
 	char c;
 	int length;
-	Interp *iPtr = (Interp *)((Shbltin_t*)data)->ptr;
+	Interp *iPtr = (Interp *)context->ptr;
 	if (argc < 2)
 	{
 	     sfprintf(sfstderr,

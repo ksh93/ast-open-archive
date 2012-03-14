@@ -954,13 +954,23 @@ xinstall/grand:'
 install/grand:'
 
 	EXEC	-n install
-		OUTPUT -
-		ERROR - $'install:
-install/grand:
-make [install/grand]: Makefile: a main target must be specified
-make [install]: *** exit code 1 making grand
-make: *** exit code 1 making install'
-		EXIT 1
+		OUTPUT - $'+ if	silent test ! -d bin
++ then	mkdir -p bin 		    		   
++ fi
++ if	silent test \'\' != "t.exe"
++ then	if	silent test \'\' != ""
++ 	then	: bin/t.exe linked to t.exe
++ 	elif	silent test -d "t.exe"
++ 	then	cp -pr t.exe bin
++ 	else	silent cmp -s t.exe bin/t.exe ||
++ 		{
++ 		if	silent test -f "bin/t.exe"
++ 		then	{ mv -f bin/t.exe bin/t.exe.old || { test -f bin/t.exe && ignore rm -f bin/t.exe.old* && mv -f bin/t.exe `echo bin/t.exe.old* | sed -e \'s/.* //\' -e \'s/old\\(z*\\)$/old\\1z/\' -e \'s/\\*$//\'`; }; }
++ 		fi
++ 		ignore cp t.exe bin/t.exe  		    		   
++ 		}
++ 	fi
++ fi'
 
 TEST 28 ':INSTALLDIR: + mode'
 
@@ -1216,7 +1226,24 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 
 TEST 36 ':MAKE: with *.mk rhs'
 
-	EXEC	-n all cc-
+	PROG	mkdir dir
+
+	EXEC	-n
 		INPUT Makefile $':MAKE: foo.mk'
-		INPUT foo.mk $'foo :\n\t: $(<) :'
+		INPUT foo.mk $'all :\n\t: foo :'
+		INPUT dir/Makefile $'all :\n\t: dir :'
+		OUTPUT - $'+ : foo :'
 		ERROR - $'foo.mk:'
+	EXEC	-n all
+
+	EXEC	-n
+		INPUT Makefile $':MAKE: dir'
+		OUTPUT - $'+ : dir :'
+		ERROR - $'dir:'
+	EXEC	-n all
+
+	EXEC	-n
+		INPUT Makefile $':MAKE: foo.mk - dir'
+		OUTPUT - $'+ : foo :\n+ : dir :'
+		ERROR - $'foo.mk:\ndir:'
+	EXEC	-n all

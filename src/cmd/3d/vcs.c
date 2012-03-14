@@ -300,7 +300,7 @@ get_tag(int f, register Tag_t* tp)
 
 	s = (char *)tp + sizeof(int);
 	memset((char *)tp, 0, sizeof(Tag_t));
-	if (!READ(f, (char *)&(tp->length), sizeof(int)) || (READ(f, (char *)s, (len = tp->length - sizeof(int))) != len))
+	if (!READ(f, (char *)&(tp->length), sizeof(int)) || (len = tp->length - sizeof(int)) && READ(f, (char *)s, len) != len)
 		return(0);
 	if (tp->type & LOG)
 	{

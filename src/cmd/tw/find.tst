@@ -39,6 +39,10 @@ function DATA
 				chmod $i$i$i mode/$i$i$i
 			done
 			;;
+		not)	mkdir -p not/yet
+			: > not/now
+			: > not/yet/already
+			;;
 		size)	mkdir size
 			for ((i = 0; i < 600; i += 11))
 			do	Z=$i
@@ -1163,3 +1167,10 @@ TEST 08 '-mtime [-+]N'
 	EXEC	time -sort name -type f -mtime +3
 		OUTPUT -
 	EXEC	time -sort name -type f -mtime +4
+
+TEST 09 '! implicit -print bug'
+	DO	DATA not
+	EXEC	not ! -type f
+		OUTPUT - $'not\nnot/yet'
+	EXEC	not ! -type f -print
+	EXEC	not '(' ! -type f ')' -print

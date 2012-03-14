@@ -113,7 +113,7 @@ USAGE_LICENSE
 "	file) unless \b--strict\b is enabled.]"
 
 "\n"
-"\nfile ...\n"
+"\n[ file ... ]\n"
 "\n"
 
 "[+EXAMPLES]{"

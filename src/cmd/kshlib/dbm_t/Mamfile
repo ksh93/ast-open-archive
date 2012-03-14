@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -10,7 +10,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -105,11 +105,12 @@ make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cmdext.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/cmdext.h dontcare
 make ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/shcmd.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/cmdext.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/stak.h implicit
 make ${PACKAGE_ast_INCLUDE}/stk.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
@@ -127,10 +128,6 @@ make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/aso.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
@@ -146,6 +143,7 @@ done ${PACKAGE_ast_INCLUDE}/error.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/nval.h implicit
 prev ${PACKAGE_ast_INCLUDE}/option.h implicit
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
@@ -164,7 +162,7 @@ done ${PACKAGE_ast_INCLUDE}/shell.h
 done dbm_t.c
 meta dbm_t.o %.c>%.o dbm_t.c dbm_t
 prev dbm_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm_t"\" -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshdbm_t]"\" -D_PACKAGE_ast -D_BLD_DEBUG -c dbm_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm_t"\" -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshdbm_t]"\" -D_PACKAGE_ast -D_BLD_DEBUG -c dbm_t.c
 done dbm_t.o generated
 exec - ${AR} rc libkshdbm_t.a dbm_t.o
 exec - (ranlib libkshdbm_t.a) >/dev/null 2>&1 || true
@@ -177,10 +175,10 @@ make dbm_t.tst
 meta dbm_t.tst %.rt>%.tst dbm_t.rt dbm_t
 make dbm_t.rt
 done dbm_t.rt
-exec - if	[[ "1" || "dbm_t.rt" -nt "dbm_t.tst" ]]
-exec - then	mktest --style=regress dbm_t.rt > dbm_t.tst
+exec - if [[ "1" || "dbm_t.rt" -nt "dbm_t.tst" ]]
+exec - then mktest --style=regress dbm_t.rt > dbm_t.tst
 exec - fi
 done dbm_t.tst generated
-exec - regress  dbm_t.tst ${SHELL}
+exec - regress dbm_t.tst ${SHELL}
 done test.dbm_t virtual
 done test dontcare virtual

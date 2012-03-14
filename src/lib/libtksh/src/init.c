@@ -2,8 +2,8 @@
 #include "tkshlib.h"
 #include "tclcmd.h"
 
-extern int b_TkshSetlistCmd(int argc, char *argv[], void *data);
-extern int b_TkshInfoCmd(int argc, char *argv[], void *data);
+extern int b_TkshSetlistCmd(int argc, char *argv[], Shbltin_t *context);
+extern int b_TkshInfoCmd(int argc, char *argv[], Shbltin_t *context);
 
 typedef struct {
     char *name;                 /* Name of command. */

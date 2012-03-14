@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -1996,7 +1996,7 @@ imap_command(char* s)
 	else
 	{
 		trace = state.trace;
-		state.trace |= TRACE('r');
+		TRACE('r');
 		n = imapexec(imap, "%s", s);
 		state.trace = trace;
 	}
@@ -2486,7 +2486,8 @@ imap_msglist(register char* s)
 		note(ERROR, "imap: %s: invalid SEARCH expression", s);
 		return 0;
 	}
-	t = ++s + strlen(s);
+	s++;
+	t = s + strlen(s);
 	for (; t > s && isspace(*--t) && *t != ')';);
 	imap->index = state.msg.list;
 	if (imapexec(imap, "SEARCH %*.*s", t - s, t - s, s))

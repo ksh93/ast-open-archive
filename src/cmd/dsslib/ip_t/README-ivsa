@@ -2,14 +2,13 @@ ipv6 address longest prefix match using an interval dictionary
 use this until the lpm(1) retrie implementation handles ipv6 addresses
 
 	Glenn Fowler
-	Network Services Research
+	Information and Software Systems Research
 	gsf@research.att.com
 
 This directory contains the standalone code for ipv6 address longest
-prefix match using an interval dictionary. The code is currently AT&T
-PROPRIETARY, so don't propagate this outside of AT&T.  ivsa requires
-the ast standalone astsa source package.  Read this package and astsa
-in the same directory and run this to build libivsa.a:
+prefix match using an interval dictionary. ivsa requires the ast
+standalone astsa source package.  Read this package and astsa in the
+same directory and run this to build libivsa.a:
 
 	make -f ivsa.omk
 

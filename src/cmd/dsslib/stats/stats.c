@@ -621,7 +621,6 @@ list(Cx_t* cx, register State_t* state, Sfio_t* op, const char* label, register 
 	Cxoperand_t	arg;
 	Group_t*	group;
 	char*		s;
-	int		r;
 
 	do
 	{

@@ -50,6 +50,8 @@ unexpand :: unexpand.c LICENSE=since=1995,author=dgk
 
 expand :LINK: unexpand
 
+yes :: yes.sh LICENSE=since=2007,author=dgk
+
 :TEST: csplit dd locale ls seq touch tsort
 
 :: y2k.dat

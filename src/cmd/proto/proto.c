@@ -32,7 +32,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Research) 2012-01-01 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Research) 2012-02-20 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -112,6 +112,8 @@ USAGE_LICENSE
 "		[+package?The generic software package name, e.g., \bast\b.]"
 "		[+parent?They own it all, e.g., \bAT&T\b.]"
 "		[+since?The year the software was first released.]"
+"		[+source?The year the input files was modified.]"
+"		[+start?The year the license was first applied to the software.]"
 "		[+url?The URL of the detailed license text, e.g.,"
 "		\bhttp://www.research.att.com/sw/license/open-ast.html\b.]"
 "		[+urlmd5?The \bmd5sum\b(1) of the downloaded URL data. Note that"

@@ -1,14 +1,14 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1989-2010 AT&T Intellectual Property          #
+#          Copyright (c) 1989-2012 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
-#                  Common Public License, Version 1.0                  #
+#                 Eclipse Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
 #                                                                      #
 #                A copy of the License is available at                 #
-#            http://www.opensource.org/licenses/cpl1.0.txt             #
-#         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         #
+#          http://www.eclipse.org/org/documents/epl-v10.html           #
+#         (with md5 checksum b35adb5213ca9657e911e9befb180842)         #
 #                                                                      #
 #              Information and Software Systems Research               #
 #                            AT&T Research                             #
@@ -25,7 +25,7 @@
 #
 case $(getopts '[-]' opt "--???man" 2>&1) in
 version=[0-9]*)
-	usage=$'\n[-?\n@(#)$Id: seq (AT&T Labs Research) 2007-06-27 $\n]
+	usage=$'\n[-?\n@(#)$Id: seq (AT&T Labs Research) 2012-04-14 $\n]
 	'$USAGE_LICENSE$'
 	[+NAME?seq - print a sequence of numbers]
 	[+DESCRIPTION?\bseq\b writes the numbers from \afirst\a to \alast\a
@@ -85,7 +85,7 @@ while getopts "$usage" var
 do	case $var in
 	f)
 		fmt=$OPTARG
-		[[ $fmt == %*[efg] ]] || err_exit "invalid format string: $fmt"
+		[[ $fmt == *%*([^[:space:][:alpha:]])[efg]* ]] || err_exit "$fmt: invalid format string"
 		;;
 	s)
 		sep=$OPTARG;;

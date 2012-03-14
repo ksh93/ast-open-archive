@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-02-14 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-02-29 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1586,11 +1586,8 @@ RECURSEROOT = .
 		exit 0
 	end
 	$(D) : .OBJECT
-	P := $(D:B:S:N!=$(...:A=.ONOBJECT:N=.*:/.\(.*\)/\1/L:N!=*.*:/ /|/G):/ /|/G)
-	if P
-		P := $(P)|
-	end
-	P := $(P)recurse|.RECURSE
+	P := recurse .RECURSE $(D:B:S:N!=$(...:A=.ONOBJECT:N=.*:/.\(.*\)/\1/L:N!=*.*:/ /|/G)) $(<<) $(...:A>*.RECURSE.INIT.*)
+	P := $(P:U:/ /|/G)
 	.ORIGINAL.ARGS. := $(.ORIGINAL.ARGS.:N!=$(P))
 	.ARGS : .CLEAR $(~.ARGS:N!=$(P))
 	P := $(D:N!=-|.|.CC-*|cc-*)
@@ -1612,7 +1609,7 @@ RECURSEROOT = .
 	if	$(*.VIEW:O=2:N=...:+2d) test -d $(<) $(-virtual:+|| $(MKDIR) $(<))
 	then	$(-silent:~echo $$(-recurse-enter) $$(.RWD.:+$$$(<:N!=/*:+$$$$(.RWD.)/))$$(<)$$(":") >&2)
 		cd $(<)
-		$(MAKE) $(-) --errorid=$(<:Q) $(=:V:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:C%$%/%)$(<) $(.RECURSE.OPTIONS.) $(.RECURSE.ARGS.)
+		$(MAKE) $(-) --errorid=$(<:Q) $(=:V:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:C%$%/%)$(<) $(.RECURSE.OPTIONS.) $(.ORIGINAL.ARGS.)
 		$(-recurse-leave:+$$(-silent:~echo $$$(-recurse-leave) $$$(.RWD.:+$$$$(<:N!=/*:+$$$$$(.RWD.)/))$$$(<)$$$(":") >&2))
 	else	echo $(<): warning: cannot recurse on virtual directory >&2
 	fi
@@ -1630,7 +1627,7 @@ RECURSEROOT = .
 .RECURSE.FILE : .USE .ALWAYS .LOCAL .FORCE .RECURSE.FLUSH .RECURSE.SEMAPHORE
 	set -
 	$(-silent:~echo $(.RWD.:+$(<:N!=/*:+$(.RWD.)/))$(<)$$(":") >&2)
-	$(MAKE) $(-) --errorid=$(<:B:Q) --file=$(<) $(=) .RWD.=$(.RWD.) $(.RECURSE.ARGS.)
+	$(MAKE) $(-) --errorid=$(<:B:Q) --file=$(<) $(=) .RWD.=$(.RWD.) $(.ORIGINAL.ARGS.)
 
 /*
  * source dependency operator
@@ -4969,7 +4966,7 @@ end
 	G := $(.PROTO.LICENSE.)
 	for F $(.MANIFEST.:T=F:P=A)
 		if G && F == "*.{1,3}(?)"
-			print ;;$(PROTO) $(PROTOFLAGS) -c '' -dp $(F);$(F);$(F:$(E))
+			print ;;$(PROTO) $(PROTOFLAGS) -o source=$(F:T=ZR=%Y) -c '' -dp $(F);$(F);$(F:$(E))
 		else
 			print ;;;$(F);$(F:$(E))
 		end
@@ -4983,7 +4980,7 @@ end
 	for F $(.MANIFEST.)
 		P := $(F:T=F)
 		if N && F == "*.{1,3}(?)"
-			print ;;$(PROTO) $(PROTOFLAGS) -c '' -dp $(P);$(P);$(F:$(E))
+			print ;;$(PROTO) $(PROTOFLAGS) -o source=$(F:T=ZR=%Y) -c '' -dp $(P);$(P);$(F:$(E))
 		else
 			print ;;;$(P);$(F:$(E))
 		end

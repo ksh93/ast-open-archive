@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.6 2011-12-13
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -10,7 +10,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
 setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv CCLDFLAGS ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -42,33 +42,33 @@ make libvcodex.a archive
 make vcodex.req
 exec - set -
 exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
-exec - *?)	echo " " ;;
+exec - *?) echo " " ;;
 exec - esac
 exec - for i in vcodex vgraph dll ast
-exec - do	case $i in
-exec - 	"vcodex"|vcodex)
-exec - 		;;
-exec - 	*)	if	test -f  ${INSTALLROOT}/lib/lib/$i
-exec - 		then	y=`cat ${INSTALLROOT}/lib/lib/$i`
-exec - 			case $y in
-exec - 			*-?*)	echo "" $y ;;
-exec - 			esac
-exec - 			continue
-exec - 		elif	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   -L${INSTALLROOT}/lib ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 				*$x*) continue ;;
-exec - 				esac
-exec - 				;;
-exec - 			esac
-exec - 		fi
-exec - 		;;
-exec - 	esac
-exec - 	echo " -l$i"
+exec - do case $i in
+exec - "vcodex"|vcodex)
+exec - ;;
+exec - *) if test -f ${INSTALLROOT}/lib/lib/$i
+exec - then y=`cat ${INSTALLROOT}/lib/lib/$i`
+exec - case $y in
+exec - *-?*) echo "" $y ;;
+exec - esac
+exec - continue
+exec - elif test ! -f ${INSTALLROOT}/lib/lib$i.a
+exec - then case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -L${INSTALLROOT}/lib ${LDFLAGS} -o 1.${COTEMP}.x 1.${COTEMP}.o -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - *$x*) case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} -o 1.${COTEMP}.x 1.${COTEMP}.o -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - *$x*) continue ;;
+exec - esac
+exec - ;;
+exec - esac
+exec - fi
+exec - ;;
+exec - esac
+exec - echo " -l$i"
 exec - done
 exec - } > vcodex.req
 exec - rm -f 1.${COTEMP}.*
@@ -83,7 +83,6 @@ make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/aso.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
@@ -93,12 +92,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
 done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/aso.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
@@ -118,7 +111,10 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
@@ -359,14 +355,14 @@ exec - echo "#define VCMETHOD(m)	extern Vcmethod_t* m;"
 exec - echo "#endif"
 exec - echo
 exec - for m
-exec - do	echo "VCMETHOD($m)"
+exec - do echo "VCMETHOD($m)"
 exec - done
 exec - echo
 exec - echo "#undef	VCMETHOD"
 exec - } > 1.${COTEMP}.h
-exec - if	cmp 2>/dev/null -s 1.${COTEMP}.h vcmethods.h
-exec - then	rm -f 1.${COTEMP}.h
-exec - else	mv 1.${COTEMP}.h vcmethods.h
+exec - if cmp 2>/dev/null -s 1.${COTEMP}.h vcmethods.h
+exec - then rm -f 1.${COTEMP}.h
+exec - else mv 1.${COTEMP}.h vcmethods.h
 exec - fi
 done vcmethods.h dontcare generated
 prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
@@ -380,265 +376,265 @@ done vchdr.h dontcare
 done vcopen.c
 meta vcopen.o %.c>%.o vcopen.c vcopen
 prev vcopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcopen.c
 done vcopen.o generated
 make vcclose.o
 prev vcclose.c
 meta vcclose.o %.c>%.o vcclose.c vcclose
 prev vcclose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcclose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcclose.c
 done vcclose.o generated
 make vcio.o
 prev vcio.c
 meta vcio.o %.c>%.o vcio.c vcio
 prev vcio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c vcio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c vcio.c
 done vcio.o generated
 make vcdisc.o
 prev vcdisc.c
 meta vcdisc.o %.c>%.o vcdisc.c vcdisc
 prev vcdisc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcdisc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcdisc.c
 done vcdisc.o generated
 make vcextract.o
 prev vcextract.c
 meta vcextract.o %.c>%.o vcextract.c vcextract
 prev vcextract.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcextract.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcextract.c
 done vcextract.o generated
 make vcrecode.o
 prev vcrecode.c
 meta vcrecode.o %.c>%.o vcrecode.c vcrecode
 prev vcrecode.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcrecode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcrecode.c
 done vcrecode.o generated
 make vccontext.o
 prev vccontext.c
 meta vccontext.o %.c>%.o vccontext.c vccontext
 prev vccontext.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vccontext.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vccontext.c
 done vccontext.o generated
 make vclog.o
 prev vclog.c
 meta vclog.o %.c>%.o vclog.c vclog
 prev vclog.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vclog.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vclog.c
 done vclog.o generated
 make vcsfxsort.o
 prev vcsfxsort.c
 meta vcsfxsort.o %.c>%.o vcsfxsort.c vcsfxsort
 prev vcsfxsort.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfxsort.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfxsort.c
 done vcsfxsort.o generated
 make vcperiod.o
 prev vcperiod.c
 meta vcperiod.o %.c>%.o vcperiod.c vcperiod
 prev vcperiod.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcperiod.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcperiod.c
 done vcperiod.o generated
 make vclzparse.o
 prev vclzparse.c
 meta vclzparse.o %.c>%.o vclzparse.c vclzparse
 prev vclzparse.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vclzparse.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vclzparse.c
 done vclzparse.o generated
 make vcbuffer.o
 prev vcbuffer.c
 meta vcbuffer.o %.c>%.o vcbuffer.c vcbuffer
 prev vcbuffer.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcbuffer.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcbuffer.c
 done vcbuffer.o generated
 make vcbcktsort.o
 prev vcbcktsort.c
 meta vcbcktsort.o %.c>%.o vcbcktsort.c vcbcktsort
 prev vcbcktsort.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcbcktsort.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcbcktsort.c
 done vcbcktsort.o generated
 make vcqsort.o
 prev vcqsort.c
 meta vcqsort.o %.c>%.o vcqsort.c vcqsort
 prev vcqsort.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcqsort.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcqsort.c
 done vcqsort.o generated
 make vcmethod.o
 prev vcmethod.c
 meta vcmethod.o %.c>%.o vcmethod.c vcmethod
 prev vcmethod.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcmethod.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcmethod.c
 done vcmethod.o generated
 make vcsfio.o
 prev vcsfio.c
 meta vcsfio.o %.c>%.o vcsfio.c vcsfio
 prev vcsfio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfio.c
 done vcsfio.o generated
 make vcalias.o
 prev vcalias.c
 meta vcalias.o %.c>%.o vcalias.c vcalias
 prev vcalias.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcalias.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcalias.c
 done vcalias.o generated
 make vcdcache.o
 prev Vcdelta/vcdcache.c
 meta vcdcache.o %.c>%.o Vcdelta/vcdcache.c vcdcache
 prev Vcdelta/vcdcache.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdcache.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdcache.c
 done vcdcache.o generated
 make vcdelta.o
 prev Vcdelta/vcdelta.c
 meta vcdelta.o %.c>%.o Vcdelta/vcdelta.c vcdelta
 prev Vcdelta/vcdelta.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdelta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdelta.c
 done vcdelta.o generated
 make vcdtable.o
 prev Vcdelta/vcdtable.c
 meta vcdtable.o %.c>%.o Vcdelta/vcdtable.c vcdtable
 prev Vcdelta/vcdtable.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdtable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdtable.c
 done vcdtable.o generated
 make vcdtblinit.o
 prev Vcdelta/vcdtblinit.c
 meta vcdtblinit.o %.c>%.o Vcdelta/vcdtblinit.c vcdtblinit
 prev Vcdelta/vcdtblinit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdtblinit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vcdtblinit.c
 done vcdtblinit.o generated
 make vchamming.o
 prev Vcdelta/vchamming.c
 meta vchamming.o %.c>%.o Vcdelta/vchamming.c vchamming
 prev Vcdelta/vchamming.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vchamming.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vcdelta/vchamming.c
 done vchamming.o generated
 make vchbits.o
 prev Vchuff/vchbits.c
 meta vchbits.o %.c>%.o Vchuff/vchbits.c vchbits
 prev Vchuff/vchbits.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchbits.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchbits.c
 done vchbits.o generated
 make vchcode.o
 prev Vchuff/vchcode.c
 meta vchcode.o %.c>%.o Vchuff/vchcode.c vchcode
 prev Vchuff/vchcode.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchcode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchcode.c
 done vchcode.o generated
 make vchsize.o
 prev Vchuff/vchsize.c
 meta vchsize.o %.c>%.o Vchuff/vchsize.c vchsize
 prev Vchuff/vchsize.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchsize.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchsize.c
 done vchsize.o generated
 make vchtrie.o
 prev Vchuff/vchtrie.c
 meta vchtrie.o %.c>%.o Vchuff/vchtrie.c vchtrie
 prev Vchuff/vchtrie.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchtrie.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchtrie.c
 done vchtrie.o generated
 make vchuffgroup.o
 prev Vchuff/vchuffgroup.c
 meta vchuffgroup.o %.c>%.o Vchuff/vchuffgroup.c vchuffgroup
 prev Vchuff/vchuffgroup.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffgroup.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffgroup.c
 done vchuffgroup.o generated
 make vchuffman.o
 prev Vchuff/vchuffman.c
 meta vchuffman.o %.c>%.o Vchuff/vchuffman.c vchuffman
 prev Vchuff/vchuffman.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffman.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffman.c
 done vchuffman.o generated
 make vchuffpart.o
 prev Vchuff/vchuffpart.c
 meta vchuffpart.o %.c>%.o Vchuff/vchuffpart.c vchuffpart
 prev Vchuff/vchuffpart.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffpart.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_BLD_vcodex -D_PACKAGE_ast -c Vchuff/vchuffpart.c
 done vchuffpart.o generated
 make vcbwt.o
 prev Vcmisc/vcbwt.c
 meta vcbwt.o %.c>%.o Vcmisc/vcbwt.c vcbwt
 prev Vcmisc/vcbwt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcbwt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcbwt.c
 done vcbwt.o generated
 make vcmap.o
 prev Vcmisc/vcmap.c
 meta vcmap.o %.c>%.o Vcmisc/vcmap.c vcmap
 prev Vcmisc/vcmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmap.c
 done vcmap.o generated
 make vcmtf.o
 prev Vcmisc/vcmtf.c
 meta vcmtf.o %.c>%.o Vcmisc/vcmtf.c vcmtf
 prev Vcmisc/vcmtf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmtf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmtf.c
 done vcmtf.o generated
 make vcrle.o
 prev Vcmisc/vcrle.c
 meta vcrle.o %.c>%.o Vcmisc/vcrle.c vcrle
 prev Vcmisc/vcrle.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
 done vcrle.o generated
 make vcstrip.o
 prev Vcmisc/vcstrip.c
 meta vcstrip.o %.c>%.o Vcmisc/vcstrip.c vcstrip
 prev Vcmisc/vcstrip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcstrip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcstrip.c
 done vcstrip.o generated
 make vctranspose.o
 prev Vcmisc/vctranspose.c
 meta vctranspose.o %.c>%.o Vcmisc/vctranspose.c vctranspose
 prev Vcmisc/vctranspose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vctranspose.c
 done vctranspose.o generated
 make vcwclose.o
 prev Vcwindow/vcwclose.c
 meta vcwclose.o %.c>%.o Vcwindow/vcwclose.c vcwclose
 prev Vcwindow/vcwclose.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwclose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwclose.c
 done vcwclose.o generated
 make vcwdecode.o
 prev Vcwindow/vcwdecode.c
 meta vcwdecode.o %.c>%.o Vcwindow/vcwdecode.c vcwdecode
 prev Vcwindow/vcwdecode.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwdecode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwdecode.c
 done vcwdecode.o generated
 make vcwfile.o
 prev Vcwindow/vcwfile.c
 meta vcwfile.o %.c>%.o Vcwindow/vcwfile.c vcwfile
 prev Vcwindow/vcwfile.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwfile.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwfile.c
 done vcwfile.o generated
 make vcwmethod.o
 prev Vcwindow/vcwmethod.c
 meta vcwmethod.o %.c>%.o Vcwindow/vcwmethod.c vcwmethod
 prev Vcwindow/vcwmethod.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwmethod.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwmethod.c
 done vcwmethod.o generated
 make vcwmirror.o
 prev Vcwindow/vcwmirror.c
 meta vcwmirror.o %.c>%.o Vcwindow/vcwmirror.c vcwmirror
 prev Vcwindow/vcwmirror.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwmirror.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwmirror.c
 done vcwmirror.o generated
 make vcwngram.o
 prev Vcwindow/vcwngram.c
 meta vcwngram.o %.c>%.o Vcwindow/vcwngram.c vcwngram
 prev Vcwindow/vcwngram.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwngram.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwngram.c
 done vcwngram.o generated
 make vcwopen.o
 prev Vcwindow/vcwopen.c
 meta vcwopen.o %.c>%.o Vcwindow/vcwopen.c vcwopen
 prev Vcwindow/vcwopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwopen.c
 done vcwopen.o generated
 make vcwprefix.o
 prev Vcwindow/vcwprefix.c
 meta vcwprefix.o %.c>%.o Vcwindow/vcwprefix.c vcwprefix
 prev Vcwindow/vcwprefix.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwprefix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwprefix.c
 done vcwprefix.o generated
 make vcwvote.o
 prev Vcwindow/vcwvote.c
 meta vcwvote.o %.c>%.o Vcwindow/vcwvote.c vcwvote
 prev Vcwindow/vcwvote.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I-D${INSTALLROOT}/lib/probe/C/pp/0F689CA5rbincc -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwvote.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwvote.c
 done vcwvote.o generated
 exec - ${AR} rc libvcodex.a vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcsfio.o vcalias.o vcdcache.o vcdelta.o vcdtable.o vcdtblinit.o vchamming.o vchbits.o vchcode.o vchsize.o vchtrie.o vchuffgroup.o vchuffman.o vchuffpart.o vcbwt.o
 exec - ${AR} rc libvcodex.a vcmap.o vcmtf.o vcrle.o vcstrip.o vctranspose.o vcwclose.o vcwdecode.o vcwfile.o vcwmethod.o vcwmirror.o vcwngram.o vcwopen.o vcwprefix.o vcwvote.o
@@ -647,81 +643,81 @@ done libvcodex.a generated
 done vcodex virtual
 prev libvcodex.a archive
 make ${INSTALLROOT}/lib
-exec - if	silent test ! -d ${INSTALLROOT}/lib
-exec - then	mkdir -p ${INSTALLROOT}/lib
+exec - if silent test ! -d ${INSTALLROOT}/lib
+exec - then mkdir -p ${INSTALLROOT}/lib
 exec - fi
 done ${INSTALLROOT}/lib generated
 make ${INSTALLROOT}/lib/libvcodex.a archive
 prev ${INSTALLROOT}/lib
 prev libvcodex.a archive
-exec - test '' = 'libvcodex.a' || ${STDCMP} 2>/dev/null -s libvcodex.a ${INSTALLROOT}/lib/libvcodex.a || { ${STDMV} ${INSTALLROOT}/lib/libvcodex.a ${INSTALLROOT}/lib/libvcodex.a.old 2>/dev/null || true; ${STDCP} libvcodex.a ${INSTALLROOT}/lib/libvcodex.a  		    		    ;}
+exec - test '' = 'libvcodex.a' || ${STDCMP} 2>/dev/null -s libvcodex.a ${INSTALLROOT}/lib/libvcodex.a || { ${STDMV} ${INSTALLROOT}/lib/libvcodex.a ${INSTALLROOT}/lib/libvcodex.a.old 2>/dev/null || true; ${STDCP} libvcodex.a ${INSTALLROOT}/lib/libvcodex.a ;}
 exec - (ranlib ${INSTALLROOT}/lib/libvcodex.a) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/libvcodex.a generated
 make ${INSTALLROOT}/man/man3
-exec - if	silent test ! -d ${INSTALLROOT}/man/man3
-exec - then	mkdir -p ${INSTALLROOT}/man/man3
+exec - if silent test ! -d ${INSTALLROOT}/man/man3
+exec - then mkdir -p ${INSTALLROOT}/man/man3
 exec - fi
 done ${INSTALLROOT}/man/man3 generated
 make ${INSTALLROOT}/man/man3/vcodex.3
 prev ${INSTALLROOT}/man/man3
 make vcodex.3
 done vcodex.3
-exec - test '' = 'vcodex.3' || ${STDCMP} 2>/dev/null -s vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3 || { ${STDMV} ${INSTALLROOT}/man/man3/vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3.old 2>/dev/null || true; ${STDCP} vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3  		    		    ;}
+exec - test '' = 'vcodex.3' || ${STDCMP} 2>/dev/null -s vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3 || { ${STDMV} ${INSTALLROOT}/man/man3/vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3.old 2>/dev/null || true; ${STDCP} vcodex.3 ${INSTALLROOT}/man/man3/vcodex.3 ;}
 done ${INSTALLROOT}/man/man3/vcodex.3 generated
 make ${INSTALLROOT}/lib/lib
-exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
-exec - then	mkdir -p ${INSTALLROOT}/lib/lib
+exec - if silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
 done ${INSTALLROOT}/lib/lib generated
 make ${INSTALLROOT}/lib/lib/vcodex
 prev ${INSTALLROOT}/lib/lib
 prev vcodex.req
-exec - test '' = 'vcodex.req' || ${STDCMP} 2>/dev/null -s vcodex.req ${INSTALLROOT}/lib/lib/vcodex || { ${STDMV} ${INSTALLROOT}/lib/lib/vcodex ${INSTALLROOT}/lib/lib/vcodex.old 2>/dev/null || true; ${STDCP} vcodex.req ${INSTALLROOT}/lib/lib/vcodex  		    		    ;}
+exec - test '' = 'vcodex.req' || ${STDCMP} 2>/dev/null -s vcodex.req ${INSTALLROOT}/lib/lib/vcodex || { ${STDMV} ${INSTALLROOT}/lib/lib/vcodex ${INSTALLROOT}/lib/lib/vcodex.old 2>/dev/null || true; ${STDCP} vcodex.req ${INSTALLROOT}/lib/lib/vcodex ;}
 done ${INSTALLROOT}/lib/lib/vcodex generated
 make ${PACKAGE_ast_INCLUDE}
-exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	mkdir -p ${PACKAGE_ast_INCLUDE}
+exec - if silent test ! -d ${PACKAGE_ast_INCLUDE}
+exec - then mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/vcodex.h
 prev ${PACKAGE_ast_INCLUDE}
 prev vcodex.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcodex.h  > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcodex.h 1.${COTEMP}.x
-exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcodex.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv' vcodex.h > 1.${COTEMP}.x
+exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcodex.h 1.${COTEMP}.x
+exec - then rm -f 1.${COTEMP}.x
+exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcodex.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vcodex.h generated
 make ${PACKAGE_ast_INCLUDE}/vcsfio.h
 prev vcsfio.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcsfio.h  > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcsfio.h 1.${COTEMP}.x
-exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcsfio.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv' vcsfio.h > 1.${COTEMP}.x
+exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcsfio.h 1.${COTEMP}.x
+exec - then rm -f 1.${COTEMP}.x
+exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcsfio.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vcsfio.h generated
 make ${PACKAGE_ast_INCLUDE}/vcwindow.h
 prev Vcwindow/vcwindow.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  Vcwindow/vcwindow.h  > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcwindow.h 1.${COTEMP}.x
-exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcwindow.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv' Vcwindow/vcwindow.h > 1.${COTEMP}.x
+exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcwindow.h 1.${COTEMP}.x
+exec - then rm -f 1.${COTEMP}.x
+exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcwindow.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vcwindow.h generated
 make ${PACKAGE_ast_INCLUDE}/vclib.h
 prev vclib.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vclib.h  > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vclib.h 1.${COTEMP}.x
-exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vclib.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv' vclib.h > 1.${COTEMP}.x
+exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vclib.h 1.${COTEMP}.x
+exec - then rm -f 1.${COTEMP}.x
+exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vclib.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vclib.h generated
 make ${PACKAGE_ast_INCLUDE}/vcmethods.h
 prev vcmethods.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcmethods.h  > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcmethods.h 1.${COTEMP}.x
-exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcmethods.h
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv' vcmethods.h > 1.${COTEMP}.x
+exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcmethods.h 1.${COTEMP}.x
+exec - then rm -f 1.${COTEMP}.x
+exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcmethods.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vcmethods.h generated
 done install virtual

@@ -687,55 +687,6 @@ cond(register char* s, char** e)
 static void	expand(Sfio_t*, char*);
 
 /*
- * while test with expansion
- */
-
-static long
-test(register char* s, char** e, int* f)
-{
-	register char*	t;
-	char*		q;
-	int		n;
-	long		v;
-
-	if (state.ec)
-	{
-		t = s;
-		while (t = strchr(t, state.ec))
-			if (*++t != '{' && *t != '}')
-				break;
-		if (t)
-		{
-			expand(state.arg, s);
-			sfputr(state.tmp, use(state.arg), 0);
-			s = use(state.tmp);
-		}
-	}
-	v = cond(s, &q);
-	n = 0;
-	for (t = q; *t; t++)
-	{
-		if (*t == state.ec)
-		{
-			if (*(t + 1) == '{' || isspace(*(t + 1)))
-			{
-				t++;
-				n = COND_BLOCK;
-			}
-			else
-				break;
-		}
-		else if (!isspace(*t))
-			break;
-	}
-	if (e)
-		*e = t;
-	if (f)
-		*f = n;
-	return v;
-}
-
-/*
  * pop input stream
  * return non-0 on EOF
  */
@@ -1073,18 +1024,6 @@ env(char* s)
 		v->vs.current = v->vs.previous = DEFAULT_vs;
 	}
 	return v;
-}
-
-/*
- * get macro value by name
- */
-
-static char*
-get(char* name)
-{
-	register Tag_t*	mp;
-
-	return (mp = (Tag_t*)hashget(state.symbols, name)) && mp->body ? mp->body : "";
 }
 
 /*

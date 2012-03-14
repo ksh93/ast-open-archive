@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -26,19 +26,23 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: du (AT&T Research) 2009-12-09 $\n]"
+"[-?\n@(#)$Id: du (AT&T Research) 2012-01-26 $\n]"
 USAGE_LICENSE
 "[+NAME?du - summarize disk usage]"
 "[+DESCRIPTION?\bdu\b reports the number of blocks contained in all files"
 "	and recursively all directories named by the \apath\a arguments."
 "	The current directory is used if no \apath\a is given. Usage for"
 "	all files and directories is counted, even when the listing is"
-"	omitted.]"
+"	omitted. Directories and files are only counted once, even if"
+"	they appear more than once as a hard link, a target of a"
+"	symbolic link, or an operand.]"
 "[+?The default block size is 512. The block count includes only the actual"
 "	data blocks used by each file and directory, and may not include"
 "	other filesystem data required to represent the file. Blocks are"
 "	counted only for the first link to a file; subsequent links are"
 "	ignored. Partial blocks are rounded up for each file.]"
+"[+?If more than one of \b-b\b, \b-h\b, \b-k\b, \b-K,\b or \b-m\b are"
+"	specified only the rightmost takes affect.]"
 
 "[a:all?List usage for each file. If neither \b--all\b nor \b--summary\b"
 "	is specified then only usage for the \apath\a arguments and"
@@ -70,171 +74,124 @@ USAGE_LICENSE
 
 #include <ast.h>
 #include <ls.h>
-#include <hash.h>
-#include <ftwalk.h>
+#include <cdt.h>
+#include <fts.h>
 #include <error.h>
 
-#define BLOCKS(n)	(Count_t)((state.blocksize==LS_BLOCKSIZE)?(n):(((n)*LS_BLOCKSIZE+state.blocksize-1)/state.blocksize))
+#define BLOCKS(n)	(Count_t)((blocksize==LS_BLOCKSIZE)?(n):(((n)*LS_BLOCKSIZE+blocksize-1)/blocksize))
 
 typedef Sfulong_t Count_t;
 
-static struct State_s			/* program state		*/
-{
-	int		all;		/* list non-directories too	*/
-	Hash_table_t*	links;		/* hard link hash table		*/
-	int		silent;		/* be silent about errors	*/
-	int		summary;	/* list summary only		*/
-	int		scale;		/* numeric output scale		*/
-	int		total;		/* list complete total only	*/
-	unsigned long	blocksize;	/* blocksize			*/
-	Count_t		count;		/* total block count		*/
-} state;
-
 typedef struct Fileid_s			/* unique file id		*/
 {
-	int		dev;
-	int		ino;
+	ino_t		ino;
+	dev_t		dev;
 } Fileid_t;
 
-/*
- * list info on a single file
- */
-
-static int
-du(register Ftw_t* ftw)
+typedef struct Hit_s			/* file already seen		*/
 {
-	register Count_t	n = 0;
-	register Count_t	b;
-	register int		list = !state.summary;
+	Dtlink_t	link;		/* dictionary link		*/
+	Fileid_t	id;		/* unique file id		*/
+} Hit_t;
 
-	if (ftw->info == FTW_NS)
-	{
-		if (!state.silent)
-			error(ERROR_SYSTEM|2, "%s: not found", ftw->path);
-		return 0;
-	}
-	switch (ftw->info)
-	{
-	case FTW_D:
-		if (!(ftw->local.pointer = newof(0, Count_t, 1, 0)))
-			error(ERROR_SYSTEM|3, "out of space");
-		return 0;
-	case FTW_DC:
-		if (!state.silent)
-			error(2, "%s: directory causes cycle", ftw->path);
-		return 0;
-	case FTW_DNR:
-		if (!state.silent)
-			error(ERROR_SYSTEM|2, "%s: cannot read directory", ftw->path);
-		break;
-	case FTW_DNX:
-		if (!state.silent)
-			error(ERROR_SYSTEM|2, "%s: cannot search directory", ftw->path);
-		ftw->status = FTW_SKIP;
-		break;
-	case FTW_DP:
-		if (ftw->local.pointer)
-		{
-			n = *(Count_t*)ftw->local.pointer;
-			free(ftw->local.pointer);
-		}
-		break;
-	default:
-		if (ftw->statb.st_nlink > 1)
-		{
-			Fileid_t	id;
-			Hash_bucket_t*	b;
+static void
+mark(Dt_t* dict, Hit_t* key, FTSENT* ent)
+{
+	Hit_t*		hit;
 
-			id.dev = ftw->statb.st_dev;
-			id.ino = ftw->statb.st_ino;
-			if (!(b = (Hash_bucket_t*)hashlook(state.links, (char*)&id, HASH_CREATE|HASH_FIXED, (char*)sizeof(Hash_bucket_t))))
-			{
-				static int	warned;
+	static int	warned;
 
-				if (!warned)
-				{
-					warned = 1;
-					error(1, "%s: hard link table out of space", ftw->path);
-				}
-			}
-			else if (b->value)
-				return 0;
-			b->value = (char*)b;
-		}
-		if (!state.all)
-			list = 0;
-		break;
-	}
-	b = iblocks(&ftw->statb);
-	state.count += b;
-	n += b;
-	if (ftw->parent->local.pointer)
-		*(Count_t*)ftw->parent->local.pointer += n;
-	if (!state.total && (list || ftw->level <= 0))
+	if (hit = newof(0, Hit_t, 1, 0))
 	{
-		if (state.scale)
-			sfprintf(sfstdout, "%s\t%s\n", fmtscale((Sfulong_t)n * state.blocksize, state.scale), ftw->path);
-		else
-			sfprintf(sfstdout, "%I*u\t%s\n", sizeof(Count_t), BLOCKS(n), ftw->path);
+		*hit = *key;
+		dtinsert(dict, hit);
 	}
-	return 0;
+	else if (!warned)
+	{
+		warned = 1;
+		error(1, "%s: file id dictionary out of space", ent->fts_path);
+	}
 }
 
 int
 main(int argc, register char** argv)
 {
-	int	flags;
+	register FTS*		fts;
+	register FTSENT*	ent;
+	char*			s;
+	char*			d;
+	Dt_t*			dict;
+	Count_t			n;
+	Count_t			b;
+	int			dirs;
+	int			flags;
+	int			list;
+	int			logical;
+	int			multiple;
+	struct stat		st;
+	Hit_t			hit;
+	Dtdisc_t		disc;
+
+	int			all = 0;
+	int			silent = 0;
+	int			summary = 0;
+	int			scale = 0;
+	int			total = 0;
+	unsigned long		blocksize = 0;
+	Count_t			count = 0;
 
 	NoP(argc);
 	error_info.id = "du";
-	state.blocksize = LS_BLOCKSIZE;
-	flags = FTW_MULTIPLE|FTW_PHYSICAL|FTW_TWICE;
+	blocksize = 0;
+	flags = FTS_PHYSICAL|FTS_NOSEEDOTDIR;
 	for (;;)
 	{
 		switch (optget(argv, usage))
 		{
 		case 'a':
-			state.all = 1;
+			all = 1;
 			continue;
 		case 'b':
-			state.blocksize = (opt_info.num <= 0) ? 512 : opt_info.num;
+			blocksize = (opt_info.num <= 0) ? 512 : opt_info.num;
 			continue;
 		case 'f':
-			state.silent = 1;
+			silent = 1;
 			continue;
 		case 'h':
-			state.scale = 1024;
+			scale = 1024;
+			blocksize = 0;
 			continue;
 		case 'K':
-			state.scale = 1000;
+			scale = 1000;
+			blocksize = 0;
 			continue;
 		case 'k':
-			state.blocksize = 1024;
+			blocksize = 1024;
 			continue;
 		case 'm':
-			state.blocksize = 1024 * 1024;
+			blocksize = 1024 * 1024;
 			continue;
 		case 's':
-			state.summary = 1;
+			summary = 1;
 			continue;
 		case 't':
-			state.total = 1;
+			total = 1;
 			continue;
 		case 'x':
-			flags |= FTW_MOUNT;
+			flags |= FTS_XDEV;
 			continue;
 		case 'v':
-			state.silent = 0;
+			silent = 0;
 			continue;
 		case 'H':
-			flags |= FTW_META|FTW_PHYSICAL;
+			flags |= FTS_META|FTS_PHYSICAL;
 			continue;
 		case 'L':
-			flags &= ~(FTW_META|FTW_PHYSICAL);
+			flags &= ~(FTS_META|FTS_PHYSICAL);
 			continue;
 		case 'P':
-			flags &= ~FTW_META;
-			flags |= FTW_PHYSICAL;
+			flags &= ~FTS_META;
+			flags |= FTS_PHYSICAL;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -248,20 +205,125 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (!(state.links = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(Fileid_t), HASH_name, "hard-links", 0)))
-		error(3, "not enough space for hard link table");
-
-	/*
-	 * do it
-	 */
-
-	ftwalk(argv[0] ? (char*)argv : NiL, du, flags, NiL);
-	if (state.total)
+	memset(&hit, 0, sizeof(hit));
+	memset(&disc, 0, sizeof(disc));
+	disc.key = offsetof(Hit_t, id);
+	disc.size = sizeof(Fileid_t);
+	if (!(dict = dtopen(&disc, Dtset)))
+		error(3, "not enough space for file id dictionary");
+	if (blocksize)
+		scale = 0;
+	else
+		blocksize = LS_BLOCKSIZE;
+	if (logical = !(flags & (FTS_META|FTS_PHYSICAL)))
+		flags |= FTS_PHYSICAL;
+	multiple = argv[0] && argv[1];
+	dirs = logical || multiple;
+	if (!(fts = fts_open(argv, flags, NiL)))
+		error(ERROR_system(1), "%s: not found", argv[1]);
+	while (ent = fts_read(fts))
 	{
-		if (state.scale)
-			sfprintf(sfstdout, "%s\n", fmtscale(state.count * state.blocksize, state.scale));
+		if (ent->fts_info != FTS_DP)
+		{
+			if (multiple && !ent->fts_level)
+			{
+				if (s = strrchr(ent->fts_path, '/'))
+				{
+					*s = 0;
+					d = ent->fts_path;
+				}
+				else
+					d = "..";
+				if (stat(d, &st))
+				{
+					error(ERROR_SYSTEM|2, "%s: cannot stat", d);
+					continue;
+				}
+				hit.id.dev = st.st_dev;
+				hit.id.ino = st.st_ino;
+				if (dtsearch(dict, &hit))
+				{
+					fts_set(NiL, ent, FTS_SKIP);
+					continue;
+				}
+				if (s)
+					*s = '/';
+			}
+			hit.id.dev = ent->fts_statp->st_dev;
+			hit.id.ino = ent->fts_statp->st_ino;
+			if (dirs && dtsearch(dict, &hit))
+			{
+				fts_set(NiL, ent, FTS_SKIP);
+				continue;
+			}
+		}
+		list = !summary;
+		n = 0;
+		switch (ent->fts_info)
+		{
+		case FTS_NS:
+			if (!silent)
+				error(ERROR_SYSTEM|2, "%s: not found", ent->fts_path);
+			continue;
+		case FTS_D:
+			if (!(ent->fts_pointer = newof(0, Count_t, 1, 0)))
+				error(ERROR_SYSTEM|3, "out of space");
+			if (dirs)
+				mark(dict, &hit, ent);
+			continue;
+		case FTS_DC:
+			if (!silent)
+				error(2, "%s: directory causes cycle", ent->fts_path);
+			continue;
+		case FTS_DNR:
+			if (!silent)
+				error(ERROR_SYSTEM|2, "%s: cannot read directory", ent->fts_path);
+			break;
+		case FTS_DNX:
+			if (!silent)
+				error(ERROR_SYSTEM|2, "%s: cannot search directory", ent->fts_path);
+			fts_set(NiL, ent, FTS_SKIP);
+			break;
+		case FTS_DP:
+			if (ent->fts_pointer)
+			{
+				n = *(Count_t*)ent->fts_pointer;
+				free(ent->fts_pointer);
+			}
+			break;
+		case FTS_SL:
+			if (logical)
+			{
+				fts_set(NiL, ent, FTS_FOLLOW);
+				continue;
+			}
+			/*FALLTHROUGH*/
+		default:
+			if (ent->fts_statp->st_nlink > 1 || dirs && !ent->fts_level)
+				mark(dict, &hit, ent);
+			if (!all)
+				list = 0;
+			break;
+		}
+		b = iblocks(ent->fts_statp);
+		count += b;
+		n += b;
+		if (ent->fts_parent->fts_pointer)
+			*(Count_t*)ent->fts_parent->fts_pointer += n;
+		if (!total && (list || ent->fts_level <= 0))
+		{
+			if (scale)
+				sfprintf(sfstdout, "%s\t%s\n", fmtscale((Sfulong_t)n * blocksize, scale), ent->fts_path);
+			else
+				sfprintf(sfstdout, "%I*u\t%s\n", sizeof(Count_t), BLOCKS(n), ent->fts_path);
+		}
+	}
+	if (total)
+	{
+		if (scale)
+			sfprintf(sfstdout, "%s\n", fmtscale(count * blocksize, scale));
 		else
-			sfprintf(sfstdout, "%I*u\n", sizeof(Count_t), BLOCKS(state.count));
+			sfprintf(sfstdout, "%I*u\n", sizeof(Count_t), BLOCKS(count));
 	}
 	return error_info.errors != 0;
 }

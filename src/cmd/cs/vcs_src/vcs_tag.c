@@ -37,10 +37,8 @@ tag_t*	get_tag(f, tp)
 
 	s = (char *)tp + sizeof(int);
 	(void) memset((char *)tp, 0, sizeof(tag_t));
-	if (!sfread(f, (char *)&(tp->length), sizeof(int)) || (sfread(f, (char *)s, (len = tp->length - sizeof(int))) != len))
-	{
+	if (!sfread(f, (char *)&(tp->length), sizeof(int)) || (len = tp->length - sizeof(int)) && sfread(f, (char *)s, len) != len)
 		return (NULL);
-	}
 
 	if (tp->type & LOG)
 	{

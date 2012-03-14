@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -54,10 +54,10 @@ static void tksh_userinit(Shell_t* shp, int subshell)
 	args[0] = av[0]; args[1] = NULL;
 	if ((len >= 4) && (strcmp(end-4, "tksh") == 0))
 		/* b_tkinit(0, (char **) 0, (void *) 0); */
-		b_tkinit(1, args, (void *) 0);
+		b_tkinit(1, args, (Shbltin_t *) 0);
 	else if ((len >= 6) && (strcmp(end-6, "tclksh") == 0))
                 /* b_tclinit(0, (char **) 0, (void *) 0); */
-                b_tclinit(1, args, (void *) 0);
+                b_tclinit(1, args, (Shbltin_t *) 0);
 	else
 	{
 		sh_addbuiltin("tclinit", b_tclinit, (void *) 0);
@@ -66,7 +66,7 @@ static void tksh_userinit(Shell_t* shp, int subshell)
 #else
 	sh_addbuiltin("tkinit", b_tkinit, (void *) 0);
 	if ((len >= 6) && (strcmp(end-6, "tclksh") == 0))
-                b_tclinit(0, (char **) 0, (void *) 0);
+                b_tclinit(0, (char **) 0, (Shbltin_t *) 0);
 	else
 		sh_addbuiltin("tclinit", b_tclinit, (void *) 0);
 #endif

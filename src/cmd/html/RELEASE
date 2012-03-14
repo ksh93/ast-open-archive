@@ -1,3 +1,4 @@
+12-02-29 mm2html: fix so stack bug that popped one too many
 12-01-11 mm2html: fix \*(Rf to use <SUP>...</SUP>
 12-01-01 htmlrefs: add <SCRIPT src=...> to include list
 11-12-30 mm2html: add .xx faq

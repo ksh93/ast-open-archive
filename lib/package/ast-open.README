@@ -1,7 +1,8 @@
 The AT&T Software Technology ast-open package from AT&T Research
 contains all of the ast open source commands and libraries.  This
 package is a superset of the following packages: ast-base ast-make
-ast-ksh ksh ast-ast; you won't need these if you download ast-open.
+ast-ksh ksh ast-ast ast-dss; you won't need these if you download
+ast-open.
 
 Source Package Installation Instructions:
 
@@ -93,7 +94,58 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-12-01-01  --- Release ksh93u+ ---
+12-02-29  --- Release ksh93u+ ---
+12-02-29  A bug which could lead to a core dump when more that four shared
+	  libraries were added with the builtin command has been fixed.
+12-02-29  Fixed a few bugs which caused SIGCHLD to be blocked preventing
+	  background jobs from being reaped until a foreground job was run.
+12-02-27  A bug in which sh -c for a simple command caused a fork() has been
+	  fixed.
+12-02-27  A timing bug on systems such as AIX that doesn't support vfork()
+	  that could cause the exist status to get lost has been fixed.
+12-02-22  A private file descriptor that was not close-on-exec for a command
+	  substitution and has been fixed.
+12-02-14  A bug in which ^Z did not stop a pipeline when the last component
+	  was a shell built-in has been fixed.
+12-02-14  getconf("PATH") used to initialize ed(1) path.
+12-02-13 +In earlier version read from standard input would fail when called
+	  from the KEYBD trap.  Now read options -N, -n, and -t should work
+	  when called from a KEYBD trap.
+12-02-13  If FCEDIT is not set and fc is invoked without the -e option,
+	  ed will be invoked if found instead of /bin/ed. 
+12-02-10  Another bug in the saving and restoring of IFS in a subshell
+	  that caused a core dump has been fixed.
+12-02-08  A bug in which .sh.fun disciplines could be cleared after a
+	  function completes has been fixed.
+12-02-08  A bug in job control in which the foregroup process group was not
+	  set correctly after restarting a stopped pipeline has been fixed.
+12-02-07  A bug in which numbers with leading zeros could be treated as
+	  octal constants outside of ((...)) has been fixed.
+12-02-06  A bug in arithmetic with compound variables containing multiple
+	  array elements has been fixed.
+12-02-02  A bug in the ulimit option table was fixed.
+12-01-26  A bug in which a set command that did not change monitor could
+	  effect the behavior of the monitor when monitor mode is on is fixed.
+12-01-21 +You can now test whether the shell implements a math function using
+	  typeset -f .sh.math.name, where name is the name of the function.
+12-01-21  A bug in which typeset -L and typeset -R did not handle multibyte
+	  characters correctly has been fixed.
+12-01-20  A bug that could cause the shell to hang waiting for an incorrect
+	  job pid has been fixed.
+12-01-19  A memory leak which occured for a nested command subtiution has been
+	  fixed.
+12-01-17  A bug in which typeset -u PS1 could enable the uppercase attribute
+	  for some other variables, for exampe, HISTFILE has been fixed.
+12-01-16  A bug in which .sh.match was not correct after a substring match when
+	  the replacement string contained a substring match has been fixed.
+12-01-12 +Files that are sourced from profile files are now read and executed
+	  one command at a time so that alias definitions take effect as they
+	  do for profile files.
+12-01-12  A bug in which whence -p would find a function if one existed and
+	  there was no command of that name on PATH.
+12-01-11  Change b_* prototype (int, char**, void*) => (int, char**, Shbltin_t*).
+12-01-05  A bug in which read was not terminating for a signal that had a trap
+	  set has been fixed.
 12-01-01  A timing problem with >; has been fixed.
 12-01-01  A macro expansion memory leak has been fixed.
 11-12-26  A bug in array assignments of the form arr=( $arr[i] ...) in which
@@ -159,7 +211,7 @@ All recorded changes follow.
 11-08-03  A bug in which the shell did not preserve the exit status for a
 	  coprocess has been fixed.
 11-08-02  A bug in the saving and restoring of IFS in command substitution that
-	  cause case a core dump has been fixed.
+	  caused a core dump has been fixed.
 11-07-21  Modified the 10-08-27 bug fix so that background jobs started in for
 	  and while loops created interactively generate completion messages.
 11-07-20  I fixed a bug in here documents in which multi-byte characters that
@@ -3266,6 +3318,9 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+12-02-29 mm2html: fix so stack bug that popped one too many
+12-01-11 mm2html: fix \*(Rf to use <SUP>...</SUP>
+12-01-01 htmlrefs: add <SCRIPT src=...> to include list
 11-12-30 mm2html: add .xx faq
 11-09-11 mm2html: add .H n "title" link="href"
 11-08-06 mm2html: use optget() style for .SH and .TP
@@ -3375,6 +3430,9 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+12-02-20 proto.c: bump version to match astlicense() { since start source } change
+12-02-14 protp.tst: update for libpp/ppproto.c fix
+12-01-01 proto.c: add epl to the license type list
 11-03-04 sear.sh: add { sear32.ico sear64.ico }, $(dirname -r lib/$COMMAND/...)
 11-02-02 Makefile: don't update ../INIT/proto.c if no change or if cpp hack failed
 10-10-10 sear.sh: retain .exe suffix in sear -- its dos on the other side!
@@ -3426,6 +3484,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+12-02-02 add timeout to { testlib terror.h }
 11-10-20 add TESTLIB.mk, common { testlib terror.h }, and test.aso
 11-09-26 vmalloc: sync with kpv
 10-05-28 date.dat,datey2k.dat: update for ast move to %Q? %K
@@ -3859,6 +3918,19 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+12-02-29 Makerules.mk: fix ``lhs :MAKE: rhs'' logic for lhs and rhs makefile
+12-02-29 option.c: fix regress option doc typo
+12-02-20 Makerules.mk: update for astlicense() { since start source }
+12-02-14 Makerules.mk: ignore MAKE_OPTIONS for --mam
+12-02-14 Makerules.mk: add LICENSEFILEDEFAULT
+12-02-14 Makerules.mk: add PWD edit ala MAKEPATH to PAXFLAGS
+12-02-07 metarule.c: fix read string past terminator bug
+12-02-02 Makerules.mk: add [[ a || b ]] to the $SHELL -n compatibility test
+12-01-30 Makerules.mk: fix .INSTALL* to better handle 'text file busy'
+12-01-26 SCCS.mk: add to rule install list
+12-01-21 --- release 5.7 ---
+12-01-21 internal tmfmt() must use user format on special times too
+12-01-09 Makerules.mk: fix .MAMEDIT. to elide -[DI]-*
 11-12-13 option.c: fix off by 1 undermalloc
 11-12-13 Makerules.mk: fix MAKE_OPTIONS to peoperly handle --*=* options
 11-11-01 Makerules.mk: omit .TARGETs from manifest
@@ -5236,6 +5308,7 @@ All recorded changes follow.
 
 :::::::: at ::::::::
 
+12-02-29 atd.c,atx.c: fix uid/gid sequencing for unix/winix compatibility
 10-06-01 sync with ast api 20100601
 10-03-19 atd.c,atx.c: each job in separate session
 06-10-11 add sfstruse() error checks
@@ -5274,6 +5347,9 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+12-02-28 pty.c: change --verbose[=level] to --debug=level
+12-02-11 what.c: fix boyer moore cut n paste bug -- thanks werner
+12-01-26 pty.c: fix --man docs
 10-04-22 dlls.c: fix --path to only list the path -- doh
 10-11-03 od.c: use is[w]print() for printable char check
 10-10-19 od.c: speed up inner loop
@@ -5468,6 +5544,7 @@ All recorded changes follow.
 
 :::::::: bgp ::::::::
 
+12-02-20 bgp.c,bgplib.h: drop unused ip4toip6()
 11-09-11 bgp-mrt.c: fix debug trace offset when bgp messages skipped
 11-08-25 bgp-mrt.c: streamline BGP_best logic and drop Mrtpart_t
 11-08-25 bgp-mrt.c: drop state->v6 and use rp->afi
@@ -5593,6 +5670,8 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+12-02-24 *sa.omk: clean up standalone old make makefiles
+12-02-24 README-*: bring standalone READMEs up to date
 11-10-06 testiv.c: add { -ip4 -ip6 } options
 11-10-06 ivstr.c,ivfmt.c: add for iv addr size 1..255
 11-10-06 iv-nested.c: fix bug that called nested freef on internal flat intervals
@@ -5640,7 +5719,8 @@ All recorded changes follow.
 
 :::::::: lsa ::::::::
 
-08-06-11 ospf_lsa.c: handle generic ip address type binding
+12-02-29 add { lsag pmcoa } formats
+12-01-15 ospf_lsa.c: handle generic ip address type binding
 03-02-07 change "time" to "ns_t" and u_int64 in the canonical record
 03-01-31 update rtid doc
 03-01-23 update for void* => Dssrecord_t*
@@ -6198,6 +6278,8 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+12-02-14 yes.sh: add
+12-01-23 du.c: the rightmost of { -b -h -k -K -m } overrides the others
 11-12-13 features/procfs, pss-procfs.c: check _PS_task for { st_uid st_gid }
 11-08-24 ls.c: fix { linkop linktext } to check for FTS_SLNONE too
 11-08-01 file.c: add -b, --brief | --no-filename
@@ -6519,6 +6601,7 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+12-02-29 find.c: fix ``! -type f'' vs ``! -type f -print'' bug
 11-10-31 tw.c: handle -lexpr X2I change -- scary
 11-07-25 expr.c: fix -e sort:url core dump
 11-06-30 tw.tst: add symbol table scope tests
@@ -6664,6 +6747,27 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+12-03-10 misc/optget.c: HELP_index for "PLUGIN" too
+12-02-29 include/shcmd.h: PLUGIN_VERSION 20111111 for cdt disc/meth change
+12-02-29 comp/spawnveg.c: fix sigcritical() to include waitpid() for internal child
+12-02-29 malloc.c: make __malloc_hook initialization thread safe
+12-02-24 comp/iconv.c: fix winix UTF-8 vs UCS-2 over-conversion
+12-02-24 astsa/*.h: clean up header guards
+12-02-24 astsa/astsa.omk: clean up standalone old make makefile interactions
+12-02-21 misc/cmdarg.c: fix bug that set argv[0]
+12-02-10 sfvprintf.c: fix 1 byte too long buffer access
+12-02-07 malloc.c/features/vmalloc: add gnu __malloc_hook tests
+12-02-06 vmmopen.c: fix ALIGN vs sys/param.h macro conflict
+12-02-02 astlicense.c: add license.component for component-specific licenses
+12-01-31 spawnveg.c: fix transient bug that made invalid setpgid() call
+12-01-27 pathpath.c: fix buffer size math when internal allocation requested
+12-01-24 malloc.c: fix _vmkeep() bug that did not return previous state
+12-01-23 malloc.c: add VMALLOC_OPTIONS=break to try sbrk() block allocator first
+12-01-21 astlicense.c: option style only overrides default license.type
+12-01-18 malloc.c: disable multiple regions for tracing or !vmbest or ASO_SIGNAL
+12-01-12 sfpkrd.c: add __sun I_PEEK+rsh runtime workaround
+12-01-10 shcmd.h: void* => Shbltin_t*
+12-01-10 tmxdate.c: handle { n>=1000 } TM_PARTS
 11-12-21 plug up some meory links -- thanks mhlavink
 11-12-21 vmprivate.c: enclose VM_NONMEM exception in CLRLOCK(vm,0) ... SETLOCK(vm,0)
 11-12-13 aso: in -lposix for uwin, not -last -- just like vmalloc
@@ -8429,6 +8533,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+12-02-14 rm.c: --force ignores no file operands specified
+12-01-10 b_* (int, char**, void*) => (int, char**, Shbltin_t*)
 11-08-27 pids.c: add getsid() iffe test
 10-08-16 chmod.c: add -l alias for { -h --symlink }
 11-08-16 chgrp.c: change lchmod() ref to lchown()
@@ -8955,6 +9061,7 @@ All recorded changes follow.
 
 :::::::: libsum ::::::::
 
+12-02-29 sum-sha2.c: bitcount[] order reversed to allow a single noalias buffer copy
 09-09-28 sumlib.c: use simple (faster) method name match function
 08-06-05 sum-lmd.c: align context to largest int
 08-05-01 sumlib.c: add some -lmd verification checks
@@ -8983,6 +9090,7 @@ All recorded changes follow.
 
 :::::::: libvdelta ::::::::
 
+12-02-14 vdelhdr.h,vdio.c: apply patch from philippe.bergheaud
 04-03-14 vdelta.h: #if !_DLL => #if !defined(_DLL) to handle empty value
 08/11/95 version 2.0 -- new delta layout but old update recognized
 04/24/95 back out of latest version -- incompatible deltas generated
@@ -9039,6 +9147,7 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+12-02-22 coinit.c: handle non-identifier export var names
 11-12-13 cowait.c: handle sfpoll() error return on interrupt
 11-11-21 cowait.c: poll before blocking read to weed out killed jobs (no 'x' message)
 11-08-30 codata.c,coopen.c: drop macro "..." catenation for old cc
@@ -9187,6 +9296,8 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+12-02-29 pp.probe: handle predefined function-like macro definitions
+12-02-14 ppproto.c: fix "already noticed" logic
 11-08-30 ppproto.c: bump BLOCK to 16*1024 for (ppargs.c self-doc!)
 11-03-15 ppop.c: add ppok() readonly check for subset of ppop(PP_*)
 11-03-02 ppop.c,ppcontrol.c: use ppset() to handle readonly values
@@ -9673,6 +9784,7 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+12-02-29 cxopen.c: add "hex" details for external buffer representation
 11-10-07 dssopen.c: use generic dll_lib() to load methods
 11-09-11 cxmap.c: fix cxsub() to cast <=> string if necessary
 11-09-11 add <MAP><PART><EDIT>ed-style-substitute</></></>

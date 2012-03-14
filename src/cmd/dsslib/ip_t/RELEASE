@@ -1,3 +1,5 @@
+12-02-24 *sa.omk: clean up standalone old make makefiles
+12-02-24 README-*: bring standalone READMEs up to date
 11-10-06 testiv.c: add { -ip4 -ip6 } options
 11-10-06 ivstr.c,ivfmt.c: add for iv addr size 1..255
 11-10-06 iv-nested.c: fix bug that called nested freef on internal flat intervals

@@ -1,4 +1,5 @@
-12-04-14 protp.tst: update for libpp/ppproto.c fix
+12-02-20 proto.c: bump version to match astlicense() { since start source } change
+12-02-14 protp.tst: update for libpp/ppproto.c fix
 12-01-01 proto.c: add epl to the license type list
 11-03-04 sear.sh: add { sear32.ico sear64.ico }, $(dirname -r lib/$COMMAND/...)
 11-02-02 Makefile: don't update ../INIT/proto.c if no change or if cpp hack failed

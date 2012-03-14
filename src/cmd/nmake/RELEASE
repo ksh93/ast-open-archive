@@ -1,3 +1,6 @@
+12-02-29 Makerules.mk: fix ``lhs :MAKE: rhs'' logic for lhs and rhs makefile
+12-02-29 option.c: fix regress option doc typo
+12-02-20 Makerules.mk: update for astlicense() { since start source }
 12-02-14 Makerules.mk: ignore MAKE_OPTIONS for --mam
 12-02-14 Makerules.mk: add LICENSEFILEDEFAULT
 12-02-14 Makerules.mk: add PWD edit ala MAKEPATH to PAXFLAGS

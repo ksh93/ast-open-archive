@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2011-11-11
+# @(#)pp.probe (AT&T Research) 2012-02-29
 #
 # C probe for libpp
 #
@@ -565,7 +565,8 @@ echo "$predef" >> all.pp
 	do	echo "\"\", 0 };" >> cpp$i.$src
 	done
 	}
-preval="`for i in 0 1 2 3 4 5;do $cc -E cpp$i.$src;done | sed -e '/\".*\".*,.*,/!d' -e 's/[^\"]*\"\\([^\"]*\\)\"[ 	]*,[ 	]*([ 	]*long[ 	]*)[ 	]*\\(.*\\)[ 	]*-[ 	]*1[ 	]*,[ 	]*\$/\\1 \\2 =/g'` `$cc -dM -E stdc.$src | sed -e '/[ 	]*#[ 	]*define/!d' -e '/\"/d' -e 's/[ 	]*#[ 	]*define[ 	]*\\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*\\)[ 	]*\\(.*\\)/\\1 \\2 =/'`"
+preval="`for i in 0 1 2 3 4 5;do $cc -E cpp$i.$src;done | sed -e '/\".*\".*,.*,/!d' -e 's/[^\"]*\"\\([^\"]*\\)\"[ 	]*,[ 	]*([ 	]*long[ 	]*)[ 	]*\\(.*\\)[ 	]*-[ 	]*1[ 	]*,[ 	]*\$/\\1 \\2 =/g' -e '/\\(^[^ ]*\\) \1  *=$/d'` `$cc -dM -E stdc.$src | sed -e '/[ 	]*#[ 	]*define/!d' -e '/\"/d' -e 's/[ 	]*#[ 	]*define[ 	]*\\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*([^)]*)\\)[ 	]*\\(.*\\)/\\1 \\2 =/' -e 's/[ 	]*#[ 	]*define[ 	]*\\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*\\)[ 	]*\\(.*\\)/\\1 \\2 =/'`"
+	print -r "$preval" > /tmp/probe/preval
 
 for i in bufld namei quota reboot utsname vfs
 do	echo "#include <sys/$i.h>" > t.$src

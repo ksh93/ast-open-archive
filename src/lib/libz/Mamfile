@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-07
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/zlib.lic
+done ${PACKAGEROOT}/lib/package/zlib.lic
 make install
 make z
 make libz.a archive
@@ -117,6 +117,7 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
@@ -136,6 +137,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done zconf.h dontcare
 done zlib.h
@@ -197,6 +199,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 done gzio.c
 meta gzio.o %.c>%.o gzio.c gzio
@@ -285,6 +288,7 @@ make sfdcgzip.c
 make sfdcgzip.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfdisc.h dontcare
 done sfdcgzip.h
 prev zlib.h implicit
@@ -352,7 +356,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/zlib.h
 prev ${PACKAGE_ast_INCLUDE}
 prev zlib.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"' zlib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/zlib.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"' zlib.h > 1.${COTEMP}.x
 exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/zlib.h 1.${COTEMP}.x
 exec - then rm -f 1.${COTEMP}.x
 exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/zlib.h
@@ -360,7 +364,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/zlib.h generated
 make ${PACKAGE_ast_INCLUDE}/zconf.h
 prev zconf.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"' zconf.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/zlib.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"' zconf.h > 1.${COTEMP}.x
 exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/zconf.h 1.${COTEMP}.x
 exec - then rm -f 1.${COTEMP}.x
 exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/zconf.h
@@ -368,7 +372,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/zconf.h generated
 make ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
 prev sfdcgzip.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"' sfdcgzip.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/zlib.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"' sfdcgzip.h > 1.${COTEMP}.x
 exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcgzip.h 1.${COTEMP}.x
 exec - then rm -f 1.${COTEMP}.x
 exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcgzip.h

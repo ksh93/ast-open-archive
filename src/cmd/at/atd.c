@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -35,7 +35,7 @@
  * <time> is the earliest absolute time the job can be run
  */
 
-static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2010-03-19 $\0\n";
+static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2012-02-29 $\0\n";
 
 #include "at.h"
 
@@ -586,10 +586,10 @@ static void
 reap(register State_t* state, register Job_t* job, int status)
 {
 	char*		e;
-	unsigned long	t;
+	time_t		t;
 
 	error(0, "%s %s %lu exit %d \"%s\"", job->name, fmtuid(job->owner->user->uid), job->pid, status, job->label);
-	if (job->repeat && (t = tmdate(job->repeat, &e, (time_t*)&job->start)) && !*e)
+	if (job->repeat && (t = job->start) && (t = tmdate(job->repeat, &e, &t)) && !*e)
 	{
 		complete(state, job);
 		job->start = t;
@@ -1069,8 +1069,8 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 					break;
 				case AT_STATUS:
 					if (!m++)
-						error(ERROR_OUTPUT|0, con->fd, "JOB               LABEL        PID Q USER     START               REPEAT");
-					error(ERROR_OUTPUT|0, con->fd, "%-17s %-*s%5d %-1s %-8.8s %s %s", job->name, sizeof(job->label), job->label, job->pid, job->queue->name, job->owner->user->name, fmttime(AT_TIME_FORMAT, job->start), job->period);
+						error(ERROR_OUTPUT|0, con->fd, "JOB                   LABEL        PID   Q USER     START               REPEAT");
+					error(ERROR_OUTPUT|0, con->fd, "%-21s %-*s%7d %-1s %.-8s %s %s", job->name, sizeof(job->label), job->label, job->pid, job->queue->name, job->owner->user->name, fmttime(AT_TIME_FORMAT, job->start), job->period);
 					break;
 				case AT_REMOVE:
 					if (con->id.uid == job->id.uid || !con->id.uid)
@@ -1240,6 +1240,8 @@ stampwrite(int fd, const void* buf, size_t n)
 		if (now >= rollover)
 			commit();
 	}
+	else if (!now)
+		now = NOW;
 	if (fd == 2 && (s = fmttime(AT_TIME_FORMAT, now)))
 	{
 		i = strlen(s);

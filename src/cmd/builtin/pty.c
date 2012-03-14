@@ -21,7 +21,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)pty (AT&T Research) 2012-01-26\n]"
+"[-?\n@(#)pty (AT&T Research) 2012-02-28\n]"
 USAGE_LICENSE
 "[+NAME?pty - create pseudo terminal and run command]"
 "[+DESCRIPTION?\bpty\b creates a pseudo pty and then runs \bcommand\b "
@@ -73,6 +73,8 @@ USAGE_LICENSE
         "[P \atext\a?delay each master write until the beginning of "
             "an unread input line exactly matches \atext\a]"
     "}"
+"[D:debug?Set the debug trace \alevel\a, higher levels produce more "
+    "output, disabled for level 0.]#[level]"
 "[m:messages?Redirect diagnostic message output to \afile\a.]:[file]"
 "[s!:session?Create a separate session for the process started by "
     "\bpty\b.]"
@@ -80,8 +82,6 @@ USAGE_LICENSE
     "\amilliseconds\a.]#[milliseconds:=1000]"
 "[T:tty?Pass \astty\a to the \bstty\b(1) command to initialize the "
     "pty.]:[stty]"
-"[v:verbose?Set the verbose trace \alevel\a, more output for higher "
-    "levels, disabled for level 0.]#?[level]"
 "[w:delay?Set the delay before each master write to "
     "\amilliseconds\a.]#[milliseconds:=0]"
 
@@ -973,6 +973,9 @@ b_pty(int argc, char** argv, Shbltin_t* context)
 			if (opt_info.num)
 				fun = dialogue;
 			continue;
+		case 'D':
+			error_info.trace = -(int)opt_info.num;
+			continue;
 		case 'm':
 			messages = opt_info.arg;
 			continue;
@@ -984,9 +987,6 @@ b_pty(int argc, char** argv, Shbltin_t* context)
 			continue;
 		case 'T':
 			stty = opt_info.arg;
-			continue;
-		case 'v':
-			error_info.trace = -(int)opt_info.num;
 			continue;
 		case 'w':
 			delay = (int)opt_info.num;
