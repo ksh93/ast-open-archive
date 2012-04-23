@@ -1,3 +1,6 @@
+12-04-20 pax.c: verify that --maxout > --blocksize (else it recurses on newio()!)
+12-04-17 pax.c,copy.c: fix multiple prompt for --write --yes
+12-04-17 misc.c: --yes accepts { 'y' 'Y' '1' }, { 'q' 'Q' '-' } => remaining no
 11-06-21 pax.c,copy.c,file.c: add --filter option mtime=<date-string>
 11-03-17 copy.c: fix bug that didn't list special files for --verbose
 11-02-11 pax-tnef.c: handle "" member names -- really?

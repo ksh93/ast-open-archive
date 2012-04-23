@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -23,10 +23,10 @@
 
 Text retemp;	/* holds a rewritten regex, without delimiter */
 
-int
+word
 recomp(Text *rebuf, Text *t, int sub)
 {
-	static int lastre;
+	static word lastre;
 	int code;
 	int c;
 	int n;
@@ -81,12 +81,13 @@ reexec(regex_t* re, char* s, size_t n, size_t nmatch, regmatch_t* match, int fla
 int
 substitute(regex_t *re, Text *data)
 {
-	int n;
+	word n;
+	int c;
 	regmatch_t matches[100];
 	if(reexec(re, (char*)data->s, data->w - data->s, elementsof(matches), matches, 0))
 		return 0;
-	if(n = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {
-		reerror(re, n);
+	if(c = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {
+		reerror(re, c);
 		return 0;
 	}
 	n = re->re_sub->re_len;

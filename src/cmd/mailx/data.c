@@ -10,7 +10,7 @@
 static const char	id[] = STAMP;
 
 static const char	terms[] = "\n\
-@(#)Copyright (c) 1980, 1993, 1996 - 2011\n\
+@(#)Copyright (c) 1980, 1993, 1996 - " YEAR "\n\
 \tThe Regents of the University of California. All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
@@ -375,6 +375,8 @@ static const struct var	vartab[] =
 	X("Write a header summary when entering receive mode."),
 "headerbotch",	&state.var.headerbotch,		0,	0,0,
 	X("Ignore blank lines in message headers."),
+"headfake",	&state.var.headfake,		0,	0,0,
+	X("Fake initial ``From '' line to read message from another mailer."),
 "hold",		&state.var.hold,		0,	0,0,
 	X("Preserve all READ messages in the system mailbox rather than in ${MBOX}."),
 "hostname",	&state.var.hostname,		0,	"localhost",0,

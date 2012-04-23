@@ -12,10 +12,4 @@ K	(abc~({ABC})|xyz~({XYZ}))	<xyz>		(1,4)(1,4){XYZ}(2:1)
 K	+(abc~({ABC})|xyz~({XYZ}))	<abcxyz>	(1,7)(1,7){ABC}(1:4){XYZ}(2:1)
 K	+(abc~({ABC})|xyz~({XYZ}))	<xyzabc>	(1,7)(1,7){XYZ}(2:4){ABC}(1:1)
 
-K	~({ABC})abc			<abc>		(1,4){ABC}(1:1)
-K	(~({ABC})abc|~({XYZ})xyz)	<abc>		(1,4)(1,4){ABC}(1:1)
-K	(~({ABC})abc|~({XYZ})xyz)	<xyz>		(1,4)(1,4){XYZ}(2:1)
-K	+(~({ABC})abc|~({XYZ})xyz)	<abcxyz>	(1,7)(1,7){ABC}(1:4){XYZ}(2:1)
-K	+(~({ABC})abc|~({XYZ})xyz)	<xyzabc>	(1,7)(1,7){XYZ}(2:4){ABC}(1:1)
-
 }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -35,7 +35,7 @@
 #define SNAPSHOT_DELIM	"|"
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Research) 2011-10-31 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Research) 2012-04-11 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the "
@@ -925,7 +925,10 @@ main(int argc, register char** argv)
 		}
 		if (*argv || args || count || !(state.cmdflags & CMD_IMPLICIT))
 		{
-			state.cmd = cmdopen(argv, count, size, args, state.cmdflags, errorf);
+			Cmddisc_t	disc;
+
+			CMDDISC(&disc, state.cmdflags, errorf);
+			state.cmd = cmdopen(argv, count, size, args, &disc);
 			state.ftwflags |= FTW_DOT;
 		}
 		else

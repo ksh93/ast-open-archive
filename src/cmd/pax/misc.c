@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -200,22 +200,19 @@ selectfile(register Archive_t* ap, register File_t* f)
 	}
 	if (!match(f->path))
 		return 0;
-	if (f->type != X_IFDIR)
+	if (f->type != X_IFDIR && ap->update && (d = (Member_t*)hashget(ap->update, f->name)))
 	{
-		if (ap->update && (d = (Member_t*)hashget(ap->update, f->name)))
-		{
-			if (f->type != X_IFREG && d->dev != f->st->st_dev)
-				/* keep */;
-			else if (!(c = tvcmp(&d->mtime, tvmtime(&t, f->st))))
-				return 0;
-			else if (state.update != OPT_different && c > 0)
-				return 0;
-			else
-				return 0;
-		}
-		if (state.verify && !verify(ap, f, NiL))
+		if (f->type != X_IFREG && d->dev != f->st->st_dev)
+			/* keep */;
+		else if (!(c = tvcmp(&d->mtime, tvmtime(&t, f->st))))
+			return 0;
+		else if (state.update != OPT_different && c > 0)
+			return 0;
+		else
 			return 0;
 	}
+	if (state.verify && !verify(ap, f, NiL))
+		return 0;
 	ap->selected++;
 	if (!linked)
 	{
@@ -319,7 +316,9 @@ verify(Archive_t* ap, register File_t* f, register char* prompt)
 	NoP(ap);
 	if (!prompt)
 	{
-		if (state.yesno)
+		if (state.yesno < 0)
+			return 0;
+		else if (state.yesno)
 			switch (state.operation)
 			{
 			case IN:
@@ -342,7 +341,14 @@ verify(Archive_t* ap, register File_t* f, register char* prompt)
 		finish(2);
 	}
 	if (state.yesno)
-		return *name == 'y';
+	{
+		if (*name == 'q' || *name == 'Q' || *name == '-')
+		{
+			state.yesno = -1;
+			return 0;
+		}
+		return *name == 'y' || *name == 'Y' || *name == '1';
+	}
 	switch (*name)
 	{
 	case 0:

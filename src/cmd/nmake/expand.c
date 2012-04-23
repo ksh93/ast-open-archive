@@ -899,10 +899,9 @@ list(Sfio_t* xp, register char* s, char* pat, int flags)
 								if (flags & SORT_qualified)
 									sfprintf(xp, " %s/%s", s, *v);
 								else
-								{
 									sfputr(xp, *v, -1);
+								if (flags & SORT_first)
 									goto first;
-								}
 							}
 			}
 			else
@@ -915,10 +914,9 @@ list(Sfio_t* xp, register char* s, char* pat, int flags)
 								if (flags & SORT_qualified)
 									sfprintf(xp, " %s/%s", s, *v);
 								else
-								{
 									sfputr(xp, *v, -1);
+								if (flags & SORT_first)
 									goto first;
-								}
 							}
 			}
 		first:	;

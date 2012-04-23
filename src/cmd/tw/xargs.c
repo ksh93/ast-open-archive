@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: xargs (AT&T Research) 2005-03-07 $\n]"
+"[-?\n@(#)$Id: xargs (AT&T Research) 2012-04-11 $\n]"
 USAGE_LICENSE
 "[+NAME?xargs - construct arg list and execute command]"
 "[+DESCRIPTION?\bxargs\b constructs a command line consisting of the"
@@ -117,13 +117,15 @@ main(int argc, register char** argv)
 
 	int			argmax = 0;
 	char*			eof = "_";
-	int			flags = CMD_EMPTY|CMD_EXIT;
 	char*			insert = 0;
 	int			lines = 0;
 	size_t			size = 0;
 	int			term = -1;
 
+	Cmddisc_t		disc;
+
 	NoP(argc);
+	CMDDISC(&disc, CMD_EMPTY|CMD_EXIT, errorf);
 	error_info.id = "xargs";
 	for (;;)
 	{
@@ -158,7 +160,7 @@ main(int argc, register char** argv)
 			/*FALLTHROUGH*/
 		case 'I':
 			insert = opt_info.arg ? opt_info.arg : "{}";
-			flags |= CMD_INSERT;
+			disc.flags |= CMD_INSERT;
 			term = '\n';
 			continue;
 		case 'l':
@@ -181,19 +183,19 @@ main(int argc, register char** argv)
 			argmax = opt_info.num;
 			continue;
 		case 'p':
-			flags |= CMD_QUERY;
+			disc.flags |= CMD_QUERY;
 			continue;
 		case 's':
 			size = opt_info.num;
 			continue;
 		case 't':
-			flags |= CMD_TRACE;
+			disc.flags |= CMD_TRACE;
 			continue;
 		case 'x':
-			flags |= CMD_MINIMUM;
+			disc.flags |= CMD_MINIMUM;
 			continue;
 		case 'z':
-			flags &= ~CMD_EMPTY;
+			disc.flags &= ~CMD_EMPTY;
 			continue;
 		case 'D':
 			error_info.trace = -opt_info.num;
@@ -202,7 +204,7 @@ main(int argc, register char** argv)
 			term = 0;
 			continue;
 		case 'X':
-			flags |= CMD_EXACT;
+			disc.flags |= CMD_EXACT;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -216,7 +218,7 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (!(cmd = cmdopen(argv, argmax, size, insert, flags, errorf)))
+	if (!(cmd = cmdopen(argv, argmax, size, insert, &disc)))
 		error(ERROR_SYSTEM|3, "out of space [cmd]");
 	if (!(sp = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space [arg]");
@@ -280,7 +282,7 @@ main(int argc, register char** argv)
 				if (c || insert)
 				{
 					if (lines && c > 1 && isspace(s[c - 2]))
-						cmd->argcount--;
+						cmdarg(cmd, 0, -1);
 					cmdarg(cmd, s, c);
 				}
 				continue;

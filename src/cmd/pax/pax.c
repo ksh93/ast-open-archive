@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2011-06-21 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2012-04-20 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1746,6 +1746,8 @@ main(int argc, char** argv)
 	state.tmp.buffersize = state.buffersize;
 	if (!(state.tmp.buffer = newof(0, char, state.tmp.buffersize, 0)))
 		nospace();
+	if (state.maxout && state.maxout <= state.blocksize)
+		error(3, "--maxout=%#i must be greater than --blocksize=%#i", state.maxout, state.blocksize);
 	message((-1, "blocksize=%d buffersize=%d recordsize=%d", state.blocksize, state.buffersize, state.record.size));
 
 	/*

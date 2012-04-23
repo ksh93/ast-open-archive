@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -22,7 +22,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Research) 2010-08-11 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Research) 2012-03-28 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"
@@ -80,10 +80,10 @@ int uflag = 0;		/* unbuffered output */
 unsigned char*	map;	/* CC_NAT*IVE => CC_ASCII map */
 
 void
-grow(Text *t, int n)
+grow(Text *t, word n)
 {
-	int w = t->w - t->s;
-	int e = t->e - t->s + (n/SF_BUFSIZE+1)*SF_BUFSIZE;
+	word w = t->w - t->s;
+	word e = t->e - t->s + (n/SF_BUFSIZE+1)*SF_BUFSIZE;
 	t->s = oldof(t->s, unsigned char, e, 0);
 	if(t->s == 0)
 		error(3, "out of space");
@@ -115,7 +115,7 @@ aopen(char *s, int level)
 static void
 readscript(Text *t, char *s)
 {
-	int n;
+	word n;
 	Sfio_t *f = aopen(s, 3);
 	for(;;) {
 		assure(t, 4);
@@ -158,7 +158,7 @@ int
 readline(Text *t)
 {
 	char*	s;
-	int	c;
+	word	c;
 
 	coda();
 	if (qflag || input.iargc <= 0)

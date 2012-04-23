@@ -1,3 +1,6 @@
+12-04-20 grep.c: always enable FTS_META (to disable pure FTS_PHYSICAL)
+12-04-17 type.dat: add type.dat re-type switch tests
+12-03-38 sed?.[ch]: 64 bit cleanup for msvc
 11-06-25 grep.c: handle FTS_SLNONE
 10-12-10 grep.c: fix some empty line buffer boundary bugs
 10-11-22 testregex.dat: add more [...\...] tests

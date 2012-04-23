@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -33,7 +33,6 @@ void fixlabels(Text*);
 void fixbrack(Text*);
 void ckludge(Text*, int, int, int, Text*);
 int addr(Text*, Text*);
-word pack(int, int, int);
 word* instr(unsigned char*);
 unsigned char *succi(unsigned char*);
 
@@ -113,7 +112,7 @@ succi(unsigned char *p)
 }
 
 word
-pack(int neg, int cmd, int length)
+pack(int neg, int cmd, word length)
 {
 	int l = length & LMASK;
 	if(length != l)
@@ -122,7 +121,7 @@ pack(int neg, int cmd, int length)
 }
 
 void
-putint(Text *s, int n)
+putword(Text *s, word n)
 {
 	assure(s, sizeof(word));
 	*(word*)s->w = n;
@@ -144,7 +143,7 @@ number(Text *t)
 int
 addr(Text *script, Text *t)
 {
-	int n;
+	word n;
 	if(reflags & REG_LENIENT)
 		while(*t->w == ' ' || *t->w == '\t' || *t->w == '\r')
 			t->w++;
@@ -166,7 +165,7 @@ addr(Text *script, Text *t)
 		if(n == 0)
 			syntax("address is zero");
 	}
-	putint(script, n);
+	putword(script, n);
 	if(reflags & REG_LENIENT)
 		while(*t->w == ' ' || *t->w == '\t' || *t->w == '\r')
 			t->w++;
@@ -174,7 +173,7 @@ addr(Text *script, Text *t)
 }
 
 regex_t *
-readdr(int x)
+readdr(word x)
 {
 	return (regex_t*)(rebuf.s + (x&AMASK));
 }
@@ -198,7 +197,7 @@ word *
 lablook(unsigned char *l, Text *labels)
 {
 	unsigned char *p, *q;
-	int n, m;
+	word n, m;
 	assure(labels, 1);
 	for(p = labels->s; p < labels->w; ) {
 		q = p + sizeof(word);
@@ -208,7 +207,7 @@ lablook(unsigned char *l, Text *labels)
 		p = (unsigned char*)wordp(q);
 	}
 	n = ustrlen(l);
-	m = p - labels->s;
+	m = (p - labels->s);
 	assure(labels, sizeof(word)+n+1+sizeof(word));
 	p = labels->s + m;
 	*(word*)p = -1;
@@ -221,8 +220,8 @@ lablook(unsigned char *l, Text *labels)
 
 /* find pos in label list; assign value i to label if i>=0 */
 
-int
-getlab(Text *t, int i)
+word
+getlab(Text *t, word i)
 {
 	word *p;
 	unsigned char *u;
@@ -252,9 +251,9 @@ Cc(Text *script, Text *t)	/* colon */
 void
 bc(Text *script, Text *t)
 {
-	int g;
+	word g;
 	g = getlab(t, -1);	/* relative pointer to label list */
-	putint(script, g);
+	putword(script, g);
 }
 
 void
@@ -294,7 +293,7 @@ rc(Text *script, Text *t)
 	if(u == t->w)
 		syntax("missing file name");
 	*t->w = 0;
-	putint(script, (unsigned char*)lablook(u, &files) - files.s);
+	putword(script, (unsigned char*)lablook(u, &files) - files.s);
 	*t->w = '\n';
 }
 
@@ -325,13 +324,13 @@ void				/* { */
 Lc(Text *script, Text *t)
 {
 	while(blank(t));
-	putint(&brack, script->w - sizeof(word) - script->s);
+	putword(&brack, script->w - sizeof(word) - script->s);
 }
 
 void				/* } */
 Rc(Text *script, Text *t)
 {
-	int l;
+	word l;
 	word *p;
 	t = t;
 	if(brack.w == 0 || (brack.w-=sizeof(word)) < brack.s)
@@ -433,12 +432,13 @@ void
 sc(Text *script, Text *t)
 {
 	regex_t* re;
-	int n;
+	word n;
+	int c;
 	n = recomp(&rebuf, t, 1);
-	putint(script, n);
+	putword(script, n);
 	re = readdr(n);
-	if(n = regsubcomp(re, (char*)t->w, NiL, 0, 0))
-		badre(re, n);
+	if(c = regsubcomp(re, (char*)t->w, NiL, 0, 0))
+		badre(re, c);
 	t->w += re->re_npat;
 	script->w = (unsigned char*)wordp(script->w);
 	if(re->re_sub->re_flags & REG_SUB_WRITE)
@@ -448,7 +448,7 @@ sc(Text *script, Text *t)
 void
 yc(Text *script, Text *t)
 {
-	int i, m, x;
+	word i, m, x;
 	int delim;
 	unsigned char *s, *pb, *qb;
 	unsigned char *p, *q, *o, *v, **w;
@@ -514,7 +514,7 @@ yc(Text *script, Text *t)
 				else if(qc!=delim && qc!='\\')
 					q = qb-1;
 			}
-			i = q-qb;
+			i = (q-qb);
 			if(w[pc]) {
 				if(w[pc][0]!=i || memcmp(&w[pc][1], qb, i))
 					syntax("ambiguous map");
@@ -522,7 +522,7 @@ yc(Text *script, Text *t)
 			}
 			else {
 				w[pc] = v;
-				*v++ = i;
+				*v++ = (unsigned char)i;
 				memcpy(v, qb, i);
 				v += i;
 			}
@@ -578,7 +578,7 @@ yc(Text *script, Text *t)
 			syntax("string lengths differ");
 		for(i=0; i<UCHAR_MAX+1; i++)
 			if(s[i] == 0)
-				s[i] = i;
+				s[i] = (unsigned char)i;
 	}
 	t->w = q;
 }
@@ -673,7 +673,7 @@ static const cmdf docom[128] = {
 void
 compile(Text *script, Text *t)
 {
-	int loc;	/* progam counter */
+	word loc;	/* progam counter */
 	int neg;	/* ! in effect */
 	int cmd;
 	int naddr;

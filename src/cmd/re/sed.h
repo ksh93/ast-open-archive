@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2009 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -25,11 +25,7 @@
 
 #include "regex.h"
 
-#if LONG_MAX > INT_MAX
-typedef long word;
-#else
-typedef int word;
-#endif
+typedef ptrdiff_t word;
 
 typedef struct {
 	unsigned char *w;		/* write pointer */
@@ -39,11 +35,11 @@ typedef struct {
 
 extern void	compile(Text*, Text*);
 extern void	execute(Text*, Text*);
-extern int	recomp(Text*, Text*, int);
+extern word	recomp(Text*, Text*, int);
 extern int	reexec(regex_t*, char*, size_t, size_t, regmatch_t*, int);
 extern int	match(unsigned char*, Text*, int);
 extern int	substitute(regex_t*, Text*);
-extern regex_t*	readdr(int);
+extern regex_t*	readdr(word);
 extern void	tcopy(Text*, Text*);
 extern void	printscript(Text*);
 extern void	vacate(Text*);
@@ -59,7 +55,7 @@ extern void	coda(void);
 	/* space management; assure room for n more chars in Text */
 #define assure(t, n) \
 	do if((t)->s==0 || (t)->w>=(t)->e-(n)-1) grow((t), (n));while(0)
-extern void	grow(Text*, int);
+extern void	grow(Text*, word);
 
 	/* round character pointer up to word pointer.
 	   portable to the cray; simpler tricks are not */
@@ -113,7 +109,6 @@ extern unsigned char*	map;
 #define DOLLAR		AMASK		/* huge address */
 #define REGADR		(~AMASK)	/* context address */
 
-extern word	pack(int, int, int);
 extern word*	instr(unsigned char*);
 
 #define code(inst)	((inst)>>2*BYTE & 0xff)

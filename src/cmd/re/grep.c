@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2011-06-25 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2012-04-20 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -524,7 +524,6 @@ execute(Sfio_t* input, char* name)
 					x = state.re.head;
 					do
 					{
-						error(-1, "AHA#%d [%d] %-.*s", __LINE__, len, len, s);
 						if ((result = regrexec(&x->re, s, len, state.posnum, state.pos, state.options, '\n', (void*)x, record)) < 0)
 							goto done;
 						if (result && result != REG_NOMATCH)
@@ -626,7 +625,7 @@ main(int argc, char** argv)
 	FTSENT*	ent;
 
 	NoP(argc);
-	flags = fts_flags() | FTS_TOP | FTS_NOPOSTORDER | FTS_NOSEEDOTDIR;
+	flags = fts_flags() | FTS_META | FTS_TOP | FTS_NOPOSTORDER | FTS_NOSEEDOTDIR;
 	state.match = 1;
 	state.options = REG_FIRST|REG_NOSUB|REG_NULL;
 	h = 0;

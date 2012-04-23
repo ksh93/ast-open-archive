@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the BSD package               *
-*Copyright (c) 1978-2011 The Regents of the University of California an*
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -796,7 +796,7 @@ mark1(char* str, int set, int clr)
 		}
 	}
 	if (!f) {
-		if (!(state.msg.list->m_index = first(0, MMNORM))) {
+		if (!state.msg.list || !(state.msg.list->m_index = first(0, MMNORM))) {
 			note(0, "No messages to %s", state.cmd->c_name);
 			return 1;
 		}

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -47,7 +47,7 @@ cputchar(int c)
 void
 writeline(Text *data)
 {
-	int n = data->w - data->s;
+	word n = data->w - data->s;
 	if(sfwrite(sfstdout, data->s, n) != n)
 		error(ERROR_SYSTEM|3, stdouterr);
 	cputchar('\n');
@@ -57,7 +57,7 @@ writeline(Text *data)
          -1 if (numeric) address has been passed,
 	  0 otherwise*/
 int
-sel1(int addr, Text *data)
+sel1(word addr, Text *data)
 {
 	if(addr & REGADR)
 		return reexec(readdr(addr), (char*)data->s, data->w - data->s, 0, 0, 0) == 0;
@@ -86,7 +86,7 @@ selected(unsigned char *pc, Text *data)
 	case 0:			/* 0 address */
 		return !neg;
 	case 1:			/* 1 address */
-		return neg ^ sel1(ipc[0], data)==1;
+		return neg ^ (sel1(ipc[0], data)==1);
 	case 2:
 		error(ERROR_PANIC|4, IBUG,1);
 	case 3:			/* 2 address */
@@ -127,7 +127,7 @@ vacate(Text *t)
 void
 tcopy(Text *from, Text *to)
 {
-	int n = from->w - from->s;
+	word n = from->w - from->s;
 	assure(to, n+1);
 	memmove(to->w, from->s, n);
 	to->w += n;
@@ -167,7 +167,7 @@ de(Text *script, unsigned char *pc, Text *data)
 unsigned char *
 De(Text *script, unsigned char *pc, Text *data)
 {
-	int n;
+	word n;
 	unsigned char *end = (unsigned char*)ustrchr(data->s, '\n');
 	if(end == 0)
 		return de(script, pc, data);
@@ -283,7 +283,7 @@ ne(Text *script, unsigned char *pc, Text *data)
 unsigned char *
 Pe(Text *script, unsigned char *pc, Text *data)
 {
-	int n;
+	word n;
 	unsigned char *end = ustrchr(data->s, '\n');
 	if(end == 0)
 		n = data->w - data->s;
@@ -325,11 +325,11 @@ te(Text *script, unsigned char *pc, Text *data)
 }
 
 unsigned char *
-ww(Text *script, unsigned char *pc, Text *data, int offset)
+ww(Text *script, unsigned char *pc, Text *data, word offset)
 {
 	word *q = (word*)(files.s + offset);
 	Sfio_t *f = *(Sfio_t**)q;
-	int n = data->w - data->s;
+	word n = data->w - data->s;
 	assure(data, 1);
 	*data->w = '\n';
 	if(sfwrite(f, data->s, n+1) != n+1 ||
@@ -369,7 +369,7 @@ ye(Text *script, unsigned char *pc, Text *data)
 	unsigned int c, x;
 	int i, n;
 	Sfio_t *f;
-	if(x = *m++ - (unsigned char*)0) {
+	if(x = (unsigned int)(*m++ - (unsigned char*)0)) {
 		if(!(f = sfstropen()))
 			error(ERROR_SYSTEM|3, "out of space");
 		while(s<w) {
@@ -385,7 +385,7 @@ ye(Text *script, unsigned char *pc, Text *data)
 				while(b<s)
 					sfputc(f, *b++);
 		}
-		x = sfstrtell(f);
+		x = (unsigned int)sfstrtell(f);
 		assure(data, x);
 		memcpy(data->s, sfstrbase(f), x);
 		data->w = data->s + x;
@@ -432,7 +432,7 @@ struct { char p, q; } digram[] = {
 unsigned char *
 le(Text *script, unsigned char *pc, Text *data)
 {
-	int i;
+	word n;
 	int j;
 	unsigned char *s;
 	unsigned char *b;
@@ -455,8 +455,8 @@ le(Text *script, unsigned char *pc, Text *data)
 			*b++ = *s;
 	hit:
 		if((b - buf) >= LEMAX) {
-			i = o - buf;
-			if(sfwrite(sfstdout, buf, i) != i)
+			n = o - buf;
+			if(sfwrite(sfstdout, buf, n) != n)
 				error(ERROR_SYSTEM|3, stdouterr);
 			cputchar('\\');
 			cputchar('\n');
@@ -468,8 +468,8 @@ le(Text *script, unsigned char *pc, Text *data)
 	}
 	*b++ = '$';
 	*b++ = '\n';
-	i = b - buf;
-	if(sfwrite(sfstdout, buf, i) != i)
+	n = b - buf;
+	if(sfwrite(sfstdout, buf, n) != n)
 		error(ERROR_SYSTEM|3, stdouterr);
 	return nexti(pc);
 }	

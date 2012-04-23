@@ -1,3 +1,5 @@
+12-04-13 cmd1.c: fix empty list null pointer deref
+12-02-29 add headfake boolean option to fake 'From ' line in saved message
 11-09-11 add sender=/address/head/pattern/[&|]/head/pattern/...
 11-07-17 fix message list to apply mimeview() to part 0 (main message body)
 10-09-08 fix edited To: in message to override command line recipients

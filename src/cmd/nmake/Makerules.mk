@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-02-29 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-04-22 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -33,7 +33,7 @@ tmp = ${COTEMP}
  * rule option definitions
  */
 
-set option=';all-static;b;-;Force the prerequisite libraries of static \b+l\b\aname\a library references to be static.'
+set option=';all-static;bp;-;Force the prerequisite libraries of static \b+l\b\aname\a library references to be static.'
 set option=';ancestor;n;-;Set the ancestor search directory depth to \adepth\a. \bMAKEPATH\b and variant recursive invocations may increase the depth.;depth:=3'
 set option=';ancestor-source;s;-;A list of \b.SOURCE\b\a.suffix\a \adirectory\a pairs added to the ancestor directory search.;.SOURCE.suffix directory...:=$(.ANCESTOR.LIST)'
 set option=';archive-clean;s;-;A catenation of edit operators that selects archive member files to be removed after being added to the archive.;edit-ops'
@@ -42,14 +42,14 @@ set option=';cctype;s;-;Set the \bprobe\b(1) C compiler type identifier. The def
 set option=';clean-ignore;s;-;Ignore \bclean\b action generated target files matching \apattern\a.;pattern'
 set option=';clobber;sv;-;Replace existing \binstall\b action targets matching \apattern\a instead of renaming to \atarget\a\b.old\b.;pattern:!*'
 set option=';compare;b;-;Ignore \binstall\b action targets whose contents have not changed. On by default.'
-set option=';debug-symbols;b;-;Compile and link with debugging symbol options enabled.'
+set option=';debug-symbols;bp;-;Compile and link with debugging symbol options enabled.'
 set option=';force-shared;b;-;Do not ignore \b-l\b\aname\a shared library reference modification times.'
 set option=';instrument;s;-;Enable compile-time, link-time and/or run-time code instrumentation. Instrumentation interfaces that replace the compiler command, and the \bapp\b, \binsight\b, \bpurecov\b, \bpurify\b, \bquantify\b and \bsentinel\b special-need interfaces, are supported.;command'
 set option=';ld-script;s;-;A space-separated list of suffixes of script files to be passed to the linker.;suffix'
-set option=';lib-type;b;-;Bind library references to \b--debug-symbols\b or \b--profile\b specific variants.'
+set option=';lib-type;bp;-;Bind library references to \b--debug-symbols\b or \b--profile\b specific variants.'
 set option=';link;s;-;Hard link \binstall\b action targets matching \apattern\a instead of copying.;pattern'
-set option=';local-static;b;-;Compile and link against static library targets. The default links against shared library targets, but care must be taken to point runtime shared library binding to the current directory when executing command targets in the current directory.'
-set option=';native-pp;n;-;Force the use of the native C preprocessor and print a \alevel\a diagnostic message noting the override.;level'
+set option=';local-static;bp;-;Compile and link against static library targets. The default links against shared library targets, but care must be taken to point runtime shared library binding to the current directory when executing command targets in the current directory.'
+set option=';native-pp;np;-;Force the use of the native C preprocessor and print a \alevel\a diagnostic message noting the override.;level'
 set option=';official-output;s;-;The \bdiff\b(1) log file name for the \bofficial\b action. If \afile\a is a relative path name then it is written in the next view level.;file:=OFFICIAL'
 set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b$$(CC.INCLUDE.LOCAL)\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
 set option=';preserve;sv;-;Move existing \binstall\b action targets matching \apattern\a to the \bETXTBSY\b subdirectory of the install target.;pattern:!*'
@@ -59,8 +59,8 @@ set option=';recurse-enter;s;-;\atext\a prependeded to the \adirectory\a\b:\b me
 set option=';recurse-leave;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon leaving a recursive \b:MAKE:\b directory. If \b--recurse-leave\b is not specified then no message is printed upon leaving \b:MAKE:\b directories.;text'
 set option=';select;s;-;A catenation of edit operators that selects terminal source files.;edit-ops'
 set option=';separate-include;b;-;Allow \b$$(CC.INCLUDE.LOCAL)\b to be used with compilers that support it. On by default. If \b--noseparate-include\b is set then \b$$(CC.INCLUDE.LOCAL)\b will not be used, even if the current compiler supports it.'
-set option=';shared;b;-;Set \b:LIBRARY:\b to generate shared libraries (dlls).'
-set option=';static-link;b;-;Compile and link with a preference for static libraries.'
+set option=';shared;bp;-;Set \b:LIBRARY:\b to generate shared libraries (dlls).'
+set option=';static-link;bp;-;Compile and link with a preference for static libraries.'
 set option=';strip-symbols;b;-;Strip link-time static symbols from executables.'
 set option=';threads;b;-;Compile and link with thread options enabled. Not implemented yet.'
 set option=';variants;sv;-;Select only \bcc-\b\avariant\a directories matching \apattern\a.;pattern:!*'
@@ -799,24 +799,23 @@ end
 							end
 						end
 						while 1
-							T := $(*.SOURCE.%.ARCHIVE:L>$(L:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)))
+							T := $(*.SOURCE.%.ARCHIVE:L!>$(L:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)))
 							if ! T && Z
-								T := $(*.SOURCE.%.ARCHIVE:L>$(L:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)$(V)*))
+								T := $(*.SOURCE.%.ARCHIVE:L!>$(L:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)$(V)*))
 							end
 							if T
 								if ! "$(CC.SUFFIX.SHARED)" || T != "*$(CC.SUFFIX.SHARED)"
 									if T == "*$(CC.SUFFIX.ARCHIVE)"
-										if "$(-stdlib-l)"
-											if "$(CC.STDLIB:N=$(T:T=F:D))"
-												H = -
-											end
+										if "$(CC.STDLIB:N=$(T:D))"
+											return - $(T:T=F)
 										end
-										return $(H) $(T)
+										return $(H) $(T:B:S)
 									end
 									if "$(CC.SUFFIX.STATIC)" && T == "*$(CC.SUFFIX.STATIC)"
 										H = -
 									end
 								end
+								T := $(T:B:S)
 								Q = .ARCHIVE
 								if ! "$(-force-shared)" && ! "$(-static-link)" && ! "$(CC.SUFFIX.DYNAMIC)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
 									Q += .IGNORE

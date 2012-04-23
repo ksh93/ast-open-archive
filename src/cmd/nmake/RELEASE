@@ -1,3 +1,7 @@
+12-04-20 option.c,load.c,Makerules.mk: add Op option .mo reread prereqs
+12-03-22 Makerules.mk: .BIND.-l% in STDLIB dir with only CC.SUFFIX.ARCHIVE => -lfoo
+12-03-22 bind.c: add .BIND.-l% --debug=3 trace
+12-03-22 expand.c: SORT_qualified '!' and and SORT_first '>' no longer mutually exclusive
 12-02-29 Makerules.mk: fix ``lhs :MAKE: rhs'' logic for lhs and rhs makefile
 12-02-29 option.c: fix regress option doc typo
 12-02-20 Makerules.mk: update for astlicense() { since start source }

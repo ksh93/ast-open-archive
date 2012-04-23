@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2011-08-24 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2012-04-20 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -1330,7 +1330,7 @@ main(int argc, register char** argv)
 	else
 		s = argv[0];
 	error_info.id = s;
-	state.ftwflags = ftwflags() | FTW_CHILDREN;
+	state.ftwflags = ftwflags() | FTW_META | FTW_CHILDREN;
 	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()))
 		error(3, "out of space");
 	if (!(state.keys = hashalloc(NiL, HASH_name, "keys", 0)))

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -41,6 +41,7 @@
 #define Om		(1<<13)		/* internal option		*/
 #define On		(1<<14)		/* numeric value		*/
 #define Oo		(1<<15)		/* flag sense opposite		*/
+#define Op		(1L<<19)	/* .mo probe prerequisite	*/
 #define Os		(1L<<16)	/* string value			*/
 #define Ov		(1L<<17)	/* value is optional		*/
 #define Ox		(1L<<18)	/* not expanded in $(-)		*/
@@ -62,7 +63,7 @@
 #define OPT_corrupt	('X'|Os|Ov)	/* corrupt statefile action	*/
 #define OPT_cross	('J'|Ob)	/* don't run gen'd executables	*/
 #define OPT_debug	('d'|Oi|On)	/* debug trace level		*/
-#define OPT_define	('D'|Os|Ox)	/* passed to preprocessor	*/
+#define OPT_define	('D'|Op|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_errorid	('E'|Os)	/* append to error output id	*/
 #define OPT_exec	('n'|Ob|Oo)	/* execute shell actions	*/
 #define OPT_expandview	('x'|Ob)	/* expand paths if fsview!=0	*/
@@ -97,7 +98,7 @@
 #define OPT_test	('T'|On)	/* enable test code		*/
 #define OPT_tolerance	('z'|On)	/* time comparison tolerance	*/
 #define OPT_touch	('t'|Ob)	/* touch out of date targets	*/
-#define OPT_undef	('U'|Os|Ox)	/* passed to preprocessor	*/
+#define OPT_undef	('U'|Op|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_vardump	('v'|Ob|Ox)	/* dump variable definitions	*/
 #define OPT_warn	('w'|Ob)	/* enable source file warnings	*/
 #define OPT_writeobject	(107|Of|Os|Ov|Ox)/* write recompiled object	*/

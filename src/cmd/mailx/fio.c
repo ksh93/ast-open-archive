@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2006 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -141,7 +141,14 @@ setptr(register FILE* ibuf, off_t offset)
 	inhead = 0;
 	mp = 0;
 	count = 0;
-	while (fgets(cp = buf, LINESIZE, ibuf)) {
+	for (;;) {
+		cp = buf;
+		if (state.var.headfake) {
+			state.var.headfake = 0;
+			strcopy(cp, "From bozo@bigtop Wed Feb 29 00:00:00 2012\r\n");
+		}
+		else if (!fgets(cp, LINESIZE, ibuf))
+			break;
 		prevcount = count;
 		count = strlen(cp);
 		if (count == 0 && (zoff = ftell(ibuf)) > roff) {

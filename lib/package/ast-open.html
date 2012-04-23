@@ -1035,7 +1035,60 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-03-29  --- Release ksh93u++ ---
+12-03-29  A bug in which appending an index array onto an array without elements
+	  caused the first element to be 1 rather than 0 has been fixed.
+12-03-29  A bug which could cause a core dump when copying a large index array
+	  has been fixed.
+12-03-28  The shell now generates an error message when the sizes with L, Z,
+	  and R are &gt; 32767 instead of generating a core dump.
+12-03-28  A bug in left and right justification in which the width of invalid
+	  characters was not taken as zero has been fixed.
+12-03-26  A bug in which typeset -p ref, when ref is a reference to an index
+	  array element did not display the subscript has been fixed.
+12-03-23  A bug in lowercase and uppercase fields when expanding ${name:=val}
+	  when name is the empty string has been fixed.
+12-03-22  A namespace bug in which a type t defined in namespace foo could not
+	  be referenced outside the namespace as .foo.t has been fixed.
+12-03-22  A bug in name reference scoping in which a name function called from
+	  another function is pass a name reference to a compound variable
+	  instance to be created and the compound variable is in the global
+	  scope.
+12-03-22  A bug in which ${ref&#0091;@}} did not behave like ${arr&#0091;i&#0093;&#0091;@&#0093;} when
+	  ref is a name reference to arr&#0091;i&#0093; has been fixed.
+12-03-21  A bug in which assigning a compound variable into arr&#0091;i&#0093;, where
+	  arr&#0091;i&#0093; is an array variable did not work correctly has been fixed.
+12-03-21  A bug with multi-dimenstional index arrays in which ${arr&#0091;i&#0093;&#0091;j&#0093;}
+	  could generate a bogus error message when i was &gt; 9 has been fixed.
+12-03-21  A bug in which typeset v=foo, typeset -p v&#0091;0&#0093; generated a core dump
+	  has been fixed.
+12-03-20  A bug which caused a core dump when defining a type with a field
+	  as ' integer -a data=(&#0091;0&#0093;=0)' has been fixed.
+12-03-19  Using typeset -a array when array is an associative arry not
+	  generated an error message.
+12-03-19  typeset +a, typeset +A, and typeset +C not displays the variables
+	  with the attributes a, A, and C respectively instead of an error.
+12-03-19  A bug in which typeset -pC, typeset -pa, and typeset -pA output all
+	  variables rather than those of type C, a, or A only has been fixed.
+12-03-18  A bug in which unset foo where foo is a name reference to a compound
+	  variable defined inside a function is not unset has been fixed.
+12-03-18  A bug with SHOPT_EDPREDICT which could cause a core dump when the
+	  list of matches became empty has been fixed.  
+12-03-15  The assignment, typeset -C foo=(a b c) now generates a syntax
+	  error since a is not an assignment command.
+12-03-16  A bug in which an unset discipline from a variable defined in a
+	  subshell is not invoked in the subshell has been fixed.
+12-03-08  The assignment typeset -a (x=1 y=2) now creates an index array
+	  of two elements rathern than an array of one element which is
+	  a compound variable.
+12-03-02  A bug in which a program that exits with value 12 when called
+	  from a command substitution in which standard output has been
+	  redirected caused the shell to hang has been fixed.
+12-03-01  A bug in which the shell could not parse &#0091;&#0091; '&#0093;' == ~(E)&#0091;&#0093;&#0093; &#0093;&#0093;
+	  has been fixed.
 12-02-29  --- Release ksh93u+ ---
+12-02-29  A bug in which ~user expanded first in a subshell prevented it
+	  from expanding later in a program has been fixed.
 12-02-29  A bug which could lead to a core dump when more that four shared
 	  libraries were added with the builtin command has been fixed.
 12-02-29  Fixed a few bugs which caused SIGCHLD to be blocked preventing
@@ -3929,6 +3982,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-20 pax.c: verify that --maxout &gt; --blocksize (else it recurses on newio()!)
+12-04-17 pax.c,copy.c: fix multiple prompt for --write --yes
+12-04-17 misc.c: --yes accepts { 'y' 'Y' '1' }, { 'q' 'Q' '-' } =&gt; remaining no
 11-06-21 pax.c,copy.c,file.c: add --filter option mtime=&lt;date-string&gt;
 11-03-17 copy.c: fix bug that didn't list special files for --verbose
 11-02-11 pax-tnef.c: handle "" member names -- really?
@@ -4895,6 +4951,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-20 option.c,load.c,Makerules.mk: add Op option .mo reread prereqs
+12-03-22 Makerules.mk: .BIND.-l% in STDLIB dir with only CC.SUFFIX.ARCHIVE =&gt; -lfoo
+12-03-22 bind.c: add .BIND.-l% --debug=3 trace
+12-03-22 expand.c: SORT_qualified '!' and and SORT_first '&gt;' no longer mutually exclusive
 12-02-29 Makerules.mk: fix ``lhs :MAKE: rhs'' logic for lhs and rhs makefile
 12-02-29 option.c: fix regress option doc typo
 12-02-20 Makerules.mk: update for astlicense() { since start source }
@@ -6881,6 +6941,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mailx changes">mailx changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-13 cmd1.c: fix empty list null pointer deref
+12-02-29 add headfake boolean option to fake 'From ' line in saved message
 11-09-11 add sender=/address/head/pattern/&#0091;&amp;|&#0093;/head/pattern/...
 11-07-17 fix message list to apply mimeview() to part 0 (main message body)
 10-09-08 fix edited To: in message to override command line recipients
@@ -7105,6 +7167,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-20 grep.c: always enable FTS_META (to disable pure FTS_PHYSICAL)
+12-04-17 type.dat: add type.dat re-type switch tests
+12-03-38 sed?.&#0091;ch&#0093;: 64 bit cleanup for msvc
 11-06-25 grep.c: handle FTS_SLNONE
 10-12-10 grep.c: fix some empty line buffer boundary bugs
 10-11-22 testregex.dat: add more &#0091;......&#0093; tests
@@ -7360,6 +7425,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-20 ls.c: FTW_META default
 12-02-14 yes.sh: add
 12-01-23 du.c: the rightmost of { -b -h -k -K -m } overrides the others
 11-12-13 features/procfs, pss-procfs.c: check _PS_task for { st_uid st_gid }
@@ -7689,6 +7755,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-11 find,tw,xargs: update to cmdopen() discipline api
 12-02-29 find.c: fix ``! -type f'' vs ``! -type f -print'' bug
 11-10-31 tw.c: handle -lexpr X2I change -- scary
 11-07-25 expr.c: fix -e sort:url core dump
@@ -7844,6 +7911,13 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-23 sfio_t.h: change getr to 32 bits to prepare for UTF-8 delimiters
+12-04-23 features/signal.c: add SIGSTKFLT
+12-04-17 regex/regcomp.c: fix (E:...) vs (E)... scoping
+12-04-11 features/sys: add aix's _LARGE_FILE_API to the _LARGEFILE(64)?_SOURCE mix -- anyone else?
+12-04-11 include/cmdarg.h,misc/cmdarg.c: (finally!) add a discipline with Cmdrun_f
+12-03-28 vmalloc: int vs &#0091;s&#0093;size_t cleanup
+12-03-27 sfio: fix #if logic that caused syntax errors (on 64 bit uwin)
 12-03-10 misc/optget.c: HELP_index for "PLUGIN" too
 12-02-29 include/shcmd.h: PLUGIN_VERSION 20111111 for cdt disc/meth change
 12-02-29 comp/spawnveg.c: fix sigcritical() to include waitpid() for internal child
@@ -7865,7 +7939,7 @@ All recorded changes follow.
 12-01-12 sfpkrd.c: add __sun I_PEEK+rsh runtime workaround
 12-01-10 shcmd.h: void* =&gt; Shbltin_t*
 12-01-10 tmxdate.c: handle { n&gt;=1000 } TM_PARTS
-11-12-21 plug up some meory links -- thanks mhlavink
+11-12-21 plug up some memory links -- thanks mhlavink
 11-12-21 vmprivate.c: enclose VM_NONMEM exception in CLRLOCK(vm,0) ... SETLOCK(vm,0)
 11-12-13 aso: in -lposix for uwin, not -last -- just like vmalloc
 11-12-13 sfpoll.c: all streams SF_IOINTR =&gt; don't ignore EINTR
@@ -9636,6 +9710,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-04-20 chgrp.c,chmod.c,cksum.c,cp.c: default fts_flags()|FTS_META (to disable pure FTS_PHYSICAL)
+12-03-26 cp.c: fix --interactive astquery() logic that ignored no&amp;quit!
 12-02-14 rm.c: --force ignores no file operands specified
 12-01-10 b_* (int, char**, void*) =&gt; (int, char**, Shbltin_t*)
 11-08-27 pids.c: add getsid() iffe test
@@ -11412,7 +11488,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>March 13, 2012</TD>
+<TD align=right>April 23, 2012</TD>
 </TR>
 </TABLE>
 <P>

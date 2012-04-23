@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -162,6 +162,7 @@ typedef struct Loadstate_s		/* load state			*/
 static struct Object_s			/* object global state		*/
 {
 	Sfio_t*		pp;		/* prerequisite ref pointer	*/
+	char*		options;	/* preprocess/probe options	*/
 	unsigned char*	a2n;		/* CC_ASCII=>CC_NATIVE		*/
 	unsigned char*	n2a;		/* CC_NATIVE=>CC_ASCII		*/
 	unsigned long	garbage;	/* state garbage count		*/
@@ -1368,20 +1369,7 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 			lowres = 0;
 		}
 		else if (n & COMP_OPTIONS)
-		{
-			/*
-			 * compare with current preprocessor options
-			 */
-
-			for (p = internal.preprocess->prereqs; p; p = p->next)
-				sfputr(internal.nam, p->rule->name, p->next ? ' ' : -1);
-			u = sfstruse(internal.nam);
-			if (!streq(s, u))
-			{
-				error(state.exec || state.mam.out ? -1 : 1, "%s: options changed%s%s", r->name, *s ? " from " : null, s);
-				break;
-			}
-		}
+			object.options = strdup(s);
 	}
  nope:
 	state.init--;
@@ -1433,7 +1421,7 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
  */
 
 int
-load(register Sfio_t* sp, const char* objfile, int ucheck)
+load(register Sfio_t* sp, const char* objfile, int source, int ucheck)
 {
 	register int		n;
 	register Rule_t*	r;
@@ -1489,6 +1477,23 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	OLD_header_t		old_header;
 	OLD_trailer_t		old_trailer;
 
+	if (source)
+	{
+		/*
+		 * compare with current preprocess options
+		 */
+
+		for (d = internal.preprocess->prereqs; d; d = d->next)
+			sfputr(internal.nam, d->rule->name, d->next ? ' ' : -1);
+		s = sfstruse(internal.nam);
+		if (!object.options)
+			object.options = (char*)null;
+		if (!streq(object.options, s))
+		{
+			error(state.exec || state.mam.out ? -1 : 1, "%s: options changed from \"%s\" to \"%s\"", objfile, object.options, s);
+			return 0;
+		}
+	}
 	loadinit();
 	zero(ls);
 

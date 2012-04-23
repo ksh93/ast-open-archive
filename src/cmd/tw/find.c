@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2012-02-29 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2012-04-11 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -845,6 +845,7 @@ compile(State_t* state, char** argv, register Node_t* np, int nested)
 	int			index = opt_info.index;
 	int			i;
 	int			k;
+	Cmddisc_t		disc;
 	enum Command		oldop = PRINT;
 
 	for (;;)
@@ -1120,7 +1121,8 @@ compile(State_t* state, char** argv, register Node_t* np, int nested)
 			argv[opt_info.index - 1] = 0;
 			if (k & CMD_INSERT)
 				i = 1;
-			if (!(np->first.xp = cmdopen(com, i, 0, "{}", k|CMD_EXIT|CMD_IGNORE, errorf)))
+			CMDDISC(&disc, k|CMD_EXIT|CMD_IGNORE, errorf);
+			if (!(np->first.xp = cmdopen(com, i, 0, "{}", &disc)))
 			{
 				error(ERROR_SYSTEM|2, "out of space");
 				return -1;

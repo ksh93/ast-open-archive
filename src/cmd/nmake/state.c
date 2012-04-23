@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -144,7 +144,7 @@ stateview(int op, char* name, register Rule_t* s, register Rule_t* r, int view, 
 
 				state.stateview = view;
 				message((-2, "loading state view %d file %s", view, file));
-				if (load(fp, file, 0) > 0)
+				if (load(fp, file, 0, 0) > 0)
 					state.view[view].flags |= BIND_EXISTS;
 				else if (state.corrupt && *state.corrupt == 'a' && !(state.view[0].flags & BIND_EXISTS))
 					state.accept = 1;
@@ -638,7 +638,7 @@ readstate(void)
 			state.stateview = 0;
 			message((-2, "loading state file %s", file));
 			makerule(file)->dynamic |= D_built;
-			if (load(fp, file, 10) > 0)
+			if (load(fp, file, 0, 10) > 0)
 				state.view[0].flags |= BIND_EXISTS;
 			else if (!state.corrupt)
 				error(3, "use -%c%c to accept current state or -%c to remake", OPT(OPT_accept), OPT(OPT_readstate), OPT(OPT_readstate));

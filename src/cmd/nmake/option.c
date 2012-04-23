@@ -171,6 +171,7 @@ static Option_t		options[] =	/* option table			*/
 	"	[+i?internal value inverted]"
 	"	[+n?numeric value]"
 	"	[+o?\a-char\a means \b--no\b\aname\a]"
+	"	[+p?.mo probe prerequisite]"
 	"	[+s?string value]"
 	"	[+v?optional option argument]"
 	"	[+x?not expanded in \b$(-)\b]"
@@ -500,6 +501,8 @@ declare(Sfio_t* sp, register Option_t* op)
 		sfputc(internal.tmp, 'n');
 	if (op->flags & Oo)
 		sfputc(internal.tmp, 'o');
+	if (op->flags & Op)
+		sfputc(internal.tmp, 'p');
 	if (op->flags & Os)
 		sfputc(internal.tmp, 's');
 	if (op->flags & Ov)
@@ -654,6 +657,8 @@ showop(register Option_t* op)
 		sfprintf(internal.tmp, "|n");
 	if (op->flags & Oo)
 		sfprintf(internal.tmp, "|o");
+	if (op->flags & Op)
+		sfprintf(internal.tmp, "|p");
 	if (op->flags & Os)
 		sfprintf(internal.tmp, "|s");
 	if (op->flags & Ov)
@@ -746,6 +751,7 @@ setop(register Option_t* op, register int n, char* s, int type)
 {
 	char*		t;
 	Rule_t*		r;
+	int		preprocess;
 	int		readonly;
 
 	readonly = state.readonly;
@@ -1089,6 +1095,9 @@ setop(register Option_t* op, register int n, char* s, int type)
 					case 'o':
 						n |= Oo;
 						continue;
+					case 'p':
+						n |= Op;
+						continue;
 					case 's':
 						n &= ~(Ob|On);
 						n |= Os;
@@ -1379,6 +1388,28 @@ setop(register Option_t* op, register int n, char* s, int type)
 	}
 	if (op->set)
 		setcall(op, readonly);
+	if ((op->flags & Op) && !state.reading && !state.user)
+	{
+		if ((op->flags & Os) && s)
+		{
+			sfprintf(internal.tmp, "--%s=%s", op->name, s);
+			if (!(r = getrule(sfstruse(internal.tmp))))
+				r = makerule(NiL);
+			addprereq(internal.preprocess, r, PREREQ_APPEND);
+		}
+		else if ((op->flags & (Ob|On)) && n)
+		{
+			if (!n)
+				sfprintf(internal.tmp, "--no%s", op->name);
+			else if (n != 1)
+				sfprintf(internal.tmp, "--%s=%d", op->name, n);
+			else
+				sfprintf(internal.tmp, "--%s", op->name);
+			if (!(r = getrule(sfstruse(internal.tmp))))
+				r = makerule(NiL);
+			addprereq(internal.preprocess, r, PREREQ_APPEND);
+		}
+	}
 }
 
 /*

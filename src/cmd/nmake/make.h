@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -980,7 +980,7 @@ extern int		nametype(const char*, char**);
 extern List_t*		joint(Rule_t*);
 extern List_t*		listcopy(List_t*);
 extern void		listops(Sfio_t*, int);
-extern int		load(Sfio_t*, const char*, int);
+extern int		load(Sfio_t*, const char*, int, int);
 extern int		loadable(Sfio_t*, Rule_t*, int);
 extern void		localvar(Sfio_t*, Var_t*, char*, int);
 extern char*		localview(Rule_t*);

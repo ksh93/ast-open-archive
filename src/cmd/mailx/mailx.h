@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the BSD package               *
-*Copyright (c) 1978-2011 The Regents of the University of California an*
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -802,6 +802,7 @@ typedef struct {
 	char*	followup;
 	char*	header;
 	char*	headerbotch;
+	char*	headfake;
 	char*	hold;
 	char*	home;
 	char*	hostname;
