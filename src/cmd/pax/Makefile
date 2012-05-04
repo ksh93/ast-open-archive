@@ -23,7 +23,11 @@ nocom :: nocom.c
 
 $(LIBDIR)/pax :INSTALLDIR: cia.fmt ppar.fmt
 
-:INSTALLDIR: bax cpio tar testpax
+:INSTALLDIR: bax testpax
+
+if CC.HOSTTYPE != "win32*"
+:INSTALLDIR: cpio tar
+end
 
 bax :: bax.1 bax.sh
 
@@ -33,7 +37,7 @@ delta2patch :: delta2patch.sh
 
 rpm2cpio :: rpm2cpio.sh
 
-tar :: tar.sh
+tar :: tar.sh LICENSE=since=1989,author=gsf+brussell
 
 :TEST: pax
 

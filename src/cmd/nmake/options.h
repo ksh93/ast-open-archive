@@ -70,7 +70,7 @@
 #define OPT_explain	('e'|Ob)	/* explain actions		*/
 #define OPT_file	('f'|Oa|Os|Ox)	/* next arg is makefile		*/
 #define OPT_force	('F'|Ob)	/* force targets to be updated	*/
-#define OPT_global	('g'|Oa|Os)	/* next arg is global makefile	*/
+#define OPT_global	('g'|Oa|Os|Ov)	/* next arg is global makefile	*/
 #define OPT_ignore	('i'|Ob)	/* ignore shell action errors	*/
 #define OPT_ignorelock	('K'|Ob)	/* ignore state file locking	*/
 #define OPT_include	('I'|Os|Ox)	/* passed to preprocessor	*/

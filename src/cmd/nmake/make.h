@@ -801,6 +801,9 @@ typedef struct State_s			/* program state		*/
 	unsigned char	never;		/* really - don't exec anything	*/
 	unsigned char	op;		/* currently parsing operator	*/
 	unsigned char	override;	/* override explicit rules	*/
+	unsigned char	pushed;		/* --global state		*/
+	unsigned char	push_global;	/* --global state		*/
+	unsigned char	push_user;	/* --global state		*/
 	unsigned char	preprocess;	/* preprocess all makefiles	*/
 	unsigned char	reading;	/* currently reading makefile	*/
 	unsigned char	readonly;	/* current vars|opts readonly	*/

@@ -1,3 +1,5 @@
+12-05-04 option.c: add 'set --global...set --noglobal' scoping for :OP: makefiles
+12-05-03 Makerules.mk: don't use ``grep -q'' until sun/oracle gets on board
 12-04-20 option.c,load.c,Makerules.mk: add Op option .mo reread prereqs
 12-03-22 Makerules.mk: .BIND.-l% in STDLIB dir with only CC.SUFFIX.ARCHIVE => -lfoo
 12-03-22 bind.c: add .BIND.-l% --debug=3 trace

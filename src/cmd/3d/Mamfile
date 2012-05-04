@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-04-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-04
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -1140,7 +1140,7 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - ;;
 exec - *) if ENV= LC_ALL=C x= $SHELL -nc '[[ a || b ]] && : ${list[level]}  !(pattern)' 2>/dev/null
-exec - then if grep -q '### .*archaic.* ###'
+exec - then if grep '### .*archaic.* ###' >/dev/null
 exec - then : 3d contains archaic constructs :
 exec - else ENV= LC_ALL=C $SHELL -n 3d.sh
 exec - fi
@@ -1181,7 +1181,7 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - ;;
 exec - *) if ENV= LC_ALL=C x= $SHELL -nc '[[ a || b ]] && : ${list[level]}  !(pattern)' 2>/dev/null
-exec - then if grep -q '### .*archaic.* ###'
+exec - then if grep '### .*archaic.* ###' >/dev/null
 exec - then : opaque contains archaic constructs :
 exec - else ENV= LC_ALL=C $SHELL -n opaque.sh
 exec - fi
@@ -1221,7 +1221,7 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - ;;
 exec - *) if ENV= LC_ALL=C x= $SHELL -nc '[[ a || b ]] && : ${list[level]}  !(pattern)' 2>/dev/null
-exec - then if grep -q '### .*archaic.* ###'
+exec - then if grep '### .*archaic.* ###' >/dev/null
 exec - then : vex contains archaic constructs :
 exec - else ENV= LC_ALL=C $SHELL -n vex.sh
 exec - fi

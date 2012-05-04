@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-04-22 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-05-03 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1094,7 +1094,7 @@ end
 	?*:*:*|*::*|*:*:$RANDOM)
 		;;
 	*)	if	ENV= LC_ALL=C x= $SHELL -nc '[[ a || b ]] && : ${list[level]} $$(( 1 + $x )) !(pattern)' 2>/dev/null
-		then	if	$(GREP) -q '### .*archaic.* ###'
+		then	if	$(GREP) '### .*archaic.* ###' >/dev/null
 			then	: $(<) contains archaic constructs :
 			else	ENV= LC_ALL=C $SHELL -n $(>)
 			fi

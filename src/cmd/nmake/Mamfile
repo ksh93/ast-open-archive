@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-04-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-04
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -382,7 +382,7 @@ make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.7 2012-04-20 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.7 2012-05-04 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -398,7 +398,7 @@ exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - ;;
 exec - *) if ENV= LC_ALL=C x= $SHELL -nc '[[ a || b ]] && : ${list[level]}  !(pattern)' 2>/dev/null
-exec - then if grep -q '### .*archaic.* ###'
+exec - then if grep '### .*archaic.* ###' >/dev/null
 exec - then : ppcc contains archaic constructs :
 exec - else ENV= LC_ALL=C $SHELL -n ppcc.sh
 exec - fi

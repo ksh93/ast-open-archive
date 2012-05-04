@@ -461,6 +461,12 @@ readfile(register char* file, int type, char* filter)
 				oldname(r);
 				r->dynamic &= ~D_bound;
 			}
+			if (state.pushed)
+			{
+				state.pushed = 0;
+				state.global = state.push_global;
+				state.user = state.push_user;
+			}
 			return(1);
 		}
 		if ((type & COMP_DONTCARE) || (r->property & P_dontcare))

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -591,6 +591,7 @@ setvar(char* s, char* v, int flags)
 	register Var_t*		p;
 	register int		n;
 	int			isid;
+	int			undefined;
 
 	if (!v)
 		v = null;
@@ -616,7 +617,7 @@ setvar(char* s, char* v, int flags)
 	 * check for a previous definition
 	 */
 
-	if (!(p = getvar(s)))
+	if (undefined = !(p = getvar(s)))
 	{
 		newvar(p);
 		if (p->property & V_import)
@@ -645,7 +646,7 @@ setvar(char* s, char* v, int flags)
 		p = auxiliary(s, 1);
 	}
 	p->property |= flags & (V_builtin|V_functional);
-	if (state.user || state.readonly || !(p->property & V_readonly) && (!(p->property & V_import) || state.global != 1 || (flags & V_import) || state.base && !state.init))
+	if (state.user || state.readonly || undefined || !(p->property & V_readonly) && (!state.pushed && !(p->property & V_import) || state.global != 1 || (flags & V_import) || state.base && !state.init))
 	{
 		if (flags & V_import)
 		{

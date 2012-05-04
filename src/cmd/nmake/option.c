@@ -846,6 +846,26 @@ setop(register Option_t* op, register int n, char* s, int type)
 			error(2, "%s: invalid corrupt action", s);
 		}
 		return;
+	case OPT(OPT_global):
+		if (!s)
+		{
+			if (n)
+			{
+				state.pushed = 1;
+				state.push_global = state.global;
+				state.global = 1;
+				state.push_user = state.user;
+				state.user = 0;
+			}
+			else if (state.pushed)
+			{
+				state.pushed = 0;
+				state.global = state.push_global;
+				state.user = state.push_user;
+			}
+			return;
+		}
+		break;
 	case OPT(OPT_include):
 		addprereq(catrule(internal.source->name, external.source, NiL, 1), makerule(s), PREREQ_APPEND);
 		if (!(op->flags & OPT_READONLY))

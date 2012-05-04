@@ -486,7 +486,7 @@ Tcl_DoOneEvent(flags)
 
     while (1) {
 
-	sh_sigcheck(); /* XXX: tksh specific */
+	sh_sigcheck(0); /* XXX: tksh specific */
 
 	/*
 	 * The first thing we do is to service any asynchronous event

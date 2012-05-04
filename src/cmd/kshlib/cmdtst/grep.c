@@ -21,7 +21,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2012-04-20 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2012-05-03 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files for "
@@ -90,6 +90,7 @@ USAGE_LICENSE
 "[T:test?Enable implementation specific tests.]: [test]"
 "[w:word-match|word-regexp?Force \apatterns\a to match complete words.]"
 "[a?Ignored for GNU compatibility.]"
+"[Y:color|colour?Ignored for GNU compatibility.]:[when]"
 "\n"
 "\n[ pattern ] [ file ... ]\n"
 "\n"
@@ -455,7 +456,7 @@ record(void* handle, const char* s, size_t len)
 }
 
 static int
-execute(State_t* state, Sfio_t* input, char* name, void* context)
+execute(State_t* state, Sfio_t* input, char* name, Shbltin_t* context)
 {
 	register char*	s;
 	char*		file;
@@ -675,7 +676,7 @@ execute(State_t* state, Sfio_t* input, char* name, void* context)
 }
 
 static int
-grep(char* id, int options, int argc, char** argv, void* context)
+grep(char* id, int options, int argc, char** argv, Shbltin_t* context)
 {
 	int	c;
 	char*	s;
@@ -967,7 +968,7 @@ grep(char* id, int options, int argc, char** argv, void* context)
 }
 
 int
-b_grep(int argc, char** argv, void* context)
+b_grep(int argc, char** argv, Shbltin_t* context)
 {
 	char*	s;
 	int	options;
@@ -1008,28 +1009,28 @@ b_grep(int argc, char** argv, void* context)
 }
 
 int
-b_egrep(int argc, char** argv, void* context)
+b_egrep(int argc, char** argv, Shbltin_t* context)
 {
 	NoP(argc);
 	return grep("egrep", REG_EXTENDED, argc, argv, context);
 }
 
 int
-b_fgrep(int argc, char** argv, void* context)
+b_fgrep(int argc, char** argv, Shbltin_t* context)
 {
 	NoP(argc);
 	return grep("fgrep", REG_LITERAL, argc, argv, context);
 }
 
 int
-b_pgrep(int argc, char** argv, void* context)
+b_pgrep(int argc, char** argv, Shbltin_t* context)
 {
 	NoP(argc);
 	return grep("pgrep", REG_EXTENDED|REG_LENIENT, argc, argv, context);
 }
 
 int
-b_xgrep(int argc, char** argv, void* context)
+b_xgrep(int argc, char** argv, Shbltin_t* context)
 {
 	NoP(argc);
 	return grep("xgrep", REG_AUGMENTED, argc, argv, context);

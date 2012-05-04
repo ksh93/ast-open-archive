@@ -561,7 +561,7 @@ Tcl_TclEval(interp, cmd)
 	iPtr->flags &= ~ERR_ALREADY_LOGGED;
     }
     iPtr->termPtr = termPtr;
-	sh_sigcheck();
+	sh_sigcheck(0);
 	iPtr->interpType = oldInterpType;
     return result;
 }
