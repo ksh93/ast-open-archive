@@ -1035,7 +1035,25 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-12-05-04  --- Release ksh93u+ ---
+12-05-15  --- Release ksh93u+ ---
+12-05-15  The default value for -L, -R, and -Z when the size was not set was
+	  incorrectly defaulting to 1 and has been fixed.
+12-05-15  A bug in which a subshell of the form (name=value exec ...) could
+	  coredump when name is an environment variable and xtrace is on has
+	  been fixed.
+12-05-15  Fixed a .paths bug in which only the first BUILTIN_LIB assignment worked.
+12-05-14  Arithmetic expressions and subexpressions that are not floating point
+	  now treat -0 as 0, so that $((-0)) is 0 and $((-0.0)) is -0. 
+12-05-11  'unset .sh' now fails with readonly message instead of coredump. 
+12-05-11  A bug which left an associative array arr containing one element in
+	  the wrong state after expanding with ${arr&#0091;@&#0093;} has been fixed. 
+12-05-10  A bug in which typeset -f did not display options that called getopts
+	  has been fixed.
+12-05-08  Fixed a number of potential bugs uncovered by valgrind.
+12-05-08  A bug in which typeset -b -Z10 var did not initialize var to the
+	  empty string has been fixed.
+12-05-07  A bug in which the exit value of an interactive shell could be
+	  affected by the evaluation of the PS1 prompt has been fixed.
 12-05-04  A bug in which x=() was not unsetting the old value of x before
 	  creating an empty compound variable has been fixed.
 12-05-01  A bug in vi edit mode in which after &lt;ESC&gt;^V, the terminal was not
@@ -4042,6 +4060,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-05-14 pax.c: use Format_t.match to eliminate explicit format references
+12-05-14 pax.c: add xz format -- requires local system standalone xz command
+12-05-07 tar.sh: fix file/option quoting, --show
 12-05-04 tar.sh: snarf update from Brian Russell
 12-04-20 pax.c: verify that --maxout &gt; --blocksize (else it recurses on newio()!)
 12-04-17 pax.c,copy.c: fix multiple prompt for --write --yes
@@ -5012,6 +5033,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-05-14 make.c: .IGNORE disables non-file "must"
 12-05-04 option.c: add 'set --global...set --noglobal' scoping for :OP: makefiles
 12-05-03 Makerules.mk: don't use ``grep -q'' until sun/oracle gets on board
 12-04-20 option.c,load.c,Makerules.mk: add Op option .mo reread prereqs
@@ -7230,6 +7252,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-05-07 grep.c: add case 'y': to *really* ignore --color
 12-05-03 grep.c: add -Y, --color -- ignored for GNU compatibility
 12-04-20 grep.c: always enable FTS_META (to disable pure FTS_PHYSICAL)
 12-04-17 type.dat: add type.dat re-type switch tests
@@ -7975,6 +7998,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-05-15 misc/optget.c: #? option with no value should have opt_info.num==0
+12-05-11 misc/stk.c: fix memmove() read of 1 uninitialized byte
+12-05-11 regex/regcoll.c: avoid memcpy() to self
 12-05-01 port/astconf.c: fix astconflist() to list standard minmax value if defined
 12-04-26 sfio/sftmp.c: fix memory leak due to inadvertent SF_STATIC copy
 12-04-26 sfio/sfwrite.c: fix subtle memory leak (with Vmlast or Vmpool or freeBSD malloc)
@@ -11558,7 +11584,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>May 04, 2012</TD>
+<TD align=right>May 15, 2012</TD>
 </TR>
 </TABLE>
 <P>

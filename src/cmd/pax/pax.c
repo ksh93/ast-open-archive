@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2012-04-20 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2012-05-14 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -793,81 +793,78 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 			ap = getarchive(state.operation);
 			if (!y)
 				ap->format = 0;
-			else
+			else if (s = strdup(v))
 			{
-				if (streq(v, "tgz"))
-					v = "tar:gzip";
-				else if (streq(v, "tbz"))
-					v = "tar:bzip";
-				if (s = strdup(v))
-					do
+				v = s;
+				do
+				{
+					for (e = s, o = 0;;)
 					{
-						for (e = s, o = 0;;)
+						switch (*e++)
 						{
-							switch (*e++)
-							{
-							case 0:
-								e = 0;
+						case 0:
+							e = 0;
+							break;
+						case ' ':
+						case '\t':
+						case '\n':
+						case ':':
+						case ',':
+						case '.':
+							*(e - 1) = 0;
+							if (*s)
 								break;
-							case ' ':
-							case '\t':
-							case '\n':
-							case ':':
-							case ',':
-							case '.':
+							s = e;
+							continue;
+						case '=':
+							if (!o)
+							{
 								*(e - 1) = 0;
-								if (*s)
-									break;
-								s = e;
-								continue;
-							case '=':
-								if (!o)
-								{
-									*(e - 1) = 0;
-									o = e;
-								}
-								continue;
-							default:
-								continue;
+								o = e;
 							}
+							continue;
+						default:
+							continue;
+						}
+						break;
+					}
+					if (!(fp = getformat(s, 0)) && s == v && s[0] == 't' && !strchr(s, ':') && (fp = getformat(s + 1, 0)))
+					{
+						if (ap->format = getformat("tar", 0))
+							s++;
+						else
+							fp = 0;
+					}
+					if (!fp)
+					{
+						if (!pathpath("lib/pax", opt.arg0, PATH_EXECUTE, tmp1, sizeof(tmp1)) || sfsprintf(tmp2, sizeof(tmp2) - 1, "%s/%s.fmt", tmp1, s) <= 0 || !(sp = sfopen(NiL, tmp2, "r")))
+							error(3, "%s: unknown archive format", s);
+						while (e = sfgetr(sp, '\n', 1))
+							if (*e != '#')
+							{
+								setoptions(e, sfvalue(sp), NiL, state.usage, ap, type);
+								if (line && !hdr)
+									line += opt_info.offset;
+							}
+						sfclose(sp);
+					}
+					else
+					{
+						fp->details = o;
+						switch (fp->flags & (ARCHIVE|COMPRESS|DELTA))
+						{
+						case ARCHIVE:
+							ap->format = fp;
+							break;
+						case COMPRESS:
+							ap->compress = fp;
+							break;
+						case DELTA:
+							initdelta(ap, fp);
 							break;
 						}
-						if (s[0] == 'g' && s[1] == 'z')
-							s = "gzip";
-						else if (s[0] == 'b' && s[1] == 'z')
-							s = "bzip";
-						else if (s[0] == 'v' && (s[1] == 'c' || s[1] == 'z'))
-							s = "vczip";
-						if (!(fp = getformat(s, 0)))
-						{
-							if (!pathpath("lib/pax", opt.arg0, PATH_EXECUTE, tmp1, sizeof(tmp1)) || sfsprintf(tmp2, sizeof(tmp2) - 1, "%s/%s.fmt", tmp1, s) <= 0 || !(sp = sfopen(NiL, tmp2, "r")))
-								error(3, "%s: unknown archive format", s);
-							while (e = sfgetr(sp, '\n', 1))
-								if (*e != '#')
-								{
-									setoptions(e, sfvalue(sp), NiL, state.usage, ap, type);
-									if (line && !hdr)
-										line += opt_info.offset;
-								}
-							sfclose(sp);
-						}
-						else
-						{
-							fp->details = o;
-							switch (fp->flags & (ARCHIVE|COMPRESS|DELTA))
-							{
-							case ARCHIVE:
-								ap->format = fp;
-								break;
-							case COMPRESS:
-								ap->compress = fp;
-								break;
-							case DELTA:
-								initdelta(ap, fp);
-								break;
-							}
-						}
-					} while (s = e);
+					}
+				} while (s = e);
 			}
 			ap->expected = ap->format;
 			if (!state.operation)

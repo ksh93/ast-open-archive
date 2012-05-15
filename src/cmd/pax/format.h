@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -60,7 +60,8 @@ extern Format_t			PAX_DEBUG_FORMAT;
 #define pax_pds_next		(&pax_compress_format)
 #define pax_compress_next	(&pax_gzip_format)
 #define pax_gzip_next		(&pax_bzip_format)
-#define pax_bzip_next		(&pax_vczip_format)
+#define pax_bzip_next		(&pax_xz_format)
+#define pax_xz_next		(&pax_vczip_format)
 #define pax_vczip_next		(&pax_delta_format)
 #define pax_delta_next		(&pax_delta_88_format)
 #define pax_delta_88_next	(&pax_ignore_format)
@@ -92,5 +93,6 @@ extern Format_t			pax_ustar_format;
 extern Format_t			pax_vczip_format;
 extern Format_t			pax_vdb_format;
 extern Format_t			pax_vmsbackup_format;
+extern Format_t			pax_xz_format;
 
 #endif

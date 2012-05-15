@@ -55,9 +55,9 @@ TEST 02 'long options'
 	EXEC	cmd "$usage" --method abc
 		OUTPUT - $'return=x option=-x name=--method arg=(null) num=1\nargument=1 value="abc"'
 	EXEC	cmd "$usage" -V -x --si 10k --size=1m
-		OUTPUT - $'return=V option=-V name=-V arg=(null) num=1\nreturn=x option=-x name=-x arg=(null) num=1\nreturn=z option=-z name=--size arg=10k num=10000\nreturn=z option=-z name=--size arg=1m num=1000000'
+		OUTPUT - $'return=V option=-V name=-V arg=(null) num=1\nreturn=x option=-x name=-x arg=(null) num=0\nreturn=z option=-z name=--size arg=10k num=10000\nreturn=z option=-z name=--size arg=1m num=1000000'
 	EXEC	cmd "$usage" -V -x --si 10ki --size=1mi
-		OUTPUT - $'return=V option=-V name=-V arg=(null) num=1\nreturn=x option=-x name=-x arg=(null) num=1\nreturn=z option=-z name=--size arg=10ki num=10240\nreturn=z option=-z name=--size arg=1mi num=1048576'
+		OUTPUT - $'return=V option=-V name=-V arg=(null) num=1\nreturn=x option=-x name=-x arg=(null) num=0\nreturn=z option=-z name=--size arg=10ki num=10240\nreturn=z option=-z name=--size arg=1mi num=1048576'
 	EXEC	cmd "$usage" --yes --no --noyes --no-yes --yes=1 --yes=0
 		OUTPUT - $'return=-10 option=-10 name=--yes arg=(null) num=1\nreturn=-20 option=-20 name=--no arg=(null) num=1\nreturn=-10 option=-10 name=--yes arg=(null) num=0\nreturn=-10 option=-10 name=--yes arg=(null) num=0\nreturn=-10 option=-10 name=--yes arg=(null) num=1\nreturn=-10 option=-10 name=--yes arg=(null) num=0'
 	EXEC	cmd "$usage" --vern
@@ -1460,7 +1460,7 @@ TEST 15 'required vs. optional arguments'
 	EXEC	cmd "$usage" --opt=1 --opt -2 --opt 3 4 5
 		OUTPUT - $'return=o option=-o name=--optional arg=1 num=1\nreturn=o option=-o name=--optional arg=(null) num=1\nreturn=2 option=-2 name=-2 arg=(null) num=1\nreturn=o option=-o name=--optional arg=(null) num=1\nargument=1 value="3"\nargument=2 value="4"\nargument=3 value="5"'
 	EXEC	cmd "$usage" -o1 -o -2 -o 3 4 5
-		OUTPUT - $'return=o option=-o name=-o arg=1 num=1\nreturn=o option=-o name=-o arg=(null) num=1\nreturn=2 option=-2 name=-2 arg=(null) num=1\nreturn=o option=-o name=-o arg=3 num=1\nargument=1 value="4"\nargument=2 value="5"'
+		OUTPUT - $'return=o option=-o name=-o arg=1 num=1\nreturn=o option=-o name=-o arg=(null) num=0\nreturn=2 option=-2 name=-2 arg=(null) num=1\nreturn=o option=-o name=-o arg=3 num=1\nargument=1 value="4"\nargument=2 value="5"'
 	usage=$'[-][y:sort?sort by key]:?[key]{[a?A]}'
 	EXEC	ls "$usage" -y
 		OUTPUT - $'return=y option=-y name=-y arg=(null) num=1'
@@ -1632,7 +1632,7 @@ duh
 TEST 18 'more compatibility'
 	usage=$'CD:[macro[=value]]EI:?[dir]MPU:[macro]V?A:[assertion]HTX:[dialect]Y:[stdinclude] [input [output]]'
 	EXEC	cpp "$usage" -Da=b -Ic -I -Id
-		OUTPUT - $'return=D option=-D name=-D arg=a=b num=1\nreturn=I option=-I name=-I arg=c num=1\nreturn=I option=-I name=-I arg=(null) num=1\nreturn=I option=-I name=-I arg=d num=1'
+		OUTPUT - $'return=D option=-D name=-D arg=a=b num=1\nreturn=I option=-I name=-I arg=c num=1\nreturn=I option=-I name=-I arg=(null) num=0\nreturn=I option=-I name=-I arg=d num=1'
 	EXEC	cpp "$usage" -?
 		OUTPUT - $'return=? option=-? name=-? num=0'
 		ERROR - $'Usage: cpp [-CEMPV] [-D macro[=value]] [-I[dir]] [-U macro] [input [output]]'
@@ -2006,7 +2006,7 @@ TEST 27 'opt_info.num with opt_info.arg'
 	EXEC	huh "$usage" -o
 		OUTPUT - $'return=o option=-o name=-o arg=(null) num=1'
 	EXEC	huh "$usage" -o -f
-		OUTPUT - $'return=o option=-o name=-o arg=(null) num=1\nreturn=f option=-f name=-f arg=(null) num=1'
+		OUTPUT - $'return=o option=-o name=-o arg=(null) num=0\nreturn=f option=-f name=-f arg=(null) num=1'
 	EXEC	huh "$usage" --optional=ok
 		OUTPUT - $'return=o option=-o name=--optional arg=ok num=1'
 	EXEC	huh "$usage" --optional ok
@@ -2823,24 +2823,24 @@ TEST 41 'cache exercises'
 [1] return=c option=-c name=-c arg=2 num=1
 [1] return=a option=-a name=-a arg=(null) num=1'
 	EXEC typeset "$usage" -c -a
-		OUTPUT - $'[3] return=c option=-c name=-c arg=(null) num=1
+		OUTPUT - $'[3] return=c option=-c name=-c arg=(null) num=0
 [3] return=a option=-a name=-a arg=(null) num=1
-[2] return=c option=-c name=-c arg=(null) num=1
+[2] return=c option=-c name=-c arg=(null) num=0
 [2] return=a option=-a name=-a arg=(null) num=1
-[1] return=c option=-c name=-c arg=(null) num=1
+[1] return=c option=-c name=-c arg=(null) num=0
 [1] return=a option=-a name=-a arg=(null) num=1'
 	EXEC typeset "$usage" -a -b1 -c -c2
 		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
 [3] return=b option=-b name=-b arg=1 num=1
-[3] return=c option=-c name=-c arg=(null) num=1
+[3] return=c option=-c name=-c arg=(null) num=0
 [3] return=c option=-c name=-c arg=2 num=1
 [2] return=a option=-a name=-a arg=(null) num=1
 [2] return=b option=-b name=-b arg=1 num=1
-[2] return=c option=-c name=-c arg=(null) num=1
+[2] return=c option=-c name=-c arg=(null) num=0
 [2] return=c option=-c name=-c arg=2 num=1
 [1] return=a option=-a name=-a arg=(null) num=1
 [1] return=b option=-b name=-b arg=1 num=1
-[1] return=c option=-c name=-c arg=(null) num=1
+[1] return=c option=-c name=-c arg=(null) num=0
 [1] return=c option=-c name=-c arg=2 num=1'
 	usage=$'[-1c]a:[command][n:number]#?[number][s:string]:?[string]'
 	EXEC typeset "$usage" -n
@@ -2876,6 +2876,26 @@ TEST 41 'cache exercises'
 [1] return=a option=-a name=-a arg=locate num=1
 [1] argument=1 value="OPT"
 [1] argument=2 value="--foo"'
+	usage=$'[-1c][L]#?[n?Left justify.][Z]#?[n?Zero fill.]'
+	EXEC typeset "$usage" -Z -L -L -Z -L foo=bar
+		OUTPUT - '[3] return=Z option=-Z name=-Z arg=(null) num=0
+[3] return=L option=-L name=-L arg=(null) num=0
+[3] return=L option=-L name=-L arg=(null) num=0
+[3] return=Z option=-Z name=-Z arg=(null) num=0
+[3] return=L option=-L name=-L arg=(null) num=0
+[3] argument=1 value="foo=bar"
+[2] return=Z option=-Z name=-Z arg=(null) num=0
+[2] return=L option=-L name=-L arg=(null) num=0
+[2] return=L option=-L name=-L arg=(null) num=0
+[2] return=Z option=-Z name=-Z arg=(null) num=0
+[2] return=L option=-L name=-L arg=(null) num=0
+[2] argument=1 value="foo=bar"
+[1] return=Z option=-Z name=-Z arg=(null) num=0
+[1] return=L option=-L name=-L arg=(null) num=0
+[1] return=L option=-L name=-L arg=(null) num=0
+[1] return=Z option=-Z name=-Z arg=(null) num=0
+[1] return=L option=-L name=-L arg=(null) num=0
+[1] argument=1 value="foo=bar"'
 
 TEST 42 'optional long names'
 	usage=$'[-][a:aaa][b:bbb?BBB][c?CCC][d:?DDD][e\f:n:eee\f][f\f:y:fff\f?FFF][g:ggg?GGG]'

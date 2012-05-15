@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-04
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -486,13 +486,21 @@ meta pax-vdb.o %.c>%.o pax-vdb.c pax-vdb
 prev pax-vdb.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c pax-vdb.c
 done pax-vdb.o generated
+make pax-xz.o
+make pax-xz.c
+prev format.h implicit
+done pax-xz.c
+meta pax-xz.o %.c>%.o pax-xz.c pax-xz
+prev pax-xz.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c pax-xz.c
+done pax-xz.o generated
 bind -lardir
 bind -lodelta
 bind -lvdelta
 bind -lcodex
 bind -lsum
 bind -ldll
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pax bio.o convert.o copy.o pax.o options.o delta.o file.o format.o misc.o paxlib.o pax-ar.o pax-bzip.o pax-compress.o pax-cpio.o pax-delta.o pax-delta_88.o pax-flash.o pax-gzip.o pax-ignore.o pax-mime.o pax-patch.o pax-pds.o pax-rpm.o pax-saveset.o pax-slt.o pax-tar.o pax-tnef.o pax-vczip.o pax-vdb.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libcodex} ${mam_libsum} ${mam_libdll} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pax bio.o convert.o copy.o pax.o options.o delta.o file.o format.o misc.o paxlib.o pax-ar.o pax-bzip.o pax-compress.o pax-cpio.o pax-delta.o pax-delta_88.o pax-flash.o pax-gzip.o pax-ignore.o pax-mime.o pax-patch.o pax-pds.o pax-rpm.o pax-saveset.o pax-slt.o pax-tar.o pax-tnef.o pax-vczip.o pax-vdb.o pax-xz.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libcodex} ${mam_libsum} ${mam_libdll} ${mam_libast}
 done pax generated
 make nocom
 make nocom.o

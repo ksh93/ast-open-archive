@@ -24,9 +24,7 @@
 #
 
 command=tar
-synopsis="
-Usage: $command [options] [operands] files ... "
-#synopsis="
+
 #Usage: $command c[bBfkLopvVwzZ[[0-9][hlm]]] [tarfile] [exclude-file]
 #       $command r[bBfkLvVwzZ[[0-9][hlm]]] [files ...]
 #       $command t[bBfkvX[[0-9][hlm]] [tarfile] [exclude-file]
@@ -34,7 +32,7 @@ Usage: $command [options] [operands] files ... "
 #       $command x[bBfkmopvVw[[0-9][hlm]]] [tarfile] [exclude-file]"
 
 usage=$'
-[-?\n@(#)$Id: tar (AT&T Labs Research) 2012-05-01 $\n]
+[-?\n@(#)$Id: tar (AT&T Labs Research) 2012-05-07 $\n]
 '$USAGE_LICENSE$'
 [+NAME?tar - create tape archives, and add or extract files]
 [+DESCRIPTION?The \btar\b utility is a compatibility script on top of
@@ -65,6 +63,7 @@ usage=$'
 [f:file]:[file?Use archive \afile\a or device (default /dev/rmt0).]
 [h:logical|dereference?Follow symbolic links.]
 [j:bzip?Filter the archive through \bbzip2\b(1).]
+[J:xz?Filter the archive through \bxz\b(1).]
 [k?On archive read only extract files that are newer than the target
     files.]
 [l?Link. Complain if tar cannot resolve all of the links to files being
@@ -89,9 +88,14 @@ usage=$'
 
 [+SEE ALSO?\bar\b(1), \bbzip2\b(1), \bchown\b(1), \bcompress\b(1),
     \bcpio\b(1), \bcsh\b(1), \bgzip\b(1), \bksh\b(1), \bls\b(1),
-    \bmt\b(1), \bpax\b(1), \bumask\b(2), \benviron\b(5)]
+    \bmt\b(1), \bpax\b(1), \bumask\b(2), \bxz\b(1), \benviron\b(5)]
 '
-options="-P"
+
+typeset -a options
+integer noptions=0
+
+options[noptions++]="-P"
+eval=eval
 file=""
 list=false
 r_ok=true
@@ -118,28 +122,31 @@ process_option()
 {
 	case $1 in
 	[0-9])	case $fileSpecified in
-		true)	print -u2 "$command: cannot specify both file and tape$synopsis"; exit 1 ;;
-		*)	file="-o tape=$1"
+		true)	print -u2 "$command: cannot specify both file and tape"; exit 1 ;;
+		*)	file="--tape=$1"
 			tapeSpecified=true
 			;;
 		esac
 		;;
-	13)	options+=" --atime"	;;
+	13)	options[noptions++]="--atime"	;;
 	23)	if [[ $# == 0 ]]
 		then
-			print -u2 "$command: excluded file name argument expected$synopsis"; exit 1
+			print -u2 "$command: excluded file name argument expected"; exit 1
 		else
 			excludedFiles+=" $OPTARG"
 			directedToExclude=true
 			w_ok=false
 		fi
 		;;
+	33)	set --showme
+		eval=
+		;;
 	[hlm])	case $lastopt in
 		[0-9])	file="${file}$1"	;;
 		*)	case $1 in
-			h)	options+=" -L"		;;
+			h)	options[noptions++]="-L"	;;
 			l)	;;
-			m)	options+=" -pam"	;;
+			m)	options[noptions++]="-pam"	;;
 			esac
 			;;
 		esac
@@ -149,54 +156,54 @@ process_option()
 			optsWargs+="b "
 		elif [[ $# == 0 ]]
 		then
-			print -u2 "$command: blocking factor argument expected$synopsis"; exit 1
+			print -u2 "$command: blocking factor argument expected"; exit 1
 		else
-			options+=" -b ${OPTARG}b"
+			options[noptions++]="-b"
+			options[noptions++]="${OPTARG}b"
 		fi
 		;;
 	c)	mode="-w" ; r_ok=false ;;
 	f)	if [[ $tapeSpecified == true ]]
 		then
-			print -u2 "$command: cannot specify both file and tape$synopsis"; exit 1
+			print -u2 "$command: cannot specify both file and tape"; exit 1
 		elif [[ $2 == "short form" ]]
 		then
 			optsWargs+="f "
 			fileSpecified=true
 		elif [[ $# == 0 ]]
 		then
-			print -u2 "$command: file name argument expected$synopsis"; exit 1
+			print -u2 "$command: file name argument expected"; exit 1
 		else
 			case $1 in	# Retain most recent file operand
 			-)	file="" ;;
-			*)	file="-f $OPTARG" ;;
+			*)	file="--file=$OPTARG" ;;
 			esac
 			fileSpecified=true
 		fi
 		;;
 	j)	zip=":bzip" ;;
-	k)	options+=" -u"	;;
-	o)	owner=`who am i | sed -e 's/ .*//'`
-		options+=" --owner $owner"
-		;;
-	p)	options+=" -pe" ;;
-	r)	mode="-w" ; r_ok=false ; options+=" -a" ;;
+	k)	options[noptions++]="-u"	;;
+	o)	options[noptions++]="--owner=${USER:-${LOGNAME:-$(id -un)}}" ;;
+	p)	options[noptions++]="-pe" ;;
+	r)	mode="-w" ; r_ok=false ; options[noptions++]="-a" ;;
 	t)	mode="-r" ; w_ok=false ; list=true ;;
-	u)	mode="-w" ; r_ok=false ; options+=" -u" ;;
-	v)	options+=" -v" ;;
-	w)	options+=" -o yes" ;;
+	u)	mode="-w" ; r_ok=false ; options[noptions++]="-u" ;;
+	v)	options[noptions++]="-v" ;;
+	w)	options[noptions++]="-o"; options[noptions++]="yes" ;;
 	x)	mode="-r" ; w_ok=false ;;
 	z)	zip=":gzip"	;;
-	A)	mode="-w" ; r_ok=false ; options+=" -a" ;;
-	B)	options+=" -b 10kib"	;;
+	A)	mode="-w" ; r_ok=false ; options[noptions++]="-a" ;;
+	B)	options[noptions++]="-b"; options[noptions++]="10ki"	;;
 	E)	format="pax"	;;
+	J)	zip=":xz" ;;
 	L)	if [[ $2 == "short form" ]]
 		then
 			optsWargs+="L "
 		elif [[ $# == 0 ]]
 		then
-			print -u2 "$command: maxout argument expected$synopsis"; exit 1
+			print -u2 "$command: maxout argument expected"; exit 1
 		else
-			options+=" --maxout=$(($OPTARG*1024))"
+			options[noptions++]="--maxout=$(($OPTARG*1024))"
 		fi
 		;;
 	V)	if [[ $2 == "short form" ]]
@@ -204,9 +211,9 @@ process_option()
 			optsWargs+="V "
 		elif [[ $# == 0 ]]
 		then
-			print -u2 "$command: volume label argument expected$synopsis"; exit 1
+			print -u2 "$command: volume label argument expected"; exit 1
 		else
-			options+=" --label=$OPTARG"
+			options[noptions++]="--label=$OPTARG"
 		fi
 		;;
 	Z)	zip=":compress" ;;
@@ -229,7 +236,7 @@ case $1 in
 	fi
 	shift
 	while [[ $arg ]]
-	do process_option ${arg:0:1} "short form" || usage
+	do	process_option ${arg:0:1} "short form" || usage
 		arg=${arg#?}
 	done
 	;;
@@ -242,28 +249,28 @@ for i in $optsWargs
 do
 	case $i in
 	b)	case $# in
-		0)	print -u2 "$command: blocking factor argument expected$synopsis"; exit 1 ;;
+		0)	print -u2 "$command: blocking factor argument expected"; exit 1 ;;
 		esac
 		block=$1		# Retain most recent block operand
 		shift
 		;;
 	f)	case $# in
-		0)	print -u2 "$command: file name argument expected$synopsis"; exit 1 ;;
+		0)	print -u2 "$command: file name argument expected"; exit 1 ;;
 		esac
 		case $1 in		# Retain most recent file operand
-		-)	file=""		;;
-		*)	file="-f $1"	;;
+		-)	file=""			;;
+		*)	file="--file=$1"	;;
 		esac
 		shift
 		;;
 	L)	case $# in
-		0)	print -u2 "$command: maxout argument expected$synopsis"; exit 1 ;;
+		0)	print -u2 "$command: maxout argument expected"; exit 1 ;;
 		esac
 		maxout=$(($1*1024))	# Retain most recent maxout operand
 		shift
 		;;
 	V)	case $# in
-		0)	print -u2 "$command: volume label argument expected$synopsis"; exit 1 ;;
+		0)	print -u2 "$command: volume label argument expected"; exit 1 ;;
 		esac
 		label=$1		# Retain most recent label operand
 		shift
@@ -271,25 +278,27 @@ do
 	esac
 done
 if [[ $block ]]
-then	options+=" -b ${block}b"	# Take most recent block operand short form
+then	options[noptions++]="-b"; options[noptions++]="${block}b"	# Take most recent block operand short form
 fi
 if [[ $maxout ]]
-then	options+=" --maxout=$maxout"	# Take most recent maxout operand short form
+then	options[noptions++]="--maxout=$maxout"	# Take most recent maxout operand short form
 fi
 if [[ $label ]]
-then	options+=" --label=$label"	# Take most recent label operand short form
+then	options[noptions++]="--label=$label"	# Take most recent label operand short form
 fi
 
-xstring=""
 if [[ $directedToExclude == true ]]
 then
+	exclude=""
 	prefix="!("			# Build list of files to exclude
 	for i in $excludedFiles
-	do
-		xstring+=$prefix$i
+	do	exclude+=$prefix$i
 		prefix="|"
 	done
-	xstring+=")"
+	if	[[ $exclude ]]
+	then	exclude+=")"
+		set -- $exclude
+	fi
 fi
 
 case $mode in
@@ -306,10 +315,11 @@ case $mode in
 	case $# in
 	0)	set "." ;;
 	esac
-	options+=" -x $format$zip"
+	options[noptions++]="-x"; options[noptions++]="$format$zip"
 	;;
-*)	print -u2 "$command: one of Acrtx must be specified$synopsis"; exit 1 ;;
+*)	print -u2 "$command: one of Acrtx must be specified"; exit 1 ;;
 esac
 
-eval pax $mode $options $file $xstring "$@" 
-#eval print pax $mode $options $file $xstring "$@" 
+[[ $file ]] && options[noptions++]="$file"
+
+; pax $mode "${options[@]}" "$@" 

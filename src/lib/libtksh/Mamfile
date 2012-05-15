@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-04
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-14
 setv INSTALLROOT ../../..
 setv PACKAGE_X11 ${INSTALLROOT}
 setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11

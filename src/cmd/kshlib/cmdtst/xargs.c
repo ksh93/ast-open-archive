@@ -29,6 +29,7 @@
 static const char usage[] =
 "[-?\n@(#)$Id: xargs (AT&T Research) 2012-04-11 $\n]"
 USAGE_LICENSE
+"[--plugin?ksh]"
 "[+NAME?xargs - construct arg list and execute command]"
 "[+DESCRIPTION?\bxargs\b constructs a command line consisting of the "
     "\acommand\a and \aargument\a operands specified followed by as many "

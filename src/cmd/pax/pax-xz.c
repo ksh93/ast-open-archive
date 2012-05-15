@@ -20,52 +20,51 @@
 #pragma prototyped
 
 /*
- * pax bzip format
+ * pax xz format
  */
 
 #include "format.h"
 
 static int
-bzip_getprologue(Pax_t* pax, Format_t* fp, Archive_t* ap, File_t* f, unsigned char* buf, size_t size)
+xz_getprologue(Pax_t* pax, Format_t* fp, Archive_t* ap, File_t* f, unsigned char* buf, size_t size)
 {
-	if (size < 3 || buf[0] != 0x42 || buf[1] != 0x5a || buf[2] != 0x68)
+	off_t		pos;
+	unsigned char	foot[6];
+
+	if (size < 5 || buf[0] != 0xfd || buf[1] != '7' || buf[2] != 'z' || buf[3] != 'X' || buf[4] != 'Z')
 		return 0;
-	ap->uncompressed = ap->io->size * 7;
+	if ((pos = lseek(ap->io->fd, (off_t)0, SEEK_CUR)) < 0 || lseek(ap->io->fd, (off_t)-sizeof(foot), SEEK_END) <= 0 || read(ap->io->fd, foot, sizeof(foot)) != sizeof(foot) || foot[4] != 0x59 || foot[5] != 0x5A)
+		return 0;
+	else
+		ap->uncompressed = (foot[0]) |
+				   (foot[1] << 8) |
+				   (foot[2] << 16) |
+				   (foot[3] << 24);
+	lseek(ap->io->fd, pos, SEEK_SET);
 	return 1;
 }
 
-static Compress_format_t	pax_bzip_data =
+static Compress_format_t	pax_xz_data =
 {
 	0,
-	{ "bunzip2" },
+	{ "xz", "--decompress" },
 	{ 0 },
 };
 
-Format_t	pax_bzip_format =
+Format_t	pax_xz_format =
 {
-	"bzip",
-	"bzip2|bz",
-	"bzip compression",
+	"xz",
+	0,
+	"xz compression",
 	0,
 	COMPRESS|IN|OUT,
 	0,
 	0,
 	0,
-	PAXNEXT(bzip),
-	&pax_bzip_data,
+	PAXNEXT(xz),
+	&pax_xz_data,
 	0,
-	bzip_getprologue,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0
+	xz_getprologue,
 };
 
-PAXLIB(bzip)
+PAXLIB(xz)

@@ -1,3 +1,6 @@
+12-05-14 pax.c: use Format_t.match to eliminate explicit format references
+12-05-14 pax.c: add xz format -- requires local system standalone xz command
+12-05-07 tar.sh: fix file/option quoting, --show
 12-05-04 tar.sh: snarf update from Brian Russell
 12-04-20 pax.c: verify that --maxout > --blocksize (else it recurses on newio()!)
 12-04-17 pax.c,copy.c: fix multiple prompt for --write --yes

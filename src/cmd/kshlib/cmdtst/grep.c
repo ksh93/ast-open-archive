@@ -21,8 +21,9 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2012-05-03 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2012-05-11 $\n]"
 USAGE_LICENSE
+"[--plugin?ksh]"
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files for "
     "lines containing a match for the given \apatterns\a. Matching lines are "
@@ -845,6 +846,9 @@ grep(char* id, int options, int argc, char** argv, Shbltin_t* context)
 			break;
 		case 'x':
 			state.options |= REG_LEFT|REG_RIGHT;
+			break;
+		case 'Y':
+			/* ignored for GNU compatibility */
 			break;
 		case '?':
 			vmclose(state.vm);

@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Research) 2012-05-03 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2012-05-07 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -792,6 +792,9 @@ main(int argc, char** argv)
 			break;
 		case 'x':
 			state.options |= REG_LEFT|REG_RIGHT;
+			break;
+		case 'Y':
+			/* ignored for GNU compatibility */
 			break;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
