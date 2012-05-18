@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make taso
 make libtaso.a archive
@@ -76,7 +76,7 @@ done taso.req generated
 make taso.o
 make taso.c
 make FEATURE/pthread implicit
-meta FEATURE/pthread features/%>FEATURE/% features/pthread pthread
+meta FEATURE/pthread features/%>FEATURE/% ${PACKAGEROOT}/src/lib/libtaso/features/pthread pthread
 make features/pthread
 done features/pthread
 bind -lpthread
@@ -163,7 +163,7 @@ done ${PACKAGE_ast_INCLUDE}/ast.h
 make ${PACKAGE_ast_INCLUDE}/ast_standards.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_standards.h
 done taso.c
-meta taso.o %.c>%.o taso.c taso
+meta taso.o %.c>%.o ${PACKAGEROOT}/src/lib/libtaso/taso.c taso
 prev taso.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_taso -D_PACKAGE_ast -c taso.c
 done taso.o generated

@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make ardir
 make libardir.a archive
@@ -168,7 +168,7 @@ done ardir.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ardirlib.h
 done ardir.c
-meta ardir.o %.c>%.o ardir.c ardir
+meta ardir.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ardir.c ardir
 prev ardir.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ardir.c
 done ardir.o generated
@@ -186,7 +186,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tm.h
 prev ardirlib.h implicit
 done ar-aix.c
-meta ar-aix.o %.c>%.o ar-aix.c ar-aix
+meta ar-aix.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ar-aix.c ar-aix
 prev ar-aix.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aix.c
 done ar-aix.o generated
@@ -195,7 +195,7 @@ make ar-aixbig.c
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ardirlib.h implicit
 done ar-aixbig.c
-meta ar-aixbig.o %.c>%.o ar-aixbig.c ar-aixbig
+meta ar-aixbig.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ar-aixbig.c ar-aixbig
 prev ar-aixbig.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aixbig.c
 done ar-aixbig.o generated
@@ -205,7 +205,7 @@ prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ardirlib.h implicit
 done ar-local.c
-meta ar-local.o %.c>%.o ar-local.c ar-local
+meta ar-local.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ar-local.c ar-local
 prev ar-local.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-local.c
 done ar-local.o generated
@@ -219,7 +219,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/cdt.h
 prev ardirlib.h implicit
 done ar-omf.c
-meta ar-omf.o %.c>%.o ar-omf.c ar-omf
+meta ar-omf.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ar-omf.c ar-omf
 prev ar-omf.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-omf.c
 done ar-omf.o generated
@@ -232,7 +232,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/swap.h
 prev ardirlib.h implicit
 done ar-pdp11.c
-meta ar-pdp11.o %.c>%.o ar-pdp11.c ar-pdp11
+meta ar-pdp11.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ar-pdp11.c ar-pdp11
 prev ar-pdp11.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-pdp11.c
 done ar-pdp11.o generated
@@ -241,7 +241,7 @@ make ar-port.c
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ardirlib.h implicit
 done ar-port.c
-meta ar-port.o %.c>%.o ar-port.c ar-port
+meta ar-port.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ar-port.c ar-port
 prev ar-port.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-port.c
 done ar-port.o generated
@@ -251,7 +251,7 @@ prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/swap.h implicit
 prev ardirlib.h implicit
 done ar-s5r0.c
-meta ar-s5r0.o %.c>%.o ar-s5r0.c ar-s5r0
+meta ar-s5r0.o %.c>%.o ${PACKAGEROOT}/src/lib/libardir/ar-s5r0.c ar-s5r0
 prev ar-s5r0.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-s5r0.c
 done ar-s5r0.o generated

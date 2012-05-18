@@ -34,14 +34,14 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make proto
 make proto.o
 make proto.c
-make ../../lib/libpp/ppproto.c implicit
-make ../../lib/libast/port/astlicense.c implicit
+make ${INSTALLROOT}/src/lib/libpp/ppproto.c implicit
+make ${INSTALLROOT}/src/lib/libast/port/astlicense.c implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
@@ -114,16 +114,16 @@ done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-done ../../lib/libast/port/astlicense.c dontcare
-make ../../lib/libpp/ppfsm.h implicit
-done ../../lib/libpp/ppfsm.h dontcare
-make ../../lib/libpp/pplib.h implicit
+done ${INSTALLROOT}/src/lib/libast/port/astlicense.c dontcare
+make ${INSTALLROOT}/src/lib/libpp/ppfsm.h implicit
+done ${INSTALLROOT}/src/lib/libpp/ppfsm.h dontcare
+make ${INSTALLROOT}/src/lib/libpp/pplib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ../../lib/libpp/ppkey.h implicit
-done ../../lib/libpp/ppkey.h dontcare
+make ${INSTALLROOT}/src/lib/libpp/ppkey.h implicit
+done ${INSTALLROOT}/src/lib/libpp/ppkey.h dontcare
 make ../../lib/libpp/ppdef.h implicit
 done ../../lib/libpp/ppdef.h dontcare
-make ../../lib/libpp/pp.h implicit
+make ${INSTALLROOT}/src/lib/libpp/pp.h implicit
 make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
@@ -144,18 +144,18 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hash.h dontcare
-done ../../lib/libpp/pp.h dontcare
+done ${INSTALLROOT}/src/lib/libpp/pp.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../../lib/libpp/pplib.h dontcare
+done ${INSTALLROOT}/src/lib/libpp/pplib.h dontcare
 make ${PACKAGE_ast_INCLUDE}/hashkey.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashkey.h dontcare
-make ../../lib/libpp/ppfsm.c implicit
-prev ../../lib/libpp/ppfsm.h implicit
-prev ../../lib/libpp/pplib.h implicit
-done ../../lib/libpp/ppfsm.c dontcare
-done ../../lib/libpp/ppproto.c
+make ${INSTALLROOT}/src/lib/libpp/ppfsm.c implicit
+prev ${INSTALLROOT}/src/lib/libpp/ppfsm.h implicit
+prev ${INSTALLROOT}/src/lib/libpp/pplib.h implicit
+done ${INSTALLROOT}/src/lib/libpp/ppfsm.c dontcare
+done ${INSTALLROOT}/src/lib/libpp/ppproto.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 make ${PACKAGE_ast_INCLUDE}/times.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
@@ -166,7 +166,7 @@ done ${PACKAGE_ast_INCLUDE}/times.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done proto.c
-meta proto.o %.c>%.o proto.c proto
+meta proto.o %.c>%.o ${PACKAGEROOT}/src/cmd/proto/proto.c proto
 prev proto.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libpp -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -c proto.c
 done proto.o generated
@@ -175,23 +175,23 @@ exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${I
 done proto generated
 make mamake
 make mamake.o
-make ../INIT/mamake.c
+make ${INSTALLROOT}/src/cmd/INIT/mamake.c
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../INIT/mamake.c
-meta mamake.o %.c>%.o ../INIT/mamake.c mamake
-prev ../INIT/mamake.c
+done ${INSTALLROOT}/src/cmd/INIT/mamake.c
+meta mamake.o %.c>%.o ${PACKAGEROOT}/src/cmd/INIT/mamake.c mamake
+prev ${INSTALLROOT}/src/cmd/INIT/mamake.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/mamake.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -D_PACKAGE_ast -c ${INSTALLROOT}/src/cmd/INIT/mamake.c
 done mamake.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mamake mamake.o ${mam_libast}
 done mamake generated
 make ratz
 make ratz.o
-make ../INIT/ratz.c
+make ${INSTALLROOT}/src/cmd/INIT/ratz.c
 make unix.h implicit
 done unix.h dontcare virtual
 make alloc.h implicit
@@ -208,24 +208,24 @@ done direct.h dontcare virtual
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../INIT/ratz.c
-meta ratz.o %.c>%.o ../INIT/ratz.c ratz
-prev ../INIT/ratz.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ../INIT/ratz.c
+done ${INSTALLROOT}/src/cmd/INIT/ratz.c
+meta ratz.o %.c>%.o ${PACKAGEROOT}/src/cmd/INIT/ratz.c ratz
+prev ${INSTALLROOT}/src/cmd/INIT/ratz.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ${INSTALLROOT}/src/cmd/INIT/ratz.c
 done ratz.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o ratz ratz.o ${mam_libast}
 done ratz generated
 make release
 make release.o
-make ../INIT/release.c
+make ${INSTALLROOT}/src/cmd/INIT/release.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../INIT/release.c
-meta release.o %.c>%.o ../INIT/release.c release
-prev ../INIT/release.c
+done ${INSTALLROOT}/src/cmd/INIT/release.c
+meta release.o %.c>%.o ${PACKAGEROOT}/src/cmd/INIT/release.c release
+prev ${INSTALLROOT}/src/cmd/INIT/release.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/release.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -D_PACKAGE_ast -c ${INSTALLROOT}/src/cmd/INIT/release.c
 done release.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o release release.o ${mam_libast}
@@ -233,7 +233,7 @@ done release generated
 make sear
 make sear.sh
 done sear.sh
-meta sear %.sh>% sear.sh sear
+meta sear %.sh>% ${PACKAGEROOT}/src/cmd/proto/sear.sh sear
 prev sear.sh
 setv LICENSE -DLICENSE="since=2001,author=dgk+gsf"
 exec - case static,port:$OPTIND:$RANDOM in
@@ -274,7 +274,7 @@ done sear generated
 make changes
 make changes.sh
 done changes.sh
-meta changes %.sh>% changes.sh changes
+meta changes %.sh>% ${PACKAGEROOT}/src/cmd/proto/changes.sh changes
 prev changes.sh
 setv LICENSE -DLICENSE="since=2005,author=gsf"
 exec - case static,port:$OPTIND:$RANDOM in
@@ -349,8 +349,8 @@ exec - fi
 done ${INSTALLROOT}/lib/sear generated
 make ${INSTALLROOT}/lib/sear/ratz.c
 prev ${INSTALLROOT}/lib/sear
-prev ../INIT/ratz.c
-exec - test '' = '../INIT/ratz.c' || ${STDCMP} 2>/dev/null -s ../INIT/ratz.c ${INSTALLROOT}/lib/sear/ratz.c || { ${STDMV} ${INSTALLROOT}/lib/sear/ratz.c ${INSTALLROOT}/lib/sear/ratz.c.old 2>/dev/null || true; ${STDCP} ../INIT/ratz.c ${INSTALLROOT}/lib/sear/ratz.c ;}
+prev ${INSTALLROOT}/src/cmd/INIT/ratz.c
+exec - test '' = '${INSTALLROOT}/src/cmd/INIT/ratz.c' || ${STDCMP} 2>/dev/null -s ${INSTALLROOT}/src/cmd/INIT/ratz.c ${INSTALLROOT}/lib/sear/ratz.c || { ${STDMV} ${INSTALLROOT}/lib/sear/ratz.c ${INSTALLROOT}/lib/sear/ratz.c.old 2>/dev/null || true; ${STDCP} ${INSTALLROOT}/src/cmd/INIT/ratz.c ${INSTALLROOT}/lib/sear/ratz.c ;}
 done ${INSTALLROOT}/lib/sear/ratz.c generated
 make ${INSTALLROOT}/lib/sear/sear.ico
 make sear.ico

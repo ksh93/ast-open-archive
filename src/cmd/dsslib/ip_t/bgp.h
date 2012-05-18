@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -32,7 +32,7 @@
 #include <ast_common.h>
 #include <ip6.h>
 
-#define BGP_VERSION		20110811L	/* interface version	*/
+#define BGP_VERSION		20120515L	/* interface version	*/
 
 #define BGP_SET16		0xffff		/* as16 path set marker	*/
 #define BGP_SET32		0xffffffff	/* as32 path set marker	*/
@@ -87,17 +87,17 @@
 #define BGP_dst_as16		((26<<1)|1)
 #define BGP_dst_as32		((27<<1)|1)
 #define BGP_extended		((28<<1)|1)
-#define BGP_hop			((29<<1)|1)
-#define BGP_hopv4		((30<<1)|1)
-#define BGP_hopv6		((31<<1)|1)
-#define BGP_label		((32<<1)|1)
-#define BGP_labels		((33<<1)|1)
-#define BGP_local		((34<<1)|1)
-#define BGP_mcast_vpn_grp_addr	((35<<1)|1)
-#define BGP_mcast_vpn_src_addr	((36<<1)|1)
-#define BGP_mcast_vpn_type	((37<<1)|1)
-#define BGP_med			((38<<1)|1)
-#define BGP_message		((39<<1)|1)
+#define BGP_flags		((29<<1)|1)
+#define BGP_hop			((30<<1)|1)
+#define BGP_hopv4		((31<<1)|1)
+#define BGP_hopv6		((32<<1)|1)
+#define BGP_id			((33<<1)|1)
+#define BGP_label		((34<<1)|1)
+#define BGP_labels		((35<<1)|1)
+#define BGP_local		((36<<1)|1)
+#define BGP_med			((37<<1)|1)
+#define BGP_message		((38<<1)|1)
+#define BGP_mvpn		((39<<1)|1)
 #define BGP_new_state		((40<<1)|1)
 #define BGP_old_state		((41<<1)|1)
 #define BGP_origin		((42<<1)|1)
@@ -105,32 +105,28 @@
 #define BGP_path		((44<<1)|1)
 #define BGP_path16		((45<<1)|1)
 #define BGP_path32		((46<<1)|1)
-#define BGP_pmsi_tunnel_flags	((47<<1)|1)
-#define BGP_pmsi_tunnel_id	((48<<1)|1)
-#define BGP_pmsi_tunnel_label	((49<<1)|1)
-#define BGP_pmsi_tunnel_type	((50<<1)|1)
-#define BGP_prefix		((51<<1)|1)
-#define BGP_prefixv4		((52<<1)|1)
-#define BGP_prefixv6		((53<<1)|1)
-#define BGP_rd_addr		((54<<1)|1)
-#define BGP_rd_as		((55<<1)|1)
-#define BGP_rd_number		((56<<1)|1)
-#define BGP_rd_type		((57<<1)|1)
-#define BGP_safi		((58<<1)|1)
-#define BGP_src_addr		((59<<1)|1)
-#define BGP_src_addrv4		((60<<1)|1)
-#define BGP_src_addrv6		((61<<1)|1)
-#define BGP_src_as		((62<<1)|1)
-#define BGP_src_as16		((63<<1)|1)
-#define BGP_src_as32		((64<<1)|1)
-#define BGP_stamp		((65<<1)|1)
-#define BGP_time		((66<<1)|1)
-#define BGP_type		((67<<1)|1)
-#define BGP_unknown		((68<<1)|1)
-#define BGP_usec		((69<<1)|1)
-#define BGP_weight		((70<<1)|1)
+#define BGP_prefix		((47<<1)|1)
+#define BGP_prefixv4		((48<<1)|1)
+#define BGP_prefixv6		((49<<1)|1)
+#define BGP_rd_addr		((50<<1)|1)
+#define BGP_rd_as		((51<<1)|1)
+#define BGP_rd_number		((52<<1)|1)
+#define BGP_rd_type		((53<<1)|1)
+#define BGP_safi		((54<<1)|1)
+#define BGP_src_addr		((55<<1)|1)
+#define BGP_src_addrv4		((56<<1)|1)
+#define BGP_src_addrv6		((57<<1)|1)
+#define BGP_src_as		((58<<1)|1)
+#define BGP_src_as16		((59<<1)|1)
+#define BGP_src_as32		((60<<1)|1)
+#define BGP_stamp		((61<<1)|1)
+#define BGP_time		((62<<1)|1)
+#define BGP_type		((63<<1)|1)
+#define BGP_unknown		((64<<1)|1)
+#define BGP_usec		((65<<1)|1)
+#define BGP_weight		((66<<1)|1)
 
-#define BGP_LAST		70
+#define BGP_LAST		66
 
 #define BGP_INDEX(x)		(((x)>>1)-1)
 
@@ -151,16 +147,15 @@
 #define BGP_SET_extended		(1<<10)
 #define BGP_SET_hopv4			(1<<11)
 #define BGP_SET_hopv6			(1<<12)
-#define BGP_SET_mcast_vpn_grp_addrv6	(1<<13)
-#define BGP_SET_mcast_vpn_src_addrv6	(1<<14)
-#define BGP_SET_originatorv6		(1L<<15)
-#define BGP_SET_path16			(1L<<16)
-#define BGP_SET_path32			(1L<<17)
-#define BGP_SET_prefixv4		(1L<<18)
-#define BGP_SET_prefixv6		(1L<<19)
-#define BGP_SET_src_addrv4		(1L<<20)
-#define BGP_SET_src_addrv6		(1L<<21)
-#define BGP_SET_unknown			(1L<<22)
+#define BGP_SET_mvpn			(1<<13)
+#define BGP_SET_originatorv6		(1<<14)
+#define BGP_SET_path16			(1L<<15)
+#define BGP_SET_path32			(1L<<16)
+#define BGP_SET_prefixv4		(1L<<17)
+#define BGP_SET_prefixv6		(1L<<18)
+#define BGP_SET_src_addrv4		(1L<<19)
+#define BGP_SET_src_addrv6		(1L<<20)
+#define BGP_SET_unknown			(1L<<21)
 
 /*
  * BGP_type
@@ -241,8 +236,6 @@ struct Bgproute_s
 	Bgpaddr_t	dpa_addr;	/* dpa addr			*/
 	Bgpaddr_t	dst_addr;	/* destination addr		*/
 	Bgpaddr_t	hop;		/* next hop addr		*/
-	Bgpaddr_t	mcast_vpn_grp_addr; /* mcast vpn group addr	*/
-	Bgpaddr_t	mcast_vpn_src_addr; /* mcast vpn source addr	*/
 	Bgpaddr_t	originator;	/* originator addr		*/
 	Bgpaddr_t	rd_addr;	/* nlri rd addr			*/
 	Bgpaddr_t	src_addr;	/* source addr			*/
@@ -265,8 +258,8 @@ struct Bgproute_s
 	Bgpnum_t	label;		/* nlri label			*/
 	Bgpnum_t	rd_as;		/* nlri rd as number 		*/
 	Bgpnum_t	rd_number;	/* nlri rd assigned number 	*/
-	Bgpnum_t	pmsi_tunnel_id; /* pmsi tunnel identifier	*/
-	Bgpnum_t	pmsi_tunnel_label; /* pmsi tunnel label		*/
+	Bgpnum_t	flags;		/* aux flags			*/
+	Bgpnum_t	id;		/* aux id			*/
 
 	/* 16 bit members */
 
@@ -294,18 +287,15 @@ struct Bgproute_s
 	unsigned char	afi;		/* announce afi			*/
 	unsigned char	safi;		/* announce subsequent afi	*/
 	unsigned char	p1;		/* parameter 1			*/
-	unsigned char	mcast_vpn_type;	/* mcast vpn type		*/
-	unsigned char	pmsi_tunnel_flags;/* pmsi tunnel flags		*/
-	unsigned char	pmsi_tunnel_type;/* pmsi tunnel type		*/
 	unsigned char	rd_type;	/* nlri rd type			*/
 
 	/* unaligned fixed buffer members */
 
 	unsigned char	prefixv6[17];	/* prefix			*/
 
-	char		pad[2];	/* pad to 8 byte boundary	*/
+	char		pad[5];		/* pad to 8 byte boundary	*/
 
-	char		data[1696];	/* vector data (round to 2K)	*/
+	char		data[1704];	/* vector data (round to 2K)	*/
 };
 
 #endif

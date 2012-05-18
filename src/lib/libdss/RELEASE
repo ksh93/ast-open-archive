@@ -1,3 +1,5 @@
+12-05-15 cx.h: add CX_DEPRECATED
+12-05-15 cxopen.c: handle nested structs
 12-02-29 cxopen.c: add "hex" details for external buffer representation
 11-10-07 dssopen.c: use generic dll_lib() to load methods
 11-09-11 cxmap.c: fix cxsub() to cast <=> string if necessary

@@ -1228,6 +1228,7 @@ cxaddtype(Cx_t* cx, register Cxtype_t* type, Cxdisc_t* disc)
 			(*disc->errorf)(NiL, disc, 2, "%s: type already defined", type->name);
 		return -1;
 	}
+	dtinsert(dict, type);
 	if (!(type->header.flags & CX_NORMALIZED))
 	{
 		type->header.flags |= CX_NORMALIZED;
@@ -1257,25 +1258,32 @@ cxaddtype(Cx_t* cx, register Cxtype_t* type, Cxdisc_t* disc)
 					(*disc->errorf)(NiL, disc, 2, "%s: no member table", type->name);
 				return -1;
 			}
-			if (!(type->member->members = cx ? dtnew(cx->vm, &state.namedisc, Dtoset) : dtopen(&state.namedisc, Dtoset)))
+			if (type->header.flags & CX_REFERENCED)
+				type->member->members = cx ? cx->variables : state.variables;
+			else if (!(type->member->members = cx ? dtnew(cx->vm, &state.namedisc, Dtoset) : dtopen(&state.namedisc, Dtoset)))
 			{
 				if (disc->errorf)
 					(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 				return -1;
 			}
-			for (i = 0; member->name; member++)
-			{
-				v = member;
-				if ((base = (char*)v->type) && !(v->type = cxtype(cx, base, disc)))
+			else
+				for (i = 0; member->name; member++)
 				{
-					if (disc->errorf)
-						(*disc->errorf)(NiL, disc, 2, "%s: unknown type", base);
-					return -1;
+					v = member;
+					if (!(v->header.flags & CX_NORMALIZED))
+					{
+						v->header.flags |= CX_NORMALIZED;
+						if ((base = (char*)v->type) && !(v->type = cxtype(cx, base, disc)))
+						{
+							if (disc->errorf)
+								(*disc->errorf)(NiL, disc, 2, "%s: unknown type", base);
+							return -1;
+						}
+						v->member = type;
+					}
+					v->header.index = i++;
+					dtinsert(type->member->members, v);
 				}
-				v->member = type;
-				v->header.index = i++;
-				dtinsert(type->member->members, v);
-			}
 		}
 		if (type->generic)
 			for (i = 0; base = (char*)type->generic[i]; i++)
@@ -1286,7 +1294,6 @@ cxaddtype(Cx_t* cx, register Cxtype_t* type, Cxdisc_t* disc)
 					return -1;
 				}
 	}
-	dtinsert(dict, type);
 	if (!(type->header.flags & CX_INITIALIZED))
 	{
 		type->header.flags |= CX_INITIALIZED;
@@ -1981,6 +1988,8 @@ cxaddvariable(register Cx_t* cx, register Cxvariable_t* variable, Cxdisc_t* disc
 	}
 	else
 		dict = state.variables;
+	if (!variable)
+		return 0;
 	if (dtsearch(dict, variable))
 	{
 		if (disc->errorf)
@@ -2071,6 +2080,7 @@ cxvariable(Cx_t* cx, const char* name, register Cxtype_t* m, Cxdisc_t* disc)
 					{
 						if (m)
 							(*disc->errorf)(NiL, disc, 2, "%s: not a member of %s", s, m->name);
+
 						else
 							(*disc->errorf)(NiL, disc, 2, "%s: undefined variable", s);
 					}
@@ -2092,7 +2102,8 @@ cxvariable(Cx_t* cx, const char* name, register Cxtype_t* m, Cxdisc_t* disc)
 				tail = ref;
 				if (!(s = t))
 					break;
-				if (!(m = v->type->base) || !(dict = m->member->members))
+				if ((!(m = v->type) || !m->member || !(dict = m->member->members)) &&
+				    (!(m = v->type->base) || !m->member || !(dict = m->member->members)))
 				{
 					if (disc->errorf)
 						(*disc->errorf)(NiL, disc, 2, "%s: struct or union variable expected",  v->name);

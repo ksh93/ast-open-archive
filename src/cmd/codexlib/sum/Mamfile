@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make sum
 make libcodexsum.a archive
@@ -130,7 +130,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/codex.h
 done sum.c
-meta sum.o %.c>%.o sum.c sum
+meta sum.o %.c>%.o ${PACKAGEROOT}/src/cmd/codexlib/sum/sum.c sum
 prev sum.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sum.c
 done sum.o generated

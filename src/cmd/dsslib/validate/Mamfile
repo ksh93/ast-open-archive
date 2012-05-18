@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make validate
 make libdssvalidate.a archive
@@ -165,7 +165,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done validate.c
-meta validate.o %.c>%.o validate.c validate
+meta validate.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/validate/validate.c validate
 prev validate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssvalidate]"\" -D_PACKAGE_ast -c validate.c
 done validate.o generated
@@ -173,7 +173,7 @@ make lib.o
 make lib.c
 prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
-meta lib.o %.c>%.o lib.c lib
+meta lib.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/validate/lib.c lib
 prev lib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated

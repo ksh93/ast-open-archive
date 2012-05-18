@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -54,6 +54,7 @@
 #define CX_NORMALIZED	0x0001
 #define CX_INITIALIZED	0x0002
 #define CX_REFERENCED	0x0004
+#define CX_DEPRECATED	0x0008
 #define CX_IGNORECASE	0x0100
 
 /* Cxpart_t.flags */

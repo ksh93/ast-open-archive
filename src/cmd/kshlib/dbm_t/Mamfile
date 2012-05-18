@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make dbm_t
 make libkshdbm_t.a archive
@@ -160,7 +160,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/shell.h
 done dbm_t.c
-meta dbm_t.o %.c>%.o dbm_t.c dbm_t
+meta dbm_t.o %.c>%.o ${PACKAGEROOT}/src/cmd/kshlib/dbm_t/dbm_t.c dbm_t
 prev dbm_t.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm_t"\" -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshdbm_t]"\" -D_PACKAGE_ast -D_BLD_DEBUG -c dbm_t.c
 done dbm_t.o generated
@@ -172,7 +172,7 @@ done install virtual
 make test
 make test.dbm_t
 make dbm_t.tst
-meta dbm_t.tst %.rt>%.tst dbm_t.rt dbm_t
+meta dbm_t.tst %.rt>%.tst ${PACKAGEROOT}/src/cmd/kshlib/dbm_t/dbm_t.rt dbm_t
 make dbm_t.rt
 done dbm_t.rt
 exec - if [[ "1" || "dbm_t.rt" -nt "dbm_t.tst" ]]

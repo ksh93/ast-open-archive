@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make lookup
 make libdsslookup.a archive
@@ -163,7 +163,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done lookup.c
-meta lookup.o %.c>%.o lookup.c lookup
+meta lookup.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/lookup/lookup.c lookup
 prev lookup.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2010-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dsslookup]"\" -D_PACKAGE_ast -c lookup.c
 done lookup.o generated
@@ -171,7 +171,7 @@ make lib.o
 make lib.c
 prev ${PACKAGE_ast_INCLUDE}/dss.h implicit
 done lib.c
-meta lib.o %.c>%.o lib.c lib
+meta lib.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/lookup/lib.c lib
 prev lib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated

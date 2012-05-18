@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make zoo
 make libpaxzoo.a archive
@@ -164,7 +164,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/paxlib.h
 done zoo.c
-meta zoo.o %.c>%.o zoo.c zoo
+meta zoo.o %.c>%.o ${PACKAGEROOT}/src/cmd/paxlib/zoo/zoo.c zoo
 prev zoo.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c zoo.c
 done zoo.o generated

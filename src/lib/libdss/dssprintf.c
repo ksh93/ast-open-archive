@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -600,13 +600,13 @@ dssprintf(Dss_t* dss, Cx_t* cx, Sfio_t* sp, const char* format, Dssrecord_t* rec
 			if (dss->meth->cx->fields)
 			{
 				for (vp = (Cxvariable_t*)dtfirst(dss->meth->cx->fields); vp; vp = (Cxvariable_t*)dtnext(dss->meth->cx->fields, vp), n++)
-					if (q < (l = strlen(vp->name)))
+					if (!(vp->header.flags & CX_DEPRECATED) && q < (l = strlen(vp->name)))
 						q = l;
 			}
 			else if (dss->meth->data)
 			{
 				for (vp = (Cxvariable_t*)dss->meth->data; vp->name; vp++, n++)
-					if (q < (l = strlen(vp->name)))
+					if (!(vp->header.flags & CX_DEPRECATED) && q < (l = strlen(vp->name)))
 						q = l;
 			}
 			q += 2;
@@ -633,13 +633,16 @@ dssprintf(Dss_t* dss, Cx_t* cx, Sfio_t* sp, const char* format, Dssrecord_t* rec
 					}
 					else if (!vp->name)
 						break;
-					s += sfsprintf(s, q + 4, "%-*s%%s\n", q, vp->name);
-					ap->variable = vp;
-					ap->type = DSS_FORMAT_string;
-					ap->cast = cx->state->type_string;
-					if (cxisstring(vp->type) && vp->format.map && vp->format.map->part && vp->format.map->part->edit)
-						ap->edit = vp->format.map->part->edit;
-					ap++;
+					if (!(vp->header.flags & CX_DEPRECATED))
+					{
+						s += sfsprintf(s, q + 4, "%-*s%%s\n", q, vp->name);
+						ap->variable = vp;
+						ap->type = DSS_FORMAT_string;
+						ap->cast = cx->state->type_string;
+						if (cxisstring(vp->type) && vp->format.map && vp->format.map->part && vp->format.map->part->edit)
+							ap->edit = vp->format.map->part->edit;
+						ap++;
+					}
 					if (dss->meth->cx->fields)
 						vp = (Cxvariable_t*)dtnext(dss->meth->cx->fields, vp);
 					else

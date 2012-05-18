@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,6 +31,10 @@
 #include <ip6.h>
 #include <swap.h>
 
+/*
+ * mcast_vpn_grp_addr => agg_addr
+ */
+
 #define GROUP_STATE			0
 
 #define STATE_BGP_HEADER		1
@@ -50,7 +54,7 @@
 #define BE(b,p,n)	memcpy(b,p,n)
 
 #define DATA(sp,rp)		(rp=&sp->route,sp->osize=sp->size)
-#define ZERO(sp,rp)		(sp->size=0,memset(rp,0,BGP_FIXED),sp->unknown.size=0)
+#define ZERO(sp,rp)		((rp->set&BGP_SET_mvpn?(sp->np->size=0,memset(sp->np,0,BGP_FIXED),sp->np->unknown.size=0):0),sp->size=0,memset(rp,0,BGP_FIXED),sp->unknown.size=0)
 #define HEAD(sp,rp)		(rp->message=sp->message,rp->stamp=sp->time)
 #define INIT(sp,rp)		(DATA(sp,rp),ZERO(sp,rp),HEAD(sp,rp))
 #define NEXT(sp,rp)		(DATA(sp,rp),HEAD(sp,rp))
@@ -76,6 +80,7 @@ typedef struct Mrtpeer_s
 typedef struct Mrtstate_s
 {
 	Bgproute_t		route;
+	Bgproute_t*		np;
 	Bgpnum_t		time;
 	Bgpnum_t		message;
 	Bgpnum_t		best;
@@ -441,12 +446,15 @@ mrtident(Dssfile_t* file, void* buf, size_t n, Dssdisc_t* disc)
 static int
 mrtopen(Dssfile_t* file, Dssdisc_t* disc)
 {
+	Bgp_t*		bgp = (Bgp_t*)file->dss->data;
+
 	if (!(file->data = (void*)vmnewof(file->dss->vm, 0, Mrtstate_t, 1, 0)))
 	{
 		if (disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return -1;
 	}
+	((Mrtstate_t*)file->data)->np = &bgp->sub;
 	ANONYMIZE_OPEN(file, disc);
 	return 0;
 }
@@ -579,6 +587,7 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 	int		v;
 	char*		buf;
 	Bgpnum_t*	np;
+	Bgproute_t*	op;
 
 	j = BE1(state->buf++);
 	switch (rp->safi)
@@ -630,16 +639,21 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		}
 		break;
 	case MRT_SAFI_MCAST_VPN:
+		rp->set |= BGP_SET_mvpn;
+		op = rp;
+		rp = state->np;
+		rp->afi = op->afi;
+		rp->safi = op->safi;
 		m = BE1(state->buf++);
 		if (m > (int)(end - state->buf))
 		{
 			if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d too large -- %d available", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf));
+				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d too large -- %d available", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf));
 			goto nope;
 		}
 		end = state->buf + m;
 		if (file->dss->flags & DSS_DEBUG)
-			sfprintf(sfstderr, "                            %s.%s size %d available %d/%d\n", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf), (int)(state->end - state->buf));
+			sfprintf(sfstderr, "                            %s.%s size %d available %d/%d\n", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf), (int)(state->end - state->buf));
 		PAYLOAD(file, state->buf, m);
 		switch (j)
 		{
@@ -664,7 +678,7 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			break;
 		default:
 			if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-				(*disc->errorf)(NiL, disc, 1, "%s.%s unknown route type", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, j));
+				(*disc->errorf)(NiL, disc, 1, "%s.%s unknown route type", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j));
 			goto skip;
 		}
 		if ((q & VPN_rd) && rd(file, state, rp, end, disc))
@@ -682,13 +696,13 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			switch (i)
 			{
 			case MRT_BITS_IPV4:
-				rp->mcast_vpn_src_addr.v4 = AE4(state->buf);
+				rp->src_addr.v4 = AE4(state->buf);
 				state->buf += 4;
 				break;
 			case MRT_BITS_IPV6:
-				AE(rp->mcast_vpn_src_addr.v6, state->buf, 16);
+				AE(rp->src_addr.v6, state->buf, 16);
 				state->buf += 16;
-				rp->set |= BGP_SET_mcast_vpn_src_addrv6;
+				rp->set |= BGP_SET_src_addrv6;
 				break;
 			default:
 				if (disc->errorf && !(file->dss->flags & DSS_QUIET))
@@ -699,13 +713,14 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			switch (i)
 			{
 			case MRT_BITS_IPV4:
-				rp->mcast_vpn_grp_addr.v4 = AE4(state->buf);
+				rp->agg_addr.v4 = AE4(state->buf);
 				state->buf += 4;
+				rp->set |= BGP_SET_agg_addrv4;
 				break;
 			case MRT_BITS_IPV6:
-				AE(rp->mcast_vpn_grp_addr.v6, state->buf, 16);
+				AE(rp->agg_addr.v6, state->buf, 16);
 				state->buf += 16;
-				rp->set |= BGP_SET_mcast_vpn_grp_addrv6;
+				rp->set |= BGP_SET_agg_addrv6;
 				break;
 			default:
 				if (disc->errorf && !(file->dss->flags & DSS_QUIET))
@@ -715,13 +730,13 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		}
 		if (q & VPN_originator)
 		{
-			if (rp->afi == MRT_AFI_IPV4 || (int)(end - state->buf) == 4)
+			if (op->afi == MRT_AFI_IPV4 || (int)(end - state->buf) == 4)
 			{
 				rp->originator.v4 = AE4(state->buf);
 				state->buf += 4;
 				rp->set &= ~BGP_SET_originatorv6;
 			}
-			else if (rp->afi == MRT_AFI_IPV6 || (int)(end - state->buf) == 16)
+			else if (op->afi == MRT_AFI_IPV6 || (int)(end - state->buf) == 16)
 			{
 				AE(rp->originator.v6, state->buf, 16);
 				state->buf += 16;
@@ -730,17 +745,17 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			else
 			{
 				if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-					(*disc->errorf)(NiL, disc, 1, "%u: unknown afi index (size %d)", rp->afi, (int)(end - state->buf));
+					(*disc->errorf)(NiL, disc, 1, "%u: unknown afi index (size %d)", op->afi, (int)(end - state->buf));
 				goto nope;
 			}
 		}
 		if (state->buf < end)
 		{
 			if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d -- %d unused", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf));
+				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d -- %d unused", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf));
 			state->buf = end;
 		}
-		rp->mcast_vpn_type = j;
+		rp->type = j;
 		goto done;
 	default:
 		if (disc->errorf && !(file->dss->flags & DSS_QUIET))

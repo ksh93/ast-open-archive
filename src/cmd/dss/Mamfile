@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make dss
 make dss.o
@@ -164,7 +164,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/dsslib.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done dss.c
-meta dss.o %.c>%.o dss.c dss
+meta dss.o %.c>%.o ${PACKAGEROOT}/src/cmd/dss/dss.c dss
 prev dss.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dss]"\" -D_PACKAGE_ast -c dss.c
 done dss.o generated

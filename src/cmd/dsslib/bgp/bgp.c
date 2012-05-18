@@ -40,6 +40,9 @@ static const char usage[] =
 #define BGP_extended_len	(((BGP_LAST+6)<<1)|1)
 #define BGP_labels_len		(((BGP_LAST+7)<<1)|1)
 
+#define CXD(name,type,index,description) \
+	{name,description,{{0},CX_DEPRECATED},0,(Cxtype_t*)type,0,index},
+
 Dssformat_t*		bgp_formats = bgp_first_format;
 
 static Cxvariable_t fields[] =
@@ -75,19 +78,19 @@ CXV("dst_as",		"as_t",		BGP_dst_as,		"Destination AS number.")
 CXV("dst_as16",		"as16_t",	BGP_dst_as16,		"Destination AS16 number.")
 CXV("dst_as32",		"as32_t",	BGP_dst_as32,		"Destination AS32 number.")
 CXV("extended",		"extended_t",	BGP_extended,		"Extended community list.")
+CXV("flags",		"number",	BGP_flags,		"Auxiliary flags.")
 CXV("history",		"number",	BGP_history,		"History prefix.")
 CXV("hop",		"ipaddr_t",	BGP_hop,		"Next hop address.")
 CXV("hopv4",		"ipv4addr_t",	BGP_hopv4,		"Next hop ipv4 address.")
 CXV("hopv6",		"ipv6addr_t",	BGP_hopv6,		"Next hop ipv6 address.")
+CXV("id",		"number",	BGP_id,			"Auxiliary id.")
 CXV("internal",		"number",	BGP_internal,		"Internal prefix.")
 CXV("label",		"number",	BGP_label,		"NLRI label.")
 CXV("labels",		"labels_t",	BGP_labels,		"NLRI label list; LHS is label, RHS is COS and end of stack bit.")
 CXV("local",		"number",	BGP_local,		"Local preference.")
-CXV("mcast_vpn_grp_addr","ipaddr_t",	BGP_mcast_vpn_grp_addr,	"Mcast vpn group address.")
-CXV("mcast_vpn_src_addr","ipaddr_t",	BGP_mcast_vpn_src_addr,	"Mcast vpn source address.")
-CXV("mcast_vpn_type",	"number",	BGP_mcast_vpn_type,	"Mcast vpn type.")
 CXV("med",		"number",	BGP_med,		"Multi exit discriminator.")
 CXV("message",		"number",	BGP_message,		"Message group index.")
+CXV("mvpn",		"bgp_t",	BGP_mvpn,		"Mcast vpn data.")
 CXV("new_state",	"number",	BGP_new_state,		"STATE_CHANGE record new state.")
 CXV("old_state",	"number",	BGP_old_state,		"STATE_CHANGE record old state.")
 CXV("origin",		"number",	BGP_origin,		"Origin: 'i':igp, 'e':egp, '?':incomplete.")
@@ -95,10 +98,6 @@ CXV("originator",	"ipv4addr_t",	BGP_originator,		"Originator ipv4 address.")
 CXV("path",		"aspath_t",	BGP_path,		"AS path.")
 CXV("path16",		"as16path_t",	BGP_path16,		"AS16 path.")
 CXV("path32",		"as32path_t",	BGP_path32,		"AS32 path.")
-CXV("pmsi_tunnel_flags","number",	BGP_pmsi_tunnel_flags,	"PMSI tunnel flags.")
-CXV("pmsi_tunnel_id",	"number",	BGP_pmsi_tunnel_id,	"PMSI tunnel id.")
-CXV("pmsi_tunnel_label","number",	BGP_pmsi_tunnel_label,	"PMSI tunnel label.")
-CXV("pmsi_tunnel_type",	"number",	BGP_pmsi_tunnel_type,	"PMSI tunnel type.")
 CXV("prefix",		"ipprefix_t",	BGP_prefix,		"Routing ddress prefix and length.")
 CXV("prefixv4",		"ipv4prefix_t",	BGP_prefixv4,		"ipv4 routing prefix and length.")
 CXV("prefixv6",		"ipv6prefix_t",	BGP_prefixv6,		"ipv6 routing prefix and length.")
@@ -126,13 +125,13 @@ CXV("valid",		"number",	BGP_valid,		"Valid prefix.")
 CXV("weight",		"number",	BGP_weight,		"Router proprietary weight.")
 CXV("MESSAGE",		"number",	BGP_MESSAGE,		"Message group bit, toggled for each message.")
 CXV("PART",		"number",	BGP_PART,		"Message part bit, 0 for first part, 1 for remainder.")
-CXV("cluster_len",	"number",	BGP_cluster_len,	"DEPRECATED -- use sizeof(cluster). Cluster id list length.")
-CXV("community_len",	"number",	BGP_community_len,	"DEPRECATED -- use sizeof(community). Community of interest id list length.")
-CXV("extended_len",	"number",	BGP_extended_len,	"DEPRECATED -- use sizeof(extended). Extended community list length.")
-CXV("labels_len",	"number",	BGP_labels_len,		"DEPRECATED -- use sizeof(labels). NLRI label list length.")
-CXV("path_len",		"number",	BGP_path_len,		"DEPRECATED -- use sizeof(path). AS path length.")
-CXV("path16_len",	"number",	BGP_path16_len,		"DEPRECATED -- use sizeof(path16). AS16 path length.")
-CXV("path32_len",	"number",	BGP_path32_len,		"DEPRECATED -- use sizeof(path32). AS32 path length.")
+CXD("cluster_len",	"number",	BGP_cluster_len,	"DEPRECATED -- use sizeof(cluster). Cluster id list length.")
+CXD("community_len",	"number",	BGP_community_len,	"DEPRECATED -- use sizeof(community). Community of interest id list length.")
+CXD("extended_len",	"number",	BGP_extended_len,	"DEPRECATED -- use sizeof(extended). Extended community list length.")
+CXD("labels_len",	"number",	BGP_labels_len,		"DEPRECATED -- use sizeof(labels). NLRI label list length.")
+CXD("path_len",		"number",	BGP_path_len,		"DEPRECATED -- use sizeof(path). AS path length.")
+CXD("path16_len",	"number",	BGP_path16_len,		"DEPRECATED -- use sizeof(path16). AS16 path length.")
+CXD("path32_len",	"number",	BGP_path32_len,		"DEPRECATED -- use sizeof(path32). AS32 path length.")
 {0}
 };
 
@@ -289,6 +288,9 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.buffer.size = rp->extended.size;
 		r->value.buffer.elements = 0;
 		break;
+	case BGP_flags:
+		r->value.number = rp->flags;
+		break;
 	case BGP_hop:
 		if (rp->set & BGP_SET_hopv6)
 		{
@@ -311,6 +313,9 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.buffer.size = sizeof(rp->hop.v6);
 		r->value.buffer.elements = 0;
 		break;
+	case BGP_id:
+		r->value.number = rp->id;
+		break;
 	case BGP_label:
 		r->value.number = rp->label;
 		break;
@@ -322,42 +327,14 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 	case BGP_local:
 		r->value.number = rp->local;
 		break;
-	case BGP_mcast_vpn_grp_addr:
-		if (rp->afi == MRT_AFI_IPV6)
-		{
-			r->value.buffer.data = rp->mcast_vpn_grp_addr.v6;
-			r->value.buffer.size = sizeof(rp->mcast_vpn_grp_addr.v6);
-			r->value.buffer.elements = 0;
-			r->type = bgp->type_ipv6addr;
-		}
-		else
-		{
-			r->value.number = rp->mcast_vpn_grp_addr.v4;
-			r->type = bgp->type_ipv4addr;
-		}
-		break;
-	case BGP_mcast_vpn_src_addr:
-		if (rp->afi == MRT_AFI_IPV6)
-		{
-			r->value.buffer.data = rp->mcast_vpn_src_addr.v6;
-			r->value.buffer.size = sizeof(rp->mcast_vpn_src_addr.v6);
-			r->value.buffer.elements = 0;
-			r->type = bgp->type_ipv6addr;
-		}
-		else
-		{
-			r->value.number = rp->mcast_vpn_src_addr.v4;
-			r->type = bgp->type_ipv4addr;
-		}
-		break;
-	case BGP_mcast_vpn_type:
-		r->value.number = rp->mcast_vpn_type;
-		break;
 	case BGP_med:
 		r->value.number = rp->med;
 		break;
 	case BGP_message:
 		r->value.number = rp->message;
+		break;
+	case BGP_mvpn:
+		r->value.number = !!(rp->set & BGP_SET_mvpn);
 		break;
 	case BGP_new_state:
 		r->value.number = rp->type == BGP_TYPE_state_change ? rp->new_state : 0;
@@ -407,18 +384,6 @@ op_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		r->value.buffer.data = rp->data + rp->path32.offset;
 		r->value.buffer.size = rp->path32.size * sizeof(Bgpnum_t);
 		r->value.buffer.elements = rp->path32.elements;
-		break;
-	case BGP_pmsi_tunnel_label:
-		r->value.number = rp->pmsi_tunnel_label;
-		break;
-	case BGP_pmsi_tunnel_flags:
-		r->value.number = rp->pmsi_tunnel_flags;
-		break;
-	case BGP_pmsi_tunnel_id:
-		r->value.number = rp->pmsi_tunnel_id;
-		break;
-	case BGP_pmsi_tunnel_type:
-		r->value.number = rp->pmsi_tunnel_type;
 		break;
 	case BGP_prefix:
 		if (rp->set & BGP_SET_prefixv6)
@@ -552,6 +517,32 @@ static Cxcallout_t local_callouts[] =
 CXC(CX_GET, "void", "void", op_get, 0)
 };
 
+static int
+bgp_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	void*		save;
+	int		i;
+
+	save = DSSRECORD(data)->data;
+	DSSRECORD(data)->data = &BGPDATA(data)->sub;
+	i = op_get(cx, pc, r, a, b, data, disc);
+	DSSRECORD(data)->data = save;
+	return i;
+}
+
+static Cxmember_t	bgp_member =
+{
+	bgp_get,
+	0,
+	(Dt_t*)&fields[0]
+};
+
+static Cxtype_t	types[] =
+{
+	{ "bgp_t",	"BGP route data.", { { 0 }, CX_REFERENCED }, (Cxtype_t*)"number", 0, 0, 0, 0, 0, 0, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4 }, 0, &bgp_member	},
+	{ 0 }
+};
+
 /*
  * methf
  */
@@ -568,6 +559,10 @@ bgpmeth(const char* name, const char* options, const char* schema, Dssdisc_t* di
 
 	if (!dtsize(meth->formats))
 	{
+		cxaddvariable(meth->cx, NiL, disc);
+		for (i = 0; types[i].name; i++)
+			if (cxaddtype(meth->cx, &types[i], disc))
+				return 0;
 		for (i = 0; i < elementsof(local_callouts); i++)
 			if (cxaddcallout(meth->cx, &local_callouts[i], disc))
 				return 0;
@@ -680,7 +675,7 @@ Dsslib_t dss_lib_bgp =
 {
 	"bgp",
 	"bgp method"
-	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2011-08-24 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2012-05-15 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	&libraries[0],

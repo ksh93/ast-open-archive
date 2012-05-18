@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2012-02-29 $\n]"
+"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2012-05-15 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method provides types, global "

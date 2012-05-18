@@ -94,7 +94,11 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-12-05-15  --- Release ksh93u+ ---
+12-05-17  --- Release ksh93u+ ---
+12-05-17  A bug with fixed size arrays which could cause a core dump has been
+	  fixed.
+12-05-17  A bug in which the here-document <<< $(<file) was not processed
+	  correctly has been fixed.
 12-05-15  The default value for -L, -R, and -Z when the size was not set was
 	  incorrectly defaulting to 1 and has been fixed.
 12-05-15  A bug in which a subshell of the form (name=value exec ...) could
@@ -5815,6 +5819,7 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+12-05-15 bgp.h: change BGP_PMSI_* to BGP_pmsi
 12-02-24 *sa.omk: clean up standalone old make makefiles
 12-02-24 README-*: bring standalone READMEs up to date
 11-10-06 testiv.c: add { -ip4 -ip6 } options
@@ -6901,6 +6906,7 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+12-05-18 misc/stk.c: fix access of moved realloc() data
 12-05-15 misc/optget.c: #? option with no value should have opt_info.num==0
 12-05-11 misc/stk.c: fix memmove() read of 1 uninitialized byte
 12-05-11 regex/regcoll.c: avoid memcpy() to self
@@ -9955,6 +9961,8 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+12-05-15 cx.h: add CX_DEPRECATED
+12-05-15 cxopen.c: handle nested structs
 12-02-29 cxopen.c: add "hex" details for external buffer representation
 11-10-07 dssopen.c: use generic dll_lib() to load methods
 11-09-11 cxmap.c: fix cxsub() to cast <=> string if necessary

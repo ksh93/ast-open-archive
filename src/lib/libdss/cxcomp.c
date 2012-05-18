@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1353,7 +1353,9 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			case '.':
 				if (!x && !v && (v = variable(cx, cc, c, m, 0)))
 					x = 1;
-				if (!x || !v || !v->type->base || !v->type->base->member)
+				if (!x || !v ||
+				    (!(m = v->type) || !m->member || !m->member->members) &&
+				    (!(m = v->type->base) || !m->member || !m->member->members))
 				{
 					if (cx->disc->errorf)
 						(*cx->disc->errorf)(cx, cx->disc, 2, "%s struct or union variable expected", cxcontext(cx));
@@ -1361,7 +1363,6 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 				}
 				if (!code(cx, cc, expr, CX_GET, 1, v->type, cx->state->type_void, v, 0, NiL))
 					goto bad;
-				m = v->type->base;
 				x = 0;
 				v = 0;
 				continue;

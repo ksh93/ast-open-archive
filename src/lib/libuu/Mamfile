@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make uu
 make libuu.a archive
@@ -179,7 +179,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done uu.h dontcare
 done uulib.h
 done uulib.c
-meta uulib.o %.c>%.o uulib.c uulib
+meta uulib.o %.c>%.o ${PACKAGEROOT}/src/lib/libuu/uulib.c uulib
 prev uulib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_uu -c uulib.c
 done uulib.o generated

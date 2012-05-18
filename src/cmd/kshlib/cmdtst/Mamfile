@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make cmdtst
 make libkshcmdtst.a archive
@@ -116,7 +116,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h
 done lib.c
-meta lib.o %.c>%.o lib.c lib
+meta lib.o %.c>%.o ${PACKAGEROOT}/src/cmd/kshlib/cmdtst/lib.c lib
 prev lib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lib.c
 done lib.o generated
@@ -166,7 +166,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h
 done grep.c
-meta grep.o %.c>%.o grep.c grep
+meta grep.o %.c>%.o ${PACKAGEROOT}/src/cmd/kshlib/cmdtst/grep.c grep
 prev grep.c
 setv _BLD_cmdtst -U_BLD_cmdtst
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshcmdtst"\" -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshcmdtst]"\" -c grep.c
@@ -179,7 +179,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmdarg.h
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done xargs.c
-meta xargs.o %.c>%.o xargs.c xargs
+meta xargs.o %.c>%.o ${PACKAGEROOT}/src/cmd/kshlib/cmdtst/xargs.c xargs
 prev xargs.c
 setv _BLD_cmdtst -U_BLD_cmdtst
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshcmdtst"\" -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshcmdtst]"\" -c xargs.c
