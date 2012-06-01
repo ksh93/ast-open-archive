@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-14
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ss
 make ss.o
@@ -57,10 +57,14 @@ done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
 make ${PACKAGE_ast_INCLUDE}/wctype.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wctype.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/wchar.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+done ${PACKAGE_ast_INCLUDE}/wchar.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_wctype.h dontcare
 done ${PACKAGE_ast_INCLUDE}/wctype.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
@@ -75,8 +79,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
@@ -148,7 +150,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cs.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ss.c
-meta ss.o %.c>%.o ${PACKAGEROOT}/src/cmd/ss/ss.c ss
+meta ss.o %.c>%.o ss.c ss
 prev ss.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?ss]"\" -c ss.c
 done ss.o generated
@@ -160,7 +162,7 @@ make ssd
 make ssd.o
 make ssd.c
 make FEATURE/cmd implicit
-meta FEATURE/cmd features/%>FEATURE/% ${PACKAGEROOT}/src/cmd/ss/features/cmd cmd
+meta FEATURE/cmd features/%>FEATURE/% features/cmd cmd
 make features/cmd
 done features/cmd
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} ' ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/cmd
@@ -180,7 +182,7 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ssd.c
-meta ssd.o %.c>%.o ${PACKAGEROOT}/src/cmd/ss/ssd.c ssd
+meta ssd.o %.c>%.o ssd.c ssd
 prev ssd.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ssd.c
 done ssd.o generated

@@ -114,7 +114,7 @@ ppdebug.h : ppfsm.h ppdef.h pplib.h
 	v/^#define/d
 	g/PROTOMAIN/d
 	1,$s/^#define //
-	1,$s/[ 	].*//
+	1,$s/[^A-Za-z0-9_].*//
 	1,$s/.*/	"&", &,/
 	1i
 	$("/")*

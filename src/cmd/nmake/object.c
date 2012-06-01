@@ -1236,7 +1236,6 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 {
 	register List_t*	p;
 	char*			s;
-	char*			u;
 	char*			sn;
 	long			n;
 	Sfoff_t			off;

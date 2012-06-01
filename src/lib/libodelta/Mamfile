@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-14
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make odelta
 make libodelta.a archive
@@ -91,10 +91,14 @@ done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
 make ${PACKAGE_ast_INCLUDE}/wctype.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wctype.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/wchar.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+done ${PACKAGE_ast_INCLUDE}/wchar.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_wctype.h dontcare
 done ${PACKAGE_ast_INCLUDE}/wctype.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
@@ -109,8 +113,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
@@ -153,7 +155,7 @@ make update.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done update.h
 done delta.c
-meta delta.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/delta.c delta
+meta delta.o %.c>%.o delta.c delta
 prev delta.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c delta.c
 done delta.o generated
@@ -161,7 +163,7 @@ make mtchstring.o
 make mtchstring.c
 prev update.h implicit
 done mtchstring.c
-meta mtchstring.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/mtchstring.c mtchstring
+meta mtchstring.o %.c>%.o mtchstring.c mtchstring
 prev mtchstring.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c mtchstring.c
 done mtchstring.o generated
@@ -169,7 +171,7 @@ make suftree.o
 make suftree.c
 prev suftree.h implicit
 done suftree.c
-meta suftree.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/suftree.c suftree
+meta suftree.o %.c>%.o suftree.c suftree
 prev suftree.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c suftree.c
 done suftree.o generated
@@ -177,7 +179,7 @@ make update.o
 make update.c
 prev update.h implicit
 done update.c
-meta update.o %.c>%.o ${PACKAGEROOT}/src/lib/libodelta/update.c update
+meta update.o %.c>%.o update.c update
 prev update.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c update.c
 done update.o generated

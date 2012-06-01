@@ -1,3 +1,4 @@
+12-05-28 rskey.c: fix unsigned comparison to 0
 11-10-11 recsort.h,rskeyopen.c: RSKEY_VERSION=20111011, add Rsdisc_t* argument
 11-09-27 rsopen.c,rsmerge.c: drop obsolete VM_TRUST
 10-05-25 rskey.c: locale-ize Rskey_t.tab and key_m_code()

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -186,6 +186,24 @@ buffer(char** buf, char* end, register char* s, int n)
 #undef	_no_exit_exit
 #endif
 
+#if _lib_syscall && _sys_syscall
+
+#include <sys/syscall.h>
+
+#ifdef SYS_exit
+
+static void
+sys_exit(int code)
+{
+	syscall(SYS_exit, code);
+}
+
+#define SYS_EXIT	sys_exit
+
+#endif
+
+#endif
+
 /*
  * initialize the 3d syscall table
  */
@@ -206,10 +224,13 @@ callinit(void)
 		for (cp = sys_trace; cp < &sys_trace[elementsof(sys_trace)]; cp++)
 			if (!(cp->func = (Sysfunc_t)dlsym(dll, cp->name)) && (*cp->name != '_' || !(cp->func = (Sysfunc_t)dlsym(dll, cp->name + 1)) || !*cp->name++))
 				cp->func = (Sysfunc_t)nosys;
-#if _no_exit_exit
+#if !defined(SYS_EXIT) && _no_exit_exit
 		state.libexit = (Exitfunc_t)dlsym(dll, "exit");
 #endif
 	}
+#ifdef SYS_EXIT
+	sys_trace[0].func = (Sysfunc_t)sys_exit;
+#endif
 }
 
 /*

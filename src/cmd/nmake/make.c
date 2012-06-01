@@ -838,7 +838,7 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 				pop = mampush(mam, r, flags);
 			}
 			if (mam)
-				sfprintf(mam, "%smeta %s %s %s %s\n", state.mam.label, mamname(r), r4->name, r2->name, stem);
+				sfprintf(mam, "%smeta %s %s %s %s\n", state.mam.label, mamname(r), r4->name, state.mam.statix ? localview(r2) : r2->name, stem);
 			debug((-9, "metarule=%s source=%s stem=%s", r4->name, r2->name, stem));
 			frame.stem = stem;
 

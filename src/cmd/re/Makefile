@@ -55,7 +55,7 @@ test.re : test.glob - test.fnmatch - test.match - test.regex
 testregex.tgz : README.re Makefile.re \
 		testfnmatch.c testglob.c testregex.c \
 		testfnmatch.dat testglob.dat testmatch.dat testregex.dat \
-		locale.dat rxposix.dat standards.dat
+		locale.dat rxposix.dat
 	for f in $(*)
 	do	case $f in
 		*READ*)	echo "^^^$f^README" ;;

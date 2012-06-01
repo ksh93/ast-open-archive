@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-14
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make vdelta
 make libvdelta.a archive
@@ -86,10 +86,15 @@ done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
 done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
 make ${PACKAGE_ast_INCLUDE}/wctype.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wctype.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/wchar.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+done ${PACKAGE_ast_INCLUDE}/wchar.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_wctype.h dontcare
 done ${PACKAGE_ast_INCLUDE}/wctype.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
@@ -104,8 +109,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
@@ -138,7 +141,7 @@ make vdelta.h implicit
 done vdelta.h dontcare
 done vdelhdr.h
 done vddelta.c
-meta vddelta.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vddelta.c vddelta
+meta vddelta.o %.c>%.o vddelta.c vddelta
 prev vddelta.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vddelta.c
 done vddelta.o generated
@@ -146,7 +149,7 @@ make vdio.o
 make vdio.c
 prev vdelhdr.h implicit
 done vdio.c
-meta vdio.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vdio.c vdio
+meta vdio.o %.c>%.o vdio.c vdio
 prev vdio.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdio.c
 done vdio.o generated
@@ -154,7 +157,7 @@ make vdupdate.o
 make vdupdate.c
 prev vdelhdr.h implicit
 done vdupdate.c
-meta vdupdate.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vdupdate.c vdupdate
+meta vdupdate.o %.c>%.o vdupdate.c vdupdate
 prev vdupdate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdupdate.c
 done vdupdate.o generated
@@ -162,7 +165,7 @@ make vdsqueeze.o
 make vdsqueeze.c
 prev vdelhdr.h implicit
 done vdsqueeze.c
-meta vdsqueeze.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vdsqueeze.c vdsqueeze
+meta vdsqueeze.o %.c>%.o vdsqueeze.c vdsqueeze
 prev vdsqueeze.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdsqueeze.c
 done vdsqueeze.o generated
@@ -170,7 +173,7 @@ make vdexpand.o
 make vdexpand.c
 prev vdelhdr.h implicit
 done vdexpand.c
-meta vdexpand.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vdexpand.c vdexpand
+meta vdexpand.o %.c>%.o vdexpand.c vdexpand
 prev vdexpand.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdexpand.c
 done vdexpand.o generated
@@ -182,7 +185,7 @@ make vd01/vdelta01.h implicit
 done vd01/vdelta01.h dontcare
 done vd01/vdelhdr01.h
 done vd01/vddelta01.c
-meta vddelta01.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vd01/vddelta01.c vddelta01
+meta vddelta01.o %.c>%.o vd01/vddelta01.c vddelta01
 prev vd01/vddelta01.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vddelta01.c
 done vddelta01.o generated
@@ -190,7 +193,7 @@ make vdio01.o
 make vd01/vdio01.c
 prev vd01/vdelhdr01.h implicit
 done vd01/vdio01.c
-meta vdio01.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vd01/vdio01.c vdio01
+meta vdio01.o %.c>%.o vd01/vdio01.c vdio01
 prev vd01/vdio01.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdio01.c
 done vdio01.o generated
@@ -198,7 +201,7 @@ make vdupdate01.o
 make vd01/vdupdate01.c
 prev vd01/vdelhdr01.h implicit
 done vd01/vdupdate01.c
-meta vdupdate01.o %.c>%.o ${PACKAGEROOT}/src/lib/libvdelta/vd01/vdupdate01.c vdupdate01
+meta vdupdate01.o %.c>%.o vd01/vdupdate01.c vdupdate01
 prev vd01/vdupdate01.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdupdate01.c
 done vdupdate01.o generated

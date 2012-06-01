@@ -412,7 +412,7 @@ unsigned char*	zp;
 	unsigned char*	xp = cp;
 	int		c;
 
-	while (--len >= 0)
+	while (len--)
 	{
 		c = *dp++;
 		HASHPART(kp->shuffle, c);

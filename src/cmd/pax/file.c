@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -26,6 +26,8 @@
  */
 
 #include "pax.h"
+
+#include <tm.h>
 
 /*
  * "nocomment" is a hardwired "nocom"

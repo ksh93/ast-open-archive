@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -24,7 +24,7 @@
  * see testmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2010-01-01 $\0\n";
+static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2012-05-28 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -429,7 +429,7 @@ escape(char* s)
 }
 
 static void
-matchprint(int* match, int nmatch, char* ans)
+matchprint(ssize_t* match, int nmatch, char* ans)
 {
 	int	i;
 
@@ -442,12 +442,12 @@ matchprint(int* match, int nmatch, char* ans)
 		if (match[i] == -1)
 			printf("?");
 		else
-			printf("%d", match[i]);
+			printf("%z", match[i]);
 		printf(",");
 		if (match[i+1] == -1)
 			printf("?");
 		else
-			printf("%d", match[i+1]);
+			printf("%z", match[i+1]);
 		printf(")");
 	}
 	if (ans)
@@ -456,12 +456,12 @@ matchprint(int* match, int nmatch, char* ans)
 }
 
 static int
-matchcheck(int nmatch, int* match, char* ans, char* re, char* s, int flags, int query, int unspecified, int expand)
+matchcheck(int nmatch, ssize_t* match, char* ans, char* re, char* s, int flags, int query, int unspecified, int expand)
 {
 	char*	p;
 	int	i;
-	int	m;
-	int	n;
+	ssize_t	m;
+	ssize_t	n;
 
 	for (i = 0, p = ans; i < nmatch && *p; i += 2)
 	{
@@ -612,7 +612,7 @@ main(int argc, char** argv)
 	char*		version;
 	char*		field[6];
 	char		unit[64];
-	int		match[200];
+	ssize_t		match[200];
 
 	int		catch = 0;
 	int		verbose = 0;

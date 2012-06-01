@@ -114,8 +114,6 @@ typedef struct Xargs_s
 static int
 run(int argc, char** argv, Cmddisc_t* disc)
 {
-	Xargs_t*	xargs = (Xargs_t*)disc;
-
 	return sh_run(((Xargs_t*)disc)->context, argc, argv);
 }
 
@@ -126,7 +124,6 @@ b_xargs(int argc, register char** argv, Shbltin_t* context)
 	register int		q;
 	register char*		s;
 	register Sfio_t*	sp;
-	register Cmdarg_t*	cmd;
 
 	int			argmax = 0;
 	char*			eof = "_";

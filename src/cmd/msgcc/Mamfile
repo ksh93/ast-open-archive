@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-14
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,13 +34,13 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make msgadmin
 make msgadmin.sh
 done msgadmin.sh
-meta msgadmin %.sh>% ${PACKAGEROOT}/src/cmd/msgcc/msgadmin.sh msgadmin
+meta msgadmin %.sh>% msgadmin.sh msgadmin
 prev msgadmin.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -82,8 +82,6 @@ make msgcpp.o
 make msgcpp.c
 make ${PACKAGE_ast_INCLUDE}/ppkey.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ppkey.h
 make ${PACKAGE_ast_INCLUDE}/pp.h implicit
@@ -110,10 +108,14 @@ make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
 make ${PACKAGE_ast_INCLUDE}/wctype.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wctype.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/wchar.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+done ${PACKAGE_ast_INCLUDE}/wchar.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_wctype.h dontcare
 done ${PACKAGE_ast_INCLUDE}/wctype.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
@@ -180,7 +182,7 @@ done ${PACKAGE_ast_INCLUDE}/pp.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msgcpp.c
-meta msgcpp.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msgcpp.c msgcpp
+meta msgcpp.o %.c>%.o msgcpp.c msgcpp
 prev msgcpp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?msgcc]"\" -c msgcpp.c
 done msgcpp.o generated
@@ -191,7 +193,7 @@ done msgcpp generated
 make msgcc
 make msgcc.sh
 done msgcc.sh
-meta msgcc %.sh>% ${PACKAGEROOT}/src/cmd/msgcc/msgcc.sh msgcc
+meta msgcc %.sh>% msgcc.sh msgcc
 prev msgcc.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -235,7 +237,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msgcvt.c
-meta msgcvt.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msgcvt.c msgcvt
+meta msgcvt.o %.c>%.o msgcvt.c msgcvt
 prev msgcvt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?msgcc]"\" -c msgcvt.c
 done msgcvt.o generated
@@ -252,7 +254,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msggen.c
-meta msggen.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msggen.c msggen
+meta msggen.o %.c>%.o msggen.c msggen
 prev msggen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?msgcc]"\" -c msggen.c
 done msggen.o generated
@@ -265,7 +267,7 @@ prev ${PACKAGE_ast_INCLUDE}/mc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msgget.c
-meta msgget.o %.c>%.o ${PACKAGEROOT}/src/cmd/msgcc/msgget.c msgget
+meta msgget.o %.c>%.o msgget.c msgget
 prev msgget.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?msgcc]"\" -c msgget.c
 done msgget.o generated

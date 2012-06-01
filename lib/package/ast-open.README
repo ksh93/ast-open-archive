@@ -94,7 +94,26 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-12-05-17  --- Release ksh93u+ ---
+12-05-31  --- Release ksh93u+ ---
+12-05-31  Use getrlimit64/setrlimit64 on systems that support it.
+12-05-31  Fix 64 bit big-endian arithmentic bug that mishandled nan and inf.
+12-05-31  Handle ECONNRESET like EPIPE.
+12-05-31  Change .paths parse to use only the last BUILTIN_LIB from the top
+	  and treat BUILTIN_LIB value as a ':' separated list of lib names.
+12-05-29  Fix BUILTIN_LIB binding bug that ignored subsequent lookups.
+12-05-29  shtests: --nocompile omits the compile test and --compile does only
+	  the compile test.
+12-05-25  A command subsitution containing a here-document that itself contains
+	  a here-document no longer hangs.
+12-05-24  When the redirection operatory >; is directed to a symlink, it now
+	  overwrites the file named by the link rather than the link.
+12-05-21 +Added printf formats %(type)q where type can be html, url, pattern,
+	  ere, or csv. 
+12-05-18  A bug with appending elements to an indexed array has been fixed.
+12-05-18  The exit status from getopts --man interactively was 0 instead of 2
+	  and has been fixed.
+12-05-18  Another bug with SHOPT_EDPREDICT which could cause a core dump has
+	  been fixed.  
 12-05-17  A bug with fixed size arrays which could cause a core dump has been
 	  fixed.
 12-05-17  A bug in which the here-document <<< $(<file) was not processed
@@ -3120,6 +3139,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+12-05-25 file.c: #include <tm.h> for tmdate() prototype
 12-05-14 pax.c: use Format_t.match to eliminate explicit format references
 12-05-14 pax.c: add xz format -- requires local system standalone xz command
 12-05-07 tar.sh: fix file/option quoting, --show
@@ -3722,6 +3742,8 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+12-05-25 sys.tab: handle missing getdents64 on linux+gcc-4.4
+12-05-25 syscall3d.c: tweak _exit() logic (really?) to dumped core on recent solaris
 11-12-01 fix fcntl 3rd arg int vs void*
 10-06-01 sync with ast api 20100601
 10-04-10 mkdir3d.c: fix mkdir() intermediate dir logic
@@ -4060,6 +4082,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+12-05-22 bind.c,dump.c,make.c,mam.c,rule.c: fix --mam=static 3d vs VPATH diffs
 12-05-14 make.c: .IGNORE disables non-file "must"
 12-05-04 option.c: add 'set --global...set --noglobal' scoping for :OP: makefiles
 12-05-03 Makerules.mk: don't use ``grep -q'' until sun/oracle gets on board
@@ -5496,6 +5519,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+12-05-31 od,tr: errno!=EPIPE => !ERROR_PIPE(errno)
 12-02-28 pty.c: change --verbose[=level] to --debug=level
 12-02-11 what.c: fix boyer moore cut n paste bug -- thanks werner
 12-01-26 pty.c: fix --man docs
@@ -5693,6 +5717,7 @@ All recorded changes follow.
 
 :::::::: bgp ::::::::
 
+12-05-31 bgp.c: add bgp_t mvpn.<member> support
 12-02-20 bgp.c,bgplib.h: drop unused ip4toip6()
 11-09-11 bgp-mrt.c: fix debug trace offset when bgp messages skipped
 11-08-25 bgp-mrt.c: streamline BGP_best logic and drop Mrtpart_t
@@ -6904,8 +6929,78 @@ All recorded changes follow.
 05-06-30 vczip.c: handle vcsfmeth interface change
 05-06-28 vczip.c: snarf from kpv
 
+:::::::: jcl ::::::::
+
+07-12-07 jcl.rt: add prefix '/' delimiter tests
+07-06-06 JCL.mk: add USR1 USR2 interrupt handlers
+07-02-20 cpy2dss.c: handle POINTER, ignore IS
+06-11-11 jcl.c: fix map vs name=value arg precedence
+06-11-11 JCL.mk: export JCL_AUTO_* instead of via command line
+06-10-11 add sfstruse() error checks
+06-08-15 jcm.mk: add --index=n
+06-08-11 JCL.mk: add JCLGROUP for shared coshell
+06-08-08 JCL.mk: parameterize to JCLROOT=$(PACKAGEROOT)
+06-08-03 jcm.c: fix group base prereq
+06-07-31 JCL.mk: parameterize event db path
+06-06-21 jcm.c,JCL.mk: .EVENT.WAIT and .EVENT.RAISE update
+06-06-11 jcm.c: .EVENT.GET => .EVENT.WAIT, .EVENT.SET => .EVENT.RAISE
+06-05-25 cpy2dss.c: handle PIC -9(3).9(2)
+06-05-22 jcm.c,JCL.mk: add .EVENT.GET .EVENT.SET
+06-05-18 jcl.c: exit code cleanup
+06-05-17 jcl.c: update docs
+06-05-16 jcm.c: add job.base and user 'O' for job.name if specified
+05-09-22 jcm.c: add --initialize=file, handle 'T' card prescan
+	 jcm.rt: add tests
+05-09-15 cpy2dss.c: ebcdic-m (mvs) now the default
+05-09-12 jcm.c: ~PX0000 => $(JCL_AUTO_PX)0000
+05-08-31 jcl.rt,JCL.mk: add
+05-08-29 jcm.c: add JCL_AUTO prefix to makefile jcl action vars
+	 jcl.c: add -O, --odate, -R, --rdate, -S, --date
+05-05-31 cpy2dss.c: add typename()
+05-05-09 cpy2dss.c: add <QUOTEALL>
+05-04-18 cpy2dss.c: add --escape, --quote-begin, --quote-end
+05-04-11 cpy2dss.c: handle accumulated fields > fixed record size
+	 cpy2dss.c: handle --sized --text --variable
+05-02-14 jcl.c: add --import env var precedence over --map definitions
+04-12-23 cpy2dss.c: mark structs and struct arrays for --offsets
+04-12-21 cpy2dss.c: add type field to --offsets
+04-10-31 jcl.tst: add JCL_DD_ALIAS tests
+	 jcl.c: add -r,--resolve to resolve/map path operands
+04-10-20 cpy2dss.c: add -C,--comp=from:to
+04-09-27 cpy2dss.c: fix OCCURS and structure offsets, add -k,--keep
+04-09-21 jcl.c: add -s,--subdir
+04-09-20 jcl.tst: handle "export JCL_AUTO_JOB=job" change
+04-09-15 jcl.c: fix optset() to honor jcl->roflags
+	 jcl.tst: add * prefix match tests
+04-08-24 cpy2dss.c: handle REDEFINES => <UNION>, add --offsets
+04-08-06 split cmd/jcl => lib/libjcl + cmd/jcl
+04-06-18 jcl.c: JCL_LISTDATA => JCL_LISTINPUTS|JCL_LISTOUTPUTS
+	 jcl.c: --list=dd => --list=inputs or --list=outputs
+	 cpy2dss.c: add --bytemask
+04-06-09 jcl.c: default JCL_MAPFILE is now optional
+04-05-31 cpy2dss.c: fix structure pop logic, add --sized
+04-05-20 cpy2dss.c: fix --variable to *also* emit <VARIABLE>1</>
+04-05-19 cpy2dss.c: fix --variable to emit terminator and width
+04-05-14 cpy2dss.c: add --terminator=char and --variable
+04-05-06 cpy2dss.c: handle nested structs and out of sync level indices
+04-05-04 cpy2dss.c: promote from test area
+04-02-29 jcl.tst: add empty PARM test
+03-11-14 jcm.c: add from control-m experiments
+03-10-20 --map=prefix by default, --map=- to disable
+	 --map file now a sequence of ops: "map" and "set" for now
+03-10-15 add --map=prefix-map
+03-10-10 more tests
+03-10-08 reliable -x output with regression tests
+03-10-01 first code
+
 :::::::: libast ::::::::
 
+12-05-31 error.h: add ERROR_PIPE(errno) to handle EPIPE and ECONNRESET
+12-05-31 Makefile: don't install $(INCLUDEDIR)/prototyped.h: src/cmd/INIT does it
+12-05-31 regcomp.c: add (?V...) ~(V...) REG_REGEXP switch
+12-05-28 regex: regoff_t in => ssize_t via api 20120528
+12-05-21 features/asometh: split intrinsic and method tests so code only instantiated in aso.c
+12-05-21 comp/strdup.c: use oldof() since mem overwritten by string copy
 12-05-18 misc/stk.c: fix access of moved realloc() data
 12-05-15 misc/optget.c: #? option with no value should have opt_info.num==0
 12-05-11 misc/stk.c: fix memmove() read of 1 uninitialized byte
@@ -8708,6 +8803,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+12-05-31 cat,head,tee: use errno==EPIPE => ERROR_PIPE(errno)
+12-05-25 vmstate.c: #include <sfdisc.h> for sfkeyprintf() prototype
 12-04-20 chgrp.c,chmod.c,cksum.c,cp.c: default fts_flags()|FTS_META (to disable pure FTS_PHYSICAL)
 12-03-26 cp.c: fix --interactive astquery() logic that ignored no&quit!
 12-02-14 rm.c: --force ignores no file operands specified
@@ -9155,6 +9252,7 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+12-05-28 rskey.c: fix unsigned comparison to 0
 11-10-11 recsort.h,rskeyopen.c: RSKEY_VERSION=20111011, add Rsdisc_t* argument
 11-09-27 rsopen.c,rsmerge.c: drop obsolete VM_TRUST
 10-05-25 rskey.c: locale-ize Rskey_t.tab and key_m_code()
@@ -9961,6 +10059,7 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+12-05-31 dssopt.c: handle optegt() style descriptions
 12-05-15 cx.h: add CX_DEPRECATED
 12-05-15 cxopen.c: handle nested structs
 12-02-29 cxopen.c: add "hex" details for external buffer representation
@@ -10422,3 +10521,89 @@ All recorded changes follow.
 :::::::: libtaso ::::::::
 
 11-12-01 first release
+
+:::::::: libjcl ::::::::
+
+10-06-01 sync with ast api 20100601
+10-04-20 run.c: add timout arg to cowait()
+07-12-10 path.c: fix <size><suffix> ordering
+07-12-07 path.c: handle { '.' '/' } delimiters, '/' for pds
+07-12-03 jcl.h: add Jcl_t.flags JCL_GDG for data generations groups
+07-12-03 path.c: add data generations group logic
+07-11-21 run.c: fix USAGE computation
+07-04-09 Makefile: $(CC.PIC) to allow archive to be pulled into other dlls
+06-11-11 sym.c: export JCL_SYM_READONLY for exec and verbose
+06-11-11 add JCL_SYM_READONLY for command line name=value
+06-10-11 add sfstropen()/sfstruse() error checks
+06-08-14 run.c: fix coopen() to use COSHELL=pathshell()
+06-08-04 run.c: fix JOBNAME export
+06-08-04 run.c: use coshell instead of system()
+06-08-01 run.c: exit code is EXIT_STATUS(system(...))!
+06-05-18 RC cleanup
+06-05-17 libjcl.h,open.c,run.c: add JCL_EXEC SYS* redirection
+05-10-25 run.c: fix "+" file append mark placement to be first char
+	 parse.c: fix literal ' inside PARM=(...) list parse
+05-10-11 jcl.h: add JCL_DD_MARKED for paths with size marks
+05-09-15 run.c: drop "+" append mark on command arg files
+05-09-12 lib.c: add { %%BLANK[n] %%TIME }
+	 run.c: create output files if they don't exist
+05-09-09 run.c: use fmtquote() FMT_SHELL flag for [$`]
+05-08-29 jcl.h: add Jcl_t {date,odate,rdate} and control-m vars
+	 open.c: initialize Jcl_t {date,odate,rdate}
+	 lib.c: synthesize Jcl_t {date,odate,rdate} control-m vars
+	 parse.c: add '$' to control-m var id set
+05-06-11 run.c: 1 export per line for readability
+	 run.c: export STEP=step-name
+	 parse.c: fix SUBSYS=... file catenation bug
+	 parse.c: SPACE=n is not a reliable lrecl predictor
+05-02-14 sym.c: handle symbol redefinitions
+	 find.c: ${%%foo} => ${JCL_AUTO_FOO}
+	 jcl.h: fix JCL_CREATE/JCL_WARN bit value clash
+	 jcl.h: add JCL_IMPORT env var precedence over map definitions
+05-02-11 find.c: add expand() recursion check
+04-10-31 jcl.h,parse.c,run.c: add JCL_DD_ALIAS for postponed DD
+	 parse.c: handle DD SUBSYS=(name,'DDNAME=x')
+04-10-18 path.c: expand() "set" args
+04-10-17 run.c: add checkdir() to mkdir -p output dirs
+	 find.c: recursively expand set vars
+04-09-28 run.c: add more JCL_SUBDIR trace output
+04-09-21 jcl.h,run.c: add JCL_SUBDIR
+	 parse.c: add "JCL_AUTO_JOBNAME" to jclsym()
+	 parse.c: fix expression parse bugs
+	 uniq.c: trailing %% is not a file size mark
+04-09-20 run.c: add "export JCL_AUTO_JOBNAME=job"
+04-09-19 path.c: handle prefix match tail
+04-09-15 jcl.h: add Jcl_t.roflags
+	 path.c: add expand() for --include ${...} expand
+	 path.c: ${...} does lookup() then getenv() -- duh
+	 path.c: add *.X prefix match with ${1} ... subexprs
+	 path.c: add "export" and { JCL_SYM_EXPORT JCL_SYM_SET }
+04-08-11 jcl.h,find.c: add JCL_CREATE for jclfind() create
+04-08-08 path.c: provide default disc.{usage,optsetf}
+04-08-06 split cmd/jcl => lib/libjcl + cmd/jcl
+	 path.c: set options only if usage&optsetf are set
+04-06-14 run.c: clean up tmp files on exit
+04-06-06 jcl.h,parse.c: parse OUTPUT and DD OUTPUT=*
+04-05-31 jcl.h,jcl.tst: add JCL_DD_DIR for SPACE=(*(x,y,z)*)
+04-05-24 run.c: handle JCL_DISP_MOD by prefixing dd name with '+'
+04-05-20 cpy2dss.c: fix --variable to *also* emit <VARIABLE>1</>
+04-05-19 cpy2dss.c: fix --variable to emit terminator and width
+04-05-14 cpy2dss.c: add --terminator=char and --variable
+04-05-06 cpy2dss.c: handle nested structs and out of sync level indices
+04-05-04 cpy2dss.c: promote from test area
+04-02-29 parse.c: ignore %%.
+	 jclparm(): PARM=(' name=value') => name=value
+	 run.c: parms passed as one , separated arg
+	 run.c: map dd DSN=&FOO => ${TMPDIR:-/tmp}/job.$$.FOO
+04-02-11 lib.c,sym.c: fix short by one bugs in stash() and jclsym()
+04-01-30 fix '&variable' logic; JCL_LISTSCRIPTS lists INCLUDE paths too
+04-01-27 parse.c: fix off-by-one continuation logic
+04-01-14 run.c: fix std[3] => std[4] off-by-one declaration
+03-11-18 parse.c: add INCLUDE and JCLLIB, fix find search()
+03-11-17 find.c: only convert base name upper=>lower in search
+	 parse.c: add IF/ELSE/ENDIF
+03-10-30 fix DD SYSIN redirection, DD DUMMY
+03-10-16 set (recfm,lrecl) via marked() if not already set
+	 export DD catenations
+03-10-10 variable expansion by the book
+03-10-01 first code

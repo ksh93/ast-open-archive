@@ -204,7 +204,6 @@ struct State_s				/* program state		*/
 static void*
 labelcomp(const regex_t* re, const char* s, size_t len, regdisc_t* disc)
 {
-	State_t*	state = (State_t*)disc;
 	const char*	e = s + len;
 	uintmax_t	n;
 
@@ -317,7 +316,7 @@ compile(State_t* state)
 	r = 1;
 	if (!(state->tmp = sfstropen()))
 	{
-		error(ERROR_SYSTEM|2, "out of space (word pattern `%s')", s);
+		error(ERROR_SYSTEM|2, "out of space");
 		goto done;
 	}
 	if (state->number || state->before || state->after)
@@ -465,9 +464,7 @@ execute(State_t* state, Sfio_t* input, char* name, Shbltin_t* context)
 	size_t		len;
 	int		result;
 	int		line;
-	Item_t		t;
 
-	uintmax_t	hits = 0;
 	int		r = 1;
 	
 	if (state->buffer.noshare)

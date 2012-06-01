@@ -1,3 +1,5 @@
+12-05-25 sys.tab: handle missing getdents64 on linux+gcc-4.4
+12-05-25 syscall3d.c: tweak _exit() logic (really?) to dumped core on recent solaris
 11-12-01 fix fcntl 3rd arg int vs void*
 10-06-01 sync with ast api 20100601
 10-04-10 mkdir3d.c: fix mkdir() intermediate dir logic

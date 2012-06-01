@@ -1,3 +1,4 @@
+12-05-31 od,tr: errno!=EPIPE => !ERROR_PIPE(errno)
 12-02-28 pty.c: change --verbose[=level] to --debug=level
 12-02-11 what.c: fix boyer moore cut n paste bug -- thanks werner
 12-01-26 pty.c: fix --man docs

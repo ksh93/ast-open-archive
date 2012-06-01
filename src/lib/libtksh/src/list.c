@@ -261,7 +261,7 @@ typedef struct TkshRegExp
 {
 	char *re;
 	char *str;
-	int pos[20];
+	ssize_t pos[20];
 	int n;
 } TkshRegExp;
 

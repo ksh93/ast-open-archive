@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-14
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/zlib.lic
-done ${INSTALLROOT}/lib/package/zlib.lic
+make ${PACKAGEROOT}/lib/package/zlib.lic
+done ${PACKAGEROOT}/lib/package/zlib.lic
 make install
 make bz
 make libbz.a archive
@@ -85,6 +85,8 @@ make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
 make ${PACKAGE_ast_INCLUDE}/wctype.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wctype.h implicit
@@ -97,6 +99,9 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
 done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
+make ${PACKAGE_ast_INCLUDE}/wchar.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+done ${PACKAGE_ast_INCLUDE}/wchar.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_wctype.h dontcare
 done ${PACKAGE_ast_INCLUDE}/wctype.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
@@ -105,8 +110,6 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wchar.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
@@ -144,7 +147,7 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done bzhdr.h
 done blocksort.c
-meta blocksort.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/blocksort.c blocksort
+meta blocksort.o %.c>%.o blocksort.c blocksort
 prev blocksort.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
 done blocksort.o generated
@@ -152,7 +155,7 @@ make huffman.o
 make huffman.c
 prev bzhdr.h implicit
 done huffman.c
-meta huffman.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/huffman.c huffman
+meta huffman.o %.c>%.o huffman.c huffman
 prev huffman.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c huffman.c
 done huffman.o generated
@@ -160,7 +163,7 @@ make crctable.o
 make crctable.c
 prev bzhdr.h implicit
 done crctable.c
-meta crctable.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/crctable.c crctable
+meta crctable.o %.c>%.o crctable.c crctable
 prev crctable.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c crctable.c
 done crctable.o generated
@@ -168,7 +171,7 @@ make randtable.o
 make randtable.c
 prev bzhdr.h implicit
 done randtable.c
-meta randtable.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/randtable.c randtable
+meta randtable.o %.c>%.o randtable.c randtable
 prev randtable.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c randtable.c
 done randtable.o generated
@@ -176,7 +179,7 @@ make compress.o
 make compress.c
 prev bzhdr.h implicit
 done compress.c
-meta compress.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/compress.c compress
+meta compress.o %.c>%.o compress.c compress
 prev compress.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c compress.c
 done compress.o generated
@@ -184,7 +187,7 @@ make decompress.o
 make decompress.c
 prev bzhdr.h implicit
 done decompress.c
-meta decompress.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/decompress.c decompress
+meta decompress.o %.c>%.o decompress.c decompress
 prev decompress.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c decompress.c
 done decompress.o generated
@@ -194,7 +197,7 @@ make io.h implicit
 done io.h dontcare virtual
 prev bzhdr.h implicit
 done bzlib.c
-meta bzlib.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/bzlib.c bzlib
+meta bzlib.o %.c>%.o bzlib.c bzlib
 prev bzlib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c bzlib.c
 done bzlib.o generated
@@ -203,8 +206,7 @@ make sfdcbzip.c
 make sfdcbzip.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_api.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_api.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -226,7 +228,7 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done sfdcbzip.c
-meta sfdcbzip.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/sfdcbzip.c sfdcbzip
+meta sfdcbzip.o %.c>%.o sfdcbzip.c sfdcbzip
 prev sfdcbzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c sfdcbzip.c
 done sfdcbzip.o generated

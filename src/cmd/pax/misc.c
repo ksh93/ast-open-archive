@@ -956,7 +956,6 @@ int
 match(register char* s)
 {
 	register Pattern_t*	p;
-	register char*		t;
 	int			n;
 
 	if (!(p = state.pattern))

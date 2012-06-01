@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -30,7 +30,7 @@
  */
 
 static int
-optout(register Sfio_t* sp, const char* name, const char* type, const char* map, const char* ret, register const char* s, const char* x)
+optout(register Sfio_t* sp, const char* name, const char* type, const char* map, const char* ret, const char* s, const char* x)
 {
 	register const char*	t;
 	register int		c;
@@ -60,7 +60,9 @@ optout(register Sfio_t* sp, const char* name, const char* type, const char* map,
 	sfputc(sp, '?');
 	if (s)
 	{
-		if (optesc(sp, s, 0))
+		if (*s == '[')
+			sfputr(sp, s + 1, -1);
+		else if (optesc(sp, s, 0))
 			return -1;
 		if (x)
 		{
@@ -71,7 +73,8 @@ optout(register Sfio_t* sp, const char* name, const char* type, const char* map,
 	}
 	else
 		sfputc(sp, ' ');
-	sfputc(sp, ']');
+	if (s && *s != '[')
+		sfputc(sp, ']');
 	return 0;
 }
 

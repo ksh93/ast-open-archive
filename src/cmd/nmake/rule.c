@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2010 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -1035,7 +1035,25 @@ merge(register Rule_t* from, register Rule_t* to, int op)
 	if (from->name)
 	{
 		if (from == to || to->status != NOTYET && (to->status != UPDATE || !(from->property & P_use)))
+		{
+			/*
+			 * this is a workaround to separate the view vs. local binding for this case:
+			 *	from	sub/foo == foo
+			 *	to	/dir/foo == foo
+			 * it may need to be examined for cases other than (state.mam.statix)
+			 */
+
+			if (!state.exec && state.mam.statix && (from->dynamic & D_alias) && (to->property & P_terminal) && from->uname && to->uname && *from->name != '/' && *to->name == '/')
+			{
+				Rule_t*		fromstate;
+				Rule_t*		tostate;
+
+				to->uname = from->name;
+				if (!(tostate = staterule(RULE, to, NiL, 0)) && (fromstate = staterule(RULE, from, NiL, 0)))
+					*staterule(RULE, to, NiL, 1) = *fromstate;
+			}
 			return;
+		}
 #if DEBUG
 		if (to->name)
 			debug((-4, "merging %s%s into %s", (op & MERGE_ATTR) ? "attributes of " : null, from->name, to->name));
@@ -1283,7 +1301,6 @@ b_getopts(char** args)
 	char*	oid;
 	char*	s;
 	Rule_t*	r;
-	int	c;
 	Opt_t	info;
 
 	s = getval(">", 0);
@@ -1305,7 +1322,7 @@ b_getopts(char** args)
 				opt_info.offset++;
 			if (s[opt_info.offset] != '-')
 				break;
-			switch (c = optstr(s, usage))
+			switch (optstr(s, usage))
 			{
 			case 0:
 				break;

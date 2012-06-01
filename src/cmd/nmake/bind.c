@@ -900,7 +900,7 @@ bindfile(register Rule_t* r, char* name, int flags)
 		if (r->dynamic & D_alias)
 		{
 			a = r;
-			r = makerule(r->name);
+			r = makerule(unbound(r));
 			if (r == a)
 			{
 				error(1, "%s: alias loop", r->name);
@@ -2006,9 +2006,10 @@ char*
 localview(register Rule_t* r)
 {
 	register Rule_t*	x;
+	int			i;
 
 	if (r->dynamic & D_alias)
-		r = makerule(r->name);
+		r = makerule(unbound(r));
 	if (state.context && !(r->property & (P_state|P_virtual)))
 	{
 		register char*	s = r->name;
@@ -2028,5 +2029,19 @@ localview(register Rule_t* r)
 	}
 	if (!state.maxview || state.fsview && !state.expandview)
 		return r->name;
-	return (x = localrule(r, 1)) ? x->name : (r->view && r->uname ? r->uname : r->name);
+	if (x = localrule(r, 1))
+		return x->name;
+	if (r->view && r->uname)
+	{
+		if (state.mam.statix)
+		{
+			if (*r->name != '/')
+				return r->name;
+			for (i = 1; i <= state.maxview; i++)
+				if (strneq(r->name, state.view[i].path, state.view[i].pathlen) && r->name[state.view[i].pathlen] == '/')
+					return r->name + state.view[i].pathlen + 1;
+		}
+		return r->uname;
+	}
+	return r->name;
 }

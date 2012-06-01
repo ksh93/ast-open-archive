@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2010-11-03 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2012-05-31 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files in various "
@@ -1597,7 +1597,7 @@ b_od(int argc, char** argv, Shbltin_t* context)
 		*(state.base + strlen(state.base) - 1) = '\n';
 		sfprintf(sfstdout, state.base, (intmax_t)state.offset);
 	}
-	if (sfsync(sfstdout) && errno != EPIPE)
+	if (sfsync(sfstdout) && !ERROR_PIPE(errno))
 		error(ERROR_SYSTEM|2, "write error");
  done:
 	vmclose(state.vm);

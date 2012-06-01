@@ -751,7 +751,6 @@ setop(register Option_t* op, register int n, char* s, int type)
 {
 	char*		t;
 	Rule_t*		r;
-	int		preprocess;
 	int		readonly;
 
 	readonly = state.readonly;

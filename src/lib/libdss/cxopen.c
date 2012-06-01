@@ -965,7 +965,6 @@ cxopen(Cxflags_t flags, Cxflags_t test, Cxdisc_t* disc)
 	register Vmalloc_t*	vm;
 	register Vmalloc_t*	em;
 	register Vmalloc_t*	rm;
-	register int		i;
 
 	if (!(vm = vmopen(Vmdcheap, Vmbest, 0)) || !(em = vmopen(Vmdcheap, Vmlast, 0)) || !(rm = vmopen(Vmdcheap, Vmlast, 0)))
 	{
@@ -2144,7 +2143,6 @@ cxcast(Cx_t* cx, Cxoperand_t* ret, Cxvariable_t* var, Cxtype_t* type, void* data
 	Cxoperand_t	val;
 	Cxreference_t*	ref;
 	Cxtype_t*	from;
-	Cxedit_t*	edit;
 	unsigned char*	map;
 	char*		s;
 	ssize_t		n;

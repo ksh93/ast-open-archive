@@ -1,3 +1,4 @@
+12-05-31 bgp.c: add bgp_t mvpn.<member> support
 12-02-20 bgp.c,bgplib.h: drop unused ip4toip6()
 11-09-11 bgp-mrt.c: fix debug trace offset when bgp messages skipped
 11-08-25 bgp-mrt.c: streamline BGP_best logic and drop Mrtpart_t

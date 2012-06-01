@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Research) 2010-09-08 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Research) 2012-05-31 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"
@@ -492,7 +492,7 @@ trcopy(Tr_t* tr, Sfio_t* ip, Sfio_t* op, ssize_t ncopy)
 		sfwrite(op, outbuff, c);
 	if (sfsync(op))
 	{
-		if (errno != EPIPE)
+		if (!ERROR_PIPE(errno))
 			error(ERROR_SYSTEM|2, "write error [%d]", c);
 		return -1;
 	}

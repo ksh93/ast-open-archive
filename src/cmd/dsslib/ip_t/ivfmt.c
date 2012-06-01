@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -36,7 +36,6 @@ ivfmt(Iv_t* iv, const unsigned char* addr, int bits)
 	char*	s;
 	char*	e;
 	int	i;
-	int	j;
 	int	n;
 
 	if (iv->size == 16)

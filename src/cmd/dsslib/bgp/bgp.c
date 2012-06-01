@@ -90,7 +90,7 @@ CXV("labels",		"labels_t",	BGP_labels,		"NLRI label list; LHS is label, RHS is C
 CXV("local",		"number",	BGP_local,		"Local preference.")
 CXV("med",		"number",	BGP_med,		"Multi exit discriminator.")
 CXV("message",		"number",	BGP_message,		"Message group index.")
-CXV("mvpn",		"bgp_t",	BGP_mvpn,		"Mcast vpn data.")
+CXV("mvpn",		"bgp_t",	BGP_mvpn,		"[Mcast vpn data using members of the main schema; access as \bmvpn\b.\amember\a:]{[+agg_addr?VPN_S_PMSI_A_D multicast address.][+originator?Originator ipv4 address.][+rd_addr?Route distinguisher address.][+rd_as?Route distinguisher AS number.][+rd_number?Route distinguisher assigned number.][+rd_type?Route distinguisher type.][+src_addr?Source address.][+src_as?Originator AS number.]}")
 CXV("new_state",	"number",	BGP_new_state,		"STATE_CHANGE record new state.")
 CXV("old_state",	"number",	BGP_old_state,		"STATE_CHANGE record old state.")
 CXV("origin",		"number",	BGP_origin,		"Origin: 'i':igp, 'e':egp, '?':incomplete.")
@@ -675,7 +675,7 @@ Dsslib_t dss_lib_bgp =
 {
 	"bgp",
 	"bgp method"
-	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2012-05-15 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2012-05-31 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	&libraries[0],

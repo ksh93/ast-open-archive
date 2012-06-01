@@ -1,3 +1,4 @@
+12-05-25 file.c: #include <tm.h> for tmdate() prototype
 12-05-14 pax.c: use Format_t.match to eliminate explicit format references
 12-05-14 pax.c: add xz format -- requires local system standalone xz command
 12-05-07 tar.sh: fix file/option quoting, --show

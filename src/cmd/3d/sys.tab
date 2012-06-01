@@ -80,7 +80,7 @@ truncate64	truncate	int	const char*, off64_t		255
 #
 # dir got into the act too
 #
-getdents64	getdents	ssize_t		int, struct dirent64*, size_t	255
+getdents64	getdents	ssize_t		int, void*, size_t	255
 readdir64	nop		struct dirent64*	DIR*
 rewinddir64	nop		void		DIR*
 seekdir64	nop		void		DIR*, off64_t	coupled	rewinddir64 telldir64

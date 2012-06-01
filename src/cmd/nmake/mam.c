@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -99,9 +99,14 @@ mamname(register Rule_t* r)
 		return r->name;
 	if (state.mam.dynamic && (r->dynamic & D_alias))
 		r = makerule(r->name);
-	a = ((r->property & P_target) || !state.user) ? unbound(r) : (state.mam.regress || state.expandview) ? r->name : localview(r);
-	if (state.mam.statix && (s = call(makerule(external.mamname), a)) && !streq(a, s))
-		a = s;
+	if (state.mam.statix)
+	{
+		a = localview(r);
+		if ((s = call(makerule(external.mamname), a)) && !streq(a, s))
+			a = s;
+	}
+	else
+		a = ((r->property & P_target) || !state.user) ? unbound(r) : (state.mam.regress || state.expandview) ? r->name : localview(r);
 	if (state.mam.root && (*a == '/' || (r->dynamic & (D_entries|D_member|D_membertoo|D_regular)) || stat(r->name, &st)))
 	{
 		if (*a != '/')

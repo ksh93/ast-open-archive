@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -145,7 +145,7 @@ iswblank(wint_t wc)
 
 #define MAXGROUP	10
 
-typedef struct
+typedef struct Group_s
 {
 	char*		beg[MAXGROUP];
 	char*		end[MAXGROUP];
@@ -153,7 +153,7 @@ typedef struct
 	short		groups;
 } Group_t;
 
-typedef struct
+typedef struct Match_s
 {
 	Group_t		current;
 	Group_t		best;
@@ -754,7 +754,7 @@ grpmatch(Match_t* mp, int g, char* s, register char* p, char* e, int flags)
  */
 
 static int
-strgrpmatch(const char* b, const char* p, int* sub, int n, int flags)
+strgrpmatch(const char* b, const char* p, ssize_t* sub, int n, int flags)
 {
 	register int	i;
 	register char*	s;
