@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -129,8 +129,8 @@ tmain()
 		if(Write_error)
 			terror("Write exception should not have been raised yet");
 
-		if(!sfclose(w))
-			terror("sfclose should have returned error status");
+		if(sfclose(w))
+			terror("sfclose should not have returned error status");
 
 		if(!Write_error)
 			terror("Write exception should have been raised");

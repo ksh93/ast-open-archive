@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-05-03 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-06-08 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2082,7 +2082,7 @@ RECURSEROOT = .
  */
 
 ":LIBRARY:" : .MAKE .OPERATOR .PROBE.INIT
-	local A B I L M N P Q R S T V X
+	local A B H I L M N P Q R S T V X
 	P := $(.PACKAGE.plugin)
 	B := $(<:O=1)
 	M := $(B)
@@ -2111,6 +2111,8 @@ RECURSEROOT = .
 				M := $(T:/id=//)
 			elif T == "install"
 				I := $(X)
+			elif T == "list=*"
+				H := $(T:/list=//)
 			elif T == "plugin=*"
 				P := $(T:/plugin=//)
 			elif T == "private"
@@ -2252,6 +2254,31 @@ RECURSEROOT = .
 		$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
 	else
 		$(T) : $(L)
+	end
+	if H
+		L := $(M:B)
+		eval
+			$(L)src = $$(*$$(*$$(*$(L))):N=*.c:T=F)
+			$(L)list.h : ($(L)src) $$$(-mam:+$$$($(L)src))
+				{
+				cat <<!
+				$$("/")*
+				$$(" ")* -l$(L) function list -- define your own CMDLIST()
+				$$(" ")*/
+				!
+				$$(SED) \
+					-e '/^$(H)[a-z_][a-z_0-9]*(/!d' \
+					-e 's/^$(H)//' \
+					-e 's/(.*//' \
+					-e 's/.*/CMDLIST(&)/' \
+					$$($$(~):T=F) |
+				$$(SORT) -u
+				} > 1.$$(tmp).h
+				if	$$(CMP) $$(CMPFLAGS) 1.$$(tmp).h $$(<)
+				then	$$(RM) $$(RMFLAGS) 1.$$(tmp).h
+				else	$$(MV) 1.$$(tmp).h $$(<)
+				fi
+		end
 	end
 
 /*

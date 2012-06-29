@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -78,10 +78,10 @@ ciscov6ident(Dssfile_t* file, void* buf, size_t n, Dssdisc_t* disc)
 		if (strneq(f, magic[m], strlen(magic[m])) && ++m >= elementsof(magic))
 		{
 			file->caller = v;
-			return 1;
+			break;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 /*

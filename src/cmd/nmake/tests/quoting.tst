@@ -24,7 +24,7 @@ tst :: tst.sh'
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	if	grep -q \'### .*archaic.* ###\'
++ 	then	if	grep \'### .*archaic.* ###\' >/dev/null
 + 		then	: tst contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n tst.sh
 + 		fi

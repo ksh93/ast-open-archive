@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2008 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -136,7 +136,7 @@ void
 demail(void)
 {
 	if (state.var.keep || rm(state.path.mail) < 0)
-		close(open(state.path.mail, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, MAILMODE));
+		close(open(state.path.mail, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY|O_cloexec, MAILMODE));
 }
 
 /*
@@ -837,7 +837,7 @@ touch(const char* file, time_t atime, time_t mtime, int force)
 	now = time(NiL);
 	if (stat(file, &st))
 	{
-		if (!force || close(open(file, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)))
+		if (!force || close(open(file, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY|O_cloexec, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)))
 			return -1;
 		st.st_mtime = st.st_atime = now;
 	}

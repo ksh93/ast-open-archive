@@ -1037,7 +1037,51 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-12-05-31  --- Release ksh93u+ ---
+12-06-28  --- Release ksh93u+ ---
+12-06-28  Fix ulimit -a to list (Kibytes) instead of (kbytes).
+12-06-27  Fix unitialized data reference for &lt;CR&gt; as first char in --vi mode.
+12-06-26  The formatting of printf "%q" for multibyte locales has changed to
+	  output using \u&#0091;xxx&#0093; format for valid wide characters.
+12-06-25  The size limit for read -N and read -n has been raised to INT_MAX.
+12-06-22  A bug in which an exit trap set in a subshell might not be triggered
+	  when the last command was a simple executable has been fixed.
+12-06-22  A bug which could cause the shell to hang when a coprocess exits
+	  while a command inside a command substitution is reading from it has
+	  been fixed.
+12-06-21 +ksh new accepts for commands of the form for i; &lt;nl&gt; do;...;done
+12-06-19  Tab completion after a / when there is only one match not completes
+	  with that match rather than generating a menu of matches.
+12-06-19  A bug in which patterns containing {...} where not processed
+	  correctly inside ${var/pattern/string} has been fixed.  
+12-06-18  Code modified to eliminate fts_notify variable.
+12-06-15  Change the .paths plugin/builtin library variable name from
+	  BUILTIN_LIB to PLUGIN_LIB to prevent new plugin_version() aware
+	  -lcmd from causing older non-plugin_version() aware ksh to dump core.
+12-06-14  builtin without argument no longer lists .sh.tilde as a built-in.
+12-06-12  For assignments if the form x=(foo bar), foo is only check for an
+	  alias if it is float, integer, compound, or nameref.
+12-06-12 +The shell supports 64 bit i-nodes even for 32 bit binaries.
+12-06-11  A bug wth &gt;; redirection systems for which vfork() was the same a
+	  fork() has been fixed.
+12-06-11  A bug in path lookup that ignored buffer boundaries has been fixed.
+12-06-08  typeset -a var and typeset -A var, first unset var when var is
+	  a compound variable.
+12-06-08  A bug in which running shcomp on a program containg namespace
+	  could core dump has been fixed.
+12-06-06  A bug in which unset of an associative array of compound variables
+	  did not completely unset the variable has been fixed.
+12-06-06  A bug in which exporting left or right justfied fields could loose
+	  the field width has been fixed.
+12-06-06  A bug on Solaris11 in which &gt;; did not work for /dev/null was fixed.
+12-06-05  A race condition which occured when stopping a builtin command
+	  invoked from a subshell has been fixed.
+12-06-05  A bug with appending elements to an empty indexed array has been
+	  fixed.
+12-06-04  A bug in which continuing a stopped builtin could cause it to
+	  terminate has been fixed.
+12-06-04  By default, builtins added at runtime will restore the current
+	  directory if they are killed or stopped.
+12-06-04  A bug in handling \&nbsp;in read has been fixed.
 12-05-31  Use getrlimit64/setrlimit64 on systems that support it.
 12-05-31  Fix 64 bit big-endian arithmentic bug that mishandled nan and inf.
 12-05-31  Handle ECONNRESET like EPIPE.
@@ -4703,6 +4747,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-25 change strcpy() within buffer to strcopy()
+12-06-22 sys.tab,utimensat3d.c: add utimensat()
 12-05-25 sys.tab: handle missing getdents64 on linux+gcc-4.4
 12-05-25 syscall3d.c: tweak _exit() logic (really?) to dumped core on recent solaris
 11-12-01 fix fcntl 3rd arg int vs void*
@@ -5061,6 +5107,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-20 O_cloexec|F_dupfd_cloexec edit
 12-05-22 bind.c,dump.c,make.c,mam.c,rule.c: fix --mam=static 3d vs VPATH diffs
 12-05-14 make.c: .IGNORE disables non-file "must"
 12-05-04 option.c: add 'set --global...set --noglobal' scoping for :OP: makefiles
@@ -5068,7 +5115,7 @@ All recorded changes follow.
 12-04-20 option.c,load.c,Makerules.mk: add Op option .mo reread prereqs
 12-03-22 Makerules.mk: .BIND.-l% in STDLIB dir with only CC.SUFFIX.ARCHIVE =&gt; -lfoo
 12-03-22 bind.c: add .BIND.-l% --debug=3 trace
-12-03-22 expand.c: SORT_qualified '!' and and SORT_first '&gt;' no longer mutually exclusive
+12-03-22 expand.c: SORT_qualified '!' and SORT_first '&gt;' no longer mutually exclusive
 12-02-29 Makerules.mk: fix ``lhs :MAKE: rhs'' logic for lhs and rhs makefile
 12-02-29 option.c: fix regress option doc typo
 12-02-20 Makerules.mk: update for astlicense() { since start source }
@@ -6723,6 +6770,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-14 bgp.c: document int mvpn.type == route type index
+12-06-13 bgp.c: add "bgp_t mvpn.key" for mvpn route key
 12-05-31 bgp.c: add bgp_t mvpn.&lt;member&gt; support
 12-02-20 bgp.c,bgplib.h: drop unused ip4toip6()
 11-09-11 bgp-mrt.c: fix debug trace offset when bgp messages skipped
@@ -6865,6 +6914,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-13 bgp.h: add BGP_key for mvpn route key
 12-05-15 bgp.h: change BGP_PMSI_* to BGP_pmsi
 12-02-24 *sa.omk: clean up standalone old make makefiles
 12-02-24 README-*: bring standalone READMEs up to date
@@ -7058,6 +7108,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mailx changes">mailx changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-05 spam.c: fix insider() domain check that skipped pure domain with not host
 12-04-13 cmd1.c: fix empty list null pointer deref
 12-02-29 add headfake boolean option to fake 'From ' line in saved message
 11-09-11 add sender=/address/head/pattern/&#0091;&amp;|&#0093;/head/pattern/...
@@ -7284,6 +7335,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-25 test*.c: handle \u&#0091;U+...&#0093;
+12-06-23 testoldmatch.c: add tests for legacy astsa/strmatch.c
 12-05-07 grep.c: add case 'y': to *really* ignore --color
 12-05-03 grep.c: add -Y, --color -- ignored for GNU compatibility
 12-04-20 grep.c: always enable FTS_META (to disable pure FTS_PHYSICAL)
@@ -7544,6 +7597,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-06 yes.sh: use echo instead of print if no $KSH_VERSION
 12-04-20 ls.c: FTW_META default
 12-02-14 yes.sh: add
 12-01-23 du.c: the rightmost of { -b -h -k -K -m } overrides the others
@@ -7995,6 +8049,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="warp changes">warp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-22 warp.c: add utimensat()
 08-11-15 warp.c: fix time() _WIN32 intercept
 05-02-01 warp.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 05-01-01 warp.c,feature/lib: add utimes() intercept with struct timespec
@@ -8097,6 +8152,22 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-28 vmalloc/malloc.c: use sbrk() unless VMALLOC_OPTIONS=mmap or asoinit(0,0,0)!=0 (workaround until next malloc update)
+12-06-28 aso/aso.c: asoinit(0,0,0): 0: no specific init, 1: app initialized
+12-06-27 sfio/sfvprintf.c: allow { L* z* } aliases for I* -- posix will probably pick one
+12-06-26 regex/regnexec.c: fix uninitialized variable reference
+12-06-26 comp/setlocale.c: utf8_wctomb() now calls (the corrrect) wc2utf8()
+12-06-25 string/chresc.c: accept \u&#0091;U+&lt;hex&gt;&#0093; and \u{U+&lt;hex&gt;}
+12-06-24 regex/regcomp.c: mb &#0091;^...&#0093; must be marked "complicated"
+12-06-20 port/astconf.c: increase DEBUG_astconf error debug levels (may leach into rt output)
+12-06-18 sfio/_sfopen.c: add 'e' =&gt; O_CLOEXEC
+12-06-18 features/fcntl.c: add #define O_CLOEXEC 0 if not defined
+12-06-13 features/float: handle __mips c99 peculiarities
+12-06-13 features/standards: handle __MACH__ posix peculiarities
+12-06-08 sfio/sfclose.c,sfmode.c: sfclose() for sfopopen() stream returns sh-compatible $?
+12-06-08 comp/strtold.c: fix header botch that missed ldexpl() prototype -- ouch
+12-06-06 misc/proclib.h: partially undo &lt;ast_standards.h&gt; for leaked ancient bsd-isms
+12-05-31 misc/proclib.h: &lt;ast_standards.h&gt; for linux undefined struct mmsghdr*
 12-05-31 error.h: add ERROR_PIPE(errno) to handle EPIPE and ECONNRESET
 12-05-31 Makefile: don't install $(INCLUDEDIR)/prototyped.h: src/cmd/INIT does it
 12-05-31 regcomp.c: add (?V...) ~(V...) REG_REGEXP switch
@@ -9911,6 +9982,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-25 getconf.c: don't defer to native getconf if we are it -- doh
+12-06-19 tail.c: be nice and use sh_sigcheck() and tvsleep() to verify interrupts
 12-05-31 cat,head,tee: use errno==EPIPE =&gt; ERROR_PIPE(errno)
 12-05-25 vmstate.c: #include &lt;sfdisc.h&gt; for sfkeyprintf() prototype
 12-04-20 chgrp.c,chmod.c,cksum.c,cp.c: default fts_flags()|FTS_META (to disable pure FTS_PHYSICAL)
@@ -10715,6 +10788,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-06 ppline.c: preserve hosted sync even for normal sync
 12-02-29 pp.probe: handle predefined function-like macro definitions
 12-02-14 ppproto.c: fix "already noticed" logic
 11-08-30 ppproto.c: bump BLOCK to 16*1024 for (ppargs.c self-doc!)
@@ -11209,6 +11283,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdss changes">libdss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-06-15 dssopt.c: fix bug that failed to provide closing &#0093;
 12-05-31 dssopt.c: handle optegt() style descriptions
 12-05-15 cx.h: add CX_DEPRECATED
 12-05-15 cxopen.c: handle nested structs
@@ -11785,7 +11860,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>June 01, 2012</TD>
+<TD align=right>June 28, 2012</TD>
 </TR>
 </TABLE>
 <P>

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -241,7 +241,7 @@ fapply(Rule_t* r, char* lhs, char* rhs, char* act, Flags_t flags)
 	fp = 0;
 	if (!apply(r, lhs, rhs, act, flags|CO_DATAFILE))
 	{
-		if (fp = sfopen(NiL, state.tmpfile, "r"))
+		if (fp = sfopen(NiL, state.tmpfile, "re"))
 			remove(state.tmpfile);
 		else
 			error(2, "%s: cannot read temporary data output file %s", r->name, state.tmpfile);
@@ -681,8 +681,10 @@ execute(register Joblist_t* job)
 		}
 		if (!state.coshell)
 		{
+#if !O_cloexec
 			if (internal.openfile)
 				fcntl(internal.openfd, F_SETFD, FD_CLOEXEC);
+#endif
 			sp = sfstropen();
 			sfprintf(sp, "label=%s", idname);
 			expand(sp, " $(" CO_ENV_OPTIONS ")");

@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*          Copyright (c) 1990-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -157,7 +157,7 @@ csauth(register Cs_t* state, int fd, const char* path, const char* arg)
 				goto sorry;
 			}
 			s = b + sfsprintf(b, sizeof(tmp) - (b - tmp), "%03d", auth);
-			if ((stat(tmp, &st) || t1 <= (unsigned long)st.st_ctime && !remove(tmp)) && !close(open(tmp, O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) break;
+			if ((stat(tmp, &st) || t1 <= (unsigned long)st.st_ctime && !remove(tmp)) && !close(open(tmp, O_CREAT|O_TRUNC|O_cloexec, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) break;
 		}
 		key = tmp;
 		if (tokscan(num, NiL, "%lu %lu", &t1, &t2) != 2)

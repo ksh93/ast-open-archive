@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -32,7 +32,7 @@
 #include <error.h>
 #include <tm.h>
 
-#define DDLIB(s)	(streq(name,"JCLLIB")||streq(name,"JOBLIB")||streq(name,"PROCLIB"))
+#define DDLIB(s)	(streq((s),"JCLLIB")||streq((s),"JOBLIB")||streq((s),"PROCLIB"))
 #define ID1(c)		(isalpha(c)||(c)=='_'||(c)=='$'||(c)=='@'||(c)=='#')
 #define ID(c)		(isalnum(c)||(c)=='_'||(c)=='$'||(c)=='@'||(c)=='#')
 
@@ -40,6 +40,11 @@ static char		null_data[2];
 static char*		null = &null_data[1];
 
 static char		dummy[] = "/dev/null";
+
+/* vendor SS in the standard namespace -- great */
+
+#undef	SS
+#undef	ST
 
 static char		EQ[] = "=";
 static char		END[] = "\\\\";

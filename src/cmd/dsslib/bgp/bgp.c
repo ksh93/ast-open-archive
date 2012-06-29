@@ -85,12 +85,13 @@ CXV("hopv4",		"ipv4addr_t",	BGP_hopv4,		"Next hop ipv4 address.")
 CXV("hopv6",		"ipv6addr_t",	BGP_hopv6,		"Next hop ipv6 address.")
 CXV("id",		"number",	BGP_id,			"Auxiliary id.")
 CXV("internal",		"number",	BGP_internal,		"Internal prefix.")
+CXV("key",		"bgp_t",	BGP_key,		"Route key NLRI.")
 CXV("label",		"number",	BGP_label,		"NLRI label.")
 CXV("labels",		"labels_t",	BGP_labels,		"NLRI label list; LHS is label, RHS is COS and end of stack bit.")
 CXV("local",		"number",	BGP_local,		"Local preference.")
 CXV("med",		"number",	BGP_med,		"Multi exit discriminator.")
 CXV("message",		"number",	BGP_message,		"Message group index.")
-CXV("mvpn",		"bgp_t",	BGP_mvpn,		"[Mcast vpn data using members of the main schema; access as \bmvpn\b.\amember\a:]{[+agg_addr?VPN_S_PMSI_A_D multicast address.][+originator?Originator ipv4 address.][+rd_addr?Route distinguisher address.][+rd_as?Route distinguisher AS number.][+rd_number?Route distinguisher assigned number.][+rd_type?Route distinguisher type.][+src_addr?Source address.][+src_as?Originator AS number.]}")
+CXV("mvpn",		"bgp_t",	BGP_mvpn,		"[Mcast vpn data using members of the main schema; access as \bmvpn\b.\amember\a:]{[+agg_addr?VPN_S_PMSI_A_D multicast address.][+key?Route key NLRI.][+originator?Originator ipv4 address.][+rd_addr?Route distinguisher address.][+rd_as?Route distinguisher AS number.][+rd_number?Route distinguisher assigned number.][+rd_type?Route distinguisher type.][+src_addr?Source address.][+src_as?Originator AS number.][+type?The route type index.]}")
 CXV("new_state",	"number",	BGP_new_state,		"STATE_CHANGE record new state.")
 CXV("old_state",	"number",	BGP_old_state,		"STATE_CHANGE record old state.")
 CXV("origin",		"number",	BGP_origin,		"Origin: 'i':igp, 'e':egp, '?':incomplete.")
@@ -520,11 +521,12 @@ CXC(CX_GET, "void", "void", op_get, 0)
 static int
 bgp_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
+	Cxvariable_t*	vp = (Cxvariable_t*)pc->data.variable;
 	void*		save;
 	int		i;
 
 	save = DSSRECORD(data)->data;
-	DSSRECORD(data)->data = &BGPDATA(data)->sub;
+	DSSRECORD(data)->data = &BGPDATA(data)->sub + (((Cxvariable_t*)pc->data.variable)->index == BGP_key);
 	i = op_get(cx, pc, r, a, b, data, disc);
 	DSSRECORD(data)->data = save;
 	return i;
@@ -675,7 +677,7 @@ Dsslib_t dss_lib_bgp =
 {
 	"bgp",
 	"bgp method"
-	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2012-05-31 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2012-06-14 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	&libraries[0],

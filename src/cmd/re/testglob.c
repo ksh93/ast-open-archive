@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1995-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1995-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -24,7 +24,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2008-07-29 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2012-06-23 $\0\n";
 
 #if _PACKAGE_ast
 
@@ -780,7 +780,7 @@ main(int argc, char** argv)
 			switch (*p) {
 			case 'C':
 				if (!query && !(skip & level))
-					bad("locale must be nested\n", NiL);
+					bad("locale query expected\n", NiL);
 				query = 0;
 				if (locale)
 					bad("locale nesting not supported\n", NiL);

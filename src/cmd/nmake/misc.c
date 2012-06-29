@@ -42,7 +42,7 @@ rstat(char* name, Stat_t* st, int res)
 		internal.openfile = 0;
 		close(internal.openfd);
 	}
-	while ((internal.openfd = open(name, O_RDONLY|O_BINARY)) < 0)
+	while ((internal.openfd = open(name, O_RDONLY|O_BINARY|O_cloexec)) < 0)
 	{
 		if (errno != EINTR)
 		{

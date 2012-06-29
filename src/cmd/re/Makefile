@@ -35,6 +35,9 @@ fnmatch :TEST: testfnmatch.c testfnmatch.dat testregex.dat \
 match :TEST: testmatch.c testregex.dat locale.dat testmatch.dat
 	$(*:O=1) $(TESTREFLAGS) $(*:O>1)
 
+oldmatch :TEST: testoldmatch.c testregex.dat locale.dat testmatch.dat
+	$(*:O=1) $(TESTREFLAGS) $(*:O>1)
+
 regex :TEST: testregex.c testregex.dat locale.dat testmatch.dat testsub.dat \
 		testdecomp.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat \
 		perl.dat minimal.dat escape.dat group.dat haskell.dat \

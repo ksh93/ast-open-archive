@@ -578,7 +578,7 @@ lockstate(int set)
 		for (;;)
 		{
 			lockfile = file;
-			if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC|O_EXCL|O_BINARY, 0)) >= 0)
+			if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC|O_EXCL|O_BINARY|O_cloexec, 0)) >= 0)
 				break;
 			lockfile = 0;
 			if (stat(file, &st) < 0)

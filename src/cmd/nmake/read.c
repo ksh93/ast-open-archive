@@ -445,7 +445,6 @@ readfile(register char* file, int type, char* filter)
 		{
 			if (state.mam.dynamic || state.mam.regress)
 				mampush(state.mam.out, r, P_force);
-			fcntl(sffileno(rfp), F_SETFD, FD_CLOEXEC);
 			if (state.user)
 			{
 				r->status = EXISTS;

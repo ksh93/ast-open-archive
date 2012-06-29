@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -75,9 +75,9 @@ tableident(Dssfile_t* file, void* buf, size_t n, Dssdisc_t* disc)
 				break;
 		}
 		if (isdigit(*f) && !strtoip4(f, NiL, &addr, &bits) || !strtoip6(f, NiL, prefix, prefix + IP6BITS) && (file->caller = file))
-			return 1;
+			break;
 	}
-	return 0;
+	return 1;
 }
 
 /*

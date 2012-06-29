@@ -1,3 +1,5 @@
+12-06-14 bgp.c: document int mvpn.type == route type index
+12-06-13 bgp.c: add "bgp_t mvpn.key" for mvpn route key
 12-05-31 bgp.c: add bgp_t mvpn.<member> support
 12-02-20 bgp.c,bgplib.h: drop unused ip4toip6()
 11-09-11 bgp-mrt.c: fix debug trace offset when bgp messages skipped

@@ -3643,10 +3643,8 @@ Tcl_Read(chan, bufPtr, toRead)
         }
     }
 #else
-	chanSetFlags(chanPtr);
-	chanPtr->flags &= (~(CHANNEL_BLOCKED));
-	copied = sfread(chanPtr->sfPtr, bufPtr, toRead);
-	return copied;
+    chanSetFlags(chanPtr);
+    copied = sfread(chanPtr->sfPtr, bufPtr, toRead);
 #endif
     chanPtr->flags &= (~(CHANNEL_BLOCKED));
     return copied;

@@ -20,11 +20,17 @@
 #pragma prototyped
 
 /*
- * match(3) test harness
+ * strmatch(3) test harness
  * see testmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2012-05-28 $\0\n";
+#if OLD
+#define LEGACY		"old"
+#else
+#define LEGACY		""
+#endif
+
+static const char id[] = "\n@(#)$Id: test" LEGACY "match (AT&T Research) 2012-06-25 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -60,7 +66,7 @@ H("NAME\n");
 H("  testmatch - strgrpmatch(3) test harness\n");
 H("\n");
 H("SYNOPSIS\n");
-H("  testmatch [ options ] < testmatch.dat\n");
+H("  testmatch [ options ] testmatch.dat\n");
 H("\n");
 H("DESCRIPTION\n");
 H("  testmatch reads strgrpmatch(3) test specifications, one per line, from\n");
@@ -69,6 +75,13 @@ H("  summary line is written after all tests are done. Each successful\n");
 H("  test is run again with no subexpression pointer array. Unsupported\n");
 H("  features are noted before the first test, and tests requiring these\n");
 H("  features are silently ignored.\n");
+H("\n");
+#if OLD
+H("  This version tests the legacy ad-hoc implementation with roots in the\n");
+H("  Bourne sh implementation.\n");
+#else
+H("  This version tests the AST <regex.h> implementation.\n");
+#endif
 H("\n");
 H("OPTIONS\n");
 H("  -c	catch signals and non-terminating calls\n");
@@ -266,6 +279,8 @@ quote(char* s, int expand)
 static void
 report(char* comment, char* fun, char* re, char* s, char* msg, int flags, int unspecified, int expand)
 {
+	if (state.file)
+		printf("%s:", state.file);
 	printf("%d:", state.lineno);
 	if (re)
 	{
@@ -367,8 +382,8 @@ escape(char* s)
 				break;
 			case 'u':
 			case 'x':
+				q = *s == 'u' ? (s + 5) : (char*)0;
 				c = 0;
-				q = c == 'u' ? (s + 5) : (char*)0;
 				e = s + 1;
 				while (!e || !q || s < q)
 				{
@@ -392,6 +407,8 @@ escape(char* s)
 							break;
 						}
 						e = 0;
+						if (q && *(s + 1) == 'U' && *(s + 2) == '+')
+							s += 2;
 						continue;
 					case '}':
 					case ']':
@@ -442,12 +459,12 @@ matchprint(ssize_t* match, int nmatch, char* ans)
 		if (match[i] == -1)
 			printf("?");
 		else
-			printf("%z", match[i]);
+			printf("%zd", match[i]);
 		printf(",");
 		if (match[i+1] == -1)
 			printf("?");
 		else
-			printf("%z", match[i+1]);
+			printf("%zd", match[i+1]);
 		printf(")");
 	}
 	if (ans)
@@ -714,7 +731,7 @@ main(int argc, char** argv)
 		printf("\n");
 		level = 1;
 		locale = skip = testno = 0;
-		state.ignore.count = state.signals = state.unspecified = state.warnings = 0;
+		state.ignore.count = state.lineno = state.signals = state.unspecified = state.warnings = 0;
 		while (p = getline(fp))
 		{
 
@@ -788,8 +805,12 @@ main(int argc, char** argv)
 					continue;
 				case 'C':
 					if (!query && !(skip & level))
-						bad("locale must be nested\n", NiL, NiL, 0);
+						bad("locale query expected\n", NiL, NiL, 0);
 					query = 0;
+#if OLD
+					if (!(skip & level))
+						skip = note(level, skip, "locales not supported by old strmatch()");
+#else
 					if (locale)
 						bad("locale nesting not supported\n", NiL, NiL, 0);
 					if (i != 2)
@@ -811,6 +832,7 @@ main(int argc, char** argv)
 						skip = note(level, skip, "locales not supported");
 #endif
 					}
+#endif
 					cflags = NOTEST;
 					continue;
 				case 'E':
@@ -937,6 +959,7 @@ main(int argc, char** argv)
 							}
 						}
 #endif
+						skip &= ~level;
 						level >>= 1;
 					}
 					cflags = NOTEST;
@@ -1027,6 +1050,14 @@ main(int argc, char** argv)
 				fun = "strmatch";
 				eret = (rmatch = strmatch(s, re)) == 0;
 			}
+#if OLD
+			if (eret && streq(s, re))
+			{
+				note(level, skip, "old strmatch() does not fall back to literal match on error");
+				printf("-EOF\n");
+				goto skip;
+			}
+#endif
 			if (!sub)
 			{
 				if (eret)
@@ -1108,6 +1139,11 @@ main(int argc, char** argv)
 			goto compile;
 #endif
 		}
+#if OLD
+
+	skip:
+
+#endif
 		printf("TEST\t%s", unit);
 		if (subunit)
 			printf(" %-.*s", subunitlen, subunit);

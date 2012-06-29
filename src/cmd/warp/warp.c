@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1998-2008 AT&T Intellectual Property          *
+*          Copyright (c) 1998-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
+*                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -27,7 +27,7 @@
  * and the time progression factor
  */
 
-static const char id[] = "\n@(#)$Id: warp (AT&T Research) 1998-04-01 $\0\n";
+static const char id[] = "\n@(#)$Id: warp (AT&T Research) 2012-06-22 $\0\n";
 
 #if defined(_SCO_C_DIALECT) || defined(_SCO_ELF) || defined(_SCO_XPG_VERS)
 #define _NO_STATIC	1
@@ -35,7 +35,7 @@ static const char id[] = "\n@(#)$Id: warp (AT&T Research) 1998-04-01 $\0\n";
 #endif
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer time times utime _utime __utime utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
+__STDPP__directive pragma pp:hide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer time times utime _utime __utime utimensat _utimensat __utimensat utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
 __STDPP__directive pragma pp:hide execlp _execlp __execlp execve _execve __execve execvp _execvp __execvp execvpe _execvpe __execvpe
 #else
 #define alarm		______alarm
@@ -67,6 +67,9 @@ __STDPP__directive pragma pp:hide execlp _execlp __execlp execve _execve __execv
 #define utimes		______utimes
 #define _utimes		_______utimes
 #define __utimes	________utimes
+#define utimensat	______utimensat
+#define _utimensat	_______utimensat
+#define __utimensat	________utimensat
 #define utimets		______utimets
 #define _utimets	_______utimets
 #define __utimets	________utimets
@@ -120,7 +123,7 @@ struct timespec
 #endif
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer time times utime _utime __utime utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
+__STDPP__directive pragma pp:nohide alarm _alarm __alarm clock_gettime _clock_gettime __clock_gettime gettimeofday _gettimeofday __gettimeofday getitimer _getitimer __getitimer poll _poll __poll select _select __select setitimer _setitimer __setitimer time times utime _utime __utime utimensat _utimensat __utimensat utimes _utimes __utimes utimets _utimets __utimets fstat64 lstat64
 __STDPP__directive pragma pp:nohide execlp _execlp __execlp execve _execve __execve execvp _execvp __execvp execvpe _execvpe __execvpe
 #else
 #undef	alarm
@@ -149,6 +152,9 @@ __STDPP__directive pragma pp:nohide execlp _execlp __execlp execve _execve __exe
 #undef	utime
 #undef	_utime
 #undef	__utime
+#undef	utimensat
+#undef	_utimensat
+#undef	__utimensat
 #undef	utimes
 #undef	_utimes
 #undef	__utimes
@@ -189,6 +195,7 @@ typedef int (*Select_f)(int, void*, void*, void*, const struct timeval*);
 typedef time_t (*Time_f)(time_t*);
 typedef clock_t (*Times_f)(struct tms*);
 typedef int (*Utime_f)(const char*, const struct utimbuf*);
+typedef int (*Utimensat_f)(int, const char*, const struct timespec*, int);
 typedef int (*Utimes_f)(const char*, const struct timeval*);
 typedef int (*Utimets_f)(const char*, const struct timespec*);
 
@@ -862,6 +869,74 @@ __libc_utime(const char* path, const struct utimbuf* tv)
 	static Call_t	call = { "utime", "__libc_utime" };
 
 	return warp_utime(&call, path, tv);
+}
+
+#endif
+
+static int
+warp_utimensat(int dirfd, register Call_t* p, const char* path, const struct timespec* tv, int flags)
+{
+	int		r;
+	register int	i;
+	struct timespec	tb[2];
+
+	intercept(p);
+	if (!tv || p->warped)
+		return (*(Utimensat_f)p->call)(dirfd, path, tv, flags);
+	for (i = 0; i < elementsof(tb); i++)
+	{
+		tb[i] = tv[i];
+		UNWARP_ABS(tb[i].tv_sec);
+	}
+	r = (*(Utimensat_f)p->call)(dirfd, path, tb, flags);
+	if (p->level != state.level)
+	{
+		p->warped = 1;
+		r = (*(Utimensat_f)p->call)(dirfd, path, tv, flags);
+	}
+	return r;
+}
+
+extern int
+utimensat(int dirfd, const char* path, const struct timespec* tv, int flags)
+{
+	static Call_t	call = { "utimensat", "utimensat" };
+
+	return warp_utimensat(dirfd, &call, path, tv, flags);
+}
+
+#ifndef __EXPORT__
+
+extern int
+_utimensat(int dirfd, const char* path, const struct timespec* tv, int flags)
+{
+	static Call_t	call = { "utimensat", "_utimensat" };
+
+	return warp_utimensat(dirfd, &call, path, tv, flags);
+}
+
+extern int
+__utimensat(int dirfd, const char* path, const struct timespec* tv, int flags)
+{
+	static Call_t	call = { "utimensat", "__utimensat" };
+
+	return warp_utimensat(dirfd, &call, path, tv, flags);
+}
+
+extern int
+_libc_utimensat(int dirfd, const char* path, const struct timespec* tv, int flags)
+{
+	static Call_t	call = { "utimensat", "_libc_utimensat" };
+
+	return warp_utimensat(dirfd, &call, path, tv, flags);
+}
+
+extern int
+__libc_utimensat(int dirfd, const char* path, const struct timespec* tv, int flags)
+{
+	static Call_t	call = { "utimensat", "__libc_utimensat" };
+
+	return warp_utimensat(dirfd, &call, path, tv, flags);
 }
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the BSD package               *
-*Copyright (c) 1978-2011 The Regents of the University of California an*
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -454,8 +454,6 @@ insider(register char* s, register char* e, int f, char* d1, int n1, char* d2, i
 {
 	register int	n;
 
-	if (*s != '.' && !(s = strchr(s, '.')))
-		return f;
 	if (!e)
 		e = s + strlen(s);
 	do
@@ -529,6 +527,8 @@ spammed(register struct msg* mp)
 			ours = ours2 = 0;
 			domain2 = 0;
 		}
+		if (TRACING('z'))
+			note(0, "spam: ours: %s %s", state.var.domain, domain2);
 		while (headget(&pp))
 		{
 			t = pp.name;
@@ -638,16 +638,21 @@ spammed(register struct msg* mp)
 									note(0, "spam: forged");
 								test |= SPAM_received_forged;
 							}
-							else if (ours && strneq(t, "from ", 4))
+							else if (ours && strneq(t, "from ", 5))
 							{
 								n = 0;
-								e = t;
-								while ((s = strchr(e + 1, '.')) && (e = strchr(s, ' ')))
+								s = t;
+								for (s = t + 5; *s == ' '; s++);
+								while (e = strchr(s, ' '))
+								{
 									if (insider(s, e, 0, state.var.domain, ours, domain2, ours2))
 									{
 										n = 1;
 										break;
 									}
+									if (!(s = strchr(e + 1, '.')))
+										break;
+								}
 								if (!n)
 								{
 									ours = 0;

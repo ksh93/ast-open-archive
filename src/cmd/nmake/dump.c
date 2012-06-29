@@ -730,9 +730,7 @@ dumprule(Sfio_t* sp, register Rule_t* r)
 		if (!(r = getrule(unbound(r))))
 			r = z;
 	}
-	if (r == z)
-		error(2, "%s: alias loop", r->name);
-	else
+	if (r != z)
 		listrule(r->name, (char*)r, sp);
 	if (!(r->property & P_state))
 		for (i = RULE; i <= STATERULES; i++)

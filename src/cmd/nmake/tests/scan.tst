@@ -565,7 +565,7 @@ echo $STATE
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
 + *)	if	ENV= LC_ALL=C x= $SHELL -nc \'[[ a || b ]] && : ${list[level]} $(( 1 + $x )) !(pattern)\' 2>/dev/null
-+ 	then	if	grep -q \'### .*archaic.* ###\'
++ 	then	if	grep \'### .*archaic.* ###\' >/dev/null
 + 		then	: x contains archaic constructs :
 + 		else	ENV= LC_ALL=C $SHELL -n x.sh
 + 		fi

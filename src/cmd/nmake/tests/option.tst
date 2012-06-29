@@ -109,7 +109,10 @@ TEST 01 'option basics'
 --nothreads
 --novariants
 --noview-verify
---virtual:=1'
+--virtual:=1
+--all-static
+--lib-type
+--native-pp=-1'
 
 	EXEC	--clobber -n -f - . 'print -- $(-?:/ /$("\n")/G)'
 		OUTPUT - $'--all-static:=1
@@ -217,7 +220,10 @@ TEST 01 'option basics'
 --nothreads
 --novariants
 --noview-verify
---virtual:=1'
+--virtual:=1
+--all-static
+--lib-type
+--native-pp=-1'
 
 	EXEC	-n -f - -A --writeobject=test.mo --nowritestate . 'print -- $(--:/ /$("\n")/G)'
 		OUTPUT - $'--accept
@@ -302,7 +308,10 @@ TEST 01 'option basics'
 --nothreads
 --novariants
 --noview-verify
---virtual:=1'
+--virtual:=1
+--all-static
+--lib-type
+--native-pp=-1'
 
 	EXEC	-n -f - . 'print -- $(-force)'
 		OUTPUT - $''
@@ -384,12 +393,12 @@ all : .MAKE
 	print : $(--) :'
 		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1
 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :
-: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp=-1 --official-output:=OFFICIAL --noprefix-include --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
+: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp=-1 --official-output:=OFFICIAL --noprefix-include --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional --all-static --lib-type --native-pp=-1 :'
 
 	EXEC --silent
 		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1
 : --force --regress=message --silent --native-pp=-1 --noprefix-include --unconditional :
-: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp=-1 --official-output:=OFFICIAL --noprefix-include --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
+: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --regress=message --noreread --noruledump --scan --noserialize --silent --nostrictview --notarget-context --notarget-prefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarchive-clean --archive-output:=\'option\' --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --lib-type:=1 --nolink --nolocal-static --native-pp=-1 --official-output:=OFFICIAL --noprefix-include --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --noshared --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional --all-static --lib-type --native-pp=-1 :'
 
 	EXEC --silent clobber
 		OUTPUT -

@@ -702,14 +702,10 @@ static char *tksh_getval(Namval_t *nv, Namfun_t *nf)
 		return (trace_element(&trace) && ! (trace.nv)->nvalue) ?
 			NULL : (char *) nv->nvalue;
 	}
-	else
-	{
-		get_result = (trace_element(traceinfo)&&traceinfo->nv->nvalue)?
-			noSuchElement: noSuchVar;
-		nv_offattr(nv, NV_NODISC); nv_resumedisc(nv);
-		return nv_getv(nv, nf);
-	}
-	return NULL;
+	get_result = (trace_element(traceinfo)&&traceinfo->nv->nvalue)?
+		noSuchElement: noSuchVar;
+	nv_offattr(nv, NV_NODISC); nv_resumedisc(nv);
+	return nv_getv(nv, nf);
 }
 
 

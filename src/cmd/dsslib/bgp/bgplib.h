@@ -57,7 +57,7 @@ typedef struct Bgp_s			/* method handle		*/
 	Cxtype_t*	type_ipv6addr;
 	Cxtype_t*	type_ipv6prefix;
 	Cxtype_t*	type_label;
-	Bgproute_t	sub;
+	Bgproute_t	sub[2];
 } Bgp_t;
 
 #define BGP_METHOD_ANONYMIZE		0x0001

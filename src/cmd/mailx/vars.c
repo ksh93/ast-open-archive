@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the BSD package               *
-*Copyright (c) 1978-2011 The Regents of the University of California an*
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -510,7 +510,7 @@ set_mailcap(struct var* vp, const char* value)
 void
 set_news(struct var* vp, const char* value)
 {
-	if (value && *value && close(open(state.var.news, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, MAILMODE)))
+	if (value && *value && close(open(state.var.news, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY|O_cloexec, MAILMODE)))
 		note(FATAL|SYSTEM, "\"%s\"", state.var.news);
 }
 

@@ -34,7 +34,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2010-06-10 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2010-06-25 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -772,8 +772,8 @@ escape(char* s)
 				break;
 			case 'u':
 			case 'x':
+				q = *s == 'u' ? (s + 5) : (char*)0;
 				c = 0;
-				q = c == 'u' ? (s + 5) : (char*)0;
 				e = s + 1;
 				while (!e || !q || s < q)
 				{
@@ -797,6 +797,8 @@ escape(char* s)
 							break;
 						}
 						e = 0;
+						if (q && *(s + 1) == 'U' && *(s + 2) == '+')
+							s += 2;
 						continue;
 					case '}':
 					case ']':
@@ -1551,7 +1553,7 @@ main(int argc, char** argv)
 					continue;
 				case 'C':
 					if (!(test & TEST_QUERY) && !(skip & level))
-						bad("locale must be nested\n", NiL, NiL, 0, 0);
+						bad("locale query expected\n", NiL, NiL, 0, 0);
 					test &= ~TEST_QUERY;
 					if (locale)
 						bad("locale nesting not supported\n", NiL, NiL, 0, 0);

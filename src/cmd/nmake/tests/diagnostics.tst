@@ -689,7 +689,7 @@ TEST 13 'self-documentation'
 
 	EXEC	--short
 		ERROR - $'Usage: make [-AabCcJnxeFiKGklNRrOsVtvwP] [-B level] [-X[action]] [-d level]
-            [-E id] [-f file] [-g file] [-I directory] [-j level]
+            [-E id] [-f file] [-g[file]] [-I directory] [-j level]
             [-M type[,subtype][:file[:parent[:directory]]]] [-Q mask]
             [-S[level]] [-q[action]] [-T mask] [-z seconds] [-o name[=value]]
             [-D name[=value]] [-U name] [ script ... ] [ target ... ]'
@@ -700,7 +700,7 @@ TEST 13 'self-documentation'
 		ERROR - $'Usage: make [--accept] [--alias] [--base] [--believe=level] [--compatibility]
             [--compile] [--corrupt[=action]] [--cross] [--debug=level]
             [--errorid=id] [--exec] [--expandview] [--explain] [--file=file]
-            [--force] [--global=file] [--ignore] [--ignorelock]
+            [--force] [--global[=file]] [--ignore] [--ignorelock]
             [--include=directory] [--intermediate] [--jobs=level] [--keepgoing]
             [--list] [--mam=type[,subtype][:file[:parent[:directory]]]]
             [--never] [--option=\'char;name;flags;set;description;values\']
@@ -803,7 +803,7 @@ make: warning: Makefile.mo: recompiling'
 	EXEC	--noexec --include=gbl --global=global.mk
 		INPUT gbl/global.mk $'all : global'
 		OUTPUT - $'+ : all : global FOO BAR :'
-		ERROR - $'make: warning: Makefile.mo: options changed
+		ERROR - $'make: warning: Makefile.mo: global file global.mk not specified last time
 make: warning: Makefile.mo: recompiling'
 
 	EXEC	--exec --include=gbl --global=global.mk

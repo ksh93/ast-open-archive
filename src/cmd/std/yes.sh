@@ -25,7 +25,7 @@
 #
 case $(getopts '[-]' opt "--???man" 2>&1) in
 version=[0-9]*)
-	usage=$'[-?@(#)yes (AT&T Labs Research) 2007-05-16\n]
+	usage=$'[-?@(#)yes (AT&T Labs Research) 2012-06-06\n]
 	'$USAGE_LICENSE$'
 	[+NAME?yes - repeatedly out a string until killed]
 	[+DESCRIPTION?\byes\b repeatedly writes \astring\a to standard
@@ -46,12 +46,16 @@ version=[0-9]*)
 	;;
 esac
 
-while getopts "$usage" var
+while	getopts "$usage" var
 do	case $var in
 	esac
 done
 shift $((OPTIND-1))
 string=${@-y}
-while	true
-do	print -r -- "$string"
+case $KSH_VERSION in
+'')	echo=echo ;;
+*)	echo="print -r --" ;;
+esac
+while	:
+do	$echo "$string"
 done

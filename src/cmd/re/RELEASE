@@ -1,3 +1,5 @@
+12-06-25 test*.c: handle \u[U+...]
+12-06-23 testoldmatch.c: add tests for legacy astsa/strmatch.c
 12-05-07 grep.c: add case 'y': to *really* ignore --color
 12-05-03 grep.c: add -Y, --color -- ignored for GNU compatibility
 12-04-20 grep.c: always enable FTS_META (to disable pure FTS_PHYSICAL)

@@ -54,7 +54,7 @@
 #define BE(b,p,n)	memcpy(b,p,n)
 
 #define DATA(sp,rp)		(rp=&sp->route,sp->osize=sp->size)
-#define ZERO(sp,rp)		((rp->set&BGP_SET_mvpn?(sp->np->size=0,memset(sp->np,0,BGP_FIXED),sp->np->unknown.size=0):0),sp->size=0,memset(rp,0,BGP_FIXED),sp->unknown.size=0)
+#define ZERO(sp,rp)		((rp->set&BGP_SET_mvpn?(sp->np->size=0,memset(sp->np,0,BGP_FIXED),memset(sp->np+1,0,BGP_FIXED),sp->np->unknown.size=0):0),sp->size=0,memset(rp,0,BGP_FIXED),sp->unknown.size=0)
 #define HEAD(sp,rp)		(rp->message=sp->message,rp->stamp=sp->time)
 #define INIT(sp,rp)		(DATA(sp,rp),ZERO(sp,rp),HEAD(sp,rp))
 #define NEXT(sp,rp)		(DATA(sp,rp),HEAD(sp,rp))
@@ -454,7 +454,7 @@ mrtopen(Dssfile_t* file, Dssdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return -1;
 	}
-	((Mrtstate_t*)file->data)->np = &bgp->sub;
+	((Mrtstate_t*)file->data)->np = bgp->sub;
 	ANONYMIZE_OPEN(file, disc);
 	return 0;
 }
@@ -683,8 +683,14 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		}
 		if ((q & VPN_rd) && rd(file, state, rp, end, disc))
 			goto nope;
-		if ((q & VPN_key) && nlri(file, state, rp, end, disc))
-			goto nope;
+		if (q & VPN_key)
+		{
+			rp++;
+			rp->afi = op->afi;
+			rp->safi = op->safi;
+			if (nlri(file, state, rp, end, disc))
+				goto nope;
+		}
 		if (q & VPN_src_as)
 		{
 			rp->src_as = AE4(state->buf);
@@ -1717,7 +1723,8 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 static int
 mrtwrite(Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 {
-	ANONYMIZE_WRITE(file, record, disc);
+	if (record)
+		ANONYMIZE_WRITE(file, record, disc);
 	if (disc->errorf)
 		(*disc->errorf)(NiL, disc, 2, "%s: record write not implemented", file->format->name);
 	return -1;

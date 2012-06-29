@@ -52,6 +52,7 @@ $(ID)$(VARIANTID) $(VERSION) id=$(ID) :LIBRARY: README RELEASE PROMO.mm \
 	vfork3d.c write3d.c \
 	acl3d.c facl3d.c \
 	dll3d.c \
+	utimensat3d.c \
 	-ldl
 
 if ! VARIANTID

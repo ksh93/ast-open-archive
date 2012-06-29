@@ -103,7 +103,7 @@
 #define putvar(name,v)	hashput(table.var,(char*)(name),(char*)(v))
 #define reason(x)	do if(EXPLAIN)explain x;while(0)
 #define ropen(f,m)	((f)==internal.openfile?(internal.openfile=0,internal.openfd):open(f,m))
-#define rsfopen(f)	((f)==internal.openfile?(internal.openfile=0,sfnew(NiL,NiL,SF_UNBOUND,internal.openfd,SF_READ)):sfopen(NiL,f,"r"))
+#define rsfopen(f)	((f)==internal.openfile?(internal.openfile=0,sfnew(NiL,NiL,SF_UNBOUND,internal.openfd,SF_READ)):sfopen(NiL,f,"re"))
 #define setbit(v,b)	((v)|=(1L<<(b)))
 #define shquote		shellquote /* netbsd has one in <stdlib.h>! */
 #define statetimeq	timestateq /* avoids statetime symbol truncation clash */

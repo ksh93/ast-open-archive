@@ -14,7 +14,7 @@
 
 export LC_ALL=C
 
-integer seconds=1
+integer seconds=0
 
 COMMAND=3d
 
@@ -217,9 +217,9 @@ function REMOVE
 function TOUCH
 {
 	DATA $*
-	touch -t "$seconds seconds" $TWD/reference || FAIL $TWD/reference touch error
-	(( seconds++ ))
-	touch -t "$seconds seconds" $FILE || FAIL $FILE touch error
+	touch -t "#$((seconds++))" $FILE/... || FAIL $FILE/... touch error
+	touch -t "#$((seconds++))" $TWD/reference || FAIL $TWD/reference touch error
+	touch -t "#$((seconds++))" $FILE || FAIL $FILE touch error
 	if	[[ $FILE/... -nt $TWD/reference ]]
 	then	FAIL $FILE/... changed by $0
 	elif	[[ ! $FILE -nt $TWD/reference ]]

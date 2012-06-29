@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                      by AT&T Knowledge Ventures                      *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -140,7 +140,7 @@ touch(const char* file, time_t atime, time_t mtime, int force)
 			if (!force) return(-1);
 			umask(mode = umask(0));
 			mode = (~mode) & (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
-			if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC, mode)) < 0) return(-1);
+			if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC|O_cloexec, mode)) < 0) return(-1);
 			close(fd);
 			errno = oerrno;
 #if _lib_utime
@@ -159,9 +159,9 @@ touch(const char* file, time_t atime, time_t mtime, int force)
 		}
 #if !_hdr_utime || !_lib_utime
 #if _lib_utime
-		if (atime == now && mtime == now && (fd = open(file, O_RDWR)) >= 0)
+		if (atime == now && mtime == now && (fd = open(file, O_RDWR|O_cloexec)) >= 0)
 #else
-		if ((fd = open(file, O_RDWR)) >= 0)
+		if ((fd = open(file, O_RDWR|O_cloexec)) >= 0)
 #endif
 		{
 			char	c;
@@ -180,7 +180,7 @@ touch(const char* file, time_t atime, time_t mtime, int force)
 				close(fd);
 				umask(mode = umask(0));
 				mode = (~mode) & (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
-				if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC, mode)) >= 0)
+				if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC|O_cloexec, mode)) >= 0)
 				{
 					close(fd);
 					errno = oerrno;

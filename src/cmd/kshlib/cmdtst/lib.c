@@ -23,24 +23,29 @@
 #include <ast.h>
 #include <shcmd.h>
 
-extern int	b_grep(int, char**, Shbltin_t*);
-extern int	b_egrep(int, char**, Shbltin_t*);
-extern int	b_fgrep(int, char**, Shbltin_t*);
-extern int	b_xgrep(int, char**, Shbltin_t*);
-extern int	b_xargs(int, char**, Shbltin_t*);
+#undef	CMDLIST
+#if __STDC__
+#define CMDLIST(f)	extern int b_##f(int, char**, Shbltin_t*);
+#else
+#define CMDLIST(f)	extern int b_##f();
+#endif
+#include "cmdtstlist.h"
 
 void
-lib_init(int flag, void* context)
+cmdtst_init(int flag, void* context)
 {
-	error(-1, "AHA cmdtst lib_init(%d,%p)", flag, context);
 	if (!flag)
 	{
-		sh_builtin(context, "grep", b_grep, 0); 
-		sh_builtin(context, "egrep", b_egrep, 0); 
-		sh_builtin(context, "fgrep", b_fgrep, 0); 
-		sh_builtin(context, "xgrep", b_xgrep, 0); 
-		sh_builtin(context, "xargs", b_xargs, 0); 
+#undef	CMDLIST
+#define CMDLIST(f)	sh_builtin(context, #f, b_##f, 0);
+#include "cmdtstlist.h"
 	}
 }
 
-SHLIB(test)
+void
+lib_init(int flags, void* context)
+{
+	cmdtst_init(flags, context);
+}
+
+SHLIB(cmdtst)

@@ -1,3 +1,4 @@
+12-06-05 spam.c: fix insider() domain check that skipped pure domain with not host
 12-04-13 cmd1.c: fix empty list null pointer deref
 12-02-29 add headfake boolean option to fake 'From ' line in saved message
 11-09-11 add sender=/address/head/pattern/[&|]/head/pattern/...

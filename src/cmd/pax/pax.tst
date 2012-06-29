@@ -804,6 +804,7 @@ pax: warning: 0-type-regular-file: mode --------T not set
 pax: 3-type-cdev: cannot create character special file
 pax: 4-type-bdev: cannot create block special file
 5-type-dir
+6-type-fifo
 7-type-contfile
 0-jörg-signed
 12345678901234/12345678901234/12345678901234/12345678901234/12345678901234/12345678901234/1234567890
@@ -815,6 +816,7 @@ pax: 4-type-bdev: cannot create block special file
 pax: 3-type-cdev-s: cannot create character special file
 pax: 4-type-bdev-s: cannot create block special file
 5-type-dir-s
+6-type-fifo-s
 999'
 		EXIT 1
 

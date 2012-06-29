@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the BSD package               *
-*Copyright (c) 1978-2011 The Regents of the University of California an*
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -90,7 +90,7 @@ settmp(const char* name, int dir)
 			if (eaccess(name, W_OK))
 				state.readonly = 1;
 		}
-		else if ((fd = open(name, O_WRONLY|O_BINARY)) < 0)
+		else if ((fd = open(name, O_WRONLY|O_BINARY|O_cloexec)) < 0)
 			state.readonly = 1;
 		else
 			close(fd);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the bsd package               *
-*Copyright (c) 1978-2009 The Regents of the University of California an*
+*               This software is part of the BSD package               *
+*Copyright (c) 1978-2012 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -524,7 +524,7 @@ quit(void)
 			fileclose(xbuf);
 			return;
 		}
-		close(open(mbox, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, MAILMODE));
+		close(open(mbox, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY|O_cloexec, MAILMODE));
 		if (!(obuf = fileopen(mbox, "Er+"))) {
 			fileclose(ibuf);
 			fileclose(fbuf);

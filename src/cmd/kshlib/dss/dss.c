@@ -185,7 +185,6 @@ static int query(int argc, char *argv[], Shbltin_t *bp)
 	savesize = data->size;
 	data->data = bp->vnode->nvalue;
 	data->size = nv_size(bp->vnode);
-		return(1);
 	if(qp->sel)
 	{
 		if((n=(*qp->sel)(cx,&pp->expr,data,cx->disc))<=0)

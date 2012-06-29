@@ -37,6 +37,7 @@ hopv4         0.2.2.6
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         131591
@@ -116,6 +117,7 @@ hopv4         0.3.2.10
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         197131
@@ -195,6 +197,7 @@ hopv4         0.4.2.14
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         262672
@@ -274,6 +277,7 @@ hopv4         0.5.2.19
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         328213
@@ -353,6 +357,7 @@ hopv4         0.6.2.24
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         393754
@@ -432,6 +437,7 @@ hopv4         0.7.2.29
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         459295
@@ -511,6 +517,7 @@ hopv4         0.8.2.34
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         524836
@@ -590,6 +597,7 @@ hopv4         0.9.2.39
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         590377
@@ -669,6 +677,7 @@ hopv4         0.10.2.44
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         655918
@@ -748,6 +757,7 @@ hopv4         0.11.2.49
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         721459
@@ -827,6 +837,7 @@ hopv4         0.12.2.54
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         787000
@@ -906,6 +917,7 @@ hopv4         0.13.2.59
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         852541
@@ -985,6 +997,7 @@ hopv4         0.14.2.64
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         918082
@@ -1064,6 +1077,7 @@ hopv4         0.15.2.69
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         983623
@@ -1143,6 +1157,7 @@ hopv4         0.16.2.74
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         1049163
@@ -1222,6 +1237,7 @@ hopv4         0.17.2.78
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         1114704
@@ -1301,6 +1317,7 @@ hopv4         0.18.2.83
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         1180244
@@ -1380,6 +1397,7 @@ hopv4         0.19.2.87
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         1245784
@@ -1459,6 +1477,7 @@ hopv4         0.20.2.91
 hopv6         ::
 id            0
 internal      0
+key           0
 label         0
 labels        
 local         1311324

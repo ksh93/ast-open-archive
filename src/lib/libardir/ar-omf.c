@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -408,7 +408,7 @@ int omfinsert(Ardir_t *ar, const char *name, int op)
 		n = (const char*)++suffix - name;
 	else
 		n = strlen(name);
-	if((fd=open(name,O_RDONLY))>=0)
+	if((fd=open(name,O_RDONLY|O_cloexec))>=0)
 	{
 		if(fstat(fd,&statb)>=0 && (m=is_omf(fd)))
 		{

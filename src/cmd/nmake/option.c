@@ -1029,10 +1029,8 @@ setop(register Option_t* op, register int n, char* s, int type)
 			}
 			else if (streq(s, "/dev/fd/2") || streq(s, "/dev/stderr"))
 				state.mam.out = sfstderr;
-			else if (!(state.mam.out = sfopen(NiL, s, state.mam.parent ? "a" : "w")))
+			else if (!(state.mam.out = sfopen(NiL, s, state.mam.parent ? "ae" : "we")))
 				error(ERROR_SYSTEM|3, "%s: cannot write mam output file", s);
-			else
-				fcntl(sffileno(state.mam.out), F_SETFD, FD_CLOEXEC);
 			sfset(state.mam.out, SF_LINE, 1);
 			state.mam.disc.writef = mamwrite;
 			if (sfdisc(state.mam.out, &state.mam.disc) != &state.mam.disc)

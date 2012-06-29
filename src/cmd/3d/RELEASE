@@ -1,3 +1,5 @@
+12-06-25 change strcpy() within buffer to strcopy()
+12-06-22 sys.tab,utimensat3d.c: add utimensat()
 12-05-25 sys.tab: handle missing getdents64 on linux+gcc-4.4
 12-05-25 syscall3d.c: tweak _exit() logic (really?) to dumped core on recent solaris
 11-12-01 fix fcntl 3rd arg int vs void*

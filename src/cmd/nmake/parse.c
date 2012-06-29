@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1334,11 +1334,11 @@ getline(Sfio_t* sp, int lead, int term)
 					switch (m)
 					{
 					case 'i':
-						if (!(state.io[d] = sfopen(NiL, t, x == '+' ? "rw" : "r")))
+						if (!(state.io[d] = sfopen(NiL, t, x == '+' ? "rwe" : "re")))
 							error(ERROR_SYSTEM|2, "%s: cannot read", t);
 						break;
 					case 'o':
-						if (!(state.io[d] = sfopen(NiL, t, x == '+' ? "a" : "w")))
+						if (!(state.io[d] = sfopen(NiL, t, x == '+' ? "ae" : "we")))
 							error(ERROR_SYSTEM|2, "%s: cannot write", t);
 						break;
 					case 'p':
@@ -1361,12 +1361,8 @@ getline(Sfio_t* sp, int lead, int term)
 						state.io[d] = sfstderr;
 						break;
 					}
-				else
-				{
-					if (m != 'p')
-						sfsetbuf(state.io[d], NiL, 0);
-					fcntl(sffileno(state.io[d]), F_SETFD, FD_CLOEXEC);
-				}
+				else if (m != 'p')
+					sfsetbuf(state.io[d], NiL, 0);
 				break;
 			case 'n':
 				n = -1;

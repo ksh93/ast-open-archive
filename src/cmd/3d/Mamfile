@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-22
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-06-20
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -1132,8 +1132,16 @@ meta dll3d.o %.c>%.o dll3d.c dll3d
 prev dll3d.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libdll -I${PACKAGE_ast_INCLUDE} -D_BLD_dll -D_BLD_ast -D_PACKAGE_ast -DDEBUG -c dll3d.c
 done dll3d.o generated
+make utimensat3d.o
+make utimensat3d.c
+prev 3d.h implicit
+done utimensat3d.c
+meta utimensat3d.o %.c>%.o utimensat3d.c utimensat3d
+prev utimensat3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_3d -D_BLD_dll -DDEBUG -c utimensat3d.c
+done utimensat3d.o generated
 exec - ${AR} rc lib3d.a init.o bio.o copy.o error.o execv.o fs.o lib.o map.o pathcanon.o pathnext.o pathreal.o peek.o ast.o cs.o license.o vcs.o access3d.o brk3d.o chdir3d.o chmod3d.o chown3d.o close3d.o creat3d.o dir3d.o dup23d.o dup3d.o execve3d.o exit3d.o fchdir3d.o fchmod3d.o
-exec - ${AR} rc lib3d.a fchown3d.o fcntl3d.o fork3d.o fpathconf3d.o fstat3d.o fstatfs3d.o fstatvfs3d.o fsync3d.o ftruncate3d.o getdents3d.o kill3d.o link3d.o lseek3d.o lstat3d.o mkdir3d.o mknod3d.o mount3d.o open3d.o pathconf3d.o pipe3d.o read3d.o readlink3d.o rename3d.o rmdir3d.o sbrk3d.o stat3d.o statfs3d.o statvfs3d.o symlink3d.o syscall3d.o sysent3d.o truncate3d.o unlink3d.o utime3d.o utimes3d.o utimets3d.o vfork3d.o write3d.o acl3d.o facl3d.o dll3d.o
+exec - ${AR} rc lib3d.a fchown3d.o fcntl3d.o fork3d.o fpathconf3d.o fstat3d.o fstatfs3d.o fstatvfs3d.o fsync3d.o ftruncate3d.o getdents3d.o kill3d.o link3d.o lseek3d.o lstat3d.o mkdir3d.o mknod3d.o mount3d.o open3d.o pathconf3d.o pipe3d.o read3d.o readlink3d.o rename3d.o rmdir3d.o sbrk3d.o stat3d.o statfs3d.o statvfs3d.o symlink3d.o syscall3d.o sysent3d.o truncate3d.o unlink3d.o utime3d.o utimes3d.o utimets3d.o vfork3d.o write3d.o acl3d.o facl3d.o dll3d.o utimensat3d.o
 exec - (ranlib lib3d.a) >/dev/null 2>&1 || true
 done lib3d.a generated
 make 3d.sh

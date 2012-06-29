@@ -21,7 +21,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)pty (AT&T Research) 2012-02-28\n]"
+"[-?\n@(#)pty (AT&T Research) 2012-06-11\n]"
 USAGE_LICENSE
 "[+NAME?pty - create pseudo terminal and run command]"
 "[+DESCRIPTION?\bpty\b creates a pseudo pty and then runs \bcommand\b "
@@ -75,6 +75,7 @@ USAGE_LICENSE
     "}"
 "[D:debug?Set the debug trace \alevel\a, higher levels produce more "
     "output, disabled for level 0.]#[level]"
+"[l:log?Log the master stdout and stderr to \afile\a.]:[file]"
 "[m:messages?Redirect diagnostic message output to \afile\a.]:[file]"
 "[s!:session?Create a separate session for the process started by "
     "\bpty\b.]"
@@ -250,13 +251,13 @@ mkpty(int* master, int* slave)
 #endif
 	if ((*master = posix_openpt(O_RDWR)) < 0)
 		return -1;
-	if (grantpt(*master) || unlockpt(*master) || !(sname = ptsname(*master)) || (*slave = open(sname, O_RDWR)) < 0)
+	if (grantpt(*master) || unlockpt(*master) || !(sname = ptsname(*master)) || (*slave = open(sname, O_RDWR|O_cloexec)) < 0)
 	{
 		close(*master);
 		return -1;
 	}
 #else
-	if (!(sname = ptymopen(master)) || (*slave = open(sname, O_RDWR)) < 0)
+	if (!(sname = ptymopen(master)) || (*slave = open(sname, O_RDWR|O_cloexec)) < 0)
 		return -1;
 #endif
 #ifdef I_PUSH
@@ -275,7 +276,9 @@ mkpty(int* master, int* slave)
 		error(ERROR_warn(0), "unable to set pty window size");
 #endif
 	fcntl(*master, F_SETFD, FD_CLOEXEC);
+#if !O_cloexec
 	fcntl(*slave, F_SETFD, FD_CLOEXEC);
+#endif
 	alarm(0);
 	return 0;
 }
@@ -305,7 +308,7 @@ runcmd(char** argv, int slave, int session)
  */
 
 static int
-process(Sfio_t* mp, int delay, int timeout)
+process(Sfio_t* mp, Sfio_t* lp, int delay, int timeout)
 {
 	int		i;
 	int		n;
@@ -449,7 +452,7 @@ typedef struct Master_s
 #define MASTER_TIMEOUT	(-2)
 
 static char*
-masterline(Sfio_t* mp, char* prompt, int must, int timeout, Master_t* bp)
+masterline(Sfio_t* mp, Sfio_t* lp, char* prompt, int must, int timeout, Master_t* bp)
 {
 	char*		r;
 	char*		s;
@@ -624,6 +627,7 @@ masterline(Sfio_t* mp, char* prompt, int must, int timeout, Master_t* bp)
 		goto again;
 	}
  done:
+	error(-3, "Q \"%s\"", fmtesq(r, "\""));
 	s = r;
 	if (bp->cursor)
 	{
@@ -660,12 +664,10 @@ masterline(Sfio_t* mp, char* prompt, int must, int timeout, Master_t* bp)
 		{
 			if (!t)
 				t = s;
-			n++;
 			if (t > r)
-			{
 				t--;
+			else
 				n++;
-			}
 		}
 		else if (t)
 			*t++ = *s;
@@ -674,6 +676,8 @@ masterline(Sfio_t* mp, char* prompt, int must, int timeout, Master_t* bp)
 	if (n)
 		*(r + strlen(r) - n) = 0;
 	error(-1, "r \"%s\"", fmtesq(r, "\""));
+	if (lp)
+		sfputr(lp, fmtesq(r, "\""), '\n');
 	if (t)
 		bp->cursor = t - r;
 	if (bp->ignore && match(bp->ignore, r, 0))
@@ -704,7 +708,7 @@ struct Cond_s
 };
 
 static int
-dialogue(Sfio_t* mp, int delay, int timeout)
+dialogue(Sfio_t* mp, Sfio_t* lp, int delay, int timeout)
 {
 	int		op;
 	int		line;
@@ -752,7 +756,7 @@ dialogue(Sfio_t* mp, int delay, int timeout)
 		case 'w':
 			if (cond->flags & SKIP)
 				continue;
-			if (master->prompt && !masterline(mp, master->prompt, 0, timeout, master))
+			if (master->prompt && !masterline(mp, lp, master->prompt, 0, timeout, master))
 				goto done;
 			if (delay)
 				usleep((unsigned long)delay * 1000);
@@ -783,7 +787,7 @@ dialogue(Sfio_t* mp, int delay, int timeout)
 			}
 			cond = cond->next;
 			cond->flags = IF;
-			if ((cond->prev->flags & SKIP) && !(cond->text = 0) || !(cond->text = masterline(mp, 0, 0, timeout, master)))
+			if ((cond->prev->flags & SKIP) && !(cond->text = 0) || !(cond->text = masterline(mp, lp, 0, 0, timeout, master)))
 				cond->flags |= KEPT|SKIP;
 			else if (match(s, cond->text, 0))
 				cond->flags |= KEPT;
@@ -837,13 +841,13 @@ dialogue(Sfio_t* mp, int delay, int timeout)
 		case 'p':
 			if (cond->flags & SKIP)
 				continue;
-			if (!(m = masterline(mp, s, 1, timeout, master)))
+			if (!(m = masterline(mp, lp, s, 1, timeout, master)))
 				goto done;
 			break;
 		case 'r':
 			if (cond->flags & SKIP)
 				continue;
-			if (!(m = masterline(mp, 0, s[0] == '?' && s[1] == '.' ? -1 : 1, timeout, master)))
+			if (!(m = masterline(mp, lp, 0, s[0] == '?' && s[1] == '.' ? -1 : 1, timeout, master)))
 				goto done;
 			match(s, m, 1);
 			break;
@@ -864,7 +868,7 @@ dialogue(Sfio_t* mp, int delay, int timeout)
 				continue;
 			do
 			{
-				if (!(m = masterline(mp, 0, -1, timeout, master)))
+				if (!(m = masterline(mp, lp, 0, -1, timeout, master)))
 				{
 					match(s, m, 1);
 					goto done;
@@ -954,15 +958,17 @@ b_pty(int argc, char** argv, Shbltin_t* context)
 	char*		s;
 	Proc_t*		proc;
 	Sfio_t*		mp;
+	Sfio_t*		lp;
 	Argv_t*		ap;
 	char		buf[64];
 
 	int		delay = 0;
+	char*		log = 0;
 	char*		messages = 0;
 	char*		stty = 0;
 	int		session = 1;
 	int		timeout = 1000;
-	int		(*fun)(Sfio_t*,int,int) = process;
+	int		(*fun)(Sfio_t*,Sfio_t*,int,int) = process;
 
 	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	for (;;)
@@ -976,6 +982,8 @@ b_pty(int argc, char** argv, Shbltin_t* context)
 		case 'D':
 			error_info.trace = -(int)opt_info.num;
 			continue;
+		case 'l':
+			log = opt_info.arg;
 		case 'm':
 			messages = opt_info.arg;
 			continue;
@@ -1030,6 +1038,10 @@ b_pty(int argc, char** argv, Shbltin_t* context)
 		ap->argv[n + 1] = 0;
 		b_stty(ap->argc, ap->argv, 0);
 	}
+	if (!log)
+		lp = 0;
+	else if (!(lp = sfopen(NiL, log, "w")))
+		error(ERROR_system(1), "%s: cannot write", log);
 	if (!(proc = runcmd(argv, slave, session)))
 		error(ERROR_system(1), "unable run %s", argv[0]);
 	close(slave);
@@ -1049,7 +1061,9 @@ b_pty(int argc, char** argv, Shbltin_t* context)
 		if (drop)
 			close(fd);
 	}
-	slave = (*fun)(mp, delay, timeout);
+	slave = (*fun)(mp, lp, delay, timeout);
 	master = procclose(proc);
+	if (lp && sfclose(lp))
+		error(ERROR_system(1), "%s: write error", log);
 	return slave ? slave : master;
 }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -77,9 +77,9 @@ ciscoident(Dssfile_t* file, void* buf, size_t n, Dssdisc_t* disc)
 		    ((c = *f++) == '>' || c == 'h' || c == ' ') &&
 		    ((c = *f++) == 'a' || c == 'd' || c == 'i' || c == 's' || c == ' ') &&
 		    isdigit(*f) && !strtoip4(f, &t, &addr, &bits) && *t == ' ')
-			return 1;
+			break;
 	}
-	return 0;
+	return 1;
 }
 
 /*
@@ -257,7 +257,6 @@ ciscoread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 					rp->cluster.size = n / sizeof(Bgpnum_t);
 					memcpy(rp->data + o, r.value.buffer.data, n);
 					o += n;
-					continue;
 					continue;
 				case 'T':
 					rp->time = tmdate(p, &e, NiL);

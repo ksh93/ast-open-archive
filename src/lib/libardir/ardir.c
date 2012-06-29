@@ -1,14 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2005 AT&T Corp.                  *
+*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
-*                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                 Eclipse Public License, Version 1.0                  *
+*                    by AT&T Intellectual Property                     *
 *                                                                      *
 *                A copy of the License is available at                 *
-*            http://www.opensource.org/licenses/cpl1.0.txt             *
-*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
+*          http://www.eclipse.org/org/documents/epl-v10.html           *
+*         (with md5 checksum b35adb5213ca9657e911e9befb180842)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -39,7 +39,7 @@ ardiropen(const char* file, Ardirmeth_t* meth, int flags)
 		return 0;
 	strcpy(ar->path = (char*)(ar + 1), file);
 	ar->flags = flags;
-	if (((ar->fd = open(file, (flags & ARDIR_CREATE) ? (O_CREAT|O_TRUNC|O_RDWR|O_BINARY) : (flags & ARDIR_UPDATE) ? (O_RDWR|O_BINARY) : (O_RDONLY|O_BINARY))) < 0 || fstat(ar->fd, &ar->st) || !S_ISREG(ar->st.st_mode)) && (!meth || !(flags & ARDIR_FORCE)))
+	if (((ar->fd = open(file, (flags & ARDIR_CREATE) ? (O_CREAT|O_TRUNC|O_RDWR|O_BINARY|O_cloexec) : (flags & ARDIR_UPDATE) ? (O_RDWR|O_BINARY|O_cloexec) : (O_RDONLY|O_BINARY|O_cloexec))) < 0 || fstat(ar->fd, &ar->st) || !S_ISREG(ar->st.st_mode)) && (!meth || !(flags & ARDIR_FORCE)))
 	{
 		ardirclose(ar);
 		return 0;

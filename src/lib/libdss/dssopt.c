@@ -73,7 +73,7 @@ optout(register Sfio_t* sp, const char* name, const char* type, const char* map,
 	}
 	else
 		sfputc(sp, ' ');
-	if (s && *s != '[')
+	if (!s || *s != '[')
 		sfputc(sp, ']');
 	return 0;
 }

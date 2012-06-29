@@ -4,6 +4,8 @@ KEEP "*.dat"
 
 TWD
 
+export LC_ALL=C
+
 function DATA
 {
 	typeset f
@@ -524,43 +526,18 @@ TEST 32 'tail -f with partial lines'
 	PROG partial 4
 
 	EXEC -t2 -f 1 2 3 4
-		OUTPUT - $'==> 1 <==
-1
-
-==> 2 <==
-2
-
-==> 3 <==
-3
-
-==> 4 <==
-4
-
-==> 1 <==
+		OUTPUT -e 'egrep -v "^$|^==" | sort' - $'1
 1 1 ... 1 1 ok
-
-==> 2 <==
+2
 2 1 ... 2 1 ok
-
-==> 3 <==
-3 1 ... 3 1 ok
-
-==> 4 <==
-4 1 ... 4 1 ok
-
-==> 2 <==
 2 2 ... 2 2 ok
-
-==> 3 <==
+3
+3 1 ... 3 1 ok
 3 2 ... 3 2 ok
-
-==> 4 <==
-4 2 ... 4 2 ok
-
-==> 3 <==
 3 3 ... 3 3 ok
-
-==> 4 <==
+4
+4 1 ... 4 1 ok
+4 2 ... 4 2 ok
 4 3 ... 4 3 ok
 4 4 ... 4 4 ok'
 		ERROR - $'tail: warning: 1: 2.00s timeout

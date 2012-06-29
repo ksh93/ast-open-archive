@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-05-22
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-06-20
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -385,6 +385,30 @@ prev testmatch.dat
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
 exec - testmatch -c testregex.dat locale.dat testmatch.dat
 done test.match virtual
+make test.oldmatch
+make testoldmatch
+make testoldmatch.o
+make testoldmatch.c
+prev testmatch.c implicit
+make ../../lib/libast/astsa/strmatch.c implicit
+make ${PACKAGE_ast_INCLUDE}/hashkey.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/hashkey.h
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done ../../lib/libast/astsa/strmatch.c
+done testoldmatch.c
+meta testoldmatch.o %.c>%.o testoldmatch.c testoldmatch
+prev testoldmatch.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testoldmatch.c
+done testoldmatch.o generated
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o testoldmatch testoldmatch.o ${mam_libast}
+done testoldmatch generated
+prev testregex.dat
+prev locale.dat
+prev testmatch.dat
+exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
+exec - testoldmatch -c testregex.dat locale.dat testmatch.dat
+done test.oldmatch virtual
 make test.regex
 make testregex
 make testregex.o

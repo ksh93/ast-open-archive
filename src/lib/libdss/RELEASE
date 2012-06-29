@@ -1,3 +1,4 @@
+12-06-15 dssopt.c: fix bug that failed to provide closing ]
 12-05-31 dssopt.c: handle optegt() style descriptions
 12-05-15 cx.h: add CX_DEPRECATED
 12-05-15 cxopen.c: handle nested structs
