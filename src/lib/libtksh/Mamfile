@@ -648,7 +648,7 @@ exec - ${AR} rc libtcl.a panic.o regexp.o tclHash.o tclGet.o tclAsync.o tclLink.
 exec - ${AR} rc libtcl.a var.o eval.o list.o shcompat.o tcleval.o tclproc.o commands.o varcmd.o tclMain.o basic.o filecmd.o tclIO.o tclUnixChan.o tclIOUtil.o
 exec - (ranlib libtcl.a) >/dev/null 2>&1 || true
 done libtcl.a generated
-done tcl
+done tcl virtual
 prev libtcl.a archive
 make ${INSTALLROOT}/lib
 exec - if silent test ! -d ${INSTALLROOT}/lib

@@ -252,7 +252,7 @@ exec - !
 exec - ;;
 exec - esac
 exec - silent test -w testsort -a -x testsort || chmod u+w,+x testsort
-done testsort generated
+done testsort virtual
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
 exec - testsort sort
 done test.script virtual

@@ -7,7 +7,7 @@ setv PACKAGE_tk ${INSTALLROOT}
 setv PACKAGE_tk_INCLUDE ${PACKAGE_tk}/include
 setv PACKAGE_tk_LIB ${PACKAGE_tk}/lib64
 setv PACKAGE_tcl_INCLUDE ${INSTALLROOT}/include/tcl
-setv PACKAGE_tcl_LIB ${INSTALLROOT}/${INSTALLROOT}/../usr/lib64
+setv PACKAGE_tcl_LIB ${INSTALLROOT}/${PACKAGEROOT}/../../usr/lib64
 setv PACKAGE_shell ${INSTALLROOT}
 setv PACKAGE_shell_INCLUDE ${PACKAGE_shell}/include
 setv PACKAGE_shell_LIB ${PACKAGE_shell}/lib

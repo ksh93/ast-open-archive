@@ -29,7 +29,7 @@ Components in this package:
 <TR><TD align=left>
 <A href="#3d">3d</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;html&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#pax">pax</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#tksh">tksh</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libdll&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libtk</TD></TR>
 <TR><TD align=left>
-<A href="#at">at</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#ie">ie</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;paxlib&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#tw">tw</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libdss&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#libtksh">libtksh</A></TD></TR>
+<A href="#at">at</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#ie">ie</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;paxlib&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#tw">tw</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libdss&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libtksh</TD></TR>
 <TR><TD align=left>
 <A href="#builtin">builtin</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;jcl&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;probe&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;vczip&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libexpr&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libuu</TD></TR>
 <TR><TD align=left>
@@ -982,51 +982,6 @@ $ PS1='(warp) ' warp -f $(60*60*24) 2000-02-29/12:30:30
 </DIV>
 </PRE>
 <P>
-<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tksh">tksh</A></H3></FONT></FONT></CENTER>
-<EM>tksh</EM>
-is an implementation of the Tcl C library
-written on top of the library for the new KornShell
-(<EM>ksh93</EM>).
-<EM>tksh</EM>
-emulates the behavior of Tcl by using the API that is provided for extending
-<EM>ksh93</EM>,
-which is similar to the Tcl library in that it allows access to
-variables, functions and other state of the interpreter.
-This implementation requires no modification to
-<EM>ksh93</EM>,
-and allows Tcl libraries such as Tk to run on top of
-<EM>ksh93</EM>
-unchanged,
-making it possible to use shell scripts in
-place of Tcl scripts. 
-<EM>ksh93</EM>
-is well suited for use with Tk because it is
-backward compatible with
-<EM>sh</EM>,
-making it both easy to learn and easy to extend
-existing scripts to provide a graphical user interface.
-<P>
-<EM>tksh</EM>
-is not yet
-another port of Tk to another language -- it allows Tcl scripts to run without
-modification using the ksh93 internals.
-This makes it possible to combine
-Tcl and
-<EM>ksh93</EM>,
-which is useful for writing
-<EM>ksh93</EM>
-scripts that use components that have been implemented in Tcl
-(such as Tk widgets).
-<P>
-<EM>tksh</EM>
-was developed by
-<A href="http://www.research.att.com/~jlk" target=_top>Jeff Korn</A>
-and is distributed by
-<A href="mailto:advsoft@research.att.com" target=_top>advsoft@research.att.com</A>.
-For the latest information vist the
-<EM>tksh</EM>
-<A href="http://www.cs.princeton.edu/~jlk/tksh" target=_top>home page</A>.
-<P>
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="release change log">release change log</A></H3></FONT></FONT></CENTER>
 <PRE>
 
@@ -1037,7 +992,32 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-12-06-28  --- Release ksh93u+ ---
+12-08-01  --- Release ksh93u+ ---
+12-08-01  A bug that ignored interrupts for some builtins (e.g. cmdtst::grep) 
+	  that read from stdin has been fixed.
+12-08-01  A bug that interpreted "cd .foo" as "cd foo" has been fixed.
+12-07-30  Added automatic restart for EINTR for ioctl, tcgetattr, and tcsetattr.
+12-07-23  A scoping error with namrefs to compound associative arrays has
+	  been fixed.
+12-07-20  A bug where builtin -d /path/foo deleted foo has been fixed.
+12-07-18  A bug in which /dev/stdout did not work in command substitution on
+	  some systems has been fixed.
+12-07-17  A bug in which the restricted option set in a subshell prevented
+	  some variables from getting restored when the subshell completed
+	  has been fixed.
+12-07-09  A bug in which the directory is not restored after a subshell changes
+	  the name of the directory for subshells executed in the same process
+	  has been fixed.
+12-07-09  A bug in which file descriptors created with {n}&lt; file were not being
+	  closed has been fixed.
+12-07-09  The 12-04-04 fix for cd .. was not correct causing cd /etc;cd .. to
+	  remain in /etc.  This has been fixed.
+12-07-02  A bug in which builtin name did now work for builtins found in a
+	  library added by builtin -f lib has been fixed.
+12-07-02  A bug in the edit modes which &lt;tab&gt; after a directory did not refresh
+          the input line has been fixed.
+12-07-02  A bug in which an exit status &gt; 256 corresponding to a signal was
+          not returned by a function to indicate a signal exit has been fixed.
 12-06-28  Fix ulimit -a to list (Kibytes) instead of (kbytes).
 12-06-27  Fix unitialized data reference for &lt;CR&gt; as first char in --vi mode.
 12-06-26  The formatting of printf "%q" for multibyte locales has changed to
@@ -1177,7 +1157,6 @@ All recorded changes follow.
 12-04-02  Made some namespace changes and added a regression test.
 12-03-30  A bug with namespaces in which PATH and FPATH set in a namespace was
 	  not restored when leaving the namespace has been fixed.
-12-03-29  --- Release ksh93u++ ---
 12-03-29  A bug in which appending an index array onto an array without elements
 	  caused the first element to be 1 rather than 0 has been fixed.
 12-03-29  A bug which could cause a core dump when copying a large index array
@@ -8152,6 +8131,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-07-25 pathprobe.c: fix read() loop to handle EINTR
 12-06-28 vmalloc/malloc.c: use sbrk() unless VMALLOC_OPTIONS=mmap or asoinit(0,0,0)!=0 (workaround until next malloc update)
 12-06-28 aso/aso.c: asoinit(0,0,0): 0: no specific init, 1: app initialized
 12-06-27 sfio/sfvprintf.c: allow { L* z* } aliases for I* -- posix will probably pick one
@@ -10322,6 +10302,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdll changes">libdll changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-07-25 add debug diagnostics
 11-10-11 dll_lib.c: add { dllnames() dll_lib() }
 10-10-20 dllscan.c: version arg "-" =&gt; 0
 10-10-19 dllplug.c: fix bug that wiped out dlopen() error message
@@ -10380,6 +10361,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libexpr changes">libexpr changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+12-07-18 exgram.h,exeval.c: handle scanf("%&#0091;^#0093;", &amp;v) -- thanks Philippe
 11-08-25 exparse.y: fix "begin()" frame symbol table check
 11-06-30 extoken.c: enter LABEL: in the parent scope symbol table!
 11-06-26 exparse.y: fix bug that lost function return type
@@ -11860,7 +11842,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>June 29, 2012</TD>
+<TD align=right>August 07, 2012</TD>
 </TR>
 </TABLE>
 <P>
