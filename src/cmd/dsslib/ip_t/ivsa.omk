@@ -24,7 +24,7 @@ test : testiv
 	testiv -ip6 iv-ip6-prefix.dat iv-ip6-addr.dat > iv-ip6.tmp
 	@cmp -s iv-ip6.out iv-ip6.tmp || { echo 'test ip6 FAILED -- >: expected <: got'; diff  iv-ip6.tmp iv-ip6.out; }
 
-clobber : iv_clobber
+clean : iv_clean
 
-iv_clobber :
+iv_clean :
 	rm -f testiv iv-ip4.tmp iv-ip6.tmp

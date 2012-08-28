@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#          Copyright (c) 1989-2011 AT&T Intellectual Property          #
+#          Copyright (c) 1989-2012 AT&T Intellectual Property          #
 #                      and is licensed under the                       #
 #                 Eclipse Public License, Version 1.0                  #
 #                    by AT&T Intellectual Property                     #
@@ -24,7 +24,7 @@
 #
 # this is the worst iffe script, we promise
 #
-# @(#)syscall.sh (AT&T Research) 2011-12-06
+# @(#)syscall.sh (AT&T Research) 2012-08-22
 #
 eval $1
 shell=
@@ -777,7 +777,11 @@ extern long $u();" >> $tmp.g
 				case $k in
 				*char*)	n=path ;;
 				*dev_t)	n=dev ;;
-				*int*)	n=fd ;;
+				*int*)	case $f in
+					fd|fd,*)	n=flags ;;
+					*)		n=fd ;;
+					esac
+					;;
 				*mode_t*)n=mode ;;
 				*stat*)	n=st ;;
 				*)	n="<$k>${i}" ;;

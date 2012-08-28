@@ -1,6 +1,6 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the BSD package               *
+*               This software is part of the bsd package               *
 *Copyright (c) 1978-2009 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *

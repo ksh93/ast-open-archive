@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2012-05-31 $\n]"
+"[-1ls5P?\n@(#)$Id: dss library (AT&T Research) 2012-08-15 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method provides types, global "
@@ -398,6 +398,7 @@ int
 dssadd(register Dsslib_t* lib, Dssdisc_t* disc)
 {
 	register int	i;
+	int		schema;
 
 	if (lib->header.flags & CX_INITIALIZED)
 		return 0;
@@ -407,9 +408,22 @@ dssadd(register Dsslib_t* lib, Dssdisc_t* disc)
 			if (!dssload(lib->libraries[i], disc))
 				return -1;
 	if (lib->types)
+	{
+		schema = -1;
 		for (i = 0; lib->types[i].name; i++)
+		{
 			if (cxaddtype(NiL, &lib->types[i], disc))
 				return -1;
+			if (lib->types[i].header.flags & CX_SCHEMA)
+				schema = i;
+		}
+		for (i = 0; i <= schema; i++)
+			if ((lib->types[i].header.flags & (CX_INITIALIZED|CX_SCHEMA)) == CX_SCHEMA)
+			{
+				lib->types[i].header.flags |= CX_INITIALIZED;
+				lib->types[i].member->members = state.cx->variables;
+			}
+	}
 	if (lib->callouts)
 		for (i = 0; lib->callouts[i].callout; i++)
 			if (cxaddcallout(NiL, &lib->callouts[i], disc))

@@ -21,7 +21,7 @@
 #include	<ast_ndbm.h>
 
 static const char dbm_usage[] =
-"[-?@(#)$Id: Dbm_t (AT&T Research) 2008-05-09 $\n]"
+"[-?@(#)$Id: Dbm_t (AT&T Research) 2012-08-23 $\n]"
 USAGE_LICENSE
 "[+NAME?Dbm_t - create an associative array containing contents of a dbm file]"
 "[+DESCRIPTION?\bDbm_t\b is a declaration command that creates an associative "
@@ -131,7 +131,7 @@ static void dbm_get(struct dbm_array *ap)
 			ap->node.nvname = ap->key.dptr;
 			sfprintf(ap->strbuf,"%s=%s\0",nv_name(&ap->node),val);
 			val = sfstruse(ap->strbuf);
-			sh_trap(val,0);
+			sh_trap(ap->shp,val,0);
 		}
 		else
 		{
@@ -426,7 +426,7 @@ void lib_init(int flag, void* context)
 	Namval_t	*mp,*bp;
 
 	if (!flag &&
-	    (bp = sh_addbuiltin("Dbm_t", dbm_create, (void*)0)) &&
+	    (bp = sh_addbuiltin(shp, "Dbm_t", dbm_create, (void*)0)) &&
 	    (mp = nv_search("typeset", shp->bltin_tree, 0)))
 		nv_onattr(bp, nv_isattr(mp, NV_PUBLIC));
 }

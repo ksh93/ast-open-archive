@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -55,7 +55,7 @@ ftruncate64(int fd, off64_t size)
 	{
 		n = state.trap.size;
 		state.trap.size = m;
-		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], MSG_truncate, SYS3D_ftruncate64, (void*)fd, (void*)&size, NiL, NiL, NiL, NiL);
+		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], MSG_truncate, SYS3D_ftruncate64, pointerof(fd), (void*)&size, NiL, NiL, NiL, NiL);
 		state.trap.size = n;
 	}
 	else

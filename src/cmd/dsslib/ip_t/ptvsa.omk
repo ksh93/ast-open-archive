@@ -27,7 +27,7 @@ test : testptv
 	testptv ptv-prefix.dat ptv-addr.dat > testptv.tmp
 	@cmp -s testptv.out testptv.tmp || { echo 'test FAILED -- >: expected <: got'; diff  testptv.tmp testptv.out; }
 
-clobber : ptv_clobber
+clean : ptv_clean
 
-ptv_clobber :
-	rm -f testptv
+ptv_clean :
+	rm -f testptv testptv.tmp

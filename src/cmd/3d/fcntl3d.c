@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -43,13 +43,14 @@ fcntl3d(int fd, int op, ...)
 	if (op == F_DUPFD && state.file[n].reserved)
 		close(n);
 	r = FCNTL(fd, op, arg);
-#if FS
 	if (r >= 0 && r < elementsof(state.file))
+#if FS || defined(fchdir3d)
 		switch (op)
 		{
 		case F_DUPFD:
 			fs3d_dup(fd, r);
 			break;
+#if FS
 		case F_SETFD:
 			if (state.cache)
 			{
@@ -61,6 +62,7 @@ fcntl3d(int fd, int op, ...)
 					state.file[fd].flags |= FILE_CLOEXEC;
 			}
 			break;
+#endif
 		}
 #endif
 	return r;

@@ -1,3 +1,6 @@
+12-08-20 bgp-mrt.c: fix bad MCAST_VPN dump data workaround
+12-08-15 bgp.c,bgp-mrt.c: elevate struct data to cx struct types
+12-08-08 bgp.c,bgp-mrt.c: fix mvpn parse anomalies
 12-06-14 bgp.c: document int mvpn.type == route type index
 12-06-13 bgp.c: add "bgp_t mvpn.key" for mvpn route key
 12-05-31 bgp.c: add bgp_t mvpn.<member> support

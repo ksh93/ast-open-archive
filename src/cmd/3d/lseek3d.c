@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -73,7 +73,7 @@ lseek64(int fd, off64_t off, int op)
 	{
 		n = state.trap.size;
 		state.trap.size = m;
-		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], MSG_seek, SYS3D_lseek64, (void*)fd, (void*)&off, (void*)op, NiL, NiL, NiL) ? -1 : off;
+		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], MSG_seek, SYS3D_lseek64, pointerof(fd), (void*)&off, pointerof(op), NiL, NiL, NiL) ? -1 : off;
 		state.trap.size = n;
 	}
 	else

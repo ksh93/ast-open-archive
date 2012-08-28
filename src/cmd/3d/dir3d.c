@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -65,6 +65,16 @@
 #undef	strtoull
 
 static int	intercepted;
+
+#if defined(dirfd3d)
+
+int
+dirfd3d(DIR* dirp)
+{
+	return DIRFD(dirp->view->dirp);
+}
+
+#endif
 
 DIR*
 opendir3d(const char* apath)
@@ -145,6 +155,99 @@ opendir3d(const char* apath)
 	intercepted = 0;
 	return dirp;
 }
+
+#if defined(fchdir3d)
+
+DIR*
+fdopendir3d(int fd)
+{
+	char*		path;
+	char*		s;
+	DIR*		dirp = 0;
+	int		n;
+	int		oerrno;
+	long		visits = 0;
+	struct stat	st;
+	char		buf[PATH_MAX];
+
+	if (dirp = (DIR*)state.freedirp)
+		state.freedirp = 0;
+	else if (!(dirp = newof(0, DIR, 1, 0)))
+		return 0;
+	if (!(s = fdirpath(fd, NiL, buf, sizeof(buf), "fdopendir")))
+		return 0;
+	intercepted++;
+	dirp->fd = -1;
+	dirp->viewp = dirp->view;
+	n = state.in_2d;
+	if (path = pathreal(s, P_SLASH, NiL))
+		state.in_2d = 2;
+	else
+		path = s;
+	dirp->viewp->dirp = OPENDIR(path);
+	state.in_2d = n;
+	if (!dirp->viewp->dirp)
+	{
+		state.freedirp = (void*)dirp;
+		intercepted = 0;
+		return 0;
+	}
+#if defined(dirfd3d)
+	if ((n = DIRFD(dirp->viewp->dirp)) >= 0)
+		fs3d_dup(fd, n);
+#endif
+	close(fd);
+	dirp->boundary = state.boundary;
+	if (state.in_2d)
+	{
+		dirp->overlay = 0;
+		(dirp->viewp++)->opaque = 0;
+		dirp->viewp->dirp = 0;
+	}
+	else
+	{
+		oerrno = errno;
+		n = strlen(path);
+		path[n] = '/';
+		strcpy(path + n + 1, state.opaque);
+		dirp->viewp->level = state.path.level;
+		state.in_2d++;
+		(dirp->viewp++)->opaque = LSTAT(path, &st) ? 0 : st.st_ino;
+		state.in_2d--;
+		path[n] = 0;
+		while (pathnext(state.path.name, NiL, &visits))
+		{
+			state.in_2d = 2;
+			dirp->viewp->dirp = OPENDIR(state.path.name);
+			state.in_2d = 0;
+			if (dirp->viewp->dirp)
+			{
+				n = strlen(state.path.name);
+				state.path.name[n] = '/';
+				strcpy(state.path.name + n + 1, state.opaque);
+				dirp->viewp->level = state.path.level;
+				(dirp->viewp++)->opaque = LSTAT(state.path.name, &st) ? 0 : st.st_ino;
+				state.path.name[n] = 0;
+			}
+		}
+		errno = oerrno;
+		(dirp->viewp--)->dirp = 0;
+		if (dirp->viewp <= dirp->view)
+			dirp->overlay = 0;
+		else if (!(dirp->overlay = hashalloc(NiL, HASH_set, HASH_ALLOCATE, 0)))
+		{
+			closedir(dirp);
+			intercepted = 0;
+			return 0;
+		}
+	}
+	dirp->viewp = dirp->view;
+	CHEATDIR(dirp);
+	intercepted = 0;
+	return dirp;
+}
+
+#endif
 
 int
 closedir3d(register DIR* dirp)

@@ -106,6 +106,8 @@ done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_ndbm.h
 make ${PACKAGE_ast_INCLUDE}/shell.h implicit
+make ${PACKAGE_ast_INCLUDE}/shellapi.h implicit
+done ${PACKAGE_ast_INCLUDE}/shellapi.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h dontcare
@@ -149,6 +151,8 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/nval.h implicit
+make ${PACKAGE_ast_INCLUDE}/nvapi.h implicit
+done ${PACKAGE_ast_INCLUDE}/nvapi.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/option.h implicit
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -159,6 +163,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/nval.h dontcare
 make name.h implicit
 done name.h dontcare virtual
+prev ${PACKAGE_ast_INCLUDE}/stk.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -166,7 +171,7 @@ done ${PACKAGE_ast_INCLUDE}/shell.h
 done dbm_t.c
 meta dbm_t.o %.c>%.o dbm_t.c dbm_t
 prev dbm_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm_t"\" -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshdbm_t]"\" -D_PACKAGE_ast -c dbm_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${mam_cc_DLL} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""kshdbm_t"\" -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2007-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?kshdbm_t]"\" -D_PACKAGE_ast -D_BLD_DEBUG -c dbm_t.c
 done dbm_t.o generated
 exec - ${AR} rc libkshdbm_t.a dbm_t.o
 exec - (ranlib libkshdbm_t.a) >/dev/null 2>&1 || true

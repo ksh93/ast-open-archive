@@ -43,18 +43,20 @@
 #define STATE_BGP_ANNOUNCE		4
 #define STATE_BGP_PREFIX		5
 #define STATE_BGP_NLRI			6
-#define STATE_BGP_ATTR			7
-#define STATE_TABLE_DUMP		8
-#define STATE_TABLE_DUMP_V2_RIB		9
-#define STATE_TABLE_DUMP_V2_RIB_GENERIC	10
+#define STATE_BGP_NLRI_INIT		7
+#define STATE_BGP_ATTR			8
+#define STATE_TABLE_DUMP		9
+#define STATE_TABLE_DUMP_V2_RIB		10
+#define STATE_TABLE_DUMP_V2_RIB_GENERIC	11
 
 #define BE1(p)		(*(unsigned char*)(p))
 #define BE2(p)		((BE1(p)<<8)|(BE1(p+1)))
+#define BE3(p)		((BE1(p)<<16)|(BE1(p+1)<<8)|(BE1(p+2)))
 #define BE4(p)		((BE1(p)<<24)|(BE1(p+1)<<16)|(BE1(p+2)<<8)|(BE1(p+3)))
 #define BE(b,p,n)	memcpy(b,p,n)
 
-#define DATA(sp,rp)		(rp=&sp->route,sp->osize=sp->size)
-#define ZERO(sp,rp)		((rp->set&BGP_SET_mvpn?(sp->np->size=0,memset(sp->np,0,BGP_FIXED),memset(sp->np+1,0,BGP_FIXED),sp->np->unknown.size=0):0),sp->size=0,memset(rp,0,BGP_FIXED),sp->unknown.size=0)
+#define DATA(sp,rp)		(rp=&sp->route,sp->osize=sp->size,sp->temp=sizeof(rp->data))
+#define ZERO(sp,rp)		(sp->size=0,memset(rp,0,BGP_FIXED),sp->unknown.size=0)
 #define HEAD(sp,rp)		(rp->message=sp->message,rp->stamp=sp->time)
 #define INIT(sp,rp)		(DATA(sp,rp),ZERO(sp,rp),HEAD(sp,rp))
 #define NEXT(sp,rp)		(DATA(sp,rp),HEAD(sp,rp))
@@ -80,11 +82,18 @@ typedef struct Mrtpeer_s
 typedef struct Mrtstate_s
 {
 	Bgproute_t		route;
-	Bgproute_t*		np;
+	struct
+	{
+	Bgproute_t		route;
+	unsigned int		size;
+	unsigned int		osize;
+	unsigned int		temp;
+	}			key;
 	Bgpnum_t		time;
 	Bgpnum_t		message;
 	Bgpnum_t		best;
 	unsigned int		size;
+	unsigned int		temp;
 	unsigned int		osize;
 	int			as32;
 	int			entries;
@@ -121,6 +130,7 @@ typedef struct Mrtstate_s
 
 #define AE1(p)			anonymize_value(0,p,1)
 #define AE2(p)			anonymize_value(0,p,2)
+#define AE3(p)			anonymize_value(0,p,3)
 #define AE4(p)			anonymize_value(0,p,4)
 #define AET(p)			(swapmem(int_swap,&anonymize.time,p,4),anonymize.time++)
 #define AE(b,p,n)		anonymize_value((char*)b,(char*)p,n)
@@ -201,6 +211,7 @@ anonymize_flush(Dssfile_t* file, Dssdisc_t* disc)
 
 #define AE1(p)			BE1(p)
 #define AE2(p)			BE2(p)
+#define AE3(p)			BE3(p)
 #define AE4(p)			BE4(p)
 #define AET(p)			BE4(p)
 #define AE(b,p,n)		BE(b,p,n)
@@ -330,9 +341,16 @@ symbol(int group, int index)
 		case MRT_ATTR_MP_UNREACH_NLRI:		return "MP_UNREACH_NLRI";
 		case MRT_ATTR_EXTENDED_COMMUNITY:	return "EXTENDED_COMMUNITY";
 		case MRT_ATTR_AS32_PATH:		return "AS32_PATH";
-		case MRT_ATTR_AGGREGATOR32:		return "AGGREGATOR32";
-		case MRT_ATTR_CONNECTOR:		return "CONNECTOR";
+		case MRT_ATTR_AS32_AGGREGATOR:		return "AS32_AGGREGATOR";
+		case MRT_ATTR_SSA_DEPRECATED:		return "SSA_DEPRECATED";
+		case MRT_ATTR_CONNECTOR_DEPRECATED:	return "CONNECTOR_DEPRECATED";
+		case MRT_ATTR_AS_PATHLIMIT_DEPRECATED:	return "AS_PATHLIMIT_DEPRECATED";
 		case MRT_ATTR_PMSI_TUNNEL:		return "PMSI_TUNNEL";
+		case MRT_ATTR_TUNNEL_ENCAPSULATION:	return "TUNNEL_ENCAPSULATION";
+		case MRT_ATTR_TRAFFIC_ENGINEERING:	return "TRAFFIC_ENGINEERING";
+		case MRT_ATTR_EXTENDED_COMMUNITY_V6:	return "EXTENDED_COMMUNITY_V6";
+		case MRT_ATTR_AIGP_20120425:		return "AIGP_20120425";
+		case MRT_ATTR_PE_DISTINGUISHER_LABELS:	return "PE_DISTINGUISHER_LABELS";
 		case MRT_ATTR_SET:			return "SET";
 		}
 		break;
@@ -384,6 +402,7 @@ symbol(int group, int index)
 		case STATE_BGP_ANNOUNCE:		return "BGP_ANNOUNCE";
 		case STATE_BGP_PREFIX:			return "BGP_PREFIX";
 		case STATE_BGP_NLRI:			return "BGP_NLRI";
+		case STATE_BGP_NLRI_INIT:		return "BGP_NLRI_INIT";
 		case STATE_BGP_ATTR:			return "BGP_ATTR";
 		case STATE_TABLE_DUMP:			return "TABLE_DUMP";
 		case STATE_TABLE_DUMP_V2_RIB:		return "TABLE_DUMP_V2_RIB";
@@ -454,7 +473,6 @@ mrtopen(Dssfile_t* file, Dssdisc_t* disc)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
 		return -1;
 	}
-	((Mrtstate_t*)file->data)->np = bgp->sub;
 	ANONYMIZE_OPEN(file, disc);
 	return 0;
 }
@@ -464,7 +482,7 @@ mrtopen(Dssfile_t* file, Dssdisc_t* disc)
  */
 
 static int
-rd(Dssfile_t* file, Mrtstate_t* state, Bgproute_t* rp, char* end, Dssdisc_t* disc)
+rd(Dssfile_t* file, Mrtstate_t* state, const char* head, Bgprd_t* rd, char* end, Dssdisc_t* disc)
 {
 	if ((state->buf + 8) > end)
 	{
@@ -472,24 +490,24 @@ rd(Dssfile_t* file, Mrtstate_t* state, Bgproute_t* rp, char* end, Dssdisc_t* dis
 			(*disc->errorf)(NiL, disc, 1, "rd %s size %u -- %d available", symbol(GROUP_STATE, state->state), 8, (int)(end - state->buf));
 		return -1;
 	}
-	rp->rd_type = BE2(state->buf);
-	switch (rp->rd_type)
+	rd->type = BE2(state->buf);
+	switch (rd->type)
 	{
 	case 0:
-		rp->rd_as = AE2(state->buf + 2);
-		rp->rd_number = AE4(state->buf + 4);
+		rd->as = AE2(state->buf + 2);
+		rd->number = AE4(state->buf + 4);
 		break;
 	case 1:
-		rp->rd_addr.v4 = AE4(state->buf + 2);
-		rp->rd_number = AE2(state->buf + 6);
+		rd->addr.v4 = AE4(state->buf + 2);
+		rd->number = AE2(state->buf + 6);
 		break;
 	case 2:
-		rp->rd_as = AE4(state->buf + 2);
-		rp->rd_number = AE2(state->buf + 6);
+		rd->as32 = AE4(state->buf + 2);
+		rd->number = AE2(state->buf + 6);
 		break;
 	}
 	if (file->dss->flags & DSS_DEBUG)
-		sfprintf(sfstderr, "                      nlri  rd type %u number %u as %u addr %s\n", rp->rd_type, rp->rd_number, rp->rd_as, fmtip4(rp->rd_addr.v4, -1));
+		sfprintf(sfstderr, "                      %-4.4s  rd type %u number %u as %u addr %s\n", head, rd->type, rd->number, rd->as32 ? rd->as32 : rd->as, fmtip4(rd->addr.v4, -1));
 	state->buf += 8;
 	return 0;
 }
@@ -535,7 +553,6 @@ prefix(Dssfile_t* file, Mrtstate_t* state, Bgproute_t* rp, int bits, char* end, 
 			rp->bits = bits;
 			rp->attr |= BGP_best;
 		}
-		rp->set |= BGP_SET_prefixv4;
 		if (file->dss->flags & DSS_DEBUG)
 			sfprintf(sfstderr, "                      nlri  %c  %s prefix %s\n", rp->type, symbol(GROUP_AFI, rp->afi), fmtip4(rp->addr.v4, rp->bits));
 		break;
@@ -581,13 +598,14 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 {
 	int		n;
 	int		m;
+	int		l;
 	int		i;
 	int		j;
 	int		q;
 	int		v;
 	char*		buf;
 	Bgpnum_t*	np;
-	Bgproute_t*	op;
+	Bgpmvpn_t*	mp;
 
 	j = BE1(state->buf++);
 	switch (rp->safi)
@@ -615,7 +633,7 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		}
 		j -= q * 8;
 		m *= 2;
-		BGPALLOC(rp, state->size, Bgpnum_t, np, m, &rp->labels, "nlri label list", disc);
+		BGPVEC(state, rp, Bgpnum_t, np, m, &rp->labels, "nlri label list", disc);
 		for (q = 0; q < m; q += 2)
 		{
 			v = AE2(state->buf) << 8;
@@ -633,29 +651,23 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		if (rp->safi == MRT_SAFI_VPN_MLPS_LABEL)
 		{
 			buf = state->buf;
-			if (rd(file, state, rp, end, disc))
+			if (rd(file, state, "nlri", &rp->rd, end, disc))
 				goto nope;
+			rp->set |= BGP_SET_rd;
 			j -= 8 * (state->buf - buf);
 		}
 		break;
 	case MRT_SAFI_MCAST_VPN:
-		rp->set |= BGP_SET_mvpn;
-		op = rp;
-		rp = state->np;
-		rp->afi = op->afi;
-		rp->safi = op->safi;
-		m = BE1(state->buf++);
-		if (m > (int)(end - state->buf))
+		m = j;
+	workaround:
+		if (1 > (int)(end - state->buf))
 		{
 			if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d too large -- %d available", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf));
+				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d too large -- %d available", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, m), 2, (int)(end - state->buf));
 			goto nope;
 		}
-		end = state->buf + m;
-		if (file->dss->flags & DSS_DEBUG)
-			sfprintf(sfstderr, "                            %s.%s size %d available %d/%d\n", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf), (int)(state->end - state->buf));
-		PAYLOAD(file, state->buf, m);
-		switch (j)
+		l = BE1(state->buf++);
+		switch (m)
 		{
 		case VPN_INTRA_AS_I_PMSI_A_D:
 			q = VPN_rd|VPN_originator;
@@ -677,23 +689,61 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			q = VPN_rd|VPN_src_as|VPN_multicast;
 			break;
 		default:
+			/*
+			 * XXX: workaround for data bug discovered 2012-08-03 by the data guys
+			 */
+
+			if (m == j)
+			{
+				m = l;
+				j = -1;
+				goto workaround;
+			}
 			if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-				(*disc->errorf)(NiL, disc, 1, "%s.%s unknown route type", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j));
+				(*disc->errorf)(NiL, disc, 1, "%s.%s unknown route type", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, m));
 			goto skip;
 		}
-		if ((q & VPN_rd) && rd(file, state, rp, end, disc))
+		if (l > (int)(end - state->buf))
+		{
+			if (disc->errorf && !(file->dss->flags & DSS_QUIET))
+				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d too large -- %d available", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, m), l, (int)(end - state->buf));
 			goto nope;
+		}
+		end = state->buf + l;
+		if (file->dss->flags & DSS_DEBUG)
+			sfprintf(sfstderr, "                            %s.%s size %d available %d/%d\n", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, m), l, (int)(end - state->buf), (int)(state->end - state->buf));
+		PAYLOAD(file, state->buf, l);
+		BGPTEMP(state, rp, Bgpmvpn_t, mp, 1, 0, "mcast vpn nlri", disc);
+		if (!mp)
+			return -1;
+		rp->mvpn = (char*)mp - rp->data;
+		if (q & VPN_rd)
+		{
+			if (rd(file, state, "", &mp->rd, end, disc))
+				goto nope;
+			mp->set |= BGP_MVPN_SET_rd;
+		}
 		if (q & VPN_key)
 		{
-			rp++;
-			rp->afi = op->afi;
-			rp->safi = op->safi;
-			if (nlri(file, state, rp, end, disc))
+			state->key.osize = state->osize;
+			state->osize = state->size;
+			state->key.size = state->size;
+			state->size = 0;
+			state->key.temp = state->temp;
+			state->temp = sizeof(rp->data);
+			memset(&state->key.route, 0, BGP_FIXED);
+			state->key.route.afi = rp->afi;
+			state->key.route.safi = rp->safi;
+			mp->key = (char*)&state->key.route - (char*)mp;
+			if (nlri(file, state, &state->key.route, end, disc))
 				goto nope;
+			state->osize = state->key.osize;
+			state->size = state->key.size;
+			state->temp = state->key.temp;
 		}
 		if (q & VPN_src_as)
 		{
-			rp->src_as = AE4(state->buf);
+			mp->src_as32 = AE4(state->buf);
 			state->buf += 4;
 		}
 		if (q & VPN_multicast)
@@ -702,13 +752,13 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			switch (i)
 			{
 			case MRT_BITS_IPV4:
-				rp->src_addr.v4 = AE4(state->buf);
+				mp->src_addr.v4 = AE4(state->buf);
 				state->buf += 4;
 				break;
 			case MRT_BITS_IPV6:
-				AE(rp->src_addr.v6, state->buf, 16);
+				AE(mp->src_addr.v6, state->buf, 16);
 				state->buf += 16;
-				rp->set |= BGP_SET_src_addrv6;
+				mp->set |= BGP_SET_src_addrv6;
 				break;
 			default:
 				if (disc->errorf && !(file->dss->flags & DSS_QUIET))
@@ -719,14 +769,13 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			switch (i)
 			{
 			case MRT_BITS_IPV4:
-				rp->agg_addr.v4 = AE4(state->buf);
+				mp->group_addr.v4 = AE4(state->buf);
 				state->buf += 4;
-				rp->set |= BGP_SET_agg_addrv4;
 				break;
 			case MRT_BITS_IPV6:
-				AE(rp->agg_addr.v6, state->buf, 16);
+				AE(mp->group_addr.v6, state->buf, 16);
 				state->buf += 16;
-				rp->set |= BGP_SET_agg_addrv6;
+				mp->set |= BGP_MVPN_SET_group_addrv6;
 				break;
 			default:
 				if (disc->errorf && !(file->dss->flags & DSS_QUIET))
@@ -736,32 +785,32 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		}
 		if (q & VPN_originator)
 		{
-			if (op->afi == MRT_AFI_IPV4 || (int)(end - state->buf) == 4)
+			if (rp->afi == MRT_AFI_IPV4 || (int)(end - state->buf) == 4)
 			{
-				rp->originator.v4 = AE4(state->buf);
+				mp->originator.v4 = AE4(state->buf);
 				state->buf += 4;
-				rp->set &= ~BGP_SET_originatorv6;
+				mp->set &= ~BGP_MVPN_SET_originatorv6;
 			}
-			else if (op->afi == MRT_AFI_IPV6 || (int)(end - state->buf) == 16)
+			else if (rp->afi == MRT_AFI_IPV6 || (int)(end - state->buf) == 16)
 			{
-				AE(rp->originator.v6, state->buf, 16);
+				AE(mp->originator.v6, state->buf, 16);
 				state->buf += 16;
-				rp->set |= BGP_SET_originatorv6;
+				mp->set |= BGP_MVPN_SET_originatorv6;
 			}
 			else
 			{
 				if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-					(*disc->errorf)(NiL, disc, 1, "%u: unknown afi index (size %d)", op->afi, (int)(end - state->buf));
+					(*disc->errorf)(NiL, disc, 1, "%u: unknown afi index (size %d)", rp->afi, (int)(end - state->buf));
 				goto nope;
 			}
 		}
 		if (state->buf < end)
 		{
 			if (disc->errorf && !(file->dss->flags & DSS_QUIET))
-				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d -- %d unused", symbol(GROUP_SAFI, op->safi), symbol(GROUP_MCAST_VPN, j), m, (int)(end - state->buf));
+				(*disc->errorf)(NiL, disc, 1, "nlri %s.%s size %d -- %d unused", symbol(GROUP_SAFI, rp->safi), symbol(GROUP_MCAST_VPN, m), l, (int)(end - state->buf));
 			state->buf = end;
 		}
-		rp->type = j;
+		mp->type = m;
 		goto done;
 	default:
 		if (disc->errorf && !(file->dss->flags & DSS_QUIET))
@@ -801,10 +850,10 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 	int			m;
 	int			n;
 	int			q;
-	int			r;
 	Bgpasn_t*		ap;
 	Bgpnum_t*		ap32;
 	Bgpnum_t*		np;
+	Bgptunnel_t*		ta;
 	char*			nxt;
 	unsigned char*		up;
 	unsigned long		v;
@@ -887,7 +936,7 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 
 			if (i == m)
 			{
-				BGPALLOC(rp, state->size, Bgpasn_t, ap, j, &rp->path, "AS16 path", disc);
+				BGPVEC(state, rp, Bgpasn_t, ap, j, &rp->path, "AS16 path", disc);
 				for (i = j = q = 0; i <= (m - 2); i += 2)
 				{
 					/* <type> 1:set 2:sequence 3:confed_sequence 4:confed_set <length> */
@@ -947,7 +996,7 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 						j += 2;
 				}
 			}
-			BGPALLOC(rp, state->size, Bgpnum_t, ap32, j, &rp->path32, "AS32 path", disc);
+			BGPVEC(state, rp, Bgpnum_t, ap32, j, &rp->path32, "AS32 path", disc);
 			for (i = j = q = 0; i <= (m - 2); i += 4)
 			{
 				k = BE1(state->buf + i + 1);
@@ -975,9 +1024,9 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			{
 				sfprintf(sfstderr, "                                AS32 path [%u]", q);
 				for (i = 0; i < j; i++)
-					if (ap[i] != BGP_SET16)
+					if (ap32[i] != BGP_SET16)
 						sfprintf(sfstderr, " %u", ap32[i]);
-					else if (ap[++i])
+					else if (ap32[++i])
 						sfprintf(sfstderr, " :");
 					else
 						sfprintf(sfstderr, " %u", ap32[++i]);
@@ -1003,7 +1052,7 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		break;
 	case MRT_ATTR_COMMUNITY:
 		k = size / 2;
-		BGPALLOC(rp, state->size, Bgpasn_t, ap, k, &rp->community, "community list", disc);
+		BGPVEC(state, rp, Bgpasn_t, ap, k, &rp->community, "community list", disc);
 		for (i = j = 0; j < k; i += 4)
 		{
 			v = AE4(state->buf + i);
@@ -1017,7 +1066,7 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		break;
 	case MRT_ATTR_CLUSTER:
 		k = size / 4;
-		BGPALLOC(rp, state->size, Bgpnum_t, np, k, &rp->cluster, "cluster list", disc);
+		BGPVEC(state, rp, Bgpnum_t, np, k, &rp->cluster, "cluster list", disc);
 		for (i = j = 0; j < k; i += 4)
 			np[j++] = AE4(state->buf + i);
 		break;
@@ -1061,7 +1110,6 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 					state->buf += n - 4;
 				rp->hop.v4 = AE4(state->buf);
 				state->buf += 4;
-				rp->set |= BGP_SET_hopv4;
 			}
 			else if (n == 16 || rp->afi == MRT_AFI_IPV6)
 			{
@@ -1087,7 +1135,7 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		{
 			state->nxt = state->end;
 			state->end = nxt;
-			state->push = state->state == STATE_BGP_MESSAGE ? STATE_BGP_ATTR : state->state;
+			state->push = state->state;
 			state->state = STATE_BGP_NLRI;
 			return 0;
 		}
@@ -1097,16 +1145,28 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		goto reach;
 	case MRT_ATTR_EXTENDED_COMMUNITY:
 		k = size;
-		BGPALLOC(rp, state->size, unsigned char, up, k, &rp->extended, "extended community list", disc);
+		BGPVEC(state, rp, unsigned char, up, k, &rp->extended, "extended community list", disc);
 		AE(up, state->buf, k);
 		break;
-	case MRT_ATTR_AGGREGATOR32:
+	case MRT_ATTR_AS32_AGGREGATOR:
 		rp->agg_as32 = AE4(state->buf);
 		rp->agg_addr32.v4 = AE4(state->buf + 4);
 		break;
-	case MRT_ATTR_ADVERTIZER:
-	case MRT_ATTR_RCID_PATH:
-	case MRT_ATTR_SET:
+	case MRT_ATTR_PMSI_TUNNEL:
+		BGPPERM(state, rp, Bgptunnel_t, ta, 1, 0, "PMSI tunnel attribute", disc);
+		if (!ta)
+			goto nope;
+		rp->tunnel = (char*)ta - rp->data;
+		ta->flags = BE1(state->buf);
+		ta->type = BE1(state->buf + 1);
+		ta->label = AE3(state->buf + 2);
+		if ((k = size - 5) > 0)
+		{
+			BGPVEC(state, rp, unsigned char, up, k, &ta->identifier, "PMSI tunnel identifier", disc);
+			AE(up, state->buf + 5, k);
+			ta->identifier.offset -= rp->tunnel;
+		}
+		break;
 	default:
 	unknown:
 		if ((sizeof(state->unknown.data) - state->unknown.size) > 14)
@@ -1197,7 +1257,7 @@ done(Mrtstate_t* state, Bgproute_t* rp, Dssrecord_t* record, Dssdisc_t* disc)
 	state->group |= BGP_PART;
 	if (state->unknown.size)
 	{
-		BGPALLOC(rp, state->size, char, s, state->unknown.size, &rp->unknown, "unknown attributes", disc);
+		BGPVEC(state, rp, char, s, state->unknown.size, &rp->unknown, "unknown attributes", disc);
 		memcpy(s, state->unknown.data, state->unknown.size);
 		state->unknown.size = 0;
 	}
@@ -1388,7 +1448,7 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 				rp->type = BGP_TYPE_table_dump;
 				j = AE4(state->buf); /* sequence */
 				state->buf += 4;
-				rp->set &= ~(BGP_SET_prefixv4|BGP_SET_prefixv6);
+				rp->set &= ~BGP_SET_prefixv6;
 				if (state->state == STATE_TABLE_DUMP_V2_RIB_GENERIC)
 				{
 					rp->afi = BE2(state->buf);
@@ -1419,7 +1479,7 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 				INIT(state, rp);
 				if (type == MRT_BGP4MP_ET)
 				{
-					rp->usec = BE4(state->buf + 0);
+					rp->usec = AE4(state->buf + 0) % 1000000;
 					state->buf += 4;
 				}
 				switch (subtype)
@@ -1440,7 +1500,7 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 				if (BE2(state->buf + 2) == MRT_AFI_IPV6)
 				{
 					rp->attr |= BGP_ipv6;
-					rp->set |= BGP_SET_src_addrv6;
+					rp->set |= BGP_SET_src_addrv6|BGP_SET_dst_addrv6;
 					AE(rp->src_addr.v6, state->buf + 4, sizeof(rp->src_addr.v6));
 					AE(rp->dst_addr.v6, state->buf + 20, sizeof(rp->dst_addr.v6));
 					state->buf += 36;
@@ -1538,7 +1598,7 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 			/*FALLTHROUGH*/
 		case STATE_BGP_ATTRIBUTES:
 			NEXT(state, rp);
-			rp->set &= ~(BGP_SET_prefixv4|BGP_SET_prefixv6);
+			rp->set &= ~BGP_SET_prefixv6;
 			if (state->buf < state->nxt)
 			{
 				if (file->dss->flags & DSS_DEBUG)
@@ -1554,7 +1614,6 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 				for (; j < 4; j++)
 					addr <<= 8;
 				rp->addr.v4 = addr;
-				rp->set |= BGP_SET_prefixv4;
 				DONE(state, rp, record, disc);
 				return 1;
 			}
@@ -1573,7 +1632,7 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		case STATE_BGP_PREFIX:
 			NEXT(state, rp);
 		state_bgp_prefix:
-			rp->set &= ~(BGP_SET_prefixv4|BGP_SET_prefixv6);
+			rp->set &= ~BGP_SET_prefixv6;
 			if (state->buf < state->end)
 			{
 				if (file->dss->flags & DSS_DEBUG)
@@ -1589,36 +1648,43 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 				for (; j < 4; j++)
 					addr <<= 8;
 				rp->addr.v4 = addr;
-				rp->set |= BGP_SET_prefixv4;
 				DONE(state, rp, record, disc);
 				return 1;
 			}
 			state->state = 0;
 			continue;
+		case STATE_BGP_NLRI_INIT:
+			NEXT(state, rp);
+			rp->mvpn = 0;
+			state->state = STATE_BGP_NLRI;
+			goto state_bgp_nlri;
 		case STATE_BGP_NLRI:
-			if (state->buf < state->end)
+			NEXT(state, rp);
+		state_bgp_nlri:
+			if (nlri(file, state, rp, state->end, disc))
+				return -1;
+			if (state->buf >= state->end)
 			{
-				NEXT(state, rp);
-				if (nlri(file, state, rp, state->end, disc))
-					return -1;
-				if (state->buf >= state->end)
+				state->end = state->nxt;
+				state->state = state->push;
+				if (state->state == STATE_BGP_ANNOUNCE)
 				{
-					state->end = state->nxt;
-					state->state = state->push;
+					while ((i = attr(file, state, rp, state->end, disc)) > 0);
+					if (i < 0)
+						return -1;
 				}
-				DONE(state, rp, record, disc);
-				return 1;
 			}
-			state->end = state->nxt;
-			state->state = STATE_BGP_ATTR;
-			continue;
+			else
+				state->state = STATE_BGP_NLRI_INIT;
+			DONE(state, rp, record, disc);
+			return 1;
 		case STATE_BGP_ATTR:
 			NEXT(state, rp);
 			while ((i = attr(file, state, rp, state->end, disc)) > 0);
 			if (i < 0)
 				return -1;
-			if (state->state == STATE_BGP_ATTR)
-				state->state = state->push;
+			if (state->buf >= state->end)
+				state->state = 0;
 			continue;
 		case STATE_TABLE_DUMP:
 			while (state->buf < state->end)
@@ -1746,7 +1812,7 @@ mrtclose(Dssfile_t* file, Dssdisc_t* disc)
 Dssformat_t ANONYMIZE_FORMAT =
 {
 	"mrt" ANONYMIZE_FORMAT_NAME,
-	"mrt binary format" ANONYMIZE_FORMAT_DESCRIPTION " (2011-09-11) -T0x0010 enables payload trace [http://tools.ietf.org/html/draft-ietf-grow-mrt-15]",
+	"mrt binary format" ANONYMIZE_FORMAT_DESCRIPTION " (2012-08-08) -T0x0010 enables payload trace [http://tools.ietf.org/html/rfc4271]",
 	CXH,
 	mrtident,
 	mrtopen,

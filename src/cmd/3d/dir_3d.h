@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -41,6 +41,8 @@
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
 __STDPP__directive pragma pp:hide opendir _opendir __opendir
+__STDPP__directive pragma pp:hide fdopendir _fdopendir __fdopendir
+__STDPP__directive pragma pp:hide dirfd _dirfd __dirfd
 __STDPP__directive pragma pp:hide readdir _readdir __readdir readdir64 _readdir64 __readdir64
 __STDPP__directive pragma pp:hide rewinddir _rewinddir __rewinddir rewinddir64 _rewinddir64 __rewinddir64
 __STDPP__directive pragma pp:hide seekdir _seekdir __seekdir seekdir64 _seekdir64 __seekdir64
@@ -51,6 +53,12 @@ __STDPP__directive pragma pp:hide _getdents __getdents getdents64 _getdents64 __
 #define opendir		DIRopendir
 #define _opendir	_DIRopendir
 #define __opendir	__DIRopendir
+#define fdopendir	DIRfdopendir
+#define _fdopendir	_DIRfdopendir
+#define __fdopendir	__DIRfdopendir
+#define dirfd		DIRdirfd
+#define _dirfd		_DIRdirfd
+#define __dirfd		__DIRdirfd
 #define readdir		DIRreaddir
 #define _readdir	_DIRreaddir
 #define __readdir	__DIRreaddir
@@ -105,6 +113,12 @@ __STDPP__directive pragma pp:hide _getdents __getdents getdents64 _getdents64 __
 #if !defined(SYS3D_opendir)
 extern DIR*		OPENDIR(const char*);
 #endif
+#if !defined(SYS3D_dirfd)
+extern DIR*		DIRFD(const char*);
+#endif
+#if !defined(SYS3D_fdopendir)
+extern DIR*		FDOPENDIR(const char*);
+#endif
 #if !defined(SYS3D_readdir)
 extern struct dirent*	READDIR(DIR*);
 #endif
@@ -125,6 +139,8 @@ extern void		CLOSEDIR(DIR*);
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
 __STDPP__directive pragma pp:nohide opendir _opendir __opendir
+__STDPP__directive pragma pp:nohide fdopendir _fdopendir __fdopendir
+__STDPP__directive pragma pp:nohide dirfd _dirfd __dirfd
 __STDPP__directive pragma pp:nohide readdir _readdir __readdir readdir64 _readdir64 __readdir64
 __STDPP__directive pragma pp:nohide rewinddir _rewinddir __rewinddir rewinddir64 _rewinddir64 __rewinddir64
 __STDPP__directive pragma pp:nohide seekdir _seekdir __seekdir seekdir64 _seekdir64 __seekdir64
@@ -135,6 +151,12 @@ __STDPP__directive pragma pp:nohide _getdents __getdents getdents64 _getdents64 
 #undef	opendir
 #undef	_opendir
 #undef	__opendir
+#undef	fdopendir
+#undef	_fdopendir
+#undef	__fdopendir
+#undef	dirfd
+#undef	_dirfd
+#undef	__dirfd
 #undef	readdir
 #undef	_readdir
 #undef	__readdir
@@ -210,6 +232,8 @@ typedef struct
 
 extern int		closedir(DIR*);
 extern DIR*		opendir(const char*);
+extern DIR*		fdopendir(int);
+extern int		dirfd(DIR*);
 #if _HUH_2008_11_21
 extern struct dirent*	readdir(DIR*);
 #endif

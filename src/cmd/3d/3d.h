@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -537,6 +537,7 @@ extern void		calldump(char**, char*);
 extern void		callinit(void);
 extern int		checklink(const char*, struct stat*, int);
 extern void		control(void);
+extern char*		fdirpath(int, const char*, char*, size_t, const char*);
 extern int		fs3d_copy(int, int, struct stat*);
 extern int		fs3d_dup(int, int);
 extern int		fs3d_mkdir(const char*, mode_t);

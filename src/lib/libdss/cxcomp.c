@@ -636,7 +636,7 @@ code(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1,
 	static Cxformat_t	format;
 
 	x.op = op;
-	x.type = cx->table->comparison[op] ? cx->state->type_number : type1;
+	x.type = cx->table->logical[op] ? cx->state->type_bool : cx->table->comparison[op] ? cx->state->type_number : type1;
 	x.pp = pp;
 	if ((cc->pp += pp) > cc->depth)
 		cc->depth = cc->pp;
@@ -661,7 +661,7 @@ code(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1,
 		if (op != CX_REF)
 			type1 = type2 = i1->type;
 	}
-	else
+	else if (op != CX_END)
 	{
 		i1 = (Cxinstruction_t*)(sfstrseek(cc->xp, 0, SEEK_CUR) - 2 * sizeof(Cxinstruction_t));
 		i2 = i1 + 1;
@@ -683,6 +683,8 @@ code(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1,
 	if (x.callout)
 		goto done;
 	if (x.callout = cxcallout(cx, op, type1, type2, cx->disc))
+		goto done;
+	if (op == CX_CAST && (x.callout = cxcallout(cx, op, type1->fundamental, type2, cx->disc)))
 		goto done;
 	if (type1 == type2 || (op &CX_UNARY))
 	{
@@ -823,6 +825,8 @@ code(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int op, int pp, Cxtype_t* type1,
 		}
 	}
 	if (x.callout = cxcallout(cx, op, cx->state->type_void, cx->state->type_void, cx->disc))
+		goto done;
+	if (cxisbool(type1) && cxisnumber(type2) && (x.callout = cxcallout(cx, op, cx->state->type_bool, cx->state->type_bool, cx->disc)))
 		goto done;
 	if (cx->disc->errorf)
 		(*cx->disc->errorf)(cx, cx->disc, 2, "%s %s not supported [%d:%d] %p", cxcontext(cx), cxopname(op, type1, type2), cxrepresentation(type1), cxrepresentation(type2), cxcallout(cx, op, cx->state->type_string, cx->state->type_string, cx->disc));
@@ -980,7 +984,10 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			if ((p = next(cx)) == c)
 			{
 				p = next(cx);
-				o |= CX_X2;
+				if (c == '!')
+					o = CX_LOG;
+				else
+					o |= CX_X2;
 				i++;
 			}
 			if (p == '~')
@@ -1128,20 +1135,24 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 			z = 0;
 			if (!(o & CX_UNARY) && cx->table->logical[o])
 			{
-				if (cc->type != cx->state->type_number && !code(cx, cc, expr, CX_LOG, 0, cc->type, cx->state->type_void, NiL, 0, NiL))
+				if (!cxislogical(cc->type) && !code(cx, cc, expr, CX_CAST, 0, cc->type, cx->state->type_bool, NiL, 0, NiL))
 					goto bad;
 				if (o == CX_ANDAND || o == CX_OROR)
 				{
 					z = sfstrtell(cc->xp);
-					if (!code(cx, cc, expr, (o == CX_ANDAND) ? CX_SC0 : CX_SC1, 0, cx->state->type_number, cx->state->type_void, NiL, 0, NiL))
+					if (!code(cx, cc, expr, (o == CX_ANDAND) ? CX_SC0 : CX_SC1, 0, cx->state->type_bool, cx->state->type_void, NiL, 0, NiL))
 						goto bad;
 				}
 			}
 			t = cc->type;
 			if (parse(cx, cc, expr, p, NiL) != cx->state->type_void || cx->error)
 				goto bad;
-			if (cx->table->logical[o] && cc->type != cx->state->type_number && !code(cx, cc, expr, CX_LOG, 0, cc->type, cx->state->type_void, NiL, 0, NiL))
-				goto bad;
+			if (cx->table->logical[o] && !cxislogical(cc->type))
+			{
+				if (!code(cx, cc, expr, CX_CAST, 0, cc->type, cx->state->type_bool, NiL, 0, NiL))
+					goto bad;
+				cc->type = cx->state->type_bool;
+			}
 			if (o != CX_SET && ((o & CX_UNARY) ? !code(cx, cc, expr, o, 0, cc->type, cx->state->type_void, NiL, 0, NiL) : !code(cx, cc, expr, o, -1, t, cc->type, NiL, 0, h)))
 				goto bad;
 			if (cx->table->comparison[o] || cx->table->logical[o])
@@ -1641,19 +1652,22 @@ compile(Cx_t* cx, Cxcompile_t* cc, int balanced)
 	pos = sfstrtell(cc->xp);
 	if (parse(cx, cc, expr, 0, NiL) != cx->state->type_void || cx->error)
 		return 0;
-#if 0
-	/*
-	 * this is a failed attempt at a logical cast for naked variable tests
-	 */
-
+	if ((sfstrtell(cc->xp) - pos) >= sizeof(Cxinstruction_t))
 	{
 		Cxinstruction_t*	pc;
 
+		/*
+		 * logical cast for naked variable expression
+		 */
+
 		pc = (Cxinstruction_t*)(sfstrseek(cc->xp, 0, SEEK_CUR) - 1 * sizeof(Cxinstruction_t));
-		if (pc->op == CX_GET && !code(cx, cc, expr, CX_LOG, 0, pc->type, cx->state->type_void, NiL, 0, NiL))
-			return 0;
+		if (pc->op == CX_GET && !cxislogical(pc->type))
+		{
+			if (!code(cx, cc, expr, CX_CAST, 0, pc->type, cx->state->type_bool, NiL, 0, NiL))
+				return 0;
+			cc->type = cx->state->type_bool;
+		}
 	}
-#endif
 	if (!code(cx, cc, expr, CX_END, 0, cx->state->type_void, cx->state->type_void, NiL, 0, NiL))
 		return 0;
 	n = sfstrtell(cc->xp) - pos;

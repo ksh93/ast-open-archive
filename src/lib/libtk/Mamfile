@@ -4,7 +4,7 @@ setv PACKAGE_X11 ${INSTALLROOT}
 setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11
 setv PACKAGE_X11_LIB ${PACKAGE_X11}/lib64
 setv PACKAGE_tcl_INCLUDE ${INSTALLROOT}/include/tcl
-setv PACKAGE_tcl_LIB ${INSTALLROOT}/${PACKAGEROOT}/../../usr/lib64
+setv PACKAGE_tcl_LIB ${INSTALLROOT}/${INSTALLROOT}/../usr/lib64
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGEROOT ../../../../..
@@ -191,7 +191,7 @@ done generic/tkInt.h
 done unix/tkUnixSelect.c
 meta tkUnixSelect.o %.c>%.o unix/tkUnixSelect.c tkUnixSelect
 prev unix/tkUnixSelect.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixSelect.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixSelect.c
 done tkUnixSelect.o generated
 make tkUnixInit.o
 make unix/tkUnixInit.c
@@ -219,7 +219,7 @@ prev generic/tkInt.h implicit
 done unix/tkUnixXId.c
 meta tkUnixXId.o %.c>%.o unix/tkUnixXId.c tkUnixXId
 prev unix/tkUnixXId.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixXId.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixXId.c
 done tkUnixXId.o generated
 make tkUnixCursor.o
 make unix/tkUnixCursor.c
@@ -227,7 +227,7 @@ prev generic/tkInt.h implicit
 done unix/tkUnixCursor.c
 meta tkUnixCursor.o %.c>%.o unix/tkUnixCursor.c tkUnixCursor
 prev unix/tkUnixCursor.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixCursor.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixCursor.c
 done tkUnixCursor.o generated
 make tkUnixDialog.o
 make unix/tkUnixDialog.c
@@ -244,7 +244,7 @@ prev generic/tkInt.h implicit
 done unix/tkUnixDraw.c
 meta tkUnixDraw.o %.c>%.o unix/tkUnixDraw.c tkUnixDraw
 prev unix/tkUnixDraw.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDraw.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDraw.c
 done tkUnixDraw.o generated
 make tkUnixWm.o
 make unix/tkUnixWm.c
@@ -252,7 +252,7 @@ prev generic/tkInt.h implicit
 done unix/tkUnixWm.c
 meta tkUnixWm.o %.c>%.o unix/tkUnixWm.c tkUnixWm
 prev unix/tkUnixWm.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixWm.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixWm.c
 done tkUnixWm.o generated
 make tkUnix.o
 make unix/tkUnix.c
@@ -260,7 +260,7 @@ prev generic/tkInt.h implicit
 done unix/tkUnix.c
 meta tkUnix.o %.c>%.o unix/tkUnix.c tkUnix
 prev unix/tkUnix.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnix.c
 done tkUnix.o generated
 make tk3d.o
 make generic/tk3d.c
@@ -268,7 +268,7 @@ prev generic/tkInt.h implicit
 done generic/tk3d.c
 meta tk3d.o %.c>%.o generic/tk3d.c tk3d
 prev generic/tk3d.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tk3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tk3d.c
 done tk3d.o generated
 make tkArgv.o
 make generic/tkArgv.c
@@ -276,7 +276,7 @@ prev generic/tkInt.h implicit
 done generic/tkArgv.c
 meta tkArgv.o %.c>%.o generic/tkArgv.c tkArgv
 prev generic/tkArgv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkArgv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkArgv.c
 done tkArgv.o generated
 make tkAtom.o
 make generic/tkAtom.c
@@ -284,7 +284,7 @@ prev generic/tkInt.h implicit
 done generic/tkAtom.c
 meta tkAtom.o %.c>%.o generic/tkAtom.c tkAtom
 prev generic/tkAtom.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkAtom.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkAtom.c
 done tkAtom.o generated
 make tkBind.o
 make generic/tkBind.c
@@ -294,7 +294,7 @@ prev generic/tkInt.h implicit
 done generic/tkBind.c
 meta tkBind.o %.c>%.o generic/tkBind.c tkBind
 prev generic/tkBind.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBind.c
 done tkBind.o generated
 make tkBitmap.o
 make generic/tkBitmap.c
@@ -320,7 +320,7 @@ prev generic/tkInt.h implicit
 done generic/tkBitmap.c
 meta tkBitmap.o %.c>%.o generic/tkBitmap.c tkBitmap
 prev generic/tkBitmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Ibitmaps -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBitmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -Ibitmaps -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBitmap.c
 done tkBitmap.o generated
 make tkButton.o
 make generic/tkButton.c
@@ -344,7 +344,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvArc.c
 meta tkCanvArc.o %.c>%.o generic/tkCanvArc.c tkCanvArc
 prev generic/tkCanvArc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvArc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvArc.c
 done tkCanvArc.o generated
 make tkCanvBmap.o
 make generic/tkCanvBmap.c
@@ -355,7 +355,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvBmap.c
 meta tkCanvBmap.o %.c>%.o generic/tkCanvBmap.c tkCanvBmap
 prev generic/tkCanvBmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
 done tkCanvBmap.o generated
 make tkCanvImg.o
 make generic/tkCanvImg.c
@@ -364,7 +364,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvImg.c
 meta tkCanvImg.o %.c>%.o generic/tkCanvImg.c tkCanvImg
 prev generic/tkCanvImg.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
 done tkCanvImg.o generated
 make tkCanvLine.o
 make generic/tkCanvLine.c
@@ -372,7 +372,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvLine.c
 meta tkCanvLine.o %.c>%.o generic/tkCanvLine.c tkCanvLine
 prev generic/tkCanvLine.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvLine.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvLine.c
 done tkCanvLine.o generated
 make tkCanvPoly.o
 make generic/tkCanvPoly.c
@@ -380,7 +380,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvPoly.c
 meta tkCanvPoly.o %.c>%.o generic/tkCanvPoly.c tkCanvPoly
 prev generic/tkCanvPoly.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvPoly.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvPoly.c
 done tkCanvPoly.o generated
 make tkCanvPs.o
 make generic/tkCanvPs.c
@@ -389,7 +389,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvPs.c
 meta tkCanvPs.o %.c>%.o generic/tkCanvPs.c tkCanvPs
 prev generic/tkCanvPs.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
 done tkCanvPs.o generated
 make tkCanvText.o
 make generic/tkCanvText.c
@@ -398,7 +398,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvText.c
 meta tkCanvText.o %.c>%.o generic/tkCanvText.c tkCanvText
 prev generic/tkCanvText.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
 done tkCanvText.o generated
 make tkCanvUtil.o
 make generic/tkCanvUtil.c
@@ -407,7 +407,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvUtil.c
 meta tkCanvUtil.o %.c>%.o generic/tkCanvUtil.c tkCanvUtil
 prev generic/tkCanvUtil.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
 done tkCanvUtil.o generated
 make tkCanvWind.o
 make generic/tkCanvWind.c
@@ -416,7 +416,7 @@ prev generic/tkInt.h implicit
 done generic/tkCanvWind.c
 meta tkCanvWind.o %.c>%.o generic/tkCanvWind.c tkCanvWind
 prev generic/tkCanvWind.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
 done tkCanvWind.o generated
 make tkCanvas.o
 make generic/tkCanvas.c
@@ -435,7 +435,7 @@ prev generic/tkInt.h implicit
 done generic/tkClipboard.c
 meta tkClipboard.o %.c>%.o generic/tkClipboard.c tkClipboard
 prev generic/tkClipboard.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkClipboard.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkClipboard.c
 done tkClipboard.o generated
 make tkCmds.o
 make generic/tkCmds.c
@@ -443,7 +443,7 @@ prev generic/tkInt.h implicit
 done generic/tkCmds.c
 meta tkCmds.o %.c>%.o generic/tkCmds.c tkCmds
 prev generic/tkCmds.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCmds.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCmds.c
 done tkCmds.o generated
 make tkColor.o
 make generic/tkColor.c
@@ -451,7 +451,7 @@ prev generic/tkInt.h implicit
 done generic/tkColor.c
 meta tkColor.o %.c>%.o generic/tkColor.c tkColor
 prev generic/tkColor.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkColor.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkColor.c
 done tkColor.o generated
 make tkConfig.o
 make generic/tkConfig.c
@@ -459,7 +459,7 @@ prev generic/tkInt.h implicit
 done generic/tkConfig.c
 meta tkConfig.o %.c>%.o generic/tkConfig.c tkConfig
 prev generic/tkConfig.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConfig.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConfig.c
 done tkConfig.o generated
 make tkConsole.o
 make generic/tkConsole.c
@@ -467,7 +467,7 @@ prev generic/tkInt.h implicit
 done generic/tkConsole.c
 meta tkConsole.o %.c>%.o generic/tkConsole.c tkConsole
 prev generic/tkConsole.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConsole.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConsole.c
 done tkConsole.o generated
 make tkCursor.o
 make generic/tkCursor.c
@@ -475,7 +475,7 @@ prev generic/tkInt.h implicit
 done generic/tkCursor.c
 meta tkCursor.o %.c>%.o generic/tkCursor.c tkCursor
 prev generic/tkCursor.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCursor.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCursor.c
 done tkCursor.o generated
 make tkEntry.o
 make generic/tkEntry.c
@@ -492,7 +492,7 @@ prev generic/tkInt.h implicit
 done generic/tkError.c
 meta tkError.o %.c>%.o generic/tkError.c tkError
 prev generic/tkError.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkError.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkError.c
 done tkError.o generated
 make tkEvent.o
 make generic/tkEvent.c
@@ -501,7 +501,7 @@ prev generic/tkInt.h implicit
 done generic/tkEvent.c
 meta tkEvent.o %.c>%.o generic/tkEvent.c tkEvent
 prev generic/tkEvent.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEvent.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEvent.c
 done tkEvent.o generated
 make tkFileFilter.o
 make generic/tkFileFilter.c
@@ -513,7 +513,7 @@ prev generic/tkInt.h implicit
 done generic/tkFileFilter.c
 meta tkFileFilter.o %.c>%.o generic/tkFileFilter.c tkFileFilter
 prev generic/tkFileFilter.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFileFilter.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFileFilter.c
 done tkFileFilter.o generated
 make tkFocus.o
 make generic/tkFocus.c
@@ -521,7 +521,7 @@ prev generic/tkInt.h implicit
 done generic/tkFocus.c
 meta tkFocus.o %.c>%.o generic/tkFocus.c tkFocus
 prev generic/tkFocus.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFocus.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFocus.c
 done tkFocus.o generated
 make tkFont.o
 make generic/tkFont.c
@@ -529,7 +529,7 @@ prev generic/tkInt.h implicit
 done generic/tkFont.c
 meta tkFont.o %.c>%.o generic/tkFont.c tkFont
 prev generic/tkFont.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFont.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFont.c
 done tkFont.o generated
 make tkFrame.o
 make generic/tkFrame.c
@@ -546,7 +546,7 @@ prev generic/tkInt.h implicit
 done generic/tkGC.c
 meta tkGC.o %.c>%.o generic/tkGC.c tkGC
 prev generic/tkGC.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGC.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGC.c
 done tkGC.o generated
 make tkGeometry.o
 make generic/tkGeometry.c
@@ -554,7 +554,7 @@ prev generic/tkInt.h implicit
 done generic/tkGeometry.c
 meta tkGeometry.o %.c>%.o generic/tkGeometry.c tkGeometry
 prev generic/tkGeometry.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGeometry.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGeometry.c
 done tkGeometry.o generated
 make tkGet.o
 make generic/tkGet.c
@@ -562,7 +562,7 @@ prev generic/tkInt.h implicit
 done generic/tkGet.c
 meta tkGet.o %.c>%.o generic/tkGet.c tkGet
 prev generic/tkGet.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGet.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGet.c
 done tkGet.o generated
 make tkGrab.o
 make generic/tkGrab.c
@@ -570,7 +570,7 @@ prev generic/tkInt.h implicit
 done generic/tkGrab.c
 meta tkGrab.o %.c>%.o generic/tkGrab.c tkGrab
 prev generic/tkGrab.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrab.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrab.c
 done tkGrab.o generated
 make tkGrid.o
 make generic/tkGrid.c
@@ -578,7 +578,7 @@ prev generic/tkInt.h implicit
 done generic/tkGrid.c
 meta tkGrid.o %.c>%.o generic/tkGrid.c tkGrid
 prev generic/tkGrid.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrid.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrid.c
 done tkGrid.o generated
 make tkImage.o
 make generic/tkImage.c
@@ -586,7 +586,7 @@ prev generic/tkInt.h implicit
 done generic/tkImage.c
 meta tkImage.o %.c>%.o generic/tkImage.c tkImage
 prev generic/tkImage.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImage.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImage.c
 done tkImage.o generated
 make tkImgBmap.o
 make generic/tkImgBmap.c
@@ -594,7 +594,7 @@ prev generic/tkInt.h implicit
 done generic/tkImgBmap.c
 meta tkImgBmap.o %.c>%.o generic/tkImgBmap.c tkImgBmap
 prev generic/tkImgBmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgBmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgBmap.c
 done tkImgBmap.o generated
 make tkImgGIF.o
 make generic/tkImgGIF.c
@@ -602,7 +602,7 @@ prev generic/tkInt.h implicit
 done generic/tkImgGIF.c
 meta tkImgGIF.o %.c>%.o generic/tkImgGIF.c tkImgGIF
 prev generic/tkImgGIF.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgGIF.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgGIF.c
 done tkImgGIF.o generated
 make tkImgPPM.o
 make generic/tkImgPPM.c
@@ -610,7 +610,7 @@ prev generic/tkInt.h implicit
 done generic/tkImgPPM.c
 meta tkImgPPM.o %.c>%.o generic/tkImgPPM.c tkImgPPM
 prev generic/tkImgPPM.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPPM.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPPM.c
 done tkImgPPM.o generated
 make tkImgPhoto.o
 make generic/tkImgPhoto.c
@@ -618,7 +618,7 @@ prev generic/tkInt.h implicit
 done generic/tkImgPhoto.c
 meta tkImgPhoto.o %.c>%.o generic/tkImgPhoto.c tkImgPhoto
 prev generic/tkImgPhoto.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPhoto.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPhoto.c
 done tkImgPhoto.o generated
 make tkImgUtil.o
 make generic/tkImgUtil.c
@@ -628,7 +628,7 @@ prev generic/tkInt.h implicit
 done generic/tkImgUtil.c
 meta tkImgUtil.o %.c>%.o generic/tkImgUtil.c tkImgUtil
 prev generic/tkImgUtil.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Ixlib -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgUtil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -Ixlib -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgUtil.c
 done tkImgUtil.o generated
 make tkListbox.o
 make generic/tkListbox.c
@@ -674,7 +674,7 @@ prev generic/tkInt.h implicit
 done generic/tkOption.c
 meta tkOption.o %.c>%.o generic/tkOption.c tkOption
 prev generic/tkOption.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkOption.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkOption.c
 done tkOption.o generated
 make tkPack.o
 make generic/tkPack.c
@@ -682,7 +682,7 @@ prev generic/tkInt.h implicit
 done generic/tkPack.c
 meta tkPack.o %.c>%.o generic/tkPack.c tkPack
 prev generic/tkPack.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPack.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPack.c
 done tkPack.o generated
 make tkPlace.o
 make generic/tkPlace.c
@@ -690,7 +690,7 @@ prev generic/tkInt.h implicit
 done generic/tkPlace.c
 meta tkPlace.o %.c>%.o generic/tkPlace.c tkPlace
 prev generic/tkPlace.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPlace.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPlace.c
 done tkPlace.o generated
 make tkRectOval.o
 make generic/tkRectOval.c
@@ -698,7 +698,7 @@ prev generic/tkInt.h implicit
 done generic/tkRectOval.c
 meta tkRectOval.o %.c>%.o generic/tkRectOval.c tkRectOval
 prev generic/tkRectOval.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkRectOval.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkRectOval.c
 done tkRectOval.o generated
 make tkScale.o
 make generic/tkScale.c
@@ -725,7 +725,7 @@ prev generic/tkInt.h implicit
 done generic/tkSelect.c
 meta tkSelect.o %.c>%.o generic/tkSelect.c tkSelect
 prev generic/tkSelect.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSelect.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSelect.c
 done tkSelect.o generated
 make tkSend.o
 make generic/tkSend.c
@@ -733,7 +733,7 @@ prev generic/tkInt.h implicit
 done generic/tkSend.c
 meta tkSend.o %.c>%.o generic/tkSend.c tkSend
 prev generic/tkSend.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSend.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSend.c
 done tkSend.o generated
 make tkSquare.o
 make generic/tkSquare.c
@@ -741,7 +741,7 @@ prev generic/tkInt.h implicit
 done generic/tkSquare.c
 meta tkSquare.o %.c>%.o generic/tkSquare.c tkSquare
 prev generic/tkSquare.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSquare.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSquare.c
 done tkSquare.o generated
 make tkTest.o
 make generic/tkTest.c
@@ -751,7 +751,7 @@ prev generic/tkInt.h implicit
 done generic/tkTest.c
 meta tkTest.o %.c>%.o generic/tkTest.c tkTest
 prev generic/tkTest.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkTest.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkTest.c
 done tkTest.o generated
 make tkText.o
 make generic/tkText.c
@@ -772,7 +772,7 @@ prev generic/tkInt.h implicit
 done generic/tkTextBTree.c
 meta tkTextBTree.o %.c>%.o generic/tkTextBTree.c tkTextBTree
 prev generic/tkTextBTree.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
 done tkTextBTree.o generated
 make tkTextDisp.o
 make generic/tkTextDisp.c
@@ -781,7 +781,7 @@ prev generic/tkInt.h implicit
 done generic/tkTextDisp.c
 meta tkTextDisp.o %.c>%.o generic/tkTextDisp.c tkTextDisp
 prev generic/tkTextDisp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
 done tkTextDisp.o generated
 make tkTextIndex.o
 make generic/tkTextIndex.c
@@ -800,7 +800,7 @@ prev generic/tkInt.h implicit
 done generic/tkTextMark.c
 meta tkTextMark.o %.c>%.o generic/tkTextMark.c tkTextMark
 prev generic/tkTextMark.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
 done tkTextMark.o generated
 make tkTextTag.o
 make generic/tkTextTag.c
@@ -819,7 +819,7 @@ prev generic/tkInt.h implicit
 done generic/tkTextWind.c
 meta tkTextWind.o %.c>%.o generic/tkTextWind.c tkTextWind
 prev generic/tkTextWind.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
 done tkTextWind.o generated
 make tkTrig.o
 make generic/tkTrig.c
@@ -828,7 +828,7 @@ prev generic/tkInt.h implicit
 done generic/tkTrig.c
 meta tkTrig.o %.c>%.o generic/tkTrig.c tkTrig
 prev generic/tkTrig.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
 done tkTrig.o generated
 make tkUtil.o
 make generic/tkUtil.c
@@ -836,7 +836,7 @@ prev generic/tkInt.h implicit
 done generic/tkUtil.c
 meta tkUtil.o %.c>%.o generic/tkUtil.c tkUtil
 prev generic/tkUtil.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkUtil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkUtil.c
 done tkUtil.o generated
 make tkVisual.o
 make generic/tkVisual.c
@@ -844,7 +844,7 @@ prev generic/tkInt.h implicit
 done generic/tkVisual.c
 meta tkVisual.o %.c>%.o generic/tkVisual.c tkVisual
 prev generic/tkVisual.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkVisual.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkVisual.c
 done tkVisual.o generated
 make tkWindow.o
 make generic/tkWindow.c
@@ -852,7 +852,7 @@ prev generic/tkInt.h implicit
 done generic/tkWindow.c
 meta tkWindow.o %.c>%.o generic/tkWindow.c tkWindow
 prev generic/tkWindow.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkWindow.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkWindow.c
 done tkWindow.o generated
 make tkMain.o
 make generic/tkMain.c

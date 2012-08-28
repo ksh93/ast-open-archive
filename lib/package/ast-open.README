@@ -94,32 +94,65 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-12-08-01  --- Release ksh93u+ ---
-12-08-01  A bug that ignored interrupts for some builtins (e.g. cmdtst::grep) 
-	  that read from stdin has been fixed.
-12-08-01  A bug that interpreted "cd .foo" as "cd foo" has been fixed.
-12-07-30  Added automatic restart for EINTR for ioctl, tcgetattr, and tcsetattr.
-12-07-23  A scoping error with namrefs to compound associative arrays has
+12-08-24  --- Release ksh93v- ---
+12-08-24  A bug in which unsetting instance variables in a type could effect
+	  the value of that instance in other type instances has been fixed.
+12-08-23  A bug in which name references to compound variable array elements
+	  did not work correctly has been fixed.
+12-08-22  .sh.match now handles subpatterns that had no matches with
+	  ${var//pattern} correctly.
+12-08-21  A bug in setting .sh.match after ${var//pattern/string} when string
+	  is empty has been fixed.
+12-08-21  A bug in setting .sh.match after [[ string == pattern ]] has been
+	  fixed.
+12-08-21  The poll builtin from Roland Mainz has been added with the option
+	  SHOPT_POLL.
+12-08-21  A bug in which read -S did not handle "" inside double quotes has
 	  been fixed.
-12-07-20  A bug where builtin -d /path/foo deleted foo has been fixed.
-12-07-18  A bug in which /dev/stdout did not work in command substitution on
-	  some systems has been fixed.
+12-08-21  A bug in which a compound variable defined in a type could not
+	  have elements added to it has been fixed.
+12-08-20  A bug in which creating a two dimemsional associatve array could
+	  add an extra 0 element to the second subscript has been fixed.
+12-08-20  typeset -H foo no longer unsets foo when foo has been exported to
+	  the shell.
+12-08-20  A file descriptor for the current directory is now made available
+	  to built-ins in the context pointer.
+12-08-10  Rewrote .sh.match expansions fixing several bugs and improving
+	  performance.
+12-08-09  A bug in which assignments following a process substitution argument
+	  were treated as assignments rather than arguments has been fixed.
+12-08-07  Fixed a bug in which discipline functions define in a type from
+	  within a namespace where not being run in the namespace.
+12-08-07  .sh.match no longer gets set for patterns in PS4 during set -x.
+12-07-25  Each shell variable now contains a pointer to the shell pointer.
+12-07-20  <shell.h> interface updated to pass the shell interpreter pointer
+	  to most functions.
 12-07-17  A bug in which the restricted option set in a subshell prevented
-	  some variables from getting restored when the subshell completed
-	  has been fixed.
-12-07-09  A bug in which the directory is not restored after a subshell changes
-	  the name of the directory for subshells executed in the same process
-	  has been fixed.
+          some variables from getting restored when the subshell completed
+          has been fixed.
+12-07-16  The code was modified to do automatic retry for several system calls
+	  the fail with errno set to EINTR.
+12-07-12 +Added -q option was added to kill to send queued signals on systems
+	  that support sigqueue().
+12-07-12 +Added -p option to builtin to output builtins in a format that can
+	  be used to reinput.
 12-07-09  A bug in which file descriptors created with {n}< file were not being
 	  closed has been fixed.
 12-07-09  The 12-04-04 fix for cd .. was not correct causing cd /etc;cd .. to
 	  remain in /etc.  This has been fixed.
+12-07-05  Eliminated compile options and code for ECHOPRINT and OLDTERMIO.
+12-07-05  Eliminated compile options BGX, ESH, HISTEXPAND, TYPEDEF and VSH.
+	  They are the default.
 12-07-02  A bug in which builtin name did now work for builtins found in a
 	  library added by builtin -f lib has been fixed.
+12-07-02 +The -a option was added to trap to cause the current setting to be
+	  appended to the new trap setting rather than replacing it.
 12-07-02  A bug in the edit modes which <tab> after a directory did not refresh
-          the input line has been fixed.
+	  the input line has been fixed.
 12-07-02  A bug in which an exit status > 256 corresponding to a signal was
-          not returned by a function to indicate a signal exit has been fixed.
+	  not by a function to indicate a signal exit has been fixed.
+
+12-06-28  --- Release ksh93u+ ---
 12-06-28  Fix ulimit -a to list (Kibytes) instead of (kbytes).
 12-06-27  Fix unitialized data reference for <CR> as first char in --vi mode.
 12-06-26  The formatting of printf "%q" for multibyte locales has changed to
@@ -3548,6 +3581,9 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+12-08-15 mm2foswiki: add
+12-08-15 mm2bb,mm2twiki: add (but ignore some) mm2html options for compatibility
+12-08-15 mm2bb,mm2html,mm2twiki: eliminate ksh -n warnings
 12-02-29 mm2html: fix so stack bug that popped one too many
 12-01-11 mm2html: fix \*(Rf to use <SUP>...</SUP>
 12-01-01 htmlrefs: add <SCRIPT src=...> to include list
@@ -3810,6 +3846,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+12-08-22 sys.tab,dir3d.c,fchdir3d.c,openat3d.c: first round of *at()-ification
 12-06-25 change strcpy() within buffer to strcopy()
 12-06-22 sys.tab,utimensat3d.c: add utimensat()
 12-05-25 sys.tab: handle missing getdents64 on linux+gcc-4.4
@@ -5743,6 +5780,7 @@ All recorded changes follow.
 
 :::::::: dss ::::::::
 
+12-08-15 dss.c: update default struct type output
 11-09-11 dss.c: its --map=file, not --map --- doh
 11-06-15 dss.c: document '< expr-file' '< file-list-file'
 10-05-21 dss.c: add SEE ALSO \bdss::dss\b(5P) (after libast::optget() fix)
@@ -5788,6 +5826,9 @@ All recorded changes follow.
 
 :::::::: bgp ::::::::
 
+12-08-20 bgp-mrt.c: fix bad MCAST_VPN dump data workaround
+12-08-15 bgp.c,bgp-mrt.c: elevate struct data to cx struct types
+12-08-08 bgp.c,bgp-mrt.c: fix mvpn parse anomalies
 12-06-14 bgp.c: document int mvpn.type == route type index
 12-06-13 bgp.c: add "bgp_t mvpn.key" for mvpn route key
 12-05-31 bgp.c: add bgp_t mvpn.<member> support
@@ -5917,6 +5958,8 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+12-08-11 bgp.h: Bgptunnel_t
+12-08-01 bgp.h: mvpn additions
 12-06-13 bgp.h: add BGP_key for mvpn route key
 12-05-15 bgp.h: change BGP_PMSI_* to BGP_pmsi
 12-02-24 *sa.omk: clean up standalone old make makefiles
@@ -6853,6 +6896,7 @@ All recorded changes follow.
 
 :::::::: tksh ::::::::
 
+12-08-24 Makefile: shell:20120101
 05-06-14 uinit.c: trap "tkloop" only if it is defined
 04-03-31 uinit.c: unalias ksh "source" to uncover tcl builtin by same name
 03-01-02 Makefile: dynamic -lshell on CC.HOSTTYPE=*win*
@@ -7074,6 +7118,9 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+12-07-31 cdt: sync with kpv
+12-07-31 error.h: add { Error_write_f, void* handle } for sh_exit()
+12-07-30 astsa: update to handle installation that already have { aso cdt sfio vmalloc }
 12-07-25 pathprobe.c: fix read() loop to handle EINTR
 12-06-28 vmalloc/malloc.c: use sbrk() unless VMALLOC_OPTIONS=mmap or asoinit(0,0,0)!=0 (workaround until next malloc update)
 12-06-28 aso/aso.c: asoinit(0,0,0): 0: no specific init, 1: app initialized
@@ -9574,6 +9621,7 @@ All recorded changes follow.
 
 :::::::: libcs ::::::::
 
+12-08-21 msg.h: add MSG_openat
 10-06-01 sync with ast api 20100601
 10-04-12 Makefile: defer share and local generation to first use
 08-04-09 csopen.c: fix mkmount() path cleanup
@@ -10160,6 +10208,9 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+12-08-15 cx.h,cxopen.c: add cxmembers() default externalf for struct types
+12-08-11 cxcomp.c: add logical cast for naked non-numeric variable expression
+12-08-01 dssprintf.c: change --all to only list fields with non-default values
 12-06-15 dssopt.c: fix bug that failed to provide closing ]
 12-05-31 dssopt.c: handle optegt() style descriptions
 12-05-15 cx.h: add CX_DEPRECATED
@@ -10465,6 +10516,7 @@ All recorded changes follow.
 
 :::::::: libtksh ::::::::
 
+12-08-24  Makefile: shell:20120101
 12-05-04  update sh_sigcheck() => sh_sigcheck(0) -- eventually figure out Shell_t*
 10-06-01  sync with ast api 20100601
 08-08-08  src/list.c,src/tcleval.c: add temporary sh_eval(p,0x8000) hack

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -45,6 +45,7 @@
 #define errorf		_3d_errorf
 #define errormsg	_3d_errormsg
 #define errorv		_3d_errorv
+#define fdirpath	_3d_fdirpath
 #define fileinit	_3d_fileinit
 #define fix		_3d_fix
 #define forked		_3d_forked

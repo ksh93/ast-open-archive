@@ -117,7 +117,7 @@ make features/options.sh
 make OPTIONS implicit
 done OPTIONS
 done features/options.sh dontcare
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} ' ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} : run features/options.sh ${PACKAGEROOT}/src/cmd/ie/OPTIONS
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} ' ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} : run features/options.sh OPTIONS
 done FEATURE/options dontcare generated
 done sh_config.h
 make ${PACKAGE_ast_INCLUDE}/error.h implicit

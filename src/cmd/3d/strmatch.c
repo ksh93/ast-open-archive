@@ -72,6 +72,7 @@
 #undef	_lib_fnmatch	/* 3d */
 #undef	_lib_mbtowc	/* 3d */
 
+#undef	strgrpmatch
 #define strgrpmatch	_3d_strgrpmatch
 
 #if _hdr_wchar && _lib_wctype && _lib_iswctype

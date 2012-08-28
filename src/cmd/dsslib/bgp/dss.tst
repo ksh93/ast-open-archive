@@ -566,6 +566,21 @@ TEST 14 "generic anonymized parser exercises"
 	EXEC	-x bgp '{print --all}' $data/a08.mrt
 		SAME OUTPUT $data/a08.out
 
+	EXEC	-x bgp '{print --all}' $data/a10.mrt
+		SAME OUTPUT $data/a10.out
+
+	EXEC	-x bgp '{print --all}' $data/a11.mrt
+		SAME OUTPUT $data/a11.out
+
+	EXEC	-x bgp '{print --all}' $data/a12.mrt
+		SAME OUTPUT $data/a12.out
+
+	EXEC	-x bgp '{print --all}' $data/a13.mrt
+		SAME OUTPUT $data/a13.out
+
+	EXEC	-x bgp '{print --all}' $data/a14.mrt
+		SAME OUTPUT $data/a14.out
+
 TEST 15 "feature specific parser exercises"
 
 	EXEC	-x bgp '(path =~ "26677 $")|{print "%(typeof(path))s %(sizeof(path))u %(path)s"}' $data/rib.20080601.0108.bz2

@@ -1,3 +1,4 @@
+12-08-22 sys.tab,dir3d.c,fchdir3d.c,openat3d.c: first round of *at()-ification
 12-06-25 change strcpy() within buffer to strcopy()
 12-06-22 sys.tab,utimensat3d.c: add utimensat()
 12-05-25 sys.tab: handle missing getdents64 on linux+gcc-4.4

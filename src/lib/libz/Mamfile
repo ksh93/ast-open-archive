@@ -393,12 +393,12 @@ meta example.o %.c>%.o example.c example
 prev example.c
 setv _BLD_z -U_BLD_z
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c example.c
-done example.o virtual
+done example.o generated
 prev libz.a archive
 bind -lz
 bind -last
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o example example.o ${mam_libz} ${mam_libast}
-done example virtual
+done example generated
 make minigzip
 make minigzip.o
 make minigzip.c
@@ -412,10 +412,10 @@ meta minigzip.o %.c>%.o minigzip.c minigzip
 prev minigzip.c
 setv _BLD_z -U_BLD_z
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c minigzip.c
-done minigzip.o virtual
+done minigzip.o generated
 prev libz.a archive
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o minigzip minigzip.o ${mam_libz} ${mam_libast}
-done minigzip virtual
+done minigzip generated
 exec - example > /dev/null || echo libz example test FAILED
 exec - case `echo 'hello, hello!' | minigzip | minigzip -d; echo $?` in
 exec - 'hello, hello!

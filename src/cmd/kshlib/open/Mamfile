@@ -133,6 +133,8 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/option.h
 make ${PACKAGE_ast_INCLUDE}/shell.h implicit
+make ${PACKAGE_ast_INCLUDE}/shellapi.h implicit
+done ${PACKAGE_ast_INCLUDE}/shellapi.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h dontcare
@@ -157,6 +159,8 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/shcmd.h implicit
 make ${PACKAGE_ast_INCLUDE}/nval.h implicit
+make ${PACKAGE_ast_INCLUDE}/nvapi.h implicit
+done ${PACKAGE_ast_INCLUDE}/nvapi.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/option.h implicit
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -167,6 +171,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/nval.h dontcare
 make name.h implicit
 done name.h dontcare virtual
+prev ${PACKAGE_ast_INCLUDE}/stk.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit

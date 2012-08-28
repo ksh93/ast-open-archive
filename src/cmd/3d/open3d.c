@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -283,6 +283,15 @@ open3d(const char* path, int oflag, ...)
 #if FS || defined(fchdir3d)
 	if (r >= 0)
 	{
+#if FS
+		level = state.path.level;
+		if (state.cache)
+		{
+			if (!st.st_mode)
+				FSTAT(r, &st);
+			fileinit(r, &st, mp, 1);
+		}
+#endif
 #if defined(fchdir3d)
 		if (S_ISDIR(st.st_mode) && r < elementsof(state.file))
 		{
@@ -293,9 +302,16 @@ open3d(const char* path, int oflag, ...)
 				free(state.file[r].dir);
 				state.file[r].dir = 0;
 			}
-			if (dp = newof(0, Dir_t, 1, strlen(sp)))
+			if (dp = newof(0, Dir_t, 1, strlen(sp) + (*sp == '/' ? 0 : state.pwdsize + 1)))
 			{
-				strcpy(dp->path, sp);
+				if (*sp != '/')
+				{
+					strcpy(dp->path, state.pwd);
+					dp->path[state.pwdsize] = '/';
+					strcpy(dp->path + state.pwdsize + 1, sp);
+				}
+				else
+					strcpy(dp->path, sp);
 				dp->dev = st.st_dev;
 				dp->ino = st.st_ino;
 				state.file[r].dir = dp;
@@ -303,13 +319,6 @@ open3d(const char* path, int oflag, ...)
 		}
 #endif
 #if FS
-		level = state.path.level;
-		if (state.cache)
-		{
-			if (!st.st_mode)
-				FSTAT(r, &st);
-			fileinit(r, &st, mp, 1);
-		}
 		if (mp)
 			fscall(mp, MSG_open, r, state.path.name, oflag, st.st_mode, level);
 		for (mp = state.global; mp; mp = mp->global)

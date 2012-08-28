@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -23,7 +23,7 @@
 
 #include "3d.h"
 
-#if FS
+#if FS || defined(fchdir3d)
 
 int
 fs3d_dup(int ofd, int nfd)
@@ -32,6 +32,13 @@ fs3d_dup(int ofd, int nfd)
 
 	if (nfd >= 0 && ofd >= 0 && ofd < elementsof(state.file))
 	{
+#if defined(fchdir3d)
+		if (state.file[nfd].dir)
+		{
+			free(state.file[nfd].dir);
+			state.file[nfd].dir = 0;
+		}
+#endif
 		if (state.cache)
 		{
 			if (!(state.file[ofd].flags & FILE_OPEN))
@@ -50,11 +57,6 @@ fs3d_dup(int ofd, int nfd)
 					fscall(mp, MSG_dup, nfd, ofd);
 		}
 #if defined(fchdir3d)
-		if (state.file[nfd].dir)
-		{
-			free(state.file[nfd].dir);
-			state.file[nfd].dir = 0;
-		}
 		if (state.file[ofd].dir && (state.file[nfd].dir = newof(0, Dir_t, 1, strlen(state.file[ofd].dir->path))))
 		{
 			strcpy(state.file[nfd].dir->path, state.file[ofd].dir->path);
@@ -77,7 +79,7 @@ dup3d(int fd)
 
 	initialize();
 	r = DUP(fd);
-#if FS
+#if FS || defined(fchdir3d)
 	if (r >= 0 && r < elementsof(state.file))
 		fs3d_dup(fd, r);
 #endif

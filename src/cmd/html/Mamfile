@@ -280,6 +280,46 @@ exec - ;;
 exec - esac
 exec - silent test -w mm2bb -a -x mm2bb || chmod u+w,+x mm2bb
 done mm2bb generated
+make mm2foswiki
+make mm2foswiki.sh
+done mm2foswiki.sh
+meta mm2foswiki %.sh>% mm2foswiki.sh mm2foswiki
+prev mm2foswiki.sh
+exec - case static,port:$OPTIND:$RANDOM in
+exec - ?*:*:*|*::*|*:*:$RANDOM)
+exec - ;;
+exec - *) if ENV= LC_ALL=C x= $SHELL -nc '[[ a || b ]] && : ${list[level]}  !(pattern)' 2>/dev/null
+exec - then if grep '### .*archaic.* ###' >/dev/null
+exec - then : mm2foswiki contains archaic constructs :
+exec - else ENV= LC_ALL=C $SHELL -n mm2foswiki.sh
+exec - fi
+exec - fi
+exec - ;;
+exec - esac
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "") case 200 in
+exec - 0) cp mm2foswiki.sh mm2foswiki
+exec - ;;
+exec - *) {
+exec - i=`(read x; echo $x) < mm2foswiki.sh`
+exec - case $i in
+exec - '#!'*|*'||'*|':'*|'":"'*|"':'"*) echo "$i" ;;
+exec - esac
+exec - cat - mm2foswiki.sh <<'!'
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?html]"
+exec - !
+exec - } > mm2foswiki
+exec - ;;
+exec - esac
+exec - ;;
+exec - *) cat - mm2foswiki.sh > mm2foswiki <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?html]"
+exec - !
+exec - ;;
+exec - esac
+exec - silent test -w mm2foswiki -a -x mm2foswiki || chmod u+w,+x mm2foswiki
+done mm2foswiki generated
 make mm2twiki
 make mm2twiki.sh
 done mm2twiki.sh
@@ -426,6 +466,10 @@ make ${INSTALLROOT}/bin/mm2bb
 prev mm2bb
 exec - test '' = 'mm2bb' || ${STDCMP} 2>/dev/null -s mm2bb ${INSTALLROOT}/bin/mm2bb || { ${STDMV} ${INSTALLROOT}/bin/mm2bb ${INSTALLROOT}/bin/mm2bb.old 2>/dev/null || true; ${STDCP} mm2bb ${INSTALLROOT}/bin/mm2bb ;}
 done ${INSTALLROOT}/bin/mm2bb generated
+make ${INSTALLROOT}/bin/mm2foswiki
+prev mm2foswiki
+exec - test '' = 'mm2foswiki' || ${STDCMP} 2>/dev/null -s mm2foswiki ${INSTALLROOT}/bin/mm2foswiki || { ${STDMV} ${INSTALLROOT}/bin/mm2foswiki ${INSTALLROOT}/bin/mm2foswiki.old 2>/dev/null || true; ${STDCP} mm2foswiki ${INSTALLROOT}/bin/mm2foswiki ;}
+done ${INSTALLROOT}/bin/mm2foswiki generated
 make ${INSTALLROOT}/bin/mm2twiki
 prev mm2twiki
 exec - test '' = 'mm2twiki' || ${STDCMP} 2>/dev/null -s mm2twiki ${INSTALLROOT}/bin/mm2twiki || { ${STDMV} ${INSTALLROOT}/bin/mm2twiki ${INSTALLROOT}/bin/mm2twiki.old 2>/dev/null || true; ${STDCP} mm2twiki ${INSTALLROOT}/bin/mm2twiki ;}
