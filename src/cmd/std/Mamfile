@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-06-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-10-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -252,19 +252,6 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast 
 done file.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o file file.o ${mam_libast}
 done file generated
-make iconv
-make iconv.o
-make iconv.c
-prev ${PACKAGE_ast_INCLUDE}/iconv.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done iconv.c
-meta iconv.o %.c>%.o iconv.c iconv
-prev iconv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?std]"\" -c iconv.c
-done iconv.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o iconv iconv.o ${mam_libast}
-done iconv generated
 make locale
 make locale.o
 make locale.c
@@ -754,10 +741,6 @@ make ${INSTALLROOT}/bin/file
 prev file
 exec - test '' = 'file' || ${STDCMP} 2>/dev/null -s file ${INSTALLROOT}/bin/file || { ${STDMV} ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; ${STDCP} file ${INSTALLROOT}/bin/file ;}
 done ${INSTALLROOT}/bin/file generated
-make ${INSTALLROOT}/bin/iconv
-prev iconv
-exec - test '' = 'iconv' || ${STDCMP} 2>/dev/null -s iconv ${INSTALLROOT}/bin/iconv || { ${STDMV} ${INSTALLROOT}/bin/iconv ${INSTALLROOT}/bin/iconv.old 2>/dev/null || true; ${STDCP} iconv ${INSTALLROOT}/bin/iconv ;}
-done ${INSTALLROOT}/bin/iconv generated
 make ${INSTALLROOT}/bin/locale
 prev locale
 exec - test '' = 'locale' || ${STDCMP} 2>/dev/null -s locale ${INSTALLROOT}/bin/locale || { ${STDMV} ${INSTALLROOT}/bin/locale ${INSTALLROOT}/bin/locale.old 2>/dev/null || true; ${STDCP} locale ${INSTALLROOT}/bin/locale ;}

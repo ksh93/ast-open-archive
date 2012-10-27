@@ -70,4 +70,4 @@
  */
 
 #define YEAR	"2012"
-#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2012-02-29 $\n"
+#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2012-09-26 $\n"

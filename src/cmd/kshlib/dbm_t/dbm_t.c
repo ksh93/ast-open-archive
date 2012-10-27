@@ -79,7 +79,7 @@ static const Namdisc_t	*array_disc(Namval_t *np)
 {
 	Namarr_t	*ap;
 	const Namdisc_t	*dp;
-	nv_putsub(np, (char*)0, 1);
+	nv_putsub(np, (char*)0, 1, 0);
 	ap = nv_arrayptr(np);
 	dp = ap->hdr.disc;
 	nv_disc(np,&ap->hdr,NV_POP);

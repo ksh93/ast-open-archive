@@ -402,7 +402,7 @@ copyinout(Ftw_t* ftw)
 						break;
 					if ((data = lseek(rfd, hole, SEEK_DATA)) < hole)
 					{
-						if ((data = lseek(rfd, -1, SEEK_END)) < 0 || lseek(wfd, data, SEEK_SET) != data || write(wfd, "", 1) != 1)
+						if ((data = lseek(rfd, -1, SEEK_END)) < 0 || (data + 1) > hole && (lseek(wfd, data, SEEK_SET) != data || write(wfd, "", 1) != 1))
 							error(ERROR_SYSTEM|2, "%s: write error", f->name);
 						state.out->io->count += 1;
 						break;

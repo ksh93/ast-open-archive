@@ -24,7 +24,7 @@ LN = $(STDLN|"ln")
 RM = $(STDRM|"rm")
 
 BUILTINS :COMMAND: cmdlist.h
-	$(SED) -e '/^CMDLIST(.*)$/!d' -e 's/CMDLIST(\(.*\))/\1/' $(NOBIN:C,.*,-e '/^&$/d',) $(LINKS:N!=*[:]:C,.*,-e '/^&$/d',) $(*)
+	$(SED) -e '/^CMDLIST(.*,.*)$/!d' -e 's/CMDLIST(\(.*\),.*)/\1/' $(NOBIN:C,.*,-e '/^&$/d',) $(LINKS:N!=*[:]:C,.*,-e '/^&$/d',) $(*)
 
 .INIT : .builtin
 
@@ -79,8 +79,8 @@ BUILTINS :COMMAND: cmdlist.h
 
 :BUILTIN: dlls LICENSE=since=2002,author=gsf -ldll look mime \
 		pty LICENSE=since=2001,author=gsf+dgk -lutil \
-		nl LICENSE=since=2003,author=dgk asa od pr \
-		strings tr uudecode -luu uuencode -luu what who
+		nl LICENSE=since=2003,author=dgk asa pr \
+		strings uudecode -luu uuencode -luu what who
 
 dontcare -lutil
 

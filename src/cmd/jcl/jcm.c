@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: jcm (AT&T Research) 2006-08-16 $\n]"
+"[-1s1I?\n@(#)$Id: jcm (AT&T Research) 2006-08-16 $\n]"
 USAGE_LICENSE
 "[+NAME?jcm - job control-M deck converter]"
 "[+DESCRIPTION?\bjcm\b converts the control-M job scheduler decks named by"

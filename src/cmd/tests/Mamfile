@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-06-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-10-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -395,8 +395,8 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-make FEATURE/sfio implicit
-meta FEATURE/sfio >FEATURE/% sfio
+make ../../lib/libast/FEATURE/sfio implicit
+meta ../../lib/libast/FEATURE/sfio >FEATURE/% sfio
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} ' ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def sfio
 done FEATURE/sfio generated
 done sfio/sftest.h
@@ -634,8 +634,8 @@ prev windows.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_windows.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/aso.h implicit
-make FEATURE/vmalloc implicit
-meta FEATURE/vmalloc >FEATURE/% vmalloc
+make ../../lib/libast/FEATURE/vmalloc implicit
+meta ../../lib/libast/FEATURE/vmalloc >FEATURE/% vmalloc
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} ' ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def vmalloc
 done FEATURE/vmalloc dontcare generated
 prev ../../lib/libast/ast_common.h implicit

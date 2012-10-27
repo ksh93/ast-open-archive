@@ -110,28 +110,28 @@ __STDPP__directive pragma pp:hide _getdents __getdents getdents64 _getdents64 __
 
 #include <hash.h>
 
-#if !defined(SYS3D_opendir)
+#if !defined(SYS3D_opendir) && !defined(OPENDIR)
 extern DIR*		OPENDIR(const char*);
 #endif
-#if !defined(SYS3D_dirfd)
+#if !defined(SYS3D_dirfd) && !defined(DIRFD)
 extern DIR*		DIRFD(const char*);
 #endif
-#if !defined(SYS3D_fdopendir)
-extern DIR*		FDOPENDIR(const char*);
+#if !defined(SYS3D_fdopendir) && !defined(FDOPENDIR)
+extern DIR*		FDOPENDIR(int);
 #endif
-#if !defined(SYS3D_readdir)
+#if !defined(SYS3D_readdir) && !defined(READDIR)
 extern struct dirent*	READDIR(DIR*);
 #endif
-#if !defined(SYS3D_seekdir)
+#if !defined(SYS3D_seekdir) && !defined(SEEKDIR)
 extern void		SEEKDIR(DIR*, long);
 #endif
-#if !defined(SYS3D_telldir)
+#if !defined(SYS3D_telldir) && !defined(TELLDIR)
 extern long		TELLDIR(DIR*);
 #endif
-#if !defined(SYS3D_rewinddir)
+#if !defined(SYS3D_rewinddir) && !defined(REWINDDIR)
 extern void		REWINDDIR(DIR*);
 #endif
-#if !defined(SYS3D_closedir)
+#if !defined(SYS3D_closedir) && !defined(CLOSEDIR)
 extern void		CLOSEDIR(DIR*);
 #endif
 

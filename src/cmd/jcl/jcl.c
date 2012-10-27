@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,7 @@
 #include <tm.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: jcl (AT&T Research) 2006-11-11 $\n]"
+"[-1s1I?\n@(#)$Id: jcl (AT&T Research) 2006-11-11 $\n]"
 USAGE_LICENSE
 "[+NAME?jcl - jcl deck interpreter]"
 "[+DESCRIPTION?\bjcl\b interprets the JCL decks named by the \afile\a"

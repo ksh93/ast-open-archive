@@ -768,7 +768,9 @@ typedef struct {
 	}		part;
 
 	struct {
+	char	conv[256];
 	char	edit[256];
+	char	head[256];
 	char	mail[256];
 	char	mesg[256];
 	char	more[256];

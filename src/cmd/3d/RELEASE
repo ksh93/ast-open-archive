@@ -1,3 +1,4 @@
+12-09-26 fchdir3d.c: fix bad #if logic that failed on non-*at() systems
 12-08-22 sys.tab,dir3d.c,fchdir3d.c,openat3d.c: first round of *at()-ification
 12-06-25 change strcpy() within buffer to strcopy()
 12-06-22 sys.tab,utimensat3d.c: add utimensat()

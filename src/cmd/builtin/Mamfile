@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-06-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-10-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -44,7 +44,7 @@ make ${PACKAGE_ast_INCLUDE}/cmdlist.h
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/cmdlist.h
-exec - sed -e '/^CMDLIST(.*)$/!d' -e 's/CMDLIST(\(.*\))/\1/' -e '/^getconf$/d' -e '/^ln$/d' -e '/^mv$/d' -e '/^md5sum$/d' -e '/^sum$/d' ${PACKAGE_ast_INCLUDE}/cmdlist.h
+exec - sed -e '/^CMDLIST(.*,.*)$/!d' -e 's/CMDLIST(\(.*\),.*)/\1/' -e '/^getconf$/d' -e '/^ln$/d' -e '/^mv$/d' -e '/^md5sum$/d' -e '/^sum$/d' ${PACKAGE_ast_INCLUDE}/cmdlist.h
 bind -lcmd
 done .INIT dontcare virtual
 make install
@@ -260,45 +260,6 @@ done asa.o generated
 setv CMD_STANDALONE -DCMD_STANDALONE="b_asa"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o asa asa.o ${mam_libast} ${mam_libcmd}
 done asa generated
-make od
-make od.o
-make od.c
-prev ${PACKAGE_ast_INCLUDE}/wctype.h implicit
-prev ${PACKAGE_ast_INCLUDE}/wchar.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_float.h implicit
-prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
-prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_float.h
-prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/iconv.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_iconv.h implicit
-make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_iconv.h
-done ${PACKAGE_ast_INCLUDE}/iconv.h
-prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
-make ${PACKAGE_ast_INCLUDE}/swap.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/swap.h
-make ${PACKAGE_ast_INCLUDE}/sig.h implicit
-done ${PACKAGE_ast_INCLUDE}/sig.h
-prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
-done od.c
-meta od.o %.c>%.o od.c od
-prev od.c
-setv CMD_STANDALONE -DCMD_STANDALONE="b_od"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_od -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?builtin]"\" -c od.c
-done od.o generated
-setv CMD_STANDALONE -DCMD_STANDALONE="b_od"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o od od.o ${mam_libast} ${mam_libcmd}
-done od generated
 make pr
 make pr.o
 make pr.c
@@ -312,7 +273,12 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tm.h
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
+make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done pr.c
 meta pr.o %.c>%.o pr.c pr
@@ -336,21 +302,6 @@ done strings.o generated
 setv CMD_STANDALONE -DCMD_STANDALONE="b_strings"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o strings strings.o ${mam_libast} ${mam_libcmd}
 done strings generated
-make tr
-make tr.o
-make tr.c
-prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
-done tr.c
-meta tr.o %.c>%.o tr.c tr
-prev tr.c
-setv CMD_STANDALONE -DCMD_STANDALONE="b_tr"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_tr -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?builtin]"\" -c tr.c
-done tr.o generated
-setv CMD_STANDALONE -DCMD_STANDALONE="b_tr"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tr tr.o ${mam_libast} ${mam_libcmd}
-done tr generated
 make uudecode
 make uudecode.o
 make uudecode.c
@@ -480,10 +431,6 @@ make ${INSTALLROOT}/bin/asa
 prev asa
 exec - test '' = 'asa' || ${STDCMP} 2>/dev/null -s asa ${INSTALLROOT}/bin/asa || { ${STDMV} ${INSTALLROOT}/bin/asa ${INSTALLROOT}/bin/asa.old 2>/dev/null || true; ${STDCP} asa ${INSTALLROOT}/bin/asa ;}
 done ${INSTALLROOT}/bin/asa generated
-make ${INSTALLROOT}/bin/od
-prev od
-exec - test '' = 'od' || ${STDCMP} 2>/dev/null -s od ${INSTALLROOT}/bin/od || { ${STDMV} ${INSTALLROOT}/bin/od ${INSTALLROOT}/bin/od.old 2>/dev/null || true; ${STDCP} od ${INSTALLROOT}/bin/od ;}
-done ${INSTALLROOT}/bin/od generated
 make ${INSTALLROOT}/bin/pr
 prev pr
 exec - test '' = 'pr' || ${STDCMP} 2>/dev/null -s pr ${INSTALLROOT}/bin/pr || { ${STDMV} ${INSTALLROOT}/bin/pr ${INSTALLROOT}/bin/pr.old 2>/dev/null || true; ${STDCP} pr ${INSTALLROOT}/bin/pr ;}
@@ -492,10 +439,6 @@ make ${INSTALLROOT}/bin/strings
 prev strings
 exec - test '' = 'strings' || ${STDCMP} 2>/dev/null -s strings ${INSTALLROOT}/bin/strings || { ${STDMV} ${INSTALLROOT}/bin/strings ${INSTALLROOT}/bin/strings.old 2>/dev/null || true; ${STDCP} strings ${INSTALLROOT}/bin/strings ;}
 done ${INSTALLROOT}/bin/strings generated
-make ${INSTALLROOT}/bin/tr
-prev tr
-exec - test '' = 'tr' || ${STDCMP} 2>/dev/null -s tr ${INSTALLROOT}/bin/tr || { ${STDMV} ${INSTALLROOT}/bin/tr ${INSTALLROOT}/bin/tr.old 2>/dev/null || true; ${STDCP} tr ${INSTALLROOT}/bin/tr ;}
-done ${INSTALLROOT}/bin/tr generated
 make ${INSTALLROOT}/bin/uudecode
 prev uudecode
 exec - test '' = 'uudecode' || ${STDCMP} 2>/dev/null -s uudecode ${INSTALLROOT}/bin/uudecode || { ${STDMV} ${INSTALLROOT}/bin/uudecode ${INSTALLROOT}/bin/uudecode.old 2>/dev/null || true; ${STDCP} uudecode ${INSTALLROOT}/bin/uudecode ;}
@@ -671,10 +614,9 @@ done nl.tst
 exec - regress nl.tst nl
 done test.nl virtual
 make test.od
-prev od
 make od.tst
 done od.tst
-exec - regress od.tst od
+exec - regress od.tst
 done test.od virtual
 make test.paste
 make paste.tst
@@ -698,10 +640,9 @@ done tail.tst
 exec - regress tail.tst
 done test.tail virtual
 make test.tr
-prev tr
 make tr.tst
 done tr.tst
-exec - regress tr.tst tr
+exec - regress tr.tst
 done test.tr virtual
 make test.uniq
 make uniq.tst

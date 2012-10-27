@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-06-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-10-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -353,19 +353,6 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/gross.c
 make ../../lib/libast/comp/spawnveg.c implicit
-make ${PACKAGE_ast_INCLUDE}/ast_vfork.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_vfork.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
-make process.h implicit
-done process.h dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/wait.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/wait.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/spawnveg.c
 make ../../lib/libast/path/pathshell.c implicit
@@ -374,7 +361,12 @@ done ../../lib/libast/path/pathshell.c
 make ../../lib/libast/comp/waitpid.c implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
-prev ${PACKAGE_ast_INCLUDE}/wait.h implicit
+make ${PACKAGE_ast_INCLUDE}/wait.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/wait.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/waitpid.c
 make ../../lib/libast/misc/sigcrit.c implicit
@@ -408,6 +400,7 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/path/pathtmp.c dontcare
 make ../../lib/libast/path/pathtemp.c implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 make ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/times.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit

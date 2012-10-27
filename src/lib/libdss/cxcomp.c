@@ -552,6 +552,8 @@ variable(Cx_t* cx, Cxcompile_t* cc, int c, Cxtype_t* m, Cxtype_t** type)
 	Cxoperand_t	a;
 	Cxoperand_t	b;
 
+	if (type)
+		*type = 0;
 	if (identifier(cx, cc, c, &a))
 		return 0;
 	b.type = m;
@@ -563,7 +565,7 @@ variable(Cx_t* cx, Cxcompile_t* cc, int c, Cxtype_t* m, Cxtype_t** type)
 	else
 	{
 		a.refs = 0;
-		if (type && (*type = (Cxtype_t*)dtmatch(cx->types, a.value.string.data)) || (*cx->referencef)(cx, NiL, &r, &b, &a, NiL, cx->disc))
+		if (!m && type && (*type = (Cxtype_t*)dtmatch(cx->types, a.value.string.data)) || (*cx->referencef)(cx, NiL, &r, &b, &a, NiL, cx->disc))
 			return 0;
 	}
 	return r.value.variable;
@@ -1223,7 +1225,7 @@ parse(Cx_t* cx, Cxcompile_t* cc, Cxexpr_t* expr, int precedence, Cxvariable_t** 
 				goto bad;
 			x = 1;
 		}
-		else if ((cx->ctype[c] & CX_CTYPE_ALPHA) && c != '.')
+		else if (cx->ctype[c] & CX_CTYPE_ALPHA)
 		{
 			if (x)
 				goto operator_expected;

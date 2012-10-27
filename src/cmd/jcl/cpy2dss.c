@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2012 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cpy2dss (AT&T Research) 2007-02-20 $\n]"
+"[-1s1I?\n@(#)$Id: cpy2dss (AT&T Research) 2007-02-20 $\n]"
 USAGE_LICENSE
 "[+NAME?cpy2dss - convert copybook to dss flat schema]"
 "[+DESCRIPTION?\bcpy2dss\b converts each copybook \afile\a operand to a"

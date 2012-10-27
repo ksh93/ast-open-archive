@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2012-05-31 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2012-10-19 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files in various "
@@ -227,6 +227,7 @@ struct State_s
 	int		noshare;
 	}		buffer;
 	size_t		count;
+	Shbltin_t*	context;
 	struct
 	{
 	char		buf[1024];
@@ -1112,6 +1113,8 @@ od(State_t* state, char** files)
 		return 0;
 	for (;;)
 	{
+		if (sh_checksig(state->context))
+			goto bad;
 		if (s = state->peek.data)
 		{
 			state->peek.data = 0;
@@ -1316,6 +1319,7 @@ b_od(int argc, char** argv, Shbltin_t* context)
 		error(ERROR_SYSTEM|2, "out of space");
 		return 1;
 	}
+	state.context = context;
 	optinit(&optdisc, optinfo);
 	per = 0;
 	state.map = ccmap(CC_ASCII, CC_ASCII);
@@ -1485,7 +1489,10 @@ b_od(int argc, char** argv, Shbltin_t* context)
 	}
 	argv += opt_info.index;
 	if (error_info.errors)
+	{
+		vmclose(state.vm);
 		error(ERROR_usage(2), "%s", optusage(NiL));
+	}
 	switch (n = *state.base)
 	{
 	case 'n':

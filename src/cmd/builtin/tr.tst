@@ -2,6 +2,8 @@
 
 KEEP "*.dat"
 
+export LC_ALL=C
+
 function DATA
 {
 	typeset f
@@ -369,3 +371,20 @@ TEST 13 'unlucky char sign extension?'
 	EXEC	$'\x8d' $'\n'
 		INPUT -n - $'x\x8d'
 		OUTPUT - $'x'
+
+TEST 14 'multibyte basics'
+	EXPORT	LC_CTYPE=C.UTF-8
+	EXEC	-c $'[:alpha:]\n' 'X'
+		INPUT - $'\u[20ac]\u[20ac]'
+		OUTPUT - $'XX'
+	EXEC	-C $'[:alpha:]\n' 'X'
+	EXEC	-cq $'[:alpha:]\n' 'X'
+		INPUT - $'\u[20ac]\xac\u[20ac]'
+		OUTPUT - $'X\xacX'
+	EXEC	-Cq $'[:alpha:]\n' 'X'
+	EXEC	-c $'[:alpha:]\n' 'X'
+		INPUT - $'\u[20ac]\xac\u[20ac]'
+		OUTPUT - $'X\xacX'
+		ERROR - $'tr: line 1: \\xac: invalid multibyte character byte'
+		EXIT	1
+	EXEC	-C $'[:alpha:]\n' 'X'

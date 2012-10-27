@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-06-08 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-09-18 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -65,7 +65,7 @@ set option=';strip-symbols;b;-;Strip link-time static symbols from executables.'
 set option=';threads;b;-;Compile and link with thread options enabled. Not implemented yet.'
 set option=';variants;sv;-;Select only \bcc-\b\avariant\a directories matching \apattern\a.;pattern:!*'
 set option=';view-verify;n;-;Verify that all view root directories exist. If there are any missing directories then a \alevel\a diagnostic is printed.;level'
-set option=';virtual;b;-;Allow \b:MAKE:\b to \bmkdir\b(1) recursive directories that do not exist in the top view. On by default. If \b--novirtual\b is set then \b:MAKE:\b warns about but ignores virtual recursive directories.'
+set option=';virtual;b;-;Allow \b:MAKE:\b to \bmkdir\b(1) recursive directories that do not exist in the top view. On by default if VPATH contains more than one directory, otherwise off. If \b--novirtual\b is set then \b:MAKE:\b warns about but ignores virtual recursive directories.'
 
 /*
  * rule option defaults
@@ -195,8 +195,11 @@ set virtual:=1
 			end
 		end
 	end
-	if "$(-view-verify)" && ! "$(*.VIEW:O=2)"
-		error $(-view-verify) viewpath not set
+	if ! "$(*.VIEW:O=2)"
+		if "$(-view-verify)"
+			error $(-view-verify) viewpath not set
+		end
+		set --novirtual
 	end
 	if "$(-mam:N=(regress|static)*)"
 		.MAMROOT. := $(PWD:C@.*/src/@/src/@:C@/[^/]*@/..@G:C@/@@)

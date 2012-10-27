@@ -1,3 +1,4 @@
+12-09-04 cxcomp.c: type identifiers only in non-compound var constructs
 12-08-15 cx.h,cxopen.c: add cxmembers() default externalf for struct types
 12-08-11 cxcomp.c: add logical cast for naked non-numeric variable expression
 12-08-01 dssprintf.c: change --all to only list fields with non-default values

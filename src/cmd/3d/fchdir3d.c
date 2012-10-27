@@ -108,7 +108,7 @@ NoP(fchdir)
 
 #endif
 
-#if defined(faccessat3d) && defined(fchdir3d)
+#if !_nosys_faccessat && defined(faccessat3d) && defined(fchdir3d)
 
 int
 faccessat3d(int fd, const char* path, int mode, int flags)
@@ -131,13 +131,9 @@ faccessat3d(int fd, const char* path, int mode, int flags)
 	return FACCESSAT(fd, path, mode, flags);
 }
 
-#else
-
-NoP(faccessat)
-
 #endif
 
-#if defined(fstatat3d) && defined(fchdir3d)
+#if !_nosys_fstatat && defined(fstatat3d) && defined(fchdir3d)
 
 /* the 5 arg _fxstatat() disrupts our proto game -- every party needs one */
 #if defined(__STDC__) || defined(__cplusplus) || defined(_proto) || defined(c_plusplus)
@@ -154,13 +150,13 @@ int fstatat(fd, path, st, flags) int fd; char* path; struct stat* st;
 	Mount_t*	mp;
 	int		op;
 #endif
-#ifdef _3D_STAT_VER
+#if defined(_3D_STAT_VER) && SYS__fxstatat > 0
 	struct stat*	so;
 	struct stat	sc;
 #endif
 	char		buf[PATH_MAX];
 
-#ifdef _3D_STAT_VER
+#if defined(_3D_STAT_VER) && SYS__fxstatat > 0
 	if (_3d_ver != _3D_STAT_VER)
 	{
 		so = st;
@@ -184,7 +180,7 @@ int fstatat(fd, path, st, flags) int fd; char* path; struct stat* st;
 		if (fssys(mp, op))
 			fscall(mp, op, 0, state.path.name, st);
 #endif
-#ifdef _3D_STAT_VER
+#if defined(_3D_STAT_VER) && SYS__fxstatat > 0
 	if (st == &sc)
 	{
 		st = so;
@@ -245,13 +241,9 @@ fstatat643d(int fd, const char* path, struct stat64* st, int flags)
 
 #endif
 
-#else
-
-NoP(fstatat)
-
 #endif
 
-#if defined(openat3d) && defined(fchdir3d)
+#if !_nosys_openat && defined(openat3d) && defined(fchdir3d)
 
 int
 openat3d(int fd, const char* path, int oflag, ...)
@@ -269,13 +261,28 @@ openat3d(int fd, const char* path, int oflag, ...)
 	return OPENAT(fd, path, oflag, mode);
 }
 
-#else
+#endif
 
-NoP(openat)
+#if !_nosys_openat64 && defined(openat643d) && defined(fchdir3d)
+
+int
+openat643d(int fd, const char* path, int oflag, ...)
+{
+	mode_t		mode;
+	va_list		ap;
+
+	va_start(ap, oflag);
+	mode = (oflag & O_CREAT) ? va_arg(ap, int) : 0;
+	va_end(ap);
+#if defined(O_LARGEFILE)
+	oflag |= O_LARGEFILE;
+#endif
+	return openat(fd, path, oflag, mode);
+}
 
 #endif
 
-#if defined(unlinkat3d) && defined(fchdir3d)
+#if !_nosys_unlinkat && defined(unlinkat3d) && defined(fchdir3d)
 
 int
 unlinkat3d(int fd, const char* path, int flags)
@@ -287,9 +294,5 @@ unlinkat3d(int fd, const char* path, int flags)
 		return (flags & AT_REMOVEDIR) ? rmdir(dir) : unlink(dir);
 	return UNLINKAT(fd, path, flags);
 }
-
-#else
-
-NoP(unlinkat)
 
 #endif

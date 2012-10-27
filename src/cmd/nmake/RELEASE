@@ -1,3 +1,4 @@
+12-09-18 Makerules.mk: set --novirtual if VPATH contains less than 2 dirs
 12-06-20 O_cloexec|F_dupfd_cloexec edit
 12-05-22 bind.c,dump.c,make.c,mam.c,rule.c: fix --mam=static 3d vs VPATH diffs
 12-05-14 make.c: .IGNORE disables non-file "must"

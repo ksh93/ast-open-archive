@@ -23,12 +23,10 @@
  * David Korn
  * Glenn Fowler
  * AT&T Research
- *
- * tr
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Research) 2012-05-31 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Research) 2012-10-24 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"
@@ -36,8 +34,10 @@ USAGE_LICENSE
 "	characters in \aset1\a are mapped to corresponding characters"
 "	in \aset2\a.]"
 
-"[c:complement?Complement \aset1\a.]"
+"[c:complement?Complement \aset1\a using the character value order.]"
+"[C:collate?Complement \aset1\a using the character collation order.]"
 "[d:delete?Delete characters in \aset1\a but do not translate.]"
+"[q:quiet?Suppress invalid multibyte character warnings.]"
 "[s:squeeze-repeats?Replace sequences of the same character with one.]"
 "[t:truncate-set1?Truncate \aset1\a to the length of \aset2\a.]"
 
@@ -91,37 +91,66 @@ USAGE_LICENSE
 #include <error.h>
 #include <regex.h>
 
-#define TR_COMPLEMENT	(1<<0)
-#define TR_DELETE	(1<<1)
-#define TR_SQUEEZE	(1<<2)
-#define TR_TRUNCATE	(1<<3)
+#define TR_COLLATE	0x0001
+#define TR_COMPLEMENT	0x0002
+#define TR_DELETE	0x0004
+#define TR_QUIET	0x0008
+#define TR_SQUEEZE	0x0010
+#define TR_TRUNCATE	0x0020
 
-#define HITBIT		(1<<(CHAR_BIT+1))
-#define DELBIT		(1<<(CHAR_BIT+2))
-#define ONEBIT		(1<<(CHAR_BIT+3))
+#define HITBIT		0x80000000
+#define DELBIT		0x40000000
+#define ONEBIT		0x20000000
 
 #define setchar(p,s,t)	((p)->type=(t),(p)->prev=(p)->last=(-1),(p)->isit=0,(p)->count=0,(p)->base=(p)->next=(s))
 
+#define mb2wc(w,p,n)	(*ast.mb_towc)(&w,(char*)p,n)
+
 typedef struct
 {
-	int		code[1<<CHAR_BIT];
+	Shbltin_t*	context;
 	int		convert;
 	int		count;
 	int		prev;
 	int		last;
 	int		level;
+	int		mb;
 	int		position;
 	int		src;
 	int		dst;
 	int		type;
 	int		truncate;
+	int		chars;
+	int		warn;
 	regclass_t	isit;
 	unsigned char*	base;
 	unsigned char*	next;
 	unsigned char*	hold;
+	uint32_t	code[1];
 } Tr_t;
 
 static const char*	typename[] = { "source", "destination" };
+
+#if _lib_wcscoll
+
+/*
+ * collate vector of runes
+ */
+
+static int
+collate(const void* ap, const void* bp)
+{
+	wchar_t		a[2];
+	wchar_t		b[2];
+
+	a[0] = *(uint32_t*)ap;
+	a[1] = 0;
+	b[0] = *(uint32_t*)bp;
+	b[1] = 0;
+	return wcscoll(a, b);
+}
+
+#endif
 
 /*
  * return next string character
@@ -162,10 +191,16 @@ nextchar(register Tr_t* tr)
 			if (!tr->isit || (*tr->isit)(tr->prev))
 				return (!tr->type || !tr->convert) ? tr->prev : tr->convert == 'l' ? tolower(tr->prev) : toupper(tr->prev);
 		tr->last = -1;
-		tr->hold = tr->next + 1;
+		tr->hold = tr->next;
+		mbchar(tr->hold);
 	}
-	switch (c = *tr->next++)
+	switch (c = mbchar(tr->next))
 	{
+	case -1:
+		c = *(tr->next - 1);
+		if (tr->warn)
+			error(2, "%s operand: \\x%02x: invalid multibyte character byte", typename[tr->type], c);
+		break;
 	case 0:
 		tr->next--;
 		c = tr->level ? -2 : tr->type && !tr->truncate ? tr->prev : -1;
@@ -208,7 +243,7 @@ nextchar(register Tr_t* tr)
 			if (f)
 				tr->isit = f;
 			tr->prev = -1;
-			tr->last = UCHAR_MAX + 1;
+			tr->last = tr->chars;
 			return nextchar(tr);
 		case '.':
 		case '=':
@@ -259,8 +294,8 @@ nextchar(register Tr_t* tr)
 							peek.dst++;
 						tr->count = tr->src - peek.dst;
 					}
-					else if (tr->count > (1<<CHAR_BIT))
-						tr->count = (1<<CHAR_BIT);
+					else if (tr->count > tr->chars)
+						tr->count = tr->chars;
 					if (!tr->count)
 						goto next;
 					tr->count--;
@@ -297,20 +332,33 @@ nextchar(register Tr_t* tr)
  */
 
 static Tr_t*
-tropen(unsigned char* src, unsigned char* dst, int flags)
+tropen(unsigned char* src, unsigned char* dst, int flags, Shbltin_t* context)
 {
 	register Tr_t*	tr;
 	register int	c;
 	register int	n;
 	register int	x;
 	register int	squeeze;
-	unsigned int	set[1<<(CHAR_BIT+1)];
+	int		m;
+	size_t		z;
+	uint32_t*	set;
 
-	if (!(tr = newof(0, Tr_t, 1, 0)))
+	m = mbwide() ? 0x110000 : 0x100;
+	z = 0x100;
+	if (!(tr = newof(0, Tr_t, 1, (m - 1) * sizeof(uint32_t))) || !(set = newof(0, uint32_t, z, 0)))
 	{
+		if (tr)
+			free(tr);
 		error(2, "out of space [code]");
 		return 0;
 	}
+	tr->context = context;
+	if (!(flags & TR_QUIET))
+		tr->warn = 1;
+#if DEBUG_TRACE
+	error(-1, "AHA#%d m=%d tr=%p set=%p", __LINE__, m, tr, set);
+#endif
+	tr->chars = m;
 	switch (flags & (TR_DELETE|TR_SQUEEZE))
 	{
 	case TR_DELETE:
@@ -325,31 +373,60 @@ tropen(unsigned char* src, unsigned char* dst, int flags)
 	if (dst && !*dst)
 		dst = 0;
 	squeeze = (flags & TR_SQUEEZE) ? ONEBIT : 0;
-	for (n = 0; n < (1<<CHAR_BIT); n++)
+	for (n = 0; n < m; n++)
 		tr->code[n] = n;
 	n = 0;
 	if (src)
 	{
 		setchar(tr, src, 0);
-		while ((c = nextchar(tr)) >=0 && n < elementsof(set))
+		while ((c = nextchar(tr)) >=0)
 		{
 			tr->code[c] |= HITBIT;
 #if DEBUG_TRACE
 error(-1, "src %d '%c'", n, c);
 #endif
+			if (n >= z)
+			{
+				z *= 2;
+				if (!(set = newof(set, uint32_t, z, 0)))
+				{
+					error(ERROR_SYSTEM|2, "out of memory");
+					goto big;
+				}
+			}
 			set[n++] = c;
+			if (c > 0x7f)
+				tr->mb = 1;
 		}
 		if (c < -1)
 			goto bad;
 	}
-	tr->src = n;
 	if (flags & TR_COMPLEMENT)
 	{
-		for (n = c = 0; n < (1<<CHAR_BIT); n++)
+		for (n = c = 0; n < m; n++)
 			if (!(tr->code[n] & HITBIT))
+			{
+				if (c >= z)
+				{
+					z *= 2;
+					if (!(set = newof(set, uint32_t, z, 0)))
+					{
+						error(ERROR_SYSTEM|2, "out of memory");
+						goto big;
+					}
+				}
 				set[c++] = n;
+				if (n > 0x7f)
+					tr->mb = 1;
+			}
+#if _lib_wcscoll
+		if (flags & TR_COLLATE)
+			qsort(set, c, sizeof(set[0]), collate);
+#endif
 		tr->src = c;
 	}
+	else
+		tr->src = n;
 	if (tr->convert == '?')
 		tr->convert = 0;
 	setchar(tr, dst, 1);
@@ -366,6 +443,8 @@ error(-1, "src %d '%c'", n, c);
 error(-1, "dst %d '%c' => '%c'", tr->dst, c, x);
 #endif
 				tr->code[c] = x | squeeze;
+				if (x > 0x7f)
+					tr->mb = 1;
 			}
 			else if (x < -1)
 				goto bad;
@@ -375,6 +454,8 @@ error(-1, "dst %d '%c' => '%c'", tr->dst, c, x);
 				{
 					c = set[tr->dst++];
 					tr->code[c] = c | squeeze;
+					if (c > 0x7f)
+						tr->mb = 1;
 				}
 				break;
 			}
@@ -383,6 +464,8 @@ error(-1, "dst %d '%c' => '%c'", tr->dst, c, x);
 		{
 			x = squeeze ? c : 0;
 			tr->code[c] = x | squeeze;
+			if (x > 0x7f)
+				tr->mb = 1;
 		}
 	}
 	if ((flags & (TR_DELETE|TR_SQUEEZE)) == (TR_DELETE|TR_SQUEEZE))
@@ -395,13 +478,21 @@ error(-1, "dst %d '%c' => '%c'", tr->dst, c, x);
 error(-1, "dst %d '%c'", tr->dst, x);
 #endif
 				tr->code[x] = x | ONEBIT;
+				if (x > 0x7f)
+					tr->mb = 1;
 			}
 		if (x < -1)
 			goto bad;
 	}
+	free(set);
+	if (tr->mb)
+		tr->mb = mbwide();
 	return tr;
  bad:
 	error(2, "%s: invalid %s string", tr->base, typename[tr->type]);
+ big:
+	if (set)
+		free(set);
 	free(tr);
 	return 0;
 }
@@ -426,70 +517,192 @@ trcopy(Tr_t* tr, Sfio_t* ip, Sfio_t* op, ssize_t ncopy)
 {
 	register int		c;
 	register int		oldc = -1;
-	register int*		code = tr->code;
+	register uint32_t*	code = tr->code;
 	register unsigned char*	inp = 0;
 	register unsigned char*	outp = 0;
 	register unsigned char*	inend;
 	register unsigned char*	outend = 0;
 	register ssize_t	nwrite = 0;
-	unsigned char*		inbuff = 0;
-	unsigned char*		outbuff = 0;
+	unsigned char*		inbuf = 0;
+	unsigned char*		outbuf = 0;
 
-	while (nwrite != ncopy)
+	if (tr->mb)
 	{
-		if (!(inbuff = (unsigned char*)sfreserve(ip, SF_UNBOUND, SF_LOCKR)))
+		unsigned char*		pushbuf = 0;
+		unsigned char*		pushend;
+		size_t			line;
+		size_t			eline;
+		ssize_t			o;
+		wchar_t			w;
+		int			n;
+		int			m;
+		int			eof;
+		unsigned char		side[256];
+
+		line = 1;
+		eline = 0;
+		eof = 0;
+		if ((m = mbmax()) > (sizeof(side) / 2))
+			m = sizeof(side) / 2;
+		inp = inend = 0;
+		while (!sh_checksig(tr->context))
 		{
-			if (sfvalue(ip))
+			if ((o = inend - inp) <= 0 || (n = mb2wc(w, inp, o)) < 0)
 			{
-				error(2, ERROR_SYSTEM|2, "read error");
-				return -1;
-			}
-			break;
-		}
-		c = sfvalue(ip);
-		inend = (inp = inbuff) + c;
-
-		/*
-		 * process the next input buffer
-		 */
-
-		while (inp < inend)
-		{
-			if (outp >= outend)
-			{
-				/*
-				 * write out current buffer
-				 */
-
-				if ((c = outp - outbuff) > 0)
+				if (o >= m)
+					w = -1;
+				else if (pushbuf)
 				{
-					if ((nwrite += c) == ncopy)
-						break;
-					sfwrite(op, outbuff, c);
+					if (inp >= &side[sizeof(side)/2])
+					{
+						inp = pushbuf + (inp - &side[sizeof(side)/2]);
+						pushbuf = 0;
+						inend = pushend;
+						continue;
+					}
+					if (eof)
+					{
+						if (o <= 0)
+							break;
+						w = -1;
+					}
+					else if ((c = &side[sizeof(side)] - inend) <= 0)
+						w = -1;
+					else if (!(pushbuf = (unsigned char*)sfreserve(ip, SF_UNBOUND, 0)) || (n = sfvalue(ip)) <= 0)
+					{
+						eof = 1;
+						w = -1;
+					}
+					else
+					{
+						pushend = pushbuf + n;
+						if (c > n)
+							c = n;
+						memcpy(inend, pushbuf, c);
+						inend += c;
+						continue;
+					}
 				}
-
-				/*
-				 * get write buffer space
-				 */
-
-				if (!(outbuff = (unsigned char*)sfreserve(op, (ncopy < 0) ? SF_UNBOUND : (ncopy - nwrite), SF_LOCKR)))
-					break;
-				outend = (outp = outbuff) + sfvalue(op);
+				else if (eof)
+				{
+					if (o <= 0)
+						break;
+					w = -1;
+				}
+				else
+				{
+					if (inp)
+					{
+						if (o)
+							memcpy(side, inp, o);
+						mbinit();
+					}
+					else
+						o = 0;
+					if (!(inp = (unsigned char*)sfreserve(ip, SF_UNBOUND, 0)) || (n = sfvalue(ip)) <= 0)
+					{
+						eof = 1;
+						inp = side;
+						inend = inp + o;
+					}
+					else if (o)
+					{
+						pushbuf = inp;
+						pushend = pushbuf + n;
+						inp = side + o;
+						if ((c = sizeof(side) - o) > n)
+							c = n;
+						if (c)
+							memcpy(inp, pushbuf, c);
+						inend = inp + c;
+						inp = side;
+					}
+					else
+						inend = inp + n;
+					continue;
+				}
+				if (w < 0)
+				{
+					w = *inp++;
+					sfputc(sfstdout, w);
+					if (tr->warn && eline != line)
+					{
+						eline = line;
+						error(2, "line %zu: \\x%02x: invalid multibyte character byte", line, w);
+					}
+					continue;
+				}
 			}
-			c = code[*inp++];
-			if (!(c & DELBIT) && c != oldc)
+			else
+				inp += n ? n : 1;
+			if (w == '\n')
+				line++;
+			w = code[w];
+			if (!(w & DELBIT) && w != oldc)
 			{
-				*outp++ = c;
-				oldc = c | ONEBIT;
+				sfputwc(sfstdout, w & ~(HITBIT|ONEBIT));
+				oldc = w | ONEBIT;
 			}
 		}
-		sfread(ip, inbuff, inp - inbuff);
-		inp = inbuff;
 	}
-	if (inbuff && (c = inp - inbuff) > 0)
-		sfread(ip, inbuff, c);
-	if (outbuff && (c = outp - outbuff) >= 0)
-		sfwrite(op, outbuff, c);
+	else
+	{
+		while (nwrite != ncopy && !sh_checksig(tr->context))
+		{
+			if (!(inbuf = (unsigned char*)sfreserve(ip, SF_UNBOUND, SF_LOCKR)))
+			{
+				if (sfvalue(ip))
+				{
+					error(2, ERROR_SYSTEM|2, "read error");
+					return -1;
+				}
+				break;
+			}
+			c = sfvalue(ip);
+			inend = (inp = inbuf) + c;
+
+			/*
+			 * process the next input buffer
+			 */
+
+			while (inp < inend)
+			{
+				if (outp >= outend)
+				{
+					/*
+					 * write out current buffer
+					 */
+
+					if ((c = outp - outbuf) > 0)
+					{
+						if ((nwrite += c) == ncopy)
+							break;
+						sfwrite(op, outbuf, c);
+					}
+
+					/*
+					 * get write buffer space
+					 */
+
+					if (!(outbuf = (unsigned char*)sfreserve(op, (ncopy < 0) ? SF_UNBOUND : (ncopy - nwrite), SF_LOCKR)))
+						break;
+					outend = (outp = outbuf) + sfvalue(op);
+				}
+				c = code[*inp++];
+				if (!(c & DELBIT) && c != oldc)
+				{
+					*outp++ = c;
+					oldc = c | ONEBIT;
+				}
+			}
+			sfread(ip, inbuf, inp - inbuf);
+			inp = inbuf;
+		}
+		if (inbuf && (c = inp - inbuf) > 0)
+			sfread(ip, inbuf, c);
+		if (outbuf && (c = outp - outbuf) >= 0)
+			sfwrite(op, outbuf, c);
+	}
 	if (sfsync(op))
 	{
 		if (!ERROR_PIPE(errno))
@@ -514,8 +727,14 @@ b_tr(int argc, char** argv, Shbltin_t* context)
 		case 'c':
 			flags |= TR_COMPLEMENT;
 			continue;
+		case 'C':
+			flags |= TR_COMPLEMENT|TR_COLLATE;
+			continue;
 		case 'd':
 			flags |= TR_DELETE;
+			continue;
+		case 'q':
+			flags |= TR_QUIET;
 			continue;
 		case 's':
 			flags |= TR_SQUEEZE;
@@ -535,7 +754,7 @@ b_tr(int argc, char** argv, Shbltin_t* context)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (tr = tropen((unsigned char*)argv[0], (unsigned char*)argv[0] ? (unsigned char*)argv[1] : (unsigned char*)0, flags))
+	if (tr = tropen((unsigned char*)argv[0], (unsigned char*)argv[0] ? (unsigned char*)argv[1] : (unsigned char*)0, flags, context))
 	{
 		trcopy(tr, sfstdin, sfstdout, SF_UNBOUND);
 		trclose(tr);
