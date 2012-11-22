@@ -1,3 +1,4 @@
+12-11-19 pty.c: change SFSTDERR_FILENO to sffileno(sfstderr)
 12-10-24 tr.c: move to src/lib/libcmd
 12-10-19 od.c: move to src/lib/libcmd
 12-05-31 od,tr: errno!=EPIPE => !ERROR_PIPE(errno)

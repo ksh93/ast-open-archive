@@ -21,7 +21,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)pty (AT&T Research) 2012-06-11\n]"
+"[-?\n@(#)pty (AT&T Research) 2012-11-19\n]"
 USAGE_LICENSE
 "[+NAME?pty - create pseudo terminal and run command]"
 "[+DESCRIPTION?\bpty\b creates a pseudo pty and then runs \bcommand\b "
@@ -222,7 +222,7 @@ mkpty(int* master, int* slave)
 	 */
 
 	alarm(4);
-	if (tcgetattr(STDERR_FILENO, &tty) >= 0)
+	if (tcgetattr(sffileno(sfstderr), &tty) >= 0)
 		ttyp = &tty;
 	else
 	{
@@ -230,7 +230,7 @@ mkpty(int* master, int* slave)
 		error(-1, "unable to get standard error terminal attributes");
 	}
 #ifdef TIOCGWINSZ
-	if (ioctl(STDERR_FILENO, TIOCGWINSZ, &win) >= 0)
+	if (ioctl(sffileno(sfstderr), TIOCGWINSZ, &win) >= 0)
 		winp = &win;
 	else
 	{

@@ -2026,13 +2026,6 @@ punt(int old)
 		}
 
 		/*
-		 * delayed (unknown) options
-		 */
-
-		for (x = opt.delayed; x; x = x->next)
-			putptr(vec, x->option);
-
-		/*
 		 * makefile arguments
 		 */
 

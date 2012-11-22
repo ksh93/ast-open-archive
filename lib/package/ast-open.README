@@ -94,7 +94,12 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-12-10-24  --- Release ksh93v- ---
+12-11-20  --- Release ksh93v- ---
+12-11-20  Numerous changes related to new algorithm for shell redirections
+	  using the spawnvex() library.  Not yet used in all cases.
+12-11-14  A bug with caused by using spawnvex*() functions for redirections
+	  of simple commands with here-documents has been fixed.
+12-11-12  A memory leak which occured while doing path search has been fixed.
 12-10-24  A bug in which causes the shell to report a syntax error when a
 	  command substitution appeared on the line that started a here
 	  document has been fixed.
@@ -229,7 +234,7 @@ All recorded changes follow.
 12-07-02  A bug in the edit modes which <tab> after a directory did not refresh
 	  the input line has been fixed.
 12-07-02  A bug in which an exit status > 256 corresponding to a signal was
-	  not by a function to indicate a signal exit has been fixed.
+	  not returned by a function to indicate a signal exit has been fixed.
 
 12-06-28  --- Release ksh93u+ ---
 12-06-28  Fix ulimit -a to list (Kibytes) instead of (kbytes).
@@ -3319,6 +3324,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+12-11-08 file.c: fix lchmod() logic for systems that implement only ENOSYS
 12-10-17 copy.c: fix SEEK_HOLE loop that set last file byte to 0
 12-09-28 pax.c,options.c: document t<compress> => tar:<compress>
 12-05-25 file.c: #include <tm.h> for tmdate() prototype
@@ -4271,6 +4277,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+12-11-09 option.c: omit delayed/unknown options from oldmake punt
 12-09-18 Makerules.mk: set --novirtual if VPATH contains less than 2 dirs
 12-06-20 O_cloexec|F_dupfd_cloexec edit
 12-05-22 bind.c,dump.c,make.c,mam.c,rule.c: fix --mam=static 3d vs VPATH diffs
@@ -5710,6 +5717,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+12-11-19 pty.c: change SFSTDERR_FILENO to sffileno(sfstderr)
 12-10-24 tr.c: move to src/lib/libcmd
 12-10-19 od.c: move to src/lib/libcmd
 12-05-31 od,tr: errno!=EPIPE => !ERROR_PIPE(errno)
@@ -6667,6 +6675,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+12-11-07 ls.c: move --testsize logic after -H hackery
 12-10-01 iconv.c: move src/lib/libcmd
 12-06-06 yes.sh: use echo instead of print if no $KSH_VERSION
 12-04-20 ls.c: FTW_META default
@@ -7206,6 +7215,8 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+12-11-15 misc/spawnvex.c: add SPAWN_frame and SPAWN_FRAME
+12-11-10 tm/tmxdate.c: handle yyyymmddThhmmss.nnnnnnnnn[-+]hhmm
 12-10-17 comp/conf.tab: add PC MIN_HOLE_SIZE
 12-10-16 spawnvex.c: spawnvex_open(SPAWN_EXEC) => posix_spawn() exit ENOENT=126 ENOEXEC=127 ok
 12-10-15 hash/hashlib.h,hash/hashscan.c: fix *ancient* hashscan() bug that didn't handle hashsize() during scan
@@ -9045,6 +9056,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+12-11-21 wc.c,wclib.c: add --invalid-bytes, -X and fix invalid byte logic
 12-10-25 xargs.c: drop bogus "out of space" diagnostic for "command not found"
 12-10-24 tr.c: move from src/cmd/builtin
 12-10-24 grep.c: change -S,--strict to -p.--strict|lenient, add -K,--ksh-regexp -S,--sh-regexp

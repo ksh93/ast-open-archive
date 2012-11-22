@@ -1,3 +1,4 @@
+12-11-08 file.c: fix lchmod() logic for systems that implement only ENOSYS
 12-10-17 copy.c: fix SEEK_HOLE loop that set last file byte to 0
 12-09-28 pax.c,options.c: document t<compress> => tar:<compress>
 12-05-25 file.c: #include <tm.h> for tmdate() prototype

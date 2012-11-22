@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2012-04-20 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2012-11-09 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -801,11 +801,6 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 static void
 pr(register List_t* lp, Ftw_t* ftw, register int fill)
 {
-	if (state.testsize)
-	{
-		ftw->statb.st_size <<= state.testsize;
-		ftw->statb.st_blocks = ftw->statb.st_size / LS_BLOCKSIZE;
-	}
 #ifdef S_ISLNK
 	/*
 	 * -H == --hairbrained
@@ -817,6 +812,11 @@ pr(register List_t* lp, Ftw_t* ftw, register int fill)
 	if (ftw->level == 0 && (state.ftwflags & (FTW_META|FTW_PHYSICAL)) == (FTW_META|FTW_PHYSICAL) && !(ftw->info & FTW_D) && !lstat(ftw->path ? ftw->path : ftw->name, &ftw->statb) && S_ISLNK(ftw->statb.st_mode))
 		ftw->info = FTW_SL;
 #endif
+	if (state.testsize && (ftw->info & FTW_F))
+	{
+		ftw->statb.st_size <<= state.testsize;
+		ftw->statb.st_blocks = ftw->statb.st_size / LS_BLOCKSIZE;
+	}
 	lp->ftw = ftw;
 	state.adjust = 0;
 	fill -= sfkeyprintf(sfstdout, lp, state.format, key, NiL) + state.adjust;
