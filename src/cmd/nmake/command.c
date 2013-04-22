@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -1251,7 +1251,7 @@ complete(register Rule_t* r, register List_t* p, Time_t* tm, Flags_t flags)
 	}
 	else
 	{
-		if (p && streq(p->rule->name, "-"))
+		if (p && p->rule == internal.serialize)
 		{
 			p = p->next;
 			check = 1;
@@ -1346,6 +1346,24 @@ drop(void)
 }
 
 /*
+ * serialize all pending prereqs
+ */
+
+static void
+serial(Rule_t* r, register List_t* p)
+{
+	while (p && p->rule != internal.serialize && copending(state.coshell) > cojobs(state.coshell))
+	{
+		if (p->rule->prereqs)
+			serial(NiL, p->rule->prereqs);
+		complete(p->rule, NiL, NiL, 0);
+		if (p->rule == r)
+			break;
+		p = p->next;
+	}
+}
+
+/*
  * trigger action to build r
  * a contains the action attributes
  *
@@ -1400,6 +1418,8 @@ trigger(register Rule_t* r, Rule_t* a, char* action, Flags_t flags)
 
 		n = (flags & CO_FOREGROUND) ? 0 : (state.jobs - 1);
 		while ((cozombie(state.coshell) || cojobs(state.coshell) > n) && block(0));
+		if ((flags & CO_FOREGROUND) && r->active && r->active->parent && r->active->parent->prereqs && copending(state.coshell) > cojobs(state.coshell))
+			serial(r, r->active->parent->prereqs);
 	}
 	prereqs = r->prereqs;
 	if (r->active && r->active->primary)

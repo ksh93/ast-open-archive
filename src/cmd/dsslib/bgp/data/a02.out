@@ -1,4 +1,5 @@
 afi           1
+best          1
 bits          30
 bitsv4        30
 community     1034:528,1034:529,1034:530
@@ -22,6 +23,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 community     2063:537,2063:538,2063:539
@@ -46,6 +48,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          28
 bitsv4        28
 community     3092:546,3092:547,3092:548,3092:549
@@ -69,6 +72,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          28
 bitsv4        28
 community     4121:556,4121:557,4121:558,4121:559
@@ -93,6 +97,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     5151:566,5151:567,5151:568,5151:569,5151:570,5151:571
@@ -116,6 +121,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     6181:578,6181:579,6181:580,6181:581,6181:582,6181:583
@@ -140,6 +146,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          28
 bitsv4        28
 community     7210:590,7210:591,7210:592,7210:593
@@ -163,6 +170,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          28
 bitsv4        28
 community     8239:600,8239:601,8239:602,8239:603
@@ -187,6 +195,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     9269:610,9269:611,9269:612,9269:613,9269:614,9269:615
@@ -210,6 +219,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     10299:622,10299:623,10299:624,10299:625,10299:626,10299:627
@@ -234,6 +244,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     11329:634,11329:635,11329:636,11329:637,11329:638,11329:639
@@ -257,6 +268,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     12359:646,12359:647,12359:648,12359:649,12359:650,12359:651
@@ -281,6 +293,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     13388:658,13388:659,13388:660,13388:661
@@ -304,6 +317,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     14418:668,14418:669,14418:670,14418:671,14418:672,14418:673
@@ -328,6 +342,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          29
 bitsv4        29
 community     15448:680,15448:681,15448:682,15448:683,15448:684,15448:685
@@ -351,6 +366,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 community     16477:692,16477:693,16477:694
@@ -375,6 +391,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          27
 bitsv4        27
 community     17507:701,17507:702,17507:703,17507:704,17507:705,17507:706
@@ -398,6 +415,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 community     18535:713,18535:714,18535:715,18535:716
@@ -422,6 +440,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 cluster       76.106.2.213,76.106.2.214
@@ -446,6 +465,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 community     20590:733,20590:734,20590:735
@@ -470,6 +490,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 community     21618:742,21618:743,21618:744
@@ -493,6 +514,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          28
 bitsv4        28
 community     22646:751,22646:752,22646:753,22646:754
@@ -517,6 +539,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 community     23675:761,23675:762
@@ -540,6 +563,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 cluster       96.127.3.3
@@ -566,6 +590,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 cluster       100.131.3.12
@@ -591,6 +616,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 cluster       104.135.3.21
@@ -617,6 +643,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 cluster       108.139.3.30
@@ -642,6 +669,7 @@ type          65
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 cluster       112.143.3.39
@@ -668,6 +696,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 community     29844:814,29844:815,29844:816

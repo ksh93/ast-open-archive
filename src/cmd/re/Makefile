@@ -8,17 +8,13 @@ ed :: ed.c
 
 red :LINK: ed
 
-grep :: grep.c LICENSE=since=1995,author=gsf+doug
-
-egrep fgrep :LINK: grep
-
 sed :: sed.h sed0.c sed1.c sed2.c sed3.c LICENSE=since=1995,author=gsf+doug
 
-:: README RELEASE ed.tst grep.tst sed.tst
+:: README RELEASE ed.tst sed.tst
 
 TESTREFLAGS = -c
 
-:TEST: ed grep sed
+:TEST: ed sed
 
 glob :TEST: testglob.c testglob.dat
 	for i in $(*:O>1)

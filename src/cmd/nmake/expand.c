@@ -2434,6 +2434,11 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 				break;
 			}
 			break;
+		case 'Z':
+			if (*++ops == '=')
+				ops++;
+			sfputr(xp, timefmt(ops, tmxdate(s, NiL, CURTIME)), -1);
+			return;
 		default:
 			tst = 0;
 			break;

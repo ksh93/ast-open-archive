@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -172,6 +172,18 @@ addrv6_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* forma
 static ssize_t
 addr_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
+	char*	s;
+	ssize_t	n;
+
+	if (!value->buffer.data || !value->buffer.size)
+	{
+		s = fmtip4((Ptaddr_t)0, -1);
+		n = strlen(s);
+		if ((n + 1) > size)
+			return n + 1;
+		memcpy(buf, s, n + 1);
+		return n;
+	}
 	if (disc->errorf && !(cx->flags & CX_QUIET))
 		(*disc->errorf)(cx, disc, 1, "unbound generic ip address");
 	return -1;
@@ -1039,7 +1051,7 @@ Dsslib_t dss_lib_ip_t =
 {
 	"ip_t",
 	"IP type support"
-	"[-?\n@(#)$Id: dss ip type library (AT&T Research) 2012-08-11 $\n]"
+	"[-?\n@(#)$Id: dss ip type library (AT&T Research) 2013-04-09 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	0,

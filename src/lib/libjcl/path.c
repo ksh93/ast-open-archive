@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -67,7 +67,7 @@ typedef struct State_s
 static State_t		state;
 
 static const char usage[] =
-"[-?\n@(#)$Id: libjcl (AT&T Research) 2007-12-10 $\n]"
+"[-?\n@(#)$Id: libjcl (AT&T Research) 2013-03-14 $\n]"
 "[i:import]"
 "[I:include]:[directory]"
 "[k:marklength]"

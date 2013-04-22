@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1990-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1990-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -118,7 +118,8 @@ struct whod
 #if	!defined(UTMP_PATHNAME) && defined(UTMPX_PATHNAME)
 #define UTMP_PATHNAME	UTMPX_PATHNAME
 #endif	
-#if	!defined(_PATH_UTMP) && defined(_PATH_UTMPX)
+#if	defined(_PATH_UTMPX)
+#undef	_PATH_UTMP
 #define _PATH_UTMP	_PATH_UTMPX
 #endif     
 

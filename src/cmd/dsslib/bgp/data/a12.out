@@ -6,7 +6,7 @@ extended      0:6:2:14:4:5:6:8,8:9:10:12:12:13:14:16
 hopv4         0.5.2.9
 local         328200
 message       1
-mvpn          ( group_addrv4=0.6.2.13 rd=( as16=6 number=393738 ) src_addrv4=0.6.2.12 type=7 )
+mvpn          ( group_addrv4=0.6.2.13 rd=( as16=6 number=393738 ) src_addrv4=0.6.2.12 src_as32=523 type=7 )
 origin        105
 path16        {5}
 safi          5
@@ -48,7 +48,7 @@ extended      0:15:3:29:4:5:6:11
 hopv4         0.15.3.30
 local         983836
 message       3
-mvpn          ( group_addrv6=10:322:405:60D:809:A0F:C0D:E13 rd=( as16=16 number=1049375 ) src_addrv4=33.3.16.0 type=7 )
+mvpn          ( group_addrv6=10:322:405:60D:809:A0F:C0D:E13 rd=( as16=16 number=1049375 ) src_addrv6=10:321:405:60C:809:A0E:C0D:E12 src_as32=800 type=7 )
 origin        63
 path16        15
 safi          5
@@ -292,7 +292,7 @@ extended      27:62:4:92:4:5:6:20,8:9:10:21:12:13:14:25
 hopv4         27.61.4.87
 local         456983638
 message       14
-mvpn          ( group_addrv4=27.62.4.91 rd=( as16=6974 number=457049176 ) src_addrv4=27.62.4.90 type=7 )
+mvpn          ( group_addrv4=27.62.4.91 rd=( as16=6974 number=457049176 ) src_addrv4=27.62.4.90 src_as32=1113 type=7 )
 origin        105
 path16        {6973}
 safi          5
@@ -334,7 +334,7 @@ extended      27:71:5:107:4:5:6:23
 hopv4         27.71.5.108
 local         457639274
 message       16
-mvpn          ( group_addrv6=1B48:570:405:619:809:A18:C0D:E1C rd=( as16=6984 number=457704813 ) src_addrv4=111.5.72.27 type=7 )
+mvpn          ( group_addrv6=1B48:570:405:619:809:A18:C0D:E1C rd=( as16=6984 number=457704813 ) src_addrv6=1B48:56F:405:618:809:A17:C0D:E1B src_as32=1390 type=7 )
 origin        63
 path16        6983
 safi          5
@@ -559,7 +559,7 @@ extended      54:116:6:167:4:5:6:32,8:9:10:30:12:13:14:34
 hopv4         54.115.6.162
 local         913508001
 message       26
-mvpn          ( group_addrv4=54.116.6.166 rd=( as16=13940 number=913573539 ) src_addrv4=54.116.6.165 type=7 )
+mvpn          ( group_addrv4=54.116.6.166 rd=( as16=13940 number=913573539 ) src_addrv4=54.116.6.165 src_as32=1700 type=7 )
 origin        105
 path16        {13939}
 safi          5
@@ -601,7 +601,7 @@ extended      54:125:7:182:4:5:6:35
 hopv4         54.125.7.183
 local         914163637
 message       28
-mvpn          ( group_addrv6=367E:7BB:405:625:809:A21:C0D:E25 rd=( as16=13950 number=914229176 ) src_addrv4=186.7.126.54 type=7 )
+mvpn          ( group_addrv6=367E:7BB:405:625:809:A21:C0D:E25 rd=( as16=13950 number=914229176 ) src_addrv6=367E:7BA:405:624:809:A20:C0D:E24 src_as32=1977 type=7 )
 origin        63
 path16        13949
 safi          5
@@ -843,7 +843,7 @@ extended      81:172:8:245:4:5:6:44,8:9:10:39:12:13:14:43
 hopv4         81.171.8.240
 local         1370163439
 message       39
-mvpn          ( group_addrv4=81.172.8.244 rd=( as16=20908 number=1370228977 ) src_addrv4=81.172.8.243 type=7 )
+mvpn          ( group_addrv4=81.172.8.244 rd=( as16=20908 number=1370228977 ) src_addrv4=81.172.8.243 src_as32=2290 type=7 )
 origin        105
 path16        {20907}
 safi          5
@@ -885,7 +885,7 @@ extended      81:181:10:4:4:5:6:47
 hopv4         81.181.10.5
 local         1370819075
 message       41
-mvpn          ( group_addrv6=51B6:A09:405:631:809:A2A:C0D:E2E rd=( as16=20918 number=1370884614 ) src_addrv4=8.10.182.81 type=7 )
+mvpn          ( group_addrv6=51B6:A09:405:631:809:A2A:C0D:E2E rd=( as16=20918 number=1370884614 ) src_addrv6=51B6:A08:405:630:809:A29:C0D:E2D src_as32=2567 type=7 )
 origin        63
 path16        20917
 safi          5
@@ -1111,7 +1111,7 @@ extended      108:226:11:64:4:5:6:56,8:9:10:48:12:13:14:52
 hopv4         108.225.11.59
 local         1826687802
 message       51
-mvpn          ( group_addrv4=108.226.11.63 rd=( as16=27874 number=1826753340 ) src_addrv4=108.226.11.62 type=7 )
+mvpn          ( group_addrv4=108.226.11.63 rd=( as16=27874 number=1826753340 ) src_addrv4=108.226.11.62 src_as32=2877 type=7 )
 origin        105
 path16        {27873}
 safi          5
@@ -1153,7 +1153,7 @@ extended      108:235:12:79:4:5:6:59
 hopv4         108.235.12.80
 local         1827343438
 message       53
-mvpn          ( group_addrv6=6CEC:C54:405:63D:809:A33:C0D:E37 rd=( as16=27884 number=1827408977 ) src_addrv4=83.12.236.108 type=7 )
+mvpn          ( group_addrv6=6CEC:C54:405:63D:809:A33:C0D:E37 rd=( as16=27884 number=1827408977 ) src_addrv6=6CEC:C53:405:63C:809:A32:C0D:E36 src_as32=3154 type=7 )
 origin        63
 path16        27883
 safi          5
@@ -1379,7 +1379,7 @@ extended      136:24:13:139:4:5:6:68,8:9:10:57:12:13:14:61
 hopv4         136.23.13.134
 local         2283212165
 message       63
-mvpn          ( group_addrv4=136.24.13.138 rd=( as16=34840 number=2283277703 ) src_addrv4=136.24.13.137 type=7 )
+mvpn          ( group_addrv4=136.24.13.138 rd=( as16=34840 number=2283277703 ) src_addrv4=136.24.13.137 src_as32=3464 type=7 )
 origin        105
 path16        {34839}
 safi          5
@@ -1421,7 +1421,7 @@ extended      136:33:14:154:4:5:6:71
 hopv4         136.33.14.155
 local         2283867801
 message       65
-mvpn          ( group_addrv6=8822:E9F:405:649:809:A3C:C0D:E40 rd=( as16=34850 number=2283933340 ) src_addrv4=158.14.34.136 type=7 )
+mvpn          ( group_addrv6=8822:E9F:405:649:809:A3C:C0D:E40 rd=( as16=34850 number=2283933340 ) src_addrv6=8822:E9E:405:648:809:A3B:C0D:E3F src_as32=3741 type=7 )
 origin        63
 path16        34849
 safi          5
@@ -1647,7 +1647,7 @@ extended      163:78:15:214:4:5:6:80,8:9:10:66:12:13:14:70
 hopv4         163.77.15.209
 local         2739736528
 message       75
-mvpn          ( group_addrv4=163.78.15.213 rd=( as16=41806 number=2739802066 ) src_addrv4=163.78.15.212 type=7 )
+mvpn          ( group_addrv4=163.78.15.213 rd=( as16=41806 number=2739802066 ) src_addrv4=163.78.15.212 src_as32=4051 type=7 )
 origin        105
 path16        {41805}
 safi          5
@@ -1689,7 +1689,7 @@ extended      163:87:16:229:4:5:6:83
 hopv4         163.87.16.230
 local         2740392164
 message       77
-mvpn          ( group_addrv6=A358:10EA:405:655:809:A45:C0D:E49 rd=( as16=41816 number=2740457703 ) src_addrv4=233.16.88.163 type=7 )
+mvpn          ( group_addrv6=A358:10EA:405:655:809:A45:C0D:E49 rd=( as16=41816 number=2740457703 ) src_addrv6=A358:10E9:405:654:809:A44:C0D:E48 src_as32=4328 type=7 )
 origin        63
 path16        41815
 safi          5

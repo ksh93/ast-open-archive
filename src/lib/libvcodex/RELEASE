@@ -1,3 +1,6 @@
+13-01-03 vcsfio.c: handle decode of encoded /dev/null
+12-12-05 vcsfio.c: all for expansion in data write
+12-11-27 vcodex.h,vcsfio.c: add VC_DECODE|VC_OPTIONAL
 11-01-31 Makefile: use `...` instead of $( ... ) for bootstrap build
 10-06-01 sync with ast api 20100601
 09-08-19 vchufgroup.c: sync with kpv (new alg)

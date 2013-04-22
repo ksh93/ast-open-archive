@@ -1,4 +1,5 @@
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.23.2.45
@@ -17,6 +18,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.25.2.47
@@ -36,6 +38,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.27.2.49
@@ -55,6 +58,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.29.2.51
@@ -74,6 +78,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.31.2.53
@@ -93,6 +98,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.33.2.55
@@ -112,6 +118,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.35.2.57
@@ -131,6 +138,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.37.2.59
@@ -150,6 +158,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.39.2.61
@@ -169,6 +178,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.41.2.63
@@ -188,6 +198,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.43.2.65
@@ -207,6 +218,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.45.2.67
@@ -226,6 +238,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.47.2.69
@@ -245,6 +258,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.49.2.71
@@ -264,6 +278,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.51.2.73
@@ -283,6 +298,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.53.2.75
@@ -302,6 +318,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.55.2.77
@@ -321,6 +338,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.57.2.79
@@ -340,6 +358,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 hopv4         3.59.2.81
@@ -359,6 +378,7 @@ MESSAGE       1
 PART          1
 
 afi           1
+best          1
 bits          24
 bitsv4        24
 community     1600:598
@@ -381,6 +401,7 @@ type          65
 valid         1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E42:25A:405:609:809:A0C:C0D:E10
@@ -398,6 +419,7 @@ valid         1
 MESSAGE       1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E44:25B:405:60A:809:A0D:C0D:E11
@@ -416,6 +438,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E46:25C:405:60B:809:A0E:C0D:E12
@@ -434,6 +457,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E48:25D:405:60C:809:A0F:C0D:E13
@@ -452,6 +476,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E4A:25E:405:60D:809:A10:C0D:E14
@@ -470,6 +495,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E4C:25F:405:60E:809:A11:C0D:E15
@@ -488,6 +514,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E4E:260:405:60F:809:A12:C0D:E16
@@ -506,6 +533,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E50:261:405:610:809:A13:C0D:E17
@@ -524,6 +552,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E52:262:405:611:809:A14:C0D:E18
@@ -542,6 +571,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E54:263:405:612:809:A15:C0D:E19
@@ -560,6 +590,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E56:264:405:613:809:A16:C0D:E1A
@@ -578,6 +609,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E58:265:405:614:809:A17:C0D:E1B
@@ -596,6 +628,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E5A:266:405:615:809:A18:C0D:E1C
@@ -614,6 +647,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E5C:267:405:616:809:A19:C0D:E1D
@@ -632,6 +666,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E5E:268:405:617:809:A1A:C0D:E1E
@@ -650,6 +685,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E60:269:405:618:809:A1B:C0D:E1F
@@ -668,6 +704,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E62:26A:405:619:809:A1C:C0D:E20
@@ -686,6 +723,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E64:26B:405:61A:809:A1D:C0D:E21
@@ -704,6 +742,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 hopv6         E66:26C:405:61B:809:A1E:C0D:E22
@@ -722,6 +761,7 @@ MESSAGE       1
 PART          1
 
 afi           2
+best          1
 bits          64
 bitsv6        64
 community     5739:624

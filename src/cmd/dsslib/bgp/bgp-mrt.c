@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -56,10 +56,12 @@
 #define BE(b,p,n)	memcpy(b,p,n)
 
 #define DATA(sp,rp)		(rp=&sp->route,sp->osize=sp->size,sp->temp=sizeof(rp->data))
+#define SAVE(sp,rp)		(memcpy(&sp->save,rp,BGP_FIXED+(sp->osize=sp->size)))
 #define ZERO(sp,rp)		(sp->size=0,memset(rp,0,BGP_FIXED),sp->unknown.size=0)
 #define HEAD(sp,rp)		(rp->message=sp->message,rp->stamp=sp->time)
 #define INIT(sp,rp)		(DATA(sp,rp),ZERO(sp,rp),HEAD(sp,rp))
 #define NEXT(sp,rp)		(DATA(sp,rp),HEAD(sp,rp))
+#define PREV(sp,rp)		(memcpy(rp=&sp->route,&sp->save,BGP_FIXED+sp->osize))
 #define DONE(sp,rp,rec,dp)	done(sp,rp,rec,dp)
 
 #define PEER_IPV6		0x80
@@ -82,6 +84,7 @@ typedef struct Mrtpeer_s
 typedef struct Mrtstate_s
 {
 	Bgproute_t		route;
+	Bgproute_t		save;
 	struct
 	{
 	Bgproute_t		route;
@@ -758,7 +761,7 @@ nlri(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			case MRT_BITS_IPV6:
 				AE(mp->src_addr.v6, state->buf, 16);
 				state->buf += 16;
-				mp->set |= BGP_SET_src_addrv6;
+				mp->set |= BGP_MVPN_SET_src_addrv6;
 				break;
 			default:
 				if (disc->errorf && !(file->dss->flags & DSS_QUIET))
@@ -1309,10 +1312,10 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 			size = BE4(state->buf + 8);
 			ANONYMIZE_HEAD(state->buf, MRT_HEAD);
 			if (file->dss->flags & DSS_DEBUG)
-				sfprintf(sfstderr, "message %6lu  record %6lu  time %8lu  %s.%s size %I*u  offset %I*u\n", state->message, file->count, state->time, symbol(GROUP_MESSAGE, type), symbol(type, subtype), sizeof(size), size, sizeof(file->offset), file->offset + skip);
+				sfprintf(sfstderr, "message %6lu  record %6lu  time %8lu  %s.%s size %I*u  offset %I*u\n", state->message, file->count, state->time, symbol(GROUP_MESSAGE, type), symbol(type, subtype), sizeof(size), MRT_HEAD + size, sizeof(file->offset), file->offset + skip);
 			if (!(state->buf = (char*)sfreserve(file->io, size, -1)))
 				break;
-			skip += size;
+			skip += MRT_HEAD + size;
 			PAYLOAD(file, state->buf, size);
 			ANONYMIZE_DATA(state->buf, size);
 			state->end = state->buf + size;
@@ -1469,6 +1472,8 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 					if (prefix(file, state, rp, -1, state->end, disc))
 						continue;
 				}
+				rp->attr |= BGP_valid;
+				SAVE(state, rp);
 				state->entries = BE2(state->buf);
 				state->buf += 2;
 				if (file->dss->flags & DSS_DEBUG)
@@ -1689,9 +1694,11 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 		case STATE_TABLE_DUMP:
 			while (state->buf < state->end)
 			{
+				DATA(state, rp);
 				afi = rp->afi;
 				safi = rp->safi;
-				INIT(state, rp);
+				ZERO(state, rp);
+				HEAD(state, rp);
 				rp->afi = afi;
 				rp->safi = safi;
 				rp->type = BGP_TYPE_table_dump;
@@ -1749,9 +1756,7 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 					break;
 				}
 				PAYLOAD(file, state->buf, state->end - state->buf);
-				NEXT(state, rp);
-				rp->type = BGP_TYPE_table_dump;
-				rp->attr = BGP_valid;
+				PREV(state, rp);
 				i = BE2(state->buf);
 				state->buf += 2;
 				rp->stamp = AET(state->buf);

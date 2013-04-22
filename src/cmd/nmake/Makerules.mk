@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2012-09-18 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2013-04-05 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -202,7 +202,13 @@ set virtual:=1
 		set --novirtual
 	end
 	if "$(-mam:N=(regress|static)*)"
-		.MAMROOT. := $(PWD:C@.*/src/@/src/@:C@/[^/]*@/..@G:C@/@@)
+		if "$(PWD)/" == "$(INSTALLROOT)/*"
+			.MAMROOT. := $(".":P=R=$(INSTALLROOT))
+		elif "$(PWD)/" == "$(PACKAGEROOT)/*"
+			.MAMROOT. := $(".":P=R=$(PACKAGEROOT))
+		else
+			.MAMROOT. := $(PWD:C@.*/src/@/src/@:C@/[^/]*@/..@G:C@/@@)
+		end
 		.MAKE : .MAM.LOAD
 	end
 	PAXFLAGS &= $$(MAKEPATH:C@:@ @G:N!=...*:C@.*@-s\@&/*\@\@@) $$(PWD:C@.*@-s\@&/*\@\@@)
@@ -454,7 +460,7 @@ NAWK = gawk
 else
 NAWK = awk
 end
-NM = $(CC.NM)
+NM = $(CC.NM) $(CC.NM.NMFLAGS)
 NMEDIT = $(CC.NMEDIT) -e '/^$(CC.PREFIX.SYMBOL)_STUB_/d' -e '/$(CC.PREFIX.SYMBOL)_already_defined$/d'
 NMFLAGS = $(CC.NMFLAGS)
 PACKAGE =
@@ -3356,12 +3362,11 @@ PACKAGES : .SPECIAL .FUNCTION
 			if "$(_PACKAGE_$(P))" == "0"
 				continue
 			end
-			I = pkg-$(P).mk
 			V := $(version)
 			this_install := $(install)
+			I = pkg-$(P).mk
 			while 1
 				if H = "$(I:T=F)"
-					.PACKAGE.$(P).rules := $(H)
 					break
 				elif "$(PACKAGE_$(P))$(PACKAGE_$(P)_INCLUDE)$(PACKAGE_$(P)_LIB)"
 					break
@@ -3376,9 +3381,6 @@ PACKAGES : .SPECIAL .FUNCTION
 				else
 					break
 				end
-			end
-			if ! "$(.PACKAGE.$(P).rules)"
-				.PACKAGE.$(P).rules := -
 			end
 			.PACKAGE.$(P).library := $(library)
 			.PACKAGE.$(P).private := $(private)
@@ -3524,8 +3526,13 @@ PACKAGES : .SPECIAL .FUNCTION
 						.PACKAGE.build += $(P)
 					end
 				end
-				if "$(H)"
-					include + "$(H)"
+				if ! "$(.PACKAGE.$(P).rules)"
+					if "$(H)"
+						.PACKAGE.$(P).rules := $(H)
+						include + "$(H)"
+					else
+						.PACKAGE.$(P).rules := -
+					end
 				end
 			end
 		end
@@ -4149,10 +4156,16 @@ PACKAGES : .SPECIAL .FUNCTION
 	if "$(-mam:N=dynamic*)"
 		.MAM.INSTALLROOT := $(INSTALLROOT:N=$(HOME):?$HOME?$(INSTALLROOT)?)
 		print -um setv INSTALLROOT $(.MAM.INSTALLROOT)
+		.MAM.PACKAGEROOT := $(PACKAGEROOT:N=$(HOME):?$HOME?$(PACKAGEROOT)?)
+		print -um setv PACKAGEROOT $(.MAM.PACKAGEROOT)
 	end
 	.MAMEDIT. =
 	if "$(INSTALLROOT:N=..*(/*))"
 		.MAMROOT. := $(INSTALLROOT)
+	elif "$(PWD)/" == "$(INSTALLROOT)/*"
+		.MAMROOT. := $(".":P=R=$(INSTALLROOT))
+	elif "$(PWD)/" == "$(PACKAGEROOT)/*"
+		.MAMROOT. := $(".":P=R=$(PACKAGEROOT))
 	else
 		.MAMROOT. := $(PWD:C@.*/src/@/src/@:C@/[^/]*@/..@G:C@/@@)
 	end
@@ -4287,7 +4300,9 @@ PACKAGES : .SPECIAL .FUNCTION
 		.CC.NOSTDLIB. := $(CC.STDLIB:N!=$(T4:@C@ @|@G):C@ @|@G:C@^@N!=@)
 	end
 	T3 = $(PACKAGE_PATH:/:/ /G) $(.PACKAGE.DIRS.) $(.PACKAGE.GLOBAL.)
-	.SOURCE.a : $(T3:X=lib:N!=$(.PACKAGE.stdlib:/ /|/G):T=F)
+	T3 := $(T3:X=lib:N!=$(.PACKAGE.stdlib:/ /|/G):T=F)
+	.SOURCE.a : $(T3)
+	/* not a good idea ! .SOURCE.h : $(T3:D:X=include:T=F) */
 	T3 =
 	if ! "$(CC.DIALECT:N=ANSI)"
 		stdarg.h : .SPECIAL .NULL .TERMINAL .DONTCARE .IGNORE /* courtesy to proto(1) */
@@ -5087,8 +5102,12 @@ end
 	if "$(-mam:N=static*)"
 		set noreadstate reread strictview
 		set readonly
+		if "$(PWD)/" == "$(INSTALLROOT)/*"
+			PACKAGEROOT = $(.MAMROOT.)/../..
+		else
+			PACKAGEROOT = $(.MAMROOT.)
+		end
 		INSTALLROOT = $(.MAMROOT.)
-		PACKAGEROOT = $(.MAMROOT.)/../..
 		set noreadonly
 		if "$(-mam:N=*,port*)"
 			if ! "$(-?prefix-include)"

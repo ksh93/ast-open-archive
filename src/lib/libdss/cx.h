@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -58,6 +58,10 @@
 #define CX_VISITED	0x00000010
 #define CX_IGNORECASE	0x00000020
 #define CX_SCHEMA	0x00000040
+
+/* Cxmember_t.flags */
+
+#define CX_VIRTUAL	0x0001
 
 /* Cxpart_t.flags */
 
@@ -461,6 +465,7 @@ struct Cxmember_s			/* type member info		*/
 	Cxcallout_f	getf;		/* get member value		*/
 	Cxcallout_f	setf;		/* set member value		*/
 	Dt_t*		members;	/* Cxvariable_t member dict	*/
+	Cxflags_t	flags;		/* CX_* member flags		*/
 };
 
 struct Cxtype_s				/* type info			*/

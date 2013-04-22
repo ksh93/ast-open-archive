@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-11-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-02-20
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -152,7 +152,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sync.c
 meta sync.o %.c>%.o sync.c sync
 prev sync.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?sortsync]"\" -c sync.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?sortsync]"\" -c sync.c
 done sync.o generated
 make ss.o
 make ss.c
@@ -181,6 +181,11 @@ done sync virtual
 make libsorttest.a archive
 make test.o
 make test.c
+make ssexit.h implicit
+prev ${PACKAGE_ast_INCLUDE}/recsort.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done ssexit.h
 prev ss.h implicit
 done test.c
 meta test.o %.c>%.o test.c test
@@ -197,11 +202,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/ssexit.h
 prev ${PACKAGE_ast_INCLUDE}
-make ssexit.h
-prev ${PACKAGE_ast_INCLUDE}/recsort.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ssexit.h
+prev ssexit.h
 exec - test '' = 'ssexit.h' || ${STDCMP} 2>/dev/null -s ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h.old 2>/dev/null || true; ${STDCP} ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h ;}
 done ${PACKAGE_ast_INCLUDE}/ssexit.h generated
 done install virtual

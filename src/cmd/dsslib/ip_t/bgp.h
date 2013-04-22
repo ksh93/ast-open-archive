@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -227,7 +227,10 @@ typedef union Bgpaddr_u				/* ipv4/ipv6 address		*/
 #define BGP_MVPN_src_addr		9
 #define BGP_MVPN_src_addrv4		10
 #define BGP_MVPN_src_addrv6		11
-#define BGP_MVPN_type			12
+#define BGP_MVPN_src_as			12
+#define BGP_MVPN_src_as16		13
+#define BGP_MVPN_src_as32		14
+#define BGP_MVPN_type			15
 
 #define BGP_MVPN_SET_group_addrv6	0x00000001
 #define BGP_MVPN_SET_originatorv6	0x00000002

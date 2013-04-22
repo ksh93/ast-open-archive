@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -421,13 +421,14 @@ size_t		dtsz;
 }
 
 #if __STD_C
-static ssize_t getheader(Sfdc_t* sfdc, Sfio_t* f, int init, int identify)
+static ssize_t getheader(Sfdc_t* sfdc, Sfio_t* f, int init, int identify, int optional)
 #else
-static ssize_t getheader(sfdc, f, init, identify)
+static ssize_t getheader(sfdc, f, init, identify, optional)
 Sfdc_t*		sfdc;
 Sfio_t*		f;
 int		init;	/* initial call */
 int		identify;
+int		optional;
 #endif
 {
 	ssize_t		cdsz, sz;
@@ -435,6 +436,8 @@ int		identify;
 	int		indi, head, loop;
 	Vcio_t		io;
 
+	if(optional)
+		identify = -1;
 	if(identify)
 	{	/* verify header magic -- ignore if no magic */
 		if(!(code = sfreserve(f, 4, SF_LOCKR)))
@@ -506,7 +509,7 @@ int		identify;
 	}
 	if(cdsz <= 0 )
 		return identify ? 0 : VCSFERROR(sfdc, "Failure in obtaining header data");
-	else if(identify)
+	else if(identify > 0)
 		return ident(sfdc, code, cdsz);
 	else
 	{	if(sfdc->vc)
@@ -515,7 +518,7 @@ int		identify;
 			return VCSFERROR(sfdc, "Failure in initializing data transforms");
 		else if(sfdc->sfdt->type & VCSF_TRANS)
 			return ident(sfdc, code, cdsz);
-		else	return 0;
+		else	return 1;
 	}
 }
 
@@ -693,7 +696,7 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 			{	sfdc->code = vcionext(&io);
 				if(vciomore(&io) > 0 && *sfdc->code == VC_EOF)
 					continue; /* skip a sequence of VC_EOF's */
-				if(getheader(sfdc, f, 0, 0) < 0 )
+				if(getheader(sfdc, f, 0, 0, 0) < 0 )
 					break;
 				else	continue;
 			}
@@ -706,7 +709,12 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 				vcdisc(sfdc->vc, &sfdc->vcdc);
 
 			/* size of coded data */
-			if((d = vciogetu(&io)) <= 0)
+			if(vciomore(&io) == 1 && vciopeek(&io) == 0200)
+			{	vciogetc(&io);
+				d = 0;
+				ctrl = VC_RAW;
+			}
+			else if((d = vciogetu(&io)) <= 0)
 			{	VCSFERROR(sfdc, "Error in getting size of coded data");
 				BREAK;
 			}
@@ -716,10 +724,11 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 			{	sfdc->code = vcionext(&io);
 				if((m = d+VCSF_SLACK) > sfdc->bssz &&
 				   makebuf(sfdc, m) < 0 )
-					return VCSFERROR(sfdc, "Failure to allocate buffer");
-				if(fillbuf(sfdc, f, disc) <= 0 ||
-				   (m = sfdc->endb - sfdc->code) < d )
-					return VCSFERROR(sfdc, "Failure to read coded data");
+					return VCSFERROR(sfdc, "decode buffer allocation error");
+				if(fillbuf(sfdc, f, disc) < 0)
+					return VCSFERROR(sfdc, "coded data read error");
+				if ((m = sfdc->endb - sfdc->code) < d )
+					return VCSFERROR(sfdc, "coded data truncated");
 				vcioinit(&io, sfdc->code, m);
 			}
 
@@ -852,6 +861,7 @@ Sfdisc_t*	disc;
 #endif
 {
 	ssize_t		sz;
+	ssize_t		wz;
 	Sfdc_t		*sfdc = (Sfdc_t*)disc;
 
 	switch(type)
@@ -869,8 +879,11 @@ Sfdisc_t*	disc;
 			{	
 #if _SFIO_H == 1		/* Sfio: this will wind up calling vcsfdcwrite() */
 				sfset(f, SF_IOCHECK, 0);
-				if(sfwr(f, sfdc->data, sz, disc) != sz)
+				if((wz = sfwr(f, sfdc->data, sz, disc)) < sz)
+				{
+					error(1, "AHA#%d sz=%I*d wz=%I*d", __LINE__, sizeof(sz), sz, sizeof(wz), wz);
 					return VCSFERROR(sfdc, "Error in writing coded data");
+				}
 				sfset(f, SF_IOCHECK, 1);
 
 #else				/* Stdio: must call vcsfdcwrite() directly to encode */
@@ -899,8 +912,11 @@ Sfdisc_t*	disc;
 					vcioputc(&io, VC_EOF); /* write the eof marker */
 
 				sz = vciosize(&io); /* output to stream */
-				if(sz > 0 && sfwr(f, sfdc->base, sz, NIL(Sfdisc_t*)) != sz)
+				if(sz > 0 && (wz = sfwr(f, sfdc->base, sz, NIL(Sfdisc_t*))) < sz)
+				{
+					error(1, "AHA#%d sz=%I*d wz=%I*d", __LINE__, sizeof(sz), sz, sizeof(wz), wz);
 					return VCSFERROR(sfdc, "Error in writing coded data");
+				}
 			}
 		}
 
@@ -966,7 +982,7 @@ Vcwmethod_t**	vcwmt;	/* return windowing method	*/
 #if __STD_C
 Vcsfio_t* vcsfio(Sfio_t* sf, Vcsfdata_t* sfdt, int type)
 #else
-Vcsfio_t* vcsfio(sf, data, type)
+Vcsfio_t* vcsfio(sf, sfdt, type)
 Sfio_t*		sf;	/* stream to be conditioned	*/
 Vcsfdata_t*	sfdt;	/* data to initialize stream	*/
 int		type;	/* VC_ENCODE or VC_DECODE or 0	*/
@@ -977,8 +993,14 @@ int		type;	/* VC_ENCODE or VC_DECODE or 0	*/
 	Vcwmethod_t	*wmeth;
 	Sfdc_t		*sfdc = NIL(Sfdc_t*);
 	Vcsfdata_t	dflt; /* default decoding data	*/
+	int		optional;
 
-	if(!sfdt && type == VC_DECODE)
+	if(type & VC_OPTIONAL)
+	{	type &= ~VC_OPTIONAL;
+		optional = 1;
+	}
+	else	optional = 0;
+	if(!sfdt && type)
 	{	sfdt = &dflt; /* assuming coded header data */
 		memset(sfdt, 0, sizeof(Vcsfdata_t));
 	}
@@ -1067,10 +1089,11 @@ int		type;	/* VC_ENCODE or VC_DECODE or 0	*/
 				errorsfio("Ill-defined transformation for decoding.");
 		}
 		else
-		{	if(!type)
+		{	int	encoded;
+			if(!type)
 				sfdt->type |= VCSF_TRANS;
-			if(getheader(sfdc, sf, 1, !type) < 0 )
-			{	if(!type)
+			if((encoded = getheader(sfdc, sf, 1, !type, optional)) <= 0 )
+			{	if(!type || optional)
 				{	sfdt->type = 0;
 					return NIL(Vcsfio_t*);
 				}

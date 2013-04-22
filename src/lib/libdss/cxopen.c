@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -2228,6 +2228,7 @@ cxcast(Cx_t* cx, Cxoperand_t* ret, Cxvariable_t* var, Cxtype_t* type, void* data
 	unsigned char*	map;
 	Cxbuf_t*	cvt;
 	char*		s;
+	void*		d;
 	ssize_t		n;
 	Cxunsigned_t	m;
 	int		c;
@@ -2268,7 +2269,7 @@ cxcast(Cx_t* cx, Cxoperand_t* ret, Cxvariable_t* var, Cxtype_t* type, void* data
 					b.type = x.data.variable->type;
 					x.data.variable = ref->variable;
 					ret->type = x.data.variable->type;
-					if ((*ref->member->getf)(cx, &x, ret, &a, &b, data, cx->disc))
+					if ((*ref->member->getf)(cx, &x, ret, &a, &b, (ref->member->flags & CX_VIRTUAL) ? data : (void*)0, cx->disc))
 						return -1;
 				}
 			}
@@ -2446,7 +2447,7 @@ cxmembers(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxv
 					continue;
 				}
 				if (!cxcast(cx, &o, v, cx->state->type_string, NiL, NiL))
-					b += sfsprintf(b, m > b ? m - b : 0, "%s=%s ", v->name, o.value.string);
+					b += sfsprintf(b, m > b ? m - b : 0, "%s=%s ", v->name, o.value.string.data);
 			}
 		}
 	}

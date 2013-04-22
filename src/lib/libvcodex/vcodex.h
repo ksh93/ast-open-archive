@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -203,6 +203,7 @@ struct _vcodex_s
 #define VC_FLAGS		007777	/* all supported flags		*/
 #define VC_ENCODE		000001	/* handle for encoding data	*/
 #define VC_DECODE		000002	/* handle to decode data	*/
+#define VC_OPTIONAL		000004	/* decode if magic header	*/
 #define VC_CLOSECODER		000010	/* 2nd-ary coders to be closed	*/
 
 /* event types passable to discipline event handlers */
@@ -348,6 +349,7 @@ _END_EXTERNS_
 #define vcioskip(io, n)		((io)->next += (n))
 #define vcioputc(io, v)		(*(io)->next++ = (Vcchar_t)(v) )
 #define vciogetc(io)		(*(io)->next++)
+#define vciopeek(io)		(*(io)->next)
 #define vcioputs(io, str, sz)	(memcpy((io)->next, (str), (sz)), (io)->next += (sz) )
 #define vciogets(io, str, sz)	(memcpy((str), (io)->next, (sz)), (io)->next += (sz) )
 #define vciomove(io1, io2, sz)	(memcpy((io2)->next, (io1)->next, (sz)), \

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2012-11-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-02-20
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -225,7 +225,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done ip_t.c
 meta ip_t.o %.c>%.o ip_t.c ip_t
 prev ip_t.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssip_t]"\" -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ip_t.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssip_t]"\" -D_BLD_pt -D_PACKAGE_ast -D_BLD_DEBUG -c ip_t.c
 done ip_t.o generated
 make lib.o
 make lib.c
@@ -743,7 +743,7 @@ done testiv.c
 meta testiv.o %.c>%.o testiv.c testiv
 prev testiv.c
 setv _BLD_ip_t -U_BLD_ip_t
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2012 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_pt -c testiv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2000-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssip_t]"\" -D_PACKAGE_ast -D_BLD_DEBUG -D_BLD_pt -c testiv.c
 done testiv.o generated
 prev libdssip_t.a archive
 bind -ldssip_t

@@ -4782,10 +4782,8 @@ g6.dat:close:};
 g6.dat:open:long call2_0[]={/* two-step function, 0 arguments */
 g6.dat:close:};
 g6.dat:open:struct{
-g6.dat:open:}bltin[]={
 g6.dat:close:}bltin[]={
 g6.dat:open:	0,	{0,	0,	0},	0,	0,
-g6.dat:close:	0,	{0,	0,	0},	0,	0,
 g6.dat:close:};
 g6.dat:open:{
 g6.dat:close:}
@@ -4817,11 +4815,9 @@ g6.dat:close:			}
 g6.dat:close:		}
 g6.dat:open:		switch(typeof(n)->o.t){
 g6.dat:open:			if(n->o.s->val->isauto){
-g6.dat:open:			}else{
 g6.dat:close:			}else{
 g6.dat:close:			}
 g6.dat:open:			if(n->o.s->val->isauto){
-g6.dat:open:			}else{
 g6.dat:close:			}else{
 g6.dat:close:			}
 g6.dat:close:		}
@@ -4832,7 +4828,6 @@ g6.dat:open:		if(vr->type->o.t==TType){
 g6.dat:close:		}
 g6.dat:open:		if(isptrtype(vl->type)){
 g6.dat:open:			if(vl->isauto){
-g6.dat:open:			}else{
 g6.dat:close:			}else{
 g6.dat:close:			}
 g6.dat:close:		}
@@ -4845,13 +4840,10 @@ g6.dat:close:	}
 g6.dat:close:}
 g6.dat:open:{
 g6.dat:open:	if(isstr){
-g6.dat:open:	}else{
 g6.dat:close:	}else{
 g6.dat:close:	}
 g6.dat:open:	if(a->t!=NID){
-g6.dat:open:	}else if(a->o.s->val->isauto){
 g6.dat:close:	}else if(a->o.s->val->isauto){
-g6.dat:open:	}else{
 g6.dat:close:	}else{
 g6.dat:close:	}
 g6.dat:close:}
@@ -4892,7 +4884,6 @@ g6.dat:close:}
 g6.dat:open:{
 g6.dat:open:	else{
 g6.dat:open:		sprint(buf, "prog(){call on line %d}", n->line);
-g6.dat:close:		sprint(buf, "prog(){call on line %d}", n->line);
 g6.dat:close:	}
 g6.dat:open:	switch(callinst){
 g6.dat:close:	}
@@ -4924,7 +4915,6 @@ g6.dat:open:	if(s->t==NList){
 g6.dat:close:	}
 g6.dat:open:	else{
 g6.dat:open:		if(isptr){	/* string */
-g6.dat:open:		}else{
 g6.dat:close:		}else{
 g6.dat:close:		}
 g6.dat:close:	}
@@ -4974,7 +4964,6 @@ g6.dat:close:}
 g6.dat:open:{
 g6.dat:open:	switch(t->o.t){
 g6.dat:open:		if(isptrtype(t)){
-g6.dat:open:		}else if(t->o.t==TInt || t->o.t==TUnit){
 g6.dat:close:		}else if(t->o.t==TInt || t->o.t==TUnit){
 g6.dat:close:		}else if(t->o.t==TChar)
 g6.dat:open:	case TStruct:{
@@ -5005,7 +4994,6 @@ g6.dat:open:		switch(n->o.i){
 g6.dat:close:		}
 g6.dat:open:		if(isconst(n->o.n)){
 g6.dat:open:			if(topofstack()){
-g6.dat:open:			}else{
 g6.dat:close:			}else{
 g6.dat:close:			}
 g6.dat:close:		}
@@ -5064,12 +5052,10 @@ g6.dat:close:}
 g6.dat:open: * 	rec {
 g6.dat:close: * 	};
 g6.dat:open: *	rec type T: struct of { t:T; };
-g6.dat:close: *	rec type T: struct of { t:T; };
 g6.dat:open:{
 g6.dat:open:	if(n->t==NDeclsc){
 g6.dat:close:	}
 g6.dat:open:	if(n->r==0){
-g6.dat:open:	}else if(n->r->o.t==TType){
 g6.dat:close:	}else if(n->r->o.t==TType){
 g6.dat:close:	}
 g6.dat:close:}
@@ -5085,11 +5071,9 @@ g6.dat:open:{
 g6.dat:close:}
 g6.dat:open: *	prog(a:int){
 g6.dat:open: *		begin prog(b:int){ f(a, b); }(b);
-g6.dat:close: *		begin prog(b:int){ f(a, b); }(b);
 g6.dat:close: *	}
 g6.dat:open: *	prog(a:int){
 g6.dat:open: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
-g6.dat:close: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
 g6.dat:close: *	}
 g6.dat:open:{
 g6.dat:close:}
@@ -5169,7 +5153,12 @@ g6.dat:include:#include "store.h"
 g6.dat:include:#include "comm.h"
 g6.dat:include:#include "inst.h"
 g6.dat:include:#include <libc.h>
+g6.dat:define:#define	FNS
 g6.dat:include:#include "lib.h"
+g6.dat:define:#define	C	0x40000000
+g6.dat:define:#define	I	0x20000000
+g6.dat:define:#define	F	0x10000000
+g6.dat:define:#define	M(x)	((x)&~(C|I|F))
 g6.dat:include:#include "lib.h"
 g6.dat:include:#include "node.h"
 g6.dat:include:#include "symbol.h"
@@ -5208,13 +5197,7 @@ g6.dat:include:#include "node.h"
 g6.dat:include:#include "symbol.h"
 g6.dat:include:#include "ydefs.h"
 g6.dat:include:#include <libc.h>
-g6.dat:define:#define	FNS
-g6.dat:define:#define	C	0x40000000
-g6.dat:define:#define	I	0x20000000
-g6.dat:define:#define	F	0x10000000
-g6.dat:define:#define	M(x)	((x)&~(C|I|F))
-g7.dat:include:#include "sed.h" /* define sed stuff */
-g7.dat:define:#include "sed.h" /* define sed stuff */'
+g7.dat:include:#include "sed.h" /* define sed stuff */'
 	EXEC	-n -m -e open:{ -e close:} g6.dat g7.dat
 		OUTPUT - $'g6.dat:6:open:{
 g6.dat:9:open:	if(p==0){
@@ -5337,10 +5320,8 @@ g6.dat:428:close:};
 g6.dat:429:open:long call2_0[]={/* two-step function, 0 arguments */
 g6.dat:431:close:};
 g6.dat:433:open:struct{
-g6.dat:438:open:}bltin[]={
 g6.dat:438:close:}bltin[]={
 g6.dat:440:open:	0,	{0,	0,	0},	0,	0,
-g6.dat:440:close:	0,	{0,	0,	0},	0,	0,
 g6.dat:441:close:};
 g6.dat:444:open:{
 g6.dat:451:close:}
@@ -5372,11 +5353,9 @@ g6.dat:714:close:			}
 g6.dat:741:close:		}
 g6.dat:753:open:		switch(typeof(n)->o.t){
 g6.dat:756:open:			if(n->o.s->val->isauto){
-g6.dat:759:open:			}else{
 g6.dat:759:close:			}else{
 g6.dat:762:close:			}
 g6.dat:768:open:			if(n->o.s->val->isauto){
-g6.dat:771:open:			}else{
 g6.dat:771:close:			}else{
 g6.dat:774:close:			}
 g6.dat:784:close:		}
@@ -5387,7 +5366,6 @@ g6.dat:833:open:		if(vr->type->o.t==TType){
 g6.dat:837:close:		}
 g6.dat:842:open:		if(isptrtype(vl->type)){
 g6.dat:843:open:			if(vl->isauto){
-g6.dat:846:open:			}else{
 g6.dat:846:close:			}else{
 g6.dat:849:close:			}
 g6.dat:851:close:		}
@@ -5400,13 +5378,10 @@ g6.dat:888:close:	}
 g6.dat:891:close:}
 g6.dat:894:open:{
 g6.dat:896:open:	if(isstr){
-g6.dat:900:open:	}else{
 g6.dat:900:close:	}else{
 g6.dat:905:close:	}
 g6.dat:906:open:	if(a->t!=NID){
-g6.dat:910:open:	}else if(a->o.s->val->isauto){
 g6.dat:910:close:	}else if(a->o.s->val->isauto){
-g6.dat:914:open:	}else{
 g6.dat:914:close:	}else{
 g6.dat:918:close:	}
 g6.dat:919:close:}
@@ -5447,7 +5422,6 @@ g6.dat:1093:close:}
 g6.dat:1096:open:{
 g6.dat:1113:open:	else{
 g6.dat:1116:open:		sprint(buf, "prog(){call on line %d}", n->line);
-g6.dat:1116:close:		sprint(buf, "prog(){call on line %d}", n->line);
 g6.dat:1120:close:	}
 g6.dat:1122:open:	switch(callinst){
 g6.dat:1140:close:	}
@@ -5479,7 +5453,6 @@ g6.dat:1267:open:	if(s->t==NList){
 g6.dat:1271:close:	}
 g6.dat:1278:open:	else{
 g6.dat:1280:open:		if(isptr){	/* string */
-g6.dat:1285:open:		}else{
 g6.dat:1285:close:		}else{
 g6.dat:1288:close:		}
 g6.dat:1293:close:	}
@@ -5529,7 +5502,6 @@ g6.dat:1520:close:}
 g6.dat:1523:open:{
 g6.dat:1524:open:	switch(t->o.t){
 g6.dat:1529:open:		if(isptrtype(t)){
-g6.dat:1532:open:		}else if(t->o.t==TInt || t->o.t==TUnit){
 g6.dat:1532:close:		}else if(t->o.t==TInt || t->o.t==TUnit){
 g6.dat:1535:close:		}else if(t->o.t==TChar)
 g6.dat:1540:open:	case TStruct:{
@@ -5560,7 +5532,6 @@ g6.dat:1700:open:		switch(n->o.i){
 g6.dat:1742:close:		}
 g6.dat:1759:open:		if(isconst(n->o.n)){
 g6.dat:1763:open:			if(topofstack()){
-g6.dat:1766:open:			}else{
 g6.dat:1766:close:			}else{
 g6.dat:1769:close:			}
 g6.dat:1772:close:		}
@@ -5619,12 +5590,10 @@ g6.dat:2146:close:}
 g6.dat:2150:open: * 	rec {
 g6.dat:2153:close: * 	};
 g6.dat:2164:open: *	rec type T: struct of { t:T; };
-g6.dat:2164:close: *	rec type T: struct of { t:T; };
 g6.dat:2171:open:{
 g6.dat:2173:open:	if(n->t==NDeclsc){
 g6.dat:2176:close:	}
 g6.dat:2177:open:	if(n->r==0){
-g6.dat:2182:open:	}else if(n->r->o.t==TType){
 g6.dat:2182:close:	}else if(n->r->o.t==TType){
 g6.dat:2186:close:	}
 g6.dat:2190:close:}
@@ -5640,11 +5609,9 @@ g6.dat:2233:open:{
 g6.dat:2243:close:}
 g6.dat:2249:open: *	prog(a:int){
 g6.dat:2250:open: *		begin prog(b:int){ f(a, b); }(b);
-g6.dat:2250:close: *		begin prog(b:int){ f(a, b); }(b);
 g6.dat:2251:close: *	}
 g6.dat:2255:open: *	prog(a:int){
 g6.dat:2256:open: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
-g6.dat:2256:close: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
 g6.dat:2257:close: *	}
 g6.dat:2267:open:{
 g6.dat:2276:close:}
@@ -5768,18 +5735,17 @@ g6.dat:2405:include:#include "node.h"
 g6.dat:2406:include:#include "symbol.h"
 g6.dat:2407:include:#include "ydefs.h"
 g6.dat:2408:include:#include <libc.h>
-g7.dat:3:include:#include "sed.h" /* define sed stuff */
-g7.dat:3:define:#include "sed.h" /* define sed stuff */'
+g7.dat:3:include:#include "sed.h" /* define sed stuff */'
 	EXEC	-c -m -e open:{ -e close:} g6.dat g7.dat
-		OUTPUT - $'g6.dat:open:238
-g6.dat:close:236
+		OUTPUT - $'g6.dat:open:227
+g6.dat:close:231
 g7.dat:open:9
 g7.dat:close:9'
 	EXEC	-c -m -e include:include -e define:define g6.dat g7.dat
 		OUTPUT - $'g6.dat:include:54
 g6.dat:define:5
 g7.dat:include:1
-g7.dat:define:1'
+g7.dat:define:0'
 	EXEC	-h -m -e open:{ -e close:} g6.dat g7.dat
 		OUTPUT - $'open:{
 open:	if(p==0){
@@ -5902,10 +5868,8 @@ close:};
 open:long call2_0[]={/* two-step function, 0 arguments */
 close:};
 open:struct{
-open:}bltin[]={
 close:}bltin[]={
 open:	0,	{0,	0,	0},	0,	0,
-close:	0,	{0,	0,	0},	0,	0,
 close:};
 open:{
 close:}
@@ -5937,11 +5901,9 @@ close:			}
 close:		}
 open:		switch(typeof(n)->o.t){
 open:			if(n->o.s->val->isauto){
-open:			}else{
 close:			}else{
 close:			}
 open:			if(n->o.s->val->isauto){
-open:			}else{
 close:			}else{
 close:			}
 close:		}
@@ -5952,7 +5914,6 @@ open:		if(vr->type->o.t==TType){
 close:		}
 open:		if(isptrtype(vl->type)){
 open:			if(vl->isauto){
-open:			}else{
 close:			}else{
 close:			}
 close:		}
@@ -5965,13 +5926,10 @@ close:	}
 close:}
 open:{
 open:	if(isstr){
-open:	}else{
 close:	}else{
 close:	}
 open:	if(a->t!=NID){
-open:	}else if(a->o.s->val->isauto){
 close:	}else if(a->o.s->val->isauto){
-open:	}else{
 close:	}else{
 close:	}
 close:}
@@ -6012,7 +5970,6 @@ close:}
 open:{
 open:	else{
 open:		sprint(buf, "prog(){call on line %d}", n->line);
-close:		sprint(buf, "prog(){call on line %d}", n->line);
 close:	}
 open:	switch(callinst){
 close:	}
@@ -6044,7 +6001,6 @@ open:	if(s->t==NList){
 close:	}
 open:	else{
 open:		if(isptr){	/* string */
-open:		}else{
 close:		}else{
 close:		}
 close:	}
@@ -6094,7 +6050,6 @@ close:}
 open:{
 open:	switch(t->o.t){
 open:		if(isptrtype(t)){
-open:		}else if(t->o.t==TInt || t->o.t==TUnit){
 close:		}else if(t->o.t==TInt || t->o.t==TUnit){
 close:		}else if(t->o.t==TChar)
 open:	case TStruct:{
@@ -6125,7 +6080,6 @@ open:		switch(n->o.i){
 close:		}
 open:		if(isconst(n->o.n)){
 open:			if(topofstack()){
-open:			}else{
 close:			}else{
 close:			}
 close:		}
@@ -6184,12 +6138,10 @@ close:}
 open: * 	rec {
 close: * 	};
 open: *	rec type T: struct of { t:T; };
-close: *	rec type T: struct of { t:T; };
 open:{
 open:	if(n->t==NDeclsc){
 close:	}
 open:	if(n->r==0){
-open:	}else if(n->r->o.t==TType){
 close:	}else if(n->r->o.t==TType){
 close:	}
 close:}
@@ -6205,11 +6157,9 @@ open:{
 close:}
 open: *	prog(a:int){
 open: *		begin prog(b:int){ f(a, b); }(b);
-close: *		begin prog(b:int){ f(a, b); }(b);
 close: *	}
 open: *	prog(a:int){
 open: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
-close: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
 close: *	}
 open:{
 close:}
@@ -6289,7 +6239,12 @@ include:#include "store.h"
 include:#include "comm.h"
 include:#include "inst.h"
 include:#include <libc.h>
+define:#define	FNS
 include:#include "lib.h"
+define:#define	C	0x40000000
+define:#define	I	0x20000000
+define:#define	F	0x10000000
+define:#define	M(x)	((x)&~(C|I|F))
 include:#include "lib.h"
 include:#include "node.h"
 include:#include "symbol.h"
@@ -6328,29 +6283,23 @@ include:#include "node.h"
 include:#include "symbol.h"
 include:#include "ydefs.h"
 include:#include <libc.h>
-define:#define	FNS
-define:#define	C	0x40000000
-define:#define	I	0x20000000
-define:#define	F	0x10000000
-define:#define	M(x)	((x)&~(C|I|F))
-include:#include "sed.h" /* define sed stuff */
-define:#include "sed.h" /* define sed stuff */'
+include:#include "sed.h" /* define sed stuff */'
 	EXEC	-c -h -m -e open:{ -e close:} g6.dat g7.dat
-		OUTPUT - $'open:238
-close:236
+		OUTPUT - $'open:227
+close:231
 open:9
 close:9'
 	EXEC	-c -h -m -e include:include -e define:define g6.dat g7.dat
 		OUTPUT - $'include:54
 define:5
 include:1
-define:1'
+define:0'
 	EXEC	-t -m -e open:{ -e close:} g6.dat g7.dat
-		OUTPUT - $'open:247
-close:245'
+		OUTPUT - $'open:236
+close:240'
 	EXEC	-t -m -e include:include -e define:define g6.dat g7.dat
 		OUTPUT - $'include:55
-define:6'
+define:5'
 
 TEST 15 '-x with -e'
 
@@ -6383,3 +6332,38 @@ TEST 16 'ast bm checks'
 	EXEC	-E '(ab$)'
 	EXEC	-E '(abcdef$)'
 	EXEC	'(abcdefghijklmnopqrstuvwxy$)'
+
+TEST 17 '--only-matching'
+
+	EXEC	-o 'foo.*bar'
+		INPUT - $'123\nfoo-bar foo-yoyo-bar fixfoofuxbaxbarbox\n567'
+		OUTPUT - $'foo-bar foo-yoyo-bar fixfoofuxbaxbar'
+	EXEC	-o 'foo[^[:space:]]*bar'
+		OUTPUT - $'foo-bar\nfoo-yoyo-bar\nfoofuxbaxbar'
+
+TEST 18 '--context[=before[,after]]'
+
+	EXEC	-C2 X i
+		INPUT i $'A1\nX2\nX3\nX4\nX5\nA6\nA7\nA8\nA9\nA10\nX11X\nA12A'
+		OUTPUT - $'A1\nX2\nX3\nX4\nX5\nA6\nA7\n--\nA9\nA10\nX11X\nA12A'
+
+	EXEC	-n -C2 X i
+		OUTPUT - $'1-A1\n2:X2\n3:X3\n4:X4\n5:X5\n6-A6\n7-A7\n--\n9-A9\n10-A10\n11:X11X\n12-A12A'
+
+	EXEC	-H -C2 X i
+		OUTPUT - $'i-A1\ni:X2\ni:X3\ni:X4\ni:X5\ni-A6\ni-A7\n--\ni-A9\ni-A10\ni:X11X\ni-A12A'
+
+	EXEC	-H -n -C2 X i
+		OUTPUT - $'i-1-A1\ni:2:X2\ni:3:X3\ni:4:X4\ni:5:X5\ni-6-A6\ni-7-A7\n--\ni-9-A9\ni-10-A10\ni:11:X11X\ni-12-A12A'
+
+	EXEC	-o -C2 X i
+		OUTPUT - $'X\nX\nX\nX\n--\nX\nX'
+
+	EXEC	-o -n -C2 X i
+		OUTPUT - $'2:X\n3:X\n4:X\n5:X\n--\n11:X\n11:X'
+
+	EXEC	-o -H -C2 X i
+		OUTPUT - $'i:X\ni:X\ni:X\ni:X\n--\ni:X\ni:X'
+
+	EXEC	-o -H -n -C2 X i
+		OUTPUT - $'i:2:X\ni:3:X\ni:4:X\ni:5:X\n--\ni:11:X\ni:11:X'

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1996-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1996-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -25,7 +25,7 @@
 **	Written by Kiem-Phong Vo (07/08/96)
 */
 
-static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2011-10-11 $\0\n";
+static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2013-02-13 $\0\n";
 
 #if __STD_C
 Rs_t* rsnew(Rsdisc_t* disc)

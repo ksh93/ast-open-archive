@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -548,6 +548,9 @@ CXV("rd",		"rd_t",		BGP_MVPN_rd,			"Route distinguisher.")
 CXV("src_addr",		"ipaddr_t",	BGP_MVPN_src_addr,		"Source address.")
 CXV("src_addrv4",	"ipv4addr_t",	BGP_MVPN_src_addrv4,		"Source ipv4 address.")
 CXV("src_addrv6",	"ipv6addr_t",	BGP_MVPN_src_addrv6,		"Source ipv6 address.")
+CXV("src_as",		"as_t",		BGP_MVPN_src_as,		"Source AS number.")
+CXV("src_as16",		"as16_t",	BGP_MVPN_src_as16,		"Source AS16 number.")
+CXV("src_as32",		"as32_t",	BGP_MVPN_src_as32,		"Source AS32 number.")
 CXV("type",		"number",	BGP_MVPN_type,			"Route type.")
 {0}
 };
@@ -571,6 +574,7 @@ mvpn_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperan
 	else
 	{
 		bgp = (Bgp_t*)DSS(cx)->data;
+		rp = 0;
 		mp = (Bgpmvpn_t*)r->value.buffer.data;
 	}
 	if (!mp)
@@ -672,6 +676,15 @@ mvpn_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperan
 		r->value.buffer.size = sizeof(mp->src_addr.v6);
 		r->value.buffer.elements = 0;
 		break;
+	case BGP_MVPN_src_as:
+		r->value.number = mp->src_as ? mp->src_as : mp->src_as32;
+		break;
+	case BGP_MVPN_src_as16:
+		r->value.number = mp->src_as;
+		break;
+	case BGP_MVPN_src_as32:
+		r->value.number = mp->src_as32;
+		break;
 	case BGP_MVPN_type:
 		r->value.number = mp->type;
 		break;
@@ -717,7 +730,10 @@ rd_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_
 		rd = &rp->rd;
 	}
 	else if (rd = (Bgprd_t*)r->value.buffer.data)
+	{
 		bgp = (Bgp_t*)DSS(cx)->data;
+		rp = 0;
+	}
 	else
 	{
 		memset(&r->value, 0, sizeof(r->value));
@@ -992,7 +1008,7 @@ Dsslib_t dss_lib_bgp =
 {
 	"bgp",
 	"bgp method"
-	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2012-08-15 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2013-04-18 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	&libraries[0],

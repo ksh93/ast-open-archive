@@ -133,7 +133,7 @@ USAGE_LICENSE
             "b}' mrt.dat?Write the announce records from \bmrt.dat\b to the "
             "file \ba\b in the \btable\b format and all other records to the "
             "file \bb\b in the \bcisco\b format.]"
-        "[+dss -x foo-txt '{flat foo-bin}|{compress}' foo.txt > foo.bin?Convert "
+        "[+dss -x foo-txt '{flatten foo-bin}|{compress}' foo.txt > foo.bin?Convert "
             "the \bfoo-txt\b file \bfoo.txt\b to the \bfoo-bin\b \bflat\b "
             "method format file \bfoo.bin\b using the preferred compression "
             "method, where \bfoo-txt.dss\b and \bfoo-bin.dss\b are user "

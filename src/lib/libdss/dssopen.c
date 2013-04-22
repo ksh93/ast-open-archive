@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -544,7 +544,8 @@ static Cxmember_t	dss_mem =
 {
 	dss_mem_get,
 	0,
-	(Dt_t*)&dss_mem_struct[0]
+	(Dt_t*)&dss_mem_struct[0],
+	CX_VIRTUAL
 };
 
 static Cxtype_t		dss_type[] =

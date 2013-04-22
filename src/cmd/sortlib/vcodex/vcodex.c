@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2005-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2005-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0s5P?\n@(#)$Id: vcodex (AT&T Research) 2008-06-06 $\n]"
+"[-1lp0s5P?\n@(#)$Id: vcodex (AT&T Research) 2012-11-27 $\n]"
 USAGE_LICENSE
 "[+PLUGIN?vcodex - sort io vcodex discipline library]"
 "[+DESCRIPTION?The \bvcodex\b \bsort\b(1) discipline encodes and/or "
@@ -36,7 +36,7 @@ USAGE_LICENSE
     "containing 'z' and the input path has a suffix containing 'z' then the "
     "output path is renamed by appending the input path suffix.]"
 "[i:input?Decode the input files using \amethod\a. \b--noinput\b "
-    "disables input encoding.]:[method]"
+    "disables input decoding.]:[method]"
 "[o:output?Encode the output file using \amethod\a. \b--nooutput\b "
     "disables output encoding.]:[method]"
 "[r:regress?Massage \bverbose\b output for regression testing.]"
@@ -118,7 +118,11 @@ push(Sfio_t* sp, Encoding_t* code, const char* trans, int type)
 	if (type)
 		vcsf->errorf = vcsferror;
 	if (!vcsfio(sp, vcsf, type))
-		return -1;
+	{
+		type = ((type & VC_OPTIONAL) && !vcsf->type) ? 0 : -1;
+		free(vcsf);
+		return type;
+	}
 	if (code && (code->trans = vcsf->trans))
 		code->use = 1;
 	return type ? 1 : vcsf->type;
@@ -186,7 +190,7 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 	case RS_FILE_READ:
 		if (state->input.use >= 0)
 		{
-			if ((i = push((Sfio_t*)data, &state->input, NiL, VC_DECODE)) < 0)
+			if ((i = push((Sfio_t*)data, &state->input, NiL, VC_DECODE|VC_OPTIONAL)) < 0)
 			{
 				error(2, "%s: cannot push vcodex decode discipline (%s)", arg, state->input.trans);
 				return -1;

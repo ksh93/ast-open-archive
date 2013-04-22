@@ -94,22 +94,146 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-12-11-20  --- Release ksh93v- ---
+13-04-18  --- Release ksh93v- ---
+13-04-18  Fix a bug with process substitution on systems that don't support
+	  /dev/fd.
+13-04-18  Added serialization to processing of CHLD traps.
+13-04-17  A bug in arithmetic in which x[i].foo in a loop would not be
+	  re-evalued when subscript i changed value has been fixed.
+13-04-15  Fixed a couple of problems with regression tests.
+13-04-15  ksh now waits for background jobs started in functions contained
+	  in command substitution.
+13-04-11  Made code changes based on warning from the "clang" tool.
+13-04-11  Fixed two core dumps on some architectures related to uninitialzed
+	  data.
+13-04-10  ksh now waits for background jobs started in $() and ${...;} to
+	  complete as it did in ksh93u+.
+13-04-10  A bug in which x=\\x; case x in $x) echo yes;; *) echo no; esac
+	  printed yes has been fixed.  It should print no.
+13-04-08 +ksh now sets .sh.sig.pid and .sh.sig.status for CHLD traps.  The 
+	  .sh.sig.status can be one of exited, killed, dumped, stopped or
+	  continued.
+13-04-08 +The CHLD trap is now triggered with STOP and CONT signals.
+13-04-05  A bug in which a command with one or more >(...) process substitution
+	  arguments did not wait for all >(...) to complete before running the
+	  next command has been fixed.
+13-04-04  A bug in which monitor mode was not working for scripts has been
+	  fixed.
+13-04-04  A bug in which an unset variable error with set -u on did not
+	  terminate the current script has been fixed.
+13-04-03  The shell now uses mmap() on systems that suppport it for
+	  command substitution.
+13-04-03 +Functions that are used in brace group command substitution ${ ... }
+	  can assign the result to .sh.value instead of writing to standard
+	  out with the same result, but faster.
+13-04-02  A bug in the handling of string files in a type that is a member
+	  of another type has been fixed/
+13-04-02  A bug in cd ../.foobar, where ../.foobar exists, has been fixed.
+13-03-29  A bug in which read -r -d delim ignored -r has been fixed.
+13-03-28  A bug in which the KEYBD trap did not work correctly lines that
+	  are continued  has been fixed.
+13-03-28  read with line delimiter 0 and field separator \n did not split on
+	  '\n' and has been fixed.
+13-03-28  A bug in which "typeset -a" could cause a core dump has been fixed.
+13-03-27 +The variable .sh.sig containing siginfo information is no set during
+	  a SIGCHLD trap.
+13-03-26  A bug resulting from one of the memory leak bugs fixed on 13-03-15
+	  has been fixed.
+13-03-22  A bug in displaying indexed arrays of types in a compound variable
+	  has been fixed.
+13-03-22  A bug in which typeset -T did not display subtype names correctly
+	  do to a caching problem has been fixed.
+13-03-21  A bug in which ${...PATH=...} command substitution did not preserve 
+	  path bindings has been fixed.
+13-03-20  The exit value from the expansion of the PS1 prompt no longer affects
+	  the exit status of the shell.
+13-03-20  A fork bomb which could occur when a job was stopped in a shell with
+	  monitor mode, but not a job control shell has been fixed.
+13-03-19  A new patch to replace the patch removed on 13-03-06 for non utf8
+	  locales in command substitution has been added.
+13-03-17  A bug with print -v for an array of integer or floats has been fixed.
+13-03-15  Two memory leaks related to arrays created in functions has been
+	  fixed.
+13-03-14  A bug in reading an instance of an indexed array variable has been
+	  fixed.
+13-03-12  Initialized a variable in sh/macro.c that had been uninitialized.
+13-03-12  Fixed a bug that could cause a core dump with associative arrays 
+	  used withing types.
+13-03-12  Empty fields and empty arrays as type elements are not displayed
+	  when expanding a type instance.
+13-03-11  The trap command now blocks signals that have traps until the
+	  trap command completes.
+13-03-11  Signals that have traps that occur while processing a trap are
+	  deferred until the trap command completes.
+13-03-10  A bug in the expansion of a compound variable containing nested
+          types that contains arrays has been fixed.
+13-03-06  The patch made on 13-02-07 to handle non utf8 locales has been
+	  removed (for now) because it broke a utf8 locale script. 
+13-03-05  A bug in which ${!var*} to not expand correctly when it was at
+	  the beginning of a script for after a call to enum has been fixed.
+13-03-05  A bug in the expansion of a compound variable containing nested
+	  types has been fixed.
+13-03-04  A bug in the for loop optimizer which could falsely treat typeset -b
+	  as loop invariants  has been fixed.
+13-02-27  The exit value from expanding the PS[1-4] prompts no longer affect
+	  the exit status of the shell when you exit with EOF.
+13-02-22  'kill %' caused the shell to core dump.  This has been fixed.
+13-02-21  The 12-01-16 bug fix prevented .sh.match from being used in the
+	  replacement string.  The previous code was restored and a different
+	  fix which prevented .sh.match from being computed for nested
+	  replacement has been used instead.  
+13-02-20  Fixed two bugs related to reading compound variables with
+	  read -C that contain sub-elemects that are type variables.
+13-02-19  Fixed a bug introduced on 13-01-17 when adding the feature of
+	  allowing math functions to pass arrays as arguments.
+13-02-13  A bug in which hitting interrupt with reading from a terminal
+	  sent the interrupt to the current process rather than the current
+	  process group has been fixed.
+13-02-13  A bug in which x.name and x[0].name were not treated the same
+	  has been fixed.
+13-02-08 +The -p option was added to enum to display the values that are
+	  valid for the enum.
+13-02-07 +A preset alias named bool which is an alias for an enum
+	  named _Bool which has values true and false has been added.
+13-02-07  A bug in the processing of multibyte characters in non utf8 locales
+	  in command substitution has been fixed.
+13-02-05  Fixed emacs tab completion bug in which typing <tab><tab> in a
+	  directory with one element that contained an element of one entry
+	  did not expand to both names.
+13-02-24  Increased the maximum level of recursion for evaluating variables
+	  inside arithmetic expressions from 9 to 1024.
+13-02-24  Added exp10 math function.
+13-01-31  A bug in integer division which occured for numbers between INT_MAX
+	  and UINT_MAX has been fixed.
+13-01-31  A bug in the parser that did not allow for redirections with
+	  ((...)) arithmetic statements has been fixed.
+13-01-17 +User define math functions introduced on 10-03-24 now allow passing
+	  arrays as arguments.
+13-01-10 +ksh now treats ESC-O-letter the same as ESC-[-letter in vi and emacs
+	  edit modes.
+12-12-10  A bug with enumerations types when declaring an indexed array of
+	  an enumeration type has been fixed.
+12-11-30  A bug in which whence or type on a preset alias did not output the
+	  value has been fixed.
+12-11-28  Assigning an element of an indexed array as an empty array now
+	  correctly displays this with typeset -p.
+12-11-28  typeset -p of an array variable whose 0 element was an array variable
+	  with no elements did not output correctly and has been fixed.
 12-11-20  Numerous changes related to new algorithm for shell redirections
 	  using the spawnvex() library.  Not yet used in all cases.
 12-11-14  A bug with caused by using spawnvex*() functions for redirections
 	  of simple commands with here-documents has been fixed.
 12-11-12  A memory leak which occured while doing path search has been fixed.
-12-10-24  A bug in which causes the shell to report a syntax error when a
+12-10-24  A bug which caused the shell to report a syntax error when a
 	  command substitution appeared on the line that started a here
 	  document has been fixed.
 12-10-23  The shell now uses the new spawnvex*() functions for redirections
 	  of simple command that are not builtin.
 12-10-21  Here documents with $() and ${ } use larger buffers.
-12-10-21  Builtins now use mmap() for file that are opened for reading.
+12-10-21  Builtins now use mmap() for files that are opened for reading.
 12-10-18  A bug in which preceding a special builtin with command did not
 	  prevent assignments from remaining has been fixed.
-12-10-17  A bug in the self documentation for types with causes the field
+12-10-17  A bug in the self documentation for types which causes the field
 	  descriptors to be off by 1 has been fixed.
 12-10-17  An array bug which caused a regression test to fail has been fixed.
 12-10-16  A bug in the exit status for command substitution caused by no longer
@@ -173,7 +297,7 @@ All recorded changes follow.
 	  correctly has been fixed.
 12-08-31  A bug that could cause a core dump after typeset -m var=.sh.match has
 	  been fixed.
-12-08-30  For an assocative array A, $((A[sub])) no longer cause subscript sub
+12-08-30  For an associative array A, $((A[sub])) no longer cause subscript sub
 	  to be created.
 12-08-29  A scoping error in setting the scope for a reference when the
 	  reference contained subscripts containing a variable from a different
@@ -195,7 +319,7 @@ All recorded changes follow.
 	  been fixed.
 12-08-21  A bug in which a compound variable defined in a type could not
 	  have elements added to it has been fixed.
-12-08-20  A bug in which creating a two dimemsional associatve array could
+12-08-20  A bug in which creating a two dimemsional associative array could
 	  add an extra 0 element to the second subscript has been fixed.
 12-08-20  typeset -H foo no longer unsets foo when foo has been exported to
 	  the shell.
@@ -269,7 +393,7 @@ All recorded changes follow.
 	  could core dump has been fixed.
 12-06-06  A bug in which unset of an associative array of compound variables
 	  did not completely unset the variable has been fixed.
-12-06-06  A bug in which exporting left or right justfied fields could loose
+12-06-06  A bug in which exporting left or right justified fields could loose
 	  the field width has been fixed.
 12-06-06  A bug on Solaris11 in which >; did not work for /dev/null was fixed.
 12-06-05  A race condition which occured when stopping a builtin command
@@ -282,14 +406,14 @@ All recorded changes follow.
 	  directory if they are killed or stopped.
 12-06-04  A bug in handling \\ in read has been fixed.
 12-05-31  Use getrlimit64/setrlimit64 on systems that support it.
-12-05-31  Fix 64 bit big-endian arithmentic bug that mishandled nan and inf.
+12-05-31  Fix 64 bit big-endian arithmetic bug that mishandled nan and inf.
 12-05-31  Handle ECONNRESET like EPIPE.
 12-05-31  Change .paths parse to use only the last BUILTIN_LIB from the top
 	  and treat BUILTIN_LIB value as a ':' separated list of lib names.
 12-05-29  Fix BUILTIN_LIB binding bug that ignored subsequent lookups.
 12-05-29  shtests: --nocompile omits the compile test and --compile does only
 	  the compile test.
-12-05-25  A command subsitution containing a here-document that itself contains
+12-05-25  A command substitution containing a here-document that itself contains
 	  a here-document no longer hangs.
 12-05-24  When the redirection operatory >; is directed to a symlink, it now
 	  overwrites the file named by the link rather than the link.
@@ -350,7 +474,7 @@ All recorded changes follow.
 	  string when i was a valid subscript and j was <=0 rather than
 	  generating nothing has been fixed.
 12-04-17  A bug in which read -d delim from a terminal did not respond to
-	  interrupt and did not termrinate when the delimiter was entered
+	  interrupt and did not terminate when the delimiter was entered
 	  has been fixed.
 12-04-17  A bug in which a directory in PATH containing a .paths file that
 	  contains a line with FPATH=dir, where dir does not exist could
@@ -368,7 +492,7 @@ All recorded changes follow.
 12-04-09  A bug in which the leading 0 was stripped from $x, when $x contained
 	  a heximadecimal constant inside an arithmetic expression inside
 	  a for or while loop.
-12-04-06  Modified namespaces to hand variabes FPATH, PATH, and OPTIND that
+12-04-06  Modified namespaces to hand variables FPATH, PATH, and OPTIND that
 	  are defined in name spaces appropriately.  This also fixed OPTIND
 	  and OPTARG processing for functions.
 12-04-04  A bug in which cd .. fails when the current directory has been
@@ -456,7 +580,7 @@ All recorded changes follow.
 	  that caused a core dump has been fixed.
 12-02-08  A bug in which .sh.fun disciplines could be cleared after a
 	  function completes has been fixed.
-12-02-08  A bug in job control in which the foregroup process group was not
+12-02-08  A bug in job control in which the foreground process group was not
 	  set correctly after restarting a stopped pipeline has been fixed.
 12-02-07  A bug in which numbers with leading zeros could be treated as
 	  octal constants outside of ((...)) has been fixed.
@@ -474,7 +598,7 @@ All recorded changes follow.
 12-01-19  A memory leak which occured for a nested command subtiution has been
 	  fixed.
 12-01-17  A bug in which typeset -u PS1 could enable the uppercase attribute
-	  for some other variables, for exampe, HISTFILE has been fixed.
+	  for some other variables, for example, HISTFILE has been fixed.
 12-01-16  A bug in which .sh.match was not correct after a substring match when
 	  the replacement string contained a substring match has been fixed.
 12-01-12 +Files that are sourced from profile files are now read and executed
@@ -491,8 +615,8 @@ All recorded changes follow.
 	  arr was not unset before the assignment has been fixed. 
 11-12-20  A number of code changes were made based on the results of errors
 	  indicated by static code analysis.
-11-12-13  In vi edit mode a lteral <TAB> can now be entered by preceding it
-	  with a backshash.
+11-12-13  In vi edit mode a literal <TAB> can now be entered by preceding it
+	  with a backslash.
 11-12-13  When tab is entered for completion after a ' or ", the ' and "
 	  characters are no longer deleted.
 11-12-07  A bug in which a program in the current direcotry with a . in the
@@ -510,7 +634,7 @@ All recorded changes follow.
 	  quote argument in a form suitable for a field in a .csv format file.
 11-12-02 +A -S option was added to read to be able to read .csv format files.
 11-11-28  A bug in which redirection of standard error in a function called from
-	  command substitution caused standard error to be lost has ben fixed.
+	  command substitution caused standard error to be lost has been fixed.
 11-11-21  [[ (-n foo) ]] no longer requires a space before (.
 11-11-11  The readonly attribute for a variable now applies to compound
 	  assignments to that variable.
@@ -566,7 +690,7 @@ All recorded changes follow.
 	  jobs to complete has been fixed.
 11-06-09  A bug which caused the options.sh regression test to fail on OS390
 	  Linux has been fixed.  The bug could also have affected other systems.
-11-06-07 +A number of changes to support the still undocuments namespace option
+11-06-07 +A number of changes to support the still undocumented namespace option
 	  have been added.
 11-06-06  A bug in which command substitution of eval would hang when it  had
 	  standard error redirected to standard output has been fixed.
@@ -652,7 +776,7 @@ All recorded changes follow.
 11-03-04 +The tilde expansion on windows has been modified to handle user
 	  names of the form domain/user so that ~domain/user now expands
 	  to the home directory of that domain user.
-11-03-03  A bug in which the width of the prompt was calculated incorectly
+11-03-03  A bug in which the width of the prompt was calculated incorrectly
 	  which cause the wrong line length for edit commands has been fixed.
 11-03-02  A bug in which a global variables set from within a function inside
 	  a subshell can leave side effects in parent shell has been fixed.
@@ -667,7 +791,7 @@ All recorded changes follow.
 	  references defined and the script creates name references of the
 	  same name.
 11-02-21  The shell now fails with a syntax error when a here-document in a
-	  command substition is not completed before the closing ), for
+	  command substitution is not completed before the closing ), for
 	  example, $( foobar <<! )
 		here_doc
 	  !.
@@ -695,7 +819,7 @@ All recorded changes follow.
 	  variables when the same array was referenced on the left and the
 	  right hand side with different indices has been fixed.
 11-01-10  A bug in which the output of time was lost when { time...;} 2>&1
-	  occurred inside command substition has been fixed.
+	  occurred inside command substitution has been fixed.
 11-01-07  [[ -v sh.match[i] ]] was returning false when sh.match[i] was set.
 11-01-05  Added and modified warning messages with sh -n.
 11-01-02  Fixed bugs with typeset -l/-u/-M and arrays.
@@ -770,7 +894,7 @@ All recorded changes follow.
 	  when the type is initialized has been fixed.
 10-11-12  The sequences \< and \> are now preserved after patterns containing
 	  ~(E) in ${var/pattern/string} expansions.
-10-11-11  A bug in typeset -m when the variables were compound arrary instances
+10-11-11  A bug in typeset -m when the variables were compound array instances
 	  has been fixed.
 10-11-10  A bug in output of a compound variable with types containing types
 	  has been fixed.
@@ -3931,163 +4055,6 @@ All recorded changes follow.
 99-01-23 moved library tests from std to here
 	 added optget() tests
 
-:::::::: 3d ::::::::
-
-12-09-26 fchdir3d.c: fix bad #if logic that failed on non-*at() systems
-12-08-22 sys.tab,dir3d.c,fchdir3d.c,openat3d.c: first round of *at()-ification
-12-06-25 change strcpy() within buffer to strcopy()
-12-06-22 sys.tab,utimensat3d.c: add utimensat()
-12-05-25 sys.tab: handle missing getdents64 on linux+gcc-4.4
-12-05-25 syscall3d.c: tweak _exit() logic (really?) to dumped core on recent solaris
-11-12-01 fix fcntl 3rd arg int vs void*
-10-06-01 sync with ast api 20100601
-10-04-10 mkdir3d.c: fix mkdir() intermediate dir logic
-10-01-19 3d.h: increase some path buffer sizes -- these need to be dynamic!
-09-05-15 dll_3d.h: handle dllopen => dlopen
-08-12-04 fs.c: change open(/dev/fd/NN,...) try open(2) first, then dup(2)
-08-06-20 ast_3d.h,ast.c: add libast/misc/setenviron.c
-07-03-26 Makefile: drop -L* from IFFEREFS -- handled by .IFFE.REF.
-07-03-21 lib_3d.h,error.c: handle error_info => *_error_data_
-06-12-04 3d.h: strmode() bsd conflict tweak
-06-11-23 finally get linux to pass regression tests
-06-11-21 fchdir3d: let chdir do the work if fd matches cached path
-06-09-28 3d.sh: used getconf LIBPATH|LIBPREFIX|LIBSUFFIX -- how novel
-06-09-26 3d.h,dir3d.c,dll3d.c: fix strtou*l*l maps for __int64 vs. long long
-06-09-18 strmatch.c,touch.c: add private obsolete api copies
-06-08-27 mkdir3d.c: foloow mkdir -p mode rules for missing intermediates
-05-02-01 3d.sh: IFS may be unset and { ash bsh } don't on startup -- wow
-05-01-01 sys.tab,utimets3d.c: add utimets() intercept
-04-12-15 pathreal.c: "..." should fail if no lower view -- doh
-04-10-01 features/syslib: _exit test now uses SIGKILL (openbsd abort() hangs)
-04-07-26 3d.sh: update runtime docs
-	 3d.1: drop in deference to the 3d.sh runtime docs
-04-07-20 3d.h: undef _BLD_DEBUG to avoid raw libast symbols
-04-07-19 fs.c,lib.c,open3d.c,vcs_3d.h: { O_RDONLY O_WRONLY O_RDWR } are values
-04-07-19 dir3d.c: rewinddir643d() must call seekdir643d() (not seekdir64())
-04-07-01 3d.tst: TMP => TWD to match regress(1)
-04-06-16 3d.tst: coordinate $TMP with regress(1)
-04-06-14 lib.c: fix fs3d() 2d return value
-04-06-11 3d.tst: fix test and error counts
-04-05-04 open3d.c: create missing lower level dirs for O_CREAT ... file paths
-03-08-15 mount3d.c: change 3d intercept test to handle NiL || ""
-03-06-11 ast.c: add _map_malloc checks for _ast_malloc => malloc
-03-06-05 pathreal.c: fix ancient multiple relative|.. symlink bug
-03-06-04 3d.sh: change `shift $OPTIND-1' to `set x "@"; shift $OPTIND'
-03-03-28 dir3d.c,rmdir3d.c,syscall3d.c: add D_FILENO and D_TYPE ifdefs
-03-03-25 dup3d.c: fix bug that cleared Dir_t pointer just after allocation
-03-03-07 ftruncate3d.c,lseek3d.c,truncate3d.c: check _typ_off64_t
-02-10-18 features/syscall.sh: handle pseudo files in cc -E line syncs
-02-07-17 syscall3d.c: clean up user level intercept code
-02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR
-02-06-14 ast_3d.h,cs.c: move fmttime() macro override to cs.c
-02-06-06 dir3d.c: fix rewinddir() bug that did not decrement intercepted count
-02-04-01 Makefile,cs.c,cs_3d.h,ast_3d.h: _WIN32 tweaks
-01-11-26 pathreal.c: empty path is an error
-01-11-16 ftruncate3d.c,truncate3d.c: use lseek3d indirection via sysfunc()
-01-10-31 fchdir3d: add along with state.file[].dir to cache open dir paths
-	 dir3d.c: add recursive call intercepts
-	 error.c: add recursive call intercepts
-	 pathreal.c: add buffer size check
-	 features/syscall.sh: add bsd syscall __RENAME() checks
-	 syscall3d.c: check _lib_syscall before using it!
-01-10-30 features/syscall.sh,syscall3d.c: handle -ldl calls back into 3d
-01-09-20 3d.sh: drop extra } in USAGE that emitted -} for --?
-01-07-17 Makefile: don't link 3d dll against ast dll
-01-02-19 close3d: dup reserved fd's higher
-01-02-14 add :VARIANT: to build dll's for CC.DLL.VARIANTS
-01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
-00-12-14 3d.sh: fix -c
-00-10-31 ast.c add pathtemp.c
-00-10-19 init.c: initialize _3d_2d
-00-07-17 fix fchown to call MSG_fchown (not MSG_fchown); fixes vim dump!
-00-02-14 3d command long options (finally)
-99-01-01 --- release 4.0 ---
-99-04-01 dll: sfsprintf => _3d_sfsprintf
-	 check for __*_nc (osf.alpha)
-99-02-14 pathreal: copy to state.path.name if not already there
-	 rewinddir3d: just call seekdir(p,0); fixes `top' core dump
-99-01-11 lseek3d,syscall3d: add sysfunc() for off_t!=long
-99-01-01 --- release 3.0 ---
-98-02-14 3d.sh: fix _RLD32_LIST => _RLDN32_LIST typo
-	 pathreal: fix (P_LSTAT|P_READLINK) under pwd bug that did phys on .
-	 features/syscall.sh: tighten up version __call header grep
-	 unlink: trap remove() too
-	 features/syscall.sh: favor strong (_ prefix) name for some arch's
-98-02-06 syscall3d: handle longjmp with cp->active
-98-01-23 features/syscall.sh: check for _xstat vs __xstat
-98-01-01 add readdir64 rewinddir64 seekdir64 telldir64
-97-10-11 fix lefty's virtual dir touch bug -- recursive doubling on stbuf
-97-07-17 CS_INTERFACE=2
-97-04-01 features/syscall.sh: fix __exit() test for new sgi
-96-12-25 handle stat64() implementations on top of _xstat()
-	 3d.tst must be run under 3d!
-	 _SCO_STAT_VER tweaks
-	 sgi _RLD_NEXT_PATHNAME fix for -32 -n32 -64 differentiation
-	 _*xstat() hacks around proto in *stat3d.c
-	 add constant casts for long shift counts
-	 fix pathnext() to report version instance level in state.path.level
-96-11-28 fix rename() to do physical stat on subject path!
-96-02-29 handle syscall loops caused by botched libs like solaris libsocket.so
-	 generalize name service interface to handle ifs+vcs
-	 catch acl,facl even if not on local sys
-	 fix features/syscall.sh bug that set $stdc incorrectly
-	 use alloca() in execve() if possible
-	 add 3d.tst and test makefile action
-	 fix a few important virtual dir / create / append bugs
-	 fix null dereference in open3d() for state.in_2d
-96-02-14 add NFS acl,facl
-96-02-08 fix 2d bug in link,rename,symlink that generated empty arg 1
-96-01-30 fix features/syscall.sh for compilers that ignore prototypes
-96-01-22 P_TOP only takes effect for files in virtual dir!
-95-11-24 optimize exec $shell to eval in 3d.sh
-95-11-11 don't fs3d_copy opaqued files
-95-10-11 fs3d_mkdir virtual dir fix 
-	 fix 2d virtual dir test in pathreal()
-	 solaris _rename() != weak rename()
-	 solaris exit() doesn't call _exit()
-	 all static data in state
-	 test state.in_2d in link3d()
-	 fix opaque.sh that was broken sometime after 91
-	 linux LD_BIND_NOW not needed with ld.so-1.7.9
-95-07-17 handle irix-5.3 struct stat64 and off64_t
-	 dlsym(__exit) before dlsym(_exit)
-95-05-09 fix pathcanon() bug that incremented state.path.level too far on ...
-	 percolate inode metadata changes to the top level too (no more EROFS)
-	 add P_TOP to truncate() too!
-	 feature/syscall.sh does not generate #include, up to *3d.c
-	 spawnveg.c must come after spawnve.c in ast.c
-	 cspoll.c must come after cs*.c in cs.c
-	 fix 3d to work like $SHELL if no shared 3d lib found
-	 fix chdir .. symlink bug that set state.pwd to physical path
-	 add %n.n.nd to bvprintf
-	 ignore a few more non-initialization setcwd() errors
-95-01-19 fix undefined var ref for _VER_ hack calls in features/syscall.sh
-95-01-11 access W_OK succeeds if on lower view
-94-12-01 add /#fs/NAME/load to load shared lib fs
-	 add user system call trap() stack
-	 VPATH=*::* or VPATH=*:-:* to separate disjoint views
-	 change trap() to intercept()
-94-07-17 add /#fs/safe
-94-06-01 fix symlink() and link() bug that didn't instantiate virtual dir
-	 fix [f]statvfs() infinite loop for att hybrids
-94-05-11 merge with the real vcs
-	 add char*_3d_2d: if _3d_2d!=0&&getenv(_3d_2d)==0 then 2d
-	 trailing slash in pathreal() interpreted as slash dot (off/w test=010)
-93-05-28 add /#option/limit=n to limit view depth
-93-04-01 --- release 2.0 ---
-93-03-11 change /dev/3d/* to /#*
-	 remove anno and rpl specific hooks
-	 add name,monitor,active fs mounts
-92-04-01 --- release 1.1 ---
-92-02-11 change retained mounts to /dev/3d/dev
-92-01-11 add $SHELL and /bin/sh exec() checks to force 3d sh
-	 fix checklink() to concatenate relative links with original prefix
-91-11-11 --- release 1.0 ---
-	 add feature/syscall.sh to handle att s5r4, hp snake, sun 4.1
-	 change umask() 3d state toggle to mount(-,/dev/3d/option/{2d,3d})
-	 fix creat() virtual dir bug for umteenth time
-	 link() and rename() now migrate to top instead of EROFS
-
 :::::::: coshell ::::::::
 
 10-06-01 sync with ast api 20100601
@@ -4258,6 +4225,24 @@ All recorded changes follow.
 10-06-01 sync with ast api 20100601
 04-02-29 self-document
 
+:::::::: msggen ::::::::
+
+13-04-01 split src/cmd/msgcc into { src/cmd/msggen src/cmd/msgcc }
+10-10-20 msgcc.sh: add raw type (like str) for ksh -D style strings
+10-06-01 sync with ast api 20100601
+06-11-15 msgcc.sh: date -f x => date +x for ast-base portability
+06-10-11 add sfstruse() error checks
+02-03-11 msgcc: fix merge replacement threshhold logic
+	 msggen: convert { \a \b \f \n \r \v } back to C escapes
+	 msgcpp: set pp:modern
+02-02-14 msggen: add -f to list printf format signatures
+01-10-10 msgcc: allow some email forms to pass
+01-06-10 msgcpp: add proper escapes to OMIT pattern
+01-05-29 msgcc: add similar unused message replacement, -M-similar
+01-04-22 msgcc,msggen,msgget: use mcindex()
+01-01-31 ignore ls generation errors
+00-04-20 first release
+
 :::::::: msgcc ::::::::
 
 10-10-20 msgcc.sh: add raw type (like str) for ksh -D style strings
@@ -4277,6 +4262,13 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+13-04-11 pkg-cobol.mk: add :COBTRACE:
+13-04-05 Makerules.mk: add .SOURCE.h defaults ala .SOURCE.a
+13-03-20 Makerules.mk: add CC.NM.NMFLAGS for stupid stupid stupid aix -Xany
+13-03-19 pkc-cobol-mfcobc.mk: incorporate optional probe-mfcobc.mk
+13-02-20 scan.c: makerule() from tmp buffer in case of shorter canon()
+13-02-14 command.c: .FOREGROUND => all MAKING prereqs in parent chain done (e.g. via coshell service)
+12-12-01 Makerules.mk: fix MAMROOT logic when PWD outside of viewpath
 12-11-09 option.c: omit delayed/unknown options from oldmake punt
 12-09-18 Makerules.mk: set --novirtual if VPATH contains less than 2 dirs
 12-06-20 O_cloexec|F_dupfd_cloexec edit
@@ -5665,6 +5657,7 @@ All recorded changes follow.
 
 :::::::: ss ::::::::
 
+13-03-21 ssd.c: work around stupid stupid stupid solaris 11 - hey guys, don't define _PATH_UTMP and it won't get used
 10-06-01 sync with ast api 20100601
 04-07-22 ssd.c: access() => eaccess()
 03-07-29 ssd.c,features/cmd: add utmpx support
@@ -5717,6 +5710,8 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+13-04-22 grep.tst: add --context[=before,after] tests
+13-04-03 finally add grep and xargs
 12-11-19 pty.c: change SFSTDERR_FILENO to sffileno(sfstderr)
 12-10-24 tr.c: move to src/lib/libcmd
 12-10-19 od.c: move to src/lib/libcmd
@@ -5919,6 +5914,10 @@ All recorded changes follow.
 
 :::::::: bgp ::::::::
 
+13-04-18 bgp-mrt.c: add mvpn_t.src_as* to the member table -- doh
+13-03-21 bgp-mrt.c: fix TABLE_DUMP_V2_RIB* old record data bleed through
+13-03-11 bgp-mrt.c: fix mvpn.src_addrv[46] set bit
+13-03-09 bgp-mrt.c: adjust debug message size to include common mrt header
 12-08-20 bgp-mrt.c: fix bad MCAST_VPN dump data workaround
 12-08-15 bgp.c,bgp-mrt.c: elevate struct data to cx struct types
 12-08-08 bgp.c,bgp-mrt.c: fix mvpn parse anomalies
@@ -6000,6 +5999,9 @@ All recorded changes follow.
 
 :::::::: flat ::::::::
 
+13-03-11 flat.c: fix <RECORD><WIDTH> vs <SIZE> logic
+13-03-01 flat.c: fix flatten txt string => bin size+string
+12-11-29 flat.c: implement var length format records on output
 10-11-12 flat.c: eliminate strict-aliasing puns
 08-08-30 flat.c: work around macos cc struct copy bug
 07-06-05 flat.c: <COUNT>*</> => <COUNT>0</> => 0 or more
@@ -6051,6 +6053,8 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+13-04-18 bgp.h: add BGP_MVPN_src_as*
+13-04-09 ip_t.c: treat undefined unbound generic ip addrd as 0.0.0.0
 12-08-11 bgp.h: Bgptunnel_t
 12-08-01 bgp.h: mvpn additions
 12-06-13 bgp.h: add BGP_key for mvpn route key
@@ -6419,6 +6423,8 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+13-04-03 grep: move to lib/libcmd and cmd/builtin
+13-01-24 ed.c: splice => splicef to avoid gnu splice(2)
 12-06-25 test*.c: handle \u[U+...]
 12-06-23 testoldmatch.c: add tests for legacy astsa/strmatch.c
 12-05-07 grep.c: add case 'y': to *really* ignore --color
@@ -6601,6 +6607,8 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+13-02-14 main.c: change "-o file" to not use sfstdout unless /dev/stdout (for user discipline functions)
+13-02-13 main.c: add { RS_MORE RS_LAST } logic for rsprocess()
 10-08-11 main.c: use conformance(0,0) for "standard"
 10-05-25 main.c: handle mb -t
 10-05-11 main.c: add -p,--plugins=style -- common to all command swith plugins
@@ -7003,6 +7011,7 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+13-04-03 xargs: move to lib/libcmd and cmd/builtin
 12-04-11 find,tw,xargs: update to cmdopen() discipline api
 12-02-29 find.c: fix ``! -type f'' vs ``! -type f -print'' bug
 11-10-31 tw.c: handle -lexpr X2I change -- scary
@@ -7151,6 +7160,12 @@ All recorded changes follow.
 
 :::::::: jcl ::::::::
 
+13-03-04 jcl.c: add { --list=dd --list=parms }
+13-03-01 cpy2dss.c: COMP-5 => { be_t le_t } depends on _ast_intswap
+13-03-01 cpy2dss.c: --text --variable flattens db2 VARCHAR structs
+13-02-06 jcm.c: fix group and dummy job parse, handle event clear
+13-02-06 JCL.mk: add .EVENT.CLEAR
+13-01-23 cpy2dss.c: must check REC_V_INCLUSIVE() in recfmt
 07-12-07 jcl.rt: add prefix '/' delimiter tests
 07-06-06 JCL.mk: add USR1 USR2 interrupt handlers
 07-02-20 cpy2dss.c: handle POINTER, ignore IS
@@ -7215,6 +7230,14 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+13-04-18 comp/iconv.c: fix some truly rotten code in iconv_move() -- how did it work at all?
+13-04-01 misc/spawnvex.c: fix omitted SPAWN_frame case that caused EINVAL
+13-03-11 sfio/sfflsbuf.c: memcpy() => memmove() ouch
+13-03-11 path/pathfind.c: type=="" => type=0
+13-03-07 features/(dirent|lib|sys): handle opendir64 => DIR64
+13-03-07 vmalloc/vmmopen.c: disable some #include that _PACKAGE_ast already does
+13-02-14 misc/optget.c: -Wall cleanup -- thanks werner
+13-01-03 string/stropt.c: fix off-by-one comparison bug - happy new year
 12-11-15 misc/spawnvex.c: add SPAWN_frame and SPAWN_FRAME
 12-11-10 tm/tmxdate.c: handle yyyymmddThhmmss.nnnnnnnnn[-+]hhmm
 12-10-17 comp/conf.tab: add PC MIN_HOLE_SIZE
@@ -9056,6 +9079,12 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+13-04-22 grep.c: add first draft of context.c to handle -C
+13-04-03 grep.c: fix --highlight to highlight all matches on each line
+13-04-03 grep.c: add -o, --only-matching to list matching parts, each part on a separate line
+13-02-14 Makefile: add { cmdext.h cmdlist.h } force rebuild -- must do this better
+13-02-07 grep.c: drop b_pgrep() but retain p*grep argv[0] check
+12-12-12 mktemp.c: fix doc literal [...] => [...]]
 12-11-21 wc.c,wclib.c: add --invalid-bytes, -X and fix invalid byte logic
 12-10-25 xargs.c: drop bogus "out of space" diagnostic for "command not found"
 12-10-24 tr.c: move from src/cmd/builtin
@@ -9520,6 +9549,8 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+13-02-13 recsort.h: add { RS_MORE RS_LAST } for RS_READ event
+13-02-13 rsprocess.c: add RS_READ event RS_LAST logic
 12-05-28 rskey.c: fix unsigned comparison to 0
 11-10-11 recsort.h,rskeyopen.c: RSKEY_VERSION=20111011, add Rsdisc_t* argument
 11-09-27 rsopen.c,rsmerge.c: drop obsolete VM_TRUST
@@ -9690,6 +9721,7 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+12-12-01 coexec.c,cowait.c: fix service fd bugs
 12-02-22 coinit.c: handle non-identifier export var names
 11-12-13 cowait.c: handle sfpoll() error return on interrupt
 11-11-21 cowait.c: poll before blocking read to weed out killed jobs (no 'x' message)
@@ -10329,6 +10361,9 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+13-04-08 cxopen.c: fix cxmembers() bug that referenced data.string instead of data.string.data (dumped on be 32 bit)
+13-04-08 cxopen.c: fix cxcast() ref to use ref data instead of original record!
+13-03-10 dssopen.c: move default dss suffix from dssfind() to loadtags()
 12-09-04 cxcomp.c: type identifiers only in non-compound var constructs
 12-08-15 cx.h,cxopen.c: add cxmembers() default externalf for struct types
 12-08-11 cxcomp.c: add logical cast for naked non-numeric variable expression
@@ -10755,6 +10790,9 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+13-01-03 vcsfio.c: handle decode of encoded /dev/null
+12-12-05 vcsfio.c: all for expansion in data write
+12-11-27 vcodex.h,vcsfio.c: add VC_DECODE|VC_OPTIONAL
 11-01-31 Makefile: use `...` instead of $( ... ) for bootstrap build
 10-06-01 sync with ast api 20100601
 09-08-19 vchufgroup.c: sync with kpv (new alg)
@@ -10800,6 +10838,12 @@ All recorded changes follow.
 
 :::::::: libjcl ::::::::
 
+13-03-14 run.c: move --subtmp rm -rf to after the last step
+13-03-04 jcl.h,run.c,uniq.c: add { JCL_LISTDD JCL_LISTPARMS }
+13-01-15 open.c,run.c: use main scope name for tmp files
+13-01-14 run.c: JCL_LISTOUTPUTS => JCL_DISP_NEW or JCL_LIST_MOD
+12-12-04 add JCL_SUBTMP
+12-11-30 uniq.c: add item labels when more than 1 item type
 10-06-01 sync with ast api 20100601
 10-04-20 run.c: add timout arg to cowait()
 07-12-10 path.c: fix <size><suffix> ordering

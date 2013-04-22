@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1992-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -16,30 +16,36 @@
 *                                                                      *
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                  David Korn <dgk@research.att.com>                   *
-*                   Eduardo Krell <ekrell@adexus.cl>                   *
 *                                                                      *
 ***********************************************************************/
-#pragma prototyped
+#ifndef _CONTEXT_H
+#define _CONTEXT_H		1
 
-#include "3d.h"
+#include <ast.h>
 
-#ifdef dup23d
-
-int
-dup23d(int fd, register int r)
+typedef struct Context_line_s
 {
-	initialize();
-	if (r >= 0 && r < elementsof(state.file) && state.file[r].reserved) close(r);
-	r = DUP2(fd, r);
-#if FS
-	if (r >= 0 && r < elementsof(state.file))
-		fs3d_dup(fd, r);
+	char*		data;
+	size_t		size;
+	uintmax_t	line;
+#ifdef _CONTEXT_LINE_PRIVATE_
+	_CONTEXT_LINE_PRIVATE_
 #endif
-	return(r);
-}
+} Context_line_t;
 
-#else
+typedef int (*Context_list_f)(Context_line_t*, int, int, void*);
 
-NoN(dup2)
+typedef struct Context_s
+{
+	void*		handle;
+#ifdef _CONTEXT_PRIVATE_
+	_CONTEXT_PRIVATE_
+#endif
+} Context_t;
+
+extern Context_t*	context_open(Sfio_t*, size_t, size_t, Context_list_f, void*);
+extern Context_line_t*	context_line(Context_t*);
+extern int		context_show(Context_t*);
+extern int		context_close(Context_t*);
 
 #endif

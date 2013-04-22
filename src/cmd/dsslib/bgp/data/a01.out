@@ -1,4 +1,5 @@
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         4.2.2.7
@@ -16,6 +17,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         8.2.2.11
@@ -34,6 +36,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         12.2.2.15
@@ -51,6 +54,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         16.2.2.19
@@ -68,6 +72,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         20.2.2.22
@@ -85,6 +90,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         24.2.2.26
@@ -103,6 +109,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         28.2.2.30
@@ -120,6 +127,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          32
 bitsv4        32
 hopv4         32.2.2.34
@@ -138,6 +146,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         36.2.2.38
@@ -155,6 +164,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         40.2.2.42
@@ -173,6 +183,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         44.2.2.46
@@ -189,6 +200,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         48.2.2.49
@@ -206,6 +218,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         52.2.2.52
@@ -223,6 +236,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         56.2.2.56
@@ -241,6 +255,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         60.2.2.60
@@ -258,6 +273,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         64.2.2.64
@@ -276,6 +292,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         68.2.2.68
@@ -292,6 +309,7 @@ type          84
 valid         1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         72.2.2.71
@@ -309,6 +327,7 @@ valid         1
 MESSAGE       1
 
 afi           1
+best          1
 bits          30
 bitsv4        30
 hopv4         76.2.2.74

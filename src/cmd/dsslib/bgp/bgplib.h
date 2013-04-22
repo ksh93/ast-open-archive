@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -42,6 +42,7 @@
 #define BGPDATA(p)		BGPFILE(DSSRECORD(p)->file)
 
 #define BGP_FIXED		offsetof(Bgproute_t,data)
+#define BGP_PREFIX_FIXED	(offsetof(Bgproute_t,prefixv6)-offsetof(Bgproute_t,agg_addr32))
 
 typedef struct Prefix_s			/*  ip prefix			*/
 {
