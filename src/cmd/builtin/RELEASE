@@ -1,5 +1,7 @@
+13-05-22 pty.c: fix timeout logic
 13-04-22 grep.tst: add --context[=before,after] tests
 13-04-03 finally add grep and xargs
+13-03-21 who.c: work around stupid stupid stupid solaris 11 - hey guys, don't define _PATH_UTMP and it won't get used
 12-11-19 pty.c: change SFSTDERR_FILENO to sffileno(sfstderr)
 12-10-24 tr.c: move to src/lib/libcmd
 12-10-19 od.c: move to src/lib/libcmd

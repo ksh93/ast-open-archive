@@ -60,6 +60,15 @@ end
 ":COBTRACE:" : .MAKE .OPERATOR
 	$(>:B:S=.o) : .COBTRACE
 
+":COBWATCH:" : .MAKE .OPERATOR
+	local T
+	T := $(<:@/ /,/G)
+	eval
+		.COBWATCH.$(T) : .MAKE .LOCAL
+			COBOLFLAGS += -w $(T)
+	end
+	$(>:B:S=.o) : .COBWATCH.$(T)
+
 OBJCOPY = objcopy
 OBJCOPYFLAGS =
 

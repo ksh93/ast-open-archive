@@ -3,7 +3,7 @@ ast-base :PACKAGE: \
 		libdll libexpr libodelta librecsort libsum libuu libvdelta \
 		libbz libz tests coshell cpp cs mam msggen msgcc nmake probe ss \
 		libcoshell libcs libmam libpp libcodex paxlib codexlib \
-		libdss libpz dsslib libtaso
+		libdss libpz dsslib
 
 :COVERS: ast-make ast-ksh ast-ast
 

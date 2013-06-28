@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1984-2012 AT&T Intellectual Property          *
+*          Copyright (c) 1984-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -982,7 +982,7 @@ finish(int n)
 			Vmstat_t	vs;
 
 			vmstat(Vmheap, &vs);
-			error(0, "vm region %lu segments %lu busy %lu:%lu:%lu free %lu:%lu:%lu", vs.extent, vs.n_seg, vs.n_busy, vs.s_busy, vs.m_busy, vs.n_free, vs.s_free, vs.m_free);
+			error(0, "vm region %zu segments %zu busy %zu:%zu free %zu:%zu", vs.extent, vs.n_seg, vs.n_busy, vs.s_busy, vs.n_free, vs.s_free);
 		}
 		dump(sfstdout, error_info.trace <= -14);
 		/*FALLTHROUGH*/

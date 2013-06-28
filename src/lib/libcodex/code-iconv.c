@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2003-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2003-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -15,8 +15,6 @@
 *                           Florham Park NJ                            *
 *                                                                      *
 *                 Glenn Fowler <gsf@research.att.com>                  *
-*                  David Korn <dgk@research.att.com>                   *
-*                   Phong Vo <kpv@research.att.com>                    *
 *                                                                      *
 ***********************************************************************/
 #pragma prototyped
@@ -235,8 +233,7 @@ Codexmeth_t	codex_iconv =
 	" destination codesets. One option specifies the decode source or"
 	" encode destination codeset; the implied second codeset defaults"
 	" to \bnative\b.",
-	"[+(version)?codex-iconv (AT&T Research) 2000-05-09]"
-	"[+(author)?Glenn Fowler <gsf@research.att.com>]",
+	"[-?\n@(#)$Id: codex-iconv (AT&T Research) 2000-05-09 $\n]" USAGE_LICENSE,
 	CODEX_DECODE|CODEX_ENCODE|CODEX_ICONV,
 	cc_options,
 	0,

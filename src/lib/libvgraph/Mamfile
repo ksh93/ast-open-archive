@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-02-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-05-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -125,6 +125,9 @@ done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_intercept.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_intercept.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
@@ -167,15 +170,7 @@ meta grfold.o %.c>%.o grfold.c grfold
 prev grfold.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grfold.c
 done grfold.o generated
-make grsearch.o
-make grsearch.c
-prev grhdr.h implicit
-done grsearch.c
-meta grsearch.o %.c>%.o grsearch.c grsearch
-prev grsearch.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vgraph -D_PACKAGE_ast -c grsearch.c
-done grsearch.o generated
-exec - ${AR} rc libvgraph.a graph.o grbranching.o grfold.o grsearch.o
+exec - ${AR} rc libvgraph.a graph.o grbranching.o grfold.o
 exec - (ranlib libvgraph.a) >/dev/null 2>&1 || true
 done libvgraph.a generated
 done vgraph virtual

@@ -1,3 +1,10 @@
+13-06-04 add vcgetsuff() to return suffix given method
+13-05-29 add Vcodex_t.errorf -- not suitable for discipline level
+13-05-27 add vcxml.c
+13-05-23 api change: vcgetfname(char* path, char** meth, char** suff)
+13-05-22 add Vclz4 from Chris Rath
+13-05-09 kpv sync
+13-04-23 move open source plugins from vcodexlib
 13-01-03 vcsfio.c: handle decode of encoded /dev/null
 12-12-05 vcsfio.c: all for expansion in data write
 12-11-27 vcodex.h,vcsfio.c: add VC_DECODE|VC_OPTIONAL

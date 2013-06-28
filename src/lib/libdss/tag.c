@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -23,7 +23,7 @@
  * properly nested xml tag parse implementation
  * name=value args are treated as tag members
  *
- * for these exrta-xml extensions data is literal (no &element; expansions)
+ * for these extra-xml extensions data is literal (no &element; expansions)
  *
  *	<#INCLUDE#>file</>
  *		include file; the file name is the remainder of line

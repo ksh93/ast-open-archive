@@ -54,7 +54,7 @@ USAGE_LICENSE
 #include <error.h>
 #include <ls.h>
 #include <recsort.h>
-#include <vcodex.h>
+#include <vcsfio.h>
 
 struct Delay_s;
 typedef struct Delay_s Delay_t;
@@ -81,6 +81,7 @@ typedef struct State_s
 	Encoding_t	temporary;
 	Delay_t*	delay;
 	unsigned long	test;
+	int		outputs;
 	int		regress;
 	int		verbose;
 } State_t;
@@ -177,7 +178,7 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 	switch (op)
 	{
 	case RS_FILE_WRITE:
-		if (((Sfio_t*)data == sfstdout || zipit(arg)) && (state->output.use > 0 || !state->output.use && state->input.use > 0))
+		if ((!state->outputs++ || (Sfio_t*)data == sfstdout || zipit(arg)) && (state->output.use > 0 || !state->output.use && state->input.use > 0))
 			return encode(state, (Sfio_t*)data, (char*)arg);
 		if (!state->output.use && zipit(arg) && (arg || (arg = (Void_t*)"(output-stream)")) && (delay = newof(0, Delay_t, 1, strlen(arg))))
 		{

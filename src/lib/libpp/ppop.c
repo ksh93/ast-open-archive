@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1986-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1986-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -697,7 +697,7 @@ ppop(int op, ...)
 				 * out of malloc is fatal
 				 */
 
-				memfatal();
+				memfatal(NiL);
 
 				/*
 				 * initialize the error message interface

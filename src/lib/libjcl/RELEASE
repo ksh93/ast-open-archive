@@ -1,3 +1,4 @@
+13-06-27 path.c,find.c: add ${N:s%old%new%:...} edit expressions to prefix file
 13-03-14 run.c: move --subtmp rm -rf to after the last step
 13-03-04 jcl.h,run.c,uniq.c: add { JCL_LISTDD JCL_LISTPARMS }
 13-01-15 open.c,run.c: use main scope name for tmp files

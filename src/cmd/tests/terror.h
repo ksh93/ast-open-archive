@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2012 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -37,8 +37,14 @@
 #include	<signal.h>
 #include	<string.h>
 #include	<sys/types.h>
+#include	<sys/time.h>
 #include	<sys/stat.h>
+#include	<sys/mman.h>
 #include	<sys/wait.h>
+
+#if !defined(MAP_ANONYMOUS) && defined(MAP_ANON)
+#define MAP_ANONYMOUS	MAP_ANON
+#endif
 
 #ifndef elementsof
 #define elementsof(x)	(sizeof(x)/sizeof(x[0]))
@@ -86,7 +92,7 @@ static int		Tstall;
 static int		Tstchild;
 static int		Tstline;
 static int		Tsttimeout = TIMEOUT;
-static char		Tstfile[16][256];
+static char		Tstfile[256][256];
 
 #ifdef __LINE__
 #define terror		(Tstline=__LINE__),tsterror
@@ -125,12 +131,6 @@ static char		Tstfile[16][256];
 #endif
 
 #ifdef __LINE__
-#define taso(t)		((Tstline=__LINE__),tstaso(t,argv))
-#else
-#define taso(t)		((Tstline=-1),tstaso(t,argv))
-#endif
-
-#ifdef __LINE__
 #define tchild()	((Tstline=__LINE__),tstchild(argv))
 #else
 #define tchild()	((Tstline=-1),tstchild(argv))
@@ -141,6 +141,14 @@ static char		Tstfile[16][256];
 #else
 #define topts()		((Tstline=-1),tstopts(argv))
 #endif
+
+#ifdef __LINE__
+#define tshared(n)	((Tstline=__LINE__),tstshared(n))
+#else
+#define tshared(n)	((Tstline=-1),tstshared(n))
+#endif
+
+#define tresource(a,b)
 
 #define tmesg		(Tstline=-1),tstwarn
 
@@ -172,9 +180,7 @@ static void tcleanup(void)
 static void tcleanup()
 #endif
 {
-#ifdef DEBUG
-	twarn("Temp files will not be removed");
-#else
+#ifndef DEBUG
 	int	i;
 	for(i = 0; i < sizeof(Tstfile)/sizeof(Tstfile[0]); ++i)
 		if(Tstfile[i][0]) {
@@ -490,83 +496,6 @@ typedef struct Asotype_s
 	int		mask;
 } Asotype_t;
 
-static const Asotype_t	asotype[] =
-{
-	{ "SIGNAL",	ASO_SIGNAL },
-	{ "THREAD",	ASO_THREAD },
-	{ "PROCESS",	ASO_PROCESS },
-	{ "INTRINSIC",	ASO_INTRINSIC },
-};
-
-static char* asotypes(int type)
-{
-	int	i;
-	char*	p;
-
-	static char	buf[128];
-	static char*	b = buf;
-
-	p = b;
-	for (i = 0; i < elementsof(asotype); i++)
-		if (asotype[i].mask & type)
-		{
-			if (b > p)
-				*b++ = '|';
-			strcpy(b, asotype[i].name);
-			b += strlen(asotype[i].name);
-		}
-	*b++ = 0;
-	return p;
-}
-
-#if __STD_C
-static char* tstaso(int type, char** argv)
-#else
-static char* tstaso(type, argv)
-int	type;
-char**	argv;
-#endif
-{
-	char*		a;
-	char*		name = 0;
-	Asometh_t*	meth;
-	Asodisc_t	disc;
-
-	ASODISC(&disc, asoerror);
-	disc.hung = 16;
-	asoinit(0, 0, &disc);
-	while (a = *++argv)
-		if (strcmp(a, "--all") == 0)
-			Tstall++;
-		else if (strncmp(a, "--aso=", 6) == 0)
-		{
-			if (a[6])
-			{
-				name = a + 6;
-				Tstall++;
-			}
-			else
-				a = 0;
-		}
-		else if (strncmp(a, "--timeout=", 10) == 0)
-			Tsttimeout = atoi(a + 10);
-	if (type || name)
-	{
-		if (!(meth = asometh(0, name)))
-			tsterror("aso method %s not found", name);
-		if (!(meth->type & type))
-		{
-			if (name)
-				tsterror("aso method %s only supports type %s, not %s", meth->name, asotypes(meth->type), asotypes(type));
-			if (!(meth = asometh(type, name)))
-				tsterror("aso method type %s not found", asotypes(type));
-			if (asoinit(0, meth, 0))
-				tsterror("aso method %s initialization error *and* asoerror() did not report it", meth->name);
-		}
-	}
-	return a;
-}
-
 static void
 asointr(int sig)
 {
@@ -659,4 +588,55 @@ char**	argv;
 			break;
 	tstintr();
 	return (int)(v - argv);
+}
+
+static unsigned int Rand = 0xdeadbeef;
+
+#if __STD_C
+static void trandseed(unsigned int seed)
+#else
+static void trandseed(seed)
+unsigned int	seed;
+#endif
+{
+	Rand = seed == 0 ? 0xdeadbeef : seed;
+}
+
+#if __STD_C
+static unsigned int trandom(void)
+#else
+static unsigned int trandom()
+#endif
+{
+	Rand = Rand*17109811 + 751;
+	return Rand;
+}
+
+#if __STD_C
+static Void_t* tstshared(size_t n)
+#else
+static Void_t* tstshared(n)
+size_t	n;
+#endif
+{
+	Void_t*	p;
+	int	z;
+
+	if((z = open("/dev/zero", O_RDWR)) >= 0)
+	{	p = mmap(0,n,PROT_READ|PROT_WRITE,MAP_SHARED,z,0);
+		if(!p || p == (Void_t*)(-1))
+		{	p = 0;
+			close(z);
+		}
+	}
+	if(!p)
+	{
+#ifdef MAP_ANONYMOUS
+		p = mmap(0,n,PROT_READ|PROT_WRITE,MAP_ANONYMOUS|MAP_SHARED,-1,0);
+		if(!p || p == (Void_t*)(-1))
+#endif
+		tsterror("mmap failed on %zu bytes", n);
+	}
+	memset(p, 0, n);
+	return p;
 }

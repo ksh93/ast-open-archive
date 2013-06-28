@@ -1,7 +1,10 @@
-13-04-11 pkg-cobol.mk: add :COBTRACE:
+13-05-28 Makerules.mk: fix MAM CC.SUFFIX.OBJECT initialization
+13-05-07 main.c: drop Vmstat_t.m_busy Vmstat_t.m_free
+13-05-06 pkg-cobol-mfcobc.mk: add :COBWATCH:
+13-04-11 pkg-cobol-mfcobc.mk: add :COBTRACE:
 13-04-05 Makerules.mk: add .SOURCE.h defaults ala .SOURCE.a
 13-03-20 Makerules.mk: add CC.NM.NMFLAGS for stupid stupid stupid aix -Xany
-13-03-19 pkc-cobol-mfcobc.mk: incorporate optional probe-mfcobc.mk
+13-03-19 pkg-cobol-mfcobc.mk: incorporate optional probe-mfcobc.mk
 13-02-20 scan.c: makerule() from tmp buffer in case of shorter canon()
 13-02-14 command.c: .FOREGROUND => all MAKING prereqs in parent chain done (e.g. via coshell service)
 12-12-01 Makerules.mk: fix MAMROOT logic when PWD outside of viewpath

@@ -1,3 +1,4 @@
+13-06-24 pax.h,pax.c,file.c: change chmod members to modekeep and restoremode
 12-11-08 file.c: fix lchmod() logic for systems that implement only ENOSYS
 12-10-17 copy.c: fix SEEK_HOLE loop that set last file byte to 0
 12-09-28 pax.c,options.c: document t<compress> => tar:<compress>

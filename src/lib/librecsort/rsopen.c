@@ -14,7 +14,7 @@
 *                            AT&T Research                             *
 *                           Florham Park NJ                            *
 *                                                                      *
-*                   Phong Vo <kpv@research.att.com>                    *
+*                     Phong Vo <phongvo@gmail.com>                     *
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                                                                      *
 ***********************************************************************/
@@ -53,18 +53,12 @@ Rskey_t*	key;	/* key coder state			*/
 #endif
 {
 	Rsdisc_t*	disc;
+	Vmdisc_t*	vmdisc;
 	ssize_t		round;
 
 	if((round = c_max) > 0)
 		round /= 4;
-	rs->vmdisc.memoryf = Vmdcheap->memoryf;
-	rs->vmdisc.exceptf = Vmdcheap->exceptf;
-	if(!(rs->vm = (Vmalloc_t*)vmopen(&rs->vmdisc, Vmbest, 0)) )
-	{	vmfree(Vmheap,(void*)rs);
-		return -1;
-	}
-	rs->vmdisc.round = round <= 0 ? RS_RESERVE : round;
-	if(!(rs->vm = (Vmalloc_t*)vmopen(&rs->vmdisc, Vmbest, 0)) )
+	if(!(vmdisc = vmdcderive(Vmheap, round, 0)) || !(rs->vm = vmopen(vmdisc, Vmbest, 0)))
 	{	vmfree(Vmheap,(void*)rs);
 		return -1;
 	}

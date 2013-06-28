@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2013-04-05 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2013-05-28 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -87,7 +87,7 @@ set virtual:=1
 
 .OPTION.COMPATIBILITY : .MAKE .VIRTUAL .FORCE
 	local N O
-	if .MAKEVERSION. < 20121221
+	if .MAKEVERSION. < 20150101
 		O =
 		N =
 		if ! "$(-?clobber)" && "$("clobber":T=QV)"
@@ -2111,7 +2111,7 @@ RECURSEROOT = .
 				T := $(T:/--//)
 			end
 			if T == "no*"
-				T := $(T:/no//}
+				T := $(T:/no//)
 				X = 0
 			else
 				X = 1
@@ -2191,6 +2191,9 @@ RECURSEROOT = .
 		if ! I
 			X := $(.NO.INSTALL.)
 			.NO.INSTALL. := 1
+		end
+		if "$(A)" == "0"
+			:INSTALLDIR: $(L)
 		end
 		eval
 		$(L) :: $(>:V:N!=[-+][lL]*)
@@ -5148,6 +5151,7 @@ end
 		CC.STATIC =
 		CC.SUFFIX.ARCHIVE = .a
 		CC.SUFFIX.DYNAMIC = ${mam_cc_SUFFIX_DYNAMIC}
+		CC.SUFFIX.OBJECT = ${mam_cc_SUFFIX_OBJECT}
 		CC.SUFFIX.SHARED = ${mam_cc_SUFFIX_SHARED}
 		_hosttype_ = ${mam_cc_HOSTTYPE}
 	end

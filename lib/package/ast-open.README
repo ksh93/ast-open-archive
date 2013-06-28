@@ -94,8 +94,105 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-13-04-18  --- Release ksh93v- ---
-13-04-18  Fix a bug with process substitution on systems that don't support
+13-06-25  --- Release ksh93v- ---
+13-06-25  ksh93 uses the new ast system call intercepts to restart interrupted 
+	  signals.
+13-06-21  A -f nn option has been added to cd to change to a directory
+	  relative to a file descriptor of an open directory.  cd -f nn
+	  is equivalent to cd ~{nn}.
+13-06-20  A bug in which  ${IFS+abc} did not expand to abc when IFS is
+	  unset has been fixed.
+13-06-18  A bug on some systems with arithmentic expressions containing
+	  x**y has been fixed.
+13-06-13  Changes made for reliable delivery of queued signals.
+13-06-12  The character '@' in an associative array subscript is not quoted
+	  when displayed on output so that it will be a valid subscript on
+	  input.
+13-06-06  In accordance with the standard set -u now causes failures for
+	  unset positional parameres.
+13-06-05  Several changes to handle queued signals have been made.
+13-06-04  A bug with the arithmetic expression $((2**63 / -1)) on some
+	  systems has been fixed.
+13-05-31  Fix a bug in job completion when trying to make a selection after
+	  hitting <TAB> on an empty directory.
+13-05-30  A bug with set -m in a script wich could cause the script to hang
+	  has been fixed.
+13-05-30  Two bugs related to the processing of a nameref foo=$1 where $1
+	  is of the form arr[subscript] where subscript is an arithmetic
+	  expression has been fixed.
+13-05-29  ksh93 now intercepts the LC_TIME variable.
+13-05-29  A bug in which builtin -d date did not delete the date builtin has
+	  been fixed. 
+13-05-29  namespace commands are no longer allowed inside function definitions
+	  and now generate a syntax error.
+13-05-28  Fixed bugs in typeset -c for copying attributes for simple variables.
+13-05-28  Fixed two bug for typeset -c and typeset -m for variable .sh.match.
+13-05-28 +Added -j option to print (and %(json)B format specifier to printf)
+	  which will print a compound shell variable in JSON format.  This is
+	  expermental.  Let me know if I got things wrong.
+13-05-23  A bug for enumeration types in which unset elements of an array
+	  expanded to the default enum name rather than to the empty string
+	  has been fixed
+13-05-23  A bug in which set -u did not fail for unset array elements of
+	  an array of short ints (typeset -is) has been fixed.
+13-05-22 +Added -c option to typeset which is similar to typeset -m except
+	  that the variable is copied rather than moved.  This is experimental
+	  and there are known bugs.  If it can't be made reliable it will
+	  not be added.
+13-05-20  Fixed a bug in which running script < file, where script did
+	  reads generated output the the terminal in error has been fixed.
+13-05-20  Updated documentation for typeset -s and typeset -l for integer
+	  and floating point types.
+13-05-17  A bug in the ${b[i}} when b is an enumeration variable whose
+	  value corresponds to the 0'th element.
+13-05-17  A bug in which set -o nounset caused ((boold=true)) to fail has
+	  been fixed.
+13-05-16  A bug in which a nameref to a compound sub-variable that does
+	  not exit failed when called from a function with static variables
+	  has been fixed.
+13-05-15 +The set -s -Aarray sort option added on 13-04-25 now works for
+	  sorting an indexed array of type instances.
+13-05-15  A bug in which ${!foo*} did not contain foo when $foo exists
+	  has been fixed.
+13-05-15  typeset -m foo=bar now generates an error when set -o nounset is
+	  on and variable bar is unset.
+13-05-14  A bug in which bar was not empty after typeset -m foo=bar has
+	  been fixed.
+13-05-13  A bug in which the exit trap could be executed twice with ${...;}
+	  has been fixed.
+13-05-10  Added more documentation with enum --man.
+13-05-10  With print -v for with nested compound variables, the output contains
+	  typeset -C for sub-variabes that are compound assignments.
+13-05-10  Reduced the number of warning when running gcc with -Wshadow option.
+13-05-09  Updated man page to mention _Bool enumeration and bool preset alias.
+13-05-08  Modified the code to that CHLD traps are delayed when a trap from
+	  another signal is being modified.
+13-05-08  Added a ksh -n options that suggests that x=$((expr)) be replaced by
+	  ((x=expr))>
+13-05-07  A bug in which typeset -p and print -v did not display elements that
+	  were compound variables without any sub-variables has been fixed.
+13-05-06  Fixed a bug with typeset -m when varaible is a name reference to
+	  a local variable from a calling function.
+13-05-06  A bug in which shcomp failed to compile some scrips that defined
+	  enums has been fixed.
+13-05-03  Fixed a bug with typeset -m a[i]=a[j] when a is a numeric array type.
+13-05-02  Fixed another typeset -m but form moving types containing compound
+	  variables.
+13-05-02  Fixed another typeset -m bug for moving a compound variable contained
+	  in a type variable.
+13-05-01  Fixed two bugs additional bugs related to typeset -m for compound
+	  variables.
+13-05-01 +Increased to maximum number of enumeration elements from 32K to
+	  2G.
+13-04-30  A bug in which typeset -m did not preserve attributes has been fixed.
+13-04-30  A bug with with read -C var when var contained index array subscripts
+	  that caused side effects on evaluation has been fixed.
+13-04-29  A bug in defining and using multi-dimensional types and enums has
+	  been fixed.
+13-04-25  A bug which caused iffe to fail on some systems has been fixed.
+13-04-25 +The -K option has been added to set to sort indexed arrays of
+	  compound elements based on a list of keys.
+13-04-18  Fixed a bug with process substitution on systems that don't support
 	  /dev/fd.
 13-04-18  Added serialization to processing of CHLD traps.
 13-04-17  A bug in arithmetic in which x[i].foo in a loop would not be
@@ -3448,6 +3545,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+13-06-24 pax.h,pax.c,file.c: change chmod members to modekeep and restoremode
 12-11-08 file.c: fix lchmod() logic for systems that implement only ENOSYS
 12-10-17 copy.c: fix SEEK_HOLE loop that set last file byte to 0
 12-09-28 pax.c,options.c: document t<compress> => tar:<compress>
@@ -3961,6 +4059,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+13-05-09 { aso cdt vmalloc } kpv sync
 12-02-02 add timeout to { testlib terror.h }
 11-10-20 add TESTLIB.mk, common { testlib terror.h }, and test.aso
 11-09-26 vmalloc: sync with kpv
@@ -4262,10 +4361,13 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
-13-04-11 pkg-cobol.mk: add :COBTRACE:
+13-05-28 Makerules.mk: fix MAM CC.SUFFIX.OBJECT initialization
+13-05-07 main.c: drop Vmstat_t.m_busy Vmstat_t.m_free
+13-05-06 pkg-cobol-mfcobc.mk: add :COBWATCH:
+13-04-11 pkg-cobol-mfcobc.mk: add :COBTRACE:
 13-04-05 Makerules.mk: add .SOURCE.h defaults ala .SOURCE.a
 13-03-20 Makerules.mk: add CC.NM.NMFLAGS for stupid stupid stupid aix -Xany
-13-03-19 pkc-cobol-mfcobc.mk: incorporate optional probe-mfcobc.mk
+13-03-19 pkg-cobol-mfcobc.mk: incorporate optional probe-mfcobc.mk
 13-02-20 scan.c: makerule() from tmp buffer in case of shorter canon()
 13-02-14 command.c: .FOREGROUND => all MAKING prereqs in parent chain done (e.g. via coshell service)
 12-12-01 Makerules.mk: fix MAMROOT logic when PWD outside of viewpath
@@ -5710,8 +5812,10 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+13-05-22 pty.c: fix timeout logic
 13-04-22 grep.tst: add --context[=before,after] tests
 13-04-03 finally add grep and xargs
+13-03-21 who.c: work around stupid stupid stupid solaris 11 - hey guys, don't define _PATH_UTMP and it won't get used
 12-11-19 pty.c: change SFSTDERR_FILENO to sffileno(sfstderr)
 12-10-24 tr.c: move to src/lib/libcmd
 12-10-19 od.c: move to src/lib/libcmd
@@ -6607,6 +6711,7 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+13-05-17 sfopen.c: disable SFOPEN_INTERCEPT experiment -- better handled by plugins
 13-02-14 main.c: change "-o file" to not use sfstdout unless /dev/stdout (for user discipline functions)
 13-02-13 main.c: add { RS_MORE RS_LAST } logic for rsprocess()
 10-08-11 main.c: use conformance(0,0) for "standard"
@@ -7147,6 +7252,7 @@ All recorded changes follow.
 
 :::::::: vczip ::::::::
 
+13-05-09 kpv sync
 09-10-01 vczip.c: make discipline data static -- it may be accessed after main() returns
 09-07-04 vczip.c: first attempt to unify vcodex(--method) and codex(--transform)
 09-02-02 vczip.c: -u is now a flag (no optional arg)
@@ -7230,6 +7336,32 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+13-06-28 intercept.c: add AST_SERIAL_always, in particular for AST_SERIAL_RESTART
+13-06-25 intercept.c: add syscall intercepts to unify { *at() restart pathopen() }
+13-06-25 pathopen.c: low level physical/logical/special path open using pathdev()
+13-06-24 pathcanon.c: add pathdev() for  { /dev/... /proc/... } parse
+13-06-19 vmbest.c: fix strict-aliasing warnings
+13-06-19 debug.h,debug.c: add debug_printf(fd,fmt,...), debug_vprintf(fd,fmt,ap), debug_snprintf(buf,siz,fmt,ap)
+13-06-18 features/lib: fix lib *64 tests to reference related headers
+13-06-18 malloc.c: add VMALLOC_OPTIONS=debug for debug trace vs verbose trace
+13-06-18 reg[nr]exec.c: fix file size < min boyer-moore match uninitialized data ref
+13-06-17 vmalloc: harden code to handle signal storm -- almost working save one workaround
+13-06-10 sfsetbuf.c: update SFIO_OPTIONS parse to model VMALLOC_OPTIONS
+13-06-10 SFIO_OPTIONS: add _Sfmaxm maxm=size 0:legacy-min-req -1:unlimited otherwise: page rounded limit
+13-06-10 sfrd.c: change map minimal requirement logic to use _Sfmaxm
+13-06-10 sfrd.c: add SFTEST_map_minimal, disabled by default for _ast_sizeof_pointer>=8
+13-06-07 vmalloc: split global initialization into lazy components
+13-06-01 vmalloc: getenv("VMALLOC_OPTIONS") is the only env control
+13-05-31 regex/regnexec.c: fix stkstd iterference by using private env->mst
+13-05-30 vmalloc/vmmaddress.c: fix leaky shmid in _vmpagesize()
+13-05-28 vmalloc/vmdebug.c: add free() delay list to avoid deadlock
+13-05-28 include/ast_errorf.h: split out for low level disc/meth libs
+13-05-24 string/strsort.c: add strsort_r() for Strcmp_context_f
+13-05-22 string/fmtbuf.c: add thread-safe logic
+13-05-21 misc/optget.c: add the D "DATA" section
+13-05-09 { aso cdt vmalloc } kpv sync
+13-05-05 include/ast.h: _AST_PROFILE_NEWOF for debugging newof() vs oldof()
+13-05-01 misc/spawnvex.c: some cc's don't like switch(intmax_t)
 13-04-18 comp/iconv.c: fix some truly rotten code in iconv_move() -- how did it work at all?
 13-04-01 misc/spawnvex.c: fix omitted SPAWN_frame case that caused EINVAL
 13-03-11 sfio/sfflsbuf.c: memcpy() => memmove() ouch
@@ -9065,7 +9197,7 @@ All recorded changes follow.
 
 :::::::: libardir ::::::::
 
-111-08-31 ar-omf.c: fix FILENAME #pragma prototyped incompatibility
+11-08-31 ar-omf.c: fix FILENAME #pragma prototyped incompatibility
 03-09-17 ardir.c: rewind initial peek to open position in case its /dev/stdin
 03-04-05 ar-port.c: fix bug that skipped initial long name entry
 	 ar-port.c: handle netbsd.i386 ' <long-index>' vs. '/<long-index>'
@@ -9079,6 +9211,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+13-05-01 vmstate.c: update for new vmalloc snarf
 13-04-22 grep.c: add first draft of context.c to handle -C
 13-04-03 grep.c: fix --highlight to highlight all matches on each line
 13-04-03 grep.c: add -o, --only-matching to list matching parts, each part on a separate line
@@ -10335,6 +10468,7 @@ All recorded changes follow.
 
 :::::::: libcodex ::::::::
 
+13-05-24 code-vcodex.c: add to unify codex<=>vcodex 
 10-01-15 code-uu.c: add uu-base64-string to encode with no newline separators
 09-06-26 codex.h,codex.c: add Sfio_t* Codex_t.op for open/close/read/write apis
 08-05-23 code-qp.c: avoid isprint()/iscntrl() for CC_NATIVE==CC_ASCII
@@ -10790,6 +10924,13 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+13-06-04 add vcgetsuff() to return suffix given method
+13-05-29 add Vcodex_t.errorf -- not suitable for discipline level
+13-05-27 add vcxml.c
+13-05-23 api change: vcgetfname(char* path, char** meth, char** suff)
+13-05-22 add Vclz4 from Chris Rath
+13-05-09 kpv sync
+13-04-23 move open source plugins from vcodexlib
 13-01-03 vcsfio.c: handle decode of encoded /dev/null
 12-12-05 vcsfio.c: all for expansion in data write
 12-11-27 vcodex.h,vcsfio.c: add VC_DECODE|VC_OPTIONAL
@@ -10828,16 +10969,14 @@ All recorded changes follow.
 
 :::::::: libvgraph ::::::::
 
+13-04-23 kpv snarf
 08-12-07 rename graph => vgraph
 08-11-22 graph.h: add _WINIX import/export qualifiers
 08-05-21 first release for -lvcodex
 
-:::::::: libtaso ::::::::
-
-11-12-01 first release
-
 :::::::: libjcl ::::::::
 
+13-06-27 path.c,find.c: add ${N:s%old%new%:...} edit expressions to prefix file
 13-03-14 run.c: move --subtmp rm -rf to after the last step
 13-03-04 jcl.h,run.c,uniq.c: add { JCL_LISTDD JCL_LISTPARMS }
 13-01-15 open.c,run.c: use main scope name for tmp files

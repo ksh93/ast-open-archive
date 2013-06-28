@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-02-20
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-05-09
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
@@ -48,6 +48,16 @@ make ${INSTALLROOT}/include/ast/sfdisc.h implicit
 make ${INSTALLROOT}/include/ast/ast.h implicit
 make ${INSTALLROOT}/include/ast/ast_api.h implicit
 done ${INSTALLROOT}/include/ast/ast_api.h dontcare
+make ${INSTALLROOT}/include/ast/ast_debug.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
 make ${INSTALLROOT}/include/ast/vmalloc.h implicit
 make ${INSTALLROOT}/include/ast/ast_common.h implicit
 make ${INSTALLROOT}/include/ast/ast_map.h implicit
@@ -81,8 +91,7 @@ prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 done ${INSTALLROOT}/include/ast/ast_wchar.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-make ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/regex.h dontcare
 make ${INSTALLROOT}/include/ast/getopt.h implicit
 make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
@@ -91,6 +100,9 @@ done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/getopt.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_map.h implicit
+make ${INSTALLROOT}/include/ast/ast_intercept.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_intercept.h dontcare
 make ${INSTALLROOT}/include/ast/ast_botch.h implicit
 done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
 make ${INSTALLROOT}/include/ast/ast_limits.h implicit
@@ -111,6 +123,11 @@ prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast_std.h dontcare
 done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_debug.h dontcare
+make ${INSTALLROOT}/include/ast/ast_errorf.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_errorf.h dontcare
 make ${INSTALLROOT}/include/ast/sfio.h implicit
 prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
@@ -129,10 +146,7 @@ make ${INSTALLROOT}/include/ast/sfdcgzip.h implicit
 prev ${INSTALLROOT}/include/ast/sfdisc.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/sfdcgzip.h dontcare
-make ${INSTALLROOT}/include/ast/option.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/option.h implicit
 make ${INSTALLROOT}/include/ast/cdt.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
@@ -140,11 +154,7 @@ done ${INSTALLROOT}/include/ast/cdt.h dontcare
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/pzip.h
-make ${INSTALLROOT}/include/ast/error.h implicit
-prev ${INSTALLROOT}/include/ast/option.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/error.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done pzip.c
 meta pzip.o %.c>%.o pzip.c pzip

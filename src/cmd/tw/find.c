@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -115,6 +115,8 @@ static const char usage2[] =
  * retain the order
  */
 
+#undef	CMIN
+#undef	CTIME
 #undef	NOGROUP
 #undef	NOUSER
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1999-2011 AT&T Intellectual Property          *
+*          Copyright (c) 1999-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -39,32 +39,24 @@ tmain()
 
 	if(dtuserlock(dt, 1111, 1) <  0 )
 		terror("dtuserlock() should have succeeded to lock");
+	if(dt->user->lock != 1111 )
+		terror("user->lock should be 1111");
 
-	/* note the key value below must be 1111; else, a deadlock will happen */
-	if(dtuserdata(dt, (Void_t*)11, 1111) != (Void_t*)11)
-		terror("dtuserdata() should have succeeded to set value to 11");
-
-	if(dt->user->lock != 0) /* after setting value, the lock is unlocked */
-		terror("lock should be opened");
-
-	/* relocking with key == 1111 */
-	if(dtuserlock(dt, 1111, 1) <  0 )
-		terror("dtuserlock() should have succeeded to lock");
-
-	/* reading the data value is always allowed (key == 0) */
-	if(dtuserdata(dt, (Void_t*)0, 0) != (Void_t*)11)
-		terror("dtuserdata() should have return 11");
-
-	/* unlocking with key == 1111 */
 	if(dtuserlock(dt, 1111, -1) <  0 )
-		terror("dtuserlock() should have succeeded to lock");
+		terror("dtuserlock() should have succeeded to unlock");
+	if(dt->user->lock != 0 )
+		terror("user->lock should be 0");
 
-	/* setting a new value */
-	if(dtuserdata(dt, (Void_t*)22, 1) != (Void_t*)22)
-		terror("dtuserdata() should have succeeded to set value to 22");
+	if(dtuserdata(dt, (Void_t*)11, 1) != (Void_t*)0)
+		terror("dtuserdata() should have returned NULL");
+	if(dt->user->data != (Void_t*)11)
+		terror("user->data should be 11");
 
-	if(dt->user->lock != 0)
-		terror("user->lock should be zero");
+	if(dtuserdata(dt, (Void_t*)0, 0) != (Void_t*)11)
+		terror("dtuserdata() should have returned 11");
+
+	if(dtuserdata(dt, (Void_t*)22, 1) != (Void_t*)11)
+		terror("dtuserdata() should have returned 11");
 	if(dt->user->data != (Void_t*)22)
 		terror("user->data should be 22");
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1987-2012 AT&T Intellectual Property          *
+*          Copyright (c) 1987-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2012-11-08 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2013-06-24 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in "
@@ -1097,7 +1097,7 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 					state.modtime = 1;
 					state.owner = 1;
 					state.modemask = 0;
-					state.chmod = 1;
+					state.modekeep = 1;
 					continue;
 				case 'm':
 					state.modtime = 0;
@@ -1107,7 +1107,7 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 					continue;
 				case 'p':
 					state.modemask &= (S_ISUID|S_ISGID);
-					state.chmod = 1;
+					state.modekeep = 1;
 					continue;
 				case 's':
 					state.modemask &= ~(S_ISUID|S_ISGID);
