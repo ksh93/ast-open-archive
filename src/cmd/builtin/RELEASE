@@ -1,3 +1,4 @@
+13-07-17 tr.tst: sync with src/lib/libcmd/tr.c
 13-05-22 pty.c: fix timeout logic
 13-04-22 grep.tst: add --context[=before,after] tests
 13-04-03 finally add grep and xargs

@@ -920,7 +920,32 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-13-06-25  --- Release ksh93v- ---
+13-07-18  --- Release ksh93v- ---
+13-07-18  Assignments of the type name=(...) to array variables now preserve
+	  the array type and the variable type if any.
+13-07-18  If a PATH ends in ., and you are in the current directory and this
+	  directory is in FPATH, ksh now treats this a a function directory.
+13-07-17  ${!.sh.sig@&#0093;} now expands to all the .sh.sig. variables.
+13-07-17  A bug in which a fatal error such as invalid shift in a function
+	  defined with f() did not terminate the script when the f was
+	  invoked with a redirection has been fixed.
+13-07-17  A timing bug in $(...) which could cause the return value to be
+	  127 has been fixed.
+13-07-16  A bug in which references to compound variables inside a namespace
+	  was not working has been fixed.
+13-07-15  Running a function f that assigns to .sh.value no longer outputs the
+	  value of .sh.value when invoked via ${ f;}.
+13-07-15  Fixed a bug in which bool -A a=( &#0091;2&#0093;=true &#0091;4&#0093;=false ) caused the
+	  number of elements to show up as 4 rather than 2.
+13-07-11  Eliminated two references to uninitialized memory.
+13-07-10  A memory leak with using aliases has been fixed.
+13-07-09  A memory leak with autoload functions has been fixed.
+13-07-08  When using kill -q to send a signal, a CONT signal is not sent to
+	  wake the process if it is sleeping after sending the signal.
+13-07-08  Fixed a namespace bug in which print -v did not work for printing
+	  a compound array of a namespace variable.
+13-07-02  A bug in which trap '' TTOU could cause the shell to go into an
+	  infinite loop has been fixed.
 13-06-25  ksh93 uses the new ast system call intercepts to restart interrupted 
 	  signals.
 13-06-21  A -f nn option has been added to cd to change to a directory
@@ -6686,6 +6711,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-07-17 tr.tst: sync with src/lib/libcmd/tr.c
 13-05-22 pty.c: fix timeout logic
 13-04-22 grep.tst: add --context&#0091;=before,after&#0093; tests
 13-04-03 finally add grep and xargs
@@ -7755,6 +7781,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-07-17 ls.c: fix -l for empty symlink
 12-11-07 ls.c: move --testsize logic after -H hackery
 12-10-01 iconv.c: move src/lib/libcmd
 12-06-06 yes.sh: use echo instead of print if no $KSH_VERSION
@@ -8321,6 +8348,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-07-19 fix features/fcntl.c to keep track of highest bit in o_local
+13-07-18 incorporate roland mainz' solaris compatibility and hugepage patches
+13-07-18 include/vmalloc.h: restore Vmethod_t callout function order for backwards binary compatibility
+13-07-17 port/intercept.c: ast_openat(fd,0,...) =&gt; openat(fd,".",...)
+13-07-16 string/chresc.c: limit \xH \xHH to 2 hex digits (\u and \U handle wide chars now)
 13-06-28 intercept.c: add AST_SERIAL_always, in particular for AST_SERIAL_RESTART
 13-06-25 intercept.c: add syscall intercepts to unify { *at() restart pathopen() }
 13-06-25 pathopen.c: low level physical/logical/special path open using pathdev()
@@ -10202,6 +10234,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-07-17 tr.c: finally handle ``tr -Cd "&#0091;=e=&#0093;" &lt;&lt;&lt;"1e2Ã&copy;3"''-- how about a posix equivalence class api
+13-07-16 cp.c: limit st_size&gt;0 logic to S_ISREG() files
 13-05-01 vmstate.c: update for new vmalloc snarf
 13-04-22 grep.c: add first draft of context.c to handle -C
 13-04-03 grep.c: fix --highlight to highlight all matches on each line
@@ -12124,7 +12158,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>June 28, 2013</TD>
+<TD align=right>July 19, 2013</TD>
 </TR>
 </TABLE>
 <P>

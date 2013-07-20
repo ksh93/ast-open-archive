@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2012 AT&T Intellectual Property          *
+*          Copyright (c) 1989-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2012-11-09 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2013-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -629,8 +629,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 					error(3, "out of space");
 			}
 			c = pathgetlink(dirnam, txtdata, txtsize);
-			if (c > 0)
-				s = PRINTABLE(txtdata);
+			s = (c > 0) ? PRINTABLE(txtdata) : "";
 		}
 		else
 			return 0;
