@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-05-09
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -518,6 +518,10 @@ make sfio/tpkrd.c
 prev sfio/sftest.h implicit
 done sfio/tpkrd.c
 make sfio/tpoll.c
+make ../../lib/libast/sys/socket.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_socket.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_socket.h dontcare
+done ../../lib/libast/sys/socket.h dontcare
 prev sfio/sftest.h implicit
 done sfio/tpoll.c
 make sfio/tpool.c

@@ -188,7 +188,7 @@
  *	0x00004000 dump atom address with name
  *	0x00008000 force state file garbage collection
  *	0x00010000 alarm status trace
- *	0x00020000 close internal.openfd before job exec
+ *	0x00020000 unused
  *	0x00040000 set failed state|metarule event to staterule event
  *	0x00080000 replace ' ' with '?' instead of FILE_SPACE
  *	0x00100000 scan action trace

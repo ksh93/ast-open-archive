@@ -36,10 +36,6 @@
 
 #include "nocomment.c"
 
-#if __STDC__
-#define chmod(a,b)	(error(-1,"%s#%d: chmod(%s,%05o)",__FILE__,__LINE__,a,b),chmod(a,b))
-#endif
-
 /*
  * return read file descriptor for filtered current input file
  */

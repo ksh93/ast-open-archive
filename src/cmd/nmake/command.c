@@ -104,7 +104,7 @@ static Jobstate_t	jobs;
  */
 
 static void
-accept(register Rule_t* r)
+acceptrule(register Rule_t* r)
 {
 	if (r->property & P_state)
 	{
@@ -661,11 +661,11 @@ execute(register Joblist_t* job)
 			}
 			if (!(job->target->property & (P_attribute|P_virtual)))
 			{
-				accept(job->target);
+				acceptrule(job->target);
 				if ((job->target->property & (P_joint|P_target)) == (P_joint|P_target))
 					for (p = job->target->prereqs->rule->prereqs; p; p = p->next)
 						if (p->rule != job->target)
-							accept(p->rule);
+							acceptrule(p->rule);
 			}
 		}
 		else if (*t && (!state.silent || state.mam.regress))
@@ -681,10 +681,6 @@ execute(register Joblist_t* job)
 		}
 		if (!state.coshell)
 		{
-#if !O_cloexec
-			if (internal.openfile)
-				fcntl(internal.openfd, F_SETFD, FD_CLOEXEC);
-#endif
 			sp = sfstropen();
 			sfprintf(sp, "label=%s", idname);
 			expand(sp, " $(" CO_ENV_OPTIONS ")");
@@ -748,15 +744,6 @@ execute(register Joblist_t* job)
 			dumpaction(state.mam.out, MAMNAME(job->target), t, NiL);
 		if (r = getrule(external.makerun))
 			maketop(r, P_dontcare|P_foreground, NiL);
-#if _WINIX
-		if (internal.openfile)
-#else
-		if ((state.test & 0x00020000) && internal.openfile)
-#endif
-		{
-			internal.openfile = 0;
-			close(internal.openfd);
-		}
 		if (!(job->cojob = coexec(state.coshell, t, job->flags, state.tmpfile, NiL, sfstruse(att))))
 			error(3, "%s: cannot send action to coshell", job->target->name);
 		job->cojob->local = (void*)job;

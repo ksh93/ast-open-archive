@@ -920,7 +920,15 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-13-07-18  --- Release ksh93v- ---
+13-07-24  --- Release ksh93v- ---
+13-07-24  A bug in which += assignments did not work for environment variables
+	  specified for non-special builtin commands has been fixed.
+13-07-24  The _ variable is new set as a reference to the type inside
+	  discipline functions for non-type variables in the type.
+13-07-23  A bug in the arithmetic assignment to an enum using a ?: operator
+	  with the nounset option has been fixed.
+13-07-22  The .sh.sig variable has been modified to treat .sh.value as a
+	  compound variable containing int and ptr.
 13-07-18  Assignments of the type name=(...) to array variables now preserve
 	  the array type and the variable type if any.
 13-07-18  If a PATH ends in ., and you are in the current directory and this
@@ -5248,6 +5256,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-07-17 use O_CLOEXEC
 13-05-28 Makerules.mk: fix MAM CC.SUFFIX.OBJECT initialization
 13-05-07 main.c: drop Vmstat_t.m_busy Vmstat_t.m_free
 13-05-06 pkg-cobol-mfcobc.mk: add :COBWATCH:
@@ -8348,6 +8357,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-07-25 add ast/sys/socket.h =&gt; ast_socket.h =&gt; ../include/sys/socket.h for intercepts
+13-07-22 pathopen.c: fix PATH_DEV logic to preserve ksh sh_open() semantics
 13-07-19 fix features/fcntl.c to keep track of highest bit in o_local
 13-07-18 incorporate roland mainz' solaris compatibility and hugepage patches
 13-07-18 include/vmalloc.h: restore Vmethod_t callout function order for backwards binary compatibility
@@ -10906,6 +10917,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcoshell changes">libcoshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-07-24 coopen.c: close child side of msgfp in parent (stops hung caller on shell failure)
 12-12-01 coexec.c,cowait.c: fix service fd bugs
 12-02-22 coinit.c: handle non-identifier export var names
 11-12-13 cowait.c: handle sfpoll() error return on interrupt
@@ -12158,7 +12170,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>July 19, 2013</TD>
+<TD align=right>July 27, 2013</TD>
 </TR>
 </TABLE>
 <P>
