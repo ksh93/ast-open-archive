@@ -892,7 +892,8 @@ make vcxml.o
 prev Vcmisc/vcxml.c
 meta vcxml.o %.c>%.o Vcmisc/vcxml.c vcxml
 prev Vcmisc/vcxml.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <phongvo@gmail.com>][-copyright?Copyright (c) 2003-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcxml.c
+setv LICENSE -DLICENSE="since=2013,author=gsf"
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?libvcodex]"\" -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcxml.c
 done vcxml.o generated
 exec - ${AR} rc libvcodex.a vcopen.o vcclose.o vcio.o vcdisc.o vcextract.o vcrecode.o vccontext.o vclog.o vcsfxsort.o vcperiod.o vclzparse.o vcbuffer.o vcbcktsort.o vcqsort.o vcmethod.o vcalias.o vcama.o vcamadiff.o vcbdw.o vccrypt.o vcsum.o vcxaes.o vcxcrc.o vcxhash.o vcxmd5.o vcdcache.o vcdelta.o vcdtable.o vcdtblinit.o vchamming.o
 exec - ${AR} rc libvcodex.a vchbits.o vchcode.o vchsize.o vchtrie.o vchuffgroup.o vchuffman.o vchuffpart.o lz4.o lz4hc.o vclz4.o vcbwt.o vcmap.o vcmtf.o vcetoa.o vcnetflow.o vcrle.o vcstrip.o vctranspose.o vcsfio.o vcsieve.o vcrdb.o vcrdformat.o vcrdparse.o vcrdplan.o vcrdvector.o vcrtable.o vctable.o vctblplan.o vcwclose.o vcwdecode.o vcwfile.o vcwmethod.o vcwmirror.o vcwngram.o vcwopen.o vcwprefix.o vcwvote.o vcxml.o

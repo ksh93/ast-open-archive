@@ -682,20 +682,100 @@ vcodex_done(Codex_t* p)
 }
 
 static int
+vcodex_option(Codex_t* p, const char* s, Vcwmethod_t** wmeth, size_t* wsize, unsigned int* vflags, char** source)
+{
+	int		b;
+	char*		e;
+	char*		x;
+	ssize_t		v;
+	Vcwmethod_t*	w;
+
+	if (isdigit(*s))
+		v = strton(s, &e, NiL, 0);
+	else
+	{
+		e = (char*)s;
+		if (e[0] == 'n' && e[1] == 'o')
+		{
+			e += 2;
+			v = 0;
+		}
+		else
+			v = 1;
+	}
+	for (x = e; b = *x++;)
+		if (b == '.' || b == '=')
+			break;
+	if (!b)
+		x = 0;
+	if (!*e)
+	{
+		if (!*wsize)
+			*wsize = v;
+	}
+	else if (streq(e, "plain"))
+	{
+		if (v)
+			*vflags |= VCSF_PLAIN;
+		else
+			*vflags &= ~VCSF_PLAIN;
+	}
+	else if (streq(e, "source"))
+	{
+		if (!x)
+			goto badarg;
+		*source = x;
+	}
+	else if (streq(e, "vcdiff"))
+	{
+		if (v)
+			*vflags |= VCSF_VCDIFF;
+		else
+			*vflags &= ~VCSF_VCDIFF;
+	}
+	else if (w = vcwgetmeth(e))
+	{
+		while (b = *e++)
+			if (b == '.' || b == '=')
+			{
+				v = strton(e, &e, NiL, 0);
+				if (*e)
+				{
+					if (p->disc->errorf)
+						(*p->disc->errorf)(NiL, p->disc, 2, "%s: %s: invalid window size", x, e);
+					return -1;
+				}
+				break;
+			}
+		if (!wmeth)
+		{
+			*wmeth = w;
+			if (v > 1 && !*wsize)
+				*wsize = v;
+		}
+	}
+	else
+	{
+	badarg:
+		if (p->disc->errorf)
+			(*p->disc->errorf)(NiL, p->disc, 2, "%s: %s: unknown option", s, e);
+		return -1;
+	}
+	return 0;
+}
+
+static int
 vcodex_open(Codex_t* p, char* const args[], Codexnum_t flags)
 {
 	register State_t*	state;
 	const char*		s;
-	char*			e;
-	char*			x;
 	int			i;
-	int			v;
-	int			b;
 	unsigned int		vflags;
 	char*			source;
 	char*			transform;
 	ssize_t			wsize;
 	Vcwmethod_t*		wmeth;
+	Vcodex_t*		vc;
 
 	/*
 	 * vcodex options
@@ -720,95 +800,16 @@ vcodex_open(Codex_t* p, char* const args[], Codexnum_t flags)
 		vflags = VC_DECODE;
 	else
 		vflags = 0;
+	wmeth = 0;
 	wsize = 0;
-	wmeth = Vcwprefix;
+#if CODEX_VERSION >= 20130501L
+	if ((s = p->disc->window) && vcodex_option(p, s, &wmeth, &wsize, &vflags, &source))
+		return -1;
+#endif
 	i = 2;
 	while (s = args[i++])
-	{
-		if (isdigit(*s))
-			v = strton(s, &e, NiL, 0);
-		else
-		{
-			e = (char*)s;
-			if (e[0] == 'n' && e[1] == 'o')
-			{
-				e += 2;
-				v = 0;
-			}
-			else
-				v = 1;
-		}
-		for (x = e; b = *x++;)
-			if (b == '.' || b == '=')
-				break;
-		if (!b)
-			x = 0;
-		if (!*e)
-			wsize = v;
-		else if (streq(e, "plain"))
-		{
-			if (v)
-				vflags |= VCSF_PLAIN;
-			else
-				vflags &= ~VCSF_PLAIN;
-		}
-		else if (streq(e, "source"))
-		{
-			if (!x)
-				goto badarg;
-			source = x;
-		}
-		else if (streq(e, "vcdiff"))
-		{
-			if (v)
-				vflags |= VCSF_VCDIFF;
-			else
-				vflags &= ~VCSF_VCDIFF;
-		}
-		else if (wmeth = vcwgetmeth(e))
-		{
-			while (b = *e++)
-				if (b == '.' || b == '=')
-				{
-					v = strton(e, &e, NiL, 0);
-					if (*e)
-						goto badarg;
-					break;
-				}
-			if (v > 1)
-				wsize = v;
-		}
-		else
-		{
-		badarg:
-			if (p->disc->errorf)
-				(*p->disc->errorf)(NiL, p->disc, 2, "%s: %s: unknown option", s, e);
+		if (vcodex_option(p, s, &wmeth, &wsize, &vflags, &source))
 			return -1;
-		}
-	}
-#if CODEX_VERSION >= 20130501L
-	if (x = p->disc->window)
-	{
-		if (!(wmeth = vcwgetmeth(x)))
-		{
-			if (p->disc->errorf)
-				(*p->disc->errorf)(NiL, p->disc, 2, "%s: unknown window option", x);
-			return -1;
-		}
-		while (b = *e++)
-			if (b == '.' || b == '=' || b == '-')
-			{
-				v = strton(e, &e, NiL, 0);
-				if (*e)
-				{
-					if (p->disc->errorf)
-						(*p->disc->errorf)(NiL, p->disc, 2, "%s: %s: invalid window size", x, e);
-					return -1;
-				}
-				break;
-			}
-	}
-#endif
 	if (!(state = newof(0, State_t, 1, 0)))
 	{
 		if (p->disc->errorf)
@@ -837,6 +838,8 @@ vcodex_open(Codex_t* p, char* const args[], Codexnum_t flags)
 			{	VCSFERROR(state, "Non-existing or unreadable source file.");
 				goto bad;
 			}
+			if(!wmeth)
+				wmeth = Vcwprefix;
 			state->vcw = vcwopen(&state->vcwdc, wmeth);
 			if(!state->vcw)
 			{	VCSFERROR(state, "Windowing not possible");
@@ -844,9 +847,16 @@ vcodex_open(Codex_t* p, char* const args[], Codexnum_t flags)
 			}
 		}
 
+		/* if no expicit window size then pick min nonzero window size from all coders */
+		if(!wsize)
+		{	wsize = VCSF_WSIZE;
+			for(vc = state->vc; vc; vc = vc->coder)
+				if(vc->meth->window && wsize > vc->meth->window)
+					wsize = vc->meth->window;
+		}
+
 		/* buffer to accumulate data before encoding */
-		state->dtsz = wsize > 0 ? wsize :
-			state->vc->meth->window > 0 ? state->vc->meth->window : VCSF_WSIZE;
+		state->dtsz = wsize;
 		if(!(state->data = (Vcchar_t*)malloc(state->dtsz)) )
 		{	VCSFERROR(state, "Out of memory for data buffer");
 			goto bad;
@@ -1100,7 +1110,7 @@ vcodex_write(Sfio_t* f, const Void_t* buf, size_t n, Sfdisc_t* disc)
 
 		/* process data directly if buffer is empty and data is large */
 		if(w == state->dtsz && (n-sz) >= w)
-		{	if((w = encode(state, dt, n-sz)) < 0)
+		{	if((w = encode(state, dt, w)) < 0)
 			{	VCSFERROR(state, "encode failed");
 				break;
 			}

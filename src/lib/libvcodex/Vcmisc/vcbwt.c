@@ -35,10 +35,11 @@ Void_t**	out;
 #endif
 {
 	Vcsfx_t		*sfx;
-	ssize_t		hd, sp, sz, *idx, k;
+	ssize_t		sz;
+	Vcinx_t		hd, sp, *idx, k;
 	Vcio_t		io;
 	Vcchar_t	*dt, *output, *bw;
-	ssize_t		rv = -1;
+	Vcinx_t		rv = -1;
 
 	if(size == 0)
 		return 0;

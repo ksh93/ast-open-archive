@@ -41,6 +41,7 @@ vcodex 2.0 :LIBRARY: vcodex.3 \
 	-lvgraph -ldll -lz
 
 vclz4.o : LICENSE=since=2013,author=car
+vcxml.o : LICENSE=since=2013,author=gsf
 
 vclib.h : vchdr.h
 	$(SED) -e 's/HDR/LIB/g' $(*) > $(<)

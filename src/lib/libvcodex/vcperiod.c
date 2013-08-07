@@ -33,16 +33,16 @@ ssize_t	dtsz;
 #endif
 {
 	Vcchar_t	*dt;
-	ssize_t		*dist, *lcp;
-	ssize_t		i, k, p, m, n, s, maxs, sz;
-	ssize_t		*peak, period;
+	Vcinx_t		*dist, *lcp;
+	Vcinx_t		i, k, p, m, n, s, maxs, sz;
+	Vcinx_t		*peak, period;
 	Vcsfx_t		*sfx;
 
-	if(!data || (sz = (ssize_t)dtsz) <= 16 /* too little data */ )
+	if(!data || (sz = (Vcinx_t)dtsz) <= 16 /* too little data */ )
 		return -1;
 
 	/* sfx is the indices of substrings sorted in lex order */
-	if(!(lcp = (ssize_t*)calloc(1, sz*sizeof(ssize_t))) )
+	if(!(lcp = (Vcinx_t*)calloc(1, sz*sizeof(Vcinx_t))) )
 		return -1;
 	if(!(sfx = vcsfxsort(data, (size_t)sz)) )
 	{	free(lcp);
@@ -62,7 +62,7 @@ ssize_t	dtsz;
 	}
 
 	/* dist[k] counts number of matches at distance k */
-	dist = sfx->inv; memset(dist, 0, sz*sizeof(ssize_t));
+	dist = sfx->inv; memset(dist, 0, sz*sizeof(Vcinx_t));
 	maxs = 4*vclogi(sz); /* bound search to save time */
 	for(i = 0; i < sz; ++i)
 	{	for(m = 0, s = maxs, k = i+1; k < sz && s >= 0; ++k, --s)
@@ -84,7 +84,7 @@ ssize_t	dtsz;
 	}
 
 #define NEIGHBOR	2 /* #neighbors to check on each side */
-	peak = sfx->idx; memset(peak, 0, sz*sizeof(ssize_t));
+	peak = sfx->idx; memset(peak, 0, sz*sizeof(Vcinx_t));
 
 	maxs = 0; /* max #matches at any distance */
 	for(p = 0; p < sz/2; ++p)

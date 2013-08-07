@@ -94,7 +94,19 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-13-07-24  --- Release ksh93v- ---
+13-08-05  --- Release ksh93v- ---
+13-08-05  Fix a bug in which read -C could reference uninitialized memory.
+13-07-31  Fixed a bug with index arrays of short integer types in arrays
+	  inside types that could lead to a core dump.
+13-07-30  Fixed a bug with short integer arithemtic that could lead to a
+	  core dump.
+13-07-30 +An experimental change to each enumeration variable have subvariables
+	  for each enumeration constant.  ${enum.name} will expand to the
+	  numerical value of the enumeration name associatied with enum.
+13-07-30 +An experimental change to allow ${foo.__} to expand to the parent
+	  node for foo, or foo if foo doesn't have a parent.  There are no
+	  regression tests for .__ yet.
+13-07-26  Fixed a memory leak bug with `...`.
 13-07-24  A bug in which += assignments did not work for environment variables
 	  specified for non-special builtin commands has been fixed.
 13-07-24  The _ variable is new set as a reference to the type inside
@@ -7152,6 +7164,7 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+13-08-02 find: add { -show -delete } for gnu/sol compatibility
 13-04-03 xargs: move to lib/libcmd and cmd/builtin
 12-04-11 find,tw,xargs: update to cmdopen() discipline api
 12-02-29 find.c: fix ``! -type f'' vs ``! -type f -print'' bug
@@ -7370,8 +7383,18 @@ All recorded changes follow.
 03-10-08 reliable -x output with regression tests
 03-10-01 first code
 
+:::::::: fus3d ::::::::
+
+2013-07-29 snarf from amazing dr.ek, ast-ize, and its alive
+
 :::::::: libast ::::::::
 
+13-08-06 tm/tvsleep.c: fix interrupted select() remaining time logic
+13-08-06 path/pathopen.c,pathdev.c: handle /dev/fd/ dir pseudo stat
+13-08-05 vmalloc/malloc.c: add VMALLOC_OPTIONS=usage => VM_usage
+13-08-01 path/pathopen.c: fix /dev/fd/<fd>/trailing-path bug that missed trailing-path
+13-07-31 features/lib: add setregid
+13-07-29 vmalloc/vmdcsystem.c: add EINTR restart checks for system getmemory
 13-07-25 add ast/sys/socket.h => ast_socket.h => ../include/sys/socket.h for intercepts
 13-07-22 pathopen.c: fix PATH_DEV logic to preserve ksh sh_open() semantics
 13-07-19 fix features/fcntl.c to keep track of highest bit in o_local
@@ -10514,6 +10537,8 @@ All recorded changes follow.
 
 :::::::: libcodex ::::::::
 
+13-08-06 code-vcodex.c: do not encode more than a window at a time!
+13-07-30 codexlist.c: work around installations with obsolete vcodex plugin
 13-05-24 code-vcodex.c: add to unify codex<=>vcodex 
 10-01-15 code-uu.c: add uu-base64-string to encode with no newline separators
 09-06-26 codex.h,codex.c: add Sfio_t* Codex_t.op for open/close/read/write apis
@@ -10970,6 +10995,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+13-08-07 vcodex.h,vcsfxsort.c: ssize_t (64 bit) => Vcinx_t (32 bit) -- noticable affect on memory footprint
 13-06-04 add vcgetsuff() to return suffix given method
 13-05-29 add Vcodex_t.errorf -- not suitable for discipline level
 13-05-27 add vcxml.c

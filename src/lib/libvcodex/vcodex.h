@@ -482,11 +482,13 @@ _END_EXTERNS_
 	TYPES AND FUNCTIONS RELATED TO STRING, SUFFIX SORTING 
 *************************************************************************/
 
+typedef int32_t Vcinx_t;
+
 typedef struct _vcsfx_s
-{	ssize_t*	idx;	/* the sorted suffix array		*/
-	ssize_t*	inv;	/* the inverted indices/ranks		*/
+{	Vcinx_t*	idx;	/* the sorted suffix array		*/
+	Vcinx_t*	inv;	/* the inverted indices/ranks		*/
 	Vcchar_t*	str;	/* the source string			*/
-	ssize_t		nstr;
+	Vcinx_t		nstr;	/* input size				*/
 } Vcsfx_t;
 
 _BEGIN_EXTERNS_

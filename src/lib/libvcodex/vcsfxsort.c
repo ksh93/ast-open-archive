@@ -43,10 +43,10 @@
 #define INSERTSORT	64	/* insertion sort any set <= this	*/
 
 #ifdef DEBUG
-static ssize_t	Cn, Cz, Gn, Gz;
+static Vcinx_t	Cn, Cz, Gn, Gz;
 extern char*		getenv(const char*);
 
-static int chktodo(Vcsfx_t* sfx, ssize_t lo, ssize_t hi)
+static int chktodo(Vcsfx_t* sfx, Vcinx_t lo, Vcinx_t hi)
 {	static int	Dblev = -1;
 
 	if(Dblev < 0)
@@ -65,21 +65,21 @@ static int chktodo(Vcsfx_t* sfx, ssize_t lo, ssize_t hi)
 
 /* make sure that the magic numbering is still ok */
 static int intcmp(void* one, void* two, void* disc)
-{	return (int)(*((ssize_t*)one) - *((ssize_t*)two));
+{	return (int)(*((Vcinx_t*)one) - *((Vcinx_t*)two));
 }
-static int chkdata(Vcsfx_t* sfx, ssize_t lo, ssize_t hi)
-{	ssize_t	i, endi, k;
-	ssize_t	*idx = sfx->idx, *inv = sfx->inv, nstr = sfx->nstr;
-	ssize_t	*ary;
+static int chkdata(Vcsfx_t* sfx, Vcinx_t lo, Vcinx_t hi)
+{	Vcinx_t	i, endi, k;
+	Vcinx_t	*idx = sfx->idx, *inv = sfx->inv, nstr = sfx->nstr;
+	Vcinx_t	*ary;
 
 	if(lo > hi || !chktodo(sfx,lo,hi))
 		return 1;
 
-	if(!(ary = (ssize_t*)malloc((hi-lo+1)*sizeof(ssize_t))) )
+	if(!(ary = (Vcinx_t*)malloc((hi-lo+1)*sizeof(Vcinx_t))) )
 		return 0;
 	for(k = 0, i = lo; i <= hi; ++i, ++k)
 		ary[k] = idx[i];
-	vcqsort(ary, k, sizeof(ssize_t), intcmp, (Void_t*)0);
+	vcqsort(ary, k, sizeof(Vcinx_t), intcmp, (Void_t*)0);
 	for(i = 1; i < k; ++i) /* check distinctness */
 		/**/DEBUG_ASSERT(ary[i] != ary[i-1]);
 	free(ary);
@@ -94,9 +94,9 @@ static int chkdata(Vcsfx_t* sfx, ssize_t lo, ssize_t hi)
 }
 
 /* make sure that all suffixes in [lo,hi] are properly sorted */
-static int cmpsfx(Vcsfx_t* sfx, ssize_t p, ssize_t s)
+static int cmpsfx(Vcsfx_t* sfx, Vcinx_t p, Vcinx_t s)
 {	Vcchar_t	*ps = sfx->str+p, *ss = sfx->str+s;
-	ssize_t		v, n, k;
+	Vcinx_t		v, n, k;
 
 	p = sfx->nstr-p; s = sfx->nstr-s;
 	for(n = p < s ? p : s, k = 0; k < n; ++k)
@@ -113,9 +113,9 @@ static int cmpsfx(Vcsfx_t* sfx, ssize_t p, ssize_t s)
 
 	return p < s ? 1 : -1;
 }
-static int chksorted(Vcsfx_t* sfx, ssize_t lo, ssize_t hi)
-{	ssize_t	*i, *inv = sfx->inv, *idx = sfx->idx;
-	ssize_t	*min = idx+lo, *max = idx+hi;
+static int chksorted(Vcsfx_t* sfx, Vcinx_t lo, Vcinx_t hi)
+{	Vcinx_t	*i, *inv = sfx->inv, *idx = sfx->idx;
+	Vcinx_t	*min = idx+lo, *max = idx+hi;
 
 	for(i = min; i <= max; ++i)
 		/**/DEBUG_ASSERT(inv[*i] == i-idx);
@@ -128,8 +128,8 @@ static int chksorted(Vcsfx_t* sfx, ssize_t lo, ssize_t hi)
 }
 
 /* make sure that list[] is a one-to-one function */
-static int chkone2one(ssize_t* list, ssize_t size)
-{	ssize_t		i;
+static int chkone2one(Vcinx_t* list, Vcinx_t size)
+{	Vcinx_t		i;
 	Vcchar_t	*chk;
 
 	if(!(chk = (Vcchar_t*)calloc(size,1)) )
@@ -145,8 +145,8 @@ static int chkone2one(ssize_t* list, ssize_t size)
 }
 
 /* make sure that idx[] and inv[] are inverses of one another */
-static int chkinverse(ssize_t* idx, ssize_t* inv, ssize_t size)
-{	ssize_t	i;
+static int chkinverse(Vcinx_t* idx, Vcinx_t* inv, Vcinx_t size)
+{	Vcinx_t	i;
 
 	for(i = 0; i < size; ++i) /* check inverse functions */
 		/**/DEBUG_ASSERT(inv[idx[i]] == i);
@@ -155,16 +155,16 @@ static int chkinverse(ssize_t* idx, ssize_t* inv, ssize_t size)
 }
 
 /* make sure that all headers of length "len" are the same */
-static int chkheader(Vcsfx_t* sfx, ssize_t* lo, ssize_t* hi, ssize_t len)
+static int chkheader(Vcsfx_t* sfx, Vcinx_t* lo, Vcinx_t* hi, Vcinx_t len)
 {
 	for(lo += 1; lo <= hi; ++lo)
 		/**/DEBUG_ASSERT(memcmp(sfx->str + lo[-1], sfx->str + lo[0], len) == 0);
 }
 
 /* make sure that [min,le) and (re,max] have been completely sorted */
-static int chkbounds(Vcsfx_t* sfx, ssize_t* min, ssize_t* max, ssize_t* le, ssize_t* re)
+static int chkbounds(Vcsfx_t* sfx, Vcinx_t* min, Vcinx_t* max, Vcinx_t* le, Vcinx_t* re)
 {
-	ssize_t	*idx = sfx->idx, *inv = sfx->inv;
+	Vcinx_t	*idx = sfx->idx, *inv = sfx->inv;
 
 	for(; min < le; ++min)
 		/**/DEBUG_ASSERT(inv[*min] == (min-idx) && idx[inv[*min]] == *min);
@@ -180,19 +180,19 @@ static int chkbounds(Vcsfx_t* sfx, ssize_t* min, ssize_t* max, ssize_t* le, ssiz
 #define GMAX(g,x,y,e)	(((g)[((x)<<8)+(y)+1]) - (((x) == (e) && (y) == 255) ? 1 : 0) - 1)
 
 #if __STD_C 
-static void sfxbsort(Vcsfx_t* sfx, ssize_t* grp)
+static void sfxbsort(Vcsfx_t* sfx, Vcinx_t* grp)
 #else
 static void sfxbsort(sfx, grp)
 Vcsfx_t*	sfx;
-ssize_t*	grp;
+Vcinx_t*	grp;
 #endif
 {
 	int		i, j, v;
-	ssize_t		n, *g;
+	Vcinx_t		n, *g;
 	Vcchar_t	*s, *ends;
-	ssize_t		*idx = sfx->idx, *inv = sfx->inv;
+	Vcinx_t		*idx = sfx->idx, *inv = sfx->inv;
 
-	memset(grp, 0, 256*256*sizeof(ssize_t)); /* get frequencies */
+	memset(grp, 0, 256*256*sizeof(Vcinx_t)); /* get frequencies */
 	for(ends = (s = sfx->str)+sfx->nstr-1, i = *s; s < ends; i = j)
 		grp[(i<<8) + (j = *++s)] += 1;
 
@@ -220,15 +220,15 @@ ssize_t*	grp;
 }
 
 #if __STD_C /* swap two adjacent lists of integers */
-static void sfxswap(ssize_t* min, ssize_t* mid, ssize_t* max)
+static void sfxswap(Vcinx_t* min, Vcinx_t* mid, Vcinx_t* max)
 #else
 static void sfxswap(min, mid, max)
-ssize_t*	min;
-ssize_t*	mid;
-ssize_t*	max;
+Vcinx_t*	min;
+Vcinx_t*	mid;
+Vcinx_t*	max;
 #endif
 {
-	ssize_t	m, n;
+	Vcinx_t	m, n;
 
 	if((n = max-mid) > (m = mid-min+1) )
 		n = m;
@@ -237,17 +237,17 @@ ssize_t*	max;
 }
 
 #if __STD_C /* multikey-quicksort */
-static void sfxqsort(Vcsfx_t* sfx, ssize_t* min, ssize_t* max, ssize_t hdr)
+static void sfxqsort(Vcsfx_t* sfx, Vcinx_t* min, Vcinx_t* max, Vcinx_t hdr)
 #else
 static void sfxqsort(sfx, min, max, hdr)
 Vcsfx_t*	sfx;
-ssize_t*	min;	/* sorting [min,max] 	*/
-ssize_t*	max;
-ssize_t		hdr;	/* common header 	*/
+Vcinx_t*	min;	/* sorting [min,max] 	*/
+Vcinx_t*	max;
+Vcinx_t		hdr;	/* common header 	*/
 #endif
 {
-	ssize_t	*l, *r, *le, *re, k, ln, mn, rn, pi, sz, c[3];
-	ssize_t	*inv = sfx->inv, *idx = sfx->idx;
+	Vcinx_t	*l, *r, *le, *re, k, ln, mn, rn, pi, sz, c[3];
+	Vcinx_t	*inv = sfx->inv, *idx = sfx->idx;
 
 q_sort:	if((sz = max-min+1) <= INSERTSORT) /* insertion sort */
 	{	for(l = min+1; l <= max; ++l) /* insert *l into [0,l-1] */
@@ -371,7 +371,7 @@ q_sort:	if((sz = max-min+1) <= INSERTSORT) /* insertion sort */
 		}
 
 		if(rn > 0)
-		{	/**/DEBUG_DECLARE(ssize_t, n_sz = re-le+1) DEBUG_DECLARE(ssize_t, n_cp = 0)
+		{	/**/DEBUG_DECLARE(Vcinx_t, n_sz = re-le+1) DEBUG_DECLARE(Vcinx_t, n_cp = 0)
 			/**/DEBUG_COUNT(Gn); DEBUG_TALLY(1, Gz, n_sz);
 
 			/* the below two theorems are needed for copying to work */
@@ -413,19 +413,19 @@ q_sort:	if((sz = max-min+1) <= INSERTSORT) /* insertion sort */
 }
 
 #if __STD_C /* copy-sort yx-groups based on the sort order of x-suffixes */
-static void sfxcsort(Vcsfx_t* sfx, ssize_t y, ssize_t* grp)
+static void sfxcsort(Vcsfx_t* sfx, Vcinx_t y, Vcinx_t* grp)
 #else
 static void sfxcsort(sfx, y, grp)
 Vcsfx_t*	sfx;
-ssize_t		y;	/* common first byte	*/
-ssize_t*	grp;	/* bounds of xy-groups	*/
+Vcinx_t		y;	/* common first byte	*/
+Vcinx_t*	grp;	/* bounds of xy-groups	*/
 #endif
 {
-	ssize_t		i, k, l, r, x, *xy;
-	ssize_t		omin, omax, pmin[256], pmax[256];
+	Vcinx_t		i, k, l, r, x, *xy;
+	Vcinx_t		omin, omax, pmin[256], pmax[256];
 	Vcchar_t	*str = sfx->str;
-	ssize_t		*inv = sfx->inv, *idx = sfx->idx;
-	ssize_t		endc = sfx->str[sfx->nstr-1];
+	Vcinx_t		*inv = sfx->inv, *idx = sfx->idx;
+	Vcinx_t		endc = sfx->str[sfx->nstr-1];
 
 	/* bounds of group headed by the same y */
 	if((omin = grp[y<<8]) > (omax = grp[(y<<8)+256]-1) )
@@ -460,21 +460,21 @@ ssize_t*	grp;	/* bounds of xy-groups	*/
 }
 
 #if __STD_C /* sort the unsorted xy-groups for the same x */
-static int sfxosort(Vcsfx_t* sfx, ssize_t x, ssize_t* grp, int dir)
+static int sfxosort(Vcsfx_t* sfx, Vcinx_t x, Vcinx_t* grp, int dir)
 #else
 static int sfxosort(sfx, x, grp, dir)
 Vcsfx_t*	sfx;
-ssize_t	x;	/* common header byte	*/
-ssize_t*	grp;
+Vcinx_t	x;	/* common header byte	*/
+Vcinx_t*	grp;
 int		dir;	/* itoh-tanaka sort dir	*/
 #endif
 {
-	ssize_t		l, r, k, i, y, z;
+	Vcinx_t		l, r, k, i, y, z;
 	Graph_t		*gr;
 	Grnode_t	*hd, *tl, *nd;
 	Gredge_t	*e;
 	Vcchar_t	*str = sfx->str, endc = sfx->str[sfx->nstr-1];
-	ssize_t		nstr = sfx->nstr, *inv = sfx->inv, *idx = sfx->idx;
+	Vcinx_t		nstr = sfx->nstr, *inv = sfx->inv, *idx = sfx->idx;
 	int		rv = -1;
 
 	/* construct graph of relations between xy-groups */
@@ -516,7 +516,7 @@ int		dir;	/* itoh-tanaka sort dir	*/
 	for(nd = hd; nd; nd = nd->link) /* top-sort */
 	{	for(e = nd->oedge; e; e = e->onext)
 			(tl = tl->link = e->head)->link = NIL(Grnode_t*);
-		l = grp[(x<<8) + TYPECAST(ssize_t,nd->label)]; r = inv[idx[l]];
+		l = grp[(x<<8) + TYPECAST(Vcinx_t,nd->label)]; r = inv[idx[l]];
 		sfxqsort(sfx, idx+l, idx+r, 2);
 		/**/DEBUG_ASSERT(chkdata(sfx, l, r));
 	}
@@ -537,22 +537,22 @@ Void_t*	astr;	/* string to be sorted	*/
 ssize_t	nstr;	/* length of string	*/
 #endif
 {
-	ssize_t		l, r, x, y, endc;
-	ssize_t		grp[256*256+1];
+	Vcinx_t		l, r, x, y, endc;
+	Vcinx_t		grp[256*256+1];
 	Vcchar_t	*str; /* the addressable astr	*/
-	ssize_t		*idx, *inv; /* index and rank	*/
+	Vcinx_t		*idx, *inv; /* index and rank	*/
 	Vcsfx_t		*sfx; /* suffix array structure	*/
 	int		error = 1;
 
 	if(!(str = (Vcchar_t*)astr) || nstr <= 0)
 		{ str = NIL(Vcchar_t*); nstr = 0; }
 
-	if(!(sfx = (Vcsfx_t*)malloc(sizeof(Vcsfx_t)+2*(nstr+1)*sizeof(ssize_t))) )
+	if(!(sfx = (Vcsfx_t*)malloc(sizeof(Vcsfx_t)+2*(nstr+1)*sizeof(Vcinx_t))) )
 		return NIL(Vcsfx_t*);
-	sfx->idx = idx = (ssize_t*)(sfx+1);
+	sfx->idx = idx = (Vcinx_t*)(sfx+1);
 	sfx->inv = inv = idx+nstr+1;
 	sfx->str = str;
-	sfx->nstr = (ssize_t)nstr;
+	sfx->nstr = (Vcinx_t)nstr;
 	idx[sfx->nstr] = inv[sfx->nstr] = sfx->nstr; /* the infinite eos byte */
 	if(sfx->nstr <= 1) /* the easy sorting case */
 	{	idx[0] = inv[0] = 0;
@@ -563,7 +563,7 @@ ssize_t	nstr;	/* length of string	*/
 	endc = str[nstr-1];
 
 #ifdef ITOH_TANAKA /* sfxqsort half the data using itoh-tanaka strategy */
-{	ssize_t	c, d;
+{	Vcinx_t	c, d;
 
 	c = d = 0;
 	for(x = 0; x < 256; ++x)
@@ -624,7 +624,7 @@ it_err: ;
 	for(nd = hd; nd; nd = nd->link) /* now process in top-sort order */
 	{	for(e = nd->oedge; e; e = e->onext)
 			(tl = tl->link = e->head)->link = NIL(Grnode_t*);
-		x = TYPECAST(ssize_t,nd->label);
+		x = TYPECAST(Vcinx_t,nd->label);
 		if(sfxosort(sfx, x, grp, 0) < 0)
 			goto ob_err;
 		sfxcsort(sfx, x, grp); /* copy-sort */

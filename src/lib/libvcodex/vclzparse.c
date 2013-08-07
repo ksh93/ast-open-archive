@@ -439,14 +439,14 @@ static int sfxparse(vcpa)
 Vclzparse_t*	vcpa;
 #endif
 {
-	ssize_t		p, r, ad;
-	ssize_t		lp, lz, rp, rz, savp, savlp, savlz;
-	ssize_t		nsrc, nstr;
-	ssize_t		*inv, *idx;
+	Vcinx_t		p, r, ad;
+	Vcinx_t		lp, lz, rp, rz, savp, savlp, savlz;
+	Vcinx_t		nsrc, nstr;
+	Vcinx_t		*inv, *idx;
 	Vcchar_t	*s1, *s2, *ends, *str = NIL(Vcchar_t*);
 	Pair_t		pair;
 	Vcsfx_t		*sfx = NIL(Vcsfx_t*);
-	ssize_t		mmin = MMIN(vcpa);
+	Vcinx_t		mmin = MMIN(vcpa);
 	int		rv = -1;
 
 	/* catenate source and target strings into a superstring */
