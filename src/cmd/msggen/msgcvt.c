@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2000-2011 AT&T Intellectual Property          *
+*          Copyright (c) 2000-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -683,7 +683,6 @@ main(int argc, char** argv)
 		}
 		break;
 	}
-	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	(*convert)(sfstdin, sfstdout, flags);
