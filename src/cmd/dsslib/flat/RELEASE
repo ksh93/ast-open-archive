@@ -1,3 +1,4 @@
+13-08-11 flat.c: strcopy() => stpcpy()
 13-03-11 flat.c: fix <RECORD><WIDTH> vs <SIZE> logic
 13-03-01 flat.c: fix flatten txt string => bin size+string
 12-11-29 flat.c: implement var length format records on output

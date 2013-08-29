@@ -299,7 +299,7 @@ action(const char* command, int pattern)
 	fp->re = re;
 	fp->argv = (char**)(fp + 1);
 	fp->command = (char*)(fp->argv + n);
-	s = strcopy(fp->command, command) + 1;
+	s = stpcpy(fp->command, command) + 1;
 	strcpy(s, command);
 	fp->argv[0] = s;
 	q = 0;

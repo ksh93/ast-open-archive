@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 2002-2012 AT&T Intellectual Property          *
+*          Copyright (c) 2002-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -114,7 +114,7 @@
 #define MRT_ATTR_TUNNEL_ENCAPSULATION		23
 #define MRT_ATTR_TRAFFIC_ENGINEERING		24
 #define MRT_ATTR_EXTENDED_COMMUNITY_V6		25
-#define MRT_ATTR_AIGP_20120425			26
+#define MRT_ATTR_AIGP				26
 #define MRT_ATTR_PE_DISTINGUISHER_LABELS	27
 #define MRT_ATTR_SET				128
 

@@ -1,4 +1,4 @@
-# 6.37.38-15.307.308-31.291.308 regression tests for the ast floating point strto*() routines
+# 32.6.37.38-64.15.307.308-80.31.291.308 regression tests for the ast floating point strto*() routines
 
 TEST 01 'min/max'
 

@@ -500,7 +500,7 @@ rs_disc(Rskey_t* key, const char* options)
 				if (strneq(s, SS_DD_IN, sizeof(SS_DD_IN) - 1) && (p = getenv(sfprints("%-.*s", t - s, s))))
 				{
 					v[n++] = u;
-					u = strcopy(u, p) + 1;
+					u = stpcpy(u, p) + 1;
 				}
 				if (!*t)
 					break;

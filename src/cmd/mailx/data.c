@@ -349,6 +349,8 @@ static const struct var	vartab[] =
 	X("Disable the special meaning of ! in the escape command."),
 "cmd",		&state.var.cmd,			0,	0,0,
 	X("The default command invoked by the pipe command."),
+"convertheaders",&state.var.convertheaders,	0,	"",0,
+	X("Enable header charset conversion."),
 "coprocess",	&state.var.coprocess,		0,	0,set_coprocess,
 	X("Run in mode where stdin and stdout are pipes."),
 "crt",		(char**)&state.var.crt,		I,	0,set_crt,

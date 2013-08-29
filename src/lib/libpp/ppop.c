@@ -134,7 +134,7 @@ ppmapinclude(char* file, register char* s)
 				error(1, "%s: input file name required for %s ignore", file, dirname(INCLUDE));
 				return;
 			}
-			s = t = strcopy(pp.tmpbuf, error_info.file);
+			s = t = stpcpy(pp.tmpbuf, error_info.file);
 			c = *++file;
 			for (;;)
 			{
@@ -994,6 +994,16 @@ ppop(int op, ...)
 					t = *s == '_' ? "" : "__";
 					sfprintf(sp, "#%s %s%s%s #(%s)\n" , dirname(DEFINE), t, s, t, s);
 				}
+			sfprintf(sp,
+"\
+#%s _has_include #%s\n\
+#%s _has_include_next #%s\n\
+"
+				, dirname(DEFINE)
+				, keyname(X_EXISTS)
+				, dirname(DEFINE)
+				, keyname(X_EXISTS_NEXT)
+				);
 			sfprintf(sp,
 "\
 #%s %s:no%s\n\

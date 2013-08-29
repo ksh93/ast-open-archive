@@ -3481,7 +3481,7 @@ flatopen(Dss_t* dss, Dssdisc_t* disc)
 			if (!isalpha(*p))
 				*p = '_';
 			t = a;
-			a = strcopy(a, flat->meth.name);
+			a = stpcpy(a, flat->meth.name);
 			*a++ = 0;
 			if (islower(*t))
 				*t = toupper(*t);

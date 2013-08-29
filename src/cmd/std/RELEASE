@@ -1,3 +1,4 @@
+13-08-07 banner.c: (we still have banner?) drop bosu 3rd arg to main() -- thanks clang
 13-07-17 ls.c: fix -l for empty symlink
 12-11-07 ls.c: move --testsize logic after -H hackery
 12-10-01 iconv.c: move src/lib/libcmd

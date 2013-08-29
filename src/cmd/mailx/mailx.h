@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the BSD package               *
-*Copyright (c) 1978-2012 The Regents of the University of California an*
+*Copyright (c) 1978-2013 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -770,7 +770,7 @@ typedef struct {
 	struct {
 	char	conv[256];
 	char	edit[256];
-	char	head[256];
+	char	head[8*1024];
 	char	mail[256];
 	char	mesg[256];
 	char	more[256];
@@ -792,6 +792,7 @@ typedef struct {
 	char*	bang;
 	char*	cdpath;
 	char*	cmd;
+	char*	convertheaders;
 	char*	coprocess;
 	long	crt;
 	char*	dead;

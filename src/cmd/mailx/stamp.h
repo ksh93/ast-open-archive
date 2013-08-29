@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the BSD package               *
-*Copyright (c) 1978-2012 The Regents of the University of California an*
+*Copyright (c) 1978-2013 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -69,5 +69,5 @@
  * mailx version stamp
  */
 
-#define YEAR	"2012"
-#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2012-09-26 $\n"
+#define YEAR	"2013"
+#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2013-08-11 $\n"

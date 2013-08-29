@@ -178,7 +178,7 @@ mark(const char* name, int recfm, size_t size, Jcldisc_t* disc)
 		nospace(NiL, disc);
 		return 0;
 	}
-	s = u->value = strcopy(u->name = (char*)(u + 1), name) + 1;
+	s = u->value = stpcpy(u->name = (char*)(u + 1), name) + 1;
 	u->size = size;
 	m -= suflen(name);
 	sfsprintf(s, n, "%-.*s%%%s%I*u%s", m, name, (recfm & JCL_RECFM_V) ? "v" : "", sizeof(size), size, name + m);
@@ -244,7 +244,7 @@ uniq(const char* name, const char* value, unsigned long flags, Jcldisc_t* disc)
 			return;
 		}
 		u->count = 1;
-		s = strcopy(u->name = (char*)(u + 1), name);
+		s = stpcpy(u->name = (char*)(u + 1), name);
 		if (value)
 			strcpy(u->value = s + 1, value);
 		dtinsert(state.uniq, u);

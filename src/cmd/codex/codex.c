@@ -22,7 +22,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: codex (AT&T Research) 2013-05-01 $\n]"
+"[-?\n@(#)$Id: codex (AT&T Research) 2013-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?codex - encode/decode filter]"
 "[+DESCRIPTION?\bcodex\b decodes the standard input and/or encodes the "
@@ -39,7 +39,7 @@ USAGE_LICENSE
     "otherwise the method is a separate plugin; that plugin will be required "
     "to decode any encoded data. Differentiate \bcodex\b and \bvcodex\b "
     "methods with the same name by using \b-\b or \b+\b for \bcodex\b options "
-    "and \b.\b or \b=\b for \bvcodex\b options.]"
+    "and \b.\b for \bvcodex\b options.]"
 "[+?Methods may be composed using the \b^\b or \b,\b operators (with no "
     "intervening space.)]"
 "[+?Supported methods are listed below. Each method may have one or more "
@@ -69,6 +69,7 @@ USAGE_LICENSE
         "[+SOURCE=\afile\a?The delta method source \afile\a.]"
         "[+TRACE?Enable method trace.]"
         "[+VERBOSE?Enable verbose method trace.]"
+        "[+WINDOW=\asize\a?The method window size.]"
     "}"
 "[+?The \bCODEX_OPTIONS\b environment variable may contain space "
     "separated options that control all \bcodex\b(3) methods. The "

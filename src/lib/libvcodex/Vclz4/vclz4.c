@@ -253,7 +253,7 @@ Void_t**	out;	/* return decoded data	*/
 	/*
 	 * Do the LZ4 decoding from data to output
 	 */
-	if ((dsz = LZ4_uncompress_unknownOutputSize((char*)vcionext(&io), output, vciomore(&io), sz)) < 0) {
+	if ((dsz = LZ4_uncompress_unknownOutputSize((char*)vcionext(&io), (char*)output, vciomore(&io), sz)) < 0) {
 		vcbuffer(vc, output, -1, -1);
 		return -1;
 	}

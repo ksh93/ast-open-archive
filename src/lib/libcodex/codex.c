@@ -30,6 +30,7 @@ static const char	vd[] = "vcodex";
 #include <codex.h>
 #include <vcodex.h>
 #include <namval.h>
+#include <ctype.h>
 
 static int
 copy_close(Codex_t* code)
@@ -423,8 +424,10 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 	register char**		a;
 	register char*		s;
 	register char*		b;
+	register char*		d;
 	register int		c;
 	register int		q;
+	char*			g;
 	char*			v;
 	int			f;
 	int			namelen;
@@ -437,6 +440,7 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 	Codexmeth_t*		trace;
 	char*			arg[CODEX_ARGS];
 	char			can[CODEX_NAME+CODEX_ARGS];
+	char			dat[CODEX_NAME+CODEX_ARGS];
 
 	/*
 	 * check for matching inactive method in the cache
@@ -494,6 +498,7 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 		a = arg;
 		*a++ = (char*)s;
 		*a++ = b = can;
+		d = dat;
 		q = -1;
 		do
 		{
@@ -502,46 +507,76 @@ push(Sfio_t* sp, const char* name, Codexnum_t flags, Codexdisc_t* disc, Codexmet
 				q = -1;
 			else if (c == '"' || c == '\'')
 				q = c;
-			else if (c == 0 || q < 0 && (c == '-' || c == '+'))
+			else if (c == 0 || q < 0 && (c == '-' || c == '+' || c == '.' && isupper(*s)))
 			{
-				*b++ = 0;
-				v = *(a - 1);
-				if (strneq(v, "PASSPHRASE=", 11))
+				if (c != '.')
+					*b++ = 0;
+				g = 0;
+				if (strneq(s, "PASSPHRASE=", 11))
 				{
-					disc->passphrase = v + 11;
-					b = v;
+					g = s + 11;
+					disc->passphrase = d;
 				}
-				else if (streq(v, "RETAIN"))
+				else if (strneq(s, "RETAIN", 6))
 				{
+					g = s + 6;
 					flags |= CODEX_RETAIN;
-					b = v;
 				}
-				else if (strneq(v, "SIZE=", 5))
+				else if (strneq(s, "SIZE=", 5))
+					size = strtoll(s + 5, &g, 0);
+				else if (strneq(s, "SOURCE=", 7))
 				{
-					size = strtoll(v + 5, NiL, 0);
-					b = v;
+					g = s + 7;
+					disc->source = d;
 				}
-				else if (strneq(v, "SOURCE=", 7))
+				else if (strneq(s, "TRACE", 5))
 				{
-					disc->source = v + 7;
-					b = v;
-				}
-				else if (streq(v, "TRACE"))
-				{
+					g = s + 5;
 					flags |= CODEX_TRACE;
-					b = v;
 				}
-				else if (streq(v, "VERBOSE"))
+				else if (strneq(s, "VERBOSE", 7))
 				{
+					g = s + 7;
 					flags |= CODEX_VERBOSE;
-					b = v;
 				}
-				else if (strneq(v, "WINDOW=", 7))
+				else if (strneq(s, "WINDOW=", 7))
 				{
-					disc->window = v + 7;
-					b = v;
+					g = s + 7;
+					disc->window = d;
 				}
-				else
+				if (g)
+				{
+					while (d < &dat[sizeof(dat)-1])
+					{
+						switch (f = *g++)
+						{
+						case 0:
+							break;
+						case '\'':
+						case '"':
+							if (q < 0)
+								q = f;
+							else
+								*d++ = f;
+							continue;
+						case '^':
+						case ',':
+						case '.':
+						case '-':
+						case '+':
+							if (q < 0)
+								break;
+							/*FALLTHROUGH*/
+						default:
+							*d++ = f;
+							continue;
+						}
+						break;
+					}
+					*d++ = 0;
+					s = g - 1;
+				}
+				if (c != '.')
 				{
 					if (a >= &arg[elementsof(arg)-1] || b >= &can[sizeof(can)-1])
 						break;

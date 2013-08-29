@@ -40,7 +40,8 @@ regex :TEST: testregex.c testregex.dat locale.dat testmatch.dat testsub.dat \
 		nullsubexpr.dat subexpr.dat nested.dat austin.dat xopen.dat \
 		pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat \
 		cut.dat libtre.dat reg.dat callout.dat type.dat ksh.dat \
-		repetition.dat rightassoc.dat forcedassoc.dat noop.dat
+		repetition.dat rightassoc.dat forcedassoc.dat noop.dat \
+		conjunction.dat
 	$(*:O=1) $(TESTREFLAGS) $(*:O>1)
 
 test.re : test.glob - test.fnmatch - test.match - test.regex

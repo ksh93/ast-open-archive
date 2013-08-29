@@ -2466,8 +2466,8 @@ ssdd(const char* id, const char* name, Ssdisc_t* disc)
 		return -1;
 	}
 	dd->id = (char*)(dd + 1);
-	dd->name = strcopy(dd->id, id) + 1;
-	strcopy(dd->name, name);
+	dd->name = stpcpy(dd->id, id) + 1;
+	strcpy(dd->name, name);
 	dd->alt = dd->id + 3;
 	if (*dd->alt == '-' || *dd->alt == '_')
 		dd->alt++;

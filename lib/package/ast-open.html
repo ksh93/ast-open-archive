@@ -920,7 +920,42 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-13-08-05  --- Release ksh93v- ---
+13-08-27  --- Release ksh93v- ---
+13-08-27 +enum constants can have .DIG, .MAX, or .MIN sub-variables.
+13-08-26 +Floating variables can be following by DIG, MAX, MIN, EPSILON, 
+	  INT_MAX, INT_MIN, or MAX_10_EXP to give values correspong to
+ 	  the floating type of the variable.
+13-08-26 +Integer variables can be followed by .DIG, .MAX, or .MIN in
+	  arithmetic expression so give the values corresponding to that
+	  integer type.
+13-08-26 +Added 12 math constants such as E, PI, and SQRT2.
+13-08-23  Documented __ in sh.1 man page.
+13-08-22  Fixed __ to work in nested types.
+13-08-22  A bug in which print -v .sh.stats did not work within a namespace
+	  has been fixed.
+13-08-21  enumeration subvariables introduce in 13-07-30 can now be used
+	  with enum arrays and reference to enum array elements.
+13-08-20  A bug in arithemtic with variables used in an arithmetic expression
+	  inside a namespace has been fixed.
+13-08-19  A bug in which compound variables created in a namespace did not
+	  display correctly outside of the namespace has been fixed. 
+13-08-19 +The variable .sh.pwdfd which expands to the file descriptor number
+	  corresponding to $PWD has been added.
+13-08-15  A bug in which copying the .sh.stats and .sh.siginfo variables
+	  gave values that could vary has been fixed.
+13-08-14  A bug in which unknow starup options, for example ksh --foobarbla
+	  would cause the shell to core dump has been fied.
+13-08-14  A bug in which {n}&lt;&amp;0 did not work after &lt;&lt;&lt; string hs been fixed.
+13-08-12  A bug in which background jobs where not removed after the
+	  user was notified about completion has been fixed.
+13-08-11  A bug in which subscripts were evaluated twice for subscripts
+	  on the left hand side of assignments make by typeset has been fixed.
+13-08-11 +namespace was modified so that namespace names can be a compound
+	  variable rather than just an identifier and namespace are no
+	  longer nested.
+13-08-07  typeset -p (and print -v) now display the short attribute for
+	  typeset -sF and typeset -sE.
+13-08-06 +You can now use the redirection &lt;&amp; {n} whic is the same as &lt;&amp; $n.
 13-08-05  Fix a bug in which read -C could reference uninitialized memory.
 13-07-31  Fixed a bug with index arrays of short integer types in arrays
 	  inside types that could lead to a core dump.
@@ -930,7 +965,7 @@ All recorded changes follow.
 	  for each enumeration constant.  ${enum.name} will expand to the
 	  numerical value of the enumeration name associatied with enum.
 13-07-30 +An experimental change to allow ${foo.__} to expand to the parent
-	  node for foo, or foo if foo doesn't have a parent.  There are no
+	  node for foo, or foo if foo doesn't have a parent.  There are now
 	  regression tests for .__ yet.
 13-07-26  Fixed a memory leak bug with `...`.
 13-07-24  A bug in which += assignments did not work for environment variables
@@ -4419,6 +4454,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 strcopy() =&gt; stpcpy()
 13-06-24 pax.h,pax.c,file.c: change chmod members to modekeep and restoremode
 12-11-08 file.c: fix lchmod() logic for systems that implement only ENOSYS
 12-10-17 copy.c: fix SEEK_HOLE loop that set last file byte to 0
@@ -5045,6 +5081,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="coshell changes">coshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-07 NGROUPS_MAX =&gt; getconf("NGROUPS_MAX")
 10-06-01 sync with ast api 20100601
 08-04-08 event.c: use dbmlib.iffe
 07-10-23 main.c: avoid UOUT CO_SERIALIZE cswrite hangs via O_NONBLOCK
@@ -5219,6 +5256,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mam changes">mam changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 strcopy() =&gt; stpcpy()
 10-06-01 sync with ast api 20100601
 04-02-29 self-document
 
@@ -5268,6 +5306,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 strcopy() =&gt; stpcpy()
 13-07-17 use O_CLOEXEC
 13-05-28 Makerules.mk: fix MAM CC.SUFFIX.OBJECT initialization
 13-05-07 main.c: drop Vmstat_t.m_busy Vmstat_t.m_free
@@ -6887,6 +6926,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="codex changes">codex changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 codex.c: add WINDOW=size to usage&#0091;&#0093;
 09-04-15 codex.c: add --passfile=file
 08-05-08 codex.c: Codexdisc_t can't be on main()'s stack due to SF_ATEXIT
 06-08-23 codex.tst: add uu boundary and text tests
@@ -6954,6 +6994,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="bgp changes">bgp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-28 mrt.h: MRT_ATTR_AIGP_20120425 =&gt; MRT_ATTR_AIGP
+13-08-28 bgp.c: add BGP_aigp, "aigp_t aigp { values_t aigp }"
+13-08-28 bgp-mrt.c: parse MRT_ATTR_AIGP subtype 1
 13-04-18 bgp-mrt.c: add mvpn_t.src_as* to the member table -- doh
 13-03-21 bgp-mrt.c: fix TABLE_DUMP_V2_RIB* old record data bleed through
 13-03-11 bgp-mrt.c: fix mvpn.src_addrv&#0091;46&#0093; set bit
@@ -7048,6 +7091,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="flat changes">flat changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 flat.c: strcopy() =&gt; stpcpy()
 13-03-11 flat.c: fix &lt;RECORD&gt;&lt;WIDTH&gt; vs &lt;SIZE&gt; logic
 13-03-01 flat.c: fix flatten txt string =&gt; bin size+string
 12-11-29 flat.c: implement var length format records on output
@@ -7108,6 +7152,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ip_t changes">ip_t changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-28 bgp.h: add BGP_aigp
+13-08-28 ip_t.c: add "values_t" uint32_t vector type
 13-04-18 bgp.h: add BGP_MVPN_src_as*
 13-04-09 ip_t.c: treat undefined unbound generic ip addrd as 0.0.0.0
 12-08-11 bgp.h: Bgptunnel_t
@@ -7307,6 +7353,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mailx changes">mailx changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 head.c: add header charset conversion buffer boundary checks
+13-08-11 add -o noconvertheaders to disable header charset conversion
 12-09-26 head.c handle =?UTF-8?&#0091;BQ&#0093;?...?=; other charsets later
 12-06-05 spam.c: fix insider() domain check that skipped pure domain with not host
 12-04-13 cmd1.c: fix empty list null pointer deref
@@ -7802,6 +7850,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-07 banner.c: (we still have banner?) drop bosu 3rd arg to main() -- thanks clang
 13-07-17 ls.c: fix -l for empty symlink
 12-11-07 ls.c: move --testsize logic after -H hackery
 12-10-01 iconv.c: move src/lib/libcmd
@@ -8137,6 +8186,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-26 expr.c: fix null pointer deref in matchval() -- thanks Philippe
 13-08-02 find: add { -show -delete } for gnu/sol compatibility
 13-04-03 xargs: move to lib/libcmd and cmd/builtin
 12-04-11 find,tw,xargs: update to cmdopen() discipline api
@@ -8377,6 +8427,33 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-26 features/float: fix (FLT|DBL|LDBL)_*_(MIN|MAX) algorithm to not use exact powers of 2!!
+13-08-25 path/pathcanon.c: finalize //@// extended/hidden attribute namespace *for testing*
+13-08-24 include/fts.h,misc/fts.c: make preparations for FTS.fts_dirfd, fdopendir(), fgetcwd(), openat(), fstatat()
+13-08-23 path/pathcanon.c: add PATH_DROP_LEAD_SLASH2 and PATH_DROP_TAIL_SLASH to unify ast c14n
+13-08-23 features/float: add (FLT|DBL|LDBL)_EPSILON logic
+13-08-22 features/lib,include/ast_std.h,comp/qsort.c,comp/qsort_r.c: add { qsort qsort_r } from Bentley/McIlroy code
+13-08-22 misc/getcwd.c: now a wrapper call to fgetcwd(AT_FDCWD)
+13-08-21 regex/regdecomp.c: fix REG_SHELL decompilation bug
+13-08-21 regex/regcomp.c: fix REG_SHELL ~(A)(...) parse bug that didn't treat second ')' as closing paren
+13-08-20 misc/fgetcwd.c: add, inspired by olga
+13-08-17 path/pathcanon.c: /dev/file/flag&#0091;,flag...&#0093;:&#0091;/&#0093;path for relative and absolute paths
+13-08-17 port/intercept.c: move pathdev() intercepts to ast_*at() and make ast_*&#0091;!at&#0093;() call ast_*at() counterpart
+13-08-15 features/lib,features/dirent,port/intercept.c: add ast_opendir() and fdopendir() tests
+13-08-14 features/atdev: additional support for comp/at.c emulation on frankenstein systems
+13-08-11 features/lib: add `lib fdatasync,fssync,sync' tests
+13-08-11 features/fcntl.c: another round for { O_DIRECTORY O_SEARCH }, stabilize ast extension values
+13-08-11 port/intercept.c: add RATIFY() to check for paths with embeded directory fd refs
+13-08-11 convert strcopy() usage to stpcpy(); strncopy() will not change
+13-08-08 path/pathcanon.c: add PATH_ABSOLUTE to canonicalize relative path to absolute (rooted) path
+13-08-08 comp/resolvepath.c: now a veneer to pathdev+PATH_ABSOLUTE...
+13-08-08 string/stpcpy.c,string/stpncpy.c: add { stpcpy() stpncpy() } emulations
+13-08-08 include/ast.h,path/pathcanon.c: add { /dev/file@flag1,.../path /dev/file@flag1,..././path } to pathdev
+13-08-08 port/intercept.c: handle O_ASYNC anomalies in ast_openat()
+13-08-07 sfio.h,sftmp.c: add SF_TMPFILE notification for sftmp() switch from buf to file
+13-08-07 include/ast.h: add getconf("string") macro using astconf()
+13-08-07 features/fcntl.c: add more macro guards to cover diffs between iffe time and compile time
+13-08-07 features/limits.c: { _POSIX_NAME_MAX _POSIX_PATH_MAX } failsafes for systems (like darwin) that omit them
 13-08-06 tm/tvsleep.c: fix interrupted select() remaining time logic
 13-08-06 path/pathopen.c,pathdev.c: handle /dev/fd/ dir pseudo stat
 13-08-05 vmalloc/malloc.c: add VMALLOC_OPTIONS=usage =&gt; VM_usage
@@ -10271,6 +10348,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 ls.c: move from src/cmd/std
+13-08-11 join.c: drop setlocale() call already done by optget()
+13-08-11 strcopy() =&gt; stpcpy()
 13-07-17 tr.c: finally handle ``tr -Cd "&#0091;=e=&#0093;" &lt;&lt;&lt;"1e2Ã&copy;3"''-- how about a posix equivalence class api
 13-07-16 cp.c: limit st_size&gt;0 logic to S_ISREG() files
 13-05-01 vmstate.c: update for new vmalloc snarf
@@ -11000,6 +11080,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcs changes">libcs changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-07 csopen.c: NGROUPS_MAX =&gt; getconf("NGROUPS_MAX")
 12-08-21 msg.h: add MSG_openat
 10-06-01 sync with ast api 20100601
 10-04-12 Makefile: defer share and local generation to first use
@@ -11104,6 +11185,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 strcopy() =&gt; stpcpy()
+13-08-11 ppexpr.c,ppop.c: add clang _has_include =&gt; #exists, _has_include_next =&gt; #exists_next
 12-06-06 ppline.c: preserve hosted sync even for normal sync
 12-02-29 pp.probe: handle predefined function-like macro definitions
 12-02-14 ppproto.c: fix "already noticed" logic
@@ -11570,6 +11653,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcodex changes">libcodex changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-08 codex.c: handle &lt;method&gt;.WINDOW=NNN^&lt;method&gt;...
 13-08-06 code-vcodex.c: do not encode more than a window at a time!
 13-07-30 codexlist.c: work around installations with obsolete vcodex plugin
 13-05-24 code-vcodex.c: add to unify codex&lt;=&gt;vcodex 
@@ -11602,6 +11686,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdss changes">libdss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 strcopy() =&gt; stpcpy()
 13-04-08 cxopen.c: fix cxmembers() bug that referenced data.string instead of data.string.data (dumped on be 32 bit)
 13-04-08 cxopen.c: fix cxcast() ref to use ref data instead of original record!
 13-03-10 dssopen.c: move default dss suffix from dssfind() to loadtags()
@@ -12102,6 +12187,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libjcl changes">libjcl changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-08-11 strcopy() =&gt; stpcpy()
 13-06-27 path.c,find.c: add ${N:s%old%new%:...} edit expressions to prefix file
 13-03-14 run.c: move --subtmp rm -rf to after the last step
 13-03-04 jcl.h,run.c,uniq.c: add { JCL_LISTDD JCL_LISTPARMS }
@@ -12199,7 +12285,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>August 07, 2013</TD>
+<TD align=right>August 29, 2013</TD>
 </TR>
 </TABLE>
 <P>

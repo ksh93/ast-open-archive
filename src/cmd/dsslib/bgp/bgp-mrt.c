@@ -352,7 +352,7 @@ symbol(int group, int index)
 		case MRT_ATTR_TUNNEL_ENCAPSULATION:	return "TUNNEL_ENCAPSULATION";
 		case MRT_ATTR_TRAFFIC_ENGINEERING:	return "TRAFFIC_ENGINEERING";
 		case MRT_ATTR_EXTENDED_COMMUNITY_V6:	return "EXTENDED_COMMUNITY_V6";
-		case MRT_ATTR_AIGP_20120425:		return "AIGP_20120425";
+		case MRT_ATTR_AIGP:			return "AIGP";
 		case MRT_ATTR_PE_DISTINGUISHER_LABELS:	return "PE_DISTINGUISHER_LABELS";
 		case MRT_ATTR_SET:			return "SET";
 		}
@@ -857,6 +857,8 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 	Bgpnum_t*		ap32;
 	Bgpnum_t*		np;
 	Bgptunnel_t*		ta;
+	Bgpvec_t*		vp;
+	char*			vt;
 	char*			nxt;
 	unsigned char*		up;
 	unsigned long		v;
@@ -1054,25 +1056,21 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 		rp->agg_addr.v4 = AE4(state->buf + 2);
 		break;
 	case MRT_ATTR_COMMUNITY:
+		vp = &rp->community;
+		vt = "community list";
+		j = 2;
 		k = size / 2;
-		BGPVEC(state, rp, Bgpasn_t, ap, k, &rp->community, "community list", disc);
-		for (i = j = 0; j < k; i += 4)
-		{
-			v = AE4(state->buf + i);
-			ap[j++] = (v >> 16) & 0xffff;
-			ap[j++] = v & 0xffff;
-		}
-		break;
+		goto vectorize;
 	case MRT_ATTR_ORIGINATOR:
 		rp->set &= ~BGP_SET_originatorv6;
 		rp->originator.v4 = AE4(state->buf);
 		break;
 	case MRT_ATTR_CLUSTER:
-		k = size / 4;
-		BGPVEC(state, rp, Bgpnum_t, np, k, &rp->cluster, "cluster list", disc);
-		for (i = j = 0; j < k; i += 4)
-			np[j++] = AE4(state->buf + i);
-		break;
+		vp = &rp->cluster;
+		vt = "cluster list";
+		j = 4;
+		k = size / j;
+		goto vectorize;
 	case MRT_ATTR_DPA:
 		rp->dpa_as = AE2(state->buf);
 		rp->dpa_addr.v4 = AE4(state->buf + 2);
@@ -1168,6 +1166,39 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			BGPVEC(state, rp, unsigned char, up, k, &ta->identifier, "PMSI tunnel identifier", disc);
 			AE(up, state->buf + 5, k);
 			ta->identifier.offset -= rp->tunnel;
+		}
+		break;
+	case MRT_ATTR_AIGP:
+		i = BE1(state->buf);
+		switch (i)
+		{
+		case BGP_AIGP_aigp:
+			vp = &rp->aigp.aigp;
+			vt = "aigp tlv";
+			j = 4;
+			break;
+		default:
+			goto unknown;
+		}
+		rp->set |= BGP_SET_aigp;
+		k = BE2(state->buf + 1);
+		if (k < 3 || k > size)
+			goto unknown;
+		state->buf += 3;
+		k = (k - 3) / j;
+	vectorize:
+		switch (j)
+		{
+		case 2:
+			BGPVEC(state, rp, Bgpasn_t, ap, k, vp, vt, disc);
+			for (i = j = 0; j < k; i += 2)
+				ap[j++] = AE2(state->buf + i);
+			break;
+		case 4:
+			BGPVEC(state, rp, Bgpnum_t, np, k, vp, vt, disc);
+			for (i = j = 0; j < k; i += 4)
+				np[j++] = AE4(state->buf + i);
+			break;
 		}
 		break;
 	default:

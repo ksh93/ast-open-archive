@@ -57,6 +57,7 @@ CXV("agg_addr32v6",	"ipv6addr_t",	BGP_agg_addr32v6,	"Aggregator AS32 ipv6 addres
 CXV("agg_as",		"as_t",		BGP_agg_as,		"Aggregator AS number.")
 CXV("agg_as16",		"as16_t",	BGP_agg_as16,		"Aggregator AS16 number.")
 CXV("agg_as32",		"as32_t",	BGP_agg_as32,		"Aggregator AS32 number.")
+CXV("aigp",		"aigp_t",	BGP_aigp,		"AIGP attributes.")
 CXV("atomic",		"number",	BGP_atomic,		"Atomic.")
 CXV("best",		"number",	BGP_best,		"Best route.")
 CXV("bits",		"number",	BGP_bits,		"Number of prefix mask bits.")
@@ -93,7 +94,7 @@ CXV("message",		"number",	BGP_message,		"Message group index.")
 CXV("mvpn",		"mvpn_t",	BGP_mvpn,		"Mcast VPN data.")
 CXV("new_state",	"number",	BGP_new_state,		"STATE_CHANGE record new state.")
 CXV("old_state",	"number",	BGP_old_state,		"STATE_CHANGE record old state.")
-CXV("origin",		"number",	BGP_origin,		"Origin: 'i':igp, 'e':egp, '?':incomplete.")
+CXV("origin",		"number",	BGP_origin,		"Origin: 'i':igp, 'e':egp, '?':incomplete, '0':unset.")
 CXV("originator",	"ipv4addr_t",	BGP_originator,		"Originator ipv4 address.")
 CXV("path",		"aspath_t",	BGP_path,		"AS path.")
 CXV("path16",		"as16path_t",	BGP_path16,		"AS16 path.")
@@ -211,6 +212,19 @@ bgp_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand
 		break;
 	case BGP_agg_as32:
 		r->value.number = rp->agg_as32;
+		break;
+	case BGP_aigp:
+		if (rp->set & BGP_SET_aigp)
+		{
+			r->value.buffer.data = &rp->aigp;
+			r->value.buffer.size = sizeof(Bgpaigp_t);
+		}
+		else
+		{
+			r->value.buffer.data = 0;
+			r->value.buffer.size = 0;
+		}
+		r->value.buffer.elements = 0;
 		break;
 	case BGP_bits:
 		r->value.number = (rp->set & BGP_SET_prefixv6) ? rp->prefixv6[IP6BITS] : rp->bits;
@@ -363,7 +377,7 @@ bgp_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand
 		r->value.number = rp->type == BGP_TYPE_state_change ? rp->old_state : 0;
 		break;
 	case BGP_origin:
-		r->value.number = rp->origin ? rp->origin : '0';
+		r->value.number = rp->origin ? rp->origin : BGP_ORIGIN_unset;
 		break;
 	case BGP_originator:
 		if (rp->set & BGP_SET_originatorv6)
@@ -534,6 +548,57 @@ bgp_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand
 	}
 	return 0;
 }
+
+static Cxmember_t	bgp_member =
+{
+	bgp_get,
+	0,
+	(Dt_t*)&bgp_fields[0]
+};
+ 
+static Cxvariable_t aigp_fields[] =
+{
+CXV("aigp",		"values_t",	BGP_AIGP_aigp,		"AIGP TLV.")
+{0}
+};
+
+static int
+aigp_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
+{
+	Bgproute_t*		rp;
+	Bgpaigp_t*		aigp;
+
+	if (data)
+	{
+		rp = (Bgproute_t*)DSSDATA(data);
+		aigp = &rp->aigp;
+	}
+	else
+	{
+		aigp = (Bgpaigp_t*)r->value.buffer.data;
+		rp = (Bgproute_t*)((char*)aigp - offsetof(Bgproute_t, aigp));
+	}
+	switch (pc->data.variable->index)
+	{
+	case BGP_AIGP_aigp:
+		r->value.buffer.data = rp->data + aigp->aigp.offset;
+		r->value.buffer.size = aigp->aigp.size * sizeof(Bgpnum_t);
+		r->value.buffer.elements = 0;
+		break;
+	default:
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 1, "aigp.%s index %d not implemented in get()", pc->data.variable->name, pc->data.variable->index);
+		return -1;
+	}
+	return 0;
+}
+
+static Cxmember_t	aigp_member =
+{
+	aigp_get,
+	0,
+	(Dt_t*)&aigp_fields[0]
+};
 
 static Cxvariable_t mvpn_fields[] =
 {
@@ -854,16 +919,11 @@ static Cxmember_t	tunnel_member =
 	(Dt_t*)&tunnel_fields[0]
 };
 
-static Cxmember_t	bgp_member =
-{
-	bgp_get,
-	0,
-	(Dt_t*)&bgp_fields[0]
-};
- 
 static Cxtype_t	types[] =
 {
+	/* NOTE bgp_t must be first */
 	{ "bgp_t",	"BGP route data.", CXS, (Cxtype_t*)"buffer", 0, 0, 0, 0, 0, 0, 0, { 0, 0, CX_BUFFER, 4 }, 0, &bgp_member	},
+	{ "aigp_t",	"AIGP attributes.", CXH, (Cxtype_t*)"buffer", 0, 0, 0, 0, 0, 0, 0, { 0, 0, CX_BUFFER, 4 }, 0, &aigp_member	},
 	{ "rd_t",	"Route distinguisher.", CXH, (Cxtype_t*)"buffer", 0, 0, 0, 0, 0, 0, 0, { 0, 0, CX_BUFFER, 4 }, 0, &rd_member	},
 	{ "mvpn_t",	"Multicast VPN data.", CXH, (Cxtype_t*)"buffer", 0, 0, 0, 0, 0, 0, 0, { 0, 0, CX_BUFFER, 4 }, 0, &mvpn_member	},
 	{ "tunnel_t",	"PMSI tunnel attribute.", CXH, (Cxtype_t*)"buffer", 0, 0, 0, 0, 0, 0, 0, { 0, 0, CX_BUFFER, 4 }, 0, &tunnel_member	},

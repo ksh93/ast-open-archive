@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 5.7 2013-08-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -75,6 +75,15 @@ exec - rm -f 1.${COTEMP}.*
 done codex.req generated
 make codex.o
 make codex.c
+make ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
+done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 make ${PACKAGE_ast_INCLUDE}/namval.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
@@ -85,14 +94,6 @@ done ${PACKAGE_ast_INCLUDE}/vcwindow.h dontcare
 make ${PACKAGE_ast_INCLUDE}/vcmethods.h implicit
 done ${PACKAGE_ast_INCLUDE}/vcmethods.h dontcare
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-make ${PACKAGE_ast_INCLUDE}/endian.h implicit
-make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
-done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -317,7 +318,6 @@ done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ccode.h
-prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev codex.h implicit
 done code-qp.c
 meta code-qp.o %.c>%.o code-qp.c code-qp

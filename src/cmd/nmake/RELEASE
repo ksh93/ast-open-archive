@@ -1,3 +1,4 @@
+13-08-11 strcopy() => stpcpy()
 13-07-17 use O_CLOEXEC
 13-05-28 Makerules.mk: fix MAM CC.SUFFIX.OBJECT initialization
 13-05-07 main.c: drop Vmstat_t.m_busy Vmstat_t.m_free

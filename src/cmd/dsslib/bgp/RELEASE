@@ -1,3 +1,6 @@
+13-08-28 mrt.h: MRT_ATTR_AIGP_20120425 => MRT_ATTR_AIGP
+13-08-28 bgp.c: add BGP_aigp, "aigp_t aigp { values_t aigp }"
+13-08-28 bgp-mrt.c: parse MRT_ATTR_AIGP subtype 1
 13-04-18 bgp-mrt.c: add mvpn_t.src_as* to the member table -- doh
 13-03-21 bgp-mrt.c: fix TABLE_DUMP_V2_RIB* old record data bleed through
 13-03-11 bgp-mrt.c: fix mvpn.src_addrv[46] set bit

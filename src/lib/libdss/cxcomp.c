@@ -210,43 +210,43 @@ cxcodename(int code)
 		switch (name[i])
 		{
 		case 'C':
-			s = strcopy(s, "CALL");
+			s = stpcpy(s, "CALL");
 			break;
 		case 'D':
-			s = strcopy(s, "DEL");
+			s = stpcpy(s, "DEL");
 			break;
 		case 'G':
-			s = strcopy(s, "GET");
+			s = stpcpy(s, "GET");
 			break;
 		case 'J':
-			s = strcopy(s, "JMP");
+			s = stpcpy(s, "JMP");
 			break;
 		case 'L':
-			s = strcopy(s, "LOG");
+			s = stpcpy(s, "LOG");
 			break;
 		case 'R':
-			s = strcopy(s, "RET");
+			s = stpcpy(s, "RET");
 			break;
 		case 'S':
-			s = strcopy(s, code == CX_CAST ? "CAST" : (code & CX_X2) ? "==" : "SET");
+			s = stpcpy(s, code == CX_CAST ? "CAST" : (code & CX_X2) ? "==" : "SET");
 			break;
 		case 'e':
-			s = strcopy(s, "END");
+			s = stpcpy(s, "END");
 			break;
 		case 'n':
-			s = strcopy(s, "NUM");
+			s = stpcpy(s, "NUM");
 			break;
 		case 'p':
-			s = strcopy(s, "POP");
+			s = stpcpy(s, "POP");
 			break;
 		case 's':
-			s = strcopy(s, "STR");
+			s = stpcpy(s, "STR");
 			break;
 		case 't':
-			s = strcopy(s, "TST");
+			s = stpcpy(s, "TST");
 			break;
 		case '0':
-			s = strcopy(s, "NOP");
+			s = stpcpy(s, "NOP");
 			break;
 		case '~':
 			if (code == CX_NOMATCH)

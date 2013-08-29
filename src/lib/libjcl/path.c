@@ -534,9 +534,9 @@ jclmap(Jcl_t* jcl, const char* file, Jcldisc_t* disc)
 				memcpy(mp->prefix = (char*)(mp + 1), s, n);
 				s = mp->prefix + n;
 				*s++ = 0;
-				s = strcopy(mp->map = s, arg[1]);
+				s = stpcpy(mp->map = s, arg[1]);
 				if (tail)
-					s = strcopy(mp->tail = s + 1, tail);
+					s = stpcpy(mp->tail = s + 1, tail);
 				if (arg[2])
 					strcpy(mp->suffix = s + 1, arg[2]);
 				else

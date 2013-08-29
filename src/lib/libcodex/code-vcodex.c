@@ -704,7 +704,7 @@ vcodex_option(Codex_t* p, const char* s, Vcwmethod_t** wmeth, size_t* wsize, uns
 			v = 1;
 	}
 	for (x = e; b = *x++;)
-		if (b == '.' || b == '=')
+		if (b == '.' || b == '=' || b == ',')
 			break;
 	if (!b)
 		x = 0;

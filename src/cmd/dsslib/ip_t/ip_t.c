@@ -530,6 +530,36 @@ labels_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc
 }
 
 static ssize_t
+values_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
+{
+	Cxformat_t*	formats[2];
+
+	formats[0] = 0;
+	formats[1] = format;
+	return itl4external(cx, type, 0, 1, 0, details, formats, value, buf, size, disc);
+}
+
+static ssize_t
+values_internal(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxoperand_t* ret, const char* buf, size_t size, Vmalloc_t* vm, Cxdisc_t* disc)
+{
+	return itl4internal(cx, &ret->value, 0, 1, 0, buf, size, vm, disc);
+}
+
+static void*
+values_match_comp(Cx_t* cx, Cxtype_t* sub, Cxtype_t* pat, Cxvalue_t* val, Cxdisc_t* disc)
+{
+	if (!cxisstring(pat))
+	{
+		if (disc->errorf)
+			(*disc->errorf)(NiL, disc, 2, "%s: match requires %s pattern", sub->name, cx->state->type_string->name, sub->name);
+		return 0;
+	}
+	iredisc.version = IRE_VERSION;
+	iredisc.errorf = disc->errorf;
+	return irecomp(val->string.data, 1, 0, 4, 0, &iredisc);
+}
+
+static ssize_t
 prefixv4_external(Cx_t* cx, Cxtype_t* type, const char* details, Cxformat_t* format, Cxvalue_t* value, char* buf, size_t size, Cxdisc_t* disc)
 {
 	char*	s;
@@ -758,6 +788,16 @@ static Cxmatch_t	match_labels =
 	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. Pairs are separated by :. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. If a : tuple separator is omitted then :.* is assumed. For example, '[!1 100]' matches all lists that contain neither 1 nor 100 as the first pair element, and '^[!1: :100]-701:999$' matches all lists that don't start with 1 as the first pair element or 100 as the second pair element and end with 701:999.",
 	CXH,
 	labels_match_comp,
+	match_list_exec,
+	match_list_free
+};
+
+static Cxmatch_t	match_values =
+{
+	"values-re",
+	"Matches on this type treat a string pattern as an ire(3) integer list regular expression. Each number in the list is a distinct token. ^ $ * + . {n,m} [N1 .. Nn] are supported, and - is equivalent to .*. Adjacent numbers may be separated by space, comma, / or _; multiple adjacent separators are ignored in the match. For example, '[!1 100]' matches all lists that contain neither 1 nor 100, and '^[!1 100]-701$' matches all lists that don't start with 1 or 100 as the first element and end with 701.",
+	CXH,
+	values_match_comp,
 	match_list_exec,
 	match_list_free
 };
@@ -1033,7 +1073,7 @@ Cxtype_t	types[] =
 { "as16path_t", "A sequence of as16_t 16 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, as16path_external, as16path_internal, 0, 0, 0, 2, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal (default)), followed by the separator string.", "u," }, &match_as16path },
 { "as32path_t", "A sequence of as32_t 32 bit autonomous system numbers.", CXH, (Cxtype_t*)"buffer", 0, as32path_external, as32path_internal, 0, 0, 0, 4, { "The format details string is the format character (\b1\b or \b.\b: dotted 1-byte, \b2\b: dotted 2-byte, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: unsigned decimal (default)), followed by the separator string.", "u," }, &match_as32path },
 { "aspath_t", 0, CXH, (Cxtype_t*)"buffer", 0, aspath_external, aspath_internal, 0, 0, 0, 0, { 0 }, &match_aspath, 0, &aspath_generic[0] },
-{ "cluster_t", "A sequence of unsigned 32 bit integer cluster ids.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, 0, 4, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
+{ "cluster_t", "A sequence of unsigned 32 bit integers.", CXH, (Cxtype_t*)"buffer", 0, cluster_external, cluster_internal, 0, 0, 0, 4, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", ".," }, &match_cluster },
 { "community_t", "A sequence of unsigned 16 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, community_external, community_internal, 0, 0, 0, 2, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_community },
 { "extended_t", "A sequence of unsigned 64 bit integer tuples.", CXH, (Cxtype_t*)"buffer", 0, extended_external, extended_internal, 0, 0, 0, 8, { "The format details string is the format character (\b.\b: dotted elements, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_extended },
 { "ipv4addr_t",	"A dotted quad ipv4 address.", CXH, (Cxtype_t*)"number", 0, addrv4_external, addrv4_internal, 0, 0, 4, 0, { 0, 0, CX_UNSIGNED|CX_INTEGER, 4, 16 }, &match_prefixv4 },
@@ -1044,6 +1084,7 @@ Cxtype_t	types[] =
 { "ipprefix_t", 0, CXH, (Cxtype_t*)"number", 0, prefix_external, prefix_internal, 0, 0, 0, 0, { 0 }, &match_prefix, 0, &prefix_generic[0] },
 { "identifier_t", "A sequence of unsigned 8 bit integers.", CXH, (Cxtype_t*)"buffer", 0, identifier_external, identifier_internal, 0, 0, 0, 1, { "The format details string is the format character (\b.\b: dotted elements, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_identifier },
 { "labels_t", "A sequence of unsigned 32 bit integer pairs.", CXH, (Cxtype_t*)"buffer", 0, labels_external, labels_internal, 0, 0, 0, 8, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_labels },
+{ "values_t", "A sequence of unsigned 32 bit integers.", CXH, (Cxtype_t*)"buffer", 0, values_external, values_internal, 0, 0, 0, 8, { "The format details string is the format character (\b.\b: dotted quad, \bd\b: signed decimal, \bo\b: octal, \bx\b: hexadecimal, \bu\b: default unsigned decimal), followed by the separator string.", "u," }, &match_values },
 {0}
 };
 
