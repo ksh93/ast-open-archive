@@ -566,23 +566,28 @@ static int
 aigp_get(Cx_t* cx, Cxinstruction_t* pc, Cxoperand_t* r, Cxoperand_t* a, Cxoperand_t* b, void* data, Cxdisc_t* disc)
 {
 	Bgproute_t*		rp;
-	Bgpaigp_t*		aigp;
+	Bgpaigp_t*		ap;
 
 	if (data)
 	{
 		rp = (Bgproute_t*)DSSDATA(data);
-		aigp = &rp->aigp;
+		ap = &rp->aigp;
 	}
 	else
 	{
-		aigp = (Bgpaigp_t*)r->value.buffer.data;
-		rp = (Bgproute_t*)((char*)aigp - offsetof(Bgproute_t, aigp));
+		ap = (Bgpaigp_t*)r->value.buffer.data;
+		rp = (Bgproute_t*)((char*)ap - offsetof(Bgproute_t, aigp));
+	}
+	if (!ap)
+	{
+		memset(&r->value, 0, sizeof(r->value));
+		return 0;
 	}
 	switch (pc->data.variable->index)
 	{
 	case BGP_AIGP_aigp:
-		r->value.buffer.data = rp->data + aigp->aigp.offset;
-		r->value.buffer.size = aigp->aigp.size * sizeof(Bgpnum_t);
+		r->value.buffer.data = rp->data + ap->aigp.offset;
+		r->value.buffer.size = ap->aigp.size * sizeof(Bgpnum_t);
 		r->value.buffer.elements = 0;
 		break;
 	default:
@@ -1068,7 +1073,7 @@ Dsslib_t dss_lib_bgp =
 {
 	"bgp",
 	"bgp method"
-	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2013-04-18 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2013-09-03 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	&libraries[0],

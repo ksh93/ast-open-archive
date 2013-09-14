@@ -248,7 +248,7 @@ include(Tag_t* tag, Tagframe_t* fp, Tags_t* cp, Tags_t* tags, Tagdisc_t* disc)
  */
 
 static char*
-getline(Tag_t* tag, Tagframe_t* fp, int* inc, Tagdisc_t* disc)
+incline(Tag_t* tag, Tagframe_t* fp, int* inc, Tagdisc_t* disc)
 {
 	register char*	s;
 
@@ -298,16 +298,17 @@ table(Tag_t* tag, Tagframe_t* fp, Tags_t* cp, Tags_t* tags, Tagdisc_t* disc)
 	Tagframe_t	frame;
 
 	ret = -1;
-	memset(&frame, 0, sizeof(frame));
-	frame.prev = fp;
-	frame.level = fp->level + 1;
-	frame.tag = cp;
+	col = 0;
 	if (sfgetr(tag->ip, '\n', 1))
 	{
 		error_info.line++;
-		if (!(s = getline(tag, fp, &inc, disc)))
+		memset(&frame, 0, sizeof(frame));
+		frame.prev = fp;
+		frame.level = fp->level + 1;
+		frame.tag = cp;
+		if (!(s = incline(tag, fp, &inc, disc)))
 			goto done;
-		col = end = 0;
+		end = 0;
 		for (b = s; isalnum(*b); b++);
 		if (!(del = *b))
 		{
@@ -344,7 +345,7 @@ table(Tag_t* tag, Tagframe_t* fp, Tags_t* cp, Tags_t* tags, Tagdisc_t* disc)
 		}
 		do
 		{
-			if (!(s = getline(tag, fp, &inc, disc)))
+			if (!(s = incline(tag, fp, &inc, disc)))
 				goto done;
 			if (!*s)
 			{
@@ -353,6 +354,7 @@ table(Tag_t* tag, Tagframe_t* fp, Tags_t* cp, Tags_t* tags, Tagdisc_t* disc)
 				break;
 			}
 		} while (!inc);
+		frame.tag = tp;
 		sep = 0;
 		do
 		{
@@ -370,7 +372,6 @@ table(Tag_t* tag, Tagframe_t* fp, Tags_t* cp, Tags_t* tags, Tagdisc_t* disc)
 			}
 			else
 				sep = 1;
-			frame.tag = tp;
 			for (p = col; p && *s; p = p->next)
 			{
 				for (b = s; *s && *s != del; s++);
@@ -383,15 +384,16 @@ table(Tag_t* tag, Tagframe_t* fp, Tags_t* cp, Tags_t* tags, Tagdisc_t* disc)
 				if (p->tag->endf && (*p->tag->endf)(tag, &frame, disc))
 					goto done;
 			}
-			frame.tag = cp;
 			if (p)
 			{
+				frame.tag = cp;
 				if (disc->errorf)
 					(*disc->errorf)(tag, disc, 2, "%s: not enough columns", tagcontext(tag, &frame));
 				goto done;
 			}
 			if (*s)
 			{
+				frame.tag = cp;
 				if (disc->errorf)
 					(*disc->errorf)(tag, disc, 2, "%s: too many columns", tagcontext(tag, &frame));
 				goto done;

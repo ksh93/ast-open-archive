@@ -282,14 +282,13 @@ context(Sfio_t* sp, int level, int flags)
 {
 	static int	state;
 
-	NoP(level);
 	NoP(flags);
 	if (error_info.trace <= -10 && pp.state != state)
 	{
 		state = pp.state;
 		sfprintf(sp, " %s", ppstatestr(pp.state));
 	}
-	return 1;
+	return level;
 }
 #endif
 

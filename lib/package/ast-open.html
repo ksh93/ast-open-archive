@@ -920,7 +920,40 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-13-08-27  --- Release ksh93v- ---
+13-09-13  --- Release ksh93v- ---
+13-09-13 +The signal .sh.value variable is now a compound variable with the name
+	  value.q corresponding to kill -q signed-integer and value.Q corresponding
+	  to kill -Q unsigned-large-integer.
+13-09-13  A bug in $(...) command substitution that corrupted a trailing
+          multibyte character in non-UTF-8 locales has been fixed.
+13-09-13  Eliminted extranesous output of standard error when ksh is invoked
+	  with the -v (verbose) option.
+13-09-10  A bug in finding a function defined inside a type that was defined
+	  in a namespace has been fixed.
+13-09-10  A bug in the binding of function local variables inside arithmeitc
+	  expression inside namespaces was fixed.
+13-09-10 +A -Q option was added to kill to pass integers as large as pointers.
+	  The -q option now only accepts integers as large as typeset -i. 
+13-09-09  A bug in command substitution has been fixed.
+13-09-09  Qualified print format "%(&#0091;no&#0093;unicode)q" added to prefer \u&#0091;...&#0093;
+	  over \w&#0091;...&#0093; and override LC_OPTIONS=unicode.
+13-09-04 +\w&#0091;hex&#0093; locale-specific code point literals have been added.
+13-09-04 +The float(f) math function was added.
+13-09-04 +The int(f) math function was fixed to return 0 for floating point
+	  numbers larger than the maximum integer.
+13-09-04  A bug in which assigning a compound indexed array a value of () did
+	  not preserve the -C attribute has been fixed.
+13-09-04  kill -q can now pass numbers as large as typeset -li and
+	  .sh.sig.value is typeset -i rather than a compound variable.
+13-09-04  kill -q yields the processor and returns 2 when siqueue fails with
+	  EAGAIN and yield.
+13-09-03  A bug in which $((x.xxx)) where x is a floating point variable and
+	  xxx is not one of the known extensions yields a random value has
+	  been fixed.  It now is unset which has value 0 when set -u is off.
+13-09-03  A bug in overriding discipline functions for types defined in
+	  namespaces has been fixed.
+13-09-03  A bug which on some systems caused a core dump for large &lt;&lt;&lt; here
+	  documents has been fixed.
 13-08-27 +enum constants can have .DIG, .MAX, or .MIN sub-variables.
 13-08-26 +Floating variables can be following by DIG, MAX, MIN, EPSILON, 
 	  INT_MAX, INT_MIN, or MAX_10_EXP to give values correspong to
@@ -8427,8 +8460,23 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+13-09-12 misc/fgetcwd.c: fix stat corruption bug on systems without fdopendir()
+13-09-12 path/pathcanon.c: fix bug that added extra / when fgetcwd() returned /
+13-09-09 comp/setlocale.c,port/codeset.c: consistent handling of US-ASCII + conformance(0,0) across all os's
+13-09-09 string/utf8towc.c,string/wctoutf8.c: add { utf8toutf32() utf8towc() wctoutf8() }
+13-09-07 include/ast_std.c,comp/setlocale.c,string/stresc.c: add ast.byte_max for single byte locales
+13-09-06 comp/iconv.c: add sfclrerr() to iconv_move() if all input chars not consumed
+13-09-06 port/codeset.h,port/codeset.c: internal api for retrieving locale codeset names
+13-09-04 string/chresc.c,stresc.c: add \w&#0091;hex&#0093; support -- thanks Roland
+13-09-04 string/utf32stowcs.c,string/wcstoutf32s.c: add -- thanks Roland
+13-09-04 sfio/sfsetbuf.c: fix bug where SF_GETR mode was not cleared causing subsequent memory corruption
+13-09-04 vmalloc/vmopen.c,vmdcsystem.c,vmstat.c: temporarily set vm-&gt;meth.meth=0 to disable vmstat() during init
+13-09-04 port/intercept.c: include &lt;ast_standards.h&gt; to ensure fdopendir() prototype if _lib_fdopendir
+13-09-04 include/ast_std.h,comp/setlocale.c: add LC_OPTIONS=unicode and AST_LC_unicode
+13-09-01 path/pathcanon.c: O_* flags dev path: /dev/file/flags@flag&#0091;,flag...&#0093;@&#0091;/&#0093;path
+13-09-01 path/pathcanon.c: limit NAMED_XATTR paths to /dev/file/xattr@canonical-path//@//&#0091;remainder&#0093;
+13-08-29 cdt/dtstrhash.c: change sign-bit hitting fnv constants to hex to silence unsigned warnings
 13-08-26 features/float: fix (FLT|DBL|LDBL)_*_(MIN|MAX) algorithm to not use exact powers of 2!!
-13-08-25 path/pathcanon.c: finalize //@// extended/hidden attribute namespace *for testing*
 13-08-24 include/fts.h,misc/fts.c: make preparations for FTS.fts_dirfd, fdopendir(), fgetcwd(), openat(), fstatat()
 13-08-23 path/pathcanon.c: add PATH_DROP_LEAD_SLASH2 and PATH_DROP_TAIL_SLASH to unify ast c14n
 13-08-23 features/float: add (FLT|DBL|LDBL)_EPSILON logic
@@ -10348,7 +10396,6 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-13-08-11 ls.c: move from src/cmd/std
 13-08-11 join.c: drop setlocale() call already done by optget()
 13-08-11 strcopy() =&gt; stpcpy()
 13-07-17 tr.c: finally handle ``tr -Cd "&#0091;=e=&#0093;" &lt;&lt;&lt;"1e2Ã&copy;3"''-- how about a posix equivalence class api
@@ -12285,7 +12332,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>August 29, 2013</TD>
+<TD align=right>September 13, 2013</TD>
 </TR>
 </TABLE>
 <P>
