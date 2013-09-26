@@ -31,6 +31,24 @@
    - LZ4 source repository : http://code.google.com/p/lz4/
 */
 
+#if _PACKAGE_ast
+
+#include "vclib.h"
+#include <endian.h>
+
+#if _sizeof_pointer == 64
+#define LZ4_ARCH64	1
+#else
+#define LZ4_ARCH64	0
+#endif
+
+#if _ast_intswap
+#define LZ4_BIG_ENDIAN	0
+#else
+#define LZ4_BIG_ENDIAN	1
+#endif
+
+#else /* !_PACKAGE_ast */
 
 /* ************************************** */
 /*  CPU Feature Detection */
@@ -59,6 +77,8 @@
 #else
 /*  Little Endian assumed. PDP Endian and other very rare endian format are unsupported. */
 #endif
+
+#endif /* _PACKAGE_ast */
 
 /*  Unaligned memory access is automatically enabled for "common" CPU, such as x86. */
 /*  For others CPU, the compiler will be more cautious, and insert extra code to ensure aligned access is respected */

@@ -100,6 +100,12 @@ prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_intercept.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_intercept.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
@@ -125,11 +131,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_debug.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_errorf.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_errorf.h dontcare
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
@@ -196,7 +198,7 @@ done ../INIT/mamake.c
 meta mamake.o %.c>%.o ../INIT/mamake.c mamake
 prev ../INIT/mamake.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/mamake.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -c ../INIT/mamake.c
 done mamake.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mamake mamake.o ${mam_libast}
@@ -238,7 +240,7 @@ done ../INIT/release.c
 meta release.o %.c>%.o ../INIT/release.c release
 prev ../INIT/release.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/release.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?proto]"\" -c ../INIT/release.c
 done release.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o release release.o ${mam_libast}

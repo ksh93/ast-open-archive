@@ -130,6 +130,12 @@ prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_intercept.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_intercept.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
@@ -155,11 +161,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_debug.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_errorf.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_errorf.h dontcare
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
@@ -330,6 +332,15 @@ done Vclz4/lz4.h
 make intrin.h implicit
 done intrin.h dontcare virtual
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make vclib.h implicit
+prev vchdr.h
+exec - sed -e 's/HDR/LIB/g' vchdr.h > vclib.h
+prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
+prev io.h implicit
+prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+prev vcodex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done vclib.h dontcare generated
 done Vclz4/lz4.c
 make Vclz4/lz4hc.c
 prev Vclz4/lz4.h implicit
@@ -337,6 +348,7 @@ make Vclz4/lz4hc.h implicit
 done Vclz4/lz4hc.h
 prev intrin.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev vclib.h implicit
 done Vclz4/lz4hc.c
 make Vclz4/vclz4.c
 prev Vclz4/lz4hc.h implicit
@@ -711,13 +723,13 @@ make lz4.o
 prev Vclz4/lz4.c
 meta lz4.o %.c>%.o Vclz4/lz4.c lz4
 prev Vclz4/lz4.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -IVclz4 -I${PACKAGE_ast_INCLUDE} -c Vclz4/lz4.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVclz4 -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vclz4/lz4.c
 done lz4.o generated
 make lz4hc.o
 prev Vclz4/lz4hc.c
 meta lz4hc.o %.c>%.o Vclz4/lz4hc.c lz4hc
 prev Vclz4/lz4hc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -IVclz4 -I${PACKAGE_ast_INCLUDE} -c Vclz4/lz4hc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVclz4 -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vclz4/lz4hc.c
 done lz4hc.o generated
 make vclz4.o
 prev Vclz4/vclz4.c
@@ -956,15 +968,7 @@ exec - else mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vccrypto.h
 exec - fi
 done ${PACKAGE_ast_INCLUDE}/vccrypto.h generated
 make ${PACKAGE_ast_INCLUDE}/vclib.h
-make vclib.h
-prev vchdr.h
-exec - sed -e 's/HDR/LIB/g' vchdr.h > vclib.h
-prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
-prev io.h implicit
-prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-prev vcodex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done vclib.h generated
+prev vclib.h
 exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv' vclib.h > 1.${COTEMP}.x
 exec - if cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vclib.h 1.${COTEMP}.x
 exec - then rm -f 1.${COTEMP}.x

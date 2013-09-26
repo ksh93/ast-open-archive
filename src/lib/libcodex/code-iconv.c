@@ -221,7 +221,9 @@ cc_write(Sfio_t* sp, const void* buf, size_t n, Sfdisc_t* disc)
 static int
 cc_sync(Codex_t* p)
 {
-	mbinit();
+	State_t*	state = (State_t*)p->data;
+
+	(void)iconv(state->cvt, NiL, NiL, NiL, NiL);
 	return 0;
 }
 

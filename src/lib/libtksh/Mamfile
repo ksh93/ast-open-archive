@@ -125,6 +125,12 @@ prev ${INSTALLROOT}/include/ast/ast_map.h implicit
 make ${INSTALLROOT}/include/ast/ast_intercept.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast_intercept.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_wchar.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
 make ${INSTALLROOT}/include/ast/ast_botch.h implicit
 done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
 make ${INSTALLROOT}/include/ast/ast_limits.h implicit
@@ -166,11 +172,7 @@ done ${INSTALLROOT}/include/ast/ast_debug.h dontcare
 make ${INSTALLROOT}/include/ast/ast_errorf.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast_errorf.h dontcare
-make ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast.h dontcare
@@ -274,7 +276,7 @@ prev include/tclInt.h implicit
 done tcl/tclHash.c
 meta tclHash.o %.c>%.o tcl/tclHash.c tclHash
 prev tcl/tclHash.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c tcl/tclHash.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c tcl/tclHash.c
 done tclHash.o generated
 make tclGet.o
 make tcl/tclGet.c
@@ -291,7 +293,7 @@ prev include/tclInt.h implicit
 done tcl/tclAsync.c
 meta tclAsync.o %.c>%.o tcl/tclAsync.c tclAsync
 prev tcl/tclAsync.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c tcl/tclAsync.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c tcl/tclAsync.c
 done tclAsync.o generated
 make tclLink.o
 make tcl/tclLink.c
@@ -299,7 +301,7 @@ prev include/tclInt.h implicit
 done tcl/tclLink.c
 meta tclLink.o %.c>%.o tcl/tclLink.c tclLink
 prev tcl/tclLink.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c tcl/tclLink.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c tcl/tclLink.c
 done tclLink.o generated
 make tclExpr.o
 make tcl/tclExpr.c
@@ -383,7 +385,7 @@ prev include/tclInt.h implicit
 done tcl/tclPreserve.c
 meta tclPreserve.o %.c>%.o tcl/tclPreserve.c tclPreserve
 prev tcl/tclPreserve.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c tcl/tclPreserve.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c tcl/tclPreserve.c
 done tclPreserve.o generated
 make tclNotify.o
 make tcl/tclNotify.c
@@ -458,7 +460,7 @@ prev include/tclInt.h implicit
 done tcl/tclLoad.c
 meta tclLoad.o %.c>%.o tcl/tclLoad.c tclLoad
 prev tcl/tclLoad.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c tcl/tclLoad.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c tcl/tclLoad.c
 done tclLoad.o generated
 make tclLoadDl.o
 make tcl/tclLoadDl.c
@@ -467,7 +469,7 @@ prev include/tclInt.h implicit
 done tcl/tclLoadDl.c
 meta tclLoadDl.o %.c>%.o tcl/tclLoadDl.c tclLoadDl
 prev tcl/tclLoadDl.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c tcl/tclLoadDl.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c tcl/tclLoadDl.c
 done tclLoadDl.o generated
 make tclPkg.o
 make tcl/tclPkg.c
@@ -475,7 +477,7 @@ prev include/tclInt.h implicit
 done tcl/tclPkg.c
 meta tclPkg.o %.c>%.o tcl/tclPkg.c tclPkg
 prev tcl/tclPkg.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c tcl/tclPkg.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c tcl/tclPkg.c
 done tclPkg.o generated
 make tclPosixStr.o
 make tcl/tclPosixStr.c
@@ -561,7 +563,7 @@ prev include/tkshlib.h implicit
 done src/list.c
 meta list.o %.c>%.o src/list.c list
 prev src/list.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c src/list.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c src/list.c
 done list.o generated
 make shcompat.o
 make src/shcompat.c
@@ -569,7 +571,7 @@ prev include/tkshlib.h implicit
 done src/shcompat.c
 meta shcompat.o %.c>%.o src/shcompat.c shcompat
 prev src/shcompat.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c src/shcompat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c src/shcompat.c
 done shcompat.o generated
 make tcleval.o
 make src/tcleval.c
@@ -577,7 +579,7 @@ prev include/tkshlib.h implicit
 done src/tcleval.c
 meta tcleval.o %.c>%.o src/tcleval.c tcleval
 prev src/tcleval.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c src/tcleval.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c src/tcleval.c
 done tcleval.o generated
 make tclproc.o
 make src/tclproc.c
@@ -585,7 +587,7 @@ prev include/tkshlib.h implicit
 done src/tclproc.c
 meta tclproc.o %.c>%.o src/tclproc.c tclproc
 prev src/tclproc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c src/tclproc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c src/tclproc.c
 done tclproc.o generated
 make commands.o
 make src/commands.c
@@ -594,7 +596,7 @@ prev include/tkshlib.h implicit
 done src/commands.c
 meta commands.o %.c>%.o src/commands.c commands
 prev src/commands.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c src/commands.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c src/commands.c
 done commands.o generated
 make varcmd.o
 make src/varcmd.c
@@ -612,7 +614,7 @@ prev include/tkshlib.h implicit
 done src/tclMain.c
 meta tclMain.o %.c>%.o src/tclMain.c tclMain
 prev src/tclMain.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c src/tclMain.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c src/tclMain.c
 done tclMain.o generated
 make basic.o
 make src/basic.c
@@ -622,7 +624,7 @@ prev include/tclInt.h implicit
 done src/basic.c
 meta basic.o %.c>%.o src/basic.c basic
 prev src/basic.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -D_API_shell=20120101 -c src/basic.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Iinclude -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_BLD_tcl -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_API_shell=20120101 -c src/basic.c
 done basic.o generated
 make filecmd.o
 make src/filecmd.c

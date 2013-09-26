@@ -95,6 +95,12 @@ prev ../../lib/libast/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_intercept.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_intercept.h dontcare
+prev ../../lib/libast/ast_wchar.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ../../lib/libast/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 make ../../lib/libast/ast_botch.h implicit
 done ../../lib/libast/ast_botch.h dontcare
 make ../../lib/libast/ast_limits.h implicit
@@ -136,11 +142,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_debug.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_errorf.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_errorf.h dontcare
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-prev ../../lib/libast/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
@@ -263,7 +265,7 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev terror.h implicit
 done aso/tthread.c
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
-exec - set +x; testlib --proc=8 --thread=8 --timeout=1 ast aso ${mam_libast} ${mam_libpthread} aso/taso.c aso/tlock.c aso/tproc.c aso/tthread.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast -I${PACKAGE_ast_INCLUDE} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
+exec - set +x; testlib --proc=8 --thread=8 --timeout=1 ast aso ${mam_libast} ${mam_libpthread} aso/taso.c aso/tlock.c aso/tproc.c aso/tthread.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
 done test.aso virtual
 make test.base64
 make base64

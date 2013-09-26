@@ -2,7 +2,7 @@
 
 TITLE + xml
 
-export TZ=EST5EDT LC_ALL=C
+export TZ=EST5EDT LC_ALL=C.UTF-8
 
 VIEW data
 

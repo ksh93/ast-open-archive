@@ -1,3 +1,4 @@
+13-09-25 Vclz4/vclz4.c: add _PACKAGE_ast headers
 13-08-07 vcodex.h,vcsfxsort.c: ssize_t (64 bit) => Vcinx_t (32 bit) -- noticable affect on memory footprint
 13-06-04 add vcgetsuff() to return suffix given method
 13-05-29 add Vcodex_t.errorf -- not suitable for discipline level

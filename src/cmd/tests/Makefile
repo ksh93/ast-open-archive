@@ -48,12 +48,16 @@ vmalloc :TESTLIB: ast vmtest.h -last -lpthread \
 	tresize.c tsafemalloc.c tsegmented.c tsegwalk.c tsharemem.c \
 	tsharesimple.c tsignal.c tsinglemem.c tsmall.c tstat.c
 
+strtof-%.tst : strtof-%.rt
+	$(MKTEST) $(MKTESTFLAGS) $(>) strtof > $(<)
+
 :: RELEASE NOTES testdate.sh y2k.dat \
-	strtof-6.37.38-15.307.308-15.307.308.rt   strtof-6.37.38-15.307.308-15.307.308.tst \
-	strtof-6.37.38-15.307.308-18.4931.4932.rt strtof-6.37.38-15.307.308-18.4931.4932.tst \
-	strtof-6.37.38-15.307.308-31.291.308.rt   strtof-6.37.38-15.307.308-31.291.308.tst \
-	strtof-6.37.38-15.307.308-31.307.308.rt   strtof-6.37.38-15.307.308-31.307.308.tst \
-	strtof-6.37.38-15.307.308-33.4931.4932.rt strtof-6.37.38-15.307.308-33.4931.4932.tst
+	strtof-32.6.37.38-64.15.307.308-128.18.4931.4932.rt strtof-32.6.37.38-64.15.307.308-128.18.4931.4932.tst \
+	strtof-32.6.37.38-64.15.307.308-128.33.4931.4932.rt strtof-32.6.37.38-64.15.307.308-128.33.4931.4932.tst \
+	strtof-32.6.37.38-64.15.307.308-64.15.307.308.rt    strtof-32.6.37.38-64.15.307.308-64.15.307.308.tst \
+	strtof-32.6.37.38-64.15.307.308-80.31.291.308.rt    strtof-32.6.37.38-64.15.307.308-80.31.291.308.tst \
+	strtof-32.6.37.38-64.15.307.308-80.31.307.308.rt    strtof-32.6.37.38-64.15.307.308-80.31.307.308.tst \
+	strtof-32.6.37.38-64.15.307.308-96.18.4931.4932.rt  strtof-32.6.37.38-64.15.307.308-96.18.4931.4932.tst
 
 install :
 	: only tests in this directory : nothing to install :

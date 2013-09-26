@@ -213,6 +213,12 @@ prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_intercept.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_intercept.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
@@ -238,11 +244,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_debug.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_errorf.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_errorf.h dontcare
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
@@ -333,7 +335,7 @@ prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 done mamstate.c
 meta mamstate.o %.c>%.o mamstate.c mamstate
 prev mamstate.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -c mamstate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c mamstate.c
 done mamstate.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mamstate mamstate.o ${mam_libast}
 done mamstate generated

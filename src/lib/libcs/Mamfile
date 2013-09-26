@@ -161,6 +161,12 @@ prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_intercept.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_intercept.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
@@ -184,11 +190,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_debug.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_errorf.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_errorf.h dontcare
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
@@ -502,7 +504,7 @@ done csslib.h
 done css.c
 meta css.o %.c>%.o css.c css
 prev css.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c css.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c css.c
 done css.o generated
 make csserve.o
 make csserve.c
@@ -559,7 +561,7 @@ done msglib.h
 done msgblast.c
 meta msgblast.o %.c>%.o msgblast.c msgblast
 prev msgblast.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgblast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msgblast.c
 done msgblast.o generated
 make msgbuf.o
 make msgbuf.c
@@ -567,7 +569,7 @@ prev msglib.h implicit
 done msgbuf.c
 meta msgbuf.o %.c>%.o msgbuf.c msgbuf
 prev msgbuf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgbuf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msgbuf.c
 done msgbuf.o generated
 make msggetmask.o
 make msggetmask.c
@@ -575,7 +577,7 @@ prev msglib.h implicit
 done msggetmask.c
 meta msggetmask.o %.c>%.o msggetmask.c msggetmask
 prev msggetmask.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msggetmask.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msggetmask.c
 done msggetmask.o generated
 make msgindex.o
 make msgindex.c
@@ -583,7 +585,7 @@ prev msglib.h implicit
 done msgindex.c
 meta msgindex.o %.c>%.o msgindex.c msgindex
 prev msgindex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgindex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msgindex.c
 done msgindex.o generated
 make msginfo.o
 make msginfo.c
@@ -591,7 +593,7 @@ prev msglib.h implicit
 done msginfo.c
 meta msginfo.o %.c>%.o msginfo.c msginfo
 prev msginfo.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msginfo.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msginfo.c
 done msginfo.o generated
 make msglist.o
 make msglist.c
@@ -618,7 +620,7 @@ prev msglib.h implicit
 done msgname.c
 meta msgname.o %.c>%.o msgname.c msgname
 prev msgname.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgname.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msgname.c
 done msgname.o generated
 make msgread.o
 make msgread.c
@@ -635,7 +637,7 @@ prev msglib.h implicit
 done msgrecv.c
 meta msgrecv.o %.c>%.o msgrecv.c msgrecv
 prev msgrecv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgrecv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msgrecv.c
 done msgrecv.o generated
 make msgsend.o
 make msgsend.c
@@ -652,7 +654,7 @@ prev msglib.h implicit
 done msgsetmask.c
 meta msgsetmask.o %.c>%.o msgsetmask.c msgsetmask
 prev msgsetmask.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgsetmask.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msgsetmask.c
 done msgsetmask.o generated
 make msguser.o
 make msguser.c

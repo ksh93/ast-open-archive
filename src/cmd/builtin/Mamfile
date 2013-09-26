@@ -111,6 +111,8 @@ prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_intercept.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_intercept.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_wchar.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
@@ -252,7 +254,7 @@ meta nl.o %.c>%.o nl.c nl
 prev nl.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_nl"
 setv LICENSE -DLICENSE="since=2003,author=dgk"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DCMD_STANDALONE=b_nl -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?builtin]"\" -c nl.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DCMD_STANDALONE=b_nl -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?builtin]"\" -c nl.c
 done nl.o generated
 setv CMD_STANDALONE -DCMD_STANDALONE="b_nl"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o nl nl.o ${mam_libast} ${mam_libcmd}
@@ -376,7 +378,7 @@ done who.c
 meta who.o %.c>%.o who.c who
 prev who.c
 setv CMD_STANDALONE -DCMD_STANDALONE="b_who"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DCMD_STANDALONE=b_who -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?builtin]"\" -c who.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -D_PACKAGE_ast -DCMD_STANDALONE=b_who -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2013 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?builtin]"\" -c who.c
 done who.o generated
 setv CMD_STANDALONE -DCMD_STANDALONE="b_who"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o who who.o ${mam_libast} ${mam_libcmd}
@@ -638,6 +640,28 @@ make paste.tst
 done paste.tst
 exec - regress paste.tst
 done test.paste virtual
+make test.readlink
+make readlink.tst
+meta readlink.tst %.rt>%.tst readlink.rt readlink
+make readlink.rt
+done readlink.rt
+exec - if [[ "1" || "readlink.rt" -nt "readlink.tst" ]]
+exec - then mktest --style=regress readlink.rt > readlink.tst
+exec - fi
+done readlink.tst generated
+exec - regress readlink.tst
+done test.readlink virtual
+make test.realpath
+make realpath.tst
+meta realpath.tst %.rt>%.tst realpath.rt realpath
+make realpath.rt
+done realpath.rt
+exec - if [[ "1" || "realpath.rt" -nt "realpath.tst" ]]
+exec - then mktest --style=regress realpath.rt > realpath.tst
+exec - fi
+done realpath.tst generated
+exec - regress realpath.tst
+done test.realpath virtual
 make test.rm
 make rm.tst
 meta rm.tst %.rt>%.tst rm.rt rm

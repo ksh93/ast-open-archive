@@ -31,8 +31,6 @@
  *  derived from Bourne Shell
  */
 
-#define _AST_API_H	1
-
 #include <ast.h>
 
 void

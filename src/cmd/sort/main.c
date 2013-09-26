@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-n?\n@(#)$Id: sort (AT&T Research) 2013-02-14 $\n]"
+"[-n?\n@(#)$Id: sort (AT&T Research) 2013-09-19 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and "
@@ -481,6 +481,7 @@ parse(register Sort_t* sp, char** argv)
 	Lib_t*			lastlib = 0;
 	Lib_t*			lib;
 	Recfmt_t		r;
+	Mbstate_t		q;
 	int			obsolescent = 1;
 	char			opt[64];
 	Optdisc_t		optdisc;
@@ -537,7 +538,8 @@ parse(register Sort_t* sp, char** argv)
 		case 't':
 			if (key->tab[0])
 				error(1, "%s: %s conflicts with %s", opt_info.option, *opt_info.arg, key->tab);
-			if ((n = mbsize(opt_info.arg)) < 1)
+			mbtinit(&q);
+			if ((n = mbtsize(opt_info.arg, MB_LEN_MAX, &q)) < 1)
 			{
 				error(1, "%s: %s: invalid tab character", opt_info.option, opt_info.arg);
 				n = 0;

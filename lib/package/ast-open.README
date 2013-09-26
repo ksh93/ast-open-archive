@@ -94,10 +94,19 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-13-09-13  --- Release ksh93v- ---
+13-09-23  --- Release ksh93v- ---
+13-09-23  A bug in which a compound assignment to a type, [(T_t x=(i=2)] where
+	  type T_t is defined in FPATH would fail with a syntx error has been
+	  fixed
+13-09-16  A bug in which a 0 value for variable in arithmetic expression inside
+	  a function fails when set -u has been set has been fixed.
+13-09-16  A bug which could cause a core dump when generating the man page
+	  for user defined types containing compound variables has been fixed.
+13-09-16  A bug in the handling of array instances of type variables in an
+	  arithmetic expression has been fixed.
 13-09-13 +The signal .sh.value variable is now a compound variable with the name
-	  value.q corresponding to kill -q signed-integer and value.Q corresponding
-	  to kill -Q unsigned-large-integer.
+	  value.q for sending a signal with -q and value.Q for sending a value
+	  with -Q.
 13-09-13  A bug in $(...) command substitution that corrupted a trailing
           multibyte character in non-UTF-8 locales has been fixed.
 13-09-13  Eliminted extranesous output of standard error when ksh is invoked
@@ -5930,6 +5939,9 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+13-09-25 cksum.tst: adjust tests for gnu { md5 sha } text/binary indicator
+13-09-22 readlink.rt,realpath.rt: add tests
+13-09-19 head.tst,tail.tst: add incomplete line tests
 13-07-17 tr.tst: sync with src/lib/libcmd/tr.c
 13-05-22 pty.c: fix timeout logic
 13-04-22 grep.tst: add --context[=before,after] tests
@@ -6839,6 +6851,7 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+13-09-19 main.c: convert to mb*(Mbstate_t) api
 13-05-17 sfopen.c: disable SFOPEN_INTERCEPT experiment -- better handled by plugins
 13-02-14 main.c: change "-o file" to not use sfstdout unless /dev/stdout (for user discipline functions)
 13-02-13 main.c: add { RS_MORE RS_LAST } logic for rsprocess()
@@ -6916,6 +6929,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+13-09-19 ls.c: convert to mb*(Mbstate_t) api
 13-08-07 banner.c: (we still have banner?) drop bosu 3rd arg to main() -- thanks clang
 13-07-17 ls.c: fix -l for empty symlink
 12-11-07 ls.c: move --testsize logic after -H hackery
@@ -7472,6 +7486,13 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+13-09-25 include/ast_std.h,comp/setlocale.c: AST_LC_unicode => AST_LC_unicodeliterals, LC_OPTIONS=...unicodeliterals...
+13-09-25 include/ast_std.h,comp/setlocale.c: AST_LC_native LC_OPTIONS=...native... to bypass ast unicode iswalpha/wcwidth tables
+13-09-25 comp/eaccess.c: resolve <ast_map.h> vs <ast_intercept.h> conflict -- _ast_eaccess wins
+13-09-18 include/ast_std.h,ast.h: api>=20130913 add Mbstate_t and { mb*() wc*() } macros with Mbstate_t* last arg
+13-09-18 path/pathcanon.c: handle more flags for /dev/file/flags@...@path and do flag name lookup from table
+13-09-16 include/ast.h: add PATH_EXCEPT_LAST for readlink(1) --canonicalize
+13-09-16 path/pathcanon.c: handle PATH_EXCEPT_LAST
 13-09-12 misc/fgetcwd.c: fix stat corruption bug on systems without fdopendir()
 13-09-12 path/pathcanon.c: fix bug that added extra / when fgetcwd() returned /
 13-09-09 comp/setlocale.c,port/codeset.c: consistent handling of US-ASCII + conformance(0,0) across all os's
@@ -9402,6 +9423,16 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+13-09-25 shasum.c: add sha*sum variants
+13-09-25 cksum.c: handle SUM_INDICATOR per-method { '*'(binary) ' '(text) } read mode indicator
+13-09-25 cksum.c: fix --header to include "text" when --text specified
+13-09-25 cksum.c: { -T, --text && -t, --total } => { -t, --text && -T, --total } for gnu compatibility
+13-09-22 realpath.c,readlink.c: add based on ast::pathdev()
+13-09-22 sync.c: add roland's changes + --sfsync
+13-09-19 xarrrrghs.c: halfscore d's be walkin' t'plank t'day: fix run() to work for context==0
+13-09-19 head.c,tail.c: count incomplete lines too
+13-09-19 do not check for command when /bin/echo implied
+13-09-13 cat.c,cmdext.h,cmdlist.h,cut.c,join.c,od.c,paste.c,rev.c,tr.c,uniq.c,wc.c,wc.h,wclib.c: Mbstate_t update
 13-08-11 join.c: drop setlocale() call already done by optget()
 13-08-11 strcopy() => stpcpy()
 13-07-17 tr.c: finally handle ``tr -Cd "[=e=]" <<<"1e2é3"''-- how about a posix equivalence class api
@@ -9963,6 +9994,7 @@ All recorded changes follow.
 
 :::::::: libsum ::::::::
 
+13-09-25 sum.h,sumlib.c: add Sum_t.flags and SUM_INDICATOR for gnu { '*'(binary) ' '(text) } read mode indicator
 12-02-29 sum-sha2.c: bitcount[] order reversed to allow a single noalias buffer copy
 09-09-28 sumlib.c: use simple (faster) method name match function
 08-06-05 sum-lmd.c: align context to largest int
@@ -11127,6 +11159,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+13-09-25 Vclz4/vclz4.c: add _PACKAGE_ast headers
 13-08-07 vcodex.h,vcsfxsort.c: ssize_t (64 bit) => Vcinx_t (32 bit) -- noticable affect on memory footprint
 13-06-04 add vcgetsuff() to return suffix given method
 13-05-29 add Vcodex_t.errorf -- not suitable for discipline level
