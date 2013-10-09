@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make ed
 make ed.o
@@ -342,12 +342,12 @@ make testoldmatch
 make testoldmatch.o
 make testoldmatch.c
 prev testmatch.c implicit
-make ../../lib/libast/astsa/strmatch.c implicit
+make ${INSTALLROOT}/src/lib/libast/astsa/strmatch.c implicit
 make ${PACKAGE_ast_INCLUDE}/hashkey.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashkey.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../../lib/libast/astsa/strmatch.c
+done ${INSTALLROOT}/src/lib/libast/astsa/strmatch.c
 done testoldmatch.c
 meta testoldmatch.o %.c>%.o testoldmatch.c testoldmatch
 prev testoldmatch.c

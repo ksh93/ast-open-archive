@@ -1134,9 +1134,20 @@ attr(register Dssfile_t* file, register Mrtstate_t* state, register Bgproute_t* 
 			sfprintf(sfstderr, "                      nlri  mp %s %s/%s %s state %s\n", "withdraw", symbol(GROUP_AFI, rp->afi), symbol(GROUP_SAFI, rp->safi), k == 1 ? "inline" : "global", symbol(GROUP_STATE, state->state));
 		if (state->buf < nxt)
 		{
+			if ((state->push = state->state) == STATE_BGP_ANNOUNCE)
+			{
+				vt = state->buf;
+				state->buf = nxt;
+				while ((i = attr(file, state, rp, end, disc)) > 0);
+				if (state->buf >= state->end)
+					state->push = 0;
+				state->buf = vt;
+				i = i < 0 ? -1 : 0;
+			}
+			else
+				i = 0;
 			state->nxt = state->end;
 			state->end = nxt;
-			state->push = state->state;
 			state->state = STATE_BGP_NLRI;
 			return 0;
 		}
@@ -1703,12 +1714,6 @@ mrtread(register Dssfile_t* file, Dssrecord_t* record, Dssdisc_t* disc)
 			{
 				state->end = state->nxt;
 				state->state = state->push;
-				if (state->state == STATE_BGP_ANNOUNCE)
-				{
-					while ((i = attr(file, state, rp, state->end, disc)) > 0);
-					if (i < 0)
-						return -1;
-				}
 			}
 			else
 				state->state = STATE_BGP_NLRI_INIT;

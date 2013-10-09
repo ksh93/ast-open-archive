@@ -1,3 +1,4 @@
+13-10-10 bgp-mrt.c: fix STATE_BGP_TABLE to parse all attr() before nlri()
 13-08-28 mrt.h: MRT_ATTR_AIGP_20120425 => MRT_ATTR_AIGP
 13-08-28 bgp.c: add BGP_aigp, "aigp_t aigp { values_t aigp }"
 13-08-28 bgp-mrt.c: parse MRT_ATTR_AIGP subtype 1

@@ -546,6 +546,7 @@ struct sender {
 #define INTERPOLATE	(1<<2)
 #define MARK		(1<<3)
 #define REPLY		(1<<4)
+#define SIGN		(1<<5)
 
 /*
  * Token values returned by the scanner used for argument lists.
@@ -789,6 +790,7 @@ typedef struct {
 	char*	attachments;
 	char*	autoinc;
 	char*	autoprint;
+	char*	autosign;
 	char*	bang;
 	char*	cdpath;
 	char*	cmd;

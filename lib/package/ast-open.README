@@ -94,7 +94,13 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-13-09-23  --- Release ksh93v- ---
+13-10-08  --- Release ksh93v- ---
+13-10-08  The shell arithmetic now recognized suffices f,F, l, and L for
+	  floating point constants.
+13-10-07  The shell now prints an error message on standard error when a
+	  job specified with %job does not exist.
+13-10-04  A bug in the value of i.MAX inside an arithmetic expression when the
+	  variable i is unsigned long has been fixed.
 13-09-23  A bug in which a compound assignment to a type, [(T_t x=(i=2)] where
 	  type T_t is defined in FPATH would fail with a syntx error has been
 	  fixed
@@ -6150,6 +6156,7 @@ All recorded changes follow.
 
 :::::::: bgp ::::::::
 
+13-10-10 bgp-mrt.c: fix STATE_BGP_TABLE to parse all attr() before nlri()
 13-08-28 mrt.h: MRT_ATTR_AIGP_20120425 => MRT_ATTR_AIGP
 13-08-28 bgp.c: add BGP_aigp, "aigp_t aigp { values_t aigp }"
 13-08-28 bgp-mrt.c: parse MRT_ATTR_AIGP subtype 1
@@ -6449,6 +6456,7 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+13-10-01 mailx: add autosign to auto sign new messages
 13-08-11 head.c: add header charset conversion buffer boundary checks
 13-08-11 add -o noconvertheaders to disable header charset conversion
 12-09-26 head.c handle =?UTF-8?[BQ]?...?=; other charsets later
@@ -6929,6 +6937,7 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+13-09-26 split.c: fix opetget() docs
 13-09-19 ls.c: convert to mb*(Mbstate_t) api
 13-08-07 banner.c: (we still have banner?) drop bosu 3rd arg to main() -- thanks clang
 13-07-17 ls.c: fix -l for empty symlink
@@ -7486,6 +7495,8 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+13-09-27 path/pathcanon.c: fix buffer clobber bug between pathdev() and fgetcwd()
+13-09-27 path/pathopen.c: handle easy O_XATTR case for /dev/fd open() semantics
 13-09-25 include/ast_std.h,comp/setlocale.c: AST_LC_unicode => AST_LC_unicodeliterals, LC_OPTIONS=...unicodeliterals...
 13-09-25 include/ast_std.h,comp/setlocale.c: AST_LC_native LC_OPTIONS=...native... to bypass ast unicode iswalpha/wcwidth tables
 13-09-25 comp/eaccess.c: resolve <ast_map.h> vs <ast_intercept.h> conflict -- _ast_eaccess wins

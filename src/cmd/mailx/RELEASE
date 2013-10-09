@@ -1,3 +1,4 @@
+13-10-01 mailx: add autosign to auto sign new messages
 13-08-11 head.c: add header charset conversion buffer boundary checks
 13-08-11 add -o noconvertheaders to disable header charset conversion
 12-09-26 head.c handle =?UTF-8?[BQ]?...?=; other charsets later

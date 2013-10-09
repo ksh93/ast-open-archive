@@ -345,6 +345,8 @@ static const struct var	vartab[] =
 	X("Check for new mail at each prompt."),
 "autoprint",	&state.var.autoprint,		0,	0,0,
 	X("Print the next unREAD message after the delete and undelete commands."),
+"autosign",	&state.var.autosign,		0,	0,0,
+	X("Print the next unREAD message after the delete and undelete commands."),
 "bang",		&state.var.bang,		0,	0,0,
 	X("Disable the special meaning of ! in the escape command."),
 "cmd",		&state.var.cmd,			0,	0,0,

@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/bsd.lic
-done ${PACKAGEROOT}/lib/package/bsd.lic
+make ${INSTALLROOT}/lib/package/bsd.lic
+done ${INSTALLROOT}/lib/package/bsd.lic
 make install
 make compress
 make libcodexcompress.a archive

@@ -1073,7 +1073,7 @@ Dsslib_t dss_lib_bgp =
 {
 	"bgp",
 	"bgp method"
-	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2013-09-03 $\n]"
+	"[-1ls5Pp0?\n@(#)$Id: dss bgp method (AT&T Research) 2013-10-10 $\n]"
 	USAGE_LICENSE,
 	CXH,
 	&libraries[0],

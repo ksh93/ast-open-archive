@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/zlib.lic
-done ${PACKAGEROOT}/lib/package/zlib.lic
+make ${INSTALLROOT}/lib/package/zlib.lic
+done ${INSTALLROOT}/lib/package/zlib.lic
 make install
 make z
 make libz.a archive
