@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*          Copyright (c) 1989-2013 AT&T Intellectual Property          *
+*          Copyright (c) 1992-2013 AT&T Intellectual Property          *
 *                      and is licensed under the                       *
 *                 Eclipse Public License, Version 1.0                  *
 *                    by AT&T Intellectual Property                     *
@@ -14,14 +14,12 @@
 *                            AT&T Research                             *
 *                           Florham Park NJ                            *
 *                                                                      *
-*                 Glenn Fowler <gsf@research.att.com>                  *
+*               Glenn Fowler <glenn.s.fowler@gmail.com>                *
+*                    David Korn <dgkorn@gmail.com>                     *
 *                                                                      *
 ***********************************************************************/
 #pragma prototyped
 /*
- * Glenn Fowler
- * AT&T Research
- *
  * ls -- list file status
  */
 
@@ -31,7 +29,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2013-09-19 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2013-12-06 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -219,15 +217,16 @@ USAGE_LICENSE
 "[+BUGS?Can we add options to something else now?]"
 ;
 
-#include <ast.h>
+#include <cmd.h>
 #include <ls.h>
 #include <ctype.h>
 #include <error.h>
-#include <ftwalk.h>
+#include <fts.h>
 #include <sfdisc.h>
-#include <hash.h>
 #include <tmx.h>
 #include <fs3d.h>
+#include <dt.h>
+#include <vmalloc.h>
 
 #define LS_ACROSS	(LS_USER<<0)	/* multi-column row order	*/
 #define LS_ALL		(LS_USER<<1)	/* list all			*/
@@ -241,7 +240,7 @@ USAGE_LICENSE
 #define LS_MARKDIR	(LS_USER<<9)	/* marks dirs with /		*/
 #define LS_MOST		(LS_USER<<10)	/* list all but . and ..	*/
 #define LS_NOBACKUP	(LS_USER<<11)	/* omit *~ names		*/
-#define LS_NOSTAT	(LS_USER<<13)	/* leaf FTW_NS ok		*/
+#define LS_NOSTAT	(LS_USER<<13)	/* leaf FTS_NS ok		*/
 #define LS_PRINTABLE	(LS_USER<<14)	/* ? for non-printable chars	*/
 #define LS_QUOTE	(LS_USER<<15)	/* "..." file names		*/
 #define LS_RECURSIVE	(LS_USER<<16)	/* recursive directory descent	*/
@@ -251,7 +250,7 @@ USAGE_LICENSE
 
 #define LS_STAT		LS_NOSTAT
 
-#define VISIBLE(f)	((f)->level<=0||(!state.ignore||!strmatch((f)->name,state.ignore))&&(!(state.lsflags&LS_NOBACKUP)||(f)->name[(f)->namelen-1]!='~')&&((state.lsflags&LS_ALL)||(f)->name[0]!='.'||(state.lsflags&LS_MOST)&&((f)->name[1]&&(f)->name[1]!='.'||(f)->name[2])))
+#define VISIBLE(s,f)	((f)->fts_level<=0||(!(s)->ignore||!strmatch((f)->fts_name,(s)->ignore))&&(!((s)->lsflags&LS_NOBACKUP)||(f)->fts_name[(f)->fts_namelen-1]!='~')&&(((s)->lsflags&LS_ALL)||(f)->fts_name[0]!='.'||((s)->lsflags&LS_MOST)&&((f)->fts_name[1]&&(f)->fts_name[1]!='.'||(f)->fts_name[2])))
 
 #define BETWEEN		2		/* space between columns	*/
 #define AFTER		1		/* space after last column	*/
@@ -295,42 +294,42 @@ USAGE_LICENSE
 #define KEY_uid			32
 #define KEY_view		33
 
-#if 0
-#define BLOCKS(st)	((state.blocksize==LS_BLOCKSIZE)?iblocks(st):(state.blocksize>LS_BLOCKSIZE)?(iblocks(st)+state.blocksize/LS_BLOCKSIZE-1)/(state.blocksize/LS_BLOCKSIZE):iblocks(st)*(LS_BLOCKSIZE/state.blocksize))
-#else
-#define BLOCKS(st)	((state.blocksize==LS_BLOCKSIZE)?iblocks(st):(iblocks(st)*LS_BLOCKSIZE+state.blocksize-1)/state.blocksize)
-#endif
-#define PRINTABLE(s)	((state.lsflags&LS_PRINTABLE)?printable(s):(s))
+#define BLOCKS(s,st)	(((s)->blocksize==LS_BLOCKSIZE)?iblocks(st):(iblocks(st)*LS_BLOCKSIZE+(s)->blocksize-1)/(s)->blocksize)
+#define PRINTABLE(s,t)	(((s)->lsflags&LS_PRINTABLE)?printable(s,t):(t))
 
-typedef int (*Order_f)(Ftw_t*, Ftw_t*);
+typedef int (*Order_f)(FTSENT*, FTSENT*);
 
-typedef struct				/* dir/total counts		*/
+typedef struct Count_s			/* dir/total counts		*/
 {
 	Sfulong_t	blocks;		/* number of blocks		*/
 	Sfulong_t	bytes;		/* number of bytes		*/
 	Sfulong_t	files;		/* number of files		*/
 } Count_t;
 
-typedef struct				/* sfkeyprintf() keys		*/
+typedef struct Key_s			/* sfkeyprintf() keys		*/
 {
 	char*		name;		/* key name			*/
 	short		index;		/* index			*/
 	short		disable;	/* macro being expanded		*/
 	char*		macro;		/* macro definition		*/
+	Dtlink_t	link;		/* dict link			*/
 } Key_t;
 
-typedef struct				/* list state			*/
+typedef struct List_s			/* list state			*/
 {
 	Count_t		count;		/* directory counts		*/
-	Ftw_t*		ftw;		/* ftw info			*/
+	FTSENT*		ent;		/* ent info			*/
 	char*		dirnam;		/* pr() dirnam			*/
 	int		dirlen;		/* pr() dirlen			*/
 } List_t;
 
-typedef struct				/* program state		*/
+typedef struct State_s			/* program state		*/
 {
+	Shbltin_t*	context;	/* builtin context		*/
+	Dtdisc_t	keydisc;	/* key dict discipline		*/
+	Dt_t*		keys;		/* key dict			*/
 	char		flags[64];	/* command line option flags	*/
-	long		ftwflags;	/* FTW_* flags			*/
+	int		ftsflags;	/* FTS_* flags			*/
 	long		lsflags;	/* LS_* flags			*/
 	long		timeflags;	/* time LS_* flags		*/
 	long		blocksize;	/* file block size		*/
@@ -338,7 +337,7 @@ typedef struct				/* program state		*/
 	unsigned long	testdate;	/* --format test date		*/
 	Count_t		total;		/* total counts			*/
 	int		adjust;		/* key() print with adjustment	*/
-	int		comma;		/* LS_COMMAS ftw.level crossing	*/
+	int		comma;		/* LS_COMMAS ent.level crossing	*/
 	int		height;		/* output height in lines	*/
 	int		reverse;	/* reverse the sort		*/
 	int		scale;		/* metric scale power		*/
@@ -348,10 +347,19 @@ typedef struct				/* program state		*/
 	char*		format;		/* sfkeyprintf() format		*/
 	char*		ignore;		/* ignore files matching this	*/
 	char*		timefmt;	/* time list format		*/
-	Hash_table_t*	keys;		/* sfkeyprintf() keys		*/
+	char*		prdata;		/* pr buffer			*/
+	size_t		prsize;		/* pr buffer size		*/
+	char*		txtdata;	/* txt buffer			*/
+	size_t		txtsize;	/* txt buffer size		*/
+	unsigned short*	siz;		/* siz buffer			*/
+	size_t		sizsiz;		/* siz buffer size		*/
+	FTSENT**	vec;		/* vec buffer			*/
+	size_t		vecsiz;		/* vec buffer size		*/
 	Sfio_t*		tmp;		/* tmp string stream		*/
-	Ftw_t*		top;		/* top directory -- no label	*/
+	FTSENT*		top;		/* top directory -- no label	*/
 	Order_f		order;		/* sort comparison function	*/
+	List_t		list;		/* list state			*/
+	Vmalloc_t*	vm;		/* allocation region		*/
 } State_t;
 
 static char	DEF_header[] =
@@ -401,14 +409,12 @@ static Key_t	keys[] =
 	{ "linkname",		KEY_linkpath		},
 };
 
-static State_t		state;
-
 /*
  * return a copy of s with unprintable chars replaced by ?
  */
 
 static char*
-printable(register char* s)
+printable(State_t* state, register char* s)
 {
 	register char*	t;
 	register char*	p;
@@ -416,26 +422,26 @@ printable(register char* s)
 	wchar_t		w;
 	Mbstate_t	q;
 
-	static char*	prdata;
-	static int	prsize;
-
-	if (state.lsflags & LS_ESCAPE)
+	if (state->lsflags & LS_ESCAPE)
 	{
-		if (!(state.lsflags & LS_QUOTE))
+		if (!(state->lsflags & LS_QUOTE))
 			return fmtesc(s);
-		if (state.lsflags & LS_SHELL)
-			return fmtquote(s, "$'", "'", strlen(s), (state.lsflags & LS_ALWAYS) ? FMT_ALWAYS : 0);
+		if (state->lsflags & LS_SHELL)
+			return fmtquote(s, "$'", "'", strlen(s), (state->lsflags & LS_ALWAYS) ? FMT_ALWAYS : 0);
 		return fmtquote(s, "\"", "\"", strlen(s), FMT_ALWAYS);
 	}
 	c = strlen(s) + 4;
-	if (c > prsize)
+	if (c > state->prsize)
 	{
-		prsize = roundof(c, 512);
-		if (!(prdata = newof(prdata, char, prsize, 0)))
-			error(3, "out of space");
+		state->prsize = roundof(c, 512);
+		if (!(state->prdata = vmnewof(state->vm, state->prdata, char, state->prsize, 0)))
+		{
+			error(ERROR_SYSTEM|2, "out of space");
+			return 0;
+		}
 	}
-	t = prdata;
-	if (state.lsflags & LS_QUOTE)
+	t = state->prdata;
+	if (state->lsflags & LS_QUOTE)
 		*t++ = '"';
 	if (!mbwide())
 		while (c = *s++)
@@ -455,10 +461,10 @@ printable(register char* s)
 				while (p < s)
 					*t++ = *p++;
 	}
-	if (state.lsflags & LS_QUOTE)
+	if (state->lsflags & LS_QUOTE)
 		*t++ = '"';
 	*t = 0;
-	return prdata;
+	return state->prdata;
 }
 
 /*
@@ -468,14 +474,13 @@ printable(register char* s)
 static int
 key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn)
 {
-	register Ftw_t*		ftw;
+	State_t*		state= (State_t*)handle;
+	register FTSENT*		ent;
 	register struct stat*	st;
 	register char*		s = 0;
 	register Sflong_t	n = 0;
 	register Key_t*		kp;
-	List_t*			lp;
 	Time_t			t;
-	Mbstate_t		q;
 
 	static Sfio_t*		mp;
 	static const char	fmt_mode[] = "mode";
@@ -484,27 +489,22 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 
 	if (!fp->t_str)
 		return 0;
-	if (lp = (List_t*)handle)
-	{
-		ftw = lp->ftw;
-		st = &ftw->statb;
-	}
+	if (ent = state->list.ent)
+		st = ent->fts_statp;
 	else
-	{
-		ftw = 0;
 		st = 0;
-	}
 	t = TMX_NOTIME;
-	if (!(kp = (Key_t*)hashget(state.keys, fp->t_str)))
+	if (!(kp = (Key_t*)dtmatch(state->keys, fp->t_str)))
 	{
 		if (*fp->t_str != '$')
 		{
-			error(3, "%s: unknown format key", fp->t_str);
+			error(2, "%s: unknown format key", fp->t_str);
 			return 0;
 		}
-		if (!(kp = newof(0, Key_t, 1, 0)))
-			error(3, "out of space");
-		kp->name = hashput(state.keys, 0, kp);
+		if (!(kp = vmnewof(state->vm, 0, Key_t, 1, strlen(fp->t_str) + 1)))
+			goto nospace;
+		kp->name = (char*)(kp + 1);
+		strcpy(kp->name, fp->t_str);
 		kp->macro = getenv(fp->t_str + 1);
 		kp->index = KEY_environ;
 		kp->disable = 1;
@@ -513,10 +513,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	{
 		kp->disable = 1;
 		if (!mp && !(mp = sfstropen()))
-			error(3, "out of space");
+			goto nospace;
 		sfkeyprintf(mp, handle, kp->macro, key, NiL);
 		if (!(s = sfstruse(mp)))
-			error(3, "out of space");
+			goto nospace;
 		kp->disable = 0;
 	}
 	else switch (kp->index)
@@ -528,11 +528,11 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			t = tmxgetatime(st);
 		}
 		if (!arg)
-			arg = state.timefmt;
+			arg = state->timefmt;
 		break;
 	case KEY_blocks:
 		if (st)
-			n = BLOCKS(st);
+			n = BLOCKS(state, st);
 		break;
 	case KEY_ctime:
 		if (st)
@@ -541,7 +541,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			t = tmxgetctime(st);
 		}
 		if (!arg)
-			arg = state.timefmt;
+			arg = state->timefmt;
 		break;
 	case KEY_dev:
 		if (st)
@@ -562,41 +562,38 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			n = (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)) ? minor(idevice(st)) : minor(st->st_dev);
 		break;
 	case KEY_dir_blocks:
-		if (!state.scale)
+		if (!state->scale)
 		{
-			if (lp)
-				n = lp->count.blocks;
+			n = state->list.count.blocks;
 			break;
 		}
 		/*FALLTHROUGH*/
 	case KEY_dir_bytes:
-		if (lp)
-			n = lp->count.bytes;
-		if (state.scale)
+		n = state->list.count.bytes;
+		if (state->scale)
 		{
-			s = fmtscale(n, state.scale);
+			s = fmtscale(n, state->scale);
 			fp->fmt = 's';
 		}
 		break;
 	case KEY_dir_count:
-		if (ftw != state.top)
+		if (ent != state->top)
 		{
-			if (state.lsflags & LS_SEPARATE)
-				n = state.directories;
-			else if (state.lsflags & LS_LABEL)
+			if (state->lsflags & LS_SEPARATE)
+				n = state->directories;
+			else if (state->lsflags & LS_LABEL)
 				n = 1;
 		}
 		break;
 	case KEY_dir_files:
-		if (lp)
-			n = lp->count.files;
+		n = state->list.count.files;
 		break;
 	case KEY_environ:
 		if (!(s = kp->macro))
 			return 0;
 		break;
 	case KEY_flags:
-		s = state.flags;
+		s = state->flags;
 		break;
 	case KEY_gid:
 		if (st)
@@ -612,36 +609,33 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			n = st->st_ino;
 		break;
 	case KEY_linkpath:
-		if (ftw && (ftw->info & FTW_SL))
+		if (ent && (ent->fts_info & FTS_SL))
 		{
 			char*		dirnam;
 			int		c;
 
-			static char*	txtdata;
-			static int	txtsize;
-
-			if ((st->st_size + 1) > txtsize)
+			if ((st->st_size + 1) > state->txtsize)
 			{
-				txtsize = roundof(st->st_size + 1, 512);
-				if (!(txtdata = newof(txtdata, char, txtsize, 0)))
-					error(3, "out of space");
+				state->txtsize = roundof(st->st_size + 1, 512);
+				if (!(state->txtdata = vmnewof(state->vm, state->txtdata, char, state->txtsize, 0)))
+					goto nospace;
 			}
-			if (*ftw->name == '/' || !lp->dirnam)
-				dirnam = ftw->name;
+			if (*ent->fts_name == '/' || !state->list.dirnam)
+				dirnam = ent->fts_name;
 			else
 			{
-				sfprintf(state.tmp, "%s/%s", lp->dirnam + streq(lp->dirnam, "/"), ftw->name);
-				if (!(dirnam = sfstruse(state.tmp)))
-					error(3, "out of space");
+				sfprintf(state->tmp, "%s/%s", state->list.dirnam + streq(state->list.dirnam, "/"), ent->fts_name);
+				if (!(dirnam = sfstruse(state->tmp)))
+					goto nospace;
 			}
-			c = pathgetlink(dirnam, txtdata, txtsize);
-			s = (c > 0) ? PRINTABLE(txtdata) : "";
+			c = pathgetlink(dirnam, state->txtdata, state->txtsize);
+			s = (c > 0) ? PRINTABLE(state, state->txtdata) : "";
 		}
 		else
 			return 0;
 		break;
 	case KEY_linkop:
-		if (ftw && (ftw->info & FTW_SL))
+		if (ent && (ent->fts_info & FTS_SL))
 			s = "->";
 		else
 			return 0;
@@ -688,19 +682,19 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			t = tmxgetmtime(st);
 		}
 		if (!arg)
-			arg = state.timefmt;
+			arg = state->timefmt;
 		break;
 	case KEY_name:
-		if (ftw)
-			s = PRINTABLE(ftw->name);
+		if (ent)
+			s = PRINTABLE(state, ent->fts_name);
 		break;
 	case KEY_nlink:
 		if (st)
 			n = st->st_nlink;
 		break;
 	case KEY_path:
-		if (ftw)
-			s = ftw->path ? PRINTABLE(ftw->path) : PRINTABLE(ftw->name);
+		if (ent)
+			s = ent->fts_path ? PRINTABLE(state, ent->fts_path) : PRINTABLE(state, ent->fts_name);
 		break;
 	case KEY_perm:
 		if (st)
@@ -712,30 +706,30 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		if (st)
 		{
 			n = st->st_size;
-			if (state.scale)
+			if (state->scale)
 			{
-				s = fmtscale(n, state.scale);
+				s = fmtscale(n, state->scale);
 				fp->fmt = 's';
 			}
 		}
 		break;
 	case KEY_total_blocks:
-		if (!state.scale)
+		if (!state->scale)
 		{
-			n = state.total.blocks;
+			n = state->total.blocks;
 			break;
 		}
 		/*FALLTHROUGH*/
 	case KEY_total_bytes:
-		n = state.total.bytes;
-		if (state.scale)
+		n = state->total.bytes;
+		if (state->scale)
 		{
-			s = fmtscale(n, state.scale);
+			s = fmtscale(n, state->scale);
 			fp->fmt = 's';
 		}
 		break;
 	case KEY_total_files:
-		n = state.total.files;
+		n = state->total.files;
 		break;
 	case KEY_uid:
 		if (st)
@@ -760,6 +754,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		{
 			register char*	p;
 			wchar_t		w;
+			Mbstate_t	q;
 			int		i;
 
 			mbinit(&q);
@@ -767,7 +762,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				if (mberrno(&q))
 					s++;
 				else if ((i = mbwidth(w)) >= 0)
-					state.adjust -= (s - p) + i - 2;
+					state->adjust -= (s - p) + i - 2;
 		}
 	}
 	else if (fp->fmt == 's' && arg)
@@ -785,10 +780,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 					arg++;
 			}
 			if (!*arg)
-				arg = state.timefmt;
-			if ((unsigned long)n >= state.testdate)
+				arg = state->timefmt;
+			if ((unsigned long)n >= state->testdate)
 			{
-				n = state.testdate;
+				n = state->testdate;
 				t = TMX_NOTIME;
 			}
 			*ps = t == TMX_NOTIME ? fmttime(arg, (time_t)n) : fmttmx(arg, t);
@@ -797,6 +792,9 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	else
 		*pn = n;
 	return 1;
+ nospace:
+	error(ERROR_SYSTEM|2, "out of space");
+	return 0;
 }
 
 /*
@@ -805,7 +803,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
  */
 
 static void
-pr(register List_t* lp, Ftw_t* ftw, register int fill)
+pr(State_t* state, FTSENT* ent, register int fill)
 {
 #ifdef S_ISLNK
 	/*
@@ -815,18 +813,18 @@ pr(register List_t* lp, Ftw_t* ftw, register int fill)
 	 * but I wear my user hat more than my administrator hat
 	 */
 
-	if (ftw->level == 0 && (state.ftwflags & (FTW_META|FTW_PHYSICAL)) == (FTW_META|FTW_PHYSICAL) && !(ftw->info & FTW_D) && !lstat(ftw->path ? ftw->path : ftw->name, &ftw->statb) && S_ISLNK(ftw->statb.st_mode))
-		ftw->info = FTW_SL;
+	if (ent->fts_level == 0 && (state->ftsflags & (FTS_META|FTS_PHYSICAL)) == (FTS_META|FTS_PHYSICAL) && !(ent->fts_info & FTS_D) && !lstat(ent->fts_path ? ent->fts_path : ent->fts_name, ent->fts_statp) && S_ISLNK(ent->fts_statp->st_mode))
+		ent->fts_info = FTS_SL;
 #endif
-	if (state.testsize && (ftw->info & FTW_F))
+	if (state->testsize && (ent->fts_info & FTS_F))
 	{
-		ftw->statb.st_size <<= state.testsize;
-		ftw->statb.st_blocks = ftw->statb.st_size / LS_BLOCKSIZE;
+		ent->fts_statp->st_size <<= state->testsize;
+		ent->fts_statp->st_blocks = ent->fts_statp->st_size / LS_BLOCKSIZE;
 	}
-	lp->ftw = ftw;
-	state.adjust = 0;
-	fill -= sfkeyprintf(sfstdout, lp, state.format, key, NiL) + state.adjust;
-	if (!(state.lsflags & LS_COMMAS))
+	state->list.ent = ent;
+	state->adjust = 0;
+	fill -= sfkeyprintf(sfstdout, state, state->format, key, NiL) + state->adjust;
+	if (!(state->lsflags & LS_COMMAS))
 	{
 		if (fill > 0)
 			while (fill-- > 0)
@@ -837,16 +835,16 @@ pr(register List_t* lp, Ftw_t* ftw, register int fill)
 }
 
 /*
- * pr() ftw directory child list in column order
+ * pr() ent directory child list in column order
  * directory name is dirnam of dirlen chars
  * count is the number of VISIBLE children
  * length is the length of the longest VISIBLE child
  */
 
 static void
-col(register List_t* lp, register Ftw_t* ftw, int length)
+col(State_t* state, register FTSENT* ent, int length)
 {
-	register Ftw_t*	p;
+	register FTSENT*	p;
 	register int	i;
 	register int	n;
 	register int	files;
@@ -854,63 +852,63 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 	int		w;
 	int		a;
 
-	lp->ftw = ftw;
-	if (keys[KEY_header].macro && ftw->level >= 0)
-		sfkeyprintf(sfstdout, lp, keys[KEY_header].macro, key, NiL);
-	if ((files = lp->count.files) > 0)
+	state->list.ent = ent;
+	if (keys[KEY_header].macro && ent->fts_level >= 0)
+		sfkeyprintf(sfstdout, state, keys[KEY_header].macro, key, NiL);
+	if ((files = state->list.count.files) > 0)
 	{
-		if (!(state.lsflags & LS_COLUMNS) || length <= 0)
+		if (!(state->lsflags & LS_COLUMNS) || length <= 0)
 		{
 			n = w = 1;
 			a = 0;
 		}
 		else
 		{
-			i = ftw->name[1];
-			ftw->name[1] = 0;
-			state.adjust = 2;
-			a = sfkeyprintf(state.tmp, lp, state.format, key, NiL) - 1;
-			w = a + state.adjust + 1;
+			i = ent->fts_name[1];
+			ent->fts_name[1] = 0;
+			state->adjust = 2;
+			a = sfkeyprintf(state->tmp, state, state->format, key, NiL) - 1;
+			w = a + state->adjust + 1;
 			length += w;
-			sfstrseek(state.tmp, 0, SEEK_SET);
-			ftw->name[1] = i;
-			n = ((state.width - (length + BETWEEN + 2)) < 0) ? 1 : 2;
+			sfstrseek(state->tmp, 0, SEEK_SET);
+			ent->fts_name[1] = i;
+			n = ((state->width - (length + BETWEEN + 2)) < 0) ? 1 : 2;
 		}
-		if (state.lsflags & LS_COMMAS)
+		if (state->lsflags & LS_COMMAS)
 		{
 			length = w - 1;
 			i = 0;
-			n = state.width;
-			for (p = ftw->link; p; p = p->link)
-				if (p->local.number != INVISIBLE)
+			n = state->width;
+			for (p = ent->fts_link; p; p = p->fts_link)
+				if (p->fts_number != INVISIBLE)
 				{
 					if (!mbwide())
-						w = p->namelen;
+						w = p->fts_namelen;
 					else
 					{
 						wchar_t		x;
 						Mbstate_t	q;
 
 						mbinit(&q);
-						for (s = p->name; w = mbchar(&x, s, MB_LEN_MAX, &q);)
+						for (s = p->fts_name; w = mbchar(&x, s, MB_LEN_MAX, &q);)
 							if (mberrno(&q))
 							{
 								s++;
 								w++;
 							}
-							else if ((n = mbwidth(x)) > 0)
+							else if ((n = mbwidth(i)) > 0)
 								w += n;
 					}
 					w += a;
 					if ((n -= length + w) < 0)
 					{
-						n = state.width - (length + w);
+						n = state->width - (length + w);
 						if (i)
 							sfputr(sfstdout, ",\n", -1);
 					}
 					else if (i)
 						sfputr(sfstdout, ", ", -1);
-					pr(lp, p, 0);
+					pr(state, p, 0);
 					i = 1;
 				}
 			if (i)
@@ -918,13 +916,13 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 		}
 		else if (n <= 1)
 		{
-			for (p = ftw->link; p; p = p->link)
-				if (p->local.number != INVISIBLE)
-					pr(lp, p, 0);
+			for (p = ent->fts_link; p; p = p->fts_link)
+				if (p->fts_number != INVISIBLE)
+					pr(state, p, 0);
 		}
 		else
 		{
-			register Ftw_t**	x;
+			register FTSENT**	x;
 			int			c;
 			int			j;
 			int			k;
@@ -936,32 +934,26 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 			int			w;
 			int			z;
 
-			static unsigned short*	siz;
-			static int		sizsiz;
-
-			static Ftw_t**		vec;
-			static int		vecsiz;
-
-			if (files > sizsiz)
+			if (files > state->sizsiz)
 			{
-				sizsiz = roundof(files, 64);
-				if (!(siz = newof(siz, unsigned short, sizsiz, 0)))
-					error(3, "out of space");
+				state->sizsiz = roundof(files, 64);
+				if (!(state->siz = vmnewof(state->vm, state->siz, unsigned short, state->sizsiz, 0)))
+					error(ERROR_SYSTEM|2, "out of space");
 			}
-			if (files > (vecsiz - 1))
+			if ((files + 1) > state->vecsiz)
 			{
-				vecsiz = roundof(files + 1, 64);
-				if (!(vec = newof(vec, Ftw_t*, vecsiz, 0)))
-					error(3, "out of space");
+				state->vecsiz = roundof(files + 1, 64);
+				if (!(state->vec = vmnewof(state->vm, state->vec, FTSENT*, state->vecsiz, 0)))
+					error(ERROR_SYSTEM|2, "out of space");
 			}
-			x = vec;
+			x = state->vec;
 			i = 0;
-			for (p = ftw->link; p; p = p->link)
-				if (p->local.number != INVISIBLE)
+			for (p = ent->fts_link; p; p = p->fts_link)
+				if (p->fts_number != INVISIBLE)
 					x[i++] = p;
-			n = i / (state.width / (length + BETWEEN)) + 1;
+			n = i / (state->width / (length + BETWEEN)) + 1;
 			o = 0;
-			if ((state.lsflags & LS_ACROSS) && n > 1)
+			if ((state->lsflags & LS_ACROSS) && n > 1)
 			{
 				c = (i - 1) / n + 1;
 				do
@@ -971,28 +963,28 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 					{
 						z = 0;
 						for (l = 0, r = j; l < n && r < i; r += c, l++)
-							if (z < (x[r]->namelen + a))
-								z = x[r]->namelen + a;
+							if (z < (x[r]->fts_namelen + a))
+								z = x[r]->fts_namelen + a;
 						w += z + BETWEEN;
 					}
-					if (w <= state.width)
+					if (w <= state->width)
 						o = n;
-				} while (c < state.width / 2 && (n = (i + c) / (c + 1)) && ++c);
+				} while (c < state->width / 2 && (n = (i + c) / (c + 1)) && ++c);
 				n = o ? o : 1;
 				c = (i - 1) / n + 1;
 				k = 0;
 				for (j = 0; j < c; j++)
 				{
-					siz[k] = 0;
+					state->siz[k] = 0;
 					for (l = 0, r = j; l < n && r < i; r += c, l++)
-						if (siz[k] < x[r]->namelen)
-							siz[k] = x[r]->namelen;
-					siz[k] += a + BETWEEN;
+						if (state->siz[k] < x[r]->fts_namelen)
+							state->siz[k] = x[r]->fts_namelen;
+					state->siz[k] += a + BETWEEN;
 					k++;
 				}
 				for (j = 0; j <= i; j += c)
 					for (l = 0, w = j; l < k && w < i; l++, w++)
-						pr(lp, x[w], l < (k - 1) && w < (i - 1) ? siz[l] : 0);
+						pr(state, x[w], l < (k - 1) && w < (i - 1) ? state->siz[l] : 0);
 			}
 			else
 			{
@@ -1001,10 +993,10 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 				{
 					if (!(q = i / n))
 						q = 1;
-					for (c = q; (c - q) < 2 && c <= state.width / (BETWEEN + 1); ++c)
+					for (c = q; (c - q) < 2 && c <= state->width / (BETWEEN + 1); ++c)
 					{
 						n = m = (i + c - 1) / c;
-						if ((r = i - m * c) > state.height)
+						if ((r = i - m * c) > state->height)
 							n -= (r + c - 1) / c;
 						for (; n <= m; n++)
 						{
@@ -1014,11 +1006,11 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 							{
 								z = 0;
 								for (l = 0; l < n && j < i; j++, l++)
-									if (z < x[j]->namelen)
-										z = x[j]->namelen;
+									if (z < x[j]->fts_namelen)
+										z = x[j]->fts_namelen;
 								w += z + a + BETWEEN;
 							}
-							if (w <= state.width)
+							if (w <= state->width)
 							{
 								q = c;
 								o = n;
@@ -1031,21 +1023,21 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 				j = k = 0;
 				while (j < i)
 				{
-					siz[k] = 0;
+					state->siz[k] = 0;
 					for (l = 0; l < n && j < i; j++, l++)
-						if (siz[k] < x[j]->namelen)
-							siz[k] = x[j]->namelen;
-					siz[k] += a + BETWEEN;
+						if (state->siz[k] < x[j]->fts_namelen)
+							state->siz[k] = x[j]->fts_namelen;
+					state->siz[k] += a + BETWEEN;
 					k++;
 				}
 				for (j = 0; j < n; j++)
 					for (l = 0, w = j; l < k && w < i; l++, w += n)
-						pr(lp, x[w], l < (k - 1) && w < (i - n) ? siz[l] : 0);
+						pr(state, x[w], l < (k - 1) && w < (i - n) ? state->siz[l] : 0);
 			}
 		}
 	}
-	if (keys[KEY_trailer].macro && ftw->level >= 0)
-		sfkeyprintf(sfstdout, lp, keys[KEY_trailer].macro, key, NiL);
+	if (keys[KEY_trailer].macro && ent->fts_level >= 0)
+		sfkeyprintf(sfstdout, state, keys[KEY_trailer].macro, key, NiL);
 }
 
 /*
@@ -1053,29 +1045,29 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
  */
 
 static int
-order_none(register Ftw_t* f1, register Ftw_t* f2)
+order_none(register FTSENT* f1, register FTSENT* f2)
 {
 	return 0;
 }
 
 static int
-order_blocks(register Ftw_t* f1, register Ftw_t* f2)
+order_blocks(register FTSENT* f1, register FTSENT* f2)
 {
-	if (f1->statb.st_size < f2->statb.st_size)
+	if (f1->fts_statp->st_size < f2->fts_statp->st_size)
 		return 1;
-	if (f1->statb.st_size > f2->statb.st_size)
+	if (f1->fts_statp->st_size > f2->fts_statp->st_size)
 		return -1;
 	return 0;
 }
 
 static int
-order_atime(register Ftw_t* f1, register Ftw_t* f2)
+order_atime(register FTSENT* f1, register FTSENT* f2)
 {
 	Time_t		t1;
 	Time_t		t2;
 
-	t1 = tmxgetatime(&f1->statb);
-	t2 = tmxgetatime(&f2->statb);
+	t1 = tmxgetatime(f1->fts_statp);
+	t2 = tmxgetatime(f2->fts_statp);
 	if (t1 < t2)
 		return 1;
 	if (t1 > t2)
@@ -1084,13 +1076,13 @@ order_atime(register Ftw_t* f1, register Ftw_t* f2)
 }
 
 static int
-order_ctime(register Ftw_t* f1, register Ftw_t* f2)
+order_ctime(register FTSENT* f1, register FTSENT* f2)
 {
 	Time_t		t1;
 	Time_t		t2;
 
-	t1 = tmxgetctime(&f1->statb);
-	t2 = tmxgetctime(&f2->statb);
+	t1 = tmxgetctime(f1->fts_statp);
+	t2 = tmxgetctime(f2->fts_statp);
 	if (t1 < t2)
 		return 1;
 	if (t1 > t2)
@@ -1099,13 +1091,13 @@ order_ctime(register Ftw_t* f1, register Ftw_t* f2)
 }
 
 static int
-order_mtime(register Ftw_t* f1, register Ftw_t* f2)
+order_mtime(register FTSENT* f1, register FTSENT* f2)
 {
 	Time_t		t1;
 	Time_t		t2;
 
-	t1 = tmxgetmtime(&f1->statb);
-	t2 = tmxgetmtime(&f2->statb);
+	t1 = tmxgetmtime(f1->fts_statp);
+	t2 = tmxgetmtime(f2->fts_statp);
 	if (t1 < t2)
 		return 1;
 	if (t1 > t2)
@@ -1114,14 +1106,14 @@ order_mtime(register Ftw_t* f1, register Ftw_t* f2)
 }
 
 static int
-order_extension(register Ftw_t* f1, register Ftw_t* f2)
+order_extension(register FTSENT* f1, register FTSENT* f2)
 {
 	register int	n;
 	char*		x1;
 	char*		x2;
 
-	x1 = strrchr(f1->name, '.');
-	x2 = strrchr(f2->name, '.');
+	x1 = strrchr(f1->fts_name, '.');
+	x2 = strrchr(f2->fts_name, '.');
 	if (x1)
 	{
 		if (x2)
@@ -1134,20 +1126,20 @@ order_extension(register Ftw_t* f1, register Ftw_t* f2)
 	else
 		n = 0;
 	if (!n)
-		n = strcoll(f1->name, f2->name);
+		n = strcoll(f1->fts_name, f2->fts_name);
 	return n;
 }
 
 static int
-order_version(Ftw_t* f1, Ftw_t* f2)
+order_version(FTSENT* f1, FTSENT* f2)
 {
-	return strvcmp(f1->name, f2->name);
+	return strvcmp(f1->fts_name, f2->fts_name);
 }
 
 static int
-order_name(Ftw_t* f1, Ftw_t* f2)
+order_name(FTSENT* f1, FTSENT* f2)
 {
-	return strcoll(f1->name, f2->name);
+	return strcoll(f1->fts_name, f2->fts_name);
 }
 
 /*
@@ -1155,22 +1147,23 @@ order_name(Ftw_t* f1, Ftw_t* f2)
  */
 
 static int
-order(register Ftw_t* f1, register Ftw_t* f2)
+order(register FTSENT* const* f1, register FTSENT* const* f2)
 {
-	int	n;
+	State_t*	state = (State_t*)(*f1)->fts->fts_handle;
+	int		n;
 
-	if (!(state.lsflags & LS_DIRECTORY) && (state.ftwflags & FTW_MULTIPLE) && f1->level == 0)
+	if ((state->lsflags & (LS_DIRECTORY|LS_LABEL)) == LS_LABEL && (*f1)->fts_level == 0)
 	{
-		if (f1->info == FTW_D)
+		if ((*f1)->fts_info == FTS_D)
 		{
-			if (f2->info != FTW_D)
+			if ((*f2)->fts_info != FTS_D)
 				return 1;
 		}
-		else if (f2->info == FTW_D)
+		else if ((*f2)->fts_info == FTS_D)
 			return -1;
 	}
-	n = (*state.order)(f1, f2);
-	return state.reverse ? -n : n;
+	n = (*state->order)(*f1, *f2);
+	return state->reverse ? -n : n;
 }
 
 /*
@@ -1178,88 +1171,79 @@ order(register Ftw_t* f1, register Ftw_t* f2)
  */
 
 static void
-dir(register Ftw_t* ftw)
+dir(State_t* state, register FTSENT* ent)
 {
-	register Ftw_t*	p;
-	register int	length;
-	int		top = 0;
-	List_t		list;
+	register FTSENT*	p;
+	register int		length;
+	int			top = 0;
 
-	if (ftw->status == FTW_NAME)
-	{
-		list.dirlen = ftw->namelen;
-		list.dirnam = ftw->path + ftw->pathlen - list.dirlen;
-	}
+	state->list.dirlen = ent->fts_namelen;
+	state->list.dirnam = ent->fts_name;
+	if (ent->fts_level >= 0)
+		state->directories++;
 	else
-	{
-		list.dirlen = ftw->pathlen;
-		list.dirnam = ftw->path;
-	}
-	if (ftw->level >= 0)
-		state.directories++;
-	else
-		state.top = ftw;
+		state->top = ent;
 	length = 0;
-	list.count.blocks = 0;
-	list.count.bytes = 0;
-	list.count.files = 0;
-	for (p = ftw->link; p; p = p->link)
+	state->list.count.blocks = 0;
+	state->list.count.bytes = 0;
+	state->list.count.files = 0;
+	for (p = ent->fts_link; p; p = p->fts_link)
 	{
-		if (p->level == 0 && p->info == FTW_D && !(state.lsflags & LS_DIRECTORY))
+		if (p->fts_level == 0 && p->fts_info == FTS_D && !(state->lsflags & LS_DIRECTORY))
 		{
-			p->local.number = INVISIBLE;
+			p->fts_number = INVISIBLE;
 			top++;
 		}
-		else if (VISIBLE(p))
+		else if (VISIBLE(state, p))
 		{
-			if (p->info == FTW_NS)
+			if (p->fts_info == FTS_NS)
 			{
-				if (ftw->level < 0 || !(state.lsflags & LS_NOSTAT))
+				if (ent->fts_level < 0 || !(state->lsflags & LS_NOSTAT))
 				{
-					if (ftw->path[0] == '.' && !ftw->path[1])
-						error(2, "%s: not found", p->name);
+					if (ent->fts_path[0] == '.' && !ent->fts_path[1])
+						error(2, "%s: not found", p->fts_name);
 					else
-						error(2, "%s/%s: not found", ftw->path, p->name);
+						error(2, "%s/%s: not found", ent->fts_path, p->fts_name);
 					goto invisible;
 				}
 			}
 			else
 			{
-				list.count.blocks += BLOCKS(&p->statb);
-				list.count.bytes += p->statb.st_size;
+				state->list.count.blocks += BLOCKS(state, p->fts_statp);
+				state->list.count.bytes += p->fts_statp->st_size;
 			}
-			list.count.files++;
-			if (p->namelen > length)
-				length = p->namelen;
-			if (!(state.lsflags & LS_RECURSIVE))
-				p->status = FTW_SKIP;
+			state->list.count.files++;
+			if (p->fts_namelen > length)
+				length = p->fts_namelen;
+			if (!(state->lsflags & LS_RECURSIVE))
+				fts_set(NiL, p, FTS_SKIP);
 		}
 		else
 		{
 		invisible:
-			p->local.number = INVISIBLE;
-			p->status = FTW_SKIP;
+			p->fts_number = INVISIBLE;
+			fts_set(NiL, p, FTS_SKIP);
 		}
 	}
-	state.total.blocks += list.count.blocks;
-	state.total.bytes += list.count.bytes;
-	state.total.files += list.count.files;
-	col(&list, ftw, length);
-	state.lsflags |= LS_SEPARATE;
+	state->total.blocks += state->list.count.blocks;
+	state->total.bytes += state->list.count.bytes;
+	state->total.files += state->list.count.files;
+	col(state, ent, length);
+	state->lsflags |= LS_SEPARATE;
 	if (top)
 	{
-		if (list.count.files)
+		if (state->list.count.files)
 		{
-			state.directories++;
-			state.top = 0;
+			state->directories++;
+			state->top = 0;
 		}
 		else if (top > 1)
-			state.top = 0;
+			state->top = 0;
 		else
-			state.top = ftw->link;
-		for (p = ftw->link; p; p = p->link)
-			if (p->level == 0 && p->info == FTW_D)
-				p->local.number = 0;
+			state->top = ent->fts_link;
+		for (p = ent->fts_link; p; p = p->fts_link)
+			if (p->fts_level == 0 && p->fts_info == FTS_D)
+				p->fts_number = 0;
 	}
 }
 
@@ -1268,88 +1252,204 @@ dir(register Ftw_t* ftw)
  */
 
 static int
-ls(register Ftw_t* ftw)
+ls(State_t* state, register FTSENT* ent)
 {
-	if (!VISIBLE(ftw))
+	if (!VISIBLE(state, ent))
 	{
-		ftw->status = FTW_SKIP;
-		return 0;
+		fts_set(NiL, ent, FTS_SKIP);
+		return;
 	}
-	switch (ftw->info)
+	switch (ent->fts_info)
 	{
-	case FTW_NS:
-		if (ftw->parent->info == FTW_DNX)
+	case FTS_NS:
+		if (ent->fts_parent->fts_info == FTS_DNX)
 			break;
-		error(2, "%s: not found", ftw->path);
+		error(2, "%s: not found", ent->fts_path);
+		return;
+	case FTS_DC:
+		if (state->lsflags & LS_DIRECTORY)
+			break;
+		error(2, "%s: directory causes cycle", ent->fts_path);
+		return;
+	case FTS_DNR:
+		if (state->lsflags & LS_DIRECTORY)
+			break;
+		error(2, "%s: cannot read directory", ent->fts_path);
 		return 0;
-	case FTW_DC:
-		if (state.lsflags & LS_DIRECTORY)
+	case FTS_DOT:
+		#if 0
+		fts_set(NiL, ent, FTS_SKIP);
+		/*FALLTHROUGH*/
+		#endif
+	case FTS_D:
+	case FTS_DNX:
+		if ((state->lsflags & LS_DIRECTORY) && ent->fts_level >= 0)
 			break;
-		error(2, "%s: directory causes cycle", ftw->path);
-		return 0;
-	case FTW_DNR:
-		if (state.lsflags & LS_DIRECTORY)
-			break;
-		error(2, "%s: cannot read directory", ftw->path);
-		return 0;
-	case FTW_D:
-	case FTW_DNX:
-		if ((state.lsflags & LS_DIRECTORY) && ftw->level >= 0)
-			break;
-		if (!(state.lsflags & LS_RECURSIVE))
-			ftw->status = FTW_SKIP;
-		else if (ftw->info == FTS_DNX)
+		if (!(state->lsflags & LS_RECURSIVE))
+			fts_set(NiL, ent, FTS_SKIP);
+		else if (ent->fts_info == FTS_DNX)
 		{
-			error(2, "%s: cannot search directory", ftw->path, ftw->level);
-			ftw->status = FTW_SKIP;
-			if (ftw->level > 0 && !(state.lsflags & LS_NOSTAT))
+			error(2, "%s: cannot search directory", ent->fts_path, ent->fts_level);
+			fts_set(NiL, ent, FTS_SKIP);
+			if (ent->fts_level > 0 && !(state->lsflags & LS_NOSTAT))
 				return 0;
 		}
-		dir(ftw);
+		if (ent->fts_level >= 0)
+			fts_children(ent->fts, 0);
+		dir(state, ent);
 		return 0;
 	}
-	ftw->status = FTW_SKIP;
-	if (!ftw->level)
+	fts_set(NiL, ent, FTS_SKIP);
+	if (ent->fts_level == 1)
 	{
-		static List_t	list;
-
-		list.ftw = ftw;
-		pr(&list, ftw, 0);
+		memset(&state->list, 0, sizeof(state->list));
+		state->list.ent = ent;
+		pr(state, ent, 0);
 	}
 	return 0;
 }
 
-#define set(f)	(opt_info.num?(state.lsflags|=(f)):((state.lsflags&=~(f)),0))
-#define clr(f)	(opt_info.num?(state.lsflags&=~(f)):(state.lsflags|=(f)))
+/*
+ * snarfed from libast/misc/ftwalk.c
+ * need a rainy day to clean this up ...
+ */
+
+static int
+walk(const char* path, int (*userf)(State_t*, FTSENT*), int flags, int (*comparf)(FTSENT*const*, FTSENT*const*), State_t* state)
+{
+	register FTS*		f;
+	register FTSENT*	e;
+	register int		rv;
+	int			oi;
+	int			ns;
+	int			os;
+	int			nd;
+	FTSENT*			x;
+	FTSENT*			dd[2];
+
+	flags |= FTS_NOPOSTORDER;
+	if (!(f = fts_open((char* const*)path, flags, comparf)))
+	{
+		if (!path || !(path = (const char*)(*((char**)path))))
+			return -1;
+		ns = strlen(path) + 1;
+		if (!(e = vmnewof(state->vm, 0, FTSENT, 1, ns)))
+			return -1;
+		e->fts_accpath = e->fts_name = e->fts_path = strcpy((char*)(e + 1), path);
+		e->fts_namelen = e->fts_pathlen = ns;
+		e->fts_info = FTS_NS;
+		e->fts_parent = e;
+		e->fts_parent->fts_link = e;
+		rv = (*userf)(state, e);
+		return rv;
+	}
+	f->fts_handle = state;
+	rv = 0;
+	if (e = fts_children(f, 0))
+	{
+		nd = 0;
+		for (x = e; x; x = x->fts_link)
+			if (x->fts_info & FTS_DD)
+			{
+				x->fts_info &= ~FTS_DD;
+				dd[nd++] = x;
+				if (nd >= elementsof(dd))
+					break;
+			}
+		e->fts_parent->fts_link = e;
+		rv = (*userf)(state, e->fts_parent);
+		e->fts_parent->fts_link = 0;
+		while (nd > 0)
+			dd[--nd]->fts_info |= FTS_DD;
+		for (x = e; x; x = x->fts_link)
+			if (!(x->fts_info & FTS_D))
+				x->_fts_status = FTS_SKIP;
+	}
+	while (!rv && !sh_checksig(state->context) && (e = fts_read(f)))
+	{
+		oi = e->fts_info;
+		os = e->_fts_status;
+		nd = 0;
+		switch (e->fts_info)
+		{
+		case FTS_D:
+		case FTS_DNX:
+			for (x = fts_children(f, 0); x; x = x->fts_link)
+				if (x->fts_info & FTS_DD)
+				{
+					x->fts_info &= ~FTS_DD;
+					dd[nd++] = x;
+					if (nd >= elementsof(dd))
+						break;
+				}
+			break;
+		case FTS_DOT:
+			continue;
+		case FTS_ERR:
+			e->fts_info = FTS_NS;
+			break;
+		case FTS_NSOK:
+			e->fts_info = FTS_NSOK;
+			break;
+		case FTS_SLNONE:
+			e->fts_info = FTS_SL;
+			break;
+		}
+		rv = (*userf)(state, e);
+		e->fts_info = oi;
+		if (e->_fts_status == ns)
+			e->_fts_status = os;
+		while (nd > 0)
+			dd[--nd]->fts_info |= FTS_DD;
+	}
+	fts_close(f);
+	return rv;
+}
+
+#define set(s,f)	(opt_info.num?((s)->lsflags|=(f)):(((s)->lsflags&=~(f)),0))
+#define clr(s,f)	(opt_info.num?((s)->lsflags&=~(f)):((s)->lsflags|=(f)))
 
 int
-main(int argc, register char** argv)
+b_ls(int argc, register char** argv, Shbltin_t* context)
 {
 	register int	n;
 	register char*	s;
 	char*		e;
+	FTS*		fts;
+	FTSENT*		ent;
+	FTSENT*		x;
 	Key_t*		kp;
 	Sfio_t*		fmt;
 	long		lsflags;
 	int		dump = 0;
+	char*		av[2];
+	int		oi;
+	int		ns;
+	int		os;
+	int		nd;
+	FTSENT*		dd[2];
+	State_t		state;
 
 	static char	fmt_color[] = "%(mode:case:d*:\\E[01;34m%(name)s\\E[0m:l*:\\E[01;36m%(name)s\\E[0m:*x*:\\E[01;32m%(name)s\\E[0m:*:%(name)s)s";
 
-	NoP(argc);
-	setlocale(LC_ALL, "");
+	cmdinit(argc, argv, context, ERROR_CATALOG, ERROR_NOTIFY);
+	memset(&state, 0, sizeof(state));
+	state.keydisc.key = offsetof(Key_t, name);
+	state.keydisc.size = -1;
+	state.keydisc.link = offsetof(Key_t, link);
+	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()) || !(state.vm = vmopen(Vmdcheap, Vmbest, 0)) || !(state.keys = dtnew(state.vm, &state.keydisc, Dtset)))
+	{
+		error(ERROR_SYSTEM|2, "out of space");
+		goto done;
+	}
 	if (s = strrchr(argv[0], '/'))
 		s++;
 	else
 		s = argv[0];
 	error_info.id = s;
-	state.ftwflags = ftwflags() | FTW_META | FTW_CHILDREN;
-	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()))
-		error(3, "out of space");
-	if (!(state.keys = hashalloc(NiL, HASH_name, "keys", 0)))
-		error(3, "out of space");
+	state.ftsflags = fts_flags() | FTS_META | FTS_SEEDOT;
 	for (n = 1; n < elementsof(keys); n++)
-		hashput(state.keys, keys[n].name, &keys[keys[n].index]);
-	hashset(state.keys, HASH_ALLOCATE);
+		dtinsert(state.keys, keys + n);
 	if (streq(s, "lc"))
 		state.lsflags |= LS_COLUMNS;
 	else if (streq(s, "lf") || streq(s, "lsf"))
@@ -1376,10 +1476,10 @@ main(int argc, register char** argv)
 		switch (n)
 		{
 		case 'a':
-			set(LS_ALL);
+			set(&state, LS_ALL);
 			break;
 		case 'b':
-			set(LS_PRINTABLE|LS_ESCAPE);
+			set(&state, LS_PRINTABLE|LS_ESCAPE);
 			break;
 		case 'c':
 			state.lsflags &= ~LS_ATIME;
@@ -1388,7 +1488,7 @@ main(int argc, register char** argv)
 				state.order = order_ctime;
 			break;
 		case 'd':
-			set(LS_DIRECTORY);
+			set(&state, LS_DIRECTORY);
 			break;
 		case 'e':
 			state.lsflags |= LS_LONG;
@@ -1411,19 +1511,19 @@ main(int argc, register char** argv)
 			state.scale = 1024;
 			break;
 		case 'i':
-			set(LS_INUMBER);
+			set(&state, LS_INUMBER);
 			break;
 		case 'k':
 			state.blocksize = 1024;
 			break;
 		case 'l':
-			set(LS_LONG);
+			set(&state, LS_LONG);
 			break;
 		case 'm':
-			set(LS_COMMAS);
+			set(&state, LS_COMMAS);
 			break;
 		case 'n':
-			set(LS_NUMBER);
+			set(&state, LS_NUMBER);
 			break;
 		case 'o':
 		case 'G':
@@ -1433,19 +1533,19 @@ main(int argc, register char** argv)
 				state.lsflags |= LS_LONG|LS_NOUSER;
 			break;
 		case 'p':
-			set(LS_MARKDIR);
+			set(&state, LS_MARKDIR);
 			break;
 		case 'q':
-			set(LS_PRINTABLE);
+			set(&state, LS_PRINTABLE);
 			break;
 		case 'r':
 			state.reverse = !!opt_info.num;
 			break;
 		case 's':
-			set(LS_BLOCKS);
+			set(&state, LS_BLOCKS);
 			break;
 		case 't':
-			if (set(LS_TIME) && !state.order)
+			if (set(&state, LS_TIME) && !state.order)
 				state.order = order_mtime;
 			break;
 		case 'u':
@@ -1465,7 +1565,7 @@ main(int argc, register char** argv)
 				error(2, "%s: invalid screen width specification at `%s'", opt_info.arg, e);
 			break;
 		case 'x':
-			set(LS_ACROSS|LS_COLUMNS);
+			set(&state, LS_ACROSS|LS_COLUMNS);
 			break;
 		case 'y':
 			if (!opt_info.arg)
@@ -1534,8 +1634,11 @@ main(int argc, register char** argv)
 					 */
 
 					s = sfprints("%%Q\n%s\n", s);
-					if (!s || !(s = strdup(s)))
-						error(ERROR_SYSTEM|3, "out of space");
+					if (!s || !(s = vmstrdup(state.vm, s)))
+					{
+						error(ERROR_SYSTEM|2, "out of space");
+						goto done;
+					}
 				}
 				state.timefmt = s;
 				break;
@@ -1546,10 +1649,10 @@ main(int argc, register char** argv)
 			state.lsflags &= ~LS_ALL;
 			break;
 		case 'B':
-			set(LS_NOBACKUP);
+			set(&state, LS_NOBACKUP);
 			break;
 		case 'C':
-			set(LS_COLUMNS);
+			set(&state, LS_COLUMNS);
 			break;
 		case 'D':
 			if (s = strchr(opt_info.arg, '='))
@@ -1559,13 +1662,17 @@ main(int argc, register char** argv)
 				opt_info.arg += 2;
 				s = 0;
 			}
-			if (!(kp = (Key_t*)hashget(state.keys, opt_info.arg)))
+			if (!(kp = (Key_t*)dtmatch(state.keys, opt_info.arg)))
 			{
 				if (!s)
 					break;
-				if (!(kp = newof(0, Key_t, 1, 0)))
-					error(3, "out of space");
-				kp->name = hashput(state.keys, 0, kp);
+				if (!(kp = vmnewof(state.vm, 0, Key_t, 1, 0)))
+				{
+					error(ERROR_SYSTEM|2, "out of space");
+					goto done;
+				}
+				kp->name = opt_info.arg;
+				dtinsert(state.keys, kp);
 			}
 			if (kp->macro = s)
 			{
@@ -1579,10 +1686,10 @@ main(int argc, register char** argv)
 			state.timefmt = TIME_FULL_ISO;
 			break;
 		case 'F':
-			set(LS_MARK);
+			set(&state, LS_MARK);
 			break;
 		case 'H':
-			state.ftwflags |= FTW_META|FTW_PHYSICAL;
+			state.ftsflags |= FTS_META|FTS_PHYSICAL;
 			break;
 		case 'I':
 			state.ignore = opt_info.arg;
@@ -1611,23 +1718,23 @@ main(int argc, register char** argv)
 			}
 			break;
 		case 'K':
-			set(LS_PRINTABLE|LS_SHELL|LS_QUOTE|LS_ESCAPE);
+			set(&state, LS_PRINTABLE|LS_SHELL|LS_QUOTE|LS_ESCAPE);
 			break;
 		case 'L':
-			state.ftwflags &= ~(FTW_META|FTW_PHYSICAL|FTW_SEEDOTDIR);
+			state.ftsflags &= ~(FTS_META|FTS_PHYSICAL|FTS_SEEDOTDIR);
 			break;
 		case 'N':
-			clr(LS_PRINTABLE);
+			clr(&state, LS_PRINTABLE);
 			break;
 		case 'P':
-			state.ftwflags &= ~FTW_META;
-			state.ftwflags |= FTW_PHYSICAL;
+			state.ftsflags &= ~FTS_META;
+			state.ftsflags |= FTS_PHYSICAL;
 			break;
 		case 'Q':
-			set(LS_PRINTABLE|LS_QUOTE);
+			set(&state, LS_PRINTABLE|LS_QUOTE);
 			break;
 		case 'R':
-			set(LS_RECURSIVE);
+			set(&state, LS_RECURSIVE);
 			break;
 		case 'S':
 			state.order = order_blocks;
@@ -1646,7 +1753,7 @@ main(int argc, register char** argv)
 					break;
 				/*FALLTHROUGH*/
 			case 'a':
-				if (kp = (Key_t*)hashget(state.keys, "name"))
+				if (kp = (Key_t*)dtmatch(state.keys, "name"))
 				{
 					stresc(kp->macro = fmt_color);
 					state.lsflags |= LS_STAT;
@@ -1667,7 +1774,7 @@ main(int argc, register char** argv)
 			}
 			break;
 		case 'X':
-			set(LS_EXTENSION);
+			set(&state, LS_EXTENSION);
 			break;
 		case 'Y':
 			switch (opt_info.num)
@@ -1696,7 +1803,7 @@ main(int argc, register char** argv)
 			sfputr(fmt, opt_info.arg, ' ');
 			break;
 		case '1':
-			clr(LS_COLUMNS|LS_PRINTABLE);
+			clr(&state, LS_COLUMNS|LS_PRINTABLE);
 			break;
 		case -101:
 			if (opt_info.num <= 0)
@@ -1718,6 +1825,7 @@ main(int argc, register char** argv)
 			state.testsize = opt_info.num;
 			break;
 		case '?':
+			vmclose(state.vm);
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
 			break;
 		case ':':
@@ -1734,7 +1842,7 @@ main(int argc, register char** argv)
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	if (state.lsflags == (lsflags|LS_TIME))
-		state.ftwflags |= FTW_SEEDOTDIR; /* keep configure happy */
+		state.ftsflags |= FTS_SEEDOTDIR; /* keep configure happy */
 	if (state.lsflags & LS_DIRECTORY)
 		state.lsflags &= ~LS_RECURSIVE;
 	if (!state.order)
@@ -1766,7 +1874,7 @@ main(int argc, register char** argv)
 		)) && !sfstrtell(fmt))
 	{
 		state.lsflags |= LS_NOSTAT;
-		state.ftwflags |= FTW_DELAY|FTW_DOT;
+		state.ftsflags |= FTS_NOSTAT|FTS_NOCHDIR;
 	}
 	if (!sfstrtell(fmt))
 	{
@@ -1795,28 +1903,38 @@ main(int argc, register char** argv)
 	else
 		sfstrseek(fmt, -1, SEEK_CUR);
 	if (!(state.format = sfstruse(fmt)))
-		error(3, "out of space");
-	if (dump)
 	{
-		sfprintf(sfstdout, "%s\n", state.format);
-		return 0;
+		error(ERROR_SYSTEM|2, "out of space");
+		goto done;
 	}
-	stresc(state.format);
-
-	/*
-	 * do it
-	 */
-
-	if (argv[0])
+	if (dump)
+		sfprintf(sfstdout, "%s\n", state.format);
+	else
 	{
+		stresc(state.format);
+
+		/*
+		 * do it
+		 */
+
+		if (!argv[0])
+		{
+			argv = av;
+			argv[0] = ".";
+			argv[1] = 0;
+		}
 		if (argv[1])
 			state.lsflags |= LS_LABEL;
-		state.ftwflags |= FTW_MULTIPLE;
-		ftwalk((char*)argv, ls, state.ftwflags, order);
+		walk((char*)argv, ls, state.ftsflags, order, &state);
+		if (keys[KEY_summary].macro)
+			sfkeyprintf(sfstdout, NiL, keys[KEY_summary].macro, key, NiL);
 	}
-	else
-		ftwalk(".", ls, state.ftwflags, order);
-	if (keys[KEY_summary].macro)
-		sfkeyprintf(sfstdout, NiL, keys[KEY_summary].macro, key, NiL);
+ done:
+	if (fmt)
+		sfstrclose(fmt);
+	if (state.tmp)
+		sfstrclose(state.tmp);
+	if (state.vm)
+		vmclose(state.vm);
 	return error_info.errors != 0;
 }
