@@ -173,7 +173,7 @@ done fus3d.h
 done fus3d.c
 meta fus3d.o %.c>%.o fus3d.c fus3d
 prev fus3d.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Lefty Koutsofios <ek@research.att.com>][-copyright?Copyright (c) 2012-2014 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?fus3d]"\" -D_FILE_OFFSET_BITS=64 -D_PACKAGE_ast -DFUSE_USE_VERSION=26 -c fus3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Lefty Koutsofios <ek@research.att.com>][-copyright?Copyright (c) 2012-2015 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?fus3d]"\" -D_FILE_OFFSET_BITS=64 -D_PACKAGE_ast -DFUSE_USE_VERSION=26 -c fus3d.c
 done fus3d.o generated
 make ndfsops.o
 make ndfsops.c

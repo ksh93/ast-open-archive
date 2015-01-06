@@ -175,7 +175,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sortsum.c
 meta sortsum.o %.c>%.o sortsum.c sortsum
 prev sortsum.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2003-2014 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?sortsum]"\" -c sortsum.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2003-2015 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?sortsum]"\" -c sortsum.c
 done sortsum.o generated
 exec - ${AR} rc libsortsum.a sortsum.o
 exec - (ranlib libsortsum.a) >/dev/null 2>&1 || true

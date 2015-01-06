@@ -213,7 +213,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done html.c
 meta html.o %.c>%.o html.c html
 prev html.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2010-2014 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dsshtml]"\" -D_PACKAGE_ast -c html.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2010-2015 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dsshtml]"\" -D_PACKAGE_ast -c html.c
 done html.o generated
 make lib.o
 make lib.c

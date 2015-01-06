@@ -182,7 +182,7 @@ done ${PACKAGE_ast_INCLUDE}/dsslib.h
 done stats.c
 meta stats.o %.c>%.o stats.c stats
 prev stats.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2002-2014 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssstats]"\" -D_PACKAGE_ast -c stats.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2002-2015 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?dssstats]"\" -D_PACKAGE_ast -c stats.c
 done stats.o generated
 make lib.o
 make lib.c

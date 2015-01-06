@@ -175,7 +175,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vczip.c
 meta vczip.o %.c>%.o vczip.c vczip
 prev vczip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <phongvo@gmail.com>][-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2003-2014 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?vczip]"\" -D_PACKAGE_ast -c vczip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Phong Vo <phongvo@gmail.com>][-author?Glenn Fowler <glenn.s.fowler@gmail.com>][-copyright?Copyright (c) 2003-2015 AT&T Intellectual Property][-license?http://www.eclipse.org/org/documents/epl-v10.html][--catalog?vczip]"\" -D_PACKAGE_ast -c vczip.c
 done vczip.o generated
 bind -lvcodex
 bind -lcodex
