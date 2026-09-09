@@ -335,7 +335,7 @@ fileskip(register Archive_t* ap, register File_t* f)
 	Member_t*	d;
 	off_t		n;
 
-	if (ap->delta && (d = (Member_t*)hashget(ap->delta->tab, f->name)))
+	if (ap->delta && (d = (Member_t*)dtmatch(ap->delta->tab, f->name)))
 		d->info->delta.op = DELTA_delete;
 	if ((!ap->format->getdata || !(*ap->format->getdata)(&state, ap, f, -1)) && ((n = f->st->st_size) > 0 && f->type == X_IFREG || (n = f->datasize)) && bread(ap, NiL, (off_t)0, n, 1) < 0)
 		error(ERROR_SYSTEM|2, "%s: skip error", f->name);

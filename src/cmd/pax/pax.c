@@ -161,6 +161,10 @@ static struct
 	char*		owner;
 } opt;
 
+static Dtdisc_t		Optdisc = { offsetof(Optalias_t, name), -1, offsetof(Optalias_t, dict) };
+static Dtdisc_t		Restoredisc = { offsetof(Restore_t, name), -1, offsetof(Restore_t, dict) };
+Dtdisc_t		Linkdisc = { offsetof(Link_t, key), sizeof(Fileid_t), offsetof(Link_t, dict) };
+
 /*
  * clean up dir info before exit
  */
@@ -356,6 +360,36 @@ filter(Archive_t* ap, File_t* f)
 }
 
 /*
+ * lookup name in the state.options dictionary
+ */
+
+Option_t*
+optlookup(const char* name)
+{
+	register Optalias_t*	ap;
+
+	return (ap = (Optalias_t*)dtmatch(state.options, name)) ? ap->option : (Option_t*)0;
+}
+
+/*
+ * enter name=>op in the state.options dictionary
+ * the persistent copy of name is returned
+ */
+
+char*
+optinstall(const char* name, Option_t* op)
+{
+	register Optalias_t*	ap;
+
+	if (!(ap = newof(0, Optalias_t, 1, 0)))
+		nospace();
+	ap->name = strdup(name);
+	ap->option = op;
+	dtinsert(state.options, ap);
+	return ap->name;
+}
+
+/*
  * set options from line if != 0 or argv according to usage
  * type: 0:command EXTTYPE:extended GLBTYPE:global
  */
@@ -437,19 +471,19 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 			v = line;
 			line = e;
 			y = 1;
-			if (!(op = (Option_t*)hashget(state.options, o)))
+			if (!(op = optlookup(o)))
 			{
 				s = o;
 				if (strneq(o, VENDOR ".", sizeof(VENDOR)))
 				{
 					o += sizeof(VENDOR);
-					op = (Option_t*)hashget(state.options, o);
+					op = optlookup(o);
 				}
 				if (!op && *o == 'n' && *(o + 1) == 'o')
 				{
 					o += 2;
 					y = 0;
-					op = (Option_t*)hashget(state.options, o);
+					op = optlookup(o);
 				}
 				if (!op)
 				{
@@ -997,13 +1031,13 @@ setoptions(char* line, size_t hdr, char** argv, char* usage, Archive_t* ap, int 
 			{
 				if (s = strchr(v, '='))
 					*s++ = 0;
-				if (!(op = (Option_t*)hashget(state.options, v)))
+				if (!(op = optlookup(v)))
 				{
 					if (!s)
 						break;
 					if (!(op = newof(0, Option_t, 1, 0)))
 						nospace();
-					op->name = hashput(state.options, 0, op);
+					op->name = optinstall(v, op);
 				}
 				if (s)
 				{
@@ -1325,7 +1359,7 @@ static void
 ignore(void)
 {
 	register Option_t*	op;
-	Hash_position_t*	pos;
+	register Optalias_t*	ap;
 	char*			all;
 	char*			ext;
 	int			lev;
@@ -1338,15 +1372,14 @@ ignore(void)
 		ext = 0;
 	else if (!(ext = sfstruse(opt.ignore_ext)))
 		nospace();
-	if ((all || ext) && (pos = hashscan(state.options, 0)))
+	if (all || ext)
 	{
-		while (hashnext(pos))
+		for (ap = (Optalias_t*)dtfirst(state.options); ap; ap = (Optalias_t*)dtnext(state.options, ap))
 		{
-			op = (Option_t*)pos->bucket->value;
-			if (!(op->flags & OPT_READONLY) && (all && matchopt(pos->bucket->name, all, op) && (lev = 8) || ext && matchopt(pos->bucket->name, ext, op) && (lev = 6)) && op->level < lev)
+			op = ap->option;
+			if (!(op->flags & OPT_READONLY) && (all && matchopt(ap->name, all, op) && (lev = 8) || ext && matchopt(ap->name, ext, op) && (lev = 6)) && op->level < lev)
 				op->level = lev;
 		}
-		hashdone(pos);
 	}
 	sfstrclose(opt.ignore_all);
 	sfstrclose(opt.ignore_ext);
@@ -1517,7 +1550,7 @@ main(int argc, char** argv)
 	register char*		s;
 	register Archive_t*	ap;
 	char*			p;
-	Hash_position_t*	pos;
+	Optalias_t*		oap;
 	Option_t*		op;
 	int			n;
 	int			pass = 0;
@@ -1559,7 +1592,7 @@ main(int argc, char** argv)
 		nospace();
 	stash(&options[OPT_release].perm, release(), 0);
 	options[OPT_release].flags |= OPT_SET;
-	if (!(state.options = hashalloc(NiL, HASH_name, "options", 0)))
+	if (!(state.options = dtopen(&Optdisc, Dtset)))
 		nospace();
 	for (i = 1; options[i].name; i++)
 	{
@@ -1570,10 +1603,13 @@ main(int argc, char** argv)
 		{
 			if (s = strchr(p, '|'))
 				*s++ = 0;
-			hashput(state.options, p, &options[options[i].index]);
+			if (!(oap = newof(0, Optalias_t, 1, 0)))
+				nospace();
+			oap->name = p;
+			oap->option = &options[options[i].index];
+			dtinsert(state.options, oap);
 		} while (p = s);
 	}
-	hashset(state.options, HASH_ALLOCATE);
 	state.record.charset = 1;
 	state.record.line = 1;
 	state.summary = 1;
@@ -1839,9 +1875,9 @@ main(int argc, char** argv)
 				error(3, "%s: cannot write install temporary", state.install.path);
 		}
 	}
-	if (!(state.linktab = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(Fileid_t), HASH_name, "links", 0)))
+	if (!(state.linktab = dtopen(&Linkdisc, Dtset)))
 		error(3, "cannot allocate hard link table");
-	if ((state.operation & IN) && !state.list && !(state.restore = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_name, "restore", 0)))
+	if ((state.operation & IN) && !state.list && !(state.restore = dtopen(&Restoredisc, Dtset)))
 		error(3, "cannot allocate directory table");
 	if (state.owner)
 	{
@@ -1864,15 +1900,14 @@ main(int argc, char** argv)
 		umask(0);
 	state.modemask = ~state.modemask;
 #if DEBUG
-	if ((state.test & 0000010) && (pos = hashscan(state.options, 0)))
+	if (state.test & 0000010)
 	{
-		while (hashnext(pos))
+		for (oap = (Optalias_t*)dtfirst(state.options); oap; oap = (Optalias_t*)dtnext(state.options, oap))
 		{
-			op = (Option_t*)pos->bucket->value;
-			if (op->name == pos->bucket->name)
+			op = oap->option;
+			if (op->name == oap->name)
 				sfprintf(sfstderr, "%-16s %c %2d %d perm=%ld:%s temp=%ld:%s%s%s\n", op->name, op->flag ? op->flag : '-', op->index, op->level, op->perm.number, op->perm.string, op->temp.number, op->temp.string, (op->flags & OPT_HEADER) ? " HEADER" : "", (op->flags & OPT_READONLY) ? " READONLY" : "");
 		}
-		hashdone(pos);
 	}
 #endif
 	for (i = 0; i < elementsof(signals); i++)
@@ -1953,6 +1988,19 @@ main(int argc, char** argv)
 }
 
 /*
+ * dtwalk() adapter for restore()
+ */
+
+static int
+restorewalk(Dt_t* dt, void* obj, void* handle)
+{
+	register Restore_t*	rp = (Restore_t*)obj;
+
+	NoP(dt);
+	return restore(rp->name, (char*)rp->post, handle);
+}
+
+/*
  * print number of blocks actually copied and exit
  */
 
@@ -1978,7 +2026,7 @@ finish(int code)
 	if (state.install.path)
 		remove(state.install.path);
 	if (state.restore)
-		hashwalk(state.restore, 0, restore, NiL);
+		dtwalk(state.restore, (int(*)(Dt_t*, Void_t*, Void_t*))restorewalk, NiL);
 	sfsync(sfstdout);
 	if (state.meter.last)
 	{

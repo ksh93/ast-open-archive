@@ -34,7 +34,7 @@
 #include <ftwalk.h>
 #include <ctype.h>
 #include <ccode.h>
-#include <hash.h>
+#include <cdt.h>
 #include <proc.h>
 #include <regex.h>
 #include <error.h>
@@ -262,9 +262,11 @@ typedef struct Fileid_s			/* unique file identifier	*/
 
 typedef struct Link_s			/* link info			*/
 {
+	Dtlink_t	dict;		/* linktab dictionary link	*/
 	char*		name;		/* name				*/
 	char*		checksum;	/* hard link checksum		*/
 	int		namesize;	/* name size with null byte	*/
+	Fileid_t	key;		/* linktab lookup key		*/
 	Fileid_t	id;		/* generated link file id	*/
 } Link_t;
 
@@ -308,6 +310,8 @@ typedef struct Link_s			/* link info			*/
 
 struct Member_s				/* cached member info		*/
 {
+	Dtlink_t	dict;		/* delta->tab dictionary link	*/
+	char*		name;		/* delta->tab dictionary key	*/
 	File_t*		info;		/* deltapass() file info	*/
 	Tv_t		atime;		/* access time			*/
 	Tv_t		mtime;		/* modify time			*/
@@ -357,6 +361,13 @@ typedef struct Post_s			/* post processing restoration	*/
 	unsigned int	restoremode:1;	/* must restore mode		*/
 } Post_t;
 
+typedef struct Restore_s		/* state.restore dictionary entry */
+{
+	Dtlink_t	dict;		/* state.restore dictionary link */
+	char*		name;		/* state.restore dictionary key	*/
+	Post_t*		post;		/* post processing restoration	*/
+} Restore_t;
+
 typedef union Integral_u		/* byte|half swap probe		*/
 {
 	uint32_t	l;
@@ -386,7 +397,7 @@ typedef struct Delta_s			/* delta archive info		*/
 	char		hdrbuf[64];	/* header buffer		*/
 	int		ordered;	/* members ordered by file name	*/
 	off_t		size;		/* expected base size		*/
-	Hash_table_t*	tab;		/* entry table			*/
+	Dt_t*		tab;		/* entry table			*/
 	int		trailer;	/* optional trailer size	*/
 	char*		version;	/* optional delta version	*/
 } Delta_t;
@@ -461,7 +472,7 @@ typedef struct Pattern_s
 	int		sum;		/* collect running checksum	*/ \
 	int		swap;		/* swap operation		*/ \
 	int		swapio;		/* io swap operation		*/ \
-	Hash_table_t*	tab;		/* verification table		*/ \
+	Dt_t*		tab;		/* verification table		*/ \
 	Bio_t		tio;		/* temporary buffered io	*/ \
 	struct \
 	{ \
@@ -473,7 +484,7 @@ typedef struct Pattern_s
 	off_t		total;		/* newio() total io check	*/ \
 	char*		type;		/* archive type			*/ \
 	off_t		uncompressed;	/* uncompressed size estimate	*/ \
-	Hash_table_t*	update;		/* update info			*/ \
+	Dt_t*		update;		/* update info			*/ \
 	size_t		updated;	/* number of updated members	*/ \
 	int		warnlinkhead;	/* invalid hard link header	*/
 
@@ -543,7 +554,7 @@ typedef struct Pattern_s
 	int		intermediate;	/* intermediate ouput - rename	*/ \
 	int		interrupt;	/* this signal caused exit	*/ \
 	Link_f		linkf;		/* -L=pathsetlink() -P=link()	*/ \
-	Hash_table_t*	linktab;	/* hard link table		*/ \
+	Dt_t*		linktab;	/* hard link table		*/ \
 	char*		listformat;	/* verbose listing format	*/ \
 	int		local;		/* reject files/links outside .	*/ \
 	struct \
@@ -577,7 +588,7 @@ typedef struct Pattern_s
 	char*		mtime;		/* output date(1) mtime		*/ \
 	int		newer;		/* append only if newer		*/ \
 	int		operation;	/* IN|OUT operation mode	*/ \
-	Hash_table_t*	options;	/* option table			*/ \
+	Dt_t*		options;	/* option table			*/ \
 	int		ordered;	/* sorted base and file list	*/ \
 	int		owner;		/* set owner info		*/ \
 	Archive_t*	out;		/* output archive info		*/ \
@@ -606,7 +617,7 @@ typedef struct Pattern_s
 	int		trailerlen;	/* file trailer length		*/ \
 	}		record;		/* record info			*/ \
 	int		resetacctime;	/* reset input file access times*/ \
-	Hash_table_t*	restore;	/* post proc restoration table	*/ \
+	Dt_t*		restore;	/* post proc restoration table	*/ \
 	Sfio_t*		rtty;		/* tty file read pointer	*/ \
 	int		scanned;	/* scanned for format libs	*/ \
 	size_t		selected;	/* total of selected members	*/ \
@@ -656,6 +667,7 @@ extern char*		defoutput;
 extern char*		eomprompt;
 extern Format_t*	formats;
 extern State_t		state;
+extern Dtdisc_t		Linkdisc;
 
 extern int		addlink(Archive_t*, File_t*);
 extern int		apply(Archive_t*, File_t*, Filter_t*);
@@ -720,6 +732,8 @@ extern void		nospace(void);
 extern unsigned long	omemsum(const void*, int, unsigned long);
 extern int		openin(Archive_t*, File_t*);
 extern int		openout(Archive_t*, File_t*);
+extern char*		optinstall(const char*, Option_t*);
+extern Option_t*	optlookup(const char*);
 extern int		paxdelta(Archive_t*, Archive_t*, File_t*, int, ...);
 extern void		paxinit(Pax_t*, const char*);
 extern int		portable(Archive_t*, const char*);

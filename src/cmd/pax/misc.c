@@ -186,7 +186,8 @@ selectfile(register Archive_t* ap, register File_t* f)
 		d->uncompressed = f->uncompressed;
 		if (!(d->info = (File_t*)memdup(f, sizeof(File_t))) || !(d->info->st = (struct stat*)memdup(f->st, sizeof(struct stat))))
 			nospace();
-		d->info->name = d->info->path = hashput(ap->parent->delta->tab, f->name, d);
+		d->info->name = d->info->path = d->name = strdup(f->name);
+		dtinsert(ap->parent->delta->tab, d);
 		if (d->info->linktype != NOLINK)
 			d->info->linkpath = strdup(d->info->linkpath);
 		if (d->info->uidname)
@@ -200,7 +201,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 	}
 	if (!match(f->path))
 		return 0;
-	if (f->type != X_IFDIR && ap->update && (d = (Member_t*)hashget(ap->update, f->name)))
+	if (f->type != X_IFDIR && ap->update && (d = (Member_t*)dtmatch(ap->update, f->name)))
 	{
 		if (f->type != X_IFREG && d->dev != f->st->st_dev)
 			/* keep */;
@@ -230,7 +231,8 @@ selectfile(register Archive_t* ap, register File_t* f)
 			d->offset = ap->io->offset + ap->io->count;
 			d->size = f->st->st_size;
 			d->uncompressed = f->uncompressed;
-			hashput(ap->tab, f->path, d);
+			d->name = strdup(f->path);
+			dtinsert(ap->tab, d);
 		}
 	}
 	if (state.ordered && ap->delta && !(ap->delta->format->flags & COMPRESS) && (bp = ap->delta->base))
@@ -475,13 +477,13 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 
 	if (fmt->t_str)
 	{
-		if (!(op = (Option_t*)hashget(state.options, fmt->t_str)))
+		if (!(op = optlookup(fmt->t_str)))
 		{
 			if (*fmt->t_str != '$')
 				return 0;
 			if (!(op = newof(0, Option_t, 1, 0)))
 				nospace();
-			op->name = hashput(state.options, 0, op);
+			op->name = optinstall(fmt->t_str, op);
 			op->macro = getenv(fmt->t_str + 1);
 			op->index = OPT_environ;
 			op->flags |= OPT_DISABLE;

@@ -331,7 +331,7 @@ extend(Archive_t* ap, File_t* f, int type)
 	unsigned long		n;
 	char*			s;
 	char*			fmt;
-	Hash_position_t*	pos;
+	Optalias_t*		oap;
 	Option_t*		op;
 	Sfio_t*			sp;
 	Value_t*		vp;
@@ -363,113 +363,109 @@ extend(Archive_t* ap, File_t* f, int type)
 	default:
 		return 0;
 	}
-	if (pos = hashscan(state.options, 0))
+	for (oap = (Optalias_t*)dtfirst(state.options); oap; oap = (Optalias_t*)dtnext(state.options, oap))
 	{
-		while (hashnext(pos))
+		op = oap->option;
+		if ((op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER && op->name == oap->name && (op->level == lev || op->level == alt))
 		{
-			op = (Option_t*)pos->bucket->value;
-			if ((op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER && op->name == pos->bucket->name && (op->level == lev || op->level == alt))
+			message((-5, "extend %s level=%d:%d:%d entry=%d:%d perm=(%s,%I*d) temp=(%s,%I*d)", op->name, op->level, lev, alt, op->entry, ap->entry, op->perm.string, sizeof(op->perm.number), op->perm.number, op->temp.string, sizeof(op->temp.number), op->temp.number));
+			vp = &op->perm;
+			s = vp->string;
+			switch (op->index)
 			{
-				message((-5, "extend %s level=%d:%d:%d entry=%d:%d perm=(%s,%I*d) temp=(%s,%I*d)", op->name, op->level, lev, alt, op->entry, ap->entry, op->perm.string, sizeof(op->perm.number), op->perm.number, op->temp.string, sizeof(op->temp.number), op->temp.number));
-				vp = &op->perm;
-				s = vp->string;
-				switch (op->index)
-				{
-				case OPT_atime:
-				case OPT_ctime:
-				case OPT_mtime:
-					if (op->flags & OPT_SET)
-						s = vp->string;
-					else if (type != EXTTYPE)
-						continue;
-					else
-					{
-						switch (op->index)
-						{
-						case OPT_atime:
-							tvgetatime(&tv, f->st);
-							break;
-						case OPT_mtime:
-							tvgetmtime(&tv, f->st);
-							break;
-						case OPT_ctime:
-							tvgetctime(&tv, f->st);
-							break;
-						}
-						if (!tv.tv_nsec && op->index == OPT_mtime)
-							continue;
-						s = num + sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
-						while (*(s - 1) == '0')
-							s--;
-						if (*(s - 1) == '.')
-							*s++ = '0';
-						*s = 0;
-						s = num;
-					}
-					break;
-				case OPT_comment:
-					s = state.header.comment;
-					break;
-				case OPT_gid:
-					if (op->flags & OPT_SET)
-						f->st->st_gid = vp->number;
-					else
-					{
-						if (type != EXTTYPE)
-							f->st->st_gid = state.gid;
-						if ((uint32_t)f->st->st_gid <= (unsigned long)07777777)
-							continue;
-					}
-					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_gid), f->st->st_gid);
-					break;
-				case OPT_gname:
-					if (op->flags & OPT_SET)
-						f->gidname = s;
-					else if (!f->gidname || strlen(f->gidname) < TARSIZEOF(gname) && portable(ap, f->gidname))
-						continue;
-					s = f->gidname;
-					break;
-				case OPT_size:
-#if _typ_int64_t
-					if (type == GLBTYPE)
-						continue;
-					if (!(f->st->st_size >> 32) && !(state.test & 1))
-						continue;
-					state.test &= ~1;
-					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_size), f->st->st_size);
-					break;
-#else
+			case OPT_atime:
+			case OPT_ctime:
+			case OPT_mtime:
+				if (op->flags & OPT_SET)
+					s = vp->string;
+				else if (type != EXTTYPE)
 					continue;
-#endif
-				case OPT_uid:
-					if (op->flags & OPT_SET)
-						f->st->st_uid = vp->number;
-					else
+				else
+				{
+					switch (op->index)
 					{
-						if (type != EXTTYPE)
-							f->st->st_uid = state.uid;
-						if ((unsigned long)f->st->st_uid <= (unsigned long)07777777)
-							continue;
+					case OPT_atime:
+						tvgetatime(&tv, f->st);
+						break;
+					case OPT_mtime:
+						tvgetmtime(&tv, f->st);
+						break;
+					case OPT_ctime:
+						tvgetctime(&tv, f->st);
+						break;
 					}
-					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_uid), f->st->st_uid);
-					break;
-				case OPT_uname:
-					if (op->flags & OPT_SET)
-						f->uidname = s;
-					else if (!f->uidname || strlen(f->uidname) < TARSIZEOF(uname) && portable(ap, f->uidname))
+					if (!tv.tv_nsec && op->index == OPT_mtime)
 						continue;
-					s = f->uidname;
-					break;
-				default:
-					if (!s && (op->flags & OPT_SET))
-						sfsprintf(s = num, sizeof(num), "%ld", vp->number);
-					break;
+					s = num + sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
+					while (*(s - 1) == '0')
+						s--;
+					if (*(s - 1) == '.')
+						*s++ = '0';
+					*s = 0;
+					s = num;
 				}
-				if (s && type != TARTYPE)
-					putkey(ap, sp, op, s, 0);
+				break;
+			case OPT_comment:
+				s = state.header.comment;
+				break;
+			case OPT_gid:
+				if (op->flags & OPT_SET)
+					f->st->st_gid = vp->number;
+				else
+				{
+					if (type != EXTTYPE)
+						f->st->st_gid = state.gid;
+					if ((uint32_t)f->st->st_gid <= (unsigned long)07777777)
+						continue;
+				}
+				sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_gid), f->st->st_gid);
+				break;
+			case OPT_gname:
+				if (op->flags & OPT_SET)
+					f->gidname = s;
+				else if (!f->gidname || strlen(f->gidname) < TARSIZEOF(gname) && portable(ap, f->gidname))
+					continue;
+				s = f->gidname;
+				break;
+			case OPT_size:
+#if _typ_int64_t
+				if (type == GLBTYPE)
+					continue;
+				if (!(f->st->st_size >> 32) && !(state.test & 1))
+					continue;
+				state.test &= ~1;
+				sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_size), f->st->st_size);
+				break;
+#else
+				continue;
+#endif
+			case OPT_uid:
+				if (op->flags & OPT_SET)
+					f->st->st_uid = vp->number;
+				else
+				{
+					if (type != EXTTYPE)
+						f->st->st_uid = state.uid;
+					if ((unsigned long)f->st->st_uid <= (unsigned long)07777777)
+						continue;
+				}
+				sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_uid), f->st->st_uid);
+				break;
+			case OPT_uname:
+				if (op->flags & OPT_SET)
+					f->uidname = s;
+				else if (!f->uidname || strlen(f->uidname) < TARSIZEOF(uname) && portable(ap, f->uidname))
+					continue;
+				s = f->uidname;
+				break;
+			default:
+				if (!s && (op->flags & OPT_SET))
+					sfsprintf(s = num, sizeof(num), "%ld", vp->number);
+				break;
 			}
+			if (s && type != TARTYPE)
+				putkey(ap, sp, op, s, 0);
 		}
-		hashdone(pos);
 	}
         if (type == TARTYPE)
                 split = 0;
@@ -967,7 +963,7 @@ static int
 pax_putprologue(Pax_t* pax, register Archive_t* ap, int append)
 {
 	Format_t*		fp;
-	Hash_position_t*	hp;
+	Optalias_t*		hp;
 	Option_t*		op;
 	Delta_format_t*		dp;
 
@@ -975,15 +971,11 @@ pax_putprologue(Pax_t* pax, register Archive_t* ap, int append)
 		nospace();
 	if (append)
 		return 0;
-	if (hp = hashscan(state.options, 0))
+	for (hp = (Optalias_t*)dtfirst(state.options); hp; hp = (Optalias_t*)dtnext(state.options, hp))
 	{
-		while (hashnext(hp))
-		{
-			op = (Option_t*)hp->bucket->value;
-			if ((op->flags & OPT_GLOBAL) && op->name == hp->bucket->name && (op->level == 3 || op->level == 0) && op->perm.string)
-				putkey(ap, ap->tmp.global, op, op->perm.string, 0);
-		}
-		hashdone(hp);
+		op = hp->option;
+		if ((op->flags & OPT_GLOBAL) && op->name == hp->name && (op->level == 3 || op->level == 0) && op->perm.string)
+			putkey(ap, ap->tmp.global, op, op->perm.string, 0);
 	}
 	if (ap->delta && !(ap->delta->format->flags & PSEUDO))
 	{

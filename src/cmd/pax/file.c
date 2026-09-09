@@ -964,7 +964,7 @@ addlink(register Archive_t* ap, register File_t* f)
 	}
 	else if (f->st->st_nlink <= 1)
 		return 1;
-	if (p = (Link_t*)hashget(state.linktab, (char*)&id))
+	if (p = (Link_t*)dtmatch(state.linktab, &id))
 	{
 		if (ap->format->flags & NOHARDLINKS)
 		{
@@ -1025,9 +1025,10 @@ addlink(register Archive_t* ap, register File_t* f)
 	f->link = p;
 	strcpy(p->name = (char*)p + sizeof(*p), f->name);
 	p->namesize = n;
+	p->key = id;
 	p->id.dev = f->st->st_dev;
 	p->id.ino = f->st->st_ino;
-	hashput(state.linktab, NiL, p);
+	dtinsert(state.linktab, p);
 	return -1;
  toomany:
 	if (!state.warnlinknum)
@@ -1147,6 +1148,7 @@ void
 setfile(register Archive_t* ap, register File_t* f)
 {
 	register Post_t*	p;
+	Restore_t*		rp;
 	int			updated;
 	Post_t			post;
 
@@ -1215,7 +1217,11 @@ setfile(register Archive_t* ap, register File_t* f)
 			}
 			else
 				p->restoremode = f->restoremode;
-			hashput(state.restore, f->name, p);
+			if (!(rp = newof(0, Restore_t, 1, 0)))
+				error(3, "not enough space for file restoration info");
+			rp->name = strdup(f->name);
+			rp->post = p;
+			dtinsert(state.restore, rp);
 			ap->updated++;
 			return;
 		}

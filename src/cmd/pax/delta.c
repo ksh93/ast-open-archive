@@ -29,6 +29,8 @@
 
 #include <update.h>
 
+static Dtdisc_t		Memberdisc = { offsetof(Member_t, name), -1, offsetof(Member_t, dict) };
+
 /*
  * interpret delta header/trailer ops
  */
@@ -104,7 +106,7 @@ getdeltaheader(register Archive_t* ap, register File_t* f)
 		if (ap->delta && ap->delta->format && (ap->delta->format->variant == DELTA_94 || ap->delta->format->variant == DELTA_IGNORE && state.delta2delta))
 		{
 			ap->delta->index++;
-			if (ap->delta->tab && f->name && (f->delta.base = (Member_t*)hashget(ap->delta->tab, f->name)))
+			if (ap->delta->tab && f->name && (f->delta.base = (Member_t*)dtmatch(ap->delta->tab, f->name)))
 				f->delta.base->mark = 1;
 			if (!(ap->format->flags & DELTAINFO))
 			{
@@ -227,7 +229,7 @@ setdeltaheader(register Archive_t* ap, register File_t* f)
 			putkey(ap, ap->tmp.extended, &options[OPT_delta_op], s, 0);
 			putkey(ap, ap->tmp.extended, &options[OPT_uncompressed], NiL, f->uncompressed);
 			putkey(ap, ap->tmp.extended, &options[OPT_delta_index], NiL, ap->delta->index);
-			if (ap->delta->tab && (f->delta.base = (Member_t*)hashget(ap->delta->tab, f->name)))
+			if (ap->delta->tab && (f->delta.base = (Member_t*)dtmatch(ap->delta->tab, f->name)))
 				putkey(ap, ap->tmp.extended, &options[OPT_delta_checksum], NiL, f->delta.base->info->checksum & 0xffffffff);
 		}
 		else
@@ -294,7 +296,7 @@ initdelta(Archive_t* ap, Format_t* dp)
 {
 	if (!ap->delta && !(ap->delta = newof(0, Delta_t, 1, 0)))
 		nospace();
-	if (!ap->delta->tab && !(ap->delta->tab = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_name, "delta", 0)))
+	if (!ap->delta->tab && !(ap->delta->tab = dtopen(&Memberdisc, Dtset)))
 		nospace();
 	ap->delta->format = dp;
 }
@@ -369,14 +371,12 @@ deltaverify(Archive_t* ap)
 	register Member_t*	d;
 	register off_t		c;
 	register off_t		n;
-	Hash_position_t*	pos;
 
-	if (!state.delta.update && !state.list && ap->delta && ap->delta->base != ap && (pos = hashscan(ap->delta->tab, 0)))
+	if (!state.delta.update && !state.list && ap->delta && ap->delta->base != ap)
 	{
 		message((-2, "verify untouched base files"));
-		while (hashnext(pos))
+		for (d = (Member_t*)dtfirst(ap->delta->tab); d; d = (Member_t*)dtnext(ap->delta->tab, d))
 		{
-			d = (Member_t*)pos->bucket->value;
 			message((-1, "%s: mark=%d", d->info->name, d->mark));
 			if (!d->mark && selectfile(ap, d->info) && (wfd = openout(ap, d->info)) >= 0)
 			{
@@ -411,7 +411,6 @@ deltaverify(Archive_t* ap)
 				else paxdelta(NiL, ap, d->info, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ap->delta->base->io->fd, d->offset, d->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT|DELTA_LIST, wfd, 0);
 			}
 		}
-		hashdone(pos);
 	}
 }
 
@@ -429,12 +428,13 @@ deltaprefix(Archive_t* ip, Archive_t* op, register Member_t* d)
 	if (s = strrchr(d->info->path, '/'))
 	{
 		*s = 0;
-		if (!(m = (Member_t*)hashget(ip->delta->tab, d->info->name)))
+		if (!(m = (Member_t*)dtmatch(ip->delta->tab, d->info->name)))
 		{
 			if (!(m = newof(0, Member_t, 1, 0)))
 				nospace();
 			m->mark = 1;
-			hashput(ip->delta->tab, 0, m);
+			m->name = strdup(d->info->name);
+			dtinsert(ip->delta->tab, m);
 		}
 		else if (!m->mark)
 			deltaprefix(ip, op, m);
@@ -457,7 +457,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 
 	skip = !!ip;
 	f->delta.same = 0;
-	if (d = op->delta && op->delta->tab && f->name ? (Member_t*)hashget(op->delta->tab, f->name) : (Member_t*)0)
+	if (d = op->delta && op->delta->tab && f->name ? (Member_t*)dtmatch(op->delta->tab, f->name) : (Member_t*)0)
 		d->mark = 1;
 	if (op->delta && (op->delta->format->flags & DELTAIO))
 	{
@@ -516,7 +516,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 		if (ip && ip->delta && ip->delta->tab && f->name && (s = strrchr(f->name, '/')))
 		{
 			*s = 0;
-			if ((d = (Member_t*)hashget(ip->delta->tab, f->name)) && !d->mark)
+			if ((d = (Member_t*)dtmatch(ip->delta->tab, f->name)) && !d->mark)
 				deltaprefix(ip, op, d);
 			*s = '/';
 		}
@@ -566,40 +566,34 @@ deltadelete(register Archive_t* ap)
 {
 	register File_t*	f;
 	register Member_t*	d;
-	Hash_position_t*	pos;
 
 	if (!state.ordered && ap->delta && ap->delta->tab)
 	{
-		if (pos = hashscan(ap->delta->tab, 0))
+		message((-2, "copy the base delete entries"));
+		f = &ap->file;
+		for (d = (Member_t*)dtfirst(ap->delta->tab); d; d = (Member_t*)dtnext(ap->delta->tab, d))
 		{
-			message((-2, "copy the base delete entries"));
-			f = &ap->file;
-			while (hashnext(pos))
+			if (!d->mark && (!d->info || !d->info->ro))
 			{
-				d = (Member_t*)pos->bucket->value;
-				if (!d->mark && (!d->info || !d->info->ro))
+				ap->selected++;
+				initfile(ap, f, f->st, d->name, X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
+				f->delta.op = DELTA_delete;
+				if (d->info && d->info->st)
 				{
-					ap->selected++;
-					initfile(ap, f, f->st, pos->bucket->name, X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
-					f->delta.op = DELTA_delete;
-					if (d->info && d->info->st)
-					{
-						f->st->st_mode = d->info->st->st_mode;
-						f->st->st_gid = d->info->st->st_gid;
-						f->st->st_uid = d->info->st->st_uid;
-						f->st->st_mtime = d->info->st->st_mtime;
-					}
-					else
-					{
-						f->st->st_gid = state.uid;
-						f->st->st_uid = state.gid;
-						f->st->st_mtime = NOW;
-					}
-					putheader(ap, f);
-					puttrailer(ap, f);
+					f->st->st_mode = d->info->st->st_mode;
+					f->st->st_gid = d->info->st->st_gid;
+					f->st->st_uid = d->info->st->st_uid;
+					f->st->st_mtime = d->info->st->st_mtime;
 				}
+				else
+				{
+					f->st->st_gid = state.uid;
+					f->st->st_uid = state.gid;
+					f->st->st_mtime = NOW;
+				}
+				putheader(ap, f);
+				puttrailer(ap, f);
 			}
-			hashdone(pos);
 		}
 	}
 }
@@ -616,9 +610,9 @@ deltapass(Archive_t* ip, Archive_t* op)
 	register ssize_t	n;
 	Member_t*		d;
 	Member_t*		h;
+	Member_t*		t;
 	char*			p;
 	Filter_t*		fp;
-	Hash_position_t*	pos;
 
 	if (state.delta2delta != 2)
 		state.delta2delta = 0;
@@ -720,7 +714,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 			case DELTA_delete:
 				if (!f->delta.base)
 					error(3, "%s: base archive mismatch [%s#%d]", f->name, __FILE__, __LINE__);
-				if (ip->delta && (d = (Member_t*)hashget(ip->delta->tab, f->name)))
+				if (ip->delta && (d = (Member_t*)dtmatch(ip->delta->tab, f->name)))
 					d->info->delta.op = DELTA_delete;
 				break;
 			case DELTA_update:
@@ -766,48 +760,39 @@ deltapass(Archive_t* ip, Archive_t* op)
 		 * copy the non-empty untouched base hard links first
 		 */
 
-		if (pos = hashscan(ip->delta->tab, 0))
+		message((-2, "copy non-empty untouched base hard links"));
+		for (d = (Member_t*)dtfirst(ip->delta->tab); d; d = (Member_t*)dtnext(ip->delta->tab, d))
 		{
-			message((-2, "copy non-empty untouched base hard links"));
-			while (hashnext(pos))
+			if (!d->mark && d->info->linktype != HARDLINK && d->info->st->st_size > 0 && selectfile(op, d->info))
 			{
-				d = (Member_t*)pos->bucket->value;
-				if (!d->mark && d->info->linktype != HARDLINK && d->info->st->st_size > 0 && selectfile(op, d->info))
-				{
-					d->mark = 1;
-					deltacopy(ip, op, d->info);
-				}
+				d->mark = 1;
+				deltacopy(ip, op, d->info);
 			}
-			hashdone(pos);
 		}
 
 		/*
 		 * copy the remaining untouched base files and deletes
 		 */
 
-		if (pos = hashscan(ip->delta->tab, 0))
+		message((-2, "copy remaining untouched base files"));
+		for (d = (Member_t*)dtfirst(ip->delta->tab); d; d = (Member_t*)dtnext(ip->delta->tab, d))
 		{
-			message((-2, "copy remaining untouched base files"));
-			while (hashnext(pos))
+			t = d;
+			if (!t->mark && selectfile(op, t->info))
 			{
-				d = (Member_t*)pos->bucket->value;
-				if (!d->mark && selectfile(op, d->info))
+				t->mark = 1;
+				if (t->info->linktype == HARDLINK)
 				{
-					d->mark = 1;
-					if (d->info->linktype == HARDLINK)
+					if (!(h = (Member_t*)dtmatch(ip->delta->tab, t->info->linkpath)))
+						error(1, "%s: %s: %s: hard link not in base archive", ip->name, t->info->name, t->info->linkpath);
+					else if (!h->mark || h->info->delta.op == DELTA_delete)
 					{
-						if (!(h = (Member_t*)hashget(ip->delta->tab, d->info->linkpath)))
-							error(1, "%s: %s: %s: hard link not in base archive", ip->name, d->info->name, d->info->linkpath);
-						else if (!h->mark || h->info->delta.op == DELTA_delete)
-						{
-							h->info->name = d->info->name;
-							d = h;
-						}
+						h->info->name = t->info->name;
+						t = h;
 					}
-					deltacopy(ip, op, d->info);
 				}
+				deltacopy(ip, op, t->info);
 			}
-			hashdone(pos);
 		}
 	}
 	deltadelete(op);

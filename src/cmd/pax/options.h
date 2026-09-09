@@ -175,4 +175,11 @@ typedef struct Option_s
 	Value_t		temp;
 } Option_t;
 
+typedef struct Optalias_s		/* state.options dictionary entry */
+{
+	Dtlink_t	dict;		/* state.options dictionary link */
+	char*		name;		/* state.options dictionary key	*/
+	Option_t*	option;		/* referenced option		*/
+} Optalias_t;
+
 extern Option_t		options[];

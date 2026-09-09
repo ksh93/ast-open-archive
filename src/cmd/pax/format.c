@@ -249,8 +249,8 @@ getprologue(register Archive_t* ap)
 		 * no hard links between volumes
 		 */
 
-		hashfree(state.linktab);
-		if (!(state.linktab = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(Fileid_t), HASH_name, "links", 0)))
+		dtclose(state.linktab);
+		if (!(state.linktab = dtopen(&Linkdisc, Dtset)))
 			error(3, "cannot re-allocate hard link table");
 	}
 	return 1;
